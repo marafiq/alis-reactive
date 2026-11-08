@@ -7,7 +7,7 @@ namespace Intake;
 
 public static class ValidatorOfAnotherType
 {
-    public static void Refused(Pipeline<IntakeView> pipeline)
-        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form("intake"))
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
             .Validate<BedValidator>();
 }

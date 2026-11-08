@@ -17,7 +17,7 @@ meaning, and `spec/Core/Schema.tla` checks that what C# accepts is what the brow
   `assertNever`, or, for plugin data, the plugin the plan names. `none` has no handler: it is the plugin data of
   a plugin that contributes nothing.
 - S5 A path is a list of path steps (Q1): a JSON string is a member, a non-negative JSON integer is an index, and
-  `{"kind":"each"}` is every item of a list. `each` appears only in a form's registration paths.
+  `{"kind":"each"}` is every item of a list. `each` appears only in a registration's paths.
 - S6 A name in a path is the member's wire name for the host the view renders on (Q2).
 - S7 The plan's `version` is 7. A plan of another version is JSON the framework did not produce, refused at
   boot with one error.
@@ -120,8 +120,8 @@ or the connection before it opens (D21.11).
 | `none` | nothing | | the plugin contributes nothing to the owner: http, document, slot (its key is the container id, D12.1), an app's plugin |
 | `hub` | `offer`: whether the core shows the reconnect offer, the app's startup choice | | the owner holds the hub's connection while it lives (D12.6, D21.11) |
 | `stream` | `offer`: as a hub's | | the owner holds the stream's connection while it lives, as a hub's (D21.6, D21.11) |
-| `model` | `inputs`: a map from input id to `InputBinding` | | the inputs this plan renders, by id (D13.2, D14.3) |
-| `form` | `summary`: the summary element's id | `live`: `Live`; `registrations`: a list of `Registration` | this plan's rules for the form whose element id is the key (Q16) |
+| `model` | `inputs`: a map from input id to `InputBinding`; `containers`: a map from element id to `Container` | | the inputs and the request containers this plan renders, by id (D13.2, D14.3, D14.8) |
+| `form` | | `registration`: `Registration` | this plan's rules of one validator under one rule set, its key the validator's key and the rule set's name, so no element id meets it (D16.2) |
 
 `InputBinding` carries:
 - `name`: its binding name, the name the server speaks (D1.7);
@@ -133,10 +133,16 @@ or the connection before it opens (D21.11).
 
 Its shape and list flag of 65fdf118d leave into `value`.
 
-`Live` carries `validator` and `ruleSet`, the check live validation runs (D16.15), and `body`, an expression
-that reads the form's inputs as the form sends them (D16.5).
+`Container` carries:
+- `model`: the key of the model its block was rendered for (D14.8);
+- `kind`: `form` or `element`, the element its block rendered;
+- `summary`: its summary element's id (D13.6);
+- `live`: none, or the `Live` its inputs are checked by (D16.15).
 
-`Registration` is one validator's rules under one rule set, for the form (D16.2). It carries:
+`Live` carries `validator` and `ruleSet`, the check live validation runs (D16.15), and `body`, an expression
+that reads the container's inputs as the container sends them (D16.5).
+
+`Registration` is one validator's rules under one rule set, for every check by them in its plan (D16.2). It carries:
 - `validator`: the validator's key;
 - `ruleSet`: the rule set's name;
 - `start`: the JSON of the model's start (D16.6);
@@ -182,9 +188,9 @@ a list of `RuleTest`. `RuleTest` carries:
 
 The verdict on 65fdf118d's `FormField` (`items` as `fn(sent)`, `value` as `fn(i, sent)`) and `FormPluginData.live`,
 raised after the fact in the brief:
-- The item and value functions leave. A field is a path with `each`, read over one checked body, and the form's
+- The item and value functions leave. A field is a path with `each`, read over one checked body, and the form
   plugin walks it (D1.5, D16.14).
-- `live` stays, as `Live`, with the validator and rule set it runs.
+- `live` stays, as a container's `Live`, with the validator and rule set it runs.
 
 ## Statements
 
@@ -288,9 +294,10 @@ no argument type of its own (D9.1).
 - `HttpSend`, the argument of `alis.http`'s `send` (N9.1):
   - `method`: GET, HEAD, OPTIONS, POST, PUT or DELETE (D9.3);
   - `url`, a page path or an absolute `http` or `https` URI, as path parts and the URL's own query (D9.23);
-  - `query`, which a GET's `Form` fills with its form's inputs (N10.7);
+  - `query`, which a GET's `Form`, `Inputs` and `Input`s fill (N10.7);
   - `body`: none, JSON, URL-encoded, multipart with its fields and file parts, text, or one file as the whole body,
-    with the inputs of an element it sends (D9.6 to D9.10, D9.15, D9.16, D9.21);
+    with the inputs it sends: a native form's submission set, a container's framework inputs, its `Input`s (D9.6 to
+    D9.10, D9.15, D9.16, D9.21);
   - `headers` (D9.11, D9.12);
   - `antiforgery`: none, or the token C# wrote where the view rendered and its place, the header or the field, on a
     POST, PUT or DELETE to the page's origin (D9.22);
@@ -303,9 +310,14 @@ no argument type of its own (D9.1).
 
   A request's trace context is its run's and is not in `HttpSend` (D20.3).
 - `HttpResponse`, what `send` returns (N10.2, N10.7): `ok`, `status`, `outcome`, `headers`, `request`, the members as
-  the request sent them, and `body`, absent for kind none and every HEAD route.
-- `FormCheck`, the argument of `alis.form`'s `validate`: the validator, the rule set and the sent body with its
-  format (D16.5, N16.2).
+  the request sent them, `inputs`, the inputs it sent, each its binding name and the entry the inputs table held
+  (D10.18), and `body`, absent for kind none and every HEAD route.
+- `FormCheck`, the argument of `alis.form`'s `validate`: the registration's key, the body the request sends with its
+  format and the inputs it read (D10.18), and the request's `FormPlace` (D16.5, N16.2). A check with no request reads
+  its container's inputs as the body (N16.3).
+- `FormPlace`, where a request's failures show (D16.13): the summary of its container, by the container's id, or the
+  notice with the separator that joins the messages, a space. `alis.form`'s `showErrors` takes a `ValidationProblem`,
+  the response's `inputs` and the `FormPlace`.
 
 ## Kinds
 
@@ -388,7 +400,9 @@ The diff beyond the kinds, each with the decision that makes it:
   passed as an argument (D17.12);
 - `Vendor.payload` leaves (D17.4);
 - `InputBinding` gains `message` (D16.13), and `shape` and `list` leave into `value` (N3.3);
-- `FormPluginData.fields` becomes `registrations`, and `FormField`'s `items` and `value` functions leave (D16.14);
+- `FormPluginData` becomes one `Registration`, keyed by validator and rule set and by no element; its `summary` and
+  `live` move to `model`'s `containers` as `Container`; and `FormField`'s `items` and `value` functions leave (D16.2,
+  D14.8, D16.14);
 - `PlanDocument` gains `culture` (N3.4), `timeZone` (N3.5) and `trace` (Q20), and `version` becomes 7;
 - `number` gains `of` and `text` (D3.11);
 - the operator set loses four conversions (N3.1);
@@ -397,5 +411,5 @@ The diff beyond the kinds, each with the decision that makes it:
   (D8.7), so `Arm` leaves;
 - `HttpSend`'s methods become six and its bodies six formats, and it gains `antiforgery` and `busy`; its `retry`
   takes the defaults' numbers only (D9.3, D9.21, D9.22, D10.14, D10.21);
-- `HttpResponse` gains `headers` and `request` (N10.7);
+- `HttpResponse` gains `headers`, `request` and `inputs` (N10.7, D10.18), and `FormPlace` joins `FormCheck` (D16.13);
 - plugin data `hub` and `stream` gain `offer` (D21.11).

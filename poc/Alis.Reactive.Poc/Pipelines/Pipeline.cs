@@ -28,7 +28,7 @@ public sealed class Pipeline<TModel>
         where TPlugin : Plugin, new()
         => Reached.Plugin<TPlugin>(Build);
 
-    public BoundInput Input<TValue>(Expression<Func<TModel, TValue>> member)
+    public BoundInput<TValue> Input<TValue>(Expression<Func<TModel, TValue>> member)
         => new(Build, Build.Names.Of(member).Id);
 
     public Guard<TModel> When(TypedSource<bool> condition)
@@ -47,7 +47,7 @@ public sealed class Pipeline<TModel>
         => Trigger.Listen(Build, source, raised, pipeline);
 }
 
-public sealed class BoundInput
+public sealed class BoundInput<TValue>
 {
     private readonly PlanBuild _build;
     private readonly string _id;

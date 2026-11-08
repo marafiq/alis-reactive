@@ -7,6 +7,6 @@ namespace Intake;
 
 public static class VerbAsExtension
 {
-    public static void Refused(Pipeline<IntakeView> pipeline)
-        => pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request.Form("intake"));
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+        => pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake));
 }

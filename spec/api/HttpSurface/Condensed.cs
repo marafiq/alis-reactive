@@ -17,7 +17,17 @@ public static class CondensedRequests
         where TValue : struct
         => throw new NotSupportedException();
 
-    public static QueryParts<TRequest> Form<TRequest>(this QueryParts<TRequest> request, string formId) => throw new NotSupportedException();
+    public static QueryParts<TRequest> Form<TRequest>(this QueryParts<TRequest> request, RequestForm<TRequest> form) => throw new NotSupportedException();
+
+    public static QueryParts<TRequest> Inputs<TRequest>(this QueryParts<TRequest> request, RequestContainer<TRequest> container) => throw new NotSupportedException();
+
+    public static QueryParts<TRequest> Input<TRequest, TMember, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
+        where TValue : TMember
+        => throw new NotSupportedException();
+
+    public static QueryParts<TRequest> Input<TRequest, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
+        where TValue : struct
+        => throw new NotSupportedException();
 
     public static BodyParts<TRequest> Set<TRequest, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
         => throw new NotSupportedException();
@@ -29,7 +39,17 @@ public static class CondensedRequests
         where TValue : struct
         => throw new NotSupportedException();
 
-    public static BodiedParts<TRequest> Form<TRequest>(this BodyParts<TRequest> request, string formId) => throw new NotSupportedException();
+    public static BodiedParts<TRequest> Form<TRequest>(this BodyParts<TRequest> request, RequestForm<TRequest> form) => throw new NotSupportedException();
+
+    public static BodiedParts<TRequest> Inputs<TRequest>(this BodyParts<TRequest> request, RequestContainer<TRequest> container) => throw new NotSupportedException();
+
+    public static BodyParts<TRequest> Input<TRequest, TMember, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
+        where TValue : TMember
+        => throw new NotSupportedException();
+
+    public static BodyParts<TRequest> Input<TRequest, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
+        where TValue : struct
+        => throw new NotSupportedException();
 
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
         => throw new NotSupportedException();
@@ -38,6 +58,14 @@ public static class CondensedRequests
         => throw new NotSupportedException();
 
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
+        where TValue : struct
+        => throw new NotSupportedException();
+
+    public static BodiedParts<TRequest> Input<TRequest, TMember, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
+        where TValue : TMember
+        => throw new NotSupportedException();
+
+    public static BodiedParts<TRequest> Input<TRequest, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
         where TValue : struct
         => throw new NotSupportedException();
 

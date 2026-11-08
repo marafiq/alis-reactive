@@ -25,17 +25,17 @@ Terms used throughout:
   `{"kind":"each"}`. A string is a member name whatever its text: `"[]"`, `"[*]"`, `"*"` and `"0"` are member
   names, never markers.
 - D1.3 Every path the plan carries uses this step: `get`, `call` and `set` paths, a handler's path, a
-  vendor's object path, an input binding's body path, a form field's path, and the member paths of a
+  vendor's object path, an input binding's body path, a registration field's path, and the member paths of a
   request.
 - D1.4 A dictionary entry is a member step whose name is the key's text as System.Text.Json writes the key
   as a property name. A dictionary whose key type System.Text.Json writes no property name for is refused
   where the view renders.
-- D1.5 `each` appears only in a form's registration paths (Q16, Q19). No read, write, call or subscription carries
+- D1.5 `each` appears only in a registration's paths (Q16, Q19). No read, write, call or subscription carries
   `each`; a projection over a list is `map` (Q6).
 - D1.9 On a read, a write or a call, an index step and a member step of the same digits reach the same item:
   JavaScript reads `a[1]` and `a["1"]` alike. POC 4 planted the position of `LiveObjects<T>.At(1)` as the member
   `"1"`, and the test that writes through it passed. The index step has its meaning where a body is built: an
-  input's body path writes the body a form sends, and a position there makes an array where a member makes an
+  input's body path writes the body a request sends, and a position there makes an array where a member makes an
   object (`Alis.Reactive.Assets/runtime/plugins/model.ts:156-162`, `assignAt`). POC 10, inputs, proves it in the
   browser. If POC 10 builds the body with no path, the index step leaves the grammar and a position is a member step.
 - D1.6 The MVC binding name is one function of a CLR member path, `BindingName`: member names joined by
@@ -79,8 +79,8 @@ Terms used throughout:
   `ReadOnly<IReadOnlyList<TField>>`, which has no `Set` (`Alis.Reactive/Components/JsMembers.cs:140`).
 - `X1.4` refusal: a dictionary keyed by a type System.Text.Json cannot write as a property name: "A dictionary
   keyed by {type} cannot be sent: System.Text.Json writes no property name for its keys; key it by text or a number."
-- `X1.5` behavior: a server error key `Members[1].Name` shows its message at the input rendered with that
-  binding name, and in the summary when no input has it.
+- `X1.5` behavior: a server error key `Members[1].Name` shows its message in the request's summary, and at the
+  input the request sent under that binding name.
 
 ## Q2. One read
 
@@ -88,7 +88,7 @@ Terms used throughout:
 - D2.1 Every value the plan reads is `get(target, path, members)` or `call(target, path, args, members)`, with
   typed paths (Q1). `members` is `required` or `optional`, and C# decides it from the holder (Q5).
 - D2.2 No plugin takes a member path as text. The model plugin's `valueOf(pattern)` and `sentValueOf(sent,
-  pattern)` leave; a form's check reads the body it sends with `get` over a typed path (Q16).
+  pattern)` leave; a request's check reads the body it sends with `get` over a typed path (Q16).
 - D2.3 A member's four names come from one derivation, `MemberPath`, built from the typed lambda, the
   declaring view's `HtmlFieldPrefix` and the member steps: the binding name (`BindingName`, D1.6), the body
   path (wire names, D2.4), the JSON name of a data read (D2.5), and the element id (Q14).
@@ -335,7 +335,7 @@ Terms used throughout:
   `RespectRequiredConstructorParameters`) stops every read through it; a holder that is not an object stops. A
   member is present when the value holds it, other than what every object inherits (`constructor`), with a value
   other than `undefined`. This covers a member of data, data past a declared member (a field of the value a property
-  holds, of each item of a list it holds) and the field a find returns. A form's check reads the starts the endpoint
+  holds, of each item of a list it holds) and the field a find returns. A check reads the starts the endpoint
   that binds its body leaves, by host and format (D16.6); a data read follows the contract of the data. A member
   written by its own JSON converter (`[JsonConverter]` on the member) holds what the converter writes, not its
   members, so a path that reads past it is refused where the view renders (X4.13), in a list's lambda, a `Find`'s
@@ -1068,7 +1068,7 @@ Terms used throughout:
   `spec/Core/translated-members.md`; array predicates and validator conditions use it.
 - D8.3 They differ in exactly these ways, by what each is:
   - The operands. A pipeline condition reads any source. An array predicate reads the item and values the
-    view supplies. A validator condition reads the members of the body its form's request sends (Q16).
+    view supplies. A validator condition reads the members of the body its request sends (Q16).
   - A term the lambda door cannot translate. In an array predicate it is refused where the view renders.
     In a validator condition it leaves the rule to the server, which decides it by what it is.
   - Order. A pipeline's `When`, `ElseIf` and `Else` run in authored order, and the first that holds wins.
@@ -1150,7 +1150,7 @@ Terms used throughout:
 - `X8.2` refusal: an array predicate with a term the lambda door cannot translate: "{term} has no browser form
   in an array predicate; use a member the framework translates, or move the test to the server."
 - `X8.3` behavior: a validator condition with a term the lambda door cannot translate gates its rules on the
-  server only; the browser sends the form and shows the server's message.
+  server only; the browser sends the request and shows the server's message.
 - `X8.4` behavior: `When(a).ElseIf(b).Else()` runs the first branch whose condition holds and no other.
 - `X8.5` refusal: a response body captured in a C# variable inside `OnSuccess` and read after the request is
   refused with "The response body of the request to {url} is read outside the block that binds it: read it
@@ -1209,8 +1209,8 @@ Terms used throughout:
 - D9.1 A request is one step, `let res = await $http.send(arg)`, and `arg` is the typed plugin argument
   `HttpSend`, a contract generated into the plan's TypeScript beside the grammar. The browser declares no
   request type of its own. The grammar gains no node (G2).
-- D9.2 The builder is staged: each part is written at most once, a GET has no body format, and `Form()` exists
-  only on a request that checks a form.
+- D9.2 The builder is staged: each part is written at most once, a GET has no body format, and every door that
+  sends inputs names what it sends (D9.15): no door sends the inputs of a form the request is taken to check.
 - D9.3 The method is GET, HEAD, OPTIONS, POST, PUT or DELETE. GET, HEAD and OPTIONS send no body; POST, PUT and
   DELETE send one. PATCH is not a method of 1.0 (spec/CLAUDE.md, the owner, 2026-11-07). An action answers HEAD only
   under `[HttpHead]` and OPTIONS only under `[HttpOptions]`, on both hosts: net10 answers HEAD to an `[HttpGet]`
@@ -1290,15 +1290,30 @@ Terms used throughout:
   C# name, from the values the generated table lists (D9.20), and the browser sends the C# name of the value whose form
   it holds. A held form no value writes stops the request, naming the member; a flags combination is among them,
   though both hosts bind its comma form (`probe:core-query-flags-enum`, `probe:mvc5-enum-flags-comma`), a gate 1 flag. In a JSON body an enum is its System.Text.Json form.
-- D9.14 A hidden input is an input: it binds by its binding name and shape, and a form sends it when the sent
-  element holds it.
-- D9.15 What a request sends is closed: members it sets from sources (`Set`), the inputs of the form it checks
-  (`Form()`), the inputs of one element (`Form(formId)`), and named inputs, each typed by its own lambda. When
-  an input and a set member send the same binding name, the input's value is sent, as the body the check reads
-  (Q16). An element `Form(formId)` names that the page lacks stops the request.
+- D9.14 A hidden input is an input: it binds by its binding name and shape, and a request sends it when the
+  container it sends holds it (D9.15).
+- D9.15 What a request sends is closed, and holds on a page with many forms or none (the owner, 2026-11-08):
+  - `Set(r => r.Member, value)`: a member from any source (Q7), a response's body included.
+  - `Form(form)`: a native `<form>`'s submission set as the browser builds it, `new FormData(form)`: every
+    form-associated control the form owns, one outside its element through the `form` attribute included,
+    hand-written inputs and file inputs among them, each under its `name`. It is sent only as form data
+    (URL-encoded or multipart) or as a GET's query, since a submission set is form data. In form-field mode the
+    framework's antiforgery field replaces any the form holds (`FormData.set`, D9.22), so the endpoint reads one.
+  - `Inputs(container)`: the framework inputs inside one element of any kind (a form, a fieldset, a table row, a
+    drawer's body), rendered by any plan, nested elements included, each under its binding name, in any body.
+  - `Input(r => r.Member, pipeline.Input(m => m.Member))`: one input of the request's own view, wherever it sits,
+    sent under the request member's binding name. The value type both lambdas share makes a member of another type
+    not compile (X9.3).
+  - A request sends at most one container, through `Form` or `Inputs`, and that container is the request's: its
+    summary is where the request's failures show (D16.13). A container is typed by its model, and a request takes
+    only a container of its own model (N18.3).
+  - When an input and a set member send the same binding name, the input's value is sent, as the body the check
+    reads (Q16); two inputs that send one scalar binding name are D13.4's.
+  - A container whose element the page lacks stops the request, and so does an `Input` whose input the page lacks.
+  - The run records each input it sent, under the binding name it sent it by (D10.18).
 - D9.16 A file is the shape `file`, sent only in form data or as the whole body. A set member of file shape in a
   request with no body, a JSON, URL-encoded or text body
-  is refused by an analyzer; a file input a form sends in a GET or a JSON body stops the request when it is sent.
+  is refused by an analyzer; a file input a request sends in a GET or a JSON body stops the request when it is sent.
 - D9.17 Requests in one pipeline run one after another, each after the one before it settles. ALIS008 keeps
   refusing a second request in one pipeline, with its reason corrected: `Chained` runs a request after another
   succeeds, and `Parallel` sends them at once.
@@ -1440,14 +1455,21 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `probe:js-query-get-case`
 **Doors.**
 - kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:58-62`), `Gather` and
-  `Gather<TRequest>`, `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`), `Header`, `Form()`,
-  `Form(formId)`, `AsJson`, `AsFormData`.
+  `Gather<TRequest>`, `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`), `Header`,
+  `AsJson`, `AsFormData`, and `Form(formId)` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:146`), its meaning
+  narrowed to a native form's submission set and its argument the form's typed handle (D9.15, N18.3). The inputs of an
+  element of another kind that it sent are `Inputs(container)`'s.
+- refused: `Form()`, the inputs of the form the request checks, since a request names what it sends; its feature is
+  carried by `Form(form)` and `Inputs(container)` (D9.15).
 - `N9.1` new: `internal sealed class HttpSend` in `Alis.Reactive/PluginArguments`, with its parts `PathPart`,
   `SentField`, `SentBody` and `SentHeader`, generated into the plan's TypeScript; it replaces the hand-typed
   `HttpRequest` (`Alis.Reactive.Assets/runtime/plugins/http.ts:10-18`).
-- `N9.2` new: the staged builder: a GET builder with no body format, and `Form()` only on a request that checks.
-- `N9.3` new: named inputs typed one by one, `Field(m => m.Member)`, replacing
-  `Form(params Expression<Func<TModel, object?>>[])` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`).
+- `N9.2` new: the staged builder: a GET builder with no body format, `Form` only over a native form and only in form
+  data or a GET's query, and one container a request.
+- `N9.3` new: a named input typed by the member it fills, `Input(r => r.Member, pipeline.Input(m => m.Member))`
+  (N10.7, N14.4), replacing `Form(params Expression<Func<TModel, object?>>[])`
+  (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`). Its fallback to another view's input of the same
+  name, the one that joined the page last, leaves for `Inputs(container)` (D13.3).
 - `N9.4` new: analyzer ALIS029, a file-shaped set member in a GET or a JSON body.
 - `N9.5` new: ALIS008's corrected message
   (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`).
@@ -1468,7 +1490,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 
 **Defects.**
 - `X9.1` type: a body format on a GET does not compile: new:N9.2.
-- `X9.2` type: `Form()` on a request that checks no form does not compile: new:N9.2.
+- `X9.2` type: `Form()` naming no form does not compile, and neither does `Form` given a container that is not a
+  form: new:N9.2.
 - `X9.3` type: a named input whose type the request member does not hold does not compile: new:N9.3.
 - `X9.4` analyzer: a file-shaped set member in a GET or a JSON body: new:N9.4.
 - `X9.5` refusal: a placeholder no member fills: "The URL '{url}' has the placeholder {name}, and the request has no
@@ -1484,14 +1507,21 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `X9.12` refusal: a fixed header value with a line break: "The header {name} holds a line break, which HTTP does
   not carry in a field value; send it in the body."
 - `X9.13` behavior: a header read as text past US-ASCII sends no request, and the console names the header.
+- `X9.14` type: `Form` inside a JSON body does not compile: new:N9.2.
+- `X9.15` behavior: a native form's `<select form="intake">` outside the form's element is sent with the form's other
+  controls and its hand-written `<input name="Code">`, and the endpoint reads one antiforgery field.
+- `X9.16` behavior: a fieldset container inside the intake form: the fieldset's request sends the fieldset's inputs
+  only, and the form's request sends both.
+- `X9.17` behavior: a request that reaches a container by its id under a model it was not rendered for stops before
+  it sends, the network log holds no request, and the console names the id and both models.
 
 ## Q10. The request's flow and its response
 
 **Decision.**
 - D10.1 A request runs in this closed order: its check, then `WhileLoading`, then, inside a `try` whose
-  `finally` is the request's `Finally`, its guards (route values, the element `Form(formId)` names), the send
+  `finally` is the request's `Finally`, its guards (route values, the container it sends, its `Input`s), the send
   and one response route; then `Chained`; then the steps after the request.
-- D10.2 A form check that fails shows its messages, sends nothing, runs neither `WhileLoading` nor `Finally`,
+- D10.2 A check that fails shows its failures (D16.13), sends nothing, runs neither `WhileLoading` nor `Finally`,
   and stops its pipeline: no step after the request runs.
 - D10.3 A `WhileLoading` that stops sends nothing, runs no `Finally` and stops its pipeline. `Finally` runs
   exactly when `WhileLoading` ran, after every outcome, a stop inside a route included. The defaults' layer wraps the
@@ -1538,8 +1568,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   status 400, written by a framework door: on net10 MVC's `ValidationProblemDetails`
   (`probe:core-validation-problem-shape`), on net48 the same JSON with `TrySkipIisCustomErrors` set, the switch
   System.Web gives a response that keeps its own error body under IIS (`probe:systemweb-try-skip-iis-custom-errors`).
-  The browser reads that body only: a message shows at the input whose binding name is its key, else in the
-  form's summary.
+  The browser reads that body only and shows it as it shows its own verdict (D16.13): every message in the
+  request's summary place, and each also at the input the request sent under its key.
 - D10.9 `Chained` runs after the first request's success route and its `Finally`, only on success, and reads the
   first response's data.
 - D10.10 `Parallel` sends its requests at once. Each runs its own route as its response arrives, a stop in one
@@ -1550,7 +1580,7 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - D10.11 `Into(element)` loads the success body's HTML into the element as a slot (Q12): what the element held
   unloads first.
 - D10.12 Request defaults are configured once in C# and hold headers (D9.12), the busy indicator and the notice
-  (D10.21), the form's 400 route (D10.17), `WhileLoading` steps, `Finally`
+  (D10.21), the 400 route that shows a request's failures (D10.17), `WhileLoading` steps, `Finally`
   steps, error routes by status, a catch-all error route and a retry policy. C# composes them into every
   request where the view renders; the browser holds no defaults. A request's `WhileLoading` runs after the
   defaults', and its `Finally` before the defaults'. A request takes the defaults' retry policy or `NoRetry()`, and
@@ -1591,9 +1621,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     `Chained` request and a `Parallel` branch are one request each, with no pipeline around them
     (`Alis.Reactive/PlanAuthoring/Requests/ResponseBuilder.cs:116`,
     `Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:42`).
-  - A part the request sends takes a condition: a member `Set`, a form's inputs, a named field and a header.
+  - A part the request sends takes a condition: a member `Set`, a container's inputs, a named input and a header.
     When the condition fails, the part is left out, as if it were never gathered. The endpoint binds the
-    member's starting value (D9.10), and the form's check reads the member as the endpoint binds it (Q16).
+    member's starting value (D9.10), and the check reads the member as the endpoint binds it (Q16).
     A part whose condition fails is never sent as nothing, which a nullable member would bind as null.
   - A chained request whose condition fails is not sent, and the steps after the first request run. A
     parallel branch whose condition fails sends nothing and settles at once.
@@ -1609,8 +1639,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   that writes only its method, its URL, what it sends and its success takes every other part from its
   defaults (D10.12): the loading steps, `Finally`, the error routes and the retry policy. A default part is
   written for each request where the view renders and reads that request's own parts: its method, its URL,
-  the form it checks and the form it sends. So a default route for 400 shows the errors at the request's own
-  form. A part the request writes replaces or adds to its default, as D10.12 and D10.13 state. The condensed
+  its check and what it sends. So a default route for 400 shows the errors at the request's own summary place and
+  the inputs it sent (D16.13). A part the request writes replaces or adds to its default, as D10.12 and D10.13 state. The condensed
   form and the full form write the same plan. The condensed form's syntax goes to gate 2 (step 7), with what
   what a `.cshtml` MVC view makes hard in its lambdas as its input.
 
@@ -1620,6 +1650,11 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   - A response's data belongs to its run. The plan has no door that writes into it, and the generated contract types
     it read-only, so the runtime's own code cannot write into it either. A step that hands it, or any data value, to a
     vendor or a plugin (a `set` or a call argument) hands a structured copy (`probe:js-structured-clone-separate`).
+  - The run records, as it sends, each input it sent: the binding name it sent it under and the entry the inputs
+    table held for it (D13.1). An answer shows a message inline only at an entry the table still holds, so an input
+    that left with its slot, or one a reload of its slot mounted again under the same id, shows nothing inline, and
+    the summary place shows every message (`Ownership.tla:FailureReachesSummary`,
+    `Ownership.tla:InlineOnlyAtTheSentInput`).
     What a component does with what it is given is its own: one that edits it edits its copy, and a `Chained`
     request's gather, a `Finally` and the steps after a `Parallel` read the response as the server sent it. Evidence
     that a consumer edits what it is given: `probe:ej2-data-manager-edits-source`, a fact only; the core takes no
@@ -1655,8 +1690,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     2026-11-08: the loader shows on the right target, parallel requests of 5 and 1 seconds updating one target or two).
     A request holds the indicator on its targets, which the C# derives where the view renders and the plan carries, so
     the browser infers nothing: each element and component its success route writes outside any condition (a text, an
-    HTML, a class, a component's member or method), the element its `Into(elementId)` loads and the form its
-    `Form(formId)` sends. A notice, a plugin, a dispatch and a step inside a branch add none, and a request whose route
+    HTML, a class, a component's member or method), the element its `Into(elementId)` loads and the element of the
+    container its `Form` or `Inputs` sends. An `Input`, a notice, a plugin, a dispatch and a step inside a branch add
+    none, and a request whose route
     writes nothing so holds the page's own target, an indicator with no element. On the full form `Busy(elementId, ..)`
     names the targets in place of those, `Busy()` names the page, and `NoBusy()` holds none. The cost is said plainly: a
     route that writes five elements marks five busy, as aria-busy means of each element being modified, and one
@@ -1698,6 +1734,8 @@ and `notice` (D10.21).
 - `Request.tla:OneRouteRuns`
 - `Request.tla:SuccessWithNoRouteRunsNone`
 - `Request.tla:FailureRunsTheCatchAll`
+- `Ownership.tla:FailureReachesSummary`
+- `Ownership.tla:InlineOnlyAtTheSentInput`
 - `Request.tla:ChainedOnlyAfterSuccess`
 - `Request.tla:StepsAfterRunUnlessStopped`
 - `Request.tla:RetriesOnlyWhatIsRetryable`
@@ -1729,7 +1767,10 @@ and `notice` (D10.21).
 
 **Doors.**
 - kept: `Response`, `OnSuccess`, `OnSuccess<T>`, `OnError`, `OnError(status)` and their typed forms, `Chained`,
-  `Parallel` with `OnAllSettled`, `WhileLoading`, `Finally`, `Into`, `Validate` and `ValidationErrors(formId)`.
+  `Parallel` with `OnAllSettled`, `WhileLoading`, `Finally`, `Into` and `Validate`, which checks the body its request
+  sends (D16.2). `ValidationErrors(formId)` (`Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:291`) becomes
+  `ShowErrors(problem)`, a step of a request's route that shows the problem as that request's failures (D16.13); a
+  route shows no other container's failures, since a message maps only to the inputs its own request sent (D13.3).
 - `N10.1` new: the error door on each host, `ValidationResult.ToErrorResponse()`: net10 a `ValidationProblemDetails`
   result, net48 a JSON result with status 400 and `TrySkipIisCustomErrors`, replacing the body each app builds by hand.
 - `N10.2` new: `HttpResponse`, the contract of what `send` returns (`ok`, `status`, `outcome`, `body`).
@@ -1756,22 +1797,26 @@ and `notice` (D10.21).
     block fails CS1061 (`spec/api/refused.sh`: `VerbAsExtension`, `VerbAsExtensionBlock`, `PageUrlAsExtension`, on SDK
     10.0.101; the block form also on 11.0.100-rc.1). An instance member binds it
     (`poc/Alis.Reactive.Poc/Pipelines/Pipeline.cs:39`), and the stub's `PipelineVerbs<TModel>`, which stands in for
-    `Pipeline<TModel>` since the POC's is sealed, compiles every verb and `PageUrl` so, each checked against the classic
+    `Pipeline<TModel>` since the POC's is sealed, compiles every verb, `PageUrl` and `Container` so, each checked against the classic
     form's types in `VerbsAgree`. So a door the view calls with one type
-    argument is an instance member of the type it is called on: the verbs and `PageUrl<TPage>()` on `Pipeline<TModel>`,
-    `OnSuccess<T>` and `OnError<T>` on the request types. A condensed door with no type argument (`Set`, `Form`,
-    `OnSuccess(pipeline => ..)`, `Into`, `Download`, `Notice`) is an extension method over them. The modules: the verbs,
+    argument is an instance member of the type it is called on: the verbs, `PageUrl<TPage>()` and
+    `Container<TContainer>(containerId)` on `Pipeline<TModel>`, `OnSuccess<T>` and `OnError<T>` on the request types. A
+    door with no type argument to name (`Set`, `Form`, `Inputs`, `Input`, `OnSuccess(pipeline => ..)`, `Into`,
+    `Download`, `Notice`, `ShowErrors`, `Validate(container)`) is an extension method over them. The modules: the verbs,
     the request types, `RequestDefaults` and `NoModel` are `Pipelines`', as the POC's `Pipelines/Requests.cs` is, since
     each takes a pipeline; the objects a request reads (`Response`, `Failure`, `Content`, `Markup`, `ResponseFile`,
-    `BrowserFile`, `PageUrl`, `ValidationProblem`) are `Requests`', which names no pipeline; `AddReactiveRequests` and
+    `BrowserFile`, `PageUrl`, `ValidationProblem`, `RequestContainer`, `RequestForm`) are `Requests`', which names no
+    pipeline; `AddReactiveRequests` and
     the net48 filter are `Hosting`'s. `Hosting` depends on `Pipelines`, `Pipelines` on `Requests`, and none returns
     (`spec/api/HttpSurface` builds with each type in its module's namespace).
   - the verbs, instance members of `Pipeline<TModel>`: `Get`, `Head`, `Options`, `Post`, `Put`
     and `Delete`, each `(url)` or `<TRequest>(url, request => ..)`. The request lambda holds the HTTP parts: `Route(r =>
     r.M, value)`, `Query(r => r.M, value)`, `Header(name, value)`, and on POST, PUT and DELETE one body door, `Json`,
-    `UrlEncoded`, `Multipart`, `Text` or `File`, and on every method `Form(formId)`, a GET's inputs going to its query.
-    Refused where the view renders, as no type stops them: a second body door, a `Set` after a `Text` or `File` body,
-    a second `Form` on a GET, HEAD or OPTIONS request, a second `Busy` or `NoBusy`, and a second `Chained`. A value is a literal or any source (Q7); a member lambda dot-walks
+    `UrlEncoded`, `Multipart`, `Text` or `File`. The doors that send inputs (D9.15) are `Inputs(container)` and
+    `Input(r => r.M, input)` in every body and on a GET, and `Form(form)` in a URL-encoded or multipart body and on a
+    GET; a GET's inputs go to its query. Refused where the view renders, as no type stops them: a second body door, a
+    `Set` after a `Text` or `File` body, a second container (`Form` or `Inputs`) on one request, a second `Busy` or
+    `NoBusy`, and a second `Chained`. A value is a literal or any source (Q7); a member lambda dot-walks
     (`r => r.Handover.Round`). `Header` refuses `Content-Type`, `Accept`, the antiforgery header and the Fetch
     Standard's forbidden request headers.
   - staged by type: GET, HEAD and OPTIONS offer no body door; `NoRetry()` exists on GET, HEAD, OPTIONS, PUT and DELETE
@@ -1779,7 +1824,7 @@ and `notice` (D10.21).
     the defaults' `Retry(attempts, firstWait)` sets once (`RetryPerRequest`, `NoRetryOnPost` in `spec/api/refused.sh`); HEAD offers no content reader; `File` exists only inside `Multipart` or as the whole body; a
     success route returns the request carrying its reply's type, which offers no second success route and whose
     `Chained` receives that reply. A `Set` on a file member stays D9.16's analyzer, since `Set` takes a member of any
-    type, and a file input a GET's `Form` sends stops the request when it is sent (D9.16). A file member is `IFormFile`
+    type, and a file input a GET's `Form` or `Inputs` sends stops the request when it is sent (D9.16). A file member is `IFormFile`
     or a list of it on net10 and MVC 5's posted-file base or a list of it on net48, behind `#if NET48`. A request
     `Header(name, source)` whose source's wire form is a list or an object is refused where the view renders, as the
     POC refuses a list in a path segment (`poc/Alis.Reactive.Poc/Types/WireForms.cs`), since no C# constraint names a
@@ -1788,9 +1833,11 @@ and `notice` (D10.21).
     (reply, pipeline) => ..)` and the catch-all `OnError((failed, pipeline) => ..)`, with the readers `Content.None`,
     `Content.Json<T>()`, `Content.Text`, `Content.Html` and `Content.File` (D10.6). `OnSuccess<T>` returns a request that
     carries `T`, so its `Chained((reply, next) => ..)` receives the typed reply by construction. `Validate<TValidator>()`,
-    `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the form the request sends (Q16); `Busy(elementId, ..)`,
+    `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the body the request sends (Q16); `Busy(elementId, ..)`,
     `Busy()` and `NoBusy()` say where its busy indicator shows (D10.21); `WhileLoading`, `Finally`, `NoDefaults()` and
-    `NoValidation()` complete it.
+    `NoValidation()` complete it. `ShowErrors(problem)` is a step of a route's pipeline that shows any
+    `ValidationProblem` source, a 400's body or another route's, as the request's failures (D16.13), refused where the
+    view renders on a pipeline that is no request's route.
   - the objects, each a JS object whose members are sources: `Response<TRequest>` (`Status`, `Headers.Get(name)` and
     `Request`, the request's members as it sent them, read as `TRequest`, which a read of the input cannot give once the
     user edits it during the send), the reply of a route of kind none and of every HEAD route, and
@@ -1803,8 +1850,9 @@ and `notice` (D10.21).
     its text does not convert. Keys are compared ignoring case, as both hosts bind them (`probe:core-query-key-case`,
     `probe:mvc5-query-key-case`), which `URLSearchParams.get` does not (`probe:js-query-get-case`).
   - the condensed doors, which write the plan the full form writes: `Set(r => r.M, value)`, placed by
-    D9.4, D9.6 and D9.9 into `Route`, `Query` or the body the request names, else multipart (D10.22); `Form(formId)`,
-    the form's inputs as multipart fields and file parts plus `Validate` for the validator registered for `TRequest`;
+    D9.4, D9.6 and D9.9 into `Route`, `Query` or the body the request names, else multipart (D10.22); `Form(form)` and
+    `Inputs(container)`, sent as multipart fields and file parts, a GET's into its query; `Input(r => r.M, input)`,
+    placed as `Set` is. Every request is checked by the validator registered for `TRequest` (D16.2), whatever it sends;
     `OnSuccess(pipeline => ..)` of kind none, `OnSuccess<T>((reply, pipeline) => ..)` and `OnError<T>(status, ..)` of kind
     JSON, `Into(elementId)` of kind HTML and `Download()` of kind file; and `Notice()` with `Success`, `Error`, `Warning`
     and `Info` over the notice contract (D10.21).
@@ -1830,7 +1878,7 @@ and `notice` (D10.21).
   ```csharp illustration
   pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request
           .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
-          .Form("intake"))
+          .Form(intake))
       .OnSuccess<IntakeCreated>((created, done) => done.Notice().Success("Resident admitted"))
       .Chained((created, next) => next
           .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
@@ -1841,17 +1889,18 @@ and `notice` (D10.21).
           .Route(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
           .Multipart(body => body
               .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
-              .Form("intake")))
+              .Form(intake)))
       .Validate<IntakeValidator>()
       .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
-      .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.Form("intake").ShowErrors(refused.Body))
+      .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))
       .Chained((created, next) => next
           .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
               .Route(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
           .OnSuccess(Content.Html, (summary, loaded) => loaded.Into("resident-summary", summary.Body)));
   ```
   The first is the condensed form under defaults that hold `ShowBusy()`, `ShowValidationErrors()` and a catch-all notice;
-  the second writes the same plan less those defaults' parts, which both compose identically.
+  the second writes the same plan less those defaults' parts, which both compose identically. `intake` is the
+  `RequestForm<IntakeRequest>` the view's form block returns (N14.3).
 - `N10.6` new: the net48 JSON response door, a result that writes its body through System.Text.Json under the
   options the app registers with the framework (D2.6, D2.9), so dates are ISO 8601 (D3.10) and names follow
   the app's naming on both hosts.
@@ -2080,7 +2129,7 @@ and `notice` (D10.21).
 - D12.2 What a plan asks for belongs to its plan's owner:
   - its handlers' listeners, on any element or object, the page's included;
   - its holds on a hub or a stream;
-  - its forms' field registrations, with their rules;
+  - its registrations, with their rules, and its containers, each with its summary and live check;
   - its runs (Q11).
 - D12.3 What HTML carries belongs to the owner of the innermost slot around it, else the page:
   - the components mounted in it, which construct on `alis:mount` and destroy themselves on `alis:unmount`;
@@ -2106,9 +2155,9 @@ and `notice` (D10.21).
 - D12.6 A hub or a stream is held by every owner whose plans name it. The connection opens at the first hold
   and closes at the last release, and its retry offer goes with it. A step reaches only a held connection.
 - D12.7 Live validation is one capture-phase listener per page. An input an event reaches is checked by the
-  field registrations of the live plans that name it. Nothing is wired per element, so nothing per element
-  is released. A field registration leaves with its plan's owner, so a slot's required field no longer holds
-  the page's save once the slot unloads. What a check reads for a member whose input is gone is Q16's.
+  live checks of the containers that hold it (D16.15). Nothing is wired per element, so nothing per element
+  is released. A registration and a container leave with their plan's owner, so a slot's own checks leave with
+  the slot. What a check reads for a member whose input is gone is Q16's.
 - D12.8 An event of a live object a pipeline reaches (an object an event's payload holds, an object a method
   returns, an item of a list) is listened to by a step written in that pipeline, `listen`, with a vendor's
   listening, a payload declaration and a policy, as a handler has. Its listener:
@@ -2245,31 +2294,37 @@ plans name.
   | a hub's or a stream's connection, by URL, with its holders (Q12) | the page |
   | the contracts `busy`, `notice` and `reconnect`, by plugin name (D10.21, D21.11), and the app-level confirm and drawer, by fixed id | the page |
   | the one live-validation listener (D12.7) | the page |
-  | the form's field registrations, by binding name, item fields by `[*]` | the form |
-  | the inputs the form sends or checks: those inside its element at that moment | the form |
-  | the server's messages, each at the input inside the form that binds its key, else the summary | the form |
-  | the summary, `{formId}_validation_summary`, one per form | the form |
+  | a validator's registration under a rule set, its fields by binding name, item fields by `[*]` | the plan that renders the request or the container that checks by it, keyed by validator and rule set |
+  | the table of containers by element id, each with its model, its kind, its summary and its live check | the page, each entry under its owner |
+  | the inputs a container sends or checks: those inside its element at that moment | the container |
+  | the inputs a request sent, by binding name, each as the inputs table held it | the request, until it settles |
+  | a request's failures: every one in its summary place, each also at the input it sent under that key | the request's container's summary, else the notice |
+  | the summary, one per container, rendered by the container's block | the container |
   | listeners, holds, registrations and runs | the owner (Q12) |
   | a plan's culture and time zone, written by C# for the view (D3.11, D3.12) | the owner, by its plan |
   | the argument, the attempts, the response and the route of one request | the request, until it settles |
 
 - D13.2 A plan's id keys nothing: it names the plan in traces only, and many plans of a page share one id freely.
-- D13.3 A read of a member by its binding name belongs to a form. It reads the input inside the form's element
-  that binds the name, as the form sends it. A page-wide read by binding name is refused: two views can bind
-  one name, so on a page a name names no single input. That ends the chain of guesses that read the last
-  contributed input, then the plan's own. A read of a member's input outside a form is the component read
-  by its element id, which Q14 derives the same way in every view that renders the member.
-- D13.4 Two inputs inside one form that bind one scalar binding name stop the request or the check that reads
-  them, with one logged error that names both element ids. Form data binds the first value and JSON the last
+- D13.3 A read of a member by its binding name belongs to a container. It reads the input inside the container's
+  element that binds the name, as the container sends it. A page-wide read by binding name is refused: two views can
+  bind one name, so on a page a name names no single input. That ends the chain of guesses that read the last
+  contributed input, then the plan's own. A read of a member's input outside a container is `pipeline.Input(m =>
+  m.Member)` (N14.4), by the element id Q14 derives the same way in every view that renders the member.
+- D13.4 Two inputs a request or a check sends under one scalar binding name (two inside its container, or an
+  `Input` and one inside its container) stop the request or the check, with one logged error that names both
+  element ids. Form data binds the first value and JSON the last
   on both hosts (`probe:core-form-duplicate-name`, `probe:core-json-duplicate-name`,
   `probe:mvc5-form-duplicate-first`, `probe:mvc5-json-duplicate-last`), so the browser cannot know which one
   the endpoint binds. A list's inputs carry indexed names and are not duplicates.
-- D13.5 A form's rule for each item is written once, by a path with `each` (D1.5). It checks every item row inside
-  the form when the form checks, whoever rendered the row: the page, a list partial, or a slot's content.
-- D13.6 No plan renders a summary of its own. The summary is rendered once per form by the door that renders
-  the form (Q14), and a form's messages outlive a slot that joined the form and left.
+- D13.5 A rule for each item is written once, by a path with `each` (D1.5). A check runs it on every item row its
+  body holds, the rows inside the container it sends, whoever rendered the row: the page, a list partial, or a
+  slot's content.
+- D13.6 No plan renders a summary of its own. A container's one summary is rendered by the block that renders the
+  container (Q14), and its messages outlive a slot that joined the container and left. A request that sends no
+  container shows its failures in the notice (D16.13).
 
-**Schema nodes.** The plugin data `form` (its field registrations and summary id) and `model` (the inputs table),
+**Schema nodes.** The plugin data `form` (a registration, keyed by validator and rule set) and `model` (the
+inputs table and the containers table),
 and `request` state, which the schema does not hold: a request's state is its run's.
 
 **Checker.**
@@ -2281,8 +2336,15 @@ and `request` state, which the schema does not hold: a request's state is its ru
 - `probe:mvc5-json-duplicate-last`
 
 **Doors.**
-- kept: `Form()`, `Form(formId)`, `Form(fields)`, `Validate<TValidator>(formId)`, `ValidationErrors(formId)`.
-- `N13.1` new: a form's typed read of a member as the form sends it, the one read by binding name (D13.3); its
+- kept: `Form(formId)`, its meaning narrowed to a native form's submission set and its argument the form's typed
+  handle (D9.15, N18.3).
+- refused: `Form()`, carried by `Form(form)` and `Inputs(container)`, which name what they send (D9.2); `Form(fields)`,
+  carried by `Input(r => r.Member, input)` (N9.3); `Validate<TValidator>(formId)`, carried by a request's own check
+  (D16.2) and the check with no request, `Validate(container)` (N16.3); `ValidationErrors(formId)`, carried by
+  `ShowErrors(problem)` (N10.7); `PageForm`, which no door returns, since a request's failures show at its own summary
+  place (D16.13); `Html.FormSummary(formId)` (`Alis.Reactive/Razor/PlanExtensions.cs:98`), carried by the container's
+  block (N14.3).
+- `N13.1` new: a container's typed read of a member as the container sends it, the one read by binding name (D13.3); its
   form goes to gate 2. It carries `p.Bound(m => ..)`, whose page-wide read by name is refused.
 
 **Evidence.**
@@ -2300,12 +2362,12 @@ and `request` state, which the schema does not hold: a request's state is its ru
 **Defects.**
 - `X13.1` behavior: two partials of different models each render an input that binds `Value`, each in its own
   form; each card's save sends its own value.
-- `X13.2` behavior: a form holding two inputs that bind one name sends nothing on save, and the console names
+- `X13.2` behavior: a container holding two inputs that bind one name sends nothing on save, and the console names
   both element ids.
-- `X13.3` behavior: a row a slot loads into the form is checked by the page's item rule when the form saves.
+- `X13.3` behavior: a row a slot loads into the container is checked by the page's item rule when its request saves.
 - `X13.4` behavior: a server message for a member an editor template rendered shows beside that input.
-- `X13.5` behavior: two forms on one page keep their own summaries, and a form's summary stays after a slot that
-  joined it unloads.
+- `X13.5` behavior: two containers on one page keep their own summaries, and a container's summary stays after a
+  slot that joined it unloads.
 
 ## Q14. MVC partials and ids
 
@@ -2318,12 +2380,12 @@ and `request` state, which the schema does not hold: a request's state is its ru
   - The redesign's per-request record (`Alis.Reactive/Razor/RenderedPage.cs:29`) is refused for that
     reason, and each of its uses moves to D14.6 to D14.8.
 - D14.2 Plans compose in the browser without merging. Each plan belongs to its owner (Q12), and it reaches
-  what another view rendered through the page's input table by element id, or through the form by binding
+  what another view rendered through the page's input table by element id, or through a container by binding
   name (Q13).
   - Main merged the plans of one plan id: components replaced by key, behaviors appended in order.
   - The rewrite carries each part. A component another view renders is located by its element id, with
-    the vendor data of the reading plan's own typed declaration. Behaviors stay their own plan's. Rules and
-    messages are the form's.
+    the vendor data of the reading plan's own typed declaration. Behaviors stay their own plan's. Rules are the
+    registrations of the plan that checks by them, and messages are the request's (Q16).
   - So the plan id keys nothing (D13.2).
 - D14.3 A member has one binding name and one element id in every view that renders it:
   - The binding name is MVC's full field name under the view's `TemplateInfo` prefix (`probe:core-template-prefix-name`,
@@ -2383,8 +2445,13 @@ and `request` state, which the schema does not hold: a request's state is its ru
     partial's sections on both hosts (`probe:core-partial-section-dropped`,
     `probe:mvc5-sections-checked-in-layouts-only`). The page shows that defect.
   - A refusal by render order is refused: three commits guessed it, narrowed it and removed it.
-- D14.8 A form is a block in its view as well (N14.3). It renders the form's element and the form's one
-  summary, so no record of summaries rendered is needed (D13.6).
+- D14.8 A request container is a block in its view as well (N14.3): a native form, or an element of any other kind.
+  It renders the container's element and its one summary, so no record of summaries rendered is needed (D13.6), and
+  returns the container's handle, typed by the view's model: `RequestForm<TModel>` for a form, and
+  `RequestContainer<TModel>` for any container, a form included. Another view reaches a container by
+  `pipeline.Container<TModel>(containerId)`, which `Inputs` sends. A request that sends a container no live plan
+  renders under that id and model stops before it sends, with one error naming the id and both models, as a plan
+  composition defect (D14.6).
 
 **Schema nodes.** None new: the plan's object locators by element id, the plugin data `model` (inputs by id) and
 `slot` (container ids).
@@ -2403,10 +2470,12 @@ and `request` state, which the schema does not hold: a request's state is its ru
 - kept: `Html.ReactivePlan`, `Html.InputField`, `IdGenerator.For`, and MVC's own `Html.EditorFor`.
 - `N14.1` new: `Html.PartialFor(m => m.Member, view)`, the typed partial for a member, on both hosts.
 - `N14.2` new: the plan as a block of its view, whose end renders it; its form goes to gate 2.
-- `N14.3` new: the form as a block of its view, which renders the form's element and its summary; its form goes
+- `N14.3` new: the request container as a block of its view, which renders the container's element and its summary
+  and returns its typed handle (D14.8), and `pipeline.Container<TModel>(containerId)` for another view; their forms go
   to gate 2.
-- `N14.4` new: `pipeline.Input(m => m.Member)`, the input a member binds, reached by the id D14.3 gives it
-  (`.Component<T>()`). It replaces both lines' `Component<TComponent>(Expression<Func<TModel, object?>>)`, whose
+- `N14.4` new: `pipeline.Input(m => m.Member)`, the input a member binds, typed by the member's value as
+  `BoundInput<TValue>`, which a request sends (`Input`, D9.15) and whose `.Component<T>()` reaches the component by the
+  id D14.3 gives it. It replaces both lines' `Component<TComponent>(Expression<Func<TModel, object?>>)`, whose
   object-typed lambda ALIS009 refuses; its form goes to gate 2.
 
 **Evidence.**
@@ -2522,12 +2591,14 @@ and `request` state, which the schema does not hold: a request's state is its ru
 - D16.2 A check is one validator under one rule set, and that validator is the request's model's.
   - The request's model is the type its endpoint binds. A part of a model saved alone is its own model with its
     own validator (the owner, at 65fdf118d). `Validate<TValidator>` takes only `TValidator : ReactiveValidator<TRequest>`.
-  - For a check, the browser runs that validator's and rule set's registrations on the form, from every live plan,
-    each under its plan's prefix. A registration of another validator on the same form takes no part in the check.
-    The registrations are keyed by form, validator and rule set, so composing plans needs no merge by plan id (D14.2).
+  - The plan that renders a request carries its validator's registration under its rule set, keyed by validator and
+    rule set and by no element, and the check runs it over the body the request sends. A child validator's rules are
+    in it, under the member that holds them (D16.3), so no other plan's registration joins the check, and composing
+    plans needs no merge by plan id (D14.2). A check with no request runs the registration its container's plan
+    carries.
   - The condensed default (D10.17): a request whose model has a registered validator is checked by it under the
-    default rule set, with its messages in the form it sends. Naming a rule set, or no check, overrides it; the
-    form of the sentence goes to gate 2.
+    default rule set, whatever it sends, a container or none, with its failures placed by D16.13. Naming a rule set,
+    or no check (`NoValidation()`), overrides it; the form of the sentence goes to gate 2.
 - D16.3 A partial is attached or independent, and both nest (the owner, 2026-11-06).
   - Attached: a partial rendered for a member (`Html.PartialFor`, D14.4) has its own model and its own validator,
     and the parent's validator holds it with `SetValidator` or `ChildRules` on that member. One model has as many
@@ -2557,10 +2628,11 @@ and `request` state, which the schema does not hold: a request's state is its ru
   - The checked body is the endpoint's binding of the sent body. A sent member reads as the endpoint binds it:
     in form data an empty text binds null on both hosts (`probe:core-form-implicit-required`,
     `probe:mvc5-empty-text-null`). A member the body lacks reads its starting value (D16.6).
-  - Decision C: a request that sends no form element is checked on the members it sends beside it and on the
-    starting values of the rest, and the form's inputs it does not send are not read. This replaces 65fdf118d,
-    which read the validated form's inputs for such a request.
-  - A check with no request (`Validate`) and live validation read the form's inputs, as the form sends them.
+  - Decision C: a request is checked on what it sends and on the starting values of the rest. A request that sends
+    no container is checked on its `Set` members and its `Input`s, and no container's inputs are read. This replaces
+    65fdf118d, which read the validated form's inputs for such a request.
+  - The check with no request, `Validate(container)` (N16.3), and live validation read their container's inputs, as
+    the container sends them.
 - D16.6 Decision B: a starting value is the one the endpoint's binder leaves, for the request's host and body
   format. A member the body lacks reads from its nearest holder the body sends, at any depth, and that holder
   starts as this table says:
@@ -2583,7 +2655,7 @@ and `request` state, which the schema does not hold: a request's state is its ru
     reads from `{}` (`probe:core-stj-empty-object-start`). C# writes the start of each member a check reads, where the
     view renders, from the binding of the path down to it, as D4.2 reads data: a populated member's start hangs on
     its holder's, so one start per type cannot hold it (`spec/NOTES.md`, the second start probe). The model's path
-    starts at the validator's `T`, an item's at `RuleForEach`'s `TElement`. The plan carries each in the form's data.
+    starts at the validator's `T`, an item's at `RuleForEach`'s `TElement`. The plan carries each in the registration.
   - No hand reflection builds a start: the `Activator`, `GetConstructors` and `GetValue` reads of
     `ModelDefaults` leave (B11).
   - A type the endpoint's binder cannot create is refused where the view renders: on net48, a type with no
@@ -2652,24 +2724,34 @@ and `request` state, which the schema does not hold: a request's state is its ru
   each check of D16.10 and each condition of D16.8.
 - D16.13 A message's place is carried in the plan, never read from the page (B5).
   - C# writes each input's message element id beside the input's id, so the `_error` id convention leaves.
-  - The form's summary lists every failure of the check, and each failure also shows at its input's message
-    element when the checked body's member has an input in the form. Both are MVC's own pattern: a validation
-    summary that holds property errors, and a message for each field.
+  - Every failure of a check, the browser's verdict and the server's 400 alike, shows in the request's summary
+    place: the summary of the container it sends (D13.6), else the notice (D10.21), one notice of kind error whose
+    text joins the messages by the separator the plan carries, a space, since each message is a sentence. A request
+    whose summary place is the notice names the `notice` contract (D10.21).
+  - A failure also shows at the message element of the framework input the request sent under its binding name
+    (D10.18): an input inside its container, or its `Input`. A `Set` member, and a control of a native form's
+    submission set that is no framework input, have no message element, so their failures show in the summary place
+    only. An input that left the page before the answer shows nothing inline.
+  - Both are MVC's own pattern: a validation summary that holds property errors, and a message for each field.
   - No DOM visibility is read, so a message inside a hidden panel is still in the summary. The form of the
     summary goes to gate 2.
+  - `ShowErrors(problem)` places a `ValidationProblem` from any source the same way, a response's body included
+    (N10.7).
 - D16.14 `FormField` is designed once (P5):
   - its path as Q1's steps, every item as `each` (D13.5);
   - its value, the one read (Q2) of the checked body;
   - its tests, each a condition (Q8), a check and a message.
 
-  The form's data carries the starts of D16.6 once. `$model.sentValueOf` and `$model.sends` leave, since every
-  read is a `get` over one checked body (B3), and the form's plugin argument is a typed contract (D9.1).
-- D16.15 Live validation is D12.7's: typing clears an input's message, and blur and the input's commit check it
-  against the check with no request.
+  A registration carries the starts of D16.6 once. `$model.sentValueOf` and `$model.sends` leave, since every
+  read is a `get` over one checked body (B3), and the form plugin's argument is a typed contract (D9.1).
+- D16.15 Live validation is D12.7's, per container. A container's block carries its live check: its model's
+  registered validator under the default rule set, the rule set the block names, or none (the form goes to gate 2).
+  Typing clears an input's message, and blur and the input's commit check the input's member under the live check of
+  each container that holds it, each over its own container's inputs; a message two of them give shows once.
 
-**Schema nodes.** `fn`, `get`, `as`, `op`, `if`, `record`, `list`, `lit`; the plugin data `form`, with its
-registrations and starts as a typed contract (Q19); `$form.validate` and `$form.showErrors` as plugin calls. The
-grammar gains no node (G2).
+**Schema nodes.** `fn`, `get`, `as`, `op`, `if`, `record`, `list`, `lit`; the plugin data `form`, a registration with
+its starts as a typed contract (Q19), and `model`'s containers; `$form.validate` and `$form.showErrors` as plugin
+calls, each with the request's sent inputs and summary place. The grammar gains no node (G2).
 
 **Checker.**
 - `probe:core-form-nested-start`
@@ -2698,6 +2780,8 @@ grammar gains no node (G2).
 - `probe:whatwg-url-http`
 - `probe:js-regex-translated`
 - `Ownership.tla:RulesLeaveWithTheirOwner`
+- `Ownership.tla:FailureReachesSummary`
+- `Ownership.tla:InlineOnlyAtTheSentInput`
 - `Validation.tla:Agreement`, the browser's failures equal the door's over host, body format, creation handling,
   holder start, list item, decision C, the validator's scope and a typed text, with one invariant per aspect, each
   broken by a mutant that is today's reading at 65fdf118d:
@@ -2733,8 +2817,12 @@ grammar gains no node (G2).
 - `N16.1` new: the endpoint's validation door on both hosts. It binds, checks under the same validator and rule
   set, and answers D10.8's body or the bound model; its form goes to gate 2. It carries the endpoints' own
   `Validate` with `ErrorsByField`.
-- `N16.2` new: the form's typed plugin data, its registrations keyed by validator and rule set, and the starts of
-  D16.6.
+- `N16.2` new: the form plugin's typed data, a registration keyed by validator and rule set and by no element, with
+  the starts of D16.6, and the containers table of `model`'s data, each with its summary and live check.
+- `N16.3` new: `pipeline.Validate(container)`, the check with no request: the container model's registered validator
+  under the default rule set, over the container's inputs as it sends them; a failure shows as D16.13 places it and
+  stops its pipeline. It carries `Validate<TValidator>(formId)` of both lines; the form of naming a rule set goes to
+  gate 2.
 
 **Evidence.**
 - G10: a rule written once reaches both sides. `NotEmpty` reaches the browser, and `Must` stays on the server
@@ -2776,8 +2864,8 @@ grammar gains no node (G2).
 - `X16.5` behavior: with the Texas partial loaded the save is checked by the Texas rules; after the page loads
   the Massachusetts partial instead, the save is checked by the Massachusetts rules only, and the endpoint agrees
   on each.
-- `X16.6` behavior: a request that sends only the status beside the form is checked on the status and the starts,
-  and the name typed in the form is not read.
+- `X16.6` behavior: a request that sends only the status, set beside the intake container it does not send, is
+  checked on the status and the starts, and the name typed in the container is not read.
 - `X16.7` behavior: a failure whose message element sits in a hidden tab shows in the summary.
 - `X16.8` behavior: on net10, a non-nullable text posted empty with no rule on it saves, and the door adds no
   "The Name field is required.".
@@ -2795,6 +2883,20 @@ grammar gains no node (G2).
   WhenOnServer or UnlessOnServer."
 - `X16.14` refusal: on net48, a start the binder cannot create: "{Type} has no public parameterless constructor, so
   the endpoint cannot bind it; give {Type} a public parameterless constructor."
+- `X16.15` behavior: a request that sends only set members, on a page with no form, shows "Ward is required." in
+  the notice and sends nothing.
+- `X16.16` behavior: an `Input` of the request's view outside every container, sent under `r => r.Ward`, shows the
+  server's "Ward is required." at its own message element and in the notice.
+- `X16.17` behavior: the page and a slot's partial each render an input that binds `Name`; the slot's request sends
+  its own container, and its 400 for `Name` shows at the slot's input and in the slot container's summary only.
+- `X16.18` behavior: a native form's hand-written `<input name="Code">` fails on the server, and its message shows
+  in the form's summary only.
+- `X16.19` behavior: the slot that holds the sent input reloads while the request is in flight; the 400's message
+  shows in the page container's summary and not at the reloaded input.
+- `X16.20` behavior: a live fieldset container inside a live form container: blurring the empty name both hold
+  shows "Name is required." once.
+- `X16.21` refusal: `ShowErrors` on a pipeline that is no request's route: "ShowErrors shows a request's failures,
+  and this pipeline is no request's route; call it inside OnError or OnSuccess."
 
 ## Q17. Vendors and inversion
 
@@ -3157,8 +3259,9 @@ plans (Q19).
   - object and enum literals read member by member: the literal is written by System.Text.Json under the app's
     options, through the literal's `T`;
   - a markup payload read by `GetValue`: the payload is written by System.Text.Json through its `TPayload`;
-  - a request member found by name, ignoring case: a request sends a form typed by the request's model, so the
-    compiler matches the form's inputs to the request's members (N18.3), and a placeholder is filled by a member
+  - a request member found by name, ignoring case: a request sends a container typed by the request's model and
+    `Input`s typed by the members they fill, so the compiler matches what it sends to the request's members (N18.3),
+    and a placeholder is filled by a member
     the request sets, named by its expression (D9.4);
   - members listed with `GetProperties` and `JsonIgnore` read: the contract's members;
   - `JsonPropertyName` read from a member: the contract's JSON name, which also follows the app's naming policy;
@@ -3219,7 +3322,8 @@ shapes, starts and the payload kind of each event.
 - `N18.1` new: the reflection analyzer of D18.4, with the owner's exception list.
 - `N18.2` new: the declaration analyzer of D18.3, which replaces `JsObject`'s run-time member scan. Built in POC 13e
   (ALIS023, ALIS024).
-- `N18.3` new: a form typed by its model, and a request's `Form` that takes only a form of the request's model.
+- `N18.3` new: a container typed by its model (N14.3), and a request's `Form` and `Inputs` that take only a
+  container of the request's model.
 - `N18.4` new: the typed doors of D18.5 for the button type, the text box type and the action link's attributes.
 - `N18.5` new: the override analyzer of D18.3: an override in an app's model carries the JSON name and the
   `JsonIgnore` of the member it overrides. Built in POC 13f as ALIS025.
@@ -3246,11 +3350,11 @@ shapes, starts and the payload kind of each event.
 **Defects.**
 - `X18.1` analyzer: a `GetProperties` call in a shipped package outside the owner's list: new:N18.1.
 - `X18.2` analyzer: `Method()` called from a member other than the one it declares: new:N18.2 (POC 13e).
-- `X18.3` type: a request that sends a form of another model does not compile: new:N18.3.
+- `X18.3` type: a request that sends a container of another model does not compile: new:N18.3.
 - `X18.4` type: a button's type written as text does not compile: new:N18.4.
 - `X18.5` behavior: with the app's JSON options naming members in snake case, a request's JSON body sends
   `given_name`, and the endpoint binds it.
-- `X18.6` behavior: a member the app's JSON options ignore is not in a JSON body, and the form's check reads its
+- `X18.6` behavior: a member the app's JSON options ignore is not in a JSON body, and the check reads its
   start.
 - `X18.7` behavior: a read of a member an override implements reads it by its declaration's JSON name
   (`WhenARosterIsHandedOver`, POC 3).
@@ -3280,13 +3384,16 @@ shapes, starts and the payload kind of each event.
   driver (G1).
 - D19.6 A handler carries its payload kind (D17.4), and the vendor does not: the vendors map is shared by name across
   plans, so two plans that listen to different events of one component, read differently, agree on the vendor.
-- D19.7 A form's data is a list of registrations, each one validator under one rule set, holding the model's start,
-  the bound scalars, objects and lists of D16.6 and D16.7, and a rule tree whose groups follow the validator's child
-  validators (D16.3). The brief's item raised after the fact is decided: `FormField`'s `items` and `value` functions
-  leave for paths with `each`, and `live` stays, as `Live`, naming the check it runs.
+- D19.7 The form plugin's data is one registration, one validator under one rule set and keyed by both, holding the
+  model's start, the bound scalars, objects and lists of D16.6 and D16.7, and a rule tree whose groups follow the
+  validator's child validators (D16.3). A container is an entry of `model`'s data, keyed by its element id, with its
+  model, its kind (a form or another element), its summary's id and its live check. The brief's item raised after the
+  fact is decided: `FormField`'s `items` and `value` functions leave for paths with `each`, and `live` stays, as
+  `Live`, a container's, naming the check it runs.
 - D19.8 A number shape carries what a text converts under: `of`, an integer or a fraction, which picks the culture's
   number text for the host, and `text`, the view's culture or the invariant one (D3.11).
-- D19.9 `HttpSend`, `HttpResponse` and `FormCheck` are typed contracts generated beside the grammar, not kinds (G2).
+- D19.9 `HttpSend`, `HttpResponse`, `FormCheck` and `FormPlace` are typed contracts generated beside the grammar, not
+  kinds (G2).
 - D19.10 The plan's version is 7. A plan of another version is JSON the framework did not produce, refused at boot with
   one error.
 
@@ -3309,8 +3416,8 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 **Doors.**
 - `N19.1` new: the sealed choice classes of D19.4 in `Alis.Reactive/Grammar`, replacing `Operator`, `PathMembers` and
   `VendorEventPayload`; the public payload class has the cases `Argument`, `Event` and `Detail` of D17.4.
-- `N19.2` new: `Registration`, `BoundScalar`, `BoundObject`, `BoundList`, `RuleGroup`, `RuleField` and `RuleTest` in
-  `Alis.Reactive/Grammar/PlanDocument.cs`, replacing `FormField` and `FormTest`; they carry N16.2.
+- `N19.2` new: `Registration`, `BoundScalar`, `BoundObject`, `BoundList`, `RuleGroup`, `RuleField`, `RuleTest` and
+  `Container` in `Alis.Reactive/Grammar/PlanDocument.cs`, replacing `FormField` and `FormTest`; they carry N16.2.
 - `N19.3` new: `Culture`, `NumberText`, the time zone kinds and the trace kinds, as `PlanDocument`'s fields.
 
 **Evidence.**

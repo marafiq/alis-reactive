@@ -5,7 +5,8 @@ CONSTANT Mutant
 
 Mutants == {"none", "ReleaseOnlyLoadedSlot", "LoadKeepsOldListeners", "BootContentUnderPage", "RegistrationPerLoadOnPage",
             "ReloadSkipsRegistration", "ReleaseLeavesRules", "FirstReleaseStopsHub", "ReleaseKeepsOffer", "UnsubscribeDestroyed",
-            "ListenTwice", "ListenSurvivesRelease", "RemoveOnCollected", "RemoveOnDestroyed"}
+            "ListenTwice", "ListenSurvivesRelease", "RemoveOnCollected", "RemoveOnDestroyed", "InlineByName",
+            "SummaryOnlyWithoutInline"}
 
 ASSUME Mutant \in Mutants
 
@@ -15,12 +16,16 @@ Owners == {"page"} \cup Slots
 MaxLoads == 2
 
 VARIABLES live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
-          destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone
+          destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone,
+          req, sentGen, inline, inlineGen, summarized
 
 vars == <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
-          destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone>>
+          destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone,
+          req, sentGen, inline, inlineGen, summarized>>
 
 listens == <<listenOn, listenGen, alive, listenThrew, gone, listenOffGone>>
+
+checks == <<req, sentGen, inline, inlineGen, summarized>>
 
 HasField(content) == content \in {"boot", "card"}
 
@@ -50,6 +55,11 @@ Init ==
     /\ listenThrew = FALSE
     /\ gone = {}
     /\ listenOffGone = FALSE
+    /\ req = "idle"
+    /\ sentGen = 0
+    /\ inline = FALSE
+    /\ inlineGen = 0
+    /\ summarized = FALSE
 
 KeepsB == Mutant = "ReleaseOnlyLoadedSlot"
 
@@ -90,6 +100,7 @@ LoadA ==
     /\ destroyed' = FALSE
     /\ ReleaseA
     /\ UNCHANGED <<bGen, bLoads>>
+    /\ UNCHANGED checks
 
 UnloadA ==
     /\ live["a"]
@@ -106,6 +117,7 @@ UnloadA ==
     /\ destroyed' = FALSE
     /\ ReleaseA
     /\ UNCHANGED <<aGen, bGen, aLoads, bLoads>>
+    /\ UNCHANGED checks
 
 LoadB ==
     /\ live["a"]
@@ -118,6 +130,7 @@ LoadB ==
     /\ managed' = TRUE
     /\ UNCHANGED <<aContent, aGen, aLoads, registeredOn, fieldRegistered, rules, offer, destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
+    /\ UNCHANGED checks
 
 UnloadB ==
     /\ live["b"]
@@ -128,6 +141,7 @@ UnloadB ==
     /\ listenersOf' = [listenersOf EXCEPT !["b"] = IF Mutant = "LoadKeepsOldListeners" THEN @ ELSE 0]
     /\ UNCHANGED <<aContent, aGen, bGen, aLoads, bLoads, registeredOn, fieldRegistered, rules, destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
+    /\ UNCHANGED checks
 
 HostDestroys ==
     /\ live["a"]
@@ -137,6 +151,7 @@ HostDestroys ==
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                    threw, releasedDestroyed>>
     /\ UNCHANGED listens
+    /\ UNCHANGED checks
 
 ServerHangsUp ==
     /\ managed
@@ -145,6 +160,7 @@ ServerHangsUp ==
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed,
                    destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
+    /\ UNCHANGED checks
 
 Retry ==
     /\ offer
@@ -153,6 +169,7 @@ Retry ==
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed,
                    destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
+    /\ UNCHANGED checks
 
 ListenA(o) ==
     /\ live["a"]
@@ -164,12 +181,14 @@ ListenA(o) ==
     /\ listenGen' = [listenGen EXCEPT ![o] = aGen]
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                    destroyed, threw, releasedDestroyed, alive, listenThrew, gone, listenOffGone>>
+    /\ UNCHANGED checks
 
 Collect(o) ==
     /\ o \in alive
     /\ alive' = alive \ {o}
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                    destroyed, threw, releasedDestroyed, listenOn, listenGen, listenThrew, gone, listenOffGone>>
+    /\ UNCHANGED checks
 
 HostDestroysListened(o) ==
     /\ o \in alive
@@ -177,8 +196,37 @@ HostDestroysListened(o) ==
     /\ gone' = gone \cup {o}
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                    destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, listenOffGone>>
+    /\ UNCHANGED checks
 
-Next == LoadA \/ UnloadA \/ LoadB \/ UnloadB \/ HostDestroys \/ ServerHangsUp \/ Retry \/ \E o \in Objects : ListenA(o) \/ Collect(o) \/ HostDestroysListened(o)
+pageState == <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
+               destroyed, threw, releasedDestroyed>>
+
+SendsSlotInput ==
+    /\ req # "sent"
+    /\ live["a"]
+    /\ HasField(aContent)
+    /\ req' = "sent"
+    /\ sentGen' = aGen
+    /\ inline' = FALSE
+    /\ inlineGen' = 0
+    /\ summarized' = FALSE
+    /\ UNCHANGED pageState
+    /\ UNCHANGED listens
+
+ShowsFailures ==
+    /\ req = "sent"
+    /\ req' = "answered"
+    /\ LET here == live["a"] /\ HasField(aContent)
+           at == IF Mutant = "InlineByName" THEN here ELSE here /\ aGen = sentGen IN
+       /\ inline' = at
+       /\ inlineGen' = IF at THEN aGen ELSE 0
+       /\ summarized' = IF Mutant = "SummaryOnlyWithoutInline" THEN ~at ELSE TRUE
+    /\ UNCHANGED sentGen
+    /\ UNCHANGED pageState
+    /\ UNCHANGED listens
+
+Next == LoadA \/ UnloadA \/ LoadB \/ UnloadB \/ HostDestroys \/ ServerHangsUp \/ Retry \/ SendsSlotInput \/ ShowsFailures
+        \/ \E o \in Objects : ListenA(o) \/ Collect(o) \/ HostDestroysListened(o)
 
 Spec == Init /\ [][Next]_vars
 
@@ -209,6 +257,10 @@ NoRemoveOnCollected == ~listenThrew
 
 NoRemoveOnDestroyedListened == ~listenOffGone
 
+FailureReachesSummary == req = "answered" => summarized
+
+InlineOnlyAtTheSentInput == inline => inlineGen = sentGen
+
 ReachNestedReleased == ~(bLoads > 0 /\ ~live["b"] /\ aLoads = MaxLoads)
 
 ReachDestroyedThenReleased == ~(releasedDestroyed /\ live["a"])
@@ -220,5 +272,11 @@ ReachEachObjectListened == ~(\A o \in Objects : listenOn[o] = 1)
 ReachCollectedWhileListened == ~(\E o \in Objects : listenOn[o] = 1 /\ o \notin alive)
 
 ReachDestroyedWhileListened == ~(\E o \in Objects : listenOn[o] = 1 /\ o \in alive /\ o \in gone)
+
+ReachAnsweredAfterUnload == ~(req = "answered" /\ ~live["a"] /\ summarized /\ ~inline)
+
+ReachAnsweredAfterReload == ~(req = "answered" /\ live["a"] /\ aGen # sentGen /\ summarized /\ ~inline)
+
+ReachInlineAtTheSentInput == ~(req = "answered" /\ inline /\ summarized)
 
 ====

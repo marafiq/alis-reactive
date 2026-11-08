@@ -42,6 +42,8 @@ public static class VerbsAgree
 
         Agree<PageUrl<IntakePage>>(pipeline.PageUrl<IntakeView, IntakePage>(), verbs.PageUrl<IntakePage>());
         Agree<PageUrl<IntakePage>>(pipeline.PageUrl<IntakeView, IntakePage>("/Wards/{ward}/Intake"), verbs.PageUrl<IntakePage>("/Wards/{ward}/Intake"));
+
+        Agree<RequestContainer<IntakeRequest>>(pipeline.Container<IntakeView, IntakeRequest>("intake"), verbs.Container<IntakeRequest>("intake"));
     }
 
     private static void Agree<TRequest>(TRequest stub, TRequest design)

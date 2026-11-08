@@ -42,7 +42,11 @@ public static class RequestVerbs
 
     public static void Parallel<TModel>(this Pipeline<TModel> pipeline, params Action<Pipeline<TModel>>[] branches) => throw new NotSupportedException();
 
-    public static PageForm Form<TModel>(this Pipeline<TModel> pipeline, string formId) => throw new NotSupportedException();
+    public static RequestContainer<TContainer> Container<TModel, TContainer>(this Pipeline<TModel> pipeline, string containerId) => throw new NotSupportedException();
+
+    public static void Validate<TModel, TContainer>(this Pipeline<TModel> pipeline, RequestContainer<TContainer> container) => throw new NotSupportedException();
+
+    public static void ShowErrors<TModel>(this Pipeline<TModel> pipeline, ITypedSource<ValidationProblem> problem) => throw new NotSupportedException();
 
     public static void Into<TModel>(this Pipeline<TModel> pipeline, string elementId, ITypedSource<Markup> html) => throw new NotSupportedException();
 }

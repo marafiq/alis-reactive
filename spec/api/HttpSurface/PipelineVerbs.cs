@@ -36,4 +36,6 @@ public sealed class PipelineVerbs<TModel>
     public PageUrl<TPage> PageUrl<TPage>() => throw new NotSupportedException();
 
     public PageUrl<TPage> PageUrl<TPage>(string template) => throw new NotSupportedException();
+
+    public RequestContainer<TContainer> Container<TContainer>(string containerId) => throw new NotSupportedException();
 }

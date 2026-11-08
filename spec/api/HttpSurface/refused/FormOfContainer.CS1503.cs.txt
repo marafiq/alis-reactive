@@ -1,0 +1,12 @@
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class FormOfContainer
+{
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestContainer<IntakeRequest> intake)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
+            .Multipart(body => body.Form(intake)));
+}

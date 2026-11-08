@@ -30,25 +30,25 @@ public static class Usage
             .WhileLoading(loading => loading.Element("app-status").Text.Set("Working"))
             .Finally(done => done.Element("app-status").Text.Set("")));
 
-    public static void CondensedIntake(Pipeline<IntakeView> pipeline)
+    public static void CondensedIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
                 .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
-                .Form("intake"))
+                .Form(intake))
             .OnSuccess<IntakeCreated>((created, done) => done.Notice().Success("Resident admitted"))
             .Chained((created, next) => next
                 .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
                     .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
                 .Into("resident-summary"));
 
-    public static void FullIntake(Pipeline<IntakeView> pipeline)
+    public static void FullIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
                 .Route(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
                 .Multipart(body => body
                     .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
-                    .Form("intake")))
+                    .Form(intake)))
             .Validate<IntakeValidator>()
             .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
-            .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.Form("intake").ShowErrors(refused.Body))
+            .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))
             .Chained((created, next) => next
                 .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
                     .Route(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
@@ -97,10 +97,10 @@ public static class Usage
             .Then(north => north.Element("ward-note").Text.Set("North wing intake"))
             .Else(other => other.Element("ward-note").Text.Set(""));
 
-    public static void SaveIntake(Pipeline<IntakeView> pipeline)
+    public static void SaveIntake(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Put<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request
                 .Route(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))
-                .UrlEncoded(body => body.Form("intake")))
+                .UrlEncoded(body => body.Form(intake)))
             .OnSuccess(Content.None, (saved, done) => done.Element("saved-ward").Text.Set(saved.Request.Read(r => r.Ward)))
             .OnError(409, Content.Text, (conflict, shown) => shown.Element("intake-conflict").Text.Set(conflict.Body))
             .OnError(400, Content.Html, (invalid, shown) => shown.Into("intake", invalid.Body))
@@ -131,7 +131,7 @@ public static class Usage
             .OnSuccess(removed => removed.Notice().Info("Resident removed"))
             .NoRetry();
 
-    public static void EveryQueryPart(Pipeline<IntakeView> pipeline)
+    public static void EveryQueryPart(Pipeline<IntakeView> pipeline, RequestForm<BedQuery> bedSearch, RequestContainer<BedQuery> bedFilters)
     {
         var floor = pipeline.Component<CensusBoard>("census").Occupied;
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
@@ -152,17 +152,22 @@ public static class Usage
                 .Set(q => q.Wing, ward)
                 .Set(q => q.Bed, 4))
             .OnSuccess<Census>((counted, shown) => shown.Element("beds").Text.Set(counted.Request.Read(q => q.Ward)))
-            .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, shown) => shown.ShowErrors(refused.Body));
         pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query
                 .Route(q => q.Ward, "north")
-                .Form("bed-search"))
+                .Form(bedSearch))
             .Validate<BedQueryValidator>()
+            .Into("beds");
+        pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query
+                .Inputs(bedFilters)
+                .Input(q => q.Wing, pipeline.Input(v => v.Resident))
+                .Input(q => q.Floor, pipeline.Input(v => v.Floor)))
             .Into("beds");
         pipeline.Head("/Wards").OnSuccess(done => done.Notice().Info("Wards answered"));
         RequestVerbs.Get(pipeline, "/Wards").OnSuccess(Content.Json<Census>(), (counted, done) => done.Notice().Info("Wards listed"));
     }
 
-    public static void EveryBodyPart(Pipeline<IntakeView> pipeline)
+    public static void EveryBodyPart(Pipeline<IntakeView> pipeline, RequestContainer<BedRequest> beds, RequestForm<BedRequest> bedForm)
     {
         var floor = pipeline.Component<CensusBoard>("census").Occupied;
         var note = pipeline.Element("note").Text;
@@ -187,14 +192,14 @@ public static class Usage
                 .Set(r => r.Note, note)
                 .Set(r => r.Floor, floor))
             .OnSuccess(Content.Text, (held, done) => done.Notice().Success(held.Body))
-            .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, shown) => shown.ShowErrors(refused.Body));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Set(r => r.Ward, "north")
                 .Set(r => r.Floor, floor)
                 .Set(r => r.Note, note)
                 .Text(note)
                 .Set(r => r.Bed, 4))
-            .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("beds").ShowErrors(refused.Body))
+            .OnError<ValidationProblem>(400, (refused, shown) => shown.ShowErrors(refused.Body))
             .OnSuccess(done => done.Notice().Success("Bed held"));
         pipeline.Put<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Route(r => r.Ward, "north")
@@ -202,7 +207,8 @@ public static class Usage
                     .Set(r => r.Ward, "north")
                     .Set(r => r.Floor, floor)
                     .Set(r => r.Bed, 4)
-                    .Form("beds"))
+                    .Inputs(beds)
+                    .Input(r => r.Note, pipeline.Input(v => v.Resident)))
                 .Set(r => r.Wing, "east"))
             .OnSuccess(Content.Json<Census>(), (counted, done) => done.When(counted.Status.Eq(201)).Then(created => created.Notice().Success("Bed created")))
             .OnError((failed, shown) => shown.Notice().Error(failed.Headers.Get("X-Error")));
@@ -213,18 +219,41 @@ public static class Usage
                     .Set(r => r.Ward, "north")
                     .Set(r => r.Floor, floor)
                     .Set(r => r.Bed, 4)
-                    .Form("beds")))
+                    .Form(bedForm)
+                    .Input(r => r.Floor, pipeline.Input(v => v.Floor))))
             .OnSuccess(Content.None, (removed, done) => done.Notice().Info("Bed released"));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Route(r => r.Ward, "north")
                 .Multipart(body => body
                     .Set(r => r.Ward, "north")
                     .Set(r => r.Floor, floor)
-                    .Set(r => r.Bed, 4)))
+                    .Set(r => r.Bed, 4)
+                    .Inputs(beds)
+                    .Input(r => r.Note, pipeline.Input(v => v.Resident))))
             .OnSuccess(Content.None, (held, done) => done.Notice().Info("Bed held"));
+        pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
+                .Form(bedForm)
+                .Input(r => r.Note, pipeline.Input(v => v.Resident))
+                .Set(r => r.Bed, 4))
+            .OnError<ValidationProblem>(422, (refused, shown) => shown.ShowErrors(refused.Body))
+            .OnSuccess<ValidationProblem>((answered, shown) => shown.ShowErrors(answered.Body));
+        pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
+                .Inputs(bedForm)
+                .Input(r => r.Floor, pipeline.Input(v => v.Floor)))
+            .NoValidation();
         pipeline.Post("/Wards/Census/Refresh").OnSuccess(done => done.Notice().Info("Census refreshed"));
         pipeline.Put("/Wards/Census/Lock").OnSuccess(done => done.Notice().Info("Census locked"));
         pipeline.Delete("/Wards/Census/Lock").OnSuccess(done => done.Notice().Info("Census unlocked"));
+    }
+
+    public static void ChecksWithNoRequest(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+    {
+        pipeline.Validate(intake);
+        pipeline.Validate(pipeline.Container<IntakeView, BedRequest>("beds"));
+        pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
+                .Route(r => r.Ward, "north")
+                .Json(body => body.Inputs(pipeline.Container<IntakeView, BedRequest>("beds"))))
+            .OnSuccess(done => done.Notice().Success("Bed held"));
     }
 
     public static void EveryResponseObject(Pipeline<IntakeView> pipeline)
@@ -254,6 +283,8 @@ public sealed class IntakeEndpoint
 public sealed class IntakeView
 {
     public string Resident { get; init; } = "";
+
+    public int Floor { get; init; }
 }
 
 public sealed class IntakePage

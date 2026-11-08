@@ -115,7 +115,15 @@ public sealed class JsonBody<TRequest>
         where TValue : struct
         => throw new NotSupportedException();
 
-    public JsonBody<TRequest> Form(string formId) => throw new NotSupportedException();
+    public JsonBody<TRequest> Inputs(RequestContainer<TRequest> container) => throw new NotSupportedException();
+
+    public JsonBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
+        where TValue : TMember
+        => throw new NotSupportedException();
+
+    public JsonBody<TRequest> Input<TValue>(Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
+        where TValue : struct
+        => throw new NotSupportedException();
 }
 
 public sealed class UrlEncodedBody<TRequest>
@@ -132,7 +140,17 @@ public sealed class UrlEncodedBody<TRequest>
         where TValue : struct
         => throw new NotSupportedException();
 
-    public UrlEncodedBody<TRequest> Form(string formId) => throw new NotSupportedException();
+    public UrlEncodedBody<TRequest> Form(RequestForm<TRequest> form) => throw new NotSupportedException();
+
+    public UrlEncodedBody<TRequest> Inputs(RequestContainer<TRequest> container) => throw new NotSupportedException();
+
+    public UrlEncodedBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
+        where TValue : TMember
+        => throw new NotSupportedException();
+
+    public UrlEncodedBody<TRequest> Input<TValue>(Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
+        where TValue : struct
+        => throw new NotSupportedException();
 }
 
 public sealed class MultipartBody<TRequest>
@@ -153,5 +171,15 @@ public sealed class MultipartBody<TRequest>
 
     public MultipartBody<TRequest> File(Expression<Func<TRequest, List<IFormFile>>> member, LiveObjects<BrowserFile> files) => throw new NotSupportedException();
 
-    public MultipartBody<TRequest> Form(string formId) => throw new NotSupportedException();
+    public MultipartBody<TRequest> Form(RequestForm<TRequest> form) => throw new NotSupportedException();
+
+    public MultipartBody<TRequest> Inputs(RequestContainer<TRequest> container) => throw new NotSupportedException();
+
+    public MultipartBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
+        where TValue : TMember
+        => throw new NotSupportedException();
+
+    public MultipartBody<TRequest> Input<TValue>(Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
+        where TValue : struct
+        => throw new NotSupportedException();
 }

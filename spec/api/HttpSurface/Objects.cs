@@ -100,13 +100,18 @@ public sealed class ValidationProblem
     public IReadOnlyDictionary<string, IReadOnlyList<string>> Errors { get; init; } = new Dictionary<string, IReadOnlyList<string>>();
 }
 
-public sealed class PageForm
+public class RequestContainer<TModel>
 {
-    private PageForm()
+    private protected RequestContainer()
     {
     }
+}
 
-    public void ShowErrors(ITypedSource<ValidationProblem> problem) => throw new NotSupportedException();
+public sealed class RequestForm<TModel> : RequestContainer<TModel>
+{
+    private RequestForm()
+    {
+    }
 }
 
 public sealed class Notice

@@ -7,7 +7,7 @@ namespace Intake;
 
 public static class BodyOnNoContent
 {
-    public static void Refused(Pipeline<IntakeView> pipeline)
-        => pipeline.Put<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form("intake"))
+    public static void Refused(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
+        => pipeline.Put<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
             .OnSuccess(Content.None, (saved, done) => done.Element("saved").Text.Set(saved.Body));
 }

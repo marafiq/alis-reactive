@@ -379,7 +379,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   replace and a slot's unload (`spec/Core/Composition.tla`).
 - The owner, 2026-11-08: the default loader shows on the target a request updates, right for parallel requests of 5
   and 1 seconds on one target or on two (verbatim in `spec/NOTES.md`). Busy is a state of a target, as WAI-ARIA's aria-busy is:
-  the elements its success route writes outside a condition, the element it loads, the form it sends, or the elements
+  the elements its success route writes outside a condition, the element it loads, the container it sends, or the elements
   `Busy` names in place of those, else the page; the C# derives them, the plan carries them, and the core counts each
   target on its own (D10.21).
 - The owner, 2026-11-08, on schema.md left behind the HTTP decisions and N10.7 drifted from D10.14's retry: a drift is a
@@ -388,6 +388,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   names each one it touched, and why each other one stands. A green check proves only what it compares.
 - The owner, 2026-11-08: a page holds many forms or none, and a request works without a form on the full form's
   parts; no door, default or check assumes one form per page or a form behind every request.
+- The owner, 2026-11-08: forms nest, sit out of band, or are containers of any kind; the concept is the request
+  container, and no type is named PageForm. The native `<form>` stays the browser's way to send a form's body (`Form`), and the core
+  sends any container's framework inputs (`Inputs`) and the view's own input (`Input`) beside it, losing no feature.
 - The owner, 2026-11-08: every module works with every other, each HTTP thing is a typed JavaScript object whose members
   are sources and dot-walk (the response's status, headers and body, the page's URL, the request's fields), and main is
   the floor of features, never the bar of quality.
