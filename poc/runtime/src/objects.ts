@@ -1,6 +1,6 @@
 import type { Handler, HeldRelease, Listening, ListenStatement, PathStep, PlanDocument, ReadPresence, Release, Statement } from "./plan";
 import { evaluate, walk, type Bound, type Context } from "./evaluate";
-import { execute } from "./execute";
+import { begin } from "./execute";
 import { assertNever, Stop, value } from "./read";
 import type { Owner } from "./owners";
 import { plugin } from "./plugins";
@@ -228,8 +228,7 @@ function run(context: Context, raised: Raised, names: Names, args: unknown[]): v
     const scope = new Map(context.scope);
     scope.set(names.payload, walk(value(args), raised.payload, raised.members));
     scope.set(names.arguments, value(args));
-    const running = execute(raised.do, { ...context, scope });
-    if (running.kind === "awaiting") running.settled.catch((stopped: unknown) => report(raised, stopped));
+    begin(raised.do, { ...context, scope }, (stopped) => report(raised, stopped));
   } catch (stopped) {
     report(raised, stopped);
   }
