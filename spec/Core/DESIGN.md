@@ -1210,14 +1210,20 @@ Terms used throughout:
   request type of its own. The grammar gains no node (G2).
 - D9.2 The builder is staged: each part is written at most once, a GET has no body format, and `Form()` exists
   only on a request that checks a form.
-- D9.3 The method is GET, POST, PUT or DELETE. A GET sends no body; POST, PUT and DELETE send one.
+- D9.3 The method is GET, HEAD, OPTIONS, POST, PUT or DELETE. GET, HEAD and OPTIONS send no body; POST, PUT and
+  DELETE send one. PATCH is not a method of 1.0 (spec/CLAUDE.md, the owner, 2026-11-07). An action answers HEAD only
+  under `[HttpHead]` and OPTIONS only under `[HttpOptions]`, on both hosts: net10 answers HEAD to an `[HttpGet]`
+  action 405 (`probe:core-head-on-get-action`) and MVC 5 selects an action by its verbs alone
+  (`probe:mvc5-accept-verbs-exact`, `probe:mvc5-http-head-attribute`, `probe:mvc5-http-options-attribute`). The app's
+  OPTIONS reaches its action and its `Allow` header; a preflight, which carries `Access-Control-Request-Method`, is
+  the CORS middleware's (`probe:core-options-reaches-action`).
 - D9.4 The URL is parsed once, in C#, into text parts and placeholders. A URL that holds `#`, a brace without
   its pair, or a placeholder no member fills is refused where the view renders. A placeholder is filled by
   the top-level member of the same name of the request or of its query, compared ignoring case. A list, an object, a file, a date
   or an instant in a placeholder is refused, on both hosts, because IIS refuses a time in a path segment on
   net48 (#237). A route value is sent as its invariant text, encoded as one path segment.
 - D9.5 A route value that reads nothing or reads empty text stops its request before it is sent (D4.6).
-- D9.6 Every method sends a query. A GET sends there every member of its request that fills no placeholder;
+- D9.6 Every method sends a query. A request with no body sends there every member that fills no placeholder;
   POST, PUT and DELETE send there the members of a typed query, `Query<TQuery>(q => q.Set(..))`, beside the body.
   A member is static (a literal) or read from a source. The URL's own query text is kept, and C# appends the
   members after it with `?` or `&`. A key is the binding name, a list sends one key per item, a number is its
@@ -1225,9 +1231,18 @@ Terms used throughout:
 - D9.7 A JSON body is one object. Its member names are Q2's, its nesting follows Q1's steps, and a dictionary
   entry is a member named by its key. A JSON request that sets nothing sends `{}`, because on net10 a request
   with no body answers 415 or binds null by the endpoint parameter's nullability (`probe:core-frombody-no-body`).
-- D9.8 Form data is multipart, written by the browser. A field is named by its binding name, a list sends one
-  field per item, a number carries the decimal separator of the view's culture (D3.7) and a file is sent as
-  the file.
+- D9.8 Form data is multipart, written by the browser: an ordered list of parts, each a name and either text or a file
+  with its name and media type. A field is named by its binding name, a list sends one part per item, a number
+  carries the decimal separator of the view's culture (D3.7) and a file is sent as the file. Fields and files go in
+  one body: several files under one name, and files nested by C# path beside their fields (`Documents[0].File`,
+  `Documents[0].Caption`), bind on both hosts (`probe:core-multipart-files-and-fields`,
+  `probe:mvc5-files-keyed-by-part-name`). A file's name is sent in UTF-8 with a double quote percent-encoded
+  (`probe:fetch-multipart-file-name`), and binds as written (`probe:core-multipart-utf8-file-name`).
+  A body past the host's limit is refused before the action runs: System.Web's default limit is 4 MB and it throws
+  before MVC (`probe:mvc5-max-request-length`, `probe:mvc5-request-too-large-throws`), and past Kestrel's default
+  30,000,000 bytes a client reads no response (`probe:core-upload-over-limit`). Either answer runs exactly one route
+  (D10.5): a status the host writes picks its route, and a connection the host closes is a network failure, the
+  catch-all's. The app sets the limit in its host's configuration.
 - D9.9 DELETE sends its body as POST and PUT do. A member that fills a placeholder is also sent in the body of a
   POST, PUT or DELETE.
 - D9.10 A member that reads nothing is sent by this closed table, which C# writes into the plan:
@@ -1257,8 +1272,8 @@ Terms used throughout:
   | a non-nullable value type | the request stops, since no field binds back as nothing |
   | an object | the request stops: an empty field ends the list at that item on net10 (`probe:core-query-list-of-objects-empty-item`) and binds a null item on MVC 5, and an item left out ends the list there on both hosts (`probe:core-query-list-of-objects-gap`, `probe:mvc5-list-ends-at-missing-index`) |
 - D9.11 A header is fixed text or a scalar source sent as text. A header that reads nothing is not sent. A
-  header name is an HTTP token by RFC 9110, a name given twice ignoring case is refused, and `Content-Type` is
-  refused because the body format owns it.
+  header name is an HTTP token by RFC 9110, a name given twice ignoring case is refused, `Content-Type` is
+  refused because the body format owns it, and `Accept` is refused because the success route's kind owns it (D10.6).
 - D9.12 The headers every request sends are configured once in C#, and C# writes them into each request's
   `HttpSend` where the view renders; a request's own header of the same name, compared ignoring case, replaces
   the configured one. An app that sends `X-Requested-With: XMLHttpRequest` on every request configures it there.
@@ -1278,7 +1293,8 @@ Terms used throughout:
   (`Form()`), the inputs of one element (`Form(formId)`), and named inputs, each typed by its own lambda. When
   an input and a set member send the same binding name, the input's value is sent, as the body the check reads
   (Q16). An element `Form(formId)` names that the page lacks stops the request.
-- D9.16 A file is the shape `file`, sent only in form data. A set member of file shape in a GET or a JSON body
+- D9.16 A file is the shape `file`, sent only in form data or as the whole body. A set member of file shape in a
+  request with no body, a JSON, URL-encoded or text body
   is refused by an analyzer; a file input a form sends in a GET or a JSON body stops the request when it is sent.
 - D9.17 Requests in one pipeline run one after another, each after the one before it settles. ALIS008 keeps
   refusing a second request in one pipeline, with its reason corrected: `Chained` runs a request after another
@@ -1325,6 +1341,27 @@ Terms used throughout:
     Both are per action, and a view names its action only by URL text, so their refusal waits for a build check that
     links a request to its action, which no unit has built; it goes to gate 1 as a flag.
 
+- D9.21 The body formats are closed: none, JSON (D9.7), URL-encoded, multipart (D9.8), text and one file. Each
+  sets its own `Content-Type` as fetch writes it: `application/json`, `application/x-www-form-urlencoded;charset=UTF-8`
+  from `URLSearchParams` (`probe:fetch-urlencoded-body`), `multipart/form-data` with the browser's boundary,
+  `text/plain;charset=UTF-8` from a string and a file's own type from a `Blob` (`probe:fetch-body-media-types`). A
+  URL-encoded body binds as multipart does on both hosts, and an action under `[Consumes]` takes its own format
+  alone: net10 answers a multipart body to a URL-encoded action 415 (`probe:core-consumes-urlencoded`). Its fields are
+  named and written as the query's (D9.13). A text body and a file body are one value each, read by the action
+  from its body, since no binder on either host reads them.
+- D9.22 Antiforgery is a request default (D10.12). C# writes the token into the plan where the view renders, from the
+  host's own antiforgery (`IAntiforgery.GetAndStoreTokens` on net10, `AntiForgery.GetTokens` on net48), and every
+  POST, PUT and DELETE sends it; GET, HEAD and OPTIONS never do, as neither host asks a token of them
+  (`probe:core-antiforgery-safe-methods`). Its place is configured once:
+  - the header `RequestVerificationToken`, which net10 reads before the form and with every body
+    (`probe:core-antiforgery-names`, `probe:core-antiforgery-placement`);
+  - or the field `__RequestVerificationToken` of a URL-encoded or multipart body, which both hosts read
+    (`probe:mvc5-antiforgery-field-name`). A JSON, text or file body under the field place is refused where the view
+    renders, since no host reads a token there (`probe:core-antiforgery-placement`).
+  MVC 5's `[ValidateAntiForgeryToken]` reads the form alone (`probe:mvc5-antiforgery-reads-form-only`), so on net48 the
+  header is read only by a filter that hands it to `AntiForgery.Validate(cookieToken, formToken)`
+  (`probe:mvc5-antiforgery-validate-tokens`). Whether the framework ships that filter is the owner's; it goes to
+  gate 1 as a flag.
 - D9.13 A request's URL, query and headers follow their standards, and C# writes each part where the view renders.
   - The URL is an RFC 3986 URI reference: a path on the page's origin, or an absolute `http` or `https` URI, split
     into the parts of RFC 3986, section 3. Its path is segments, its query is the query, and a fragment is refused
@@ -1363,6 +1400,27 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `probe:net48-query-plus-space`
 - `probe:js-header-values`
 - `probe:js-header-trim`
+- `probe:core-head-on-get-action`
+- `probe:mvc5-accept-verbs-exact`
+- `probe:mvc5-http-head-attribute`
+- `probe:mvc5-http-options-attribute`
+- `probe:core-options-reaches-action`
+- `probe:core-multipart-files-and-fields`
+- `probe:mvc5-files-keyed-by-part-name`
+- `probe:fetch-multipart-file-name`
+- `probe:core-multipart-utf8-file-name`
+- `probe:fetch-urlencoded-body`
+- `probe:fetch-body-media-types`
+- `probe:core-consumes-urlencoded`
+- `probe:core-antiforgery-names`
+- `probe:core-antiforgery-placement`
+- `probe:core-antiforgery-safe-methods`
+- `probe:mvc5-antiforgery-field-name`
+- `probe:mvc5-antiforgery-reads-form-only`
+- `probe:mvc5-antiforgery-validate-tokens`
+- `probe:mvc5-max-request-length`
+- `probe:mvc5-request-too-large-throws`
+- `probe:core-upload-over-limit`
 **Doors.**
 - kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:58-62`), `Gather` and
   `Gather<TRequest>`, `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`), `Header`, `Form()`,
@@ -1435,10 +1493,24 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 
   The last three each log one error naming the request and the outcome, and their data reads nothing. A
   request with no route for its outcome runs none.
-- D10.6 The plan declares each route's body kind: JSON for `OnSuccess<T>` and `OnError<T>`, HTML for `Into`, and
-  none for a route with no data, whose body is not read. JSON is a body whose media type is `application/json`
-  or ends in `+json`; an empty JSON body is data that reads nothing. A JSON body that does not parse is a body
-  not of the declared kind. An error route reads its body as data: a body not of its kind reads nothing, and
+- D10.6 The plan declares each route's body kind, from a closed set, and the media types each takes:
+  - JSON, `application/json` or a type ending in `+json`, decoded as UTF-8 (RFC 8259); an empty JSON body is data that
+    reads nothing, and a JSON body that does not parse is a body not of the declared kind;
+  - text, any `text/*` type, read as a `string`;
+  - HTML, `text/html` or `application/xhtml+xml`, which `Into` loads (D10.11); a `text/plain` body is not HTML, so an
+    endpoint that answers a string writes it as `Content(html, "text/html")` or a partial view on net10, where a
+    string action answers `text/plain` (`probe:core-string-result-media-type`), and MVC 5 answers it `text/html`
+    (`probe:mvc5-string-result-content`, `probe:mvc5-content-type-kept-when-unset`, `probe:mvc5-response-default-text-html`);
+  - a file, any media type, saved by the browser (D10.20);
+  - none, a route with no data, whose body is not read.
+
+  Text and HTML are decoded by the `charset` their `Content-Type` names, else as UTF-8, through `TextDecoder`, since
+  fetch's `text()` decodes UTF-8 whatever the header says (`probe:fetch-text-ignores-charset`). A HEAD answer has no
+  body, so a HEAD request's routes are of kind none. C# writes `Accept` from the success route's kind alone, with no
+  `*/*`, because net10 does not respect an `Accept` that holds `*/*` and answers a string action as JSON only to
+  `application/json` (`probe:core-accept-weighted`): `application/json` for JSON, `text/*` for text, `text/html` for
+  HTML, and `*/*` for a file and for none. A validation error body is `application/problem+json` under any `Accept`
+  (`probe:core-accept-weighted`). An error route reads its body as data: a body not of its kind reads nothing, and
   the route runs.
 - D10.7 On net48 the plan carries that a response's `X-Responded-JSON` status replaces its own, so Katana's
   answer to a request that sends `X-Requested-With` runs the route of the status it withheld.
@@ -1457,7 +1529,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   to gate 2.
 - D10.11 `Into(element)` loads the success body's HTML into the element as a slot (Q12): what the element held
   unloads first.
-- D10.12 Request defaults are configured once in C# and hold headers (D9.12), `WhileLoading` steps, `Finally`
+- D10.12 Request defaults are configured once in C# and hold headers (D9.12), the antiforgery place (D9.22), the busy
+  indicator and the notice (D10.21), `WhileLoading` steps, `Finally`
   steps, error routes by status, a catch-all error route and a retry policy. C# composes them into every
   request where the view renders; the browser holds no defaults. A request's `WhileLoading` runs after the
   defaults', and its `Finally` before the defaults'. A request's retry policy replaces the defaults'. Success
@@ -1473,7 +1546,7 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     gets the same answer;
   - never 500, 501 or 505: in an MVC app the server is the app, its 500 is its own exception, and the same request
     meets it again, after a wait the user spends behind the loader;
-  - only GET, PUT and DELETE, which HTTP defines as idempotent (RFC 9110, section 9.2.2). A POST is never retried:
+  - only GET, HEAD, OPTIONS, PUT and DELETE, which HTTP defines as idempotent (RFC 9110, section 9.2.2). A POST is never retried:
     a failed POST's effect can stand on the server, and a second attempt would repeat it.
 
   Its numbers are .NET's standard resilience handler's: 3 retries after the first attempt, an exponential wait with
@@ -1539,6 +1612,25 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     the page holds the page now.
   - An event's payload is the vendor's object, written in the vendor's turn (D11.4) and copied like any data when
     handed on.
+- D10.19 A response is a typed object, as a component is (Q5): its status, a number; each header by its name, text
+  that reads nothing when the response lacks it; and its body by the route's kind (D10.6), whose members dot-walk as
+  every data path does (Q1, Q2). Each is a source (Q7) in its route, in the request `Chained` sends after it (D10.9)
+  and in the steps after the request. A HEAD route reads the status and the headers, and an OPTIONS route reads its
+  `Allow` header (`probe:core-options-reaches-action`).
+- D10.20 A file route saves the body as the browser's download, named by its `Content-Disposition`: the `filename*`
+  of RFC 6266, section 4.3, before its `filename`, since MVC 5 writes a non-ASCII name as `filename*` alone
+  (`probe:mvc5-file-name-rfc2231`) and net10 writes both, the `filename` with underscores
+  (`probe:core-file-disposition`); a response with neither is named by the last segment of the request's path, as a
+  browser names a link's download.
+- D10.21 The defaults name a busy indicator and a notice, each a contract the core owns and a component fulfils: a busy
+  indicator declares a show and a hide, and a notice declares a method that takes a text. The framework ships
+  NativeLoader and NativeToast declaring them, and an app declares its own on the same public surface; the core
+  depends on neither one's markup or CSS (the owner, 2026-11-08). The core counts the requests a busy indicator covers,
+  across every pipeline of the page, and calls its show when the count leaves 0 and its hide when it returns to 0. A
+  request covers it once across its attempts (D10.15), from its defaults' `WhileLoading` to its defaults' `Finally`,
+  which ends it on every outcome, a replaced or unloaded run's included (Q11, Q12). A failed request whose route is a
+  default shows one notice, after its last attempt; a replaced or unloaded request shows none. A request that takes
+  no defaults covers no indicator and shows no default notice.
 **Schema nodes.** `let` with `await`, `try`, `if`, `get` of `ok` and `status` on the response, the contract
 `HttpSend` and its result, `HttpResponse`.
 
@@ -1560,6 +1652,18 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 - `probe:core-cookie-auth-ajax`
 - `probe:katana-ajax-redirect-is-200`
 - `probe:core-validation-problem-shape`
+- `Composition.tla:IndicatorNeverHidesEarly`
+- `Composition.tla:IndicatorNeverStaysShown`
+- `Composition.tla:NoticeOncePerFailure`
+- `probe:core-string-result-media-type`
+- `probe:mvc5-string-result-content`
+- `probe:mvc5-content-type-kept-when-unset`
+- `probe:mvc5-response-default-text-html`
+- `probe:fetch-text-ignores-charset`
+- `probe:core-accept-weighted`
+- `probe:fetch-null-body-reads-empty`
+- `probe:core-file-disposition`
+- `probe:mvc5-file-name-rfc2231`
 
 **Doors.**
 - kept: `Response`, `OnSuccess`, `OnSuccess<T>`, `OnError`, `OnError(status)` and their typed forms, `Chained`,

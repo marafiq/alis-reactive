@@ -1511,6 +1511,15 @@
       "probe": "spec/probes/referencesource/HttpRequest.cs.txt",
       "expect": "throw new HttpException(SR.GetString(SR.Max_request_length_exceeded),",
       "source": "spec/probes/referencesource/HttpRequest.cs.txt:978"
+    },
+    {
+      "id": "core-accept-weighted",
+      "statement": "On net10 an Accept that holds */* is not respected, whatever it names first, so a request that wants a JSON answer from a string action sends application/json alone; a ValidationProblem answers application/problem+json under any Accept.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC on Kestrel",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-accept-weighted: a string action with Accept text/plain, application/json;q=0.5, */*;q=0.1 answers text/plain; charset=utf-8; with application/json, */*;q=0.1 answers text/plain; charset=utf-8; with text/html, */*;q=0.1 answers text/plain; charset=utf-8; a 400 ValidationProblem with Accept text/plain, */*;q=0.1 answers 400 application/problem+json",
+      "source": "spec/probes/AspNetCoreBinding/HttpProbes.cs"
     }
   ]
 }

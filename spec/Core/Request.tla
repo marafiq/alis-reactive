@@ -18,7 +18,11 @@ Failures == {"network", "offOrigin", "mismatch"}
 Retryable == {"network", "s503"}
 
 Configs == [placeholder : {"filled", "unfilled"}, filler : {"scalar", "date", "list"},
-            file : {"none", "set"}, method : {"GET", "POST"}, format : {"json", "form"}]
+            file : {"none", "set"}, method : {"GET", "HEAD", "OPTIONS", "POST"},
+            format : {"json", "form", "urlencoded", "text", "file"}]
+Bodiless == {"GET", "HEAD", "OPTIONS"}
+Idempotent == {"GET", "HEAD", "OPTIONS", "PUT", "DELETE"}
+FileBodies == {"form", "file"}
 Kinds == {"valueType", "list", "nullable"}
 Bodies == {"json", "form"}
 Hosts == {"net10", "net48"}
@@ -69,7 +73,7 @@ FlowInit ==
     /\ checkPasses \in BOOLEAN
     /\ loadingStops \in BOOLEAN
     /\ guardOk \in BOOLEAN
-    /\ method \in {"GET", "POST"}
+    /\ method \in {"GET", "HEAD", "POST", "PUT"}
     /\ policy \in BOOLEAN
     /\ outcomes \in [1..MaxAttempts -> Outcomes]
     /\ successRoute \in BOOLEAN
@@ -86,7 +90,7 @@ Init == PlacementInit \/ FlowInit
 Refused(c) ==
     \/ c.placeholder = "unfilled" /\ Mutant # "PlaceholderUnchecked"
     \/ c.placeholder = "filled" /\ c.filler # "scalar" /\ Mutant # "DateInPath"
-    \/ c.file = "set" /\ (c.method = "GET" \/ c.format = "json") /\ Mutant # "FileInJson"
+    \/ c.file = "set" /\ (c.method \in Bodiless \/ c.format \notin FileBodies) /\ Mutant # "FileInJson"
 
 Built(c) == ~Refused(c)
 
@@ -154,7 +158,7 @@ RouteFor(o) ==
 
 Index(i) == ((i - 1) % MaxAttempts) + 1
 
-CanRetry == policy /\ (method = "GET" \/ Mutant = "RetryAnyPost")
+CanRetry == policy /\ (method \in Idempotent \/ Mutant = "RetryAnyPost")
 
 Limit == MaxAttempts + (IF Mutant = "RetryPastAttempts" THEN 1 ELSE 0)
 
@@ -234,7 +238,7 @@ EveryPlaceholderFilled == (Placement /\ Built(config)) => config.placeholder = "
 
 RouteHoldsScalarText == (Placement /\ Built(config) /\ config.placeholder = "filled") => config.filler = "scalar"
 
-FileOnlyInFormData == (Placement /\ Built(config) /\ config.file = "set") => (config.method # "GET" /\ config.format = "form")
+FileOnlyInFormData == (Placement /\ Built(config) /\ config.file = "set") => (config.method \notin Bodiless /\ config.format \in FileBodies)
 
 NothingBindsAsDeclared == Placement => \A kind \in Kinds, body \in Bodies : Bound(kind, body, Sent(kind, body)) = Expected(kind)
 
@@ -265,7 +269,7 @@ ChainedOnlyAfterSuccess == chainedRan => (final = "ok" /\ routeRan = SuccessRout
 StepsAfterRunUnlessStopped == (Flow /\ pc = "done") => (afterRan <=> ~stopped)
 
 RetriesOnlyWhatIsRetryable ==
-    sends > 1 => (policy /\ method = "GET" /\ \A i \in 1..(sends - 1) : outcomes[Index(i)] \in Retryable)
+    sends > 1 => (policy /\ method \in Idempotent /\ \A i \in 1..(sends - 1) : outcomes[Index(i)] \in Retryable)
 
 RetryStopsAtItsAttempts == sends <= MaxAttempts
 

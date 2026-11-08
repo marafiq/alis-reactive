@@ -31,6 +31,7 @@ static class HttpProbes
             Console.WriteLine("core-options-reaches-action: OPTIONS with its own Origin to an [HttpOptions] action answers " + (int)allowed.StatusCode + " Allow " + string.Join(",", allowed.Content.Headers.Allow) + "; to an [HttpGet] action answers " + (int)wrongVerb.StatusCode + " Allow " + string.Join(",", wrongVerb.Content.Headers.Allow) + "; a preflight under the CORS default policy answers " + (int)preflight.StatusCode + (preflight.Headers.Contains("Access-Control-Allow-Methods") ? " from the CORS middleware" : " from the action"));
         }
         Console.WriteLine("core-string-result-media-type: a string action answers " + await MediaType(client, "/h/text", null) + "; with Accept application/json " + await MediaType(client, "/h/text", "application/json") + " " + await Body(client, "/h/text", "application/json") + "; with Accept text/html " + await MediaType(client, "/h/text", "text/html") + "; Content(text) answers " + await MediaType(client, "/h/content", null));
+        Console.WriteLine("core-accept-weighted: a string action with Accept text/plain, application/json;q=0.5, */*;q=0.1 answers " + await MediaType(client, "/h/text", "text/plain, application/json;q=0.5, */*;q=0.1") + "; with application/json, */*;q=0.1 answers " + await MediaType(client, "/h/text", "application/json, */*;q=0.1") + "; with text/html, */*;q=0.1 answers " + await MediaType(client, "/h/text", "text/html, */*;q=0.1") + "; a 400 ValidationProblem with Accept text/plain, */*;q=0.1 answers " + await PostMediaType(client, "/h/invalid", "text/plain, */*;q=0.1"));
         using (var file = await client.GetAsync("/h/file"))
         {
             Console.WriteLine("core-file-disposition: File(bytes, \"application/pdf\", \"Résumé.pdf\") answers " + file.Content.Headers.ContentType + " with Content-Disposition " + string.Join(",", file.Content.Headers.GetValues("Content-Disposition")));
@@ -115,6 +116,14 @@ static class HttpProbes
         return response.Content.Headers.ContentType?.ToString() ?? "no media type";
     }
 
+    static async Task<string> PostMediaType(HttpClient client, string path, string accept)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, path) { Content = new StringContent("", Encoding.UTF8, "application/x-www-form-urlencoded") };
+        request.Headers.Add("Accept", accept);
+        using var response = await client.SendAsync(request);
+        return (int)response.StatusCode + " " + (response.Content.Headers.ContentType?.MediaType ?? "no media type");
+    }
+
     static async Task<string> Body(HttpClient client, string path, string accept)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, path);
@@ -148,6 +157,13 @@ public sealed class HttpProbeController(IAntiforgery antiforgery) : Controller
     {
         Response.Headers.Allow = "GET, POST";
         return NoContent();
+    }
+
+    [HttpPost("invalid")]
+    public IActionResult Invalid()
+    {
+        ModelState.AddModelError("Ward", "Name the ward.");
+        return ValidationProblem(ModelState);
     }
 
     [HttpGet("text")]
