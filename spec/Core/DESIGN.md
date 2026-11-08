@@ -1237,7 +1237,7 @@ Terms used throughout:
   net48 (#237). A path value is sent as its invariant text, encoded as one path segment. `Path` names its placeholder
   by its member, so a `Path` whose member names no placeholder or belongs to an object the request holds, and a
   placeholder that only `Query` names, are refused where the view renders. `Query` and `Set` take any member path,
-  `r => r.NextOfKin.Name`, keyed by its C# path, and `Set` places a member of the request itself named like a
+  `r => r.NextOfKin.Name`, keyed by its C# path and written with no `!` past a holder that holds null (N9.5), and `Set` places a member of the request itself named like a
   placeholder in the path, every other in the query; a member lambda that is not a member path is refused.
 - D9.5 A path value that reads nothing or reads empty text stops its request before it is sent (D4.6).
 - D9.6 Every method sends a query. A request with no body sends there every member that fills no placeholder;
@@ -1502,6 +1502,11 @@ contract `HttpSend`, which is no node kind.
   (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`). Its fallback to another view's input of the same
   name, the one that joined the page last, leaves for `Inputs(container)` (D13.3).
 - `N9.4` new: analyzer ALIS029, a file-shaped set member in a GET or a JSON body.
+- `N9.5` new, built in POC 17c(a3-i) as ALIS036: `RequestKeysSuppressor`, a `DiagnosticSuppressor` that suppresses
+  CS8602 in the member lambda of `Query` and `Set`, which names the key a request sends by its C# path and is never
+  run (D9.4), on a read of the lambda's own parameter. The doors are matched by the method's definition. The warning
+  stays on `Path`, whose member is the request's own, on a value the view holds, inside the key or beside it, and on
+  every other lambda; an input's member path keeps it for MVC's helpers (N6.3).
 - `N9.5` new: ALIS008's corrected message
   (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`), retargeted from
   `PipelineBuilder` and `RequestExtensions` (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:37-40`)

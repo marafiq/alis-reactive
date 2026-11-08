@@ -27,6 +27,7 @@
                 .Set(r => r.Shift, board.Shift)
                 .Set(r => r.Cover, Shift.Twilight)
                 .Set(r => r.Target, board.Round)
+                .Set(r => r.Handover.Round, board.Current.Read(h => h!.Round))
                 .Header("X-Round", board.Round)
                 .Header("X-Lead", board.Current.Read(h => h!.Lead)))
             .Response(response => response.OnSuccess<RegisterAnswer>((answer, recorded) =>

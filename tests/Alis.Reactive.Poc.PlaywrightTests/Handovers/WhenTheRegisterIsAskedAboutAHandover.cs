@@ -159,6 +159,17 @@ public sealed class WhenTheRegisterIsAskedAboutAHandover : AppPageTest
     }
 
     [Test]
+    public async Task a_member_of_a_handover_the_register_may_hold_is_sent_by_its_member_path()
+    {
+        await Open("/Handovers/Ask");
+        await Press("Start the handover");
+
+        var asked = await Page.RunAndWaitForRequestAsync(AskTheRegister, Register);
+
+        Assert.That(Sent(asked, "Handover.Round"), Is.EqualTo("4"));
+    }
+
+    [Test]
     public async Task a_number_read_into_a_header_is_sent_as_its_invariant_text()
     {
         await Open("/Handovers/Ask");
