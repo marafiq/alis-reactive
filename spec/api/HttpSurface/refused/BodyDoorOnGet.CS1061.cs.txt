@@ -8,7 +8,7 @@ namespace Intake;
 public static class BodyDoorOnGet
 {
     public static void Refused(Pipeline<IntakeView> pipeline)
-        => pipeline.Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
+        => pipeline.Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
             .Path(q => q.ResidentId, 12)
             .Json(body => body.Set(q => q.ResidentId, 12)));
 }

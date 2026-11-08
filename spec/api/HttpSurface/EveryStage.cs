@@ -56,7 +56,7 @@ public static class EveryStage
                 .Then(admitted => admitted.Element("admitted").Text.Set(created.Request.Read(r => r.Name)))
                 .Else(other => other.Notice().Warning(created.Headers.Get("X-Reason"))))
             .Chained((created, next) => next
-                .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
                     .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
                 .OnSuccess<ResidentSummary>((summary, shown) => shown
                     .When(summary.Body.Read(s => s.Ward.Name).Eq(created.Request.Read(r => r.Ward)))
@@ -126,7 +126,7 @@ public static class EveryStage
                         .Then(admitted =>
                         {
                             admitted.Element("resident").Text.Set(created.Request.Read(r => r.Name));
-                            admitted.Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                            admitted.Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
                                     .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
                                 .OnSuccess<ResidentSummary>((summary, shown) =>
                                 {
@@ -165,7 +165,7 @@ public static class EveryStage
                 first =>
                 {
                     first.Element("left").Text.Set(counted.Ward);
-                    first.Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query.Set(q => q.ResidentId, 4))
+                    first.Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query.Set(q => q.ResidentId, 4))
                         .OnSuccess<ResidentSummary>((summary, shown) =>
                         {
                             shown.Element("left").Text.Set(summary.Body.Read(s => s.Ward.Name));

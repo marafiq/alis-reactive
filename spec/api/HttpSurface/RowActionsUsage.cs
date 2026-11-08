@@ -40,14 +40,14 @@ public static class RowActionsUsage
                     activated.Element.Classes.Add("done");
                 })
                 .Chained((census, next) => next
-                    .Get<IntakeView, WardQuery>("/Wards/{ward}/Residents", query => query
+                    .Get<WardQuery>("/Wards/{ward}/Residents", query => query
                         .Set(q => q.Ward, census.Request.Read(r => r.Ward)))
                     .Into("residents"));
         });
         var open = rows.NativeActionLink((activated, pipeline) =>
         {
             pipeline.Element("resident-detail").Classes.Add("loading");
-            pipeline.Get<IntakeView, ResidentQuery>("/Residents/{residentId}", query => query
+            pipeline.Get<ResidentQuery>("/Residents/{residentId}", query => query
                     .Set(q => q.ResidentId, activated.Row.Read(r => r.Id)))
                 .OnSuccess(Content.Html, (loaded, done) =>
                 {

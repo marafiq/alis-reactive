@@ -10,10 +10,9 @@
     .Reactive(box => box.Blur, (_, pipeline) =>
     {
         var name = pipeline.Input(m => m.Name).Component<NativeTextBox>().Value;
-        pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request.Set(r => r.Name, name))
-            .Response(response => response
-                .OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Read(s => s.Name)))
-                .OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Read(s => s.Room))));
+        var lookup = pipeline.Get<ResidentQuery>("/Residents/Summary/{name}", request => request.Set(r => r.Name, name));
+        lookup.OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Body.Read(s => s.Name)));
+        lookup.OnError((_, other) => other.Element("lookup-status").Text.Set("The register could not answer"));
     }))
 <p>Lookup: <strong id="lookup-status">not looked up</strong></p>
 

@@ -22,14 +22,27 @@ public sealed class ResidentsController : Controller
         "Basement" => Dropped(),
         "Moved" => Redirect("http://" + OtherHost() + ":" + Request.Host.Port + "/Residents/Elsewhere/" + Uri.EscapeDataString(query.Name)),
         "West" => new ContentResult { StatusCode = StatusCodes.Status404NotFound, ContentType = "text/plain", Content = "{\"reason\": \"" + query.Name + " is not on the West register\"}" },
+        "Interim" => FromACopy(Answer(query)),
         _ => Answer(query),
     };
+
+    [HttpGet("/Residents/Present/{name}")]
+    public IActionResult Present(ResidentQuery query)
+        => OnTheRegister.ContainsKey(query.Name) ? Content(query.Name + " is marked present", "text/plain") : StatusCode(StatusCodes.Status500InternalServerError);
 
     [HttpGet("/Residents/Elsewhere/{name}")]
     public IActionResult Elsewhere(string name)
     {
         Response.Headers.AccessControlAllowOrigin = "*";
         return Answer(new ResidentQuery { Name = name, Ward = "Moved" });
+    }
+
+    [HttpOptions("/Residents/Elsewhere/{name}")]
+    public IActionResult ElsewhereAllows()
+    {
+        Response.Headers.AccessControlAllowOrigin = "*";
+        Response.Headers.AccessControlAllowHeaders = "*";
+        return NoContent();
     }
 
     [HttpGet("/Residents/Kin/{name}")]
@@ -59,11 +72,11 @@ public sealed class ResidentsController : Controller
 
     public IActionResult HeaderNamed(string name, string value) => View(new HeaderAsk { Name = name, Value = value });
 
-    public IActionResult ResponseAfterAStep() => View(new ResidentLookup());
+    public IActionResult RouteAfterAStep() => View(new ResidentLookup());
 
-    public IActionResult ResponseTwice() => View(new ResidentLookup());
+    public IActionResult RequestWrittenTwice() => View(new ResidentLookup());
 
-    public IActionResult SuccessTwice() => View(new ResidentLookup());
+    public IActionResult RoutedRequestWrittenTwice() => View(new ResidentLookup());
 
     public IActionResult StatusTwice() => View(new ResidentLookup());
 
@@ -77,6 +90,12 @@ public sealed class ResidentsController : Controller
     {
         HttpContext.Abort();
         return new EmptyResult();
+    }
+
+    private static IActionResult FromACopy(IActionResult answer)
+    {
+        if (answer is JsonResult found) found.StatusCode = StatusCodes.Status203NonAuthoritative;
+        return answer;
     }
 
     private string OtherHost() => Request.Host.Host == "localhost" ? "127.0.0.1" : "localhost";

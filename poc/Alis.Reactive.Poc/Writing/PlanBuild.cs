@@ -27,6 +27,7 @@ internal sealed class PlanBuild
     private readonly ResultLines _resultLines = new();
     private readonly HashSet<string> _elseIfResults = new(StringComparer.Ordinal);
     private readonly List<string> _openReplies = [];
+    private readonly HashSet<string> _replies = new(StringComparer.Ordinal);
     private int _items;
     private int _results;
     private int _requests;
@@ -181,6 +182,7 @@ internal sealed class PlanBuild
     {
         RequireAPlaceThatWaits();
         var request = new RequestStatement(send, "reply" + (++_requests).ToString(CultureInfo.InvariantCulture));
+        _replies.Add(request.Reply);
         Write(request);
         return request;
     }
@@ -196,17 +198,6 @@ internal sealed class PlanBuild
         {
             _openReplies.RemoveAt(_openReplies.Count - 1);
         }
-    }
-
-    internal RefExpression Reply(RequestStatement request)
-    {
-        if (!_openReplies.Contains(request.Reply))
-        {
-            throw new InvalidOperationException(
-                "A request's reply is read outside its routes. Read the reply in the route that receives it: Response(response => response.OnSuccess<TBody>((body, pipeline) => ..)).");
-        }
-
-        return new RefExpression(request.Reply);
     }
 
     private void RequireAPlaceThatWaits()
@@ -242,6 +233,13 @@ internal sealed class PlanBuild
     internal Expression InScope(Expression read)
     {
         if (read is not RefExpression reference) return read;
+        var readsAReplyOutsideItsRoutes = _replies.Contains(reference.Name) && !_openReplies.Contains(reference.Name);
+        if (readsAReplyOutsideItsRoutes)
+        {
+            throw new InvalidOperationException(
+                "A request's reply is read outside its routes. Read the reply in the route that receives it: pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).");
+        }
+
         var readsAResultOutsideItsBlock = _resultBlocks.TryGetValue(reference.Name, out var block) && !_open.Contains(block);
         if (!readsAResultOutsideItsBlock) return read;
         if (_elseIfResults.Contains(reference.Name))

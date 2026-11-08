@@ -254,6 +254,81 @@ public sealed class WhenTheRegisterIsAsked : AppPageTest
         Assert.That(first.Url, Is.EqualTo(BaseUrl + "/Residents/Summary/Helen%20Park?Ward=South&Home=Maple+Court"));
     }
 
+    [Test]
+    public async Task a_request_whose_success_route_reads_json_asks_for_json()
+    {
+        await Open("/Residents/Lookup");
+
+        var asked = await Page.RunAndWaitForRequestAsync(() => LookUp("Helen Park"), Summaries);
+
+        Assert.That(await asked.HeaderValueAsync("Accept"), Is.EqualTo("application/json"));
+    }
+
+    [Test]
+    public async Task the_success_route_reads_the_status_the_register_answered_with()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Interim");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#answered-by")).ToHaveTextAsync("Answered from a copy");
+    }
+
+    [Test]
+    public async Task the_success_route_reads_an_ok_status_as_the_register_answering()
+    {
+        await Open("/Residents/Lookup");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#answered-by")).ToHaveTextAsync("Answered by the register");
+    }
+
+    [Test]
+    public async Task the_route_for_every_other_outcome_reads_a_failed_status_and_its_code()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Annex");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#failure")).ToHaveTextAsync("The register failed with 500");
+    }
+
+    [Test]
+    public async Task the_route_for_every_other_outcome_reads_a_dropped_connection_as_a_network_failure_with_no_status()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Basement");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#failure")).ToHaveTextAsync("The network failed");
+    }
+
+    [Test]
+    public async Task the_route_for_every_other_outcome_reads_a_redirect_to_another_origin()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Moved");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#failure")).ToHaveTextAsync("It moved to another site");
+    }
+
+    [Test]
+    public async Task the_route_for_every_other_outcome_reads_an_answer_not_of_the_declared_kind_as_content()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("East");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#failure")).ToHaveTextAsync("It answered what does not read as JSON");
+    }
+
     private async Task LookUp(string name)
     {
         await Page.GetByLabel("Resident name").FillAsync(name);

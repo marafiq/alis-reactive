@@ -8,10 +8,10 @@ public static class RequestDoors
 {
     public static void EveryGetDoor(Pipeline<IntakeView> pipeline)
     {
-        var sent = pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
+        var sent = pipeline.Get<BedQuery>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
             .OnError(409, Content.Text, (conflict, shown) => shown.Notice().Warning(conflict.Body))
             .OnError((failed, shown) => shown.Notice().Error("Failed"))
-            .Validate<BedQueryValidator>()
+            .Validate<IntakeView, BedQuery, BedQueryValidator>()
             .NoValidation()
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))
@@ -26,7 +26,7 @@ public static class RequestDoors
         sent.OnSuccess(Content.Json<Census>(), (counted, done) => done.Notice().Info("Counted"))
             .OnError(409, Content.Text, (conflict, shown) => shown.Notice().Warning(conflict.Body))
             .OnError((failed, shown) => shown.Notice().Error("Failed"))
-            .Validate<BedQueryValidator>()
+            .Validate<IntakeView, BedQuery, Response<BedQuery, Census>, BedQueryValidator>()
             .NoValidation()
             .WhileLoading(loading => loading.Notice().Info("Loading"))
             .Finally(done => done.Notice().Info("Done"))

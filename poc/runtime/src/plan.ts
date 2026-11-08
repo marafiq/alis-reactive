@@ -23,7 +23,7 @@ export interface AssignmentListening {
   readonly kind: "assignment";
 }
 
-export type BodyKind = "html" | "json";
+export type BodyKind = "html" | "json" | "none";
 
 export interface BooleanForm {
   readonly kind: "boolean";
@@ -102,10 +102,9 @@ export interface HeldRelease {
 
 export type HttpMethod = "GET";
 
-export type HttpOutcome = "success" | "status" | "network" | "redirect" | "kind";
+export type HttpOutcome = "success" | "status" | "network" | "redirect" | "content";
 
 export interface HttpResponse {
-  readonly ok: boolean;
   readonly status: number;
   readonly outcome: HttpOutcome;
   readonly body: JsonValue;
@@ -117,7 +116,6 @@ export interface HttpSend {
   readonly search: string;
   readonly query: readonly SentField[];
   readonly headers: readonly SentHeader[];
-  readonly success: BodyKind;
 }
 
 export interface IfStatement {
@@ -222,6 +220,10 @@ export interface OperatorExpression {
   readonly args: readonly Expression[];
 }
 
+export interface OtherwiseRoute {
+  readonly do: readonly Statement[];
+}
+
 export type PathPart = TextPart | ValuePart;
 
 export type PathStep = string | number;
@@ -275,7 +277,7 @@ export interface RequestStatement {
   readonly reply: string;
   readonly success: Route;
   readonly statuses: readonly StatusRoute[];
-  readonly otherwise: Route;
+  readonly otherwise: OtherwiseRoute;
 }
 
 export interface ReturnedListening {
@@ -284,6 +286,7 @@ export interface ReturnedListening {
 }
 
 export interface Route {
+  readonly kind: BodyKind;
   readonly do: readonly Statement[];
 }
 
@@ -322,6 +325,7 @@ export type Statement = SetStatement | DoStatement | LetStatement | IfStatement 
 
 export interface StatusRoute {
   readonly status: number;
+  readonly kind: BodyKind;
   readonly do: readonly Statement[];
 }
 

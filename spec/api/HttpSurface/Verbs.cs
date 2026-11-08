@@ -6,11 +6,6 @@ namespace Alis.Reactive.Pipelines;
 
 public static class RequestVerbs
 {
-    public static GetRequest<TModel, NoModel> Get<TModel>(this Pipeline<TModel> pipeline, string url) => throw new NotSupportedException();
-
-    public static GetRequest<TModel, TRequest> Get<TModel, TRequest>(this Pipeline<TModel> pipeline, string url, Action<QueryParts<TRequest>> request)
-        => throw new NotSupportedException();
-
     public static HeadRequest<TModel, NoModel> Head<TModel>(this Pipeline<TModel> pipeline, string url) => throw new NotSupportedException();
 
     public static HeadRequest<TModel, TRequest> Head<TModel, TRequest>(this Pipeline<TModel> pipeline, string url, Action<QueryParts<TRequest>> request)

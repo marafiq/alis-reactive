@@ -3,22 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
+using Alis.Reactive.Components;
 using Alis.Reactive.Plan;
+using Alis.Reactive.Requests;
 using Alis.Reactive.Types;
 using Alis.Reactive.Values;
 using Alis.Reactive.Writing;
 
 namespace Alis.Reactive.Pipelines;
 
-public sealed class Request
+internal static class GetSends
 {
-    private readonly PlanBuild _build;
-    private readonly RequestStatement _request;
-    private bool _routed;
-
-    internal Request(PlanBuild build, string url)
+    internal static Func<BodyKind, Plan.Expression> Of(string url)
     {
-        _build = build;
         var (path, search) = RequestUrls.Split(url);
         var placeholder = RequestUrls.Pieces(path, nameof(url)).FirstOrDefault(piece => piece.Placeholder);
         if (placeholder is not null)
@@ -27,32 +24,18 @@ public sealed class Request
                 $"The URL '{url}' has the placeholder {placeholder.Text}, which a request that sets no members cannot fill; take the placeholder out of the URL.", nameof(url));
         }
 
-        var send = new HttpSend(HttpMethod.Get, [new TextPart(path)], search, [], [], BodyKind.Html);
-        var argument = new LiteralExpression(JsonSerializer.SerializeToElement(send, PlanJson.Options));
-        _request = build.Request(argument);
+        return kind => new LiteralExpression(JsonSerializer.SerializeToElement(
+            new HttpSend(HttpMethod.Get, [new TextPart(path)], search, [], [new SentHeader(SentRecords.Accept, JsonSerializer.SerializeToElement(kind.Accept), WireForm.Text)]),
+            PlanJson.Options));
     }
 
-    public void Into(string elementId)
+    internal static Func<BodyKind, Plan.Expression> Of<TRequest>(PlanBuild build, string url, Action<QueryParts<TRequest>> request)
     {
-        Slots.RequireAnId(elementId);
-        if (_routed) throw new InvalidOperationException("A request loads one slot: write one Into.");
-        if (!_build.Follows(_request))
-        {
-            throw new InvalidOperationException(
-                "Into is the route of the request it follows: write it in the same sentence, before any other step, as pipeline.Get(url).Into(id).");
-        }
-
-        _routed = true;
-        var slot = _build.Slot(elementId);
-        _request.Success = new Route(_build.Route(_request, () =>
-            _build.Write(new DoStatement(new CallExpression(new ObjectExpression(slot), [PathStep.Member("load")], ReadPresence.Required, [Replies.Body(_build, _request)]), awaits: false))));
+        var (path, search) = RequestUrls.Split(RequestUrls.Checked(url));
+        var parts = new QueryParts<TRequest>(build, url, RequestUrls.Pieces(path, nameof(url)));
+        request(parts);
+        return kind => parts.Sent(url, search, kind);
     }
-}
-
-internal static class Replies
-{
-    internal static GetExpression Body(PlanBuild build, RequestStatement request)
-        => new(build.Reply(request), [PathStep.Member(PlanJson.Name(nameof(HttpResponse.Body)))], ReadPresence.Required);
 }
 
 internal static class Slots
@@ -60,6 +43,12 @@ internal static class Slots
     internal static void RequireAnId(string elementId)
     {
         if (string.IsNullOrWhiteSpace(elementId)) throw new ArgumentException("A slot is reached by the id of its element.", nameof(elementId));
+    }
+
+    internal static void Load(PlanBuild build, string elementId, ReadOnly<Markup> body)
+    {
+        var slot = build.Slot(elementId);
+        build.Write(new DoStatement(new CallExpression(new ObjectExpression(slot), [PathStep.Member("load")], ReadPresence.Required, [Sources.Of(body).Expression]), awaits: false));
     }
 
     internal static void Unload(PlanBuild build, string elementId)
@@ -198,7 +187,7 @@ public sealed class QueryParts<TRequest>
     internal LiteralExpression LiteralOf<TValue>(TValue value)
         => value is Enum named ? Literal.Of(named.ToString(), Build) : Literal.Of(value, Build);
 
-    internal RecordExpression Sent(string url, string search)
+    internal RecordExpression Sent(string url, string search, BodyKind success)
     {
         foreach (var placeholder in _pieces.Where(piece => piece.Placeholder))
         {
@@ -224,8 +213,7 @@ public sealed class QueryParts<TRequest>
             (nameof(HttpSend.Path), new ListExpression(path)),
             (nameof(HttpSend.Search), Literal.Of(search, Build)),
             (nameof(HttpSend.Query), new ListExpression([.. _query.Select(FieldRecord)])),
-            (nameof(HttpSend.Headers), new ListExpression([.. _headers.Select(HeaderRecord)])),
-            (nameof(HttpSend.Success), Literal.Of(BodyKind.Json.Text, Build)));
+            (nameof(HttpSend.Headers), new ListExpression([AcceptRecord(success), .. _headers.Select(HeaderRecord)])));
     }
 
     private QueryParts<TRequest> InPath(LambdaExpression member, SentForm form, Plan.Expression value)
@@ -300,6 +288,12 @@ public sealed class QueryParts<TRequest>
             (nameof(SentField.Form), SentRecords.FormOf(member.Form.Form)),
             (nameof(SentField.WhenNothing), Literal.Of(member.Form.WhenNothing.Text, Build)));
 
+    private RecordExpression AcceptRecord(BodyKind success)
+        => SentRecords.Record(
+            (nameof(SentHeader.Name), Literal.Of(SentRecords.Accept, Build)),
+            (nameof(SentHeader.Value), Literal.Of(success.Accept, Build)),
+            (nameof(SentHeader.Form), SentRecords.FormOf(WireForm.Text)));
+
     private RecordExpression HeaderRecord(SentMember header)
         => SentRecords.Record(
             (nameof(SentHeader.Name), Literal.Of(header.Name, Build)),
@@ -323,44 +317,10 @@ internal sealed class SentMember
     internal SentForm Form { get; }
 }
 
-public sealed class SentRequest<TModel>
-{
-    private readonly PlanBuild _build;
-    private readonly RequestStatement _request;
-    private bool _routed;
-
-    internal SentRequest(PlanBuild build, RequestStatement request)
-    {
-        _build = build;
-        _request = request;
-    }
-
-    public void Response(Action<Routes<TModel>> routes)
-    {
-        if (_routed) throw new InvalidOperationException("A request takes one Response: write each route inside it.");
-        if (!_build.Follows(_request))
-        {
-            throw new InvalidOperationException(
-                "Response routes the request it follows: write it in the same sentence, before any other step, as pipeline.Get<TRequest>(url, request => ..).Response(response => ..).");
-        }
-
-        _routed = true;
-        var declared = new Routes<TModel>(_build, _request);
-        routes(declared);
-        declared.Write();
-    }
-
-    internal static SentRequest<TModel> Get<TRequest>(PlanBuild build, string url, Action<QueryParts<TRequest>> request)
-    {
-        var (path, search) = RequestUrls.Split(RequestUrls.Checked(url));
-        var parts = new QueryParts<TRequest>(build, url, RequestUrls.Pieces(path, nameof(url)));
-        request(parts);
-        return new SentRequest<TModel>(build, build.Request(parts.Sent(url, search)));
-    }
-}
-
 internal static class SentRecords
 {
+    internal const string Accept = "Accept";
+
     internal static RecordExpression TextPart(string text, PlanBuild build)
         => Kind(PathPart.TextKind, (nameof(Plan.TextPart.Text), Literal.Of(text, build)));
 
@@ -373,69 +333,4 @@ internal static class SentRecords
 
     private static List<RecordField> Fields((string Member, Plan.Expression Value)[] fields)
         => [.. fields.Select(field => new RecordField(PlanJson.Name(field.Member), field.Value))];
-}
-
-public sealed class Routes<TModel>
-{
-    private readonly PlanBuild _build;
-    private readonly RequestStatement _request;
-    private readonly List<(int Status, Action Steps)> _errors = [];
-    private Action? _success;
-    private Action? _otherwise;
-
-    internal Routes(PlanBuild build, RequestStatement request)
-    {
-        _build = build;
-        _request = request;
-    }
-
-    public Routes<TModel> OnSuccess<TBody>(Action<ResponseBody<TBody>, Pipeline<TModel>> success)
-    {
-        if (_success is not null) throw new InvalidOperationException("A request has one success route.");
-        _success = () => success(Body<TBody>(), new Pipeline<TModel>(_build));
-        return this;
-    }
-
-    public Routes<TModel> OnError<TBody>(int status, Action<ResponseBody<TBody>, Pipeline<TModel>> error)
-    {
-        var notAnError = status is < 300 or > 599;
-        if (notAnError) throw new ArgumentOutOfRangeException(nameof(status), $"An error route is for a status from 300 to 599, not {status}.");
-        if (_errors.Any(each => each.Status == status)) throw new InvalidOperationException($"A request has one route for the status {status}.");
-        _errors.Add((status, () => error(Body<TBody>(), new Pipeline<TModel>(_build))));
-        return this;
-    }
-
-    public Routes<TModel> OnError(Action<Pipeline<TModel>> otherwise)
-    {
-        if (_otherwise is not null) throw new InvalidOperationException("A request has one route for every other outcome.");
-        _otherwise = () => otherwise(new Pipeline<TModel>(_build));
-        return this;
-    }
-
-    internal void Write()
-    {
-        if (_success is { } success) _request.Success = new Route(_build.Route(_request, success));
-        _request.Statuses = [.. _errors.Select(error => new StatusRoute(error.Status, _build.Route(_request, error.Steps)))];
-        if (_otherwise is { } otherwise) _request.Otherwise = new Route(_build.Route(_request, otherwise));
-    }
-
-    private ResponseBody<TBody> Body<TBody>() => new(_request, _build);
-}
-
-public sealed class ResponseBody<TBody> : TypedSource<TBody>
-{
-    private readonly RequestStatement _request;
-
-    internal ResponseBody(RequestStatement request, PlanBuild build)
-    {
-        _request = request;
-        Build = build;
-    }
-
-    internal override Plan.Expression Expression => Replies.Body(Build, _request);
-
-    internal override PlanBuild Build { get; }
-
-    public TypedSource<TRead> Read<TRead>(Expression<Func<TBody, TRead>> path)
-        => DataPast(path, nameof(path));
 }

@@ -6,35 +6,6 @@ using Alis.Reactive.Values;
 
 namespace Alis.Reactive.Requests;
 
-public class Response<TRequest> : JsObject
-{
-    private protected Response()
-    {
-    }
-
-    public ReadOnly<int> Status => throw new NotSupportedException();
-
-    public ResponseHeaders Headers => throw new NotSupportedException();
-
-    public ReadOnly<TRequest> Request => throw new NotSupportedException();
-}
-
-public sealed class Response<TRequest, TBody> : Response<TRequest>
-{
-    private Response()
-    {
-    }
-
-    public ReadOnly<TBody> Body => throw new NotSupportedException();
-}
-
-public sealed class Markup
-{
-    private Markup()
-    {
-    }
-}
-
 public sealed class ResponseHeaders : JsObject
 {
     private ResponseHeaders()
@@ -42,27 +13,6 @@ public sealed class ResponseHeaders : JsObject
     }
 
     public MethodResult<string?> Get(string name) => throw new NotSupportedException();
-}
-
-public enum FailureOutcome
-{
-    Status,
-    Network,
-    Redirect,
-    Content,
-}
-
-public sealed class Failure : JsObject
-{
-    private Failure()
-    {
-    }
-
-    public ReadOnly<FailureOutcome> Outcome => throw new NotSupportedException();
-
-    public ReadOnly<int> Status => throw new NotSupportedException();
-
-    public ResponseHeaders Headers => throw new NotSupportedException();
 }
 
 public sealed class ResponseFile

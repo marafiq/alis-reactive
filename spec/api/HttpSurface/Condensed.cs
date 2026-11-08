@@ -77,12 +77,6 @@ public static class CondensedStandIns
         where TValue : struct
         => throw new NotSupportedException();
 
-    public static GetRequest<TModel, TRequest, Response<TRequest>> OnSuccess<TModel, TRequest>(this GetRequest<TModel, TRequest> request, Action<Pipeline<TModel>> success)
-        => throw new NotSupportedException();
-
-    public static GetRequest<TModel, TRequest, Response<TRequest, Markup>> Into<TModel, TRequest>(this GetRequest<TModel, TRequest> request, string elementId)
-        => throw new NotSupportedException();
-
     public static GetRequest<TModel, TRequest, Response<TRequest, ResponseFile>> Download<TModel, TRequest>(this GetRequest<TModel, TRequest> request)
         => throw new NotSupportedException();
 

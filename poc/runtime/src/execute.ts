@@ -1,9 +1,9 @@
-import type { CallExpression, DoStatement, HttpResponse, HttpSend, IfStatement, LetStatement, PathStep, RequestStatement, Route, SetStatement, Statement, StatusRoute } from "./plan";
+import type { CallExpression, DoStatement, HttpSend, IfStatement, LetStatement, PathStep, RequestStatement, SetStatement, Statement } from "./plan";
 import { callee, called, evaluate, memberHolder, objectHolding, walk, type Bound, type Context } from "./evaluate";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 import { listenTo } from "./objects";
 import { requireNoSlotWithin } from "./held-slots";
-import { send } from "./http";
+import { answered } from "./http";
 
 type Awaited = DoStatement | LetStatement;
 
@@ -91,25 +91,10 @@ function stepped(statement: Statement, context: Context): Step {
 
 function requested(request: RequestStatement, context: Context): Promise<Resumed> {
   const sent = heldOrNull(evaluate(request.send, context)) as HttpSend;
-  return send(sent).then((reply) => ({
+  return answered(sent, request).then((answer) => ({
     kind: "opened",
-    block: { statements: routeFor(request, reply).do, next: 0, context: bound(context, request.reply, value(reply)) },
+    block: { statements: answer.route, next: 0, context: bound(context, request.reply, value(answer.reply)) },
   }));
-}
-
-function routeFor(request: RequestStatement, reply: HttpResponse): Route | StatusRoute {
-  switch (reply.outcome) {
-    case "success":
-      return request.success;
-    case "status":
-      return request.statuses.find((route) => route.status === reply.status) ?? request.otherwise;
-    case "network":
-    case "redirect":
-    case "kind":
-      return request.otherwise;
-    default:
-      return assertNever(reply.outcome);
-  }
 }
 
 function holds(read: Read): boolean {

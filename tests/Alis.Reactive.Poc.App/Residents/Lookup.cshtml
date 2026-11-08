@@ -12,7 +12,7 @@
     {
         var ward = pipeline.Input(m => m.Ward).Component<NativeTextBox>().Value;
         pipeline.Get<WardQuery>("/Residents/Register/{ward}", request => request.Set(r => r.Ward, ward))
-            .Response(response => response.OnError(other => other.Element("register").Text.Set("The ward's register is offline")));
+            .OnError((_, other) => other.Element("register").Text.Set("The ward's register is offline"));
         pipeline.Element("register-checked").Text.Set(ward);
     }))
 <p>Register: <strong id="register">not checked</strong>, last checked for <strong id="register-checked">no ward yet</strong></p>
@@ -27,32 +27,53 @@
                 .Query(r => r.Home, "Maple Court")
                 .Header("X-Desk", "Front desk")
                 .Header("X-Asked-For", name))
-            .Response(response => response
-                .OnSuccess<ResidentSummary>((summary, found) =>
-                {
-                    found.Element("lookup-status").Text.Set(summary.Read(s => s.Name));
-                    found.Element("lookup-route").Text.Set("On the register");
-                    found.Element("room").Text.Set(summary.Read(s => s.Room));
-                    found.Element("wing").Text.Set(summary.Read(s => s.Wing.Name));
-                    found.Element("asked-ward").Text.Set(summary.Read(s => s.Ward));
-                    found.Element("asked-home").Text.Set(summary.Read(s => s.Home));
-                    found.When(summary.Read(s => s.Wing.Floor).Gt(0))
-                        .Then(upstairs => upstairs.Element("access").Text.Set("Needs the lift"))
-                        .Else(ground => ground.Element("access").Text.Set("Step-free"));
-                    found.When(summary.Read(s => s.Medicines).Any(medicine => medicine.Controlled))
-                        .Then(controlled => controlled.Element("signing").Text.Set("A second nurse signs each round"))
-                        .Else(uncontrolled => uncontrolled.Element("signing").Text.Set("No second signature"));
-                })
-                .OnError<NoResident>(404, (missing, notFound) =>
-                {
-                    notFound.Element("lookup-route").Text.Set("Not on the register");
-                    notFound.Element("lookup-status").Text.Set(missing.Read(m => m.Reason));
-                })
-                .OnError(other => other.Element("lookup-status").Text.Set("The register could not answer")));
+            .OnSuccess<ResidentSummary>((summary, found) =>
+            {
+                found.Element("lookup-status").Text.Set(summary.Body.Read(s => s.Name));
+                found.Element("lookup-route").Text.Set("On the register");
+                found.Element("room").Text.Set(summary.Body.Read(s => s.Room));
+                found.Element("wing").Text.Set(summary.Body.Read(s => s.Wing.Name));
+                found.Element("asked-ward").Text.Set(summary.Body.Read(s => s.Ward));
+                found.Element("asked-home").Text.Set(summary.Body.Read(s => s.Home));
+                found.When(summary.Body.Read(s => s.Wing.Floor).Gt(0))
+                    .Then(upstairs => upstairs.Element("access").Text.Set("Needs the lift"))
+                    .Else(ground => ground.Element("access").Text.Set("Step-free"));
+                found.When(summary.Body.Read(s => s.Medicines).Any(medicine => medicine.Controlled))
+                    .Then(controlled => controlled.Element("signing").Text.Set("A second nurse signs each round"))
+                    .Else(uncontrolled => uncontrolled.Element("signing").Text.Set("No second signature"));
+                found.When(summary.Status.Eq(203))
+                    .Then(copy => copy.Element("answered-by").Text.Set("Answered from a copy"))
+                    .Else(register => register.Element("answered-by").Text.Set("Answered by the register"));
+            })
+            .OnError<NoResident>(404, (missing, notFound) =>
+            {
+                notFound.Element("lookup-route").Text.Set("Not on the register");
+                notFound.Element("lookup-status").Text.Set(missing.Body.Read(m => m.Reason));
+            })
+            .OnError((failed, other) =>
+            {
+                other.Element("lookup-status").Text.Set("The register could not answer");
+                other.When(failed.Outcome.Eq(FailureOutcome.Status).And(failed.Status.Eq(500)))
+                    .Then(status => status.Element("failure").Text.Set("The register failed with 500"))
+                    .ElseIf(failed.Outcome.Eq(FailureOutcome.Network).And(failed.Status.Eq(0)))
+                    .Then(network => network.Element("failure").Text.Set("The network failed"))
+                    .ElseIf(failed.Outcome.Eq(FailureOutcome.Redirect))
+                    .Then(redirect => redirect.Element("failure").Text.Set("It moved to another site"))
+                    .ElseIf(failed.Outcome.Eq(FailureOutcome.Content))
+                    .Then(content => content.Element("failure").Text.Set("It answered what does not read as JSON"));
+            });
         pipeline.Element("last-lookup").Text.Set(name);
     }))
 
-<p>Lookup: <strong id="lookup-status">not looked up</strong> <strong id="lookup-route"></strong></p>
+<p>Lookup: <strong id="lookup-status">not looked up</strong> <strong id="lookup-route"></strong> <strong id="answered-by"></strong></p>
+<p>Failure: <strong id="failure">none</strong></p>
+
+@(plan.Button("mark-present", "Mark present")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Get<ResidentQuery>("/Residents/Present/{name}", request => request.Path(r => r.Name, pipeline.Input(m => m.Name).Component<NativeTextBox>().Value))
+            .OnSuccess(marked => marked.Element("presence").Text.Set("Marked present"))
+            .OnError((_, unmarked) => unmarked.Element("presence").Text.Set("Not marked"))))
+<p>Presence: <strong id="presence">not marked</strong></p>
 <p>Last looked up: <strong id="last-lookup">nobody yet</strong></p>
 <p>Room <strong id="room">no resident yet</strong> in the <strong id="wing">no wing yet</strong> wing, <strong id="access">access unknown</strong></p>
 <p>Medicines: <strong id="signing">not read yet</strong></p>

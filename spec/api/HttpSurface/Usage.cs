@@ -36,7 +36,7 @@ public static class Usage
                 .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward)))
             .OnSuccess<IntakeCreated>((created, done) => done.Notice().Success("Resident admitted"))
             .Chained((created, next) => next
-                .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
                     .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
                 .Into("resident-summary"));
 
@@ -49,7 +49,7 @@ public static class Usage
             .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
             .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))
             .Chained((created, next) => next
-                .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
                     .Path(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
                 .OnSuccess(Content.Html, (summary, loaded) => loaded.Into("resident-summary", summary.Body)));
 
@@ -58,15 +58,15 @@ public static class Usage
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
         pipeline.Parallel(
             census => census
-                .Get<IntakeView, CensusQuery>("/Wards/{ward}/Census", query => query.Path(q => q.Ward, ward))
+                .Get<CensusQuery>("/Wards/{ward}/Census", query => query.Path(q => q.Ward, ward))
                 .OnSuccess(Content.Json<Census>(), (counted, filled) => filled.Component<CensusBoard>("census").Occupied.Set(counted.Body.Read(c => c.Occupied)))
                 .Busy("ward-board"),
             roster => roster
-                .Get<IntakeView, RosterQuery>("/Wards/{ward}/Roster", query => query.Path(q => q.Ward, ward))
+                .Get<RosterQuery>("/Wards/{ward}/Roster", query => query.Path(q => q.Ward, ward))
                 .OnSuccess(Content.Json<Roster>(), (rostered, filled) => filled.Component<StaffRoster>("roster").OnDuty.Set(rostered.Body.Read(r => r.OnDuty)))
                 .Busy("ward-board", "roster"),
             summary => summary
-                .Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query.Path(q => q.ResidentId, 12))
+                .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query.Path(q => q.ResidentId, 12))
                 .Into("resident-summary"),
             refresh => refresh
                 .Post("/Wards/Census/Refresh")
@@ -145,25 +145,25 @@ public static class Usage
                 .Header("X-Census", floor))
             .OnSuccess(Content.None, (allowed, shown) => shown.Element("allowed").Text.Set(allowed.Headers.Get("Allow")))
             .NoValidation();
-        pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query
+        pipeline.Get<BedQuery>("/Wards/{ward}/Beds", query => query
                 .Path(q => q.Ward, "north")
                 .Set(q => q.Floor, floor)
                 .Set(q => q.Wing, ward)
                 .Set(q => q.Bed, 4))
             .OnSuccess<Census>((counted, shown) => shown.Element("beds").Text.Set(counted.Request.Read(q => q.Ward)))
             .OnError<ValidationProblem>(400, (refused, shown) => shown.ShowErrors(refused.Body));
-        pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query
+        pipeline.Get<BedQuery>("/Wards/{ward}/Beds", query => query
                 .Path(q => q.Ward, "north")
                 .Form(bedSearch))
-            .Validate<BedQueryValidator>()
+            .Validate<IntakeView, BedQuery, BedQueryValidator>()
             .Into("beds");
-        pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query => query
+        pipeline.Get<BedQuery>("/Wards/{ward}/Beds", query => query
                 .Inputs(bedFilters)
                 .Input(q => q.Wing, pipeline.Input(v => v.Resident))
                 .Input(q => q.Floor, pipeline.Input(v => v.Floor)))
             .Into("beds");
         pipeline.Head("/Wards").OnSuccess(done => done.Notice().Info("Wards answered"));
-        RequestVerbs.Get(pipeline, "/Wards").OnSuccess(Content.Json<Census>(), (counted, done) => done.Notice().Info("Wards listed"));
+        pipeline.Get("/Wards").OnSuccess(Content.Json<Census>(), (counted, done) => done.Notice().Info("Wards listed"));
     }
 
     public static void EveryBodyPart(Pipeline<IntakeView> pipeline, RequestContainer<BedRequest> beds, RequestForm<BedRequest> bedForm)

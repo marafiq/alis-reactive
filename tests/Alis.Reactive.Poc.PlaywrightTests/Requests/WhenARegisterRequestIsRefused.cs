@@ -36,7 +36,7 @@ public sealed class WhenARegisterRequestIsRefused : AppPageTest
         await Page.GotoAsync(BaseUrl + "/Residents/ReplyAfterItsRequest");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: A request's reply is read outside its routes. Read the reply in the route that receives it: Response(response => response.OnSuccess<TBody>((body, pipeline) => ..)).");
+            "InvalidOperationException: A request's reply is read outside its routes. Read the reply in the route that receives it: pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).");
     }
 
     [Test]
@@ -85,30 +85,30 @@ public sealed class WhenARegisterRequestIsRefused : AppPageTest
     }
 
     [Test]
-    public async Task a_response_written_after_another_step_is_refused_where_the_view_renders()
+    public async Task a_route_written_after_another_step_is_refused_where_the_view_renders()
     {
-        await Page.GotoAsync(BaseUrl + "/Residents/ResponseAfterAStep");
+        await Page.GotoAsync(BaseUrl + "/Residents/RouteAfterAStep");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: Response routes the request it follows: write it in the same sentence, before any other step, as pipeline.Get<TRequest>(url, request => ..).Response(response => ..).");
+            "InvalidOperationException: A route belongs to the request it follows: write it in the same sentence, before any other step, as pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..) or pipeline.Get(url).Into(id).");
     }
 
     [Test]
-    public async Task a_second_response_of_one_request_is_refused_where_the_view_renders()
+    public async Task a_request_held_in_a_variable_and_routed_twice_is_refused_where_the_view_renders()
     {
-        await Page.GotoAsync(BaseUrl + "/Residents/ResponseTwice");
+        await Page.GotoAsync(BaseUrl + "/Residents/RequestWrittenTwice");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: A request takes one Response: write each route inside it.");
+            "InvalidOperationException: A request is written as one chain, each door on the stage the door before it returned, and this stage took a door already: write pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).OnError((failed, pipeline) => ..).");
     }
 
     [Test]
-    public async Task a_second_success_route_is_refused_where_the_view_renders()
+    public async Task a_routed_request_held_in_a_variable_and_routed_twice_is_refused_where_the_view_renders()
     {
-        await Page.GotoAsync(BaseUrl + "/Residents/SuccessTwice");
+        await Page.GotoAsync(BaseUrl + "/Residents/RoutedRequestWrittenTwice");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: A request has one success route.");
+            "InvalidOperationException: A request is written as one chain, each door on the stage the door before it returned, and this stage took a door already: write pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).OnError((failed, pipeline) => ..).");
     }
 
     [Test]

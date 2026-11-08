@@ -45,15 +45,15 @@ public sealed class WhenACardRequestIsRefused : AppPageTest
         await Page.GotoAsync(BaseUrl + "/Cards/IntoAfterAStep");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: Into is the route of the request it follows: write it in the same sentence, before any other step, as pipeline.Get(url).Into(id).");
+            "InvalidOperationException: A route belongs to the request it follows: write it in the same sentence, before any other step, as pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..) or pipeline.Get(url).Into(id).");
     }
 
     [Test]
-    public async Task a_second_into_of_one_request_is_refused_where_the_view_renders()
+    public async Task a_second_into_of_one_request_held_in_a_variable_is_refused_where_the_view_renders()
     {
         await Page.GotoAsync(BaseUrl + "/Cards/IntoTwice");
 
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
-            "InvalidOperationException: A request loads one slot: write one Into.");
+            "InvalidOperationException: A request is written as one chain, each door on the stage the door before it returned, and this stage took a door already: write pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).OnError((failed, pipeline) => ..).");
     }
 }

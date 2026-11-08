@@ -1942,7 +1942,9 @@ and `notice` (D10.21).
     `Request`, the request's members as it sent them, read as `TRequest`, which a read of the input cannot give once the
     user edits it during the send), the reply of a route of kind none and of every HEAD route, and
     `Response<TRequest, TBody>`, which adds `Body`, a data read that dot-walks; `Failure` (`Outcome`: status, network, redirect or
-    content; `Status`; `Headers`); `ResponseFile`, the data of a file body (`Name`, `Size`, `Type`); `Markup`, an HTML
+    content, which the enum writes as `status`, `network`, `redirect` and `content` by its own converter and member
+    names whatever converter the app's JSON options add, so a condition on it agrees with the browser; `Status`, 0 for a
+    network failure, the Fetch Standard's network error; `Headers`); `ResponseFile`, the data of a file body (`Name`, `Size`, `Type`); `Markup`, an HTML
     body, the only text `Into(elementId, source)` takes; `BrowserFile` (lib.dom `File`), held by a file input's member;
     and `pipeline.PageUrl<TPage>()` or
     `PageUrl<TPage>(template)`, whose `Read(q => q.A.B)` reads a placeholder member from the path and any other from the
@@ -1963,17 +1965,20 @@ and `notice` (D10.21).
   - it replaces the POC's request doors (`poc/Alis.Reactive.Poc/Pipelines/Requests.cs`), each guard given its home:
     `Get(url)` becomes `Get(url)` on every verb, keeping the refusal of a placeholder no member fills, a fragment, and a
     URL that is neither a page path nor an http or https URI (`RequestUrls.Checked`). `Request.Into(id)` becomes the
-    condensed `Into(elementId)`, keeping its required id and its load on success only; its one `Into` per request and its
-    same-sentence rule now hold by type. `Get<TRequest>(url, members)` becomes `Get<TRequest>(url, request => ..)`,
+    condensed `Into(elementId)`, keeping its required id and its load on success only; in a chain its one `Into` holds by
+    type, since the stage it returns offers no success route. `Get<TRequest>(url, members)` becomes `Get<TRequest>(url, request => ..)`,
     keeping a member set once ignoring case, a placeholder with no member, and a list or a time refused in a path
     segment; its refusal of a member past the request's own (`r => r.A.B`) gives way to D9.19's C# path, as the binder
-    reads it. `SentRequest.Response(routes)` gives way to the routes on the request, so its one `Response` and its same
-    sentence hold by construction. `Routes.OnSuccess` becomes `OnSuccess(Content.<kind>, ..)` and `OnSuccess<T>`, one
+    reads it. `SentRequest.Response(routes)` gives way to the routes on the request; its one `Response` and its same
+    sentence become a stage that takes one door and a route written in its request's sentence, which a request held in a
+    variable can break, so ALIS030 refuses both (N18.7) and, until it is built, the view refuses them where it renders:
+    a stage written a second time and a route written after another step. `Routes.OnSuccess` becomes `OnSuccess(Content.<kind>, ..)` and `OnSuccess<T>`, one
     by type; `Routes.OnError(status, ..)` becomes `OnError(status, Content.<kind>, ..)` and `OnError<T>(status, ..)`,
     keeping a status from 300 to 599 and one route a status, ALIS030's (N18.7); `Routes.OnError(otherwise)`
     becomes `OnError((failed, pipeline) => ..)` with `Failure`, keeping one, ALIS030's.
     `ResponseBody<TBody>.Read(path)` becomes `Body.Read(path)`, data that reads as nothing when absent. The POC's kinds by
-    door (HTML for `Get(url)`, JSON for `Get<TRequest>`) become the kind each route names.
+    door (HTML for `Get(url)`, JSON for `Get<TRequest>`) become the kind each route names, which the plan carries on the
+    route, and `Accept` is written from the success route's kind (D10.6): a request with no success route reads none.
 
   ```csharp illustration
   pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request
@@ -3669,8 +3674,9 @@ shapes, starts and the payload kind of each event.
   constant value one outside RFC 9110's field value (D9.23); a JSON body member under a number-keyed dictionary (D14.5); a second `Busy` or `NoBusy`,
   `Busy` beside `NoDefaults()` (D10.21), a status outside 300 to 599, a second route for one status and a second
   catch-all (D10.13); a staged value used more than once, a request's parts object written by two statements or a
-  request held in a variable and written twice, so a door a stage removes cannot come back through a second use, which
-  carries ALIS007's second `Chained` (N10.7).
+  request held in a variable and written twice or after another step, so a door a stage removes cannot come back
+  through a second use and a route stays in the sentence of its request, which carries ALIS007's second `Chained`
+  (N10.7).
 - `N18.8` new: ALIS031, `ShowErrors` in a block that no route encloses (D16.13).
 - `N18.9` new: ALIS032, the block analyzer: a step written on the pipeline of a block around its own (D11.10); a
   bound value carried out of its block through a variable declared outside it (D8.8, D5.11); an `ElseIf` or `Else`

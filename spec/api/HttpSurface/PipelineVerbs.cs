@@ -9,10 +9,6 @@ public sealed class PipelineVerbs<TModel>
     {
     }
 
-    public GetRequest<TModel, NoModel> Get(string url) => throw new NotSupportedException();
-
-    public GetRequest<TModel, TRequest> Get<TRequest>(string url, Action<QueryParts<TRequest>> request) => throw new NotSupportedException();
-
     public HeadRequest<TModel, NoModel> Head(string url) => throw new NotSupportedException();
 
     public HeadRequest<TModel, TRequest> Head<TRequest>(string url, Action<QueryParts<TRequest>> request) => throw new NotSupportedException();

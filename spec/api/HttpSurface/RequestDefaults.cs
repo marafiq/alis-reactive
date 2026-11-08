@@ -9,13 +9,6 @@ public enum AntiforgeryIn
     FormField,
 }
 
-public sealed class NoModel
-{
-    private NoModel()
-    {
-    }
-}
-
 public sealed class RequestDefaults
 {
     private RequestDefaults()

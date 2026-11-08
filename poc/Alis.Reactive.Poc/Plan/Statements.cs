@@ -131,36 +131,52 @@ internal sealed class RequestStatement : Statement
         Reply = reply;
     }
 
-    public Expression Send { get; }
+    public Expression Send { get; internal set; }
 
     public string Reply { get; }
 
-    public Route Success { get; internal set; } = new([]);
+    public Route Success { get; internal set; } = new(BodyKind.None, []);
 
     public IReadOnlyList<StatusRoute> Statuses { get; internal set; } = [];
 
-    public Route Otherwise { get; internal set; } = new([]);
+    public OtherwiseRoute Otherwise { get; internal set; } = new([]);
 }
 
 internal sealed class Route
 {
-    internal Route(IReadOnlyList<Statement> body)
+    internal Route(BodyKind kind, IReadOnlyList<Statement> body)
     {
+        Kind = kind;
         Do = body;
     }
+
+    public BodyKind Kind { get; }
 
     public IReadOnlyList<Statement> Do { get; }
 }
 
 internal sealed class StatusRoute
 {
-    internal StatusRoute(int status, IReadOnlyList<Statement> body)
+    internal StatusRoute(int status, BodyKind kind, IReadOnlyList<Statement> body)
     {
         Status = status;
+        Kind = kind;
         Do = body;
     }
 
     public int Status { get; }
+
+    public BodyKind Kind { get; }
+
+    public IReadOnlyList<Statement> Do { get; }
+}
+
+internal sealed class OtherwiseRoute
+{
+    internal OtherwiseRoute(IReadOnlyList<Statement> body)
+    {
+        Do = body;
+    }
 
     public IReadOnlyList<Statement> Do { get; }
 }

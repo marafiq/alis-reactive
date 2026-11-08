@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 namespace Alis.Reactive.Poc.PlaywrightTests.Slots;
 
 [TestFixture]
@@ -173,6 +175,16 @@ public sealed class WhenACardLoadsIntoASlot : AppPageTest
         await Expect(Page.Locator("#assigned")).ToHaveTextAsync("Assigned again");
 
         await Expect(Page.Locator("#calls li")).ToHaveTextAsync(["Ada Byron heard a bed assigned"]);
+    }
+
+    [Test]
+    public async Task a_card_loaded_into_a_slot_asks_for_html()
+    {
+        await Open("/Cards/Ward");
+
+        var asked = await Page.RunAndWaitForRequestAsync(() => Click("Open Ada's card"), new Regex("/Cards/Card"));
+
+        Assert.That(await asked.HeaderValueAsync("Accept"), Is.EqualTo("text/html"));
     }
 
     private Task Click(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true }).ClickAsync();

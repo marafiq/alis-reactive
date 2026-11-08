@@ -13,7 +13,7 @@
                 .Path(r => r.Name, "Helen Park")
                 .Header("X-Desk", "Front desk")
                 .Header(Model.Name, Model.Value))
-            .Response(response => response.OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Read(s => s.Name))));
+            .OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Body.Read(s => s.Name)));
     }))
 <p>Lookup: <strong id="lookup-status">not looked up</strong></p>
 

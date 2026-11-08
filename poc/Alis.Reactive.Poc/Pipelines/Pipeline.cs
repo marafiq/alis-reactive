@@ -34,10 +34,10 @@ public sealed class Pipeline<TModel>
     public Guard<TModel> When(TypedSource<bool> condition)
         => new(Build, Sources.Of(condition).Expression, Build.When);
 
-    public Request Get(string url) => new(Build, RequestUrls.Checked(url));
+    public GetRequest<TModel, NoModel> Get(string url) => new(new RoutedRequest(Build, GetSends.Of(RequestUrls.Checked(url))));
 
-    public SentRequest<TModel> Get<TRequest>(string url, Action<QueryParts<TRequest>> request)
-        => SentRequest<TModel>.Get(Build, url, request);
+    public GetRequest<TModel, TRequest> Get<TRequest>(string url, Action<QueryParts<TRequest>> request)
+        => new(new RoutedRequest(Build, GetSends.Of(Build, url, request)));
 
     public void Unload(string elementId) => Slots.Unload(Build, elementId);
 

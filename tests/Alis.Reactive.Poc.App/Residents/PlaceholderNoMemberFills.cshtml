@@ -11,7 +11,7 @@
     {
         var name = pipeline.Input(m => m.Name).Component<NativeTextBox>().Value;
         pipeline.Get<ResidentQuery>("/Residents/Summary/{resident}", request => request.Set(r => r.Name, name))
-            .Response(response => response.OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Read(s => s.Name))));
+            .OnSuccess<ResidentSummary>((summary, found) => found.Element("lookup-status").Text.Set(summary.Body.Read(s => s.Name)));
     }))
 <p>Lookup: <strong id="lookup-status">not looked up</strong></p>
 

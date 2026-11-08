@@ -63,7 +63,7 @@ public sealed class ReadsNothingSuppressor : DiagnosticSuppressor
         private static readonly ImmutableHashSet<string> ReadingNothing = ["Count", "Where", "Select", "Any", "All", "Find"];
         private static readonly ImmutableHashSet<string> Stopping = ["Sum", "OrderBy", "OrderByDescending"];
         private static readonly ImmutableHashSet<string> Predicates = ["Any", "All", "Count"];
-        private static readonly string[] PathReaders = ["Alis.Reactive.Components.ReadOnly`1", "Alis.Reactive.Components.MethodResult`1", "Alis.Reactive.Pipelines.ResponseBody`1"];
+        private static readonly string[] PathReaders = ["Alis.Reactive.Components.ReadOnly`1", "Alis.Reactive.Components.MethodResult`1"];
 
         private readonly INamedTypeSymbol _lists;
         private readonly ImmutableArray<INamedTypeSymbol> _pathReaders;

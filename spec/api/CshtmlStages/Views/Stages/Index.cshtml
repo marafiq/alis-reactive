@@ -47,7 +47,7 @@
                 done.When(created.Status.Eq(201))
                     .Then(admitted =>
                     {
-                        admitted.Get<IntakeView, SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                        admitted.Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
                                 .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
                             .OnSuccess<ResidentSummary>((summary, shown) =>
                             {
@@ -89,7 +89,7 @@
     var open = rows.NativeActionLink((activated, pipeline) =>
     {
         pipeline.Element("resident-detail").Classes.Add("loading");
-        pipeline.Get<IntakeView, ResidentQuery>("/Residents/{residentId}", query => query
+        pipeline.Get<ResidentQuery>("/Residents/{residentId}", query => query
                 .Set(q => q.ResidentId, activated.Row.Read(r => r.Id)))
             .OnSuccess(Content.Html, (loaded, done) =>
             {

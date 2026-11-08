@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 var requiresConstructorParameters = builder.Configuration.GetValue<bool>("Json:RespectRequiredConstructorParameters");
+var enumsByTheirNames = builder.Configuration.GetValue<bool>("Json:EnumsByTheirNames");
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(json =>
     {
-        json.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+        json.JsonSerializerOptions.Converters.Add(enumsByTheirNames ? new JsonStringEnumConverter() : new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         json.JsonSerializerOptions.RespectRequiredConstructorParameters = requiresConstructorParameters;
     })
     .AddRazorOptions(razor =>

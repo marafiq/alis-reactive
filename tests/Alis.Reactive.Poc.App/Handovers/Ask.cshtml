@@ -30,8 +30,8 @@
                 .Set(r => r.Handover.Round, board.Current.Read(h => h!.Round))
                 .Header("X-Round", board.Round)
                 .Header("X-Lead", board.Current.Read(h => h!.Lead)))
-            .Response(response => response.OnSuccess<RegisterAnswer>((answer, recorded) =>
-                recorded.Element("register-answer").Text.Set(answer.Read(a => a.Recorded))));
+            .OnSuccess<RegisterAnswer>((answer, recorded) =>
+                recorded.Element("register-answer").Text.Set(answer.Body.Read(a => a.Recorded)));
         pipeline.Element("register-asked").Text.Set(board.Ward);
     }))
 <p>Register: <strong id="register-answer">not asked yet</strong>, last asked for the <strong id="register-asked">no ward yet</strong> ward</p>
@@ -44,8 +44,8 @@
                 .Set(r => r.Round, board.Round)
                 .Set(r => r.Due, board.Due)
                 .Set(r => r.Shift, board.Shift))
-            .Response(response => response.OnSuccess<RegisterAnswer>((answer, opened) =>
-                opened.Element("round-answer").Text.Set(answer.Read(a => a.Recorded))));
+            .OnSuccess<RegisterAnswer>((answer, opened) =>
+                opened.Element("round-answer").Text.Set(answer.Body.Read(a => a.Recorded)));
     }))
 <p>Round: <strong id="round-answer">not opened yet</strong></p>
 
@@ -60,16 +60,16 @@
                 .Set(r => r.Beds, current.Read(h => h!.Beds))
                 .Set(r => r.Lead, current.Read(h => h!.Lead))
                 .Set(r => r.Target, current.Read(h => h!.Target)))
-            .Response(response => response.OnSuccess<HandoverChecked>((check, checkedIn) =>
+            .OnSuccess<HandoverChecked>((check, checkedIn) =>
             {
-                checkedIn.Element("checked-round").Text.Set(check.Read(c => c.Round));
-                checkedIn.Element("checked-starts").Text.Set(check.Read(c => c.StartsAt));
-                checkedIn.Element("checked-ends").Text.Set(check.Read(c => c.EndsAt));
-                checkedIn.Element("checked-beds").Text.Set(check.Read(c => c.Beds));
-                checkedIn.Element("checked-lead").Text.Set(check.Read(c => c.Lead));
-                checkedIn.Element("checked-target").Text.Set(check.Read(c => c.Target));
-                checkedIn.Element("checked-problems").Text.Set(check.Read(c => c.Problems));
-            }));
+                checkedIn.Element("checked-round").Text.Set(check.Body.Read(c => c.Round));
+                checkedIn.Element("checked-starts").Text.Set(check.Body.Read(c => c.StartsAt));
+                checkedIn.Element("checked-ends").Text.Set(check.Body.Read(c => c.EndsAt));
+                checkedIn.Element("checked-beds").Text.Set(check.Body.Read(c => c.Beds));
+                checkedIn.Element("checked-lead").Text.Set(check.Body.Read(c => c.Lead));
+                checkedIn.Element("checked-target").Text.Set(check.Body.Read(c => c.Target));
+                checkedIn.Element("checked-problems").Text.Set(check.Body.Read(c => c.Problems));
+            });
     }))
 <section>
     <h2>Handover on record</h2>

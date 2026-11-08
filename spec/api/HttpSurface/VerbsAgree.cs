@@ -10,11 +10,6 @@ public static class VerbsAgree
         var query = (QueryParts<BedQuery> parts) => { parts.Path(q => q.Ward, "north"); };
         var body = (BodyParts<BedRequest> parts) => { parts.Path(r => r.Ward, "north"); };
 
-        Agree<GetRequest<IntakeView, NoModel>>(RequestVerbs.Get(pipeline, "/Wards"), verbs.Get("/Wards"));
-        Agree<GetRequest<IntakeView, BedQuery>>(
-            pipeline.Get<IntakeView, BedQuery>("/Wards/{ward}/Beds", query),
-            verbs.Get<BedQuery>("/Wards/{ward}/Beds", query));
-
         Agree<HeadRequest<IntakeView, NoModel>>(pipeline.Head("/Wards"), verbs.Head("/Wards"));
         Agree<HeadRequest<IntakeView, BedQuery>>(
             pipeline.Head<IntakeView, BedQuery>("/Wards/{ward}/Beds", query),
@@ -39,6 +34,13 @@ public static class VerbsAgree
         Agree<DeleteRequest<IntakeView, BedRequest>>(
             pipeline.Delete<IntakeView, BedRequest>("/Wards/{ward}/Beds", body),
             verbs.Delete<BedRequest>("/Wards/{ward}/Beds", body));
+
+        var get = pipeline.Get<BedQuery>("/Wards/{ward}/Beds", query);
+        Agree<GetRequest<IntakeView, BedQuery>>(get.Validate<IntakeView, BedQuery, BedQueryValidator>(), new GetStages<IntakeView, BedQuery>().Validate<BedQueryValidator>());
+        var counted = get.OnSuccess<Census>((census, done) => done.Notice().Info("Counted"));
+        Agree<GetRequest<IntakeView, BedQuery, Response<BedQuery, Census>>>(
+            counted.Validate<IntakeView, BedQuery, Response<BedQuery, Census>, BedQueryValidator>(),
+            new GetStages<IntakeView, BedQuery, Response<BedQuery, Census>>().Validate<BedQueryValidator>());
 
         Agree<PageUrl<IntakePage>>(pipeline.PageUrl<IntakeView, IntakePage>(), verbs.PageUrl<IntakePage>());
         Agree<PageUrl<IntakePage>>(pipeline.PageUrl<IntakeView, IntakePage>("/Wards/{ward}/Intake"), verbs.PageUrl<IntakePage>("/Wards/{ward}/Intake"));

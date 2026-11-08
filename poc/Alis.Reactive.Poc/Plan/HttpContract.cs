@@ -6,14 +6,13 @@ namespace Alis.Reactive.Plan;
 
 internal sealed class HttpSend
 {
-    internal HttpSend(HttpMethod method, IReadOnlyList<PathPart> path, string search, IReadOnlyList<SentField> query, IReadOnlyList<SentHeader> headers, BodyKind success)
+    internal HttpSend(HttpMethod method, IReadOnlyList<PathPart> path, string search, IReadOnlyList<SentField> query, IReadOnlyList<SentHeader> headers)
     {
         Method = method;
         Path = path;
         Search = search;
         Query = query;
         Headers = headers;
-        Success = success;
     }
 
     public HttpMethod Method { get; }
@@ -25,8 +24,6 @@ internal sealed class HttpSend
     public IReadOnlyList<SentField> Query { get; }
 
     public IReadOnlyList<SentHeader> Headers { get; }
-
-    public BodyKind Success { get; }
 }
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator)]
@@ -229,15 +226,12 @@ internal sealed class WhenNothing : IChoice
 
 internal sealed class HttpResponse
 {
-    private HttpResponse(bool ok, int status, HttpOutcome outcome, JsonElement body)
+    private HttpResponse(int status, HttpOutcome outcome, JsonElement body)
     {
-        Ok = ok;
         Status = status;
         Outcome = outcome;
         Body = body;
     }
-
-    public bool Ok { get; }
 
     public int Status { get; }
 
@@ -262,25 +256,34 @@ internal sealed class HttpMethod : IChoice
 [JsonConverter(typeof(ChoiceConverter<BodyKind>))]
 internal sealed class BodyKind : IChoice
 {
-    internal static readonly BodyKind Html = new("html");
-    internal static readonly BodyKind Json = new("json");
+    internal static readonly BodyKind Html = new("html", "text/html");
+    internal static readonly BodyKind Json = new("json", "application/json");
+    internal static readonly BodyKind None = new("none", "*/*");
 
-    private BodyKind(string text)
+    private BodyKind(string text, string accept)
     {
         Text = text;
+        Accept = accept;
     }
 
     public string Text { get; }
+
+    internal string Accept { get; }
 }
 
 [JsonConverter(typeof(ChoiceConverter<HttpOutcome>))]
 internal sealed class HttpOutcome : IChoice
 {
+    internal const string StatusText = "status";
+    internal const string NetworkText = "network";
+    internal const string RedirectText = "redirect";
+    internal const string ContentText = "content";
+
     internal static readonly HttpOutcome Success = new("success");
-    internal static readonly HttpOutcome Status = new("status");
-    internal static readonly HttpOutcome Network = new("network");
-    internal static readonly HttpOutcome Redirect = new("redirect");
-    internal static readonly HttpOutcome Kind = new("kind");
+    internal static readonly HttpOutcome Status = new(StatusText);
+    internal static readonly HttpOutcome Network = new(NetworkText);
+    internal static readonly HttpOutcome Redirect = new(RedirectText);
+    internal static readonly HttpOutcome Content = new(ContentText);
 
     private HttpOutcome(string text)
     {

@@ -1,25 +1,34 @@
-import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart, SentField, SentHeader, ValuePart } from "./plan";
+import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart, RequestStatement, SentField, SentHeader, Statement, ValuePart } from "./plan";
 import { assertNever, Stop } from "./read";
 import { wireTexts } from "./wire";
 
 type Decoded = { readonly kind: "decoded"; readonly body: JsonValue } | { readonly kind: "notOfKind"; readonly reason: string };
 
-export async function send(request: HttpSend): Promise<HttpResponse> {
-  const url = composed(request);
-  const headers = headersOf(request.headers);
+export type Answer = { readonly route: readonly Statement[]; readonly reply: HttpResponse };
+
+export async function answered(sent: HttpSend, request: RequestStatement): Promise<Answer> {
+  const url = composed(sent);
+  const headers = headersOf(sent.headers);
   let response: Response;
   try {
-    response = await fetch(url, { method: request.method, headers });
+    response = await fetch(url, { method: sent.method, headers });
   } catch (failed) {
-    return unanswered(request, url, "network", false, 0, "the network failed: " + String(failed));
+    return caught(request, sent, url, "network", 0, "the network failed: " + String(failed));
   }
   if (response.redirected && new URL(response.url).origin !== window.location.origin) {
-    return unanswered(request, url, "redirect", response.ok, response.status, "it was redirected to " + new URL(response.url).origin);
+    return caught(request, sent, url, "redirect", response.status, "it was redirected to " + new URL(response.url).origin);
   }
-  if (!response.ok) return { ok: false, status: response.status, outcome: "status", body: await errorBody(response) };
-  const decoded = await decode(response, request.success);
-  if (decoded.kind === "notOfKind") return unanswered(request, url, "kind", true, response.status, decoded.reason);
-  return { ok: true, status: response.status, outcome: "success", body: decoded.body };
+  if (!response.ok) return statusAnswer(request, response);
+  const decoded = await decode(response, request.success.kind);
+  if (decoded.kind === "notOfKind") return caught(request, sent, url, "content", response.status, decoded.reason);
+  return { route: request.success.do, reply: { status: response.status, outcome: "success", body: decoded.body } };
+}
+
+async function statusAnswer(request: RequestStatement, response: Response): Promise<Answer> {
+  const route = request.statuses.find((each) => each.status === response.status);
+  if (route === undefined) return { route: request.otherwise.do, reply: { status: response.status, outcome: "status", body: null } };
+  const decoded = await decode(response, route.kind);
+  return { route: route.do, reply: { status: response.status, outcome: "status", body: decoded.kind === "decoded" ? decoded.body : null } };
 }
 
 function composed(request: HttpSend): string {
@@ -89,6 +98,8 @@ async function decode(response: Response, kind: BodyKind): Promise<Decoded> {
       return mediaType === "text/html" ? { kind: "decoded", body: await response.text() } : notOfKind(response, kind);
     case "json":
       return isJson(mediaType) ? parsed(await response.text(), response, kind) : notOfKind(response, kind);
+    case "none":
+      return { kind: "decoded", body: null };
     default:
       return assertNever(kind);
   }
@@ -103,12 +114,6 @@ function parsed(text: string, response: Response, kind: BodyKind): Decoded {
   }
 }
 
-async function errorBody(response: Response): Promise<JsonValue> {
-  if (!isJson(mediaTypeOf(response))) return null;
-  const decoded = parsed(await response.text(), response, "json");
-  return decoded.kind === "decoded" ? decoded.body : null;
-}
-
 function notOfKind(response: Response, kind: BodyKind): Decoded {
   return { kind: "notOfKind", reason: "its body is " + (response.headers.get("Content-Type") ?? "of no media type") + ", not " + kind };
 }
@@ -121,7 +126,7 @@ function isJson(mediaType: string): boolean {
   return mediaType === "application/json" || mediaType.endsWith("+json");
 }
 
-function unanswered(request: HttpSend, url: string, outcome: HttpOutcome, ok: boolean, status: number, reason: string): HttpResponse {
-  console.error("[alis] " + request.method + " " + url + " ended '" + outcome + "': " + reason + ".");
-  return { ok, status, outcome, body: null };
+function caught(request: RequestStatement, sent: HttpSend, url: string, outcome: HttpOutcome, status: number, reason: string): Answer {
+  console.error("[alis] " + sent.method + " " + url + " ended '" + outcome + "': " + reason + ".");
+  return { route: request.otherwise.do, reply: { status, outcome, body: null } };
 }

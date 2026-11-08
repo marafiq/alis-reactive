@@ -12,8 +12,8 @@
     .Reactive(button => button.Click, pipeline =>
     {
         pipeline.Get<RegisterQuery>("/Handovers/Register", request => request.Set(r => r.Counts, new Dictionary<string, int> { ["North"] = 4 }))
-            .Response(response => response.OnSuccess<RegisterAnswer>((answer, recorded) =>
-                recorded.Element("register-answer").Text.Set(answer.Read(a => a.Recorded))));
+            .OnSuccess<RegisterAnswer>((answer, recorded) =>
+                recorded.Element("register-answer").Text.Set(answer.Body.Read(a => a.Recorded)));
     }))
 <p>Register: <strong id="register-answer">not asked yet</strong></p>
 
