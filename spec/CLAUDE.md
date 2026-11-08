@@ -337,6 +337,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-07 (verbatim in `spec/NOTES.md`): the official default is C# 7.3, most of C# 8 works on net48 with
   few gotchas, so assume C# 8. An MVC 5 app is assumed at C# 8, so nothing the framework writes into an app needs
   C# 9 (no module initializer); generated code is written in C# 7.3 syntax, which compiles in an app left at the default.
+- The owner, 2026-11-07: "yeah one call is fine". An app hands the generated request tables to the framework with one
+  startup call, the same on both hosts (net48 `Application_Start`, net10 `Program.cs`); no host registers by itself.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

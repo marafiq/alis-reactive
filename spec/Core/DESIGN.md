@@ -1297,8 +1297,8 @@ Terms used throughout:
 - D9.20 What an endpoint binds is read at build, never at run time (D18.1). A source generator in the analyzers
   package walks the complex parameters of each controller action and every type reachable from them, and writes,
   for each type, the members the binder fills by their C# name as typed lambdas, and for each enum its values, in C#
-  7.3 syntax, so it compiles in an MVC 5 app at any language version the owner assumes (C# 8). How the app hands the
-  tables to the framework at startup is the owner's open question. The actions are the public methods of a net10
+  7.3 syntax, so it compiles in an MVC 5 app at any language version the owner assumes (C# 8). The app hands the
+  tables to the framework with one startup call, the same on both hosts (the owner, 2026-11-07). The actions are the public methods of a net10
   `Microsoft.AspNetCore.Mvc.ControllerBase` and of a net48 `System.Web.Mvc.Controller`, less `[NonAction]`; a net10
   parameter bound `[FromBody]`, `[FromServices]`, `[FromKeyedServices]` or `[FromHeader]` is not walked, nor a complex
   parameter with no binding attribute under `[ApiController]` on its class, a base class or its assembly, which net10
