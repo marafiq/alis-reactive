@@ -26,8 +26,10 @@ internal sealed class PlanBuild
     private readonly Dictionary<string, List<Statement>> _resultBlocks = new(StringComparer.Ordinal);
     private readonly ResultLines _resultLines = new();
     private readonly HashSet<string> _elseIfResults = new(StringComparer.Ordinal);
+    private readonly List<string> _openReplies = [];
     private int _items;
     private int _results;
+    private int _requests;
     private int _values;
     private int _readingItems;
     private int _answering;
@@ -81,7 +83,7 @@ internal sealed class PlanBuild
         var block = _open.Peek();
         _resultLines.Written(statement, block);
         block.Add(statement);
-        var awaits = statement is DoStatement { Await: true } or LetStatement { Await: true };
+        var awaits = statement is DoStatement { Await: true } or LetStatement { Await: true } or RequestStatement;
         _handlerAwaited = _handlerAwaited || awaits;
     }
 
@@ -171,6 +173,44 @@ internal sealed class PlanBuild
 
     internal RefExpression AwaitedResult(CallExpression call)
     {
+        RequireAPlaceThatWaits();
+        return Let(call, awaits: true);
+    }
+
+    internal RequestStatement Request(Expression send)
+    {
+        RequireAPlaceThatWaits();
+        var request = new RequestStatement(send, "reply" + (++_requests).ToString(CultureInfo.InvariantCulture));
+        Write(request);
+        return request;
+    }
+
+    internal IReadOnlyList<Statement> Route(RequestStatement request, Action body)
+    {
+        _openReplies.Add(request.Reply);
+        try
+        {
+            return Block(body);
+        }
+        finally
+        {
+            _openReplies.RemoveAt(_openReplies.Count - 1);
+        }
+    }
+
+    internal RefExpression Reply(RequestStatement request)
+    {
+        if (!_openReplies.Contains(request.Reply))
+        {
+            throw new InvalidOperationException(
+                "A request's reply is read outside its routes. Read the reply in the route that receives it: Response(response => response.OnSuccess<TBody>((body, pipeline) => ..)).");
+        }
+
+        return new RefExpression(request.Reply);
+    }
+
+    private void RequireAPlaceThatWaits()
+    {
         if (_readingItems > 0)
         {
             throw new InvalidOperationException(
@@ -182,8 +222,6 @@ internal sealed class PlanBuild
             throw new InvalidOperationException(
                 "A callback answers its vendor at once, so its answer cannot wait for an async method or a request.");
         }
-
-        return Let(call, awaits: true);
     }
 
     private RefExpression Let(CallExpression call, bool awaits)
@@ -370,12 +408,6 @@ internal sealed class PlanBuild
 
     internal static string PluginKey(string name) => "$plugin:" + name;
 
-    internal string Http()
-    {
-        _objects[HttpId] = new PluginLocator("alis.http", string.Empty, MethodListening.EventTarget);
-        return HttpId;
-    }
-
     internal string Slot(string containerId)
     {
         if (_contents.TryGetValue(containerId, out var noun)) throw ContentOfASlot(containerId, noun);
@@ -384,8 +416,6 @@ internal sealed class PlanBuild
         _objects[id] = new PluginLocator("alis.slot", containerId, MethodListening.EventTarget);
         return id;
     }
-
-    private const string HttpId = "$http";
 
     internal void ReplacesContentOf(string elementId, string noun)
     {
@@ -396,8 +426,8 @@ internal sealed class PlanBuild
     private static InvalidOperationException ContentOfASlot(string elementId, string noun) => new(
         $"The plan sets the {noun} of element '{elementId}', a slot this plan loads or unloads, so what the slot loaded would keep running under content it no longer shows. Empty the slot with Unload(\"{elementId}\"), and write the {noun} into an element beside it.");
 
-    internal bool Follows(RefExpression result)
-        => _open.Count > 0 && _open.Peek() is { Count: > 0 } block && block[^1] is LetStatement let && let.Name == result.Name;
+    internal bool Follows(RequestStatement request)
+        => _open.Count > 0 && _open.Peek() is { Count: > 0 } block && ReferenceEquals(block[^1], request);
 
     internal void Add(Handler handler, Listening listening)
     {

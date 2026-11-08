@@ -58,6 +58,8 @@ public sealed class ResidentsController : Controller
 
     public IActionResult CatchAllTwice() => View(new ResidentLookup());
 
+    public IActionResult ReplyAfterItsRequest() => View(new ResidentLookup());
+
     private EmptyResult Dropped()
     {
         HttpContext.Abort();

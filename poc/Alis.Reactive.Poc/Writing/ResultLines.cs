@@ -134,6 +134,9 @@ internal static class References
             case ListenStatement listen:
                 Of(listen.Object, whenReached: false, read);
                 return;
+            case RequestStatement request:
+                Of(request.Send, whenReached: false, read);
+                return;
             default:
                 throw new InvalidOperationException("A result's line is decided by the statements that read it, and this statement reads none.");
         }

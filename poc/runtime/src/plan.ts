@@ -275,9 +275,22 @@ export interface RefExpression {
 
 export type Release = LivingRelease | HeldRelease;
 
+export interface RequestStatement {
+  readonly kind: "request";
+  readonly send: Expression;
+  readonly reply: string;
+  readonly success: Route;
+  readonly statuses: readonly StatusRoute[];
+  readonly otherwise: Route;
+}
+
 export interface ReturnedListening {
   readonly kind: "returned";
   readonly subscribe: string;
+}
+
+export interface Route {
+  readonly do: readonly Statement[];
 }
 
 export type ScalarKind = "text" | "number" | "boolean" | "date" | "instant" | "written";
@@ -298,7 +311,12 @@ export interface StartAbsence {
   readonly value: JsonValue;
 }
 
-export type Statement = SetStatement | DoStatement | LetStatement | IfStatement | ListenStatement;
+export type Statement = SetStatement | DoStatement | LetStatement | IfStatement | ListenStatement | RequestStatement;
+
+export interface StatusRoute {
+  readonly status: number;
+  readonly do: readonly Statement[];
+}
 
 export interface TextForm {
   readonly kind: "text";

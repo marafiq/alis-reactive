@@ -2,11 +2,9 @@ import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart
 import { assertNever, Stop } from "./read";
 import { wireTexts } from "./wire";
 
-export const http = { send };
-
 type Decoded = { readonly kind: "decoded"; readonly body: JsonValue } | { readonly kind: "notOfKind"; readonly reason: string };
 
-async function send(request: HttpSend): Promise<HttpResponse> {
+export async function send(request: HttpSend): Promise<HttpResponse> {
   const url = composed(request);
   let response: Response;
   try {

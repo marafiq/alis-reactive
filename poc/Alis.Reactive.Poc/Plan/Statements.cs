@@ -9,6 +9,7 @@ namespace Alis.Reactive.Plan;
 [JsonDerivedType(typeof(LetStatement), "let")]
 [JsonDerivedType(typeof(IfStatement), "if")]
 [JsonDerivedType(typeof(ListenStatement), "listen")]
+[JsonDerivedType(typeof(RequestStatement), "request")]
 internal abstract class Statement
 {
     private protected Statement()
@@ -118,6 +119,48 @@ internal sealed class ListenStatement : Statement
     public string PayloadName { get; }
 
     public string ArgumentsName { get; }
+
+    public IReadOnlyList<Statement> Do { get; }
+}
+
+internal sealed class RequestStatement : Statement
+{
+    internal RequestStatement(Expression send, string reply)
+    {
+        Send = send;
+        Reply = reply;
+    }
+
+    public Expression Send { get; }
+
+    public string Reply { get; }
+
+    public Route Success { get; internal set; } = new([]);
+
+    public IReadOnlyList<StatusRoute> Statuses { get; internal set; } = [];
+
+    public Route Otherwise { get; internal set; } = new([]);
+}
+
+internal sealed class Route
+{
+    internal Route(IReadOnlyList<Statement> body)
+    {
+        Do = body;
+    }
+
+    public IReadOnlyList<Statement> Do { get; }
+}
+
+internal sealed class StatusRoute
+{
+    internal StatusRoute(int status, IReadOnlyList<Statement> body)
+    {
+        Status = status;
+        Do = body;
+    }
+
+    public int Status { get; }
 
     public IReadOnlyList<Statement> Do { get; }
 }

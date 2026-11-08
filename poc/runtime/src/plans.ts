@@ -4,7 +4,7 @@ import { Stop } from "./read";
 import type { Owner } from "./owners";
 import { holdSlots } from "./held-slots";
 
-const planVersion = 11;
+const planVersion = 12;
 
 export interface Found {
   readonly plan: PlanDocument;

@@ -1,12 +1,13 @@
-import type { CallExpression, DoStatement, IfStatement, LetStatement, PathStep, SetStatement, Statement } from "./plan";
+import type { CallExpression, DoStatement, HttpResponse, HttpSend, IfStatement, LetStatement, PathStep, RequestStatement, Route, SetStatement, Statement, StatusRoute } from "./plan";
 import { callee, called, evaluate, memberHolder, objectHolding, walk, type Bound, type Context } from "./evaluate";
 import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
 import { listenTo } from "./objects";
 import { requireNoSlotWithin } from "./held-slots";
+import { send } from "./http";
 
 type Awaited = DoStatement | LetStatement;
 
-type Stepped = Exclude<Statement, IfStatement>;
+type Stepped = Exclude<Statement, IfStatement | RequestStatement>;
 
 interface Block {
   readonly statements: readonly Statement[];
@@ -16,14 +17,11 @@ interface Block {
 
 type Frames = readonly Block[];
 
-type Step =
-  | { readonly kind: "completed"; readonly context: Context }
-  | { readonly kind: "opened"; readonly block: Block }
-  | { readonly kind: "waits"; readonly statement: Awaited; readonly settled: Promise<Read> };
+type Resumed = { readonly kind: "completed"; readonly context: Context } | { readonly kind: "opened"; readonly block: Block };
 
-type Turn =
-  | { readonly status: "waiting"; readonly below: Frames; readonly top: Block; readonly statement: Awaited; readonly settled: Promise<Read> }
-  | { readonly status: "ended" };
+type Step = Resumed | { readonly kind: "waits"; readonly settled: Promise<Resumed> };
+
+type Turn = { readonly status: "waiting"; readonly below: Frames; readonly top: Block; readonly settled: Promise<Resumed> } | { readonly status: "ended" };
 
 export function begin(statements: readonly Statement[], context: Context, stopped: (stop: Stop) => void): void {
   drive([{ statements, next: 0, context }], stopped);
@@ -38,9 +36,9 @@ function drive(frames: Frames, stopped: (stop: Stop) => void): void {
     return;
   }
   if (turn.status === "ended") return;
-  const { below, top, statement, settled } = turn;
+  const { below, top, settled } = turn;
   void settled.then(
-    (read) => drive([...below, { ...top, context: after(statement, top.context, read) }], stopped),
+    (resumed) => drive(applied(below, top, resumed), stopped),
     (reason: unknown) => ended(reason, stopped),
   );
 }
@@ -63,28 +61,55 @@ function ranUntilItWaits(start: Frames): Turn {
     }
     const step = stepped(statement, top.context);
     const advanced: Block = { ...top, next: top.next + 1 };
-    switch (step.kind) {
-      case "completed":
-        frames = [...below, { ...advanced, context: step.context }];
-        break;
-      case "opened":
-        frames = [...below, advanced, step.block];
-        break;
-      case "waits":
-        return { status: "waiting", below, top: advanced, statement: step.statement, settled: step.settled };
-      default:
-        return assertNever(step);
-    }
+    if (step.kind === "waits") return { status: "waiting", below, top: advanced, settled: step.settled };
+    frames = applied(below, advanced, step);
+  }
+}
+
+function applied(below: Frames, top: Block, resumed: Resumed): Frames {
+  switch (resumed.kind) {
+    case "completed":
+      return [...below, { ...top, context: resumed.context }];
+    case "opened":
+      return [...below, top, resumed.block];
+    default:
+      return assertNever(resumed);
   }
 }
 
 function stepped(statement: Statement, context: Context): Step {
-  if (awaits(statement)) return { kind: "waits", statement, settled: settle(statement, context) };
+  if (awaits(statement)) {
+    return { kind: "waits", settled: settle(statement, context).then((read) => ({ kind: "completed", context: after(statement, context, read) })) };
+  }
   if (statement.kind === "if") {
     const branch = holds(evaluate(statement.when, context)) ? statement.then : statement.else;
     return { kind: "opened", block: { statements: branch, next: 0, context } };
   }
+  if (statement.kind === "request") return { kind: "waits", settled: requested(statement, context) };
   return { kind: "completed", context: step(statement, context) };
+}
+
+function requested(request: RequestStatement, context: Context): Promise<Resumed> {
+  const sent = heldOrNull(evaluate(request.send, context)) as HttpSend;
+  return send(sent).then((reply) => ({
+    kind: "opened",
+    block: { statements: routeFor(request, reply).do, next: 0, context: bound(context, request.reply, value(reply)) },
+  }));
+}
+
+function routeFor(request: RequestStatement, reply: HttpResponse): Route | StatusRoute {
+  switch (reply.outcome) {
+    case "success":
+      return request.success;
+    case "status":
+      return request.statuses.find((route) => route.status === reply.status) ?? request.otherwise;
+    case "network":
+    case "redirect":
+    case "kind":
+      return request.otherwise;
+    default:
+      return assertNever(reply.outcome);
+  }
 }
 
 function holds(read: Read): boolean {

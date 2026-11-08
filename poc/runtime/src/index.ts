@@ -1,4 +1,3 @@
-import { http } from "./http";
 import { page, type Owner } from "./owners";
 import { plansWithin, slotsNamedBy, start } from "./plans";
 import { openRegistry } from "./plugins";
@@ -7,7 +6,6 @@ import { slot, slotOwner } from "./slots";
 function boot(): void {
   openRegistry(
     new Map<string, (key: string) => unknown>([
-      ["alis.http", () => http],
       ["alis.slot", slot],
     ]),
   );

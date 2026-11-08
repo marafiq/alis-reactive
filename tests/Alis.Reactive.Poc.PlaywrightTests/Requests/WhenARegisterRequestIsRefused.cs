@@ -31,6 +31,15 @@ public sealed class WhenARegisterRequestIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task a_reply_read_after_its_request_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Residents/ReplyAfterItsRequest");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: A request's reply is read outside its routes. Read the reply in the route that receives it: Response(response => response.OnSuccess<TBody>((body, pipeline) => ..)).");
+    }
+
+    [Test]
     public async Task a_member_set_twice_is_refused_where_the_view_renders()
     {
         await Page.GotoAsync(BaseUrl + "/Residents/MemberSetTwice");
