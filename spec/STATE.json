@@ -807,7 +807,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 15,
+        "files": 19,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -2119,7 +2119,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "735922b4cb0fd7bc66257846361dee8a0138735d",
+  "read_at_head": "6c596ff49574dac7efb78fb8bc3069a4c6abf242",
   "step": {
     "failing": [
       "gate1"

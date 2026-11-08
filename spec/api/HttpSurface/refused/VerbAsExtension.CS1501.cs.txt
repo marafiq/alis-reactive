@@ -1,0 +1,12 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class VerbAsExtension
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request.Form("intake"));
+}

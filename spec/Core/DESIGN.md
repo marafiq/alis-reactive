@@ -1641,9 +1641,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   (`probe:mvc5-file-name-rfc2231`) and net10 writes both, the `filename` with underscores
   (`probe:core-file-disposition`); a response with neither is named by the last segment of the request's path, as a
   browser names a link's download.
-- D10.21 The defaults name a busy indicator and a notice, each a contract the core owns and a component fulfils: a busy
-  indicator declares a show and a hide, and a notice declares a method that takes a text. The framework ships
-  NativeLoader and NativeToast declaring them, and an app declares its own on the same public surface; the core
+- D10.21 The defaults name a busy indicator and a notice, each a contract the core owns and a component fulfils: the
+  busy indicator is the plugin `busy`, with `show()` and `hide()`, which set a state and never hide by themselves; the
+  notice is the plugin `notice`, with `show(text, kind)`, its kind one of success, error, warning and info. The framework ships
+  NativeLoader and NativeToast declaring them, and an app registers its own object under the same name; the core
   depends on neither one's markup or CSS (the owner, 2026-11-08). The core counts the requests a busy indicator covers,
   across every pipeline of the page, and calls its show when the count leaves 0 and its hide when it returns to 0. A
   request holds it once across its attempts (D10.15), from its guards, once both `WhileLoading` layers completed, to
@@ -1713,36 +1714,83 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     `Antiforgery(AntiforgeryIn.FormField)` or `NoAntiforgery()`, `Header(name, value)`, `ShowBusy()`,
     `ShowValidationErrors()`, `WhileLoading`, `Finally`, `OnError(status, ..)`, `OnError(..)` and `Retry(attempts,
     firstWait)`; a defaults pipeline is `Pipeline<NoModel>`, so it names no view member. The call is required: a view
-    that renders a request in an app without it is refused, naming it.
-  - the verbs, extension methods on `Pipeline<TModel>` in the `Requests` module: `Get`, `Head`, `Options`, `Post`, `Put`
+    that renders a request in an app without it is refused, naming it. A default `Header(name, value)` takes text
+    only: no page exists at startup, so there is no source to read; a header read from the page goes on the request. A
+    default route's reply is `Response<NoModel>` or `Response<NoModel, TError>`: the defaults cannot know a request's
+    type, and `NoModel` has no member, so its `Request` offers nothing to read, and the reply stays the one family every
+    route reads.
+  - where the doors live: a call that names only the method's own type argument does not bind to an extension of a
+    generic receiver. The classic form binds only when the call names the receiver's type argument too
+    (`Post<IntakeView, IntakeRequest>`, as `spec/api/HttpSurface` writes) and fails CS1501 without it; a C# 14 extension
+    block fails CS1061 (`spec/api/refused.sh`: `VerbAsExtension`, `VerbAsExtensionBlock`, `PageUrlAsExtension`, on SDK
+    10.0.101; the block form also on 11.0.100-rc.1). An instance member binds it
+    (`poc/Alis.Reactive.Poc/Pipelines/Pipeline.cs:39`). So a door the view calls with one type
+    argument is an instance member of the type it is called on: the verbs and `PageUrl<TPage>()` on `Pipeline<TModel>`,
+    `OnSuccess<T>` and `OnError<T>` on the request types. A condensed door with no type argument (`Set`, `Form`,
+    `OnSuccess(pipeline => ..)`, `Into`, `Download`, `Notice`) is an extension method over them. The modules: the verbs,
+    the request types, `RequestDefaults` and `NoModel` are `Pipelines`', as the POC's `Pipelines/Requests.cs` is, since
+    each takes a pipeline; the objects a request reads (`Response`, `Failure`, `Content`, `Markup`, `ResponseFile`,
+    `BrowserFile`, `PageUrl`, `ValidationProblem`) are `Requests`', which names no pipeline; `AddReactiveRequests` and
+    the net48 filter are `Hosting`'s. `Hosting` depends on `Pipelines`, `Pipelines` on `Requests`, and none returns
+    (`spec/api/HttpSurface` builds with each type in its module's namespace).
+  - the verbs, instance members of `Pipeline<TModel>`: `Get`, `Head`, `Options`, `Post`, `Put`
     and `Delete`, each `(url)` or `<TRequest>(url, request => ..)`. The request lambda holds the HTTP parts: `Route(r =>
     r.M, value)`, `Query(r => r.M, value)`, `Header(name, value)`, and on POST, PUT and DELETE one body door, `Json`,
-    `UrlEncoded`, `Multipart`, `Text` or `File`. A value is a literal or any source (Q7); a member lambda dot-walks
+    `UrlEncoded`, `Multipart`, `Text` or `File`, and on every method `Form(formId)`, a GET's inputs going to its query.
+    Refused where the view renders, as no type stops them: a second body door, a `Set` after a `Text` or `File` body,
+    a second `Form` on a GET, HEAD or OPTIONS request, and a second `Chained`. A value is a literal or any source (Q7); a member lambda dot-walks
     (`r => r.Handover.Round`). `Header` refuses `Content-Type`, `Accept`, the antiforgery header and the Fetch
     Standard's forbidden request headers.
   - staged by type: GET, HEAD and OPTIONS offer no body door; `Retry` and `NoRetry` exist on GET, HEAD, OPTIONS, PUT and
-    DELETE only (X10.9); HEAD offers no content reader; a file member exists only inside `Multipart` or as `File`.
+    DELETE only (X10.9); HEAD offers no content reader; `File` exists only inside `Multipart` or as the whole body; a
+    success route returns the request carrying its reply's type, which offers no second success route and whose
+    `Chained` receives that reply. A `Set` on a file member stays D9.16's analyzer, since `Set` takes a member of any
+    type, and a file input a GET's `Form` sends stops the request when it is sent (D9.16). A file member is `IFormFile`
+    or a list of it on net10 and MVC 5's posted-file base or a list of it on net48, behind `#if NET48`. A request
+    `Header(name, source)` whose source's wire form is a list or an object is refused where the view renders, as the
+    POC refuses a list in a path segment (`poc/Alis.Reactive.Poc/Types/WireForms.cs`), since no C# constraint names a
+    scalar.
   - the routes, on the request: `OnSuccess(Content.<kind>, (reply, pipeline) => ..)`, `OnError(status, Content.<kind>,
     (reply, pipeline) => ..)` and the catch-all `OnError((failed, pipeline) => ..)`, with the readers `Content.None`,
     `Content.Json<T>()`, `Content.Text`, `Content.Html` and `Content.File` (D10.6). `OnSuccess<T>` returns a request that
-    carries `T`, so its `Chained((reply, next) => ..)` receives the typed reply by construction. `Validate<TValidator>()`
-    checks the form the request sends (Q16); `WhileLoading`, `Finally`, `NoDefaults()` and `NoValidation()` complete it.
-  - the objects, each a JS object whose members are sources: `Response<T>` (`Status`, `Headers.Get(name)`, `Body`, which
-    dot-walks, and `Request`), `Failure` (`Outcome`: status, network, redirect or content; `Status`; `Headers`),
-    `ResponseFile` (`Name`, `Size`, `Type`), `BrowserFile` (lib.dom `File`) and `pipeline.PageUrl<TPage>()` or
+    carries `T`, so its `Chained((reply, next) => ..)` receives the typed reply by construction. `Validate<TValidator>()`,
+    `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the form the request sends (Q16); `WhileLoading`,
+    `Finally`, `NoDefaults()` and `NoValidation()` complete it.
+  - the objects, each a JS object whose members are sources: `Response<TRequest>` (`Status`, `Headers.Get(name)` and
+    `Request`, the request's members as it sent them, read as `TRequest`, which a read of the input cannot give once the
+    user edits it during the send), the reply of a route of kind none and of every HEAD route, and
+    `Response<TRequest, TBody>`, which adds `Body`, a data read that dot-walks; `Failure` (`Outcome`: status, network, redirect or
+    content; `Status`; `Headers`); `ResponseFile`, the data of a file body (`Name`, `Size`, `Type`); `Markup`, an HTML
+    body, the only text `Into(elementId, source)` takes; `BrowserFile` (lib.dom `File`), held by a file input's member;
+    and `pipeline.PageUrl<TPage>()` or
     `PageUrl<TPage>(template)`, whose `Read(q => q.A.B)` reads a placeholder member from the path and any other from the
     query by its C# path, as the action that rendered the page bound it, the member's start when the key is absent or
     its text does not convert. Keys are compared ignoring case, as both hosts bind them (`probe:core-query-key-case`,
     `probe:mvc5-query-key-case`), which `URLSearchParams.get` does not (`probe:js-query-get-case`).
-  - the condensed doors, extension methods that write the plan the full form writes: `Set(r => r.M, value)`, placed by
+  - the condensed doors, which write the plan the full form writes: `Set(r => r.M, value)`, placed by
     D9.4, D9.6 and D9.9 into `Route`, `Query` or the body the request names, else multipart (D10.22); `Form(formId)`,
     the form's inputs as multipart fields and file parts plus `Validate` for the validator registered for `TRequest`;
-    `OnSuccess(pipeline => ..)`, `OnSuccess<T>((reply, pipeline) => ..)`, `OnError<T>(status, ..)`, `Into(elementId)`
-    and `Download()`; and `Notice()` with `Success`, `Error`, `Warning` and `Info` over the notice contract (D10.21).
+    `OnSuccess(pipeline => ..)` of kind none, `OnSuccess<T>((reply, pipeline) => ..)` and `OnError<T>(status, ..)` of kind
+    JSON, `Into(elementId)` of kind HTML and `Download()` of kind file; and `Notice()` with `Success`, `Error`, `Warning`
+    and `Info` over the notice contract (D10.21).
   - `Parallel(params Action<Pipeline<TModel>>[] branches)`, each branch a pipeline, the steps after it its all-settled
     block; `OnAllSettled` leaves (D10.10).
   - net48 only: `[ValidateAntiForgeryHeader]`, a filter that reads the header, else the field, and hands it to
     `AntiForgery.Validate(cookieToken, formToken)`; shipping it is the owner's (gate 1 flag, D9.22).
+  - it replaces the POC's request doors (`poc/Alis.Reactive.Poc/Pipelines/Requests.cs`), each guard given its home:
+    `Get(url)` becomes `Get(url)` on every verb, keeping the refusal of a placeholder no member fills, a fragment, and a
+    URL that is neither a page path nor an http or https URI (`RequestUrls.Checked`). `Request.Into(id)` becomes the
+    condensed `Into(elementId)`, keeping its required id and its load on success only; its one `Into` per request and its
+    same-sentence rule now hold by type. `Get<TRequest>(url, members)` becomes `Get<TRequest>(url, request => ..)`,
+    keeping a member set once ignoring case, a placeholder with no member, and a list or a time refused in a path
+    segment; its refusal of a member past the request's own (`r => r.A.B`) gives way to D9.19's C# path, as the binder
+    reads it. `SentRequest.Response(routes)` gives way to the routes on the request, so its one `Response` and its same
+    sentence hold by construction. `Routes.OnSuccess` becomes `OnSuccess(Content.<kind>, ..)` and `OnSuccess<T>`, one
+    by type; `Routes.OnError(status, ..)` becomes `OnError(status, Content.<kind>, ..)` and `OnError<T>(status, ..)`,
+    keeping a status from 300 to 599 and one route a status, refused where the view renders; `Routes.OnError(otherwise)`
+    becomes `OnError((failed, pipeline) => ..)` with `Failure`, keeping one, refused where the view renders.
+    `ResponseBody<TBody>.Read(path)` becomes `Body.Read(path)`, data that reads as nothing when absent. The POC's kinds by
+    door (HTML for `Get(url)`, JSON for `Get<TRequest>`) become the kind each route names.
 
   ```csharp illustration
   pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request

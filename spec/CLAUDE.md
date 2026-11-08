@@ -359,7 +359,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   and give a member left out and a member sent as null different meanings, which D9.10's table does not state. Every
   part takes every source (Q7), and every response body is a source for the modules after it: the page's query read
   in a condition inside an event, a chained request's URL from the first response or the page's query. `Set` and the
-  other condensed doors are extension methods that write the plan the full form writes, so they add no plan shape.
+  other condensed doors write the plan the full form writes, so they add no plan shape; a door the view calls with only
+  its own type argument is an instance member, since an extension of a generic receiver binds that call in neither the
+  classic form nor a C# 14 block (N10.7).
 - The owner, 2026-11-07: "You can only skip Patch", because a content type or a primitive done wrong breaks
   encapsulation everywhere above it. The request bodies are the Fetch Standard's: none, JSON, URL-encoded, multipart,
   text and one file as the whole body. The response bodies are read as none, JSON, text, HTML or a file the browser saves.

@@ -1,0 +1,20 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class BlockVerbs
+{
+    extension<TModel>(Pipeline<TModel> pipeline)
+    {
+        public PostRequest<TModel, TRequest> Send<TRequest>(string url) => throw new NotSupportedException();
+    }
+}
+
+public static class VerbAsExtensionBlock
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Send<IntakeRequest>("/Wards/{ward}/Intake");
+}

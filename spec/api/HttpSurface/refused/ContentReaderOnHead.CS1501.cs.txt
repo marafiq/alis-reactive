@@ -1,0 +1,13 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class ContentReaderOnHead
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Head<IntakeView, DocumentQuery>("/Documents/{id}", query => query.Route(d => d.Id, 7))
+            .OnSuccess(Content.None, (document, shown) => shown.Element("document-size").Text.Set(document.Headers.Get("Content-Length")));
+}

@@ -1,0 +1,13 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class FileReaderOnError
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Post<IntakeView, ExportRequest>("/Residents/Export", request => request.Json(body => body.Set(r => r.Ward, "north")))
+            .OnError<ResponseFile>(409, Content.File, (conflict, shown) => shown.Notice().Error("Export refused"));
+}

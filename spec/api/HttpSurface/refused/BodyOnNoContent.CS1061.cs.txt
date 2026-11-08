@@ -1,0 +1,13 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class BodyOnNoContent
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Put<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form("intake"))
+            .OnSuccess(Content.None, (saved, done) => done.Element("saved").Text.Set(saved.Body));
+}

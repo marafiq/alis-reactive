@@ -1,0 +1,14 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class ChainedReadsAnotherType
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form("intake"))
+            .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
+            .Chained((Response<IntakeRequest, SummaryQuery> created, Pipeline<IntakeView> next) => next.Notice().Info("Summary loaded"));
+}

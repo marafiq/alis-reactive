@@ -1,0 +1,13 @@
+using System;
+using Alis.Reactive.Elements;
+using Alis.Reactive.Pipelines;
+using Alis.Reactive.Requests;
+
+namespace Intake;
+
+public static class FileMemberInJson
+{
+    public static void Refused(Pipeline<IntakeView> pipeline)
+        => pipeline.Post<IntakeView, ScanUpload>("/Residents/{residentId}/Scans", request => request
+            .Json(body => body.File(r => r.Scan, pipeline.Component<FileInput>("scan").Files.At(0))));
+}
