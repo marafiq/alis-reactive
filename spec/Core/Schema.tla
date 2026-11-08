@@ -8,7 +8,7 @@ Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARea
 
 ASSUME Mutant \in Mutants
 
-StatementKinds == {"set", "do", "let", "if", "all", "try", "stop", "listen"}
+StatementKinds == {"set", "do", "let", "if", "all", "request", "stop", "listen"}
 ExpressionKinds == {"lit", "obj", "ref", "get", "data", "as", "call", "fn", "answer", "record", "list", "op", "signal"}
 AbsenceKinds == {"start", "nothing", "unbound"}
 ShapeKinds == {"string", "number", "boolean", "date", "instant", "file", "any", "array", "nullable", "object"}
@@ -130,8 +130,9 @@ CanWrite == plane = "statement" /\ writes < MaxWrites
 
 Let == CanWrite /\ Write(Entry("let", "a", 0)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
 
-Ref == CanWrite /\ (InScope("a") \/ (Mutant = "BindingLeavesItsBlock" /\ BoundAnywhere("a")))
-       /\ Write(Entry("ref", "a", 0)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
+Ref == CanWrite /\ \E name \in {"a", "reply"} :
+       /\ InScope(name) \/ (Mutant = "BindingLeavesItsBlock" /\ BoundAnywhere(name))
+       /\ Write(Entry("ref", name, 0)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
 
 Set == CanWrite /\ \E len \in IF Mutant = "EmptySet" THEN {0, 1} ELSE {1} :
        Write(Entry("set", "-", len)) /\ UNCHANGED <<plane, expr, shape, open, parent>>
@@ -148,10 +149,19 @@ OpenIf == OpenBlock("if")
 
 OpenAll == OpenBlock("all")
 
+OpenRequest ==
+    /\ CanWrite
+    /\ Len(open) <= Depth
+    /\ log' = log \o <<Entry("request", "-", 0), [k |-> "let", b |-> Len(parent) + 1, n |-> "reply", len |-> 0]>>
+    /\ writes' = writes + 1
+    /\ parent' = Append(parent, Top)
+    /\ open' = Append(open, Len(parent) + 1)
+    /\ UNCHANGED <<plane, expr, shape>>
+
 Close == plane = "statement" /\ Len(open) > 1 /\ open' = SubSeq(open, 1, Len(open) - 1)
          /\ UNCHANGED <<plane, expr, shape, parent, log, writes>>
 
-Next == Let \/ Ref \/ Set \/ OpenIf \/ OpenAll \/ Close
+Next == Let \/ Ref \/ Set \/ OpenIf \/ OpenAll \/ OpenRequest \/ Close
 
 Spec == Init /\ [][Next]_vars
 
@@ -186,6 +196,10 @@ RefsReadTheirBlock ==
 ReachNestedRead ==
     ~(\E i \in DOMAIN log : log[i].k = "ref" /\ BlockDepth(log[i].b) = 2
         /\ \E j \in 1..(i - 1) : log[j].k = "let" /\ log[j].b # log[i].b /\ Encloses(log[j].b, log[i].b))
+
+ReachReplyInANestedBlock ==
+    ~(\E i \in DOMAIN log : log[i].k = "ref" /\ log[i].n = "reply" /\ BlockDepth(log[i].b) = 2
+        /\ \E j \in 1..(i - 1) : log[j].k = "let" /\ log[j].n = "reply" /\ log[j].b # log[i].b /\ Encloses(log[j].b, log[i].b))
 
 ReachDeepRead == ~(plane = "expr" /\ expr.k = "as" /\ expr.c[1].k = "get" /\ expr.c[1].c[1].k = "obj")
 

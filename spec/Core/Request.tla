@@ -7,7 +7,8 @@ Mutants == {"none", "PlaceholderUnchecked", "DateInPath", "FileInJson", "NullFor
             "FailedCheckSends", "FinallyWithoutLoading", "CatchAllBeatsStatus", "FailureRunsSuccess",
             "ChainedAfterError", "StepsAfterStop", "RetryAnyPost", "RetryPastAttempts", "LoadingEachAttempt",
             "FailedConditionSendsNothing", "ChainedIgnoresCondition", "CatchAllRunsOnSuccess",
-            "EmptyFieldForObject", "EmptyFieldForObjectItem", "OneFlagForBothLayers", "HoldBeforeLoading"}
+            "EmptyFieldForObject", "EmptyFieldForObjectItem", "OneFlagForBothLayers", "HoldBeforeLoading",
+            "HoldOnAFailedGuard"}
 
 ASSUME Mutant \in Mutants
 
@@ -30,12 +31,12 @@ Items == {"nullableItem", "valueItem", "objectItem"}
 
 VARIABLES part, config,
           checkPasses, loadingStops, guardOk, method, policy, outcomes, successRoute, reqRoutes, defRoutes,
-          routeStops, chained, chainedWhen, takesDefaults, defaultLoadingStops,
+          routeStops, finallyStops, chained, chainedWhen, takesDefaults, defaultLoadingStops,
           pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan,
           defaultLoadings, defaultFinallies, outerEntered, held, holds
 
 scenario == <<checkPasses, loadingStops, guardOk, method, policy, outcomes, successRoute, reqRoutes, defRoutes,
-              routeStops, chained, chainedWhen, takesDefaults, defaultLoadingStops>>
+              routeStops, finallyStops, chained, chainedWhen, takesDefaults, defaultLoadingStops>>
 run == <<pc, attempt, sends, loadings, finallies, routes, entered, stopped, final, routeRan, chainedRan, afterRan,
          defaultLoadings, defaultFinallies, outerEntered, held, holds>>
 layers == <<defaultLoadings, defaultFinallies, outerEntered, held, holds>>
@@ -71,7 +72,7 @@ PlacementInit ==
     /\ checkPasses = TRUE /\ loadingStops = FALSE /\ guardOk = TRUE /\ method = "GET"
     /\ policy = FALSE /\ outcomes = [i \in 1..MaxAttempts |-> "ok"] /\ successRoute = TRUE
     /\ reqRoutes = {} /\ defRoutes = {}
-    /\ routeStops = FALSE /\ chained = FALSE /\ chainedWhen = TRUE
+    /\ routeStops = FALSE /\ finallyStops = FALSE /\ chained = FALSE /\ chainedWhen = TRUE
     /\ takesDefaults = FALSE /\ defaultLoadingStops = FALSE
     /\ pc = "idle"
     /\ IdleRun
@@ -91,6 +92,7 @@ FlowInit ==
     /\ defRoutes \in IF takesDefaults THEN SUBSET {"s503", "catchAll"} ELSE {{}}
     /\ defaultLoadingStops \in IF takesDefaults THEN BOOLEAN ELSE {FALSE}
     /\ routeStops \in BOOLEAN
+    /\ finallyStops \in BOOLEAN
     /\ chained \in BOOLEAN
     /\ chainedWhen \in BOOLEAN
     /\ pc = "check"
@@ -201,8 +203,9 @@ Loading ==
 Guard ==
     /\ pc = "guard"
     /\ entered' = TRUE
-    /\ held' = (held \/ takesDefaults)
-    /\ holds' = holds + (IF takesDefaults /\ ~held THEN 1 ELSE 0)
+    /\ LET holding == takesDefaults /\ (guardOk \/ Mutant = "HoldOnAFailedGuard") IN
+         /\ held' = (held \/ holding)
+         /\ holds' = holds + (IF holding /\ ~held THEN 1 ELSE 0)
     /\ IF guardOk
          THEN pc' = "attempt" /\ UNCHANGED stopped
          ELSE pc' = "finally" /\ stopped' = TRUE
@@ -233,8 +236,9 @@ Route ==
 Finally ==
     /\ pc = "finally"
     /\ finallies' = finallies + 1
+    /\ stopped' = (stopped \/ finallyStops)
     /\ pc' = "defaultFinally"
-    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, routes, entered, stopped, final, routeRan, chainedRan, afterRan, layers>>
+    /\ UNCHANGED <<part, config, scenario, attempt, sends, loadings, routes, entered, final, routeRan, chainedRan, afterRan, layers>>
 
 OuterRuns == IF Mutant = "OneFlagForBothLayers" THEN entered ELSE outerEntered
 
@@ -294,6 +298,8 @@ FinallyRunsWhenLoadingRan == (Flow /\ pc = "done") => ((finallies = 1) <=> enter
 EachLayerPairs == (Flow /\ pc = "done") => ((defaultFinallies = 1) <=> outerEntered)
 
 HoldSpansTheSend == (held => entered) /\ ((Flow /\ pc = "done") => ~held) /\ holds <= 1
+
+FailedGuardHoldsNothing == (Flow /\ ~guardOk) => holds = 0
 
 OneRouteRuns == (Flow /\ pc = "done" /\ final \in {"ok"} \cup Statuses) =>
     (routes = 1 /\ routeRan = IF final = "ok" THEN SuccessRoute ELSE ForStatus(final))

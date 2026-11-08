@@ -105,8 +105,9 @@ listening: `method`, `assignment` or `returned`. `Vendor.payload` of 65fdf118d l
 | `element` | `id`: an element id; `vendor`: a vendor name of `vendors` | | the component on that element at the vendor's object path. An element the page lacks, or one that holds no object at that path, stops the pipeline that reads it (D4.1). |
 | `plugin` | `name`: the plugin's name; `key`: text the plugin reads; `listen`: a vendor listening, how its events are listened to (D17.14) | `data`: plugin data | the plugin's object for that key. Its object id is `$plugin:` and its name for a plugin an app or a component brings, and for a core plugin that reads a key, `$`, the plugin's name after `alis.`, a colon and the key (`$slot:card`, as `Alis.Reactive/PlanModel/Writing/Scope.cs:234` writes it), so no element id meets it and each key is its own object. A name no script provides, or two scripts provide, stops the pipeline that reads it (D17.14). |
 
-The plugins the core's C# names are `alis.http`, `alis.form`, `alis.model`, `alis.slot`, `alis.hub`, `alis.stream`
-and `alis.document`, each provided by the core's own browser code. Any other name is a plugin an app or a component
+The plugins the core's C# names are `alis.form`, `alis.model`, `alis.slot`, `alis.hub`, `alis.stream` and
+`alis.document`, each provided by the core's own browser code; a request is the statement `request`, not a plugin
+(D10.23). Any other name is a plugin an app or a component
 brings. `alis.confirm` of 65fdf118d is Fusion's, so the core no longer names it (D17.9). The core also names three
 contracts a component provides and the core alone calls: `busy`, with `show(target)` and `hide(target)` (D10.21);
 `notice`, with `show(text, kind)` (D10.21); and `reconnect`, with `show(retry)` and `hide()` (D21.11). Each is reached
@@ -117,7 +118,7 @@ or the connection before it opens (D21.11).
 
 | Kind | Carries | Holds | Meaning |
 |------|---------|-------|---------|
-| `none` | nothing | | the plugin contributes nothing to the owner: http, document, slot (its key is the container id, D12.1), an app's plugin |
+| `none` | nothing | | the plugin contributes nothing to the owner: document, slot (its key is the container id, D12.1), an app's plugin |
 | `hub` | `offer`: whether the core shows the reconnect offer, the app's startup choice | | the owner holds the hub's connection while it lives (D12.6, D21.11) |
 | `stream` | `offer`: as a hub's | | the owner holds the stream's connection while it lives, as a hub's (D21.6, D21.11) |
 | `model` | `inputs`: a map from input id to `InputBinding`; `containers`: a map from element id to `Container` | | the inputs and the request containers this plan renders, by id (D13.2, D14.3, D14.8) |
@@ -204,9 +205,20 @@ and in the blocks inside it, and nowhere else.
 | `let` | `name`; `await`: a boolean; `binds`: `line` or `read` | `expr`: an expression | bind its value, or its awaited value, in the block (D8.8); at `line` the expression runs there, once, and every `ref` of the name reads the binding (D5.11); at `read` the expression runs where the name's one `ref` is read, in a term reached later: the right term of `and`, `or` or `coalesce`, or a branch of `cond` (D4.7) |
 | `if` | | `when`: an expression; `then`, `else`: blocks | run `then` when `when` holds, else the `else` block; an `ElseIf` is an `else` block holding its condition's results and an `if` (D8.7) |
 | `all` | | `blocks`: a list of blocks | run every block at once; the next statement runs after every block settled (D10.10) |
-| `try` | | `body`, `finally`: blocks | run the body; run `finally` once, however the body ends (D11.8) |
+| `request` | `argument`, `reply`: the names its blocks read the argument and the reply under | `send`: an expression whose value is `HttpSend`; `check`: a block; `layers`: a list of layers, the defaults' first; `success`: a route; `statuses`: a list of status routes; `otherwise`: a route; `chained`: a block | run the request's states in order (D10.23): read `send` once and bind it as `argument` in `check`, run `check`, then each layer's `whileLoading`; check what the read recorded and the contracts `HttpSend` names, and hold its busy targets; send; run the one route the outcome picks, its reply bound as `reply`; run each layer's `finally` whose `whileLoading` completed, the last layer's first, then release; run `chained` after a success. Its later statements run after all of it |
 | `listen` | `event`: the event's JavaScript name; `listen`: a vendor listening (a payload's object has no element for a vendor's `locate`); `release`: a listen release; `payload`: a path into the listener's arguments; `members`, as a handler's; `policy`; `payloadName`, `argumentsName`: the names the block binds them under | `object`: an expression; `do`: a block | listen to the event of the live object the expression reads, once per object and statement, for the owner of the plan; run the block on each raise, with the payload and the arguments bound under their names, in the scope of the block that holds the statement (D12.8) |
-| `stop` | `reason`: text C# wrote | | stop the pipeline: run none of its later statements, log the reason, run the `finally` of every `try` it is inside (D4.6, N4.1) |
+| `stop` | `reason`: text C# wrote | | stop the pipeline: run none of its later statements, log the reason; each `request` it is inside runs its layers' `finally` blocks whose `whileLoading` completed, the innermost request's first, and nothing else (D10.23, N4.1) |
+
+A request's parts are closed (D10.23, S2):
+
+| Part | Carries | Holds |
+|------|---------|-------|
+| layer | | `whileLoading`, `finally`: blocks |
+| route | `kind`: the body kind it decodes, none, JSON, text, HTML or file for a success, none, JSON, text or HTML for an error (D10.6) | `do`: a block |
+| status route | `status`: a number from 300 to 599 (D10.13); `kind`, as a route's | `do`: a block |
+
+A request that takes no defaults has one layer, its own. A route the view wrote no block for has kind none and an empty
+`do`, so every part is present.
 
 A listen release says when release removes the listener the step added (D12.8):
 
@@ -283,22 +295,22 @@ and nothing where it holds null (D6.14).
 | `nullable` | | `inner`: a shape that is not `nullable` | yes |
 | `object` | | `fields`: a map from wire name to shape | yes |
 
-## Plugin arguments
+## Contracts
 
-These are typed contracts, not node kinds (G2). S2 and S8 hold for them as for the grammar: every part is required, a
+These are typed contracts, not node kinds (G2): a `request`'s `send` value and its reply, and a plugin's arguments. S2 and S8 hold for them as for the grammar: every part is required, a
 part that can be absent is a closed union (`retry` is none or the standard policy, `body` is one of six formats),
 and a closed choice (`method`, `outcome`) is a sealed class. C# writes each as a `record` whose evaluated value is the contract;
 the contract's C# classes are generated into the plan's TypeScript beside the grammar, so the browser declares
 no argument type of its own (D9.1).
 
-- `HttpSend`, the argument of `alis.http`'s `send` (N9.1):
+- `HttpSend`, the value of a `request`'s `send` (D9.1, N9.1):
   - `method`: GET, HEAD, OPTIONS, POST, PUT or DELETE (D9.3);
   - `url`, a page path or an absolute `http` or `https` URI, as path parts and the URL's own query (D9.23);
   - `query`, which a GET's `Form`, `Inputs` and `Input`s fill (N10.7);
   - `body`: none, JSON, URL-encoded, multipart with its fields and file parts, text, or one file as the whole body,
     with the inputs it sends: a native form's submission set, a container's framework inputs, its `Input`s (D9.6 to
     D9.10, D9.15, D9.16, D9.21);
-  - `headers` (D9.11, D9.12);
+  - `headers`, the `Accept` its success route's kind takes among them (D9.11, D9.12, D10.6);
   - `antiforgery`: none, or the token C# wrote where the view rendered and its place, the header or the field, on a
     POST, PUT or DELETE to the page's origin (D9.22);
   - `retry`: none, or the standard policy with the attempts and first wait the defaults set, never a request's own
@@ -306,11 +318,13 @@ no argument type of its own (D9.1).
   - `busy`: none, the page, or its targets as the C# derived them, each an element id or an expression that reads a
     component a payload holds, such as a row action's control, resolved when the request starts (D10.21, D17.15);
   - `respondedJson`: true on net48 (D10.7);
-  - the body kind of each route (D10.6): a success route's none, JSON, text, HTML or file, an error route's none,
-    JSON, text or HTML, and the `Accept` the success kind writes.
+  - `contracts`: the contracts its defaults name, `busy` under `ShowBusy()` and `notice` for a default route's notice,
+    which its `guard` state looks up before the send (D10.21, D10.23).
+
+  The body kind each route decodes is its route's, not `HttpSend`'s (D10.23).
 
   A request's trace context is its run's and is not in `HttpSend` (D20.3).
-- `HttpResponse`, what `send` returns (N10.2, N10.7): `ok`, `status`, `outcome`, `headers`, `request`, the members as
+- `HttpResponse`, the reply a `request` binds in its routes and `chained` block (N10.2, N10.7, D10.23): `ok`, `status`, `outcome`, `headers`, `request`, the members as
   the request sent them, `inputs`, the inputs it sent, each its binding name and the entry the inputs table held
   (D10.18), and `body`, absent for kind none and every HEAD route.
 - `FormCheck`, the argument of `alis.form`'s `validate`: the registration's key, the body the request sends with its
@@ -333,9 +347,10 @@ proposed column says `added`.
 | statement | let | `Alis.Reactive.Assets/runtime/grammar/execute.ts:27` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D8.8 |
 | statement | if | `Alis.Reactive.Assets/runtime/grammar/execute.ts:28` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D8.6 |
 | statement | all | `Alis.Reactive.Assets/runtime/grammar/execute.ts:29` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D10.10 |
-| statement | try | `Alis.Reactive.Assets/runtime/grammar/execute.ts:30` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D11.8 |
+| statement | try | `Alis.Reactive.Assets/runtime/grammar/execute.ts:30` | removed | | D10.23 |
 | statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.1 |
 | statement | listen | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D12.8 |
+| statement | request | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D10.23 |
 | expression | lit | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:27` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | Q7 |
 | expression | obj | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:28` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | Q5 |
 | expression | ref | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:29` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D8.8 |
@@ -380,7 +395,7 @@ proposed column says `added`.
 | trace | off | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 | trace | on | absent | added | the trace switch of `Alis.Reactive.Assets/runtime/diagnostics/trace.ts` | D20.1 |
 
-Today 33 kinds, proposed 49: sixteen added, none removed.
+Today 33 kinds, proposed 51: nineteen added, one removed (`try`, whose `finally` a `request`'s layers carry).
 
 Today, each shape has two handlers: the conversion switch and the switch that picks a default by shape, `bound`
 (`Alis.Reactive.Assets/runtime/grammar/shape.ts:31-45`). That second switch leaves, because the browser chooses
@@ -410,6 +425,8 @@ The diff beyond the kinds, each with the decision that makes it:
 - `let` gains `binds`, `line` or `read`, so a term's own method call runs where its read is reached (D4.7);
 - `if` holds one `when` and its `then` in place of `arms`, and an `ElseIf` nests in `else` with its condition's results
   (D8.7), so `Arm` leaves;
+- `try` leaves and `request` joins the statements (D10.23): `HttpSend` becomes a `request`'s `send` value, the body
+  kind each route decodes moves from `HttpSend` to the route, and `HttpSend` gains `contracts` (D10.21);
 - `HttpSend`'s methods become six and its bodies six formats, and it gains `antiforgery` and `busy`; its `retry`
   takes the defaults' numbers only (D9.3, D9.21, D9.22, D10.14, D10.21);
 - `HttpResponse` gains `headers`, `request` and `inputs` (N10.7, D10.18), and `FormPlace` joins `FormCheck` (D16.13);

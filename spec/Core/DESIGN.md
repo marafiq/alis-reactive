@@ -13,7 +13,8 @@ Terms used throughout:
   a list of data, a value a method returns. Its members are optional.
 - Nothing is the value JavaScript holds as `null` or `undefined`. The plan never tells the two apart.
 - To stop a pipeline is to run none of its later statements, log one error naming the handler and the
-  reason, and run the `Finally` of every request the stop happens inside.
+  reason, and run, innermost first, each `Finally` layer whose `WhileLoading` completed of every request the stop
+  happens inside (D10.23).
 - A door is a line of a PublicAPI text. A door marked `N<q>.<k>` is a declaration this design proposes.
 
 ## Q1. Paths
@@ -351,8 +352,8 @@ Terms used throughout:
   naming `MethodAsync`. There is no call whose promise nobody awaits: the stop follows it, and a later rejection of
   that promise adds no second error.
 - D4.5 A missing value set as an element's text or HTML shows nothing; a missing class name changes no class.
-- D4.6 A route value that reads nothing stops its request before it is sent, and its `Finally` runs. C# writes
-  this as a guard before the send and the statement `stop(reason)` (Q19).
+- D4.6 A route value that reads nothing stops its request before it is sent, and its `Finally` runs: the request's
+  `guard` state stops it on what its `check` state read (D10.23).
 - D4.7 A method called inside a condition runs only when its term is reached: `and`, `or` and `cond` evaluate
   their terms in order and stop at the first that decides, and an `ElseIf`'s condition runs only when no branch
   before it ran. C# writes a method's result as a `let` at its line (D5.11). A result called after the block's
@@ -369,7 +370,7 @@ Terms used throughout:
   never reaches the vendor that raised the event: its listener returns, and the vendor goes on with the work it does
   after its listeners.
 
-**Schema nodes.** `get`, `call`, `set` with `members`; `data` with its steps; `do` and `let` with `await`; `try`; `op`
+**Schema nodes.** `get`, `call`, `set` with `members`; `data` with its steps; `do` and `let` with `await`; `request`; `op`
 (`and`, `or`, `cond`, `coalesce`); the new statement `stop`.
 
 **Checker.**
@@ -1215,9 +1216,11 @@ Terms used throughout:
 ## Q9. The request
 
 **Decision.**
-- D9.1 A request is one step, `let res = await $http.send(arg)`, and `arg` is the typed plugin argument
-  `HttpSend`, a contract generated into the plan's TypeScript beside the grammar. The browser declares no
-  request type of its own. The grammar gains no node (G2).
+- D9.1 A request is one statement, `request` (D10.23), whose `send` is an expression whose value is the typed
+  contract `HttpSend`, generated into the plan's TypeScript beside the grammar. The browser declares no request type
+  of its own. The grammar gains this one node, by the owner's amendment of G2 (2026-11-08): a request's lifecycle is a
+  state machine whose state, the busy targets it holds from its guards to the end of its defaults' `Finally`, does not
+  nest in `let`, `try` and `if` (`spec/NOTES.md`, 2026-11-08).
 - D9.2 The builder is staged: each part is written at most once, a GET has no body format, and every door that
   sends inputs names what it sends (D9.15): no door sends the inputs of a form the request is taken to check.
 - D9.3 The method is GET, HEAD, OPTIONS, POST, PUT or DELETE. GET, HEAD and OPTIONS send no body; POST, PUT and
@@ -1422,8 +1425,8 @@ Terms used throughout:
     refused where the view renders, and a value read outside it, a line break or a character past US-ASCII, stops
     its request before it is sent; fetch itself refuses a line break and a character past Latin-1
     (`probe:js-header-values`).
-**Schema nodes.** `let` with `await`, `call` on the plugin `http`, `record`, `list`, `lit`, `get`, `as`, `op`; the
-shape `file`; the contract `HttpSend`, which is no node kind.
+**Schema nodes.** `request`, its `send` a `record`, `list`, `lit`, `get`, `as` and `op`; the shape `file`; the
+contract `HttpSend`, which is no node kind.
 
 **Checker.**
 - `Request.tla:EveryPlaceholderFilled`
@@ -1480,9 +1483,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   element of another kind that it sent are `Inputs(container)`'s.
 - refused: `Form()`, the inputs of the form the request checks, since a request names what it sends; its feature is
   carried by `Form(form)` and `Inputs(container)` (D9.15).
-- `N9.1` new: `internal sealed class HttpSend` in `Alis.Reactive/PluginArguments`, with its parts `PathPart`,
-  `SentField`, `SentBody` and `SentHeader`, generated into the plan's TypeScript; it replaces the hand-typed
-  `HttpRequest` (`Alis.Reactive.Assets/runtime/plugins/http.ts:10-18`).
+- `N9.1` new: `internal sealed class HttpSend` in `Alis.Reactive/Requests`, with its parts `PathPart`,
+  `SentField`, `SentBody` and `SentHeader`, generated into the plan's TypeScript, the value of a `request`'s `send`
+  (D10.23); it replaces the hand-typed `HttpRequest` (`Alis.Reactive.Assets/runtime/plugins/http.ts:10-18`).
 - `N9.2` new: the staged builder: a GET builder with no body format, `Form` only over a native form and only in form
   data or a GET's query, and one container a request.
 - `N9.3` new: a named input typed by the member it fills, `Input(r => r.Member, pipeline.Input(m => m.Member))`
@@ -1542,9 +1545,10 @@ shape `file`; the contract `HttpSend`, which is no node kind.
 ## Q10. The request's flow and its response
 
 **Decision.**
-- D10.1 A request runs in this closed order: its check, then `WhileLoading`, then, inside a `try` whose
-  `finally` is the request's `Finally`, its guards (route values, the container it sends, its `Input`s), the send
-  and one response route; then `Chained`; then the steps after the request.
+- D10.1 A request runs in this closed order, the states of D10.23: the read of its argument and its check; the
+  defaults' `WhileLoading`, then its own; its guards (route values, the container it sends, its `Input`s, its busy
+  targets' elements, the contracts the defaults name), the send and one response route; its own `Finally`, then the
+  defaults', each when its `WhileLoading` completed; then `Chained`; then the steps after the request.
 - D10.2 A check that fails shows its failures (D16.13), sends nothing, runs neither `WhileLoading` nor `Finally`,
   and stops its pipeline: no step after the request runs.
 - D10.3 A `WhileLoading` that stops sends nothing, runs no `Finally` and stops its pipeline. `Finally` runs
@@ -1552,8 +1556,11 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   request's: each layer's `Finally` runs exactly when its own `WhileLoading` completed, the request's first, so a stop
   in the request's `WhileLoading` still runs the defaults' `Finally` (`Request.tla:EachLayerPairs`). `Finally` runs
   after its route's whole block, the awaited steps in it included, and a request that block sends is the block's own:
-  an abort or a dispose while it is in flight runs its `Finally` before the enclosing request's, each once
-  (`Lanes.tla:TheRouteTailBeforeWhatFollows`, `Lanes.tla:InnerFinallyFirst`).
+  an abort or a dispose while it is in flight runs its `Finally` layers before the enclosing request's, each once,
+  its own before the defaults' (`Run.tla:NothingRunsWhileItWaits`, `Run.tla:InnerFinallyFirst`,
+  `Run.tla:FinallyRunsOnce`). An abort pairs the layers as a stop does: one that lands while a `WhileLoading` awaits
+  runs that layer's `Finally` not at all, and the defaults' when theirs completed (`Run.tla:FinallyRunsWhenLoaded`,
+  `Run.tla:FinallyOnlyWhenLoaded`).
 - D10.4 A request follows a redirect that ends on the page's own origin, and the response it ends at is the
   request's answer: its status and body pick the route (`probe:fetch-follows-relative-redirect`). A redirect
   that ends on another origin is refused.
@@ -1674,8 +1681,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   what a `.cshtml` MVC view makes hard in its lambdas as its input.
 
 - D10.18 What each step reads is stated by when it reads, and nothing is frozen.
-  - A request's argument is read once, in the turn the request starts, and serialized as it is sent, so the body is
-    a snapshot by construction. A `Parallel`'s requests start in one turn and send what the page held then.
+  - A request's argument is read once, in the turn the request starts and before its check and its `WhileLoading`
+    (D10.23), and serialized as it is sent, so the body is a snapshot by construction and the check reads that body.
+    A `Parallel`'s requests start in one turn and send what the page held then.
   - A response's data belongs to its run. The plan has no door that writes into it, and the generated contract types
     it read-only, so the runtime's own code cannot write into it either. A step that hands it, or any data value, to a
     vendor or a plugin (a `set` or a call argument) hands a structured copy (`probe:js-structured-clone-separate`).
@@ -1684,8 +1692,8 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     that left with its slot, or one a reload of its slot mounted again under the same id, shows nothing inline, and
     the summary place shows every message (`Ownership.tla:FailureReachesSummary`,
     `Ownership.tla:InlineOnlyAtTheSentInput`).
-    What a component does with what it is given is its own: one that edits it edits its copy, and a `Chained`
-    request's gather, a `Finally` and the steps after a `Parallel` read the response as the server sent it. Evidence
+    What a component does with what it is given is its own: one that edits it edits its copy, and the later steps
+    of its route and the request `Chained` sends read the response as the server sent it. Evidence
     that a consumer edits what it is given: `probe:ej2-data-manager-edits-source`, a fact only; the core takes no
     vendor library.
   - Freezing is refused: a write into a frozen record throws (`probe:js-frozen-write-throws`), so a frozen value
@@ -1700,8 +1708,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     handed on.
 - D10.19 A response is a typed object, as a component is (Q5): its status, a number; each header by its name, text
   that reads nothing when the response lacks it; and its body by the route's kind (D10.6), whose members dot-walk as
-  every data path does (Q1, Q2). Each is a source (Q7) in its route, in the request `Chained` sends after it (D10.9)
-  and in the steps after the request. A HEAD route reads the status and the headers, and an OPTIONS route reads its
+  every data path does (Q1, Q2). Each is a source (Q7) in its route and in the block `Chained` runs (D10.9), and in
+  every block inside them (D8.8); the steps after the request do not read it, since no door hands them the reply
+  (`ReplyOutsideItsRoute`, `Schema.tla:RefsReadTheirBlock`). A HEAD route reads the status and the headers, and an OPTIONS route reads its
   `Allow` header (`probe:core-options-reaches-action`).
 - D10.20 A file route saves the body as the browser's download, named by its `Content-Disposition`: the `filename*`
   of RFC 6266, section 4.3, before its `filename`, since MVC 5 writes a non-ASCII name as `filename*` alone
@@ -1744,7 +1753,9 @@ shape `file`; the contract `HttpSend`, which is no node kind.
     not at the first failure.
   - A request holds its targets once across its attempts (D10.15), from its guards, once both `WhileLoading` layers
     completed, to the end of its defaults' `Finally`, on every outcome, a replaced or unloaded run's included (Q11,
-    Q12). A failed check or a stopped `WhileLoading` holds nothing (`Request.tla:HoldSpansTheSend`). A failed request
+    Q12). A failed check, a stopped `WhileLoading` or a failed guard holds nothing (`Request.tla:HoldSpansTheSend`,
+    `Request.tla:FailedGuardHoldsNothing`), and an aborted or disposed run releases what it held after its defaults'
+    `Finally` (`Run.tla:ReleasedWhenEnded`). A failed request
     whose route is a default shows one notice, after its last attempt; a replaced or unloaded request shows none. A
     request that takes no defaults, or whose busy is `NoBusy()`, covers no indicator; one that takes no defaults shows no
     default notice.
@@ -1754,8 +1765,36 @@ shape `file`; the contract `HttpSend`, which is no node kind.
   action whose model is bound from the form 200, with nothing of the body bound (`probe:core-json-to-form-bound`). Main's
   default is JSON (`Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:21` at 7b9e987cc); its feature is kept by
   `Json(..)`, which a `[FromBody]` or `[ApiController]` endpoint takes.
-**Schema nodes.** `let` with `await`, `try`, `if`, `get` of `ok` and `status` on the response, the contract
-`HttpSend` and its result, `HttpResponse`, with the fields `schema.md` lists for them, and the contract plugins `busy`
+- D10.23 A request is one statement of the plan, `request`, and one state machine, the one `spec/Core/Request.tla`
+  checks and `spec/Core/Run.tla` runs as a frame (the owner, 2026-11-08: "treat request as a unit", "there is implicit
+  state machine here"). Its states are `check`, `defaultLoading`, `loading`, `guard`, `attempt`, `route`, `finally`,
+  `defaultFinally`, `chained`, `after` and `done`. The statement's executor holds the request's state (the argument it
+  read, its attempt, the layers whose `WhileLoading` completed, the busy targets it holds), and no other code holds
+  any of it. C# writes the statement whole, each part in its state whatever order the view wrote the parts in (D10.1).
+
+  | State | Runs | Then | A stop | An abort |
+  |-------|------|------|--------|----------|
+  | `check` | reads the request's argument once (D10.18), recording a route value that reads nothing, a container, an input or a busy target's element the page lacks; then its check, on the body it read (D10.2, D16.5) | `defaultLoading`, or `loading` for a request that takes no defaults | a source that stops when read (D4.1), or a failed check, whose failures show: nothing is held and no layer runs | none: the state holds no await |
+  | `defaultLoading` | the defaults' `WhileLoading` | `loading` | the pipeline stops; neither `Finally` runs (D10.3) | as a stop |
+  | `loading` | the request's `WhileLoading` | `guard` | the defaults' `Finally` runs, then the pipeline stops | as a stop: the request's own `Finally` does not run, since its `WhileLoading` did not complete |
+  | `guard` | checks what the read recorded (D4.6, D9.5, D9.15) and the contracts `HttpSend` names (D10.21); then holds its busy targets | `attempt` | nothing is held; `finally` and `defaultFinally` run, then the pipeline stops, its error naming the guard and the part | none: the state holds no await |
+  | `attempt` | sends under the run's abort signal; a retryable outcome under the policy waits and sends again (D10.14, D10.15) | `route` | | the fetch or the wait ends and no route runs; then `finally` |
+  | `route` | the one route the outcome picks (D10.5, D10.13), the reply bound in its block; its awaited steps and requests are its tail (D11.5) | `finally` | `finally` and `defaultFinally` run, then the pipeline stops | the route's later steps do not run; a request of its tail runs its own layers first; then `finally` |
+  | `finally` | the request's `Finally`, exactly when `loading` completed | `defaultFinally` | its later steps do not run; `defaultFinally` runs, then the pipeline stops | one that lands while it awaits leaves it running under `replace`; under a dispose it runs to its first awaited step (D11.8) |
+  | `defaultFinally` | the defaults' `Finally`, exactly when `defaultLoading` completed; then the busy targets it holds are released (D10.21) | `chained` after a success, else `after` | the release, then the pipeline stops | as at `finally`, then the release |
+  | `chained` | the block `Chained` runs, the reply bound; a condition on it is an `if` C# writes inside it (D10.9, D10.16) | `after` | the pipeline stops | as in any block |
+  | `after` | the steps after the request in its block, which do not read the reply (D10.19) | `done` | | |
+
+  A request inside a route or a `Chained` block is a statement of that block, so it runs inside the enclosing
+  request's state, and its layers end before the enclosing state goes on: a stop or an abort runs the inner request's
+  own `Finally`, the inner defaults', then the outer's own and the outer defaults', each once and each when its
+  `WhileLoading` completed (`Run.tla:InnerFinallyFirst`, `Run.tla:FinallyRunsOnce`, `Run.tla:FinallyRunsWhenLoaded`,
+  `Run.tla:FinallyOnlyWhenLoaded`). A request in a `Parallel` branch runs in that branch's block of `all`
+  (`Lanes.tla:JoinAfterEveryBranchTail`). Every busy target a request held is released by the time its run ends,
+  aborted or disposed (`Run.tla:ReleasedWhenEnded`).
+
+**Schema nodes.** `request`, its routes and its layers (D10.23), `get` of `ok` and `status` on the reply, the contract
+`HttpSend` and the reply, `HttpResponse`, with the fields `schema.md` lists for them, and the contract plugins `busy`
 and `notice` (D10.21).
 
 **Checker.**
@@ -1783,6 +1822,11 @@ and `notice` (D10.21).
 - `Composition.tla:NoticeOncePerFailure`
 - `Request.tla:EachLayerPairs`
 - `Request.tla:HoldSpansTheSend`
+- `Request.tla:FailedGuardHoldsNothing`
+- `Run.tla:InnerFinallyFirst`
+- `Run.tla:FinallyRunsWhenLoaded`
+- `Run.tla:FinallyOnlyWhenLoaded`
+- `Run.tla:ReleasedWhenEnded`
 - `probe:core-frombody-multipart`
 - `probe:core-json-to-form-bound`
 - `probe:core-string-result-media-type`
@@ -2031,7 +2075,7 @@ and `notice` (D10.21).
   - A property, a data member and a method declared with `Method` are sync. A promise where one of them
     was declared stops the pipeline with one logged error (Q4).
   - A method declared with `MethodAsync` is awaited every time it runs. A rejection stops the pipeline,
-    logs one error and runs the enclosing request's `Finally`. The value it resolves to is read as data
+    logs one error and runs the `Finally` layers of every request it is inside (D10.23). The value it resolves to is read as data
     (Q4).
   - Today a call that was not awaited and gets a promise continues and logs only the rejection; the
     rewrite refuses that meaning.
@@ -2057,7 +2101,11 @@ and `notice` (D10.21).
   the handler runs: a branch reads the state before its `if`, so an `Else` writes the payload in the vendor's turn
   when its sibling `Then` awaits, and a step after the `if` reads the payload as awaited when any of its branches
   awaits. An `ElseIf`'s branch and the `Else` after it read the state after the conditions before them, so an
-  `Else` after an `ElseIf` whose condition awaits reads the payload as awaited (X11.13).
+  `Else` after an `ElseIf` whose condition awaits reads the payload as awaited (X11.13). A request waits at its send,
+  so its routes, its `Finally` layers and `Chained` read the payload as awaited, and its `WhileLoading` reads it as
+  the defaults' `WhileLoading` leaves it: the defaults are the app's options, so where their `WhileLoading` awaits, a
+  payload write in a request's own `WhileLoading` is refused where the view renders (X11.18,
+  `Run.tla:WritesAfterTheTurnAreRefused`).
 - D11.5 The order is closed:
   - The steps after an awaited step run after it settles.
   - Two handlers of one event run in the order the plan subscribed them, each up to its first awaited
@@ -2069,7 +2117,7 @@ and `notice` (D10.21).
   - A step settles when every block it ran settles. A branch, a route, `WhileLoading`, `Finally`, the block
     `Chained` runs and a `Parallel` branch hold awaited steps of their own, so the steps after an `if`, a request's
     `Finally` and `Chained`, the steps after the request and the steps after `Parallel` wait for the whole of each
-    block they follow (`Lanes.tla:TheRouteTailBeforeWhatFollows`, `Lanes.tla:JoinAfterEveryBranchTail`; one level is
+    block they follow (`Run.tla:NothingRunsWhileItWaits`, `Lanes.tla:JoinAfterEveryBranchTail`; one level is
     proven at `tests/Alis.Reactive.Poc.PlaywrightTests/Conditions/WhenAPipelineBranches.cs:77`). A run is in flight
     until its last block settles, so `replace`, `skip` (D11.7) and dispose (D11.8) meet a route's awaited tail as in
     flight.
@@ -2082,18 +2130,20 @@ and `notice` (D10.21).
   policy belongs to the handler, not to a request.
   - `overlap`, the default, as today, starts another run.
   - `replace` aborts the run in flight and starts the new one, so a cascade's or a search's late answer
-    never overwrites a newer one. The aborted request runs no route, and its `Finally` runs once.
+    never overwrites a newer one. The aborted request runs no route, and each of its `Finally` layers whose
+    `WhileLoading` completed runs once (D10.23).
   - `skip` starts nothing while a run is in flight, so a save clicked twice sends once.
 - D11.8 Dispose ends its owner's runs first, then releases what the owner holds.
-  - A request in flight is aborted through its fetch's abort signal and runs no route. Its `Finally` runs
-    once. A retry's wait ends (D10.15).
+  - A request in flight is aborted through its fetch's abort signal and runs no route. Each of its `Finally`
+    layers whose `WhileLoading` completed runs once, and its busy targets are released after the defaults'
+    (`Run.tla:ReleasedWhenEnded`). A retry's wait ends (D10.15).
   - An await the browser cannot abort (a `MethodAsync` promise, `Confirm`, a hub's `invoke`) settles
     later, and its settling runs nothing.
   - No route and no step after runs for a disposed owner.
   - Every `Finally` runs before the owner releases its listeners, components and content, while its
     elements are still on the page. So a `Finally` that clears what its `WhileLoading` showed, or re-enables a
     button in the slot, finds what it names. A `Finally`'s steps after its own first awaited step do not run for a
-    disposed owner.
+    disposed owner, so the run never waits again (`Run.tla:DisposedRunNeverWaits`).
 - D11.9 No step waits for time. The only waits the core owns are a retry's delay and a `Retry-After`
   (D10.14). A component's own timers, such as a toast's or a loader's timeout, are its properties.
 - D11.10 Every stage is a block, as D8.7 and D8.8 state, on every view kind, MVC 5 and ASP.NET Core MVC (the owner,
@@ -2118,23 +2168,55 @@ and `notice` (D10.21).
     `spec/api/CshtmlStages/Views/Stages/Index.cshtml` writes the same stages and a row action's loop in an ASP.NET Core
     MVC view the Razor SDK compiles at build, and `spec/api/CshtmlStages/Program.cs` the defaults' blocks in a startup
     file; an MVC 5 view is compiled where it first renders, so it stays the verify-net48 run's.
+- D11.11 A pipeline runs as one run, a state machine (`spec/Core/Run.tla`). Its frames are the blocks and requests
+  in progress, innermost last, and its status is running, waiting or ended. Only the run's driver touches a promise:
+  a step completes, opens a frame, waits on one promise or stops, and the driver runs steps in the trigger's turn
+  until one waits. So a run with no awaited step ends in that turn, the second handler of an event starts in it
+  (`Run.tla:SyncRunEndsInItsTurn`, `Run.tla:SecondHandlerStartsInTheTurn`), and while a frame waits no frame around it
+  runs (`Run.tla:NothingRunsWhileItWaits`).
+  - The C# refuses each payload write the run would make after the vendor's turn, by the path the run takes: a
+    request waits at its send, its `WhileLoading` runs after the defaults' `WhileLoading`, and the steps after an `if`
+    run after any branch's wait (D11.4, `Run.tla:WritesAfterTheTurnAreRefused`).
+  - A stop unwinds the frames innermost first, and each request frame on the way runs its `Finally` layers as frames
+    of their own (D10.23, `Run.tla:NothingRunsAfterAStop`).
+  - An abort, by `replace` (D11.7) or a dispose (D11.8), unwinds the same way from the wait it lands on and runs no
+    route (`Run.tla:NothingRunsAfterAnAbort`). Under `replace`, a `Finally` it lands in goes on when its await settles.
+    Under a dispose, each `Finally` runs to its first awaited step, whose settling runs nothing, so the run never
+    waits again (`Run.tla:DisposedRunNeverWaits`).
+  - `all` ends when each of its blocks ended (D10.10, `Lanes.tla:JoinAfterEveryBranchTail`).
+- D11.12 The core's state machines are closed, each held in one place, its transitions its TLA+ spec's actions:
+  - a run (D11.11, `spec/Core/Run.tla`), under its handler's policy and its owner's dispose (`spec/Core/Lanes.tla`);
+  - a request (D10.23, `spec/Core/Request.tla`), a frame of its run;
+  - an owner and its slot (Q12, `spec/Core/Ownership.tla`);
+  - a connection (Q21, `spec/Core/Realtime.tla`);
+  - a busy target's count (D10.21, `spec/Core/Composition.tla`).
+  Nothing else holds state across a turn: a step reads the page when it runs (D10.18), a listener is a removal its
+  owner holds, a plan's boot is one pass, and the C# writer's position is its stack of open blocks, each with its stage
+  and whether a step before it awaited (D11.4).
 
-**Schema nodes.** `do` and `let` with `await`, `all`, `try`, and the handler's policy, a field of `handler`
+**Schema nodes.** `do` and `let` with `await`, `all`, `request`, and the handler's policy, a field of `handler`
 (Q19). The abort signal is the run's, not the plan's: `HttpSend` carries none.
 
 **Checker.**
 - `Lanes.tla:DisposedRunsNothingMore`
-- `Lanes.tla:FinallyRunsWhenAborted`
-- `Lanes.tla:FinallyRunsOnce`
 - `Lanes.tla:FinallyRunsBeforeRelease`
 - `Lanes.tla:ReplacedRunRunsNoRoute`
 - `Lanes.tla:SkippedTriggerStartsNothing`
 - `Lanes.tla:AllSettledAfterEveryRequest`
 - `Lanes.tla:BranchStopEndsOnlyItself`
-- `Lanes.tla:PayloadWritesInTheVendorsTurn`
-- `Lanes.tla:TheRouteTailBeforeWhatFollows`
-- `Lanes.tla:InnerFinallyFirst`
 - `Lanes.tla:JoinAfterEveryBranchTail`
+- `Run.tla:WritesAfterTheTurnAreRefused`
+- `Run.tla:NothingRunsWhileItWaits`
+- `Run.tla:SyncRunEndsInItsTurn`
+- `Run.tla:SecondHandlerStartsInTheTurn`
+- `Run.tla:NothingRunsAfterAStop`
+- `Run.tla:NothingRunsAfterAnAbort`
+- `Run.tla:FinallyRunsWhenLoaded`
+- `Run.tla:FinallyOnlyWhenLoaded`
+- `Run.tla:FinallyRunsOnce`
+- `Run.tla:InnerFinallyFirst`
+- `Run.tla:ReleasedWhenEnded`
+- `Run.tla:DisposedRunNeverWaits`
 - `Absence.tla:UnawaitedPromiseStops`
 - `Absence.tla:PromiseWhereValueStops`
 - `Absence.tla:StopEndsOnlyItsHandler`
@@ -2200,12 +2282,31 @@ and `notice` (D10.21).
   `ElseIf` whose condition awaits an async method, the write is refused with X11.1's message.
 - `X11.14` behavior (D11.5, D10.3): a success route that writes, sends a second request and writes again: the
   request's `Finally`, its `Chained` and the step after the request run after the second request settles and the
-  route's last write shows (`Lanes.tla:TheRouteTailBeforeWhatFollows`).
-- `X11.15` behavior (D10.3, D11.7): a second click under `replace` while a route's own request is in flight: that
-  request is aborted, its `Finally` runs and then the outer `Finally`, once each, and no step of the route runs after
-  (`Lanes.tla:InnerFinallyFirst`).
+  route's last write shows (`Run.tla:NothingRunsWhileItWaits`).
+- `X11.15` behavior (D10.3, D11.7): a second click under `replace` while a route's own request is in flight, both
+  requests taking the defaults: that request is aborted, and its `Finally`, its defaults' `Finally`, the outer
+  `Finally` and the outer defaults' `Finally` run in that order, once each, and no step of either route runs after
+  (`Run.tla:InnerFinallyFirst`, `Run.tla:NothingRunsAfterAnAbort`).
 - `X11.16` behavior (D11.5): `Parallel` whose first branch's route sends a request: the steps after `Parallel` run
   after that request settles (`Lanes.tla:JoinAfterEveryBranchTail`).
+- `X11.18` refusal (D11.4): in an app whose defaults' `WhileLoading` awaits, a request whose own `WhileLoading` writes
+  its event's `Cancel` is refused where the view renders with "A write to the event's payload after an awaited step
+  reaches no vendor: write it before the first request, Confirm or async method." (`Run.tla:WritesAfterTheTurnAreRefused`).
+- `X11.19` behavior (D11.11): a click whose handler runs no awaited step and a second handler of the same click both
+  write before the click's own handling reads them: the second starts in the click's turn, and the first has ended
+  (`Run.tla:SyncRunEndsInItsTurn`, `Run.tla:SecondHandlerStartsInTheTurn`).
+- `X11.20` behavior (D10.23): a stop in the route of a request a route sends: the inner request's `Finally` and its
+  defaults' run, then the outer's own and its defaults', and no step after either request runs
+  (`Run.tla:NothingRunsAfterAStop`).
+- `X11.21` behavior (D10.3, D11.7): a second click under `replace` while the first request's own `WhileLoading`
+  awaits an async method: that request's `Finally` does not run, its defaults' `Finally` does, its busy target is
+  never shown and no route runs (`Run.tla:FinallyRunsWhenLoaded`, `Run.tla:FinallyOnlyWhenLoaded`).
+- `X11.22` behavior (D11.7): a second click under `replace` while the first request's `Finally` awaits an async
+  method: that `Finally` writes its last text once, after its await settles, its defaults' `Finally` runs after it,
+  and no step after the request runs (`Run.tla:FinallyRunsOnce`).
+- `X11.23` behavior (D11.8): a slot unloaded while its request's defaults' `Finally` awaits: the step after that
+  await does not run, and the request's busy target hides (`Run.tla:DisposedRunNeverWaits`,
+  `Run.tla:ReleasedWhenEnded`).
 - `X11.17` analyzer (D11.10): C#'s own branching (`if`, `?:`, `switch`, `try`, `return`) in any block: ALIS004,
   new:N18.6.
 
@@ -2415,7 +2516,7 @@ plans name.
 
 **Schema nodes.** The plugin data `form` (a registration, keyed by validator and rule set) and `model` (the
 inputs table and the containers table),
-and `request` state, which the schema does not hold: a request's state is its run's.
+and a request's state, which no node holds: it is its `request` statement's, in its run (D10.23, D11.11).
 
 **Checker.**
 - `Ownership.tla:RulesLeaveWithTheirOwner`
@@ -3225,7 +3326,7 @@ plans (Q19).
 **Checker.**
 - `Ownership.tla:NoUnsubscribeOnDestroyed`
 - `Ownership.tla:ListenersDoNotAccumulate`
-- `Lanes.tla:PayloadWritesInTheVendorsTurn`
+- `Run.tla:WritesAfterTheTurnAreRefused`
 - `probe:ej2-methods-returning-promise`
 - `probe:ej2-destroy-removes-instance`
 - `probe:ej2-max-public-method-arity`
@@ -3598,9 +3699,11 @@ shapes, starts and the payload kind of each event.
   and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
   write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
   `spec/NOTES.md`).
-- D19.2 The set is closed at 51 kinds: today's 33, and `stop`, `listen`, `data`, `start`, `nothing`, `unbound`,
-  `signal`, `answer`, `file`, `each`, `returned`, `living`, `held`, `stream`, `clock`, `zone`, `off` and `on`, the 18
-  `spec/Core/schema.md` marks added and `spec/Core/Schema.tla` checks. No kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
+- D19.2 The set is closed at 51 kinds: today's 33 but `try`, and `request`, `stop`, `listen`, `data`, `start`,
+  `nothing`, `unbound`, `signal`, `answer`, `file`, `each`, `returned`, `living`, `held`, `stream`, `clock`, `zone`,
+  `off` and `on`, the 19 `spec/Core/schema.md` marks added and `spec/Core/Schema.tla` checks. `try` leaves, its
+  `finally` carried by a `request`'s layers, since nothing but a request's `Finally` wrote it (the owner's amendment of
+  G2, 2026-11-08, D10.23); no other kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
   to the owner with its use case.
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).
@@ -3621,7 +3724,7 @@ shapes, starts and the payload kind of each event.
 - D19.8 A number shape carries what a text converts under: `of`, an integer or a fraction, which picks the culture's
   number text for the host, and `text`, the view's culture or the invariant one (D3.11).
 - D19.9 `HttpSend`, `HttpResponse`, `FormCheck` and `FormPlace` are typed contracts generated beside the grammar, not
-  kinds (G2).
+  kinds (G2): `HttpSend` is a `request`'s `send` value and `HttpResponse` the reply it binds (D10.23).
 - D19.10 The plan's version is 7. A plan of another version is JSON the framework did not produce, refused at boot with
   one error.
 

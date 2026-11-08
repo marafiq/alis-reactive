@@ -40,6 +40,7 @@ TLC_SPECS = {
     "Absence": {"question": "Q4", "step": 4, "expect": "green"},
     "Request": {"question": "Q9 Q10", "step": 4, "expect": "green"},
     "Lanes": {"question": "Q11", "step": 4, "expect": "green"},
+    "Run": {"question": "Q11", "step": 4, "expect": "green"},
     "Ownership": {"question": "Q12", "step": 4, "expect": "green"},
     "DateWire": {"question": "date wire form", "step": 4, "expect": "green"},
     "Schema": {"question": "Q19", "step": 5, "expect": "green"},

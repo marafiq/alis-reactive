@@ -224,6 +224,8 @@ This is the spine. Answer each question in `spec/Core/DESIGN.md`, one section pe
    Decide between one condition core (the same nodes, operators and sources, behind three authoring doors) and a stated list of exactly where they differ, and why.
 9. **Q9. The request.** One typed request, carried as a typed plugin argument. Resolves B6.
    - A typed plugin argument is a contract, not a node: G2 holds, and the grammar gains no statement or expression kind.
+     Amended by the owner, 2026-11-08: the request is one statement, `request`, and `HttpSend` the contract its `send`
+     evaluates to (G2).
    - Q19 decides where the argument contracts live and how `PlanContractGenerator` emits them. Today it walks one root, `PlanDocument`.
    - The parts:
      - **The method.** Closed at GET, POST, PUT and DELETE, unless the owner adds PATCH.
@@ -313,7 +315,10 @@ How paths are written in this brief:
 
 **Good**
 - **G1.** `runtime/grammar/evaluate.ts:25-37`: 10 expressions and 6 statements, each in one switch ending in `assertNever`. A new C# node fails typecheck.
-- **G2.** HTTP, validation, slots and dispatch add no node.
+- **G2.** HTTP, validation, slots and dispatch add no node. The owner's amendment, 2026-11-08 ("I can give you go ahead
+  for amend"): validation, slots and dispatch add none, and HTTP adds one statement, `request`, since a request's
+  lifecycle is a state machine whose state (the busy targets it holds, from its guards to the end of the defaults'
+  `Finally`) does not nest in `let`, `try` and `if` (`spec/NOTES.md`, 2026-11-08; D10.23).
   - HTTP is `let res = await $http.send({...})`, then `if res.ok … else` (`PlanModel/Requests/RequestStep.cs:101`, `:219-220`).
   - The same holds for `$form.validate`, `$slot.load` and `$document.raise` (`PlanModel/Reactions/Steps.cs`).
 - **G3.** A missing member is decided in C# by the kind of holder:

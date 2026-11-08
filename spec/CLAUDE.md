@@ -338,7 +338,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   few gotchas, so assume C# 8. An MVC 5 app is assumed at C# 8, so nothing the framework writes into an app needs
   C# 9 (no module initializer); generated code is written in C# 7.3 syntax, which compiles in an app left at the default.
 - The owner, 2026-11-07: "yeah one call is fine". An app hands the generated request tables to the framework with one
-  startup call, the same on both hosts (net48 `Application_Start`, net10 `Program.cs`); no host registers by itself.
+  startup call, the same on both hosts (net48 `Application_Start`, net10's startup file); no host registers by itself.
 - The owner, 2026-11-07, on the generators: "I think for validators it does make sense. Compile time JSOn i would defer
   it". A generator writes the app's validator list in the validation unit, replacing `Add<TValidator>()` per validator
   (D16's gate 1 exception); compile-time plan JSON is deferred, so 17b-ii measures no render-cost baseline for it.
@@ -406,11 +406,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   branch, each route, `WhileLoading`, `Finally`, the block `Chained` runs, each `Parallel` branch and the defaults' blocks.
   Conditions, the page's URL, every reply's status, headers and body, and the request as sent dot-walk in each, and a
   chained request reads every reply and request around it. A step that waits holds what follows it, a route's tail
-  included (D11.10, D11.5, `spec/Core/Lanes.tla`).
+  included (D11.10, D11.5, `spec/Core/Run.tla`).
 - Chosen within the owner's yes, 2026-11-08: a row action is one handler per action and one entry per rendered
   control, and the entry holds only the row members the action's block reads; a button takes any block and a link a
   block whose one request is a GET, its href; the handler's policy spans the action's rows, and a link reads nothing
   another script did with the click (D17.15). Both lines write a whole plan per link. The owner can overrule it.
+- The owner, 2026-11-08, amending G2: "I can give you go ahead for amend, but you have to make sure the quality bar stay
+  high, and think through and tell me if this make sense or not." HTTP adds one statement, `request`, whose executor is
+  `spec/Core/Request.tla`'s state machine, and a pipeline is one run, `spec/Core/Run.tla`'s, whose driver alone touches a
+  promise (D10.23, D11.11, D11.12). The bar the owner set with it: the machines simplify the runtime's mix of sync and
+  async, and an async call in a stack that started sync is proven by TLA+ and then in the browser.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
