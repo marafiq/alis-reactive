@@ -179,9 +179,8 @@ public sealed class QueryParts<TRequest>
     public QueryParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value)
     {
         RequestHeaders.RequireANewName(name, _headers);
-        var form = WireForms.Of<TValue>(Build.Values, name);
-        if (form.Form is ListForm) throw new ArgumentException($"The header {name} reads a list, which a header does not carry as one value; send it in the query.", nameof(value));
-        _headers.Add(new SentMember(name, Sources.Of(value).Expression, form));
+        var form = WireForms.OneHeaderValue<TValue>(Build.Values, name, nameof(value));
+        _headers.Add(new SentMember(name, Sources.Of(value).Expression, new SentForm(form, WhenNothing.Leave)));
         return this;
     }
 

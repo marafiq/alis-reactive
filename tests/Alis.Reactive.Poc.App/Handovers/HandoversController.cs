@@ -38,6 +38,8 @@ public sealed class HandoversController : Controller
 
     public IActionResult HeaderOfAList() => View(new HandoverPage());
 
+    public IActionResult HeaderOfAnObject() => View(new HandoverPage());
+
     public IActionResult DateFillsAPath() => View(new HandoverPage());
 
     private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);

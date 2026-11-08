@@ -26,6 +26,19 @@ internal static class WireForms
         return new SentForm(form, Nothing<TValue>(form));
     }
 
+    internal static WireForm OneHeaderValue<TValue>(JsonSerializerOptions options, string header, string argument)
+    {
+        var info = options.GetTypeInfo(typeof(TValue));
+        if (info.Kind == JsonTypeInfoKind.None) return FormOf(typeof(TValue), options, header);
+        var noun = info.Kind switch
+        {
+            JsonTypeInfoKind.Enumerable => "a list",
+            JsonTypeInfoKind.Dictionary => "a dictionary",
+            _ => "an object",
+        };
+        throw new ArgumentException($"The header {header} reads {noun}, which a header does not carry as one value; send it in the query.", argument);
+    }
+
     internal static bool FillsAPathSegment(WireForm form) => form is TextForm or NumberForm or BooleanForm or WrittenForm;
 
     internal static string Noun(WireForm form) => form switch

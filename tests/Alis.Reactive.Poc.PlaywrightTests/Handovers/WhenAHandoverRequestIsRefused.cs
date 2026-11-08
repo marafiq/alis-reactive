@@ -58,6 +58,15 @@ public sealed class WhenAHandoverRequestIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task a_header_reading_an_object_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Handovers/HeaderOfAnObject");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "ArgumentException: The header X-Handover reads an object, which a header does not carry as one value; send it in the query. (Parameter 'value')");
+    }
+
+    [Test]
     public async Task a_member_holding_a_dictionary_is_refused_where_the_view_renders()
     {
         await Page.GotoAsync(BaseUrl + "/Handovers/DictionaryMember");
