@@ -1,12 +1,12 @@
 ---- MODULE Ownership ----
-EXTENDS Naturals
+EXTENDS Naturals, Sequences, FiniteSets
 
 CONSTANT Mutant
 
 Mutants == {"none", "ReleaseOnlyLoadedSlot", "LoadKeepsOldListeners", "BootContentUnderPage", "RegistrationPerLoadOnPage",
             "ReloadSkipsRegistration", "ReleaseLeavesRules", "FirstReleaseStopsHub", "ReleaseKeepsOffer", "UnsubscribeDestroyed",
             "ListenTwice", "ListenSurvivesRelease", "RemoveOnCollected", "RemoveOnDestroyed", "InlineByName",
-            "SummaryOnlyWithoutInline"}
+            "SummaryOnlyWithoutInline", "ReleaseEndsAtFirstThrow", "ThrownListenerStillRuns", "ThrowLeavesTheContent"}
 
 ASSUME Mutant \in Mutants
 
@@ -17,15 +17,21 @@ MaxLoads == 2
 
 VARIABLES live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
           destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone,
-          req, sentGen, inline, inlineGen, summarized
+          req, sentGen, inline, inlineGen, summarized,
+          throws, attached, heard, met, covered, lastStep, loadedGen, selfRun
 
 vars == <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
           destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone,
-          req, sentGen, inline, inlineGen, summarized>>
+          req, sentGen, inline, inlineGen, summarized,
+          throws, attached, heard, met, covered, lastStep, loadedGen, selfRun>>
 
 listens == <<listenOn, listenGen, alive, listenThrew, gone, listenOffGone>>
 
 checks == <<req, sentGen, inline, inlineGen, summarized>>
+
+releases == <<throws, attached, heard, met, covered, lastStep, loadedGen, selfRun>>
+
+stepOutcome == <<selfRun>>
 
 HasField(content) == content \in {"boot", "card"}
 
@@ -60,6 +66,14 @@ Init ==
     /\ inline = FALSE
     /\ inlineGen = 0
     /\ summarized = FALSE
+    /\ throws = {}
+    /\ attached = IF Mutant = "BootContentUnderPage" THEN {} ELSE {<<"a", 0>>}
+    /\ heard = [o \in Slots |-> 0]
+    /\ met = {}
+    /\ covered = {}
+    /\ lastStep = "none"
+    /\ loadedGen = 0
+    /\ selfRun = FALSE
 
 KeepsB == Mutant = "ReleaseOnlyLoadedSlot"
 
@@ -80,8 +94,77 @@ ReleaseA ==
     /\ listenGen' = IF Mutant = "ListenSurvivesRelease" THEN listenGen ELSE [o \in Objects |-> 0]
     /\ UNCHANGED <<alive, gone>>
 
-LoadA ==
-    /\ aLoads < MaxLoads
+Range(s) == {s[i] : i \in 1..Len(s)}
+
+OwnerGen(o) == IF o = "a" THEN aGen ELSE bLoads
+
+Current(owners) == {<<o, OwnerGen(o)>> : o \in owners}
+
+NoneHeard == [o \in Slots |-> 0]
+
+ReleaseOrder == IF live["b"] THEN <<"b", "a">> ELSE <<"a">>
+
+FirstThrow(order) ==
+    IF \E i \in 1..Len(order) : order[i] \in throws
+    THEN CHOOSE i \in 1..Len(order) : order[i] \in throws /\ \A j \in 1..(i - 1) : order[j] \notin throws
+    ELSE 0
+
+EndsAt(order) == IF Mutant = "ReleaseEndsAtFirstThrow" THEN FirstThrow(order) ELSE 0
+
+LeavesTheContent(order) == Mutant = "ThrowLeavesTheContent" /\ Range(order) \cap throws # {}
+
+Issuers(x) == {"page"} \cup (IF live[x] THEN {x} ELSE {})
+
+StepOutcome(by, x, ended) == selfRun' = (by = x /\ x \in ended)
+
+ReleasedWhole(order, added, by, x) ==
+    /\ met' = Range(order) \cap throws
+    /\ throws' = throws \ Range(order)
+    /\ attached' = (attached \ Current(Range(order) \ throws)) \cup added
+    /\ heard' = NoneHeard
+    /\ covered' = Current(Range(order))
+    /\ StepOutcome(by, x, Range(order))
+
+EndedAtTheThrow(order, step, by, x) ==
+    LET first == EndsAt(order)
+        before == {order[i] : i \in 1..(first - 1)} IN
+    /\ IF "b" \in before
+         THEN LET l == [live EXCEPT !["b"] = FALSE] IN
+              /\ live' = l
+              /\ managed' = HubAfter(l, aContent)
+              /\ offer' = OfferAfter(HubAfter(l, aContent))
+              /\ listenersOf' = [listenersOf EXCEPT !["b"] = 0]
+         ELSE UNCHANGED <<live, managed, offer, listenersOf>>
+    /\ UNCHANGED <<aContent, aGen, bGen, aLoads, bLoads, registeredOn, fieldRegistered, rules, destroyed, threw, releasedDestroyed>>
+    /\ UNCHANGED listens
+    /\ UNCHANGED checks
+    /\ met' = {order[first]}
+    /\ throws' = throws \ before
+    /\ attached' = attached \ Current(before)
+    /\ heard' = NoneHeard
+    /\ covered' = Current(Range(order))
+    /\ lastStep' = step
+    /\ loadedGen' = CASE step = "load" -> aGen + 1 [] step = "loadB" -> bLoads + 1 [] OTHER -> loadedGen
+    /\ StepOutcome(by, x, before \cup {order[first]})
+
+ReleasedLeavingTheContent(order, step, by) ==
+    LET l == [o \in Slots |-> FALSE] IN
+    /\ live' = l
+    /\ managed' = HubAfter(l, aContent)
+    /\ offer' = OfferAfter(HubAfter(l, aContent))
+    /\ listenersOf' = [listenersOf EXCEPT !["a"] = 0, !["b"] = 0]
+    /\ registeredOn' = [registeredOn EXCEPT !["a"] = 0]
+    /\ fieldRegistered' = FALSE
+    /\ rules' = RulesWithoutA
+    /\ destroyed' = FALSE
+    /\ ReleaseA
+    /\ UNCHANGED <<aContent, aGen, bGen, aLoads, bLoads>>
+    /\ UNCHANGED checks
+    /\ ReleasedWhole(order, {}, by, "a")
+    /\ lastStep' = step
+    /\ loadedGen' = IF step = "load" THEN aGen + 1 ELSE loadedGen
+
+LoadReplaces(by) ==
     /\ LET l == [o \in Slots |-> IF o = "a" THEN TRUE ELSE live["b"] /\ KeepsB]
            released == [o \in Slots |-> IF o = "a" THEN FALSE ELSE live["b"] /\ KeepsB] IN
        /\ live' = l
@@ -101,9 +184,18 @@ LoadA ==
     /\ ReleaseA
     /\ UNCHANGED <<bGen, bLoads>>
     /\ UNCHANGED checks
+    /\ ReleasedWhole(ReleaseOrder, {<<"a", aGen + 1>>}, by, "a")
+    /\ lastStep' = "load"
+    /\ loadedGen' = aGen + 1
 
-UnloadA ==
-    /\ live["a"]
+LoadA ==
+    /\ aLoads < MaxLoads
+    /\ \E by \in Issuers("a") :
+         CASE EndsAt(ReleaseOrder) > 0 -> EndedAtTheThrow(ReleaseOrder, "load", by, "a")
+           [] LeavesTheContent(ReleaseOrder) -> ReleasedLeavingTheContent(ReleaseOrder, "load", by)
+           [] OTHER -> LoadReplaces(by)
+
+UnloadEmpties(by) ==
     /\ LET l == [o \in Slots |-> IF o = "a" THEN FALSE ELSE live["b"] /\ KeepsB] IN
        /\ live' = l
        /\ managed' = HubAfter(l, "empty")
@@ -118,11 +210,18 @@ UnloadA ==
     /\ ReleaseA
     /\ UNCHANGED <<aGen, bGen, aLoads, bLoads>>
     /\ UNCHANGED checks
+    /\ ReleasedWhole(ReleaseOrder, {}, by, "a")
+    /\ lastStep' = "unload"
+    /\ UNCHANGED loadedGen
 
-LoadB ==
+UnloadA ==
     /\ live["a"]
-    /\ aContent = "card"
-    /\ bLoads < MaxLoads
+    /\ \E by \in Issuers("a") :
+         CASE EndsAt(ReleaseOrder) > 0 -> EndedAtTheThrow(ReleaseOrder, "unload", by, "a")
+           [] LeavesTheContent(ReleaseOrder) -> ReleasedLeavingTheContent(ReleaseOrder, "unload", by)
+           [] OTHER -> UnloadEmpties(by)
+
+LoadsB(by) ==
     /\ live' = [live EXCEPT !["b"] = TRUE]
     /\ bGen' = aGen
     /\ bLoads' = bLoads + 1
@@ -131,9 +230,25 @@ LoadB ==
     /\ UNCHANGED <<aContent, aGen, aLoads, registeredOn, fieldRegistered, rules, offer, destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
     /\ UNCHANGED checks
+    /\ IF live["b"]
+         THEN ReleasedWhole(<<"b">>, {<<"b", bLoads + 1>>}, by, "b")
+         ELSE /\ met' = {}
+              /\ covered' = {}
+              /\ attached' = attached \cup {<<"b", bLoads + 1>>}
+              /\ heard' = NoneHeard
+              /\ UNCHANGED throws
+              /\ StepOutcome(by, "b", {})
+    /\ lastStep' = "loadB"
+    /\ loadedGen' = bLoads + 1
 
-UnloadB ==
-    /\ live["b"]
+LoadB ==
+    /\ live["a"]
+    /\ aContent = "card"
+    /\ bLoads < MaxLoads
+    /\ \E by \in Issuers("b") :
+         IF live["b"] /\ EndsAt(<<"b">>) > 0 THEN EndedAtTheThrow(<<"b">>, "loadB", by, "b") ELSE LoadsB(by)
+
+UnloadsB(by) ==
     /\ LET l == [live EXCEPT !["b"] = FALSE] IN
        /\ live' = l
        /\ managed' = HubAfter(l, aContent)
@@ -142,6 +257,36 @@ UnloadB ==
     /\ UNCHANGED <<aContent, aGen, bGen, aLoads, bLoads, registeredOn, fieldRegistered, rules, destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
     /\ UNCHANGED checks
+    /\ ReleasedWhole(<<"b">>, {}, by, "b")
+    /\ lastStep' = "unloadB"
+    /\ UNCHANGED loadedGen
+
+UnloadB ==
+    /\ live["b"]
+    /\ \E by \in Issuers("b") :
+         IF EndsAt(<<"b">>) > 0 THEN EndedAtTheThrow(<<"b">>, "unloadB", by, "b") ELSE UnloadsB(by)
+
+UnsubscribeThrows(o) ==
+    /\ live[o]
+    /\ o \notin throws
+    /\ throws' = throws \cup {o}
+    /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
+                   destroyed, threw, releasedDestroyed>>
+    /\ UNCHANGED listens
+    /\ UNCHANGED checks
+    /\ UNCHANGED <<attached, heard, met, covered, lastStep, loadedGen>>
+    /\ UNCHANGED stepOutcome
+
+Running == IF Mutant = "ThrownListenerStillRuns" THEN attached ELSE {e \in attached : live[e[1]] /\ OwnerGen(e[1]) = e[2]}
+
+Raise ==
+    /\ heard' = [o \in Slots |-> Cardinality({e \in Running : e[1] = o})]
+    /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
+                   destroyed, threw, releasedDestroyed>>
+    /\ UNCHANGED listens
+    /\ UNCHANGED checks
+    /\ UNCHANGED <<throws, attached, met, covered, lastStep, loadedGen>>
+    /\ UNCHANGED stepOutcome
 
 HostDestroys ==
     /\ live["a"]
@@ -152,6 +297,7 @@ HostDestroys ==
                    threw, releasedDestroyed>>
     /\ UNCHANGED listens
     /\ UNCHANGED checks
+    /\ UNCHANGED releases
 
 ServerHangsUp ==
     /\ managed
@@ -161,6 +307,7 @@ ServerHangsUp ==
                    destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
     /\ UNCHANGED checks
+    /\ UNCHANGED releases
 
 Retry ==
     /\ offer
@@ -170,6 +317,7 @@ Retry ==
                    destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
     /\ UNCHANGED checks
+    /\ UNCHANGED releases
 
 ListenA(o) ==
     /\ live["a"]
@@ -182,6 +330,7 @@ ListenA(o) ==
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                    destroyed, threw, releasedDestroyed, alive, listenThrew, gone, listenOffGone>>
     /\ UNCHANGED checks
+    /\ UNCHANGED releases
 
 Collect(o) ==
     /\ o \in alive
@@ -189,6 +338,7 @@ Collect(o) ==
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                    destroyed, threw, releasedDestroyed, listenOn, listenGen, listenThrew, gone, listenOffGone>>
     /\ UNCHANGED checks
+    /\ UNCHANGED releases
 
 HostDestroysListened(o) ==
     /\ o \in alive
@@ -197,6 +347,7 @@ HostDestroysListened(o) ==
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                    destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, listenOffGone>>
     /\ UNCHANGED checks
+    /\ UNCHANGED releases
 
 pageState == <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                destroyed, threw, releasedDestroyed>>
@@ -212,6 +363,7 @@ SendsSlotInput ==
     /\ summarized' = FALSE
     /\ UNCHANGED pageState
     /\ UNCHANGED listens
+    /\ UNCHANGED releases
 
 ShowsFailures ==
     /\ req = "attempt"
@@ -224,8 +376,10 @@ ShowsFailures ==
     /\ UNCHANGED sentGen
     /\ UNCHANGED pageState
     /\ UNCHANGED listens
+    /\ UNCHANGED releases
 
 Next == LoadA \/ UnloadA \/ LoadB \/ UnloadB \/ HostDestroys \/ ServerHangsUp \/ Retry \/ SendsSlotInput \/ ShowsFailures
+        \/ Raise \/ \E s \in Slots : UnsubscribeThrows(s)
         \/ \E o \in Objects : ListenA(o) \/ Collect(o) \/ HostDestroysListened(o)
 
 Spec == Init /\ [][Next]_vars
@@ -261,6 +415,16 @@ FailureReachesSummary == req = "done" => summarized
 
 InlineOnlyAtTheSentInput == inline => inlineGen = sentGen
 
+EveryOwnerReleasedPastAThrow == met # {} => \A c \in covered : ~(live[c[1]] /\ OwnerGen(c[1]) = c[2])
+
+ThrownListenerRunsNothing == \A o \in Slots : heard[o] <= IF live[o] THEN 1 ELSE 0
+
+StepReplacesTheContent ==
+    /\ lastStep = "load" => (live["a"] /\ aContent = "card" /\ aGen = loadedGen)
+    /\ lastStep = "unload" => (~live["a"] /\ aContent = "empty")
+    /\ lastStep = "loadB" => (live["b"] /\ bLoads = loadedGen)
+    /\ lastStep = "unloadB" => ~live["b"]
+
 ReachNestedReleased == ~(bLoads > 0 /\ ~live["b"] /\ aLoads = MaxLoads)
 
 ReachDestroyedThenReleased == ~(releasedDestroyed /\ live["a"])
@@ -278,5 +442,11 @@ ReachAnsweredAfterUnload == ~(req = "done" /\ ~live["a"] /\ summarized /\ ~inlin
 ReachAnsweredAfterReload == ~(req = "done" /\ live["a"] /\ aGen # sentGen /\ summarized /\ ~inline)
 
 ReachInlineAtTheSentInput == ~(req = "done" /\ inline /\ summarized)
+
+ReachNestedThrowReleased == ~(lastStep = "load" /\ met = Slots /\ live["a"] /\ ~live["b"] /\ aGen = loadedGen)
+
+ReachOwnUnloadThrew == ~(lastStep = "unload" /\ selfRun /\ met # {})
+
+ReachThrownListenerOutlivesItsLoad == ~(live["a"] /\ heard["a"] = 1 /\ \E e \in attached : e[1] = "a" /\ e[2] # aGen)
 
 ====

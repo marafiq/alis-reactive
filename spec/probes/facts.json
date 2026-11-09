@@ -316,6 +316,15 @@
       "source": "spec/probes/ej2-destroy.mjs"
     },
     {
+      "id": "ej2-event-put-back-after-destroy",
+      "statement": "EJ2's @Event setter calls its component's removeEventListener and addEventListener, so writing a callback property back runs the vendor's code, and on a destroyed component that code throws a TypeError.",
+      "host": "node",
+      "oracle": "ej2-base 33.1.45 under node_modules/@syncfusion, run with the real Base and Event",
+      "probe": "ej2-destroy.mjs",
+      "expect": "ej2-event-put-back-after-destroy: TypeError",
+      "source": "spec/probes/ej2-destroy.mjs"
+    },
+    {
       "id": "core-form-duplicate-name",
       "statement": "Form data that sends one scalar name twice binds the first value.",
       "host": "net10",

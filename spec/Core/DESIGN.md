@@ -2581,17 +2581,48 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     content belongs to that slot from boot, so the slot's first load or unload releases it.
 - D12.4 A slot's load replaces its content, and its unload empties it. Before either, the slot releases every
   owner whose container is inside its content, innermost first, then itself. An owner's release runs in a
-  closed order:
-  1. it ends its runs, and each `Finally` runs (Q11, D11.8);
-  2. it announces the unmount of its content;
-  3. it removes its listeners;
-  4. it releases its holds;
-  5. it drops its field registrations.
+  closed order, and what each step calls is closed:
+  1. it ends its runs, and each `Finally` runs (Q11, D11.8). An abort runs its signal's abort steps, the fetch's own
+     algorithm and an `abort` event, a dispatch as in step 2 (DOM Standard 3.2), and what a `Finally` meets is its
+     own run's (Q11), so this step throws nothing to the release;
+  2. it announces the unmount of its content with `dispatchEvent`. The DOM Standard's inner invoke reports a
+     listener's exception and goes on to the next listener (DOM Standard 2.9, inner invoke, step 2.13.1: "Report
+     exception"), so a component whose unmount throws reaches the page's `error` event and the console, never the
+     release;
+  3. it removes its listeners. Each removal runs the vendor's code, which can throw: an unsubscribe method, a returned
+     remover, a callback property's read and put-back (EJ2's `@Event` setter calls the component's observer, which
+     throws once the component is destroyed, `probe:ej2-event-put-back-after-destroy`), and D12.5's check, which reads
+     the vendor's object path or calls its lookup (D17.3);
+  4. it releases its holds. The last hold of a connection closes it: `EventSource.close()` throws nothing (HTML
+     Standard 9.2.2), a hub's `stop()` is an async function, so its rejection settles after the release and is logged
+     as one error naming the hub, and the reconnect offer's `hide()` (D21.11) runs a component's code, which can throw;
+  5. it drops its field registrations, the core's own bookkeeping, which calls nothing.
 
-  Then the content is replaced. A slot's next load starts a new owner, which subscribes once, so no listener
-  piles up across loads. When the step that loads or unloads belongs to a run of an owner the release ends, the
-  release waits for that step to return: the run's cut lands there (D11.11), its `Finally` layers run, and then the
-  release runs, so they run before the unmount (D11.8).
+  Every step of every owner runs, whatever a step or an owner before it threw, so an inner owner's error stops neither
+  the owner around it nor a sibling (gate 1's P3). The release keeps its own bookkeeping before each vendor call (the
+  owner leaves its slot, a hold leaves its count, a listener is marked released, D12.5) and keeps each error with its
+  owner and its step. Then the content is replaced, which throws to no one: a custom element's callbacks are reactions
+  the HTML Standard invokes with "report" (HTML Standard 4.13.6), and `alis:mount` is a dispatch, as in step 2. A load
+  mounts the content and starts its new owner, which subscribes once, so no listener piles up across loads, a throwing
+  release's included. Then the step that loaded or unloaded stops its pipeline with one error that names each owner
+  and the step that threw, and each `Finally` of the requests the step is inside runs, as any stop runs them. The page
+  is consistent, every owner released and the new one started, and the pipeline does not go on as if the release had
+  been clean. This is no catch-and-continue (principle 8): no error is dropped or given a default, and each reaches
+  the pipeline whose step asked for the release, which stops.
+
+  A release starts at two steps: a load (`Into`, D10.11) and an unload (`Unload`, D12.9). A slot nested in the content
+  is released by that step's release, and content the server rendered in a slot by the slot's first load or unload
+  (D12.3), so their errors stop that one step; the page is never released (D12.1). When the step's run belongs to an
+  owner its release ends (a card's `Unload("card")` from the card, or the card's `Into` of the slot around it), the
+  release waits for that step to return: the run's cut lands there (D11.11), its `Finally` layers run once each, to
+  their first awaited step, the run ends, and then the release runs, so each `Finally` runs before the unmount (D11.8)
+  and nothing after the step runs (`Run.tla:NothingRunsAfterAnAbort`, `Lanes.tla:FinallyRunsBeforeRelease`); the
+  release's errors are then logged as one error, since the run that asked for the release has ended.
+  `spec/Core/Ownership.tla` checks the release over the interleavings of a nested slot and the slot around it, each
+  step issued by the page or by the slot it releases: every owner released past a throw
+  (`EveryOwnerReleasedPastAThrow`), a raise running no listener whose removal threw (`ThrownListenerRunsNothing`),
+  and the content replaced (`StepReplacesTheContent`). That the step stops after a release that met a throw, and that
+  its `Finally` runs once, are browser promises (X12.15, X12.17), since no spec models a release inside a run.
 - D12.5 Release removes exactly what the owner holds, and nothing another owner holds. A listener is removed
   only while its element still holds, at the vendor's object path, the object the listener was added to. A
   component its host destroyed took its listeners with it, and the owner calls nothing on it. EJ2's destroy
@@ -2601,7 +2632,10 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   new object at the vendor's object path on the same element) the new object hears none of the plan's handlers,
   and the release calls nothing on it. A `listen` step that reaches the new object adds its own listener, as for
   any other object (D12.8). An element that no longer holds the object a handler subscribed to is read as one whose
-  host destroyed that object, listeners and all.
+  host destroyed that object, listeners and all. A listener is marked released before its removal runs, so one whose
+  removal threw, which its vendor still holds, runs nothing when its object raises, and a callback property whose
+  put-back threw keeps that listener, which runs nothing. A check that throws is that listener's error, and its removal
+  is not called.
 - D12.6 A hub or a stream is held by every owner whose plans name it. The connection opens at the first hold
   and closes at the last release, and its retry offer goes with it. A step reaches only a held connection.
 - D12.7 Live validation is one capture-phase listener per page. An input an event reaches is checked by the
@@ -2677,9 +2711,14 @@ plans name.
 - `Ownership.tla:ListenOncePerObject`
 - `Ownership.tla:ListenLeavesWithItsOwner`
 - `Ownership.tla:NoRemoveOnCollected`
+- `Ownership.tla:EveryOwnerReleasedPastAThrow`
+- `Ownership.tla:ThrownListenerRunsNothing`
+- `Ownership.tla:StepReplacesTheContent`
 - `Lanes.tla:FinallyRunsBeforeRelease`
+- `Run.tla:NothingRunsAfterAnAbort`
 - `probe:ej2-destroy-removes-instance`
 - `probe:ej2-destroy-sets-is-destroyed`
+- `probe:ej2-event-put-back-after-destroy`
 
 **Doors.**
 - kept: `Into(element)`, `Unload(element)`, `Html.RenderPlan`, and the hub's and stream's triggers.
@@ -2720,6 +2759,15 @@ plans name.
   starts (`Alis.Reactive.Assets/runtime/plans/start.ts:46`) and removes it only while the element still holds the
   object it read then (`Alis.Reactive.Assets/runtime/objects/plan-objects.ts:37-42`).
 - An owner runs its disposers in reverse and knows nothing of runs (`Alis.Reactive.Assets/runtime/objects/owner.ts:32-40`).
+- A release that meets a throw has three answers today, and D12.4 gives a fourth. The redesign catches and logs each
+  disposer's error and goes on, so every owner is released and the step that released goes on as if the release had
+  been clean (`Alis.Reactive.Assets/runtime/objects/owner.ts:32-40`), and it drops a hub's `stop()` with `void`
+  (`Alis.Reactive.Assets/runtime/realtime/hub.ts:101-108`). Main replaces the content before it unloads the slot's
+  plans (`Alis.Reactive.Assets/runtime/execution/partials/inject.ts:30-42`) and removes a component's listener from
+  its signal's `abort` event (`Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37`,
+  `Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:73-80`), so a removal that throws is reported by the DOM
+  and the rest run, and a listener whose removal threw still runs. The POC lets the first throw end the release, so
+  the slot never empties and the next load never runs (14c's C2, `spec/NOTES.md:491-492`).
 - A slot announces the unmount of its content before replacing it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38`).
 - The redesign refuses a plan that sets a slot's text or HTML, across the plans one response renders
   (`Alis.Reactive/Razor/RenderedPage.cs:70-87`, `Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:66-69`): D12.9.
@@ -2755,6 +2803,16 @@ plans name.
 - `X12.13` behavior (D12.5): after a monitor's host restarts it, destroying the component and putting a new object
   on its element, the new object's event runs none of the plan's handlers, and closing the card that held it calls
   nothing on it.
+- `X12.15` behavior (D12.4): a card whose inner slot's plan listens to a page plugin whose unsubscribe throws is loaded
+  over: the new card shows and its button runs its handler once, the plugin's event runs neither the old card's
+  handler nor its inner slot's, and the step after the request does not run while the request's `Finally` does
+  (`Ownership.tla:EveryOwnerReleasedPastAThrow`, `Ownership.tla:StepReplacesTheContent`).
+- `X12.16` behavior (D12.5): a card whose page plugin's unsubscribe throws is closed and opened again: the plugin's
+  event runs the card's handler once (`Ownership.tla:ThrownListenerRunsNothing`).
+- `X12.17` behavior (D12.4, D11.8): a card's save whose success route unloads the card, while the card's page
+  plugin's unsubscribe throws: the request's `Finally`, which writes a note in the card and then the page's status,
+  writes the status once, so it ran while the card was on the page; the card empties, and opening it again loads it
+  (`Run.tla:NothingRunsAfterAnAbort`, `Lanes.tla:FinallyRunsBeforeRelease`).
 
 ## Q13. Where state lives
 
