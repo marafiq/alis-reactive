@@ -1942,8 +1942,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     `Request`, the request's members as it sent them, read as `TRequest`, which a read of the input cannot give once the
     user edits it during the send), the reply of a route of kind none and of every HEAD route, and
     `Response<TRequest, TBody>`, which adds `Body`, a data read that dot-walks; `Failure` (`Outcome`: status, network, redirect or
-    content, which the enum writes as `status`, `network`, `redirect` and `content` by its own converter and member
-    names whatever converter the app's JSON options add, so a condition on it agrees with the browser; `Status`, 0 for a
+    content, `FailureOutcome`, a closed choice (S8) whose own converter writes each case as the plan's outcome,
+    `status`, `network`, `redirect` and `content`, and which no converter the app's JSON options add for enums
+    reaches, so a condition on it agrees with the browser; `Status`, 0 for a
     network failure, the Fetch Standard's network error; `Headers`); `ResponseFile`, the data of a file body (`Name`, `Size`, `Type`); `Markup`, an HTML
     body, the only text `Into(elementId, source)` takes; `BrowserFile` (lib.dom `File`), held by a file input's member;
     and `pipeline.PageUrl<TPage>()` or

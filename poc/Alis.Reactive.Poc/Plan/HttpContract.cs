@@ -284,16 +284,11 @@ internal sealed class BodyKind : IChoice
 [JsonConverter(typeof(ChoiceConverter<HttpOutcome>))]
 internal sealed class HttpOutcome : IChoice
 {
-    internal const string StatusText = "status";
-    internal const string NetworkText = "network";
-    internal const string RedirectText = "redirect";
-    internal const string ContentText = "content";
-
     internal static readonly HttpOutcome Success = new("success");
-    internal static readonly HttpOutcome Status = new(StatusText);
-    internal static readonly HttpOutcome Network = new(NetworkText);
-    internal static readonly HttpOutcome Redirect = new(RedirectText);
-    internal static readonly HttpOutcome Content = new(ContentText);
+    internal static readonly HttpOutcome Status = new("status");
+    internal static readonly HttpOutcome Network = new("network");
+    internal static readonly HttpOutcome Redirect = new("redirect");
+    internal static readonly HttpOutcome Content = new("content");
 
     private HttpOutcome(string text)
     {

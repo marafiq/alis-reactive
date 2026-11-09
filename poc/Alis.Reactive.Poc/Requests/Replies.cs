@@ -40,20 +40,22 @@ public sealed class Markup
     }
 }
 
-[JsonConverter(typeof(JsonStringEnumConverter<FailureOutcome>))]
-public enum FailureOutcome
+[JsonConverter(typeof(ChoiceConverter<FailureOutcome>))]
+public sealed class FailureOutcome : IChoice
 {
-    [JsonStringEnumMemberName(HttpOutcome.StatusText)]
-    Status,
+    public static readonly FailureOutcome Status = new(HttpOutcome.Status);
+    public static readonly FailureOutcome Network = new(HttpOutcome.Network);
+    public static readonly FailureOutcome Redirect = new(HttpOutcome.Redirect);
+    public static readonly FailureOutcome Content = new(HttpOutcome.Content);
 
-    [JsonStringEnumMemberName(HttpOutcome.NetworkText)]
-    Network,
+    private readonly HttpOutcome _outcome;
 
-    [JsonStringEnumMemberName(HttpOutcome.RedirectText)]
-    Redirect,
+    private FailureOutcome(HttpOutcome outcome)
+    {
+        _outcome = outcome;
+    }
 
-    [JsonStringEnumMemberName(HttpOutcome.ContentText)]
-    Content,
+    string IChoice.Text => _outcome.Text;
 }
 
 public sealed class Failure : JsObject

@@ -3,10 +3,14 @@ using Alis.Reactive.Requests;
 
 namespace Alis.Reactive.Pipelines;
 
-public enum AntiforgeryIn
+public sealed class AntiforgeryIn
 {
-    Header,
-    FormField,
+    public static readonly AntiforgeryIn Header = new();
+    public static readonly AntiforgeryIn FormField = new();
+
+    private AntiforgeryIn()
+    {
+    }
 }
 
 public sealed class RequestDefaults
