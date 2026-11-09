@@ -241,7 +241,7 @@
         "Q18"
       ],
       "meanings": [],
-      "oracle": ".NET's LINQ to Objects over the same items on .NET 10 and net48 (Count, Where, Select, Sum, OrderBy, OrderByDescending, Any, All, FirstOrDefault) with the C# operators they call, over the values System.Text.Json writes and binds under the app's options (D4.2, D6.12); ECMAScript's array members map, filter, some, every, find, toSorted and length, which the plan calls (D6.6); and the probes core-select-past-null, core-json-decimal-text-written, core-json-decimal-text-rounded, core-json-double-text and js-array-from-text.",
+      "oracle": ".NET's LINQ to Objects over the same items on .NET 10 and net48 (Count, Where, Select, Sum, OrderBy, OrderByDescending, Any, All, FirstOrDefault) with the C# operators they call, over the values System.Text.Json writes and binds under the app's options (D4.2, D6.12); ECMAScript's array members map, filter, some, every, find, toSorted and length, which the plan calls (D6.6); and the probes core-select-past-null, core-json-decimal-text-written, core-json-decimal-text-rounded, core-json-double-text, js-array-from-text, and the date probes core-date-compares-ticks, core-stj-date-time-forms, core-query-date-forms, core-stj-own-date-converters, js-date-wall-gap, js-date-wall-overlap, js-date-milliseconds, js-key-text-order, js-span-key-order and the net48 operators of DateTime, DateTimeOffset and TimeSpan (D6.12, D6.13).",
       "checker": [
         "core:Q6",
         "core:Q4",
@@ -250,7 +250,10 @@
         "Absence.tla:NullHolderReadsNothing",
         "Schema.tla:DecimalTextComparedByValue",
         "Schema.tla:SelectFieldHoldsItsType",
-        "Schema.tla:ReadsTakeNoEach"
+        "Schema.tla:ReadsTakeNoEach",
+        "Schema.tla:DatesComparedByKey",
+        "Schema.tla:KeysOnlyCompared",
+        "Schema.tla:KeyFallbackIsALiteral"
       ],
       "defects": [
         {
@@ -287,7 +290,7 @@
         },
         {
           "id": "X6.11",
-          "rung": "analyzer"
+          "rung": "behavior"
         },
         {
           "id": "X6.12",
@@ -359,7 +362,7 @@
         },
         {
           "id": "X6.29",
-          "rung": "analyzer"
+          "rung": "behavior"
         },
         {
           "id": "X6.30",
@@ -466,6 +469,14 @@
           "rung": "behavior"
         },
         {
+          "id": "X6.57",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.58",
+          "rung": "behavior"
+        },
+        {
           "id": "M4.X1",
           "rung": "type",
           "defect": "An operation over a text does not compile: each operation of new:N6.1 over a source of string binds an overload marked Obsolete with error true, CS0619, since the covariant source of N6.4 would otherwise take a string as a list of char, which the browser does not iterate as .NET does (D6.10)."
@@ -492,10 +503,10 @@
         },
         {
           "for": "X6.4",
-          "page": "A ward board whose alarm event hands a payload with an Alarms list; its handler sets the status to Alarms where Alarms.Any() holds and to Quiet where Alarms.Any().Not() holds, then sets the second status to Read.",
-          "gesture": "Raise the alarm event with Alarms holding null.",
+          "page": "A ward board whose status starts as Unknown and whose handler of the app event AlarmRaised, its payload holding an Alarms list, sets the status to Alarms where Alarms.Any() holds and to Quiet where Alarms.Any().Not() holds, then sets the second status to Read. No list dispatches AlarmRaised with Alarms holding null, No alarms with an empty list, and One alarm with one alarm.",
+          "gesture": "Click No list.",
           "outcome": "The status keeps Unknown and the second status shows Read.",
-          "opposite": "Raised with an empty Alarms list the status shows Quiet, and with one alarm it shows Alarms.",
+          "opposite": "Clicking No alarms, the status shows Quiet, and clicking One alarm, Alarms.",
           "defect": "The null list read as a list of no item, so Any() reads false, its Not holds, and the status shows Quiet."
         },
         {
@@ -753,6 +764,46 @@
           "outcome": "The second roster lists Adams, Lee and Martin, and the first name shows Martin.",
           "opposite": "Ordered by name descending, the second roster lists Martin, Lee and Adams, and the first name shows Martin.",
           "defect": "The sort runs in place on the roster's own array, so the first name shows Adams."
+        },
+        {
+          "for": "X6.11",
+          "page": "A visit list whose server, in New York, writes six visits with the app's options: 02:30 and 03:15 on 2026-03-08, a Utc visit at 2026-11-09T08:30:00Z, a Local one at 2026-11-09T08:30:00-05:00 seen at 2026-11-09T13:00:00-05:00, an Unspecified one at 2026-11-09T08:30:00 and one at 2026-11-09T08:30:00.0000001. Four counts: v.At < new DateTime(2026, 3, 8, 3, 0, 0), v.At == new DateTime(2026, 11, 9, 8, 30, 0), v.At > new DateTime(2026, 11, 9, 8, 30, 0), and seen.Contains(v.Seen) over a view's DateTimeOffset array that holds 2026-11-09T18:00:00Z.",
+          "gesture": "Open the visits in a browser whose zone is New York, then in one whose zone is Kolkata.",
+          "outcome": "Both times the counts show 1, 3, 1 and 1.",
+          "opposite": "With the 02:30 visit written at 03:30, the first count shows 0; with the Utc visit written at 08:31, the second shows 2.",
+          "defect": "Each side read as a JavaScript Date, as the redesign compares: in New York the 02:30 visit holds 03:30, so the first count shows 0; the Z text reads as a moment, so the second count misses the Utc visit, and in Kolkata the Local one too; the tick is dropped, so the third count shows 0. Or the instants compared as their texts, so the lookup shows 0."
+        },
+        {
+          "for": "X6.29",
+          "page": "Three lists the server, in New York, writes with the app's options, each shown first to last after its sort: visits at 03:15, 01:30 and 02:30 on 2026-03-08 by OrderBy(v => v.At); seen instants 2026-11-09T18:00:00.0000001+00:00, 2026-11-09T10:00:00-08:00, 2026-11-09T13:00:00-05:00 and 2026-11-09T12:00:00-08:00 by OrderBy(v => v.Seen); stays of 23:00:00, -00:00:00.5000000 and 1.02:00:00 by OrderByDescending(v => v.Length).",
+          "gesture": "Open the page in a browser whose zone is New York.",
+          "outcome": "The visits list 01:30, 02:30, 03:15; the instants list 10:00:00-08:00, 13:00:00-05:00, 18:00:00.0000001+00:00, 12:00:00-08:00; the stays list 1.02:00:00, 23:00:00, -00:00:00.5000000.",
+          "opposite": "OrderByDescending(v => v.At) lists 03:15 first and 01:30 last.",
+          "defect": "A Date's time orders the visits, so 02:30, held as 03:30, lists last; milliseconds tie the three instants at 18:00 UTC, so 18:00:00.0000001 lists first; or the texts order, so the instants end at 18:00:00.0000001+00:00 and the stays list 23:00:00 first."
+        },
+        {
+          "for": "X6.43",
+          "page": "A visit list whose At member, a DateTime, carries its own JsonConverter that writes the day and the time as dd.MM.yyyy HH:mm, counted by v => v.At == start, a DateTime the view holds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.43's message, naming v.At == start.",
+          "opposite": "Without the member's converter, the page renders and counts the visits that start at that time.",
+          "defect": "The view's DateTime written through the member's converter and compared as text, as a member's own form compares an enum, so the page renders and a visit one tick past the start counts as equal, its text the same."
+        },
+        {
+          "for": "X6.57",
+          "page": "An app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy, and a visit list counted by v => v.At < cutoff, a DateTime the view holds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.57's message, naming v.At < cutoff.",
+          "opposite": "Without the app's converter, the page renders and counts the visits before the cutoff.",
+          "defect": "The page renders and reads the converter's text: as text it orders 01.11.2026 before 31.10.2026 and counts a November visit before an October cutoff, or as a key it stops the pipeline and no count shows."
+        },
+        {
+          "for": "X6.58",
+          "page": "A visit board test component whose Visits property holds data its own JavaScript writes, one item's At, a DateTime, held as the text 10/27/2026; a Count button counts the visits with v => v.At < cutoff, a DateTime the view holds, shows the count, then writes checked into a log.",
+          "gesture": "Click Count.",
+          "outcome": "No count shows, the log stays empty, and the console holds one error naming the text 10/27/2026.",
+          "opposite": "With that item's At held as 2026-10-27, the count shows and the log reads checked; held as 2026-02-30, a day no month holds, the count shows without that visit, the log reads checked and the console holds no error.",
+          "defect": "The text read as nothing, so the count shows without that visit and the log reads checked; or parsed by the browser's Date, so it counts as October 27, a reading no endpoint's binding shares on both hosts. Or 2026-02-30 stops the pipeline too, so with it no count shows."
         }
       ],
       "verdicts": [

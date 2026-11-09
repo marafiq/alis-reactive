@@ -245,10 +245,10 @@
       "meanings": [
         {
           "id": "M3.D1",
-          "meaning": "Each value, text and membership test reads as the .NET term it stands for, written in the one core's operators under D8.9, as the lambda door reads the same term (spec/Core/translated-members.md). IsNull is eq of the source and null, NotNull is neq: a member the data lacks reads its start first (D4.2), so IsNull holds over one whose start is null, and a value past a holder that holds null reads nothing, so neither IsNull nor NotNull holds over it, as HasValue reads in a list's lambda. IsEmpty over a text is string.IsNullOrEmpty, the nullOrEmpty operator, which holds on nothing, null and the empty text; over a list it is the empty operator, which holds on nothing, null and a list with no item; NotEmpty is not of IsEmpty, so it holds on none of them. Contains, StartsWith and EndsWith compare ordinally, as the lambda door's Contains(string) and StartsWith and EndsWith with StringComparison.Ordinal compare; Matches is Regex.IsMatch over a literal pattern D16.11's reader copies where the view renders (D7.5); MinLength(n) is gte of the text's Length in UTF-16 code units and n, a constant n below zero refused at build and a source n read as .NET reads text.Length >= n. Each text test reads nothing on a text that reads nothing or holds null, and stops its pipeline on a value that is not text. In over literal values is includes of the source in them, each written in the source's form (D8.10); In over a source that holds a list (N7.3) reads as that list's Any(item => item == value) (D6.2, D8.9), when the condition runs; NotIn is not of In, and both read nothing on a source that reads nothing; Between(low, high) is gte of low and lte of high, both bounds included, so it holds over no null. A condition that reads nothing does not hold, so its branch does not run (D8.5)."
+          "meaning": "Each value, text and membership test reads as the .NET term it stands for, written in the one core's operators under D8.9, as the lambda door reads the same term (spec/Core/translated-members.md). IsNull is eq of the source and null, NotNull is neq: a member the data lacks reads its start first (D4.2), so IsNull holds over one whose start is null, and a value past a holder that holds null reads nothing, so neither IsNull nor NotNull holds over it, as HasValue reads in a list's lambda. IsEmpty over a text is string.IsNullOrEmpty, the nullOrEmpty operator, which holds on nothing, null and the empty text; over a list it is the empty operator, which holds on nothing, null and a list with no item; NotEmpty is not of IsEmpty, so it holds on none of them. Contains, StartsWith and EndsWith compare ordinally, as the lambda door's Contains(string) and StartsWith and EndsWith with StringComparison.Ordinal compare; Matches is Regex.IsMatch over a literal pattern D16.11's reader copies where the view renders (D7.5); MinLength(n) is gte of the text's Length in UTF-16 code units and n, a constant n below zero refused at build and a source n read as .NET reads text.Length >= n. Each text test reads nothing on a text that reads nothing or holds null, and stops its pipeline on a value that is not text. In over literal values is includes of the source in them, each written in the source's form (D8.10), and over a date or a time or of eq of the keys, one term per value, with no value neq of the source's key with itself (D6.12); In over a source that holds a list (N7.3) reads as that list's Any(item => item == value) (D6.2, D8.9), by keys for a date or a time, when the condition runs; NotIn is not of In, and both read nothing on a source that reads nothing; Between(low, high) is gte of low and lte of high, both bounds included, by keys for a date or a time, so it holds over no null. A condition that reads nothing does not hold, so its branch does not run (D8.5)."
         }
       ],
-      "oracle": "The C# language specification: an if statement and its else if nesting, the conditional logical operators that read their right operand only when the left does not decide, and the lifted operators over Nullable<T>; .NET's string.IsNullOrEmpty, the ordinal Contains, StartsWith and EndsWith, Regex.IsMatch and String.Length, through spec/Core/translated-members.md; and the spec itself for nothing (D8.9), a block's scope (D8.8) and a source's form (D8.10).",
+      "oracle": "The C# language specification: an if statement and its else if nesting, the conditional logical operators that read their right operand only when the left does not decide, and the lifted operators over Nullable<T>; .NET's string.IsNullOrEmpty, the ordinal Contains, StartsWith and EndsWith, Regex.IsMatch and String.Length, through spec/Core/translated-members.md; the spec itself for nothing (D8.9), a block's scope (D8.8) and a source's form (D8.10); and for a date or a time, .NET's comparison operators on both hosts and the forms each host writes and binds (D6.12, spec/Core/conversions.md's Keys).",
       "checker": [
         "Absence.tla:ConditionTermsLazy",
         "Absence.tla:NullHolderReadsNothing",
@@ -257,6 +257,9 @@
         "Schema.tla:PatternsAreLiterals",
         "Schema.tla:DecimalTextComparedByValue",
         "Schema.tla:OperatorsClosed",
+        "Schema.tla:DatesComparedByKey",
+        "Schema.tla:KeysOnlyCompared",
+        "Schema.tla:KeyFallbackIsALiteral",
         "core:Q8",
         "core:Q4",
         "core:Q11"
@@ -347,6 +350,18 @@
           "rung": "behavior"
         },
         {
+          "id": "X8.27",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.57",
+          "rung": "refusal"
+        },
+        {
+          "id": "X6.58",
+          "rung": "behavior"
+        },
+        {
           "id": "M3.X1",
           "rung": "behavior",
           "defect": "A value test over nothing reads as JavaScript reads it: IsNull holds over a member past a holder that holds null, NotNull holds there too, or IsEmpty does not hold over nothing, so a branch runs that M3.D1 does not run, or the reverse (M3.D1, M3.N1)."
@@ -434,10 +449,10 @@
         },
         {
           "for": "M3.X1",
-          "page": "An announcement handler whose payload declares a Visitor with a Name: When the visitor's name IsNull the gate reads No name, ElseIf it is NotNull the gate reads Named, Else Unknown; a second When, the name IsEmpty, sets the badge to Blank, Else Filled.",
-          "gesture": "Raise the announcement with a visitor whose name holds null, then with a visitor that holds null, then with the name Ada.",
+          "page": "A front desk test component whose four buttons raise its Announced event from its own JavaScript, its payload declaring a Visitor with a Name: Unnamed visitor with a visitor whose name holds null, No visitor with a visitor that holds null, Nameless visitor with a visitor that has no name member, and Ada with the name Ada. The handler: When the visitor's name IsNull the gate reads No name, ElseIf it is NotNull the gate reads Named, Else Unknown; a second When, the name IsEmpty, sets the badge to Blank, Else Filled.",
+          "gesture": "Click Unnamed visitor, then No visitor, then Ada.",
           "outcome": "The null name reads No name and Blank; the null visitor reads Unknown and Blank; Ada reads Named and Filled.",
-          "opposite": "A visitor the app wrote with no name member reads its start, null, so the gate reads No name.",
+          "opposite": "Clicking Nameless visitor, whose visitor lacks the name member, reads its start, null, so the gate reads No name.",
           "defect": "IsNull or NotNull holds past the null visitor, so the gate reads No name or Named where it reads Unknown, or IsEmpty does not hold over nothing, so the badge reads Filled."
         },
         {
@@ -471,6 +486,65 @@
           "outcome": "The page is refused where the view renders with one error naming the double written as text and ending compare it on the server.",
           "opposite": "The same comparison over an offset written as a JSON number renders, and its branch runs for an offset of -0.",
           "defect": "The page renders and the browser compares the text -0 with 0, so the branch does not run where .NET's -0.0 == 0.0 holds."
+        },
+        {
+          "for": "X8.27",
+          "page": "The redesign's Visit page: a day picker test component whose Day, a DateTime? its JavaScript holds as a Date, is compared with the open day, 2026-10-27, by IsNull, NotNull, Eq, NotEq, Lt, Lte, Gt, Gte and Between it and 2026-10-29, each branch writing its line.",
+          "gesture": "Pick 2026-10-26, then 2026-10-27, then 2026-10-28, then clear the day.",
+          "outcome": "At 2026-10-26 the lines read before the open day and by the open day; at 2026-10-27 the open day, the open day itself, by the open day, from the open day on and in the open week; at 2026-10-28 another day, after the open day and from the open day on; with no day, pick a day, nothing to book, another day, and neither an ordering nor Between holds.",
+          "opposite": "Picking 2026-10-30 reads outside the open week.",
+          "defect": "The picker's Date compared with the literal's text, so the open day never equals and its lines read not the open day; or the cleared day, null, ordered as JavaScript orders null, so before and by hold with no day.",
+          "existing_test": "redesign WhenAPageComparesADayThatMayBeMissing.a_missing_day_is_neither_before_nor_after_any_day"
+        },
+        {
+          "for": "X8.27",
+          "page": "The redesign's Stay page: two day pickers, arrive and leave, whose days a Check button compares by Gt, Gte, Lt and Lte, each branch writing its line.",
+          "gesture": "Pick 2026-10-28 to leave, then pick 2026-10-27, 2026-10-28 and 2026-10-29 to arrive, clicking Check after each.",
+          "outcome": "The later line reads leaves after arriving only for an arrival on 2026-10-27, and the same-or-earlier line reads leaves after arriving for 2026-10-27 and leaves on or before arriving for 2026-10-28 and 2026-10-29.",
+          "opposite": "With both days 2026-10-28, Gte and Lte hold, and neither Gt nor Lt.",
+          "defect": "The two Dates compared by reference or as texts, so 2026-10-28 never equals 2026-10-28 and the same-or-earlier line reads leaves after arriving for it.",
+          "existing_test": "redesign WhenAPageComparesTwoDaysItReads.less_or_equal_holds_for_the_same_day_as_the_other_and_before_it"
+        },
+        {
+          "for": "X8.27",
+          "page": "The redesign's Shifts page on net10: on load, When the page's query member Starts, a TimeOnly?, is before new TimeOnly(12, 0), the shift reads a morning shift, Else not a morning shift.",
+          "gesture": "Open the page at ?starts=07:00:00, then at ?starts=14:30:00.",
+          "outcome": "07:00:00 reads a morning shift and 14:30:00 not a morning shift.",
+          "opposite": "At ?starts=11:59:59.9999999 the shift reads a morning shift.",
+          "defect": "The time read as a JavaScript Date, which holds no time of day alone, so no ordering holds and 07:00:00 reads not a morning shift.",
+          "existing_test": "redesign WhenAPageOrdersATimeOrAFlag.a_time_of_day_orders_before_a_later_one"
+        },
+        {
+          "for": "X8.27",
+          "page": "Three net10 pages: a noon page whose query member Starts, a TimeOnly?, is compared by Eq with new TimeOnly(12, 0), reading noon or not noon; a handover page whose response body's Seen, a DateTimeOffset, is compared by Eq with new DateTimeOffset(2026, 11, 9, 18, 0, 0, TimeSpan.Zero), reading the same moment or another moment; and a day picker whose Day is tested by In(2026-10-27, 2026-10-29), reading an open day or a closed day.",
+          "gesture": "Open the noon page at ?starts=12:00, then at ?starts=12:00:00.0000001; load a handover whose Seen the server writes 2026-11-09T10:00:00-08:00, then one it writes 2026-11-09T10:00:00-07:00; pick 2026-10-27, 2026-10-28 and 2026-10-29.",
+          "outcome": "noon, then not noon; the same moment, then another moment; an open day, a closed day, an open day.",
+          "opposite": "At ?starts=12:00:00.0000000 the noon page reads noon.",
+          "defect": "The texts compared, so 12:00 never equals noon's 12:00:00 and -08:00 never equals +00:00; milliseconds compared, so 12:00:00.0000001 reads noon; or In looked up by includes of the picker's Date among the literal texts, so no day is open."
+        },
+        {
+          "for": "X6.57",
+          "page": "An app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy, and a handover page whose button's When orders the response body's At, a DateTime, before a cutoff the view holds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X6.57's message, naming the At read.",
+          "opposite": "Without the app's converter, the page renders and the branch runs for an At before the cutoff.",
+          "defect": "The page renders and reads the converter's text: as text it orders 01.11.2026 before 31.10.2026, so a November handover runs the branch, or as a key it stops the pipeline."
+        },
+        {
+          "for": "X6.58",
+          "page": "A net10 rota test component with a Starts text box and a Change button, whose click raises its Changed event with a payload declared with Starts, a TimeOnly, which its JavaScript fills with the box's text; the handler's When orders Starts before new TimeOnly(12, 0) and writes morning, Else afternoon, then writes checked into a log.",
+          "gesture": "Type 7:00 PM into Starts and click Change, then type 19:00 and click Change.",
+          "outcome": "After 7:00 PM neither morning nor afternoon shows, the log stays empty and the console holds one error naming the text 7:00 PM; after 19:00 the line reads afternoon and the log reads checked.",
+          "opposite": "Typed 07:00 and changed, the line reads morning; typed 24:00 and changed, a time no day holds, the line reads afternoon, the log reads checked and the console holds no error.",
+          "defect": "The text read as nothing, so the Else runs, afternoon shows and the log reads checked though nothing named the text; or compared as text, so the branch runs by the letters of 7:00 PM. Or 24:00 stops the pipeline too, so with it the log stays empty."
+        },
+        {
+          "for": "X8.22",
+          "page": "A dose list whose Given member, a DateTime, carries its own JsonConverter that writes dd.MM.yyyy HH:mm; a button's When compares the found dose's Given with a DateTime the view holds by Eq.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X8.22's message, naming the Given read.",
+          "opposite": "Without the member's converter, the page renders and the branch runs for a dose given at that time.",
+          "defect": "The view's DateTime written through the member's converter and compared as text, so the page renders and a dose given one tick later runs the branch, its text the same."
         }
       ],
       "verdicts": [
@@ -974,10 +1048,10 @@
         },
         {
           "for": "X8.12",
-          "page": "A vital-signs handler whose payload declares Pulse as a nullable int: When the pulse is below 80 the status reads Calm and the log reads checked, Else the status reads Unknown.",
-          "gesture": "Raise the reading with a pulse that holds null.",
+          "page": "A vital-signs page whose handler of the app event ReadingTaken, its payload declaring Pulse as a nullable int: When the pulse is below 80 the status reads Calm and the log reads checked, Else the status reads Unknown. No pulse dispatches ReadingTaken with a pulse that holds null, and Pulse 70 with a pulse of 70.",
+          "gesture": "Click No pulse.",
           "outcome": "The status reads Unknown and the log stays empty.",
-          "opposite": "Raised with a pulse of 70, the status reads Calm and the log reads checked.",
+          "opposite": "Clicking Pulse 70, the status reads Calm and the log reads checked.",
           "defect": "JavaScript's null < 80 holds, so the null pulse reads Calm and the log reads checked."
         }
       ],

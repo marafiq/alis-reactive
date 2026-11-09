@@ -71,3 +71,10 @@ The meaning `M3.D1` is in `spec/Conditions/features.json`, on the feature it giv
   so `IsNull` holds over a member past a holder that holds null (`Alis.Reactive.Assets/runtime/grammar/operators.ts:4-8`
   at 65fdf118d), where D8.9 holds no comparison with it; M3.D1 reads each test as the .NET term it stands for, under
   D8.9.
+- A date or a time compares as .NET compares it, to the tick (D6.12, X8.27). The redesign compares two `Date`s by
+  `getTime` and orders by it (`Alis.Reactive.Assets/runtime/grammar/operators.ts:4-8`,
+  `Alis.Reactive.Assets/runtime/grammar/operators.ts:17-18` at 65fdf118d), so a wall time daylight saving skips orders as
+  the hour after it and a tick past a time equals it, and it refuses ordering a `TimeSpan`
+  (`Alis.Reactive/Members/BrowserOrder.cs:10-15` at 65fdf118d). The core reads each operand through its key
+  (`spec/Core/conversions.md`), keeps the redesign's 16 date tests and orders a `TimeSpan`; `In`, `NotIn` and `Between`
+  over a date compare keys too (M3.D1).

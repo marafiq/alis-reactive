@@ -4,7 +4,8 @@ EXTENDS Naturals, Sequences, FiniteSets
 CONSTANT Mutant
 
 Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARead", "AsOfAny", "PatternReadInBrowser",
-            "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock", "DecimalTextComparedAsText", "SelectFieldUnchecked"}
+            "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock", "DecimalTextComparedAsText", "SelectFieldUnchecked",
+            "DateComparedBare", "KeyAsAValue", "KeyFallbackComputed"}
 
 ASSUME Mutant \in Mutants
 
@@ -42,7 +43,12 @@ Operators == {"eq", "neq", "lt", "lte", "gt", "gte", "and", "or", "not", "add", 
               "cond", "nullableValue", "empty", "matches", "toArray", "finite", "compareNumbers", "compareOrdinal",
               "compareBooleans", "compareCulture", "merge", "trim", "trimStart", "trimEnd", "upperInvariant", "lowerInvariant",
               "upper", "lower", "upperTurkic", "lowerTurkic", "contains", "startsWith", "endsWith", "nullOrEmpty", "includes",
-              "sumInt", "sumDouble", "sumDecimal", "eqDecimal", "nonNull"}
+              "sumInt", "sumDouble", "sumDecimal", "eqDecimal", "nonNull", "dateKey", "wallKey", "instantKey", "dayKey",
+              "timeKey", "spanKey"}
+
+DateKeys == {"dateKey", "wallKey", "instantKey", "dayKey", "timeKey", "spanKey"}
+
+Comparisons == {"eq", "neq", "lt", "lte", "gt", "gte", "compareOrdinal"}
 
 OperatorSwitch == Operators
 
@@ -56,7 +62,11 @@ DecimalText == [Leaf("data") EXCEPT !.h = "decimalText"]
 
 FieldHoldingNoNull == [Leaf("data") EXCEPT !.h = "holdsNoNull"]
 
-Leaves == {Leaf("lit"), Leaf("obj"), DecimalText, FieldHoldingNoNull}
+DateHeld == [Leaf("data") EXCEPT !.h = "dateHeld"]
+
+Leaves == {Leaf("lit"), Leaf("obj"), DecimalText, FieldHoldingNoNull, DateHeld}
+
+IsKey(e) == e.k = "op" /\ e.o \in DateKeys
 
 Paths == {<<"member">>, <<"each">>}
 
@@ -72,6 +82,8 @@ ExprsTo(d) ==
         \cup {[k |-> "op", c |-> <<e, x>>, p |-> <<>>, s |-> "string", o |-> op, h |-> "value"] : e \in below, x \in below, op \in WrittenOps}
         \cup {[k |-> "op", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "nonNull", h |-> "value"] : e \in below}
         \cup {[k |-> "fn", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "eq", h |-> "value"] : e \in below}
+        \cup {[k |-> "op", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "dateKey", h |-> "value"] : e \in below}
+        \cup {[k |-> "op", c |-> <<e, x>>, p |-> <<>>, s |-> "string", o |-> "dateKey", h |-> "value"] : e \in below, x \in Leaves}
 
 RECURSIVE Nodes(_)
 Nodes(e) == {e} \cup UNION {Nodes(e.c[i]) : i \in DOMAIN e.c}
@@ -87,6 +99,13 @@ WriterAccepts(e) ==
     /\ (e.k = "op" /\ e.o = "eqDecimal") => \A i \in DOMAIN e.c : e.c[i].h = "decimalText"
     /\ e.k = "fn" => (e.c[1].h # "holdsNoNull" \/ Mutant = "SelectFieldUnchecked")
     /\ (e.k = "op" /\ e.o = "nonNull") => e.c[1].h = "holdsNoNull"
+    /\ (e.k = "op" /\ e.o \in Comparisons) => ((\A i \in DOMAIN e.c : e.c[i].h # "dateHeld") \/ Mutant = "DateComparedBare")
+    /\ IsKey(e) => e.c[1].h = "dateHeld"
+    /\ (IsKey(e) /\ Len(e.c) = 2) => (e.c[2].k = "lit" \/ Mutant = "KeyFallbackComputed")
+    /\ \A i \in DOMAIN e.c : IsKey(e.c[i]) =>
+           ((e.k = "op" /\ e.o \in Comparisons /\ \A j \in DOMAIN e.c : IsKey(e.c[j])) \/ Mutant = "KeyAsAValue")
+
+RootAccepts(e) == ~IsKey(e) \/ Mutant = "KeyAsAValue"
 
 ShapeLeaves == {[k |-> k, c |-> <<>>] : k \in {"string", "file", "any"}}
 
@@ -116,7 +135,7 @@ vars == <<plane, expr, shape, open, parent, log, writes>>
 
 Init ==
     /\ \/ /\ plane = "expr"
-          /\ expr \in {e \in ExprsTo(Depth) : WriterAccepts(e)}
+          /\ expr \in {e \in ExprsTo(Depth) : WriterAccepts(e) /\ RootAccepts(e)}
           /\ shape = NoShape
        \/ /\ plane = "shape"
           /\ shape \in {s \in ShapesTo(Depth) : ShapeAccepted(s)}
@@ -202,6 +221,15 @@ DecimalTextComparedByValue == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in {"eq
 
 SelectFieldHoldsItsType == \A n \in Nodes(expr) : n.k = "fn" => n.c[1].h # "holdsNoNull"
 
+DatesComparedByKey == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in Comparisons) => \A i \in DOMAIN n.c : n.c[i].h # "dateHeld"
+
+KeysOnlyCompared ==
+    /\ ~IsKey(expr)
+    /\ \A n \in Nodes(expr) : \A i \in DOMAIN n.c : IsKey(n.c[i]) =>
+           (n.k = "op" /\ n.o \in Comparisons /\ \A j \in DOMAIN n.c : IsKey(n.c[j]))
+
+KeyFallbackIsALiteral == \A n \in Nodes(expr) : (IsKey(n) /\ Len(n.c) = 2) => n.c[2].k = "lit"
+
 NullableWrapsOnce == \A n \in ShapeNodes(shape) : n.k = "nullable" => n.c[1].k # "nullable"
 
 SetsWriteAMember == \A i \in DOMAIN log : log[i].k = "set" => log[i].len >= 1
@@ -221,6 +249,10 @@ ReachReplyInANestedBlock ==
 ReachDeepRead == ~(plane = "expr" /\ expr.k = "as" /\ expr.c[1].k = "get" /\ expr.c[1].c[1].k = "obj")
 
 ReachDecimalTextEquality == ~(plane = "expr" /\ expr.k = "op" /\ expr.o = "eqDecimal" /\ expr.c[1].h = "decimalText" /\ expr.c[2].h = "decimalText")
+
+ReachDateKeyCompared == ~(plane = "expr" /\ expr.k = "op" /\ expr.o \in Comparisons
+                          /\ (\A i \in DOMAIN expr.c : IsKey(expr.c[i]))
+                          /\ (\E j \in DOMAIN expr.c : Len(expr.c[j].c) = 2))
 
 ReachSelectFieldStops == ~(plane = "expr" /\ expr.k = "fn" /\ expr.c[1].k = "op" /\ expr.c[1].o = "nonNull" /\ expr.c[1].c[1].h = "holdsNoNull")
 

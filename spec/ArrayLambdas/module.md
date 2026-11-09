@@ -86,3 +86,8 @@ Module 4 adds no door of its own: every capability its doors carry is a core doo
   65fdf118d), so a view counts or finds live items only after projecting them to data. The POC's live `Select` writes its field with no
   `nonNull` (`poc/Alis.Reactive.Poc/Components/LiveObjects.cs:35-36`), since gate 1's P6 came after it; the rewrite
   builds D6.16 for live items (M4.X9).
+- A date or a time in a list's lambda compares and orders as .NET does, to the tick (D6.12, D6.13, X6.11, X6.29). The
+  redesign sorts by a `Date`'s `getTime` (`Alis.Reactive.Assets/runtime/grammar/operators.ts:119-121` at 65fdf118d),
+  which drops ticks below a millisecond and orders a wall time daylight saving skips as the hour after it; the core
+  sorts by each item's key with `compareOrdinal`, and a lookup in a list the view holds compares keys, so one instant
+  written at two offsets is found.

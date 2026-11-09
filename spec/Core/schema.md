@@ -261,7 +261,7 @@ A listen release says when release removes the listener the step added (D12.8):
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
 `neg`, `coalesce`, `cond`, `nullableValue`, `nonNull`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
-`sumDouble`, `sumDecimal` and `eqDecimal`.
+`sumDouble`, `sumDecimal`, `eqDecimal`, `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey` and `spanKey`.
 `toNumber`,
 `toDate`, `toBoolean` and `toText` leave: `as` converts (D3.2, N3.1). The pattern of `matches` is a `lit` (D7.5,
 D16.11). The text operators carry .NET's meaning (`spec/Core/translated-members.md`) where JavaScript's own methods
@@ -278,6 +278,12 @@ same reader and compares the two as whole numbers at the larger scale, so "0.10"
 texts. An argument that reads nothing makes it read nothing, null equals null and no decimal, and any other value
 stops the pipeline. C# writes it for `==` over a decimal written as text, and `not` of it for `!=`; a decimal written
 as a JSON number keeps `eq` and `neq`.
+`dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey` and `spanKey` read a date or a time as `spec/Core/conversions.md`'s
+Keys read it, to the tick: nothing reads nothing, null is null, a value in the key's forms is its key text, and any
+other value stops the pipeline unless C# wrote a second argument, a `lit` of the member's start, which the key reads
+in its place; C# writes that argument for a page URL member and an input (N10.7, N3.3). C# writes a key only as an
+argument of `eq`, `neq`, `lt`, `lte`, `gt`, `gte` or `compareOrdinal` whose arguments are keys of one type (D6.12,
+D6.13), so no value position takes one.
 `toArray` is the array of the items its argument's `[Symbol.iterator]` yields, as `Array.from` reads them, where C#
 reads a list an object's iterator yields (D6.17): an argument that reads nothing or holds null reads nothing, and one
 with no iterator stops the pipeline; C# writes it over no other list.
@@ -459,7 +465,12 @@ The diff beyond the kinds, each with the decision that makes it:
   D14.8, D16.14);
 - `PlanDocument` gains `culture` (N3.4), `timeZone` (N3.5) and `trace` (Q20), and `version` becomes 7;
 - `number` gains `of` and `text` (D3.11);
-- the operator set loses four conversions (N3.1);
+- the operator set loses four conversions (N3.1), `truthy`, whose writers `Truthy` and `Falsy` are refused (M3.D1), and
+  `order`, which compared whatever came (D6.13); it gains `nullableValue` (D6.14), `nonNull` (D6.16), `compareNumbers`,
+  `compareOrdinal`, `compareBooleans` and `compareCulture` (D6.13), the text operators `trim`, `trimStart`, `trimEnd`,
+  `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`,
+  `endsWith` and `nullOrEmpty` (D6.5), `includes` (D6.6), `sumInt`, `sumDouble` and `sumDecimal` (D6.11), `eqDecimal`
+  (D6.12) and the six date keys `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey` and `spanKey` (D6.12);
 - `let` gains `binds`, `line` or `read`, so a term's own method call runs where its read is reached (D4.7);
 - `if` holds one `when` and its `then` in place of `arms`, and an `ElseIf` nests in `else` with its condition's results
   (D8.7), so `Arm` leaves;

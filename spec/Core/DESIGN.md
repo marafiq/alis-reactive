@@ -11,7 +11,9 @@ Terms used throughout:
   live member returns. Its declared members are required.
 - Data is a value with no declared methods: an event payload, a response body, a pushed message, an item of
   a list of data, a value a method returns. Its members are optional.
-- Nothing is the value JavaScript holds as `null` or `undefined`. The plan never tells the two apart.
+- Nothing is a read with no value: a value JavaScript holds as `undefined` (D4.9), a member past a holder that holds
+  null or reads nothing (D4.2), and a conversion that fails (D3.3). Null is a value the data holds, apart from nothing:
+  a comparison reads it as .NET's lifted operators do (D8.9), and a write of nothing writes null (D4.9).
 - To stop a pipeline is to run none of its later statements, log one error naming the handler and the
   reason, and run, innermost first, each `Finally` layer whose `WhileLoading` completed of every request the stop
   happens inside (D10.23).
@@ -159,7 +161,9 @@ Terms used throughout:
 - D3.1 A shape is one of `string`, `number`, `boolean`, `date`, `instant`, `file`, `any`, `array(item)`,
   `nullable(inner)`, `object(fields)`. `file` is new (Q9).
 - D3.2 There is one conversion node, `as(expr, shape)`. The operators `toNumber`, `toDate`, `toBoolean` and
-  `toText` leave the grammar, and a validation rule converts with `as` like every read.
+  `toText` leave the grammar, and a validation rule converts with `as` like every read. A comparison or a sort of a
+  date or a time reads each operand through its key (D6.12), an operator C# writes only as an argument of a
+  comparison or a sort's comparison, so a key is no conversion: no value position takes it.
 - D3.3 A conversion of a present value the shape cannot hold yields nothing. No conversion passes the
   unconverted value on.
 - D3.4 The conversions are the table of `spec/Core/conversions.md`, one row per source kind and shape; the
@@ -188,16 +192,20 @@ Terms used throughout:
     literal, a member of an object literal, a request member a literal fills) is those fields with no offset, unless
     a converter of the app's or of the member writes it, so `DateTime.Now` is the server's wall time and
     `DateTime.UtcNow` UTC's, in every browser. System.Text.Json writes a
-    Local `DateTime` with the server's offset and a Utc one with `Z` (`probe:core-stj-datetime-kind`), which `as date`
-    reads as an instant, so the plan's writer adds, after the app's converters, one that writes a `DateTime` as
+    Local `DateTime` with the server's offset and a Utc one with `Z` (`probe:core-stj-datetime-kind`), and each host
+    reads an offset in a `DateTime`'s text its own way (`probe:core-bound-offset-into-datetime`), so the plan's writer
+    adds, after the app's converters, one that writes a `DateTime` as
     Unspecified: it reaches every member, a `DateTime?` too, while a converter the app registers for `DateTime` comes
     first and a member's own `[JsonConverter]` keeps its form (D4.2) (`probe:core-stj-datetime-nested-kind`); the live
     form takes no converter of the app's, so there the plan's own writes every `DateTime` (D7.7). The
-    framework decides by the type, never by a value's `Kind`: an instant is a `DateTimeOffset`.
+    framework decides by the type, never by a value's `Kind`: an instant is a `DateTimeOffset`. A `DateTime` text
+    with an offset that data in the app's form holds is read as its wall fields, the offset dropped, since they are
+    the `Ticks` System.Text.Json wrote (`probe:core-stj-date-time-forms`, `spec/Core/conversions.md`), where a moment
+    shows another wall time (`probe:js-date-utc-text-as-moment`).
   - On net10 a `DateOnly` is the text `yyyy-MM-dd` and a `TimeOnly` the text `HH:mm:ss`, with seven places of a
     second's fraction when it has one, as System.Text.Json writes them, and net10 binds each text in a query
     (`probe:core-query-day-time`). Each holds no date (D3.13), so it reaches an element's text, a live member and the
-    wire as that text, and a list's lambda refuses comparing either (D6.12). net48 has neither type.
+    wire as that text, and a comparison reads either by its key (D6.12). net48 has neither type.
 - D3.10 A JSON response is System.Text.Json's on both hosts, written by a framework door. That means a
   `DateTime` with no offset, a UTC `DateTime` with `Z`, and a `DateTimeOffset` with its offset
   (`probe:core-stj-date-forms`).
@@ -282,6 +290,9 @@ Terms used throughout:
 - `probe:core-form-date-kind`
 - `probe:mvc5-datetime-parse`
 - `probe:core-stj-offset-into-datetime`
+- `probe:core-bound-offset-into-datetime`
+- `probe:core-stj-date-time-forms`
+- `probe:js-date-utc-text-as-moment`
 - `probe:core-stj-date-forms`
 - `probe:mvc5-json-result-date-form`
 - `probe:mvc5-json-result-date-utc`
@@ -735,14 +746,39 @@ Terms used throughout:
     "due" when the app writes enums by name, and `'I'` is "I". A member written unlike the options is compared in its
     own form (the last rule).
   - Equality (`==`, `!=`) compares a member with a value written as a JSON scalar or null, or two members of one type
-    written as a scalar: a number, text, `bool`, `char`, `Guid` or an enum. A value written as an object or a list is
-    refused, and so are two members of a type that is not a scalar: the browser compares objects by reference.
+    written as a scalar: a number, text, `bool`, `char`, `Guid` or an enum, and a date or a time by its key (below). A
+    value written as an object or a list is refused, and so are two members of a type that is not a scalar: the browser
+    compares objects by reference.
   - Ordering (`<`, `<=`, `>`, `>=`) compares a member with a value written as a JSON number or null, or a `char` with a
     `char`. A value written as text is refused, which covers an enum the app writes by name and a number the app writes
-    as text. Between two members it compares number types and `char`, and refuses every other type.
-  - A date or a time (`DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`, `TimeSpan`) is refused in a comparison:
-    its text neither orders nor equals as the instant does. `as date` and `as instant` (D3.2) carry it, built with
-    Q3's conversions.
+    as text; a date or a time is ordered by its key (below). Between two members it compares number types, `char`, and
+    a date or a time of one type, and refuses every other type.
+  - A date or a time (`DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`, `TimeSpan`, each nullable too) compares as
+    .NET compares it, to the tick: a `DateTime` by its `Ticks`, its wall time whatever its `Kind`; a `DateTimeOffset`
+    by its UTC instant; a `DateOnly` by its `DayNumber`; a `TimeOnly` and a `TimeSpan` by their `Ticks`; a nullable by
+    the lifted operators (`probe:core-date-compares-ticks`, `probe:net48-datetime-compares-ticks`,
+    `probe:net48-datetime-ticks-drop-kind`, `probe:net48-datetimeoffset-compares-utc`,
+    `probe:net48-timespan-compares-ticks`). C# writes each operand as its type's key over the value as its source holds
+    it, never over `as date` or `as instant`, whose `Date` holds milliseconds and moves a wall time daylight saving
+    skips or repeats (`probe:js-date-milliseconds`, `probe:js-date-wall-gap`, `probe:js-date-wall-overlap`):
+    `dateKey` for a `DateTime`, `wallKey` for a `DateTime` in the app's form, `instantKey` for a `DateTimeOffset`,
+    `dayKey` for a `DateOnly`, `timeKey` for a `TimeOnly` and `spanKey` for a `TimeSpan`, each read as
+    `spec/Core/conversions.md`'s Keys read it. It compares the two keys by `eq`, `neq`, `lt`, `lte`, `gt` or `gte`, a
+    member with a value or two members of one type. A value the view holds is written in its partner's form (D7.7) and
+    keyed as its partner. A lookup in a list the view holds (`Contains`), and `In` and `NotIn` (M3.D1), compare by keys
+    too: `or` of `eq` of the keys, one term per value, and with no value `neq` of the source's key with itself, which
+    reads nothing over nothing and fails over any other value, as `includes` over an empty list reads. A key stops the
+    pipeline, naming the text, on a value outside its forms, data the framework did not produce, the boundary the root
+    `CLAUDE.md` names for errors, except where C# writes the member's start for it to read in that value's place:
+    a page URL member (N10.7) and an input's text (N3.3) (X6.58). Text in a form's shape that names no value, a 30th of February, reads nothing (D3.3), as the endpoint binds none, or the start where C# writes
+    it. Neither the view's time zone nor the browser's clock decides. In a pipeline condition, a `DateTime` value
+    given where a `DateTimeOffset` is compared converts by C#'s implicit operator where the view renders, at the server
+    clock's offset for its wall time, .NET's own meaning (`probe:core-implicit-instant-server-clock`,
+    `probe:net48-implicit-instant-local-offset`); in a list's lambda that conversion is refused, of an item by X6.49
+    and of a view value by X6.6, whose door is a local of
+    `DateTimeOffset` computed before the lambda. Any other pair of these types does not compile (X8.1), and its door is
+    a local of the other type, as `DateOnly.FromDateTime(..)` computes one. A date or a time a converter writes is
+    refused, the app's options' (X6.57) and its own (X6.43).
   - A cast that narrows (`(int)d.Milligrams`) is refused: it changes the value as C# computes it, and the browser's
     number does not.
   - A cast between `decimal` and `float` or `double` is refused (X6.50): .NET rounds `(decimal)0.30000000000000004` to
@@ -793,7 +829,8 @@ Terms used throughout:
   the key read from each item, the two items swapped for descending, so items with equal keys keep their list order
   as .NET's stable sort keeps it. C# picks the comparison from the key's type and how the app's JSON writes it, where
   the view renders: a key written as a JSON number compares as numbers (`compareNumbers`), a `bool` puts false first
-  (`compareBooleans`), a `char` compares by its code unit (`compareOrdinal`), and null comes first, as
+  (`compareBooleans`), a `char` compares by its code unit (`compareOrdinal`), a date or a time compares its key
+  (D6.12) by code unit (`compareOrdinal`, `probe:js-key-text-order`, `probe:js-span-key-order`), and null comes first, as
   `Comparer<T>.Default` puts it. A nullable value key binds the overload whose sample is the underlying type's value.
   A key written unlike its list's base form (D7.7), by its own converter or number handling, is refused (D6.12, X6.39).
   Text with no comparer, or with the comparer of the view's culture (`StringComparer.CurrentCulture`), orders by
@@ -853,12 +890,40 @@ Terms used throughout:
   text or a number as a list of one (`Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93`), so its count over a
   list that reads nothing is 0, where D6.3 reads nothing.
 
-**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`, `nonNull`, `toArray`).
+**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`, `nonNull`, `toArray`, `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey`, `spanKey`).
 
 **Checker.**
 - `Absence.tla:MissingListReadsNothing`
 - `Schema.tla:DecimalTextComparedByValue`: no `eq` or `neq` the C# writes takes a decimal written as text
 - `Schema.tla:SelectFieldHoldsItsType`: no `Select` field of a type that holds no null is written bare
+- `Schema.tla:DatesComparedByKey`: no comparison or sort's comparison the C# writes takes a date or a time bare
+- `Schema.tla:KeysOnlyCompared`: a key is written only as an argument of a comparison or a sort's comparison whose
+  arguments are keys
+- `Schema.tla:KeyFallbackIsALiteral`: a key's second argument, where C# writes one, is a literal of the member's start
+- `probe:core-date-compares-ticks`
+- `probe:net48-datetime-compares-ticks`
+- `probe:net48-datetime-equals-ticks`
+- `probe:net48-datetime-ticks-drop-kind`
+- `probe:net48-datetimeoffset-compares-utc`
+- `probe:net48-datetimeoffset-equals-utc`
+- `probe:net48-timespan-compares-ticks`
+- `probe:core-stj-date-time-forms`
+- `probe:core-query-date-forms`
+- `probe:core-form-date-forms-every-culture`
+- `probe:core-bound-refused-values`
+- `probe:core-bound-offset-into-datetime`
+- `probe:core-bound-lenient-forms`
+- `probe:core-implicit-instant-server-clock`
+- `probe:net48-implicit-instant-local-offset`
+- `probe:core-stj-own-date-converters`
+- `probe:mvc5-timespan-parse`
+- `probe:mvc5-datetimeoffset-parse`
+- `probe:js-dates-zone`
+- `probe:js-date-wall-gap`
+- `probe:js-date-wall-overlap`
+- `probe:js-date-milliseconds`
+- `probe:js-key-text-order`
+- `probe:js-span-key-order`
 - `probe:core-select-past-null`
 - `probe:core-json-decimal-text-written`
 - `probe:core-json-decimal-text-rounded`
@@ -927,14 +992,20 @@ Terms used throughout:
   inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.10` analyzer (D6.12): a comparison of objects: "'{term}' compares objects, and the browser compares objects by
   reference; compare a member of each, such as d => d.Carer.Name == lead." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
-- `X6.11` analyzer (D6.12): a date or a time in a comparison: "'{term}' compares dates or times, whose text neither
-  orders nor equals as the instant does; compare them on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.11` behavior (D6.12): over visits the app's JSON writes, in New York,
+  `Count(v => v.At < new DateTime(2026, 3, 8, 3, 0, 0))` counts the visit at 02:30 on 2026-03-08, a wall time daylight
+  saving skips, and not the one at 03:15; `Count(v => v.At == new DateTime(2026, 11, 9, 8, 30, 0))` counts a Utc visit
+  written 2026-11-09T08:30:00Z, a Local one written 2026-11-09T08:30:00-05:00 and an Unspecified one written
+  2026-11-09T08:30:00, and not one at 08:30:00.0000001, which `Count(v => v.At > new DateTime(2026, 11, 9, 8, 30, 0))`
+  counts; `Count(v => seen.Contains(v.Seen))`, over a view's `DateTimeOffset` array that holds 2026-11-09T18:00:00Z,
+  counts a visit seen at 2026-11-09T13:00:00-05:00, one instant at another offset; each count is the same in Kolkata.
 - `X6.12` refusal (D6.12): an ordering against a value the app's JSON writes as text: "'{term}' orders a value the
   app's JSON writes as text, which does not order as the value does in .NET; {compare it with == or !=, or order on
   the server, for a whole number, a decimal or an enum; order it on the server, for a float or a double, whose text
   does not equal as the number does either}." A float's or double's cure names no equality, which X6.43 refuses.
-- `X6.13` analyzer (D6.12): an ordering of two members outside numbers and `char`: "'{term}' orders values the browser
-  cannot order as .NET does; order numbers or a char, or order on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.13` analyzer (D6.12): an ordering of two members outside numbers, `char`, and a date or a time of one type:
+  "'{term}' orders values the browser cannot order as .NET does; order numbers, a char, or a date or a time, or order
+  on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.14` analyzer (D6.12): a cast that narrows: "'{term}' casts a number to a narrower one, which changes the value as
   C# computes it and not as the browser does; compare the member itself." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.15` refusal (D6.7): a view value read through a null: "'{value}' reads a member of a value that is null when the
@@ -976,11 +1047,13 @@ Terms used throughout:
   order; `StringComparer.CurrentCulture` orders as no comparer does; in invariant globalization mode the text orders
   by code unit, as .NET compares it there; under `haw-US`, which the browser has no collation for, the sort and the
   steps after it do not run.
-- `X6.28` refusal (D6.13): a key the app's JSON writes as text (an enum by name, a number written as text, a `Guid`,
-  a `TimeSpan`): "'{key}' orders a value the app's JSON writes as text, which does not order as the value does in
+- `X6.28` refusal (D6.13): a key the app's JSON writes as text (an enum by name, a number written as text, a
+  `Guid`): "'{key}' orders a value the app's JSON writes as text, which does not order as the value does in
   .NET; order by a member the JSON writes as a number, or order on the server."
-- `X6.29` analyzer (D6.13): a date or a time key: "'{key}' orders dates or times, whose text does not order as the
-  instant does; order them on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X6.29` behavior (D6.13): in New York, `OrderBy(v => v.At)` lists 01:30, 02:30 and 03:15 of 2026-03-08 in that
+  order; `OrderBy(v => v.Seen)` lists 2026-11-09T10:00:00-08:00 and 2026-11-09T13:00:00-05:00, one instant, in their
+  list order, then 2026-11-09T18:00:00.0000001+00:00, then 2026-11-09T12:00:00-08:00; and
+  `OrderByDescending(v => v.Length)` lists 1.02:00:00, 23:00:00 and -00:00:00.5000000.
 - `X6.30` analyzer (D6.13): an object key: "'{key}' orders objects, which the browser does not order; order by a
   member, such as OrderBy(d => d.Carer.Name, StringComparer.Ordinal)." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.31` analyzer (D6.13): a comparer other than `StringComparer.Ordinal` and the view's culture's: "'{key}' orders
@@ -1029,10 +1102,11 @@ Terms used throughout:
 - `X6.42` refusal (D6.12): two members compared where one is written unlike the app's options: "'{term}' compares
   two members, and {cause} writes '{member}' unlike {base}, so the browser does not compare them as .NET
   does; compare them on the server."
-- `X6.43` refusal (D6.12): a `float` or `double` the JSON writes as text, or a `decimal` its own converter writes as
-  text, compared: "'{term}' compares {a float or double the JSON writes as text, whose text does not equal as the
-  number does, as -0 and 0 or NaN and NaN; a decimal its own converter writes as text, whose text the converter
-  decides}; compare it on the server."
+- `X6.43` refusal (D6.12): a `float` or `double` the JSON writes as text, a `decimal` its own converter writes as
+  text, or a date or a time its own converter writes, compared: "'{term}' compares {a float or double the JSON writes
+  as text, whose text does not equal as the number does, as -0 and 0 or NaN and NaN; a decimal its own converter
+  writes as text, whose text the converter decides; a date or a time its own converter writes, whose text the
+  converter decides}; compare it on the server."
 - `X6.45` behavior (D6.12): `Select(d => d.Charted).Count(s => s == DoseStatus.Given)` counts the three charts the
   converter writes "Given"; `Select(d => d.Supply.Vials).Sum(v => v)` is refused by X6.39's message, the item held as
   text.
@@ -1086,6 +1160,15 @@ Terms used throughout:
   needing close supervision by each seat's `data-supervision`, and its flags from its card's classes; a fall risk added
   to the card is counted in the next step; and an object that declares an iterator but holds a paged result stops the
   pipeline at the operation, and the step after it does not run.
+- `X6.57` refusal (D6.12): a date or a time the app's JSON options write by a converter of their own, compared or
+  ordered, in a list's lambda or a pipeline condition: "'{term}' compares a {type} the app's JSON options write by a
+  converter of their own, whose text the browser cannot read as the value .NET holds; compare it on the server." C#
+  tells the app's converter from System.Text.Json's own by the contract's converter, reference-equal to
+  `JsonMetadataServices`' instance when the app adds none (`probe:core-stj-own-date-converters`).
+- `X6.58` behavior (D6.12): a comparison of a date or a time stops its pipeline, logging the text, on a value a live
+  object holds outside its key's forms: a vendor's `DateTime` member that holds the text "10/27/2026", and a
+  `TimeOnly` payload member that holds "7:00 PM"; the step after it does not run, and the same pages with "2026-10-27"
+  and "19:00" compare and run it, as they do with "2026-02-30" and "24:00", which name no value and read nothing.
 
 ## Q7. Every value position takes every source
 
@@ -1147,7 +1230,8 @@ Terms used throughout:
     converter writes is shown by the server.
   - Two sources a choice or a comparison joins (`IfNull`, `Choose`, D8.10) are taken in one form by the same rules:
     a number the app's form writes as text is converted, an enum is mapped by D9.13's rows, and
-    any other difference is refused (X7.11, X8.21).
+    any other difference is refused (X7.11, X8.21). A date or a time a comparison joins is read by its key (D6.12),
+    so a `DateTime` in the app's form meets a live one by its wall time.
   - A live number is a JavaScript number, so a literal written into one that JavaScript would read as another value
     is refused where the view renders, and by ALIS033 at build when it is a constant (X7.13): NaN and ±Infinity,
     which no JSON number holds (`probe:core-stj-live-nan`); a `decimal` of more than 15 significant digits, the
@@ -1293,27 +1377,35 @@ Terms used throughout:
   `lte`, `gt`, `gte`) whose operand reads nothing reads nothing, `neq` included: a value past a holder that holds
   null holds none, and no comparison with it holds (D8.5). Null is a value the data holds, compared as .NET's lifted operators
   compare it: `eq` of null and null holds, `neq` of null and a value holds, and an ordering with null does not hold,
-  though JavaScript's `null <= 2` is true. Equality is JavaScript's `===`, and over a decimal written as text
-  `eqDecimal`, by value (D6.12); an ordering is JavaScript's `<` over the
-  numbers and one-character texts D6.12 admits. `not`, `and` and `or` are SQL's three-valued logic with nothing as its
-  unknown: `not` of nothing is nothing; `and` is false when a term is false, true when both are true, and nothing
-  otherwise; `or` is true when a term is true, false when both are false, and nothing otherwise. A term runs only when
-  it is reached (D4.7): `and` reads its right term unless its left is false, `or` unless its left is true. A condition
-  holds only when it reads true: a branch, an array predicate (`filter`, `some`, `every`, `find`) and a validator
-  condition. So `d.Carer.Name != "Ruth"` and `!(d.Carer.Name == "Ruth")` agree over a dose whose carer is null:
-  neither holds, where .NET throws. A member the item lacks reads its start first (D4.2): `d.Ward != "North"` holds
-  over a dose the app wrote with no `ward`, as it holds over the null the endpoint binds for it.
+  though JavaScript's `null <= 2` is true. Equality is JavaScript's `===`, over a decimal written as text `eqDecimal`,
+  by value, and over a date or a time `===` of its keys (D6.12); an ordering is JavaScript's `<` over the numbers and
+  one-character texts D6.12 admits and over the keys of a date or a time. `not`, `and` and `or` are SQL's three-valued
+  logic with nothing as its unknown: `not` of nothing is nothing; `and` is false when a term is false, true when both
+  are true, and nothing otherwise; `or` is true when a term is true, false when both are false, and nothing otherwise.
+  A term runs only when it is reached (D4.7): `and` reads its right term unless its left is false, `or` unless its
+  left is true. A condition holds only when it reads true: a branch, an array predicate (`filter`, `some`, `every`,
+  `find`) and a validator condition. So `d.Carer.Name != "Ruth"` and `!(d.Carer.Name == "Ruth")` agree over a dose
+  whose carer is null: neither holds, where .NET throws. A member the item lacks reads its start first (D4.2):
+  `d.Ward != "North"` holds over a dose the app wrote with no `ward`, as it holds over the null the endpoint binds for
+  it.
 - D8.10 A pipeline condition over a source reads it in its form, the app's or the live form (D7.7), and over a source
   in its own form follows D6.12's rules (POC 13f-iii); two sources in the two base forms meet by D7.7's rules: a literal it is
   compared with by `Eq` or `NotEq` is written in its form, and an ordering (X8.19), a type that is not a scalar (X8.20),
   two sources where either is in its own form (X8.21), and a `float` or `double` written as text or a `decimal` its own
   converter writes as text (X8.22) are refused. A `decimal` the options or number handling write as text is compared
-  by `Eq` and `NotEq` through `eqDecimal`, by value (D6.12, X8.26).
+  by `Eq` and `NotEq` through `eqDecimal`, by value (D6.12, X8.26). A date or a time compares by its key (D6.12), so a
+  `DateTime` in the app's form meets a live one by its wall time, and the redesign's date pages hold as their tests
+  expect (X8.27).
 
-**Schema nodes.** `op` (the comparison, text, membership and value tests, `and`, `or`, `not`); `if`.
+**Schema nodes.** `op` (the comparison, text, membership and value tests, the date keys, `and`, `or`, `not`); `if`.
 
 **Checker.**
 - `Absence.tla:ConditionTermsLazy`
+- `Schema.tla:DatesComparedByKey`
+- `Schema.tla:KeysOnlyCompared`
+- `Schema.tla:KeyFallbackIsALiteral`
+- `probe:core-implicit-instant-server-clock`
+- `probe:net48-implicit-instant-local-offset`
 - `check:fluent`
 
 **Doors.**
@@ -1322,8 +1414,9 @@ Terms used throughout:
 - `N8.2` new, its form gate 2's: the comparisons (`Eq`, `NotEq`, `Gt`, `Gte`, `Lt`, `Lte`) and `And`, `Or` and `Not`
   are extension methods on a typed source that return a `TypedSource<bool>`, which `When` and `ElseIf` take and a live
   list's predicate returns, so one comparison API serves both. Each refuses where the view renders what the lambda
-  door refuses for its type: dates and times, objects compared by reference, and an ordering of what the browser
-  cannot order as .NET does. A branch writes an `if` (POC 9a).
+  door refuses for its type: objects compared by reference, an ordering of what the browser cannot order as .NET
+  does, and a date or a time a converter writes (X6.57, X8.22); a date or a time compares by its key (D6.12). A branch
+  writes an `if` (POC 9a).
 - `N8.1` new: `internal static class LambdaCondition`, the one translator from an expression tree to
   `Condition` nodes, with a result that says which term it could not translate. It replaces
   `ElementExpressionCompiler.CompilePredicate` (`Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:68`)
@@ -1365,8 +1458,8 @@ Terms used throughout:
 - `X8.9` analyzer (D8.7): an `ElseIf` or `Else` written after another step of its block, or after a method its
   condition does not read: "An ElseIf or an Else continues the When it follows, before any other step of its block:
   write it in the same sentence." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
-- `X8.10` analyzer (N8.2): a pipeline condition that orders dates, orders flags or compares objects, each with the
-  reason the lambda door gives for it. At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+- `X8.10` analyzer (N8.2): a pipeline condition that orders flags or compares objects, each with the reason the
+  lambda door gives for it. At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X8.11` behavior (D11.5): the steps after a branch that awaits run once its method settles, and at once when the
   branch is not taken.
 - `X8.12` behavior (D8.9): a branch whose condition orders a null runs none of its steps, where JavaScript's
@@ -1396,10 +1489,11 @@ Terms used throughout:
 - `X8.21` refusal (D8.10): two sources compared where either is in its own form: "A condition compares two values,
   and {cause} writes '{read}' unlike {base}, so the browser does not compare them as .NET does; compare
   them on the server."
-- `X8.22` refusal (D8.10): a `float` or `double` the JSON writes as text, or a `decimal` its own converter writes as
-  text, compared with a value: "A condition compares {a float or double the JSON writes as text, whose text does not
-  equal as the number does, as -0 and 0 or NaN and NaN; a decimal its own converter writes as text, whose text the
-  converter decides}; compare it on the server."
+- `X8.22` refusal (D8.10): a `float` or `double` the JSON writes as text, a `decimal` its own converter writes as
+  text, or a date or a time its own converter writes, compared with a value: "A condition compares {a float or double
+  the JSON writes as text, whose text does not equal as the number does, as -0 and 0 or NaN and NaN; a decimal its own
+  converter writes as text, whose text the converter decides; a date or a time its own converter writes, whose text
+  the converter decides}; compare it on the server."
 - `X8.23` behavior (D8.10): a found chart and a component's data read to `Charted` equal `DoseStatus.Given` as the
   member's own converter writes it, "Given" where the app writes "given".
 - `X8.26` behavior (D8.10, gate 1's P15): `When(cart.Doses.Find(d => d.Medicine == "Aspirin", d => d.Copay).Eq(0.10m))`
@@ -1407,6 +1501,16 @@ Terms used throughout:
   `Else` for one that holds "0.125"; `NotEq(0.10m)` runs the other branch of each. The POC refuses the condition
   (`tests/Alis.Reactive.Poc.PlaywrightTests/Comparisons/WhenASourceInItsOwnJsonIsRefused.cs:34-39`) until the rewrite
   builds `eqDecimal`, whose unit turns that test into this one.
+- `X8.27` behavior (D8.9, D8.10): the redesign's 16 date tests hold as they expect at 65fdf118d:
+  `WhenAPageComparesADayThatMayBeMissing`'s 10 over the Visit page (a day picker's `DateTime?` against the open day by
+  `IsNull`, `NotNull`, each comparison and `Between`), `WhenAPageComparesTwoDaysItReads`'s 4 over the Stay page (two
+  picked days compared) and `WhenAPageOrdersATimeOrAFlag`'s 2 time tests over the Shifts page (a `TimeOnly` from the
+  page's query against noon), these two net10's alone, since net48 has no `TimeOnly`. Beyond them, `?starts=12:00`
+  equals `new TimeOnly(12, 0)` where `?starts=12:00:00.0000001` does not, and a response's 2026-11-09T10:00:00-08:00
+  equals `new DateTimeOffset(2026, 11, 9, 18, 0, 0, TimeSpan.Zero)`. Two outcomes of the redesign's own tests change:
+  that file's flag test, `Gt(false)`, is refused, since C# has no `<` on `bool` (module 3), and the SpanOrder page,
+  which the redesign refuses (`WhenABranchIsWrittenWrongly.an_order_of_a_length_of_time_is_refused`,
+  `Alis.Reactive/Members/BrowserOrder.cs:10-15`), orders a `TimeSpan` by its key.
 - `X8.24` type (D8.8): a route's reply read after its request, outside the route, does not compile:
   `spec/api/HttpSurface/refused/ReplyOutsideItsRoute.CS0103.cs.txt:13`.
 - `X8.25` analyzer (D11.10, D8.8): a step written on the pipeline of a block around its own, and a bound value
@@ -4397,12 +4501,12 @@ plans (Q19).
   - Moved to an analyzer, by family: ALIS030, the request (X9.5, X9.6, X9.7, X9.12, X10.18, X10.25, X14.6, X20.6;
     N18.7); ALIS031, `ShowErrors` outside a route (X16.21; N18.8); ALIS032, blocks (X5.13, X5.14, X6.8, X8.5, X8.9,
     X8.16, X8.17, X8.18, X8.25, X11.1, X17.13, X17.19; N18.9); ALIS033, lambdas, member lambdas and literals (X2.5,
-    X3.11, X4.12, X6.2, X6.6, X6.10, X6.11, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.29, X6.30,
+    X3.11, X4.12, X6.2, X6.6, X6.10, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.30,
     X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3, X14.13, X14.14; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
     X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
     N18.13), and ALIS038, the flags door (X16.23 to X16.26; N16.5), new beside the moved ones.
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
-    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X7.13, X8.19, X8.20, X8.21, X8.22, X14.15, X18.8), its culture
+    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X6.57, X7.10, X7.11, X7.13, X8.19, X8.20, X8.21, X8.22, X14.15, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
     URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5). A plan's version
     is the browser's, at boot (X19.3).

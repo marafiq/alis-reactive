@@ -254,10 +254,10 @@
         },
         {
           "for": "M5.X3",
-          "page": "An event whose payload declares an optional note member; its handler sets the first status from the note, then sets the second status to Saved.",
-          "gesture": "Raise the event without the note.",
+          "page": "A rounds test component whose two buttons raise its NoteTaken event from its own JavaScript, its payload declaring an optional note member: No note with a payload that lacks the note member, and Ward round with the note Ward round. The handler sets the first status from the note, then sets the second status to Saved.",
+          "gesture": "Click No note.",
           "outcome": "The first status is empty and the second shows Saved.",
-          "opposite": "Raised with the note Ward round, the first status shows Ward round.",
+          "opposite": "Clicking Ward round, the first status shows Ward round.",
           "defect": "The missing note shown as the text undefined or null, or the missing value stopping the pipeline so the second status keeps its text."
         }
       ],
