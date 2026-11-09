@@ -1,0 +1,604 @@
+{
+  "module": "PartialsAndSlots",
+  "features": [
+    {
+      "id": "M9.F1",
+      "summary": "A view's plan: started in the view with the view's model, in a page, a partial, an editor template or a slot's content, and rendered at the view's end as a script of plan data; each view's plan is its own, nothing carries plan state between views on the server, and the plans of a page compose in the browser without merging, each with the owner whose container holds its script. The plan's types also hold doors of other modules until they claim them: plugin registration, a validator's browser rules, a component joined to the plan and a form's summary.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:PlanExtensions",
+        "Alis.Reactive:ReactivePlan<TModel>"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public static ReactivePlan<TModel> ResolvePlan<TModel>(this HtmlHelper<TModel> html)",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:58"
+        },
+        {
+          "line": "main",
+          "text": "CreatePlan<TModel>(ReactivePlanScope.PartialView);",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:60"
+        },
+        {
+          "line": "main",
+          "text": "var elementId = PlanElementId.For(plan.PlanId);",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:97"
+        },
+        {
+          "line": "main",
+          "text": "private readonly PlanId _planId = Alis.Reactive.PlanModel.PlanId.ForModel(typeof(TModel));",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "public bool IsPartial => _scope.IsPartial;",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:46"
+        },
+        {
+          "line": "main",
+          "text": "var plan = Html.ResolvePlan<DrawerResidentModel>();",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:7"
+        },
+        {
+          "line": "main",
+          "text": "@Html.Raw(plan.RenderFormatted())",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AIAssistView/Index.cshtml:125"
+        },
+        {
+          "line": "main",
+          "text": "target.behaviors.push(...incoming.behaviors);",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/merge-policy.ts:16"
+        },
+        {
+          "line": "main",
+          "text": "if (slotPlan.planId === planId) matchingSlotPlans.push(slotPlan);",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:123"
+        },
+        {
+          "line": "redesign",
+          "text": "=> new ReactivePlan<TModel>(html.ViewContext.HttpContext.RequestServices, FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:48"
+        },
+        {
+          "line": "redesign",
+          "text": "var plan = Html.ReactivePlan<ContactCard>();",
+          "cite": "tests/Alis.Reactive.Framework.App/Plans/ContactCard.cshtml:9"
+        },
+        {
+          "line": "redesign",
+          "text": "@Html.RenderPlan(plan)",
+          "cite": "tests/Alis.Reactive.Framework.App/Plans/ContactCard.cshtml:22"
+        },
+        {
+          "line": "redesign",
+          "text": "var items = view.HttpContext.Items;",
+          "cite": "Alis.Reactive/Razor/RenderedPage.cs:29"
+        },
+        {
+          "line": "redesign",
+          "text": "$\"The plan of {View} is rendered twice, so every handler it holds would run twice: render it once, \" +",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:55"
+        },
+        {
+          "line": "redesign",
+          "text": "const slot = innermostSlot(script, slotIds);",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:63"
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "model",
+        "form",
+        "none",
+        "element"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:38-80"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:20-35"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:125-130"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:50-75"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:32-126"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:12-126"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:58-89"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plans/discover.ts:10-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/merge-policy.ts:8-37"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:23-128"
+        }
+      ],
+      "core": [
+        "Q12",
+        "Q13",
+        "Q14"
+      ],
+      "meanings": [],
+      "oracle": "MVC's own partial rendering on both hosts: a partial view runs with its own model and ViewData, rendered for a member under that member's TemplateInfo prefix (probe:core-template-prefix-name, probe:mvc5-template-full-id), and a partial's @section is dropped (probe:core-partial-section-dropped, probe:mvc5-sections-checked-in-layouts-only); and the HTML Standard, under which a script element of type application/json is a data block the browser never runs.",
+      "checker": [
+        "core:Q12",
+        "core:Q14",
+        "Ownership.tla:BootContentBelongsToItsSlot"
+      ],
+      "defects": [
+        {
+          "id": "M9.X1",
+          "rung": "type",
+          "defect": "A plan rendered twice, so every handler it holds runs twice, or a behavior written to a plan after it rendered, which the page never runs: the plan is a variable of its view's block, whose end writes it once (N14.2), so neither compiles. The redesign refuses both where the view renders (Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:52-57, Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:68-75), and main renders whatever the plan holds when RenderPlan runs (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:113)."
+        }
+      ],
+      "promises": [],
+      "verdicts": [
+        {
+          "door": "static PlanExtensions.ResolvePlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html) -> ReactivePlan<TModel!>!",
+          "verdict": "refused",
+          "reason": "It starts a partial's plan that the browser merges into the owning view's plan by plan id, the model's full name (ReactivePlanScope.PartialView, Alis.Reactive/Razor/Extensions/PlanExtensions.cs:57-65; merge-policy.ts:8-37 at 623dd4a27), with no validation summary of its own. Each view's plan is its own (D14.1) and plans compose without merging (D14.2): a partial starts its plan with the one plan door, a container renders its own summary, and a view reaches another view's input by the member it binds, whose id is one in every view (D14.3).",
+          "carriers": [
+            "N14.2",
+            "N14.3",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "static PlanExtensions.ResolvePlan<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html) -> ReactivePlan<TModel!>!",
+          "verdict": "refused",
+          "reason": "It starts a partial's plan that the browser merges into the owning view's plan by plan id, the model's full name (ReactivePlanScope.PartialView, Alis.Reactive/Razor/Extensions/PlanExtensions.cs:57-65; merge-policy.ts:8-37 at 623dd4a27), with no validation summary of its own. Each view's plan is its own (D14.1) and plans compose without merging (D14.2): a partial starts its plan with the one plan door, a container renders its own summary, and a view reaches another view's input by the member it binds, whose id is one in every view (D14.3).",
+          "carriers": [
+            "N14.2",
+            "N14.3",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.PlanId.get -> string!",
+          "verdict": "refused",
+          "reason": "An implementation detail: the model's full name, which keys main's merge of every plan of one model into one (applied-plans.ts:119-128 at 623dd4a27) and names the plan's script and its validation summary (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:97, Alis.Reactive/Razor/Extensions/PlanExtensions.cs:129-134 at 623dd4a27). The rewrite keys nothing by it (D14.2, D13.2): the block's end writes the plan's script and a container renders its own summary.",
+          "carriers": [
+            "N14.2",
+            "N14.3"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.IsPartial.get -> bool",
+          "verdict": "refused",
+          "reason": "An implementation detail: whether the plan merges into the owning view's plan. No plan of the rewrite is partial; every view's plan is its own block, and its owner is the slot whose container holds its script, else the page (D12.1), which no door names.",
+          "carriers": [
+            "N14.2"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.Render() -> string!",
+          "verdict": "refused",
+          "reason": "An implementation detail: the plan's JSON as a string, which main's RenderPlan writes into the plan's script (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:96 at 623dd4a27). The block's end writes the plan.",
+          "carriers": [
+            "N14.2"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.Render(System.IServiceProvider! services) -> string!",
+          "verdict": "refused",
+          "reason": "An implementation detail: the plan's JSON as a string, its validators' browser rules resolved from services the caller hands over. The block's end writes the plan, its rules resolved from the services the view renders with, as the redesign takes the request's (Alis.Reactive/Razor/PlanExtensions.cs:48 at 65fdf118d).",
+          "carriers": [
+            "N14.2"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.RenderFormatted() -> string!",
+          "verdict": "refused",
+          "reason": "Indented plan JSON for a view that prints its own plan, which only the framework's sandbox pages do, each in a pre element (AIAssistView/Index.cshtml:125 at 623dd4a27). No view author needs the plan as text: the block's end writes the plan's script into the page, where the browser's developer tools show it. No door hands a view its plan indented; the sandbox's plan panel goes.",
+          "carriers": [
+            "N14.2"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.RenderFormatted(System.IServiceProvider! services) -> string!",
+          "verdict": "refused",
+          "reason": "Indented plan JSON for a view that prints its own plan, which only the framework's sandbox pages do, each in a pre element (AIAssistView/Index.cshtml:125 at 623dd4a27). No view author needs the plan as text: the block's end writes the plan's script into the page, where the browser's developer tools show it. No door hands a view its plan indented; the sandbox's plan panel goes.",
+          "carriers": [
+            "N14.2"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.RegisterPlugin(Plugin! plugin) -> void",
+          "verdict": "refused",
+          "reason": "Registers a plugin instance on the plan, and a second registration of one plugin is refused only where the view renders (Alis.Reactive/PlanModel/BrowserObjects/BrowserObjectContracts.cs:42-48 at 623dd4a27). A plugin is a declaration reached by its type, so a second registration on one plan is not representable (D17.14).",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.RegisterPlugin(string! pluginName, System.Action<PluginTypeBuilder!>! configure) -> void",
+          "verdict": "refused",
+          "reason": "The plugin's members are declared by name through PluginTypeBuilder when the view renders, so no type checks a member a pipeline calls. A plugin is a declaration whose members are typed, its name the one string at the plugin boundary (D17.14).",
+          "carriers": [
+            "N17.11"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M9.F2",
+      "summary": "A slot: an element a plan loads into with a request's Into or empties with Unload, named in the plan by its id. A load replaces its content and an unload empties it; before either, the slot releases every owner inside its content, innermost first, then itself, each in D12.4's closed order and past a throw, and the step that asked stops with one error when a release threw. Content the server rendered inside a slot's container belongs to that slot, a loaded plan belongs to the innermost slot around its script, a load runs the content's own scripts and reads its plans before it releases, a step that writes over a slot of its own plan is refused, and a slot's plan listens to a component the page rendered through that component's id until the slot unloads.",
+      "status": "redesign-only",
+      "types": [],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Unload(string! elementId) -> PipelineBuilder<TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public PipelineBuilder<TModel> Into(string elementId)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:285"
+        },
+        {
+          "line": "main",
+          "text": "container.innerHTML = \"\";",
+          "cite": "Alis.Reactive.Assets/runtime/execution/partials/inject.ts:30"
+        },
+        {
+          "line": "main",
+          "text": "ej.base.append(Array.from(fragmentHost.childNodes), container, true);",
+          "cite": "Alis.Reactive.Assets/runtime/execution/partials/inject.ts:33"
+        },
+        {
+          "line": "main",
+          "text": "unloadPartialSlot(slotId);",
+          "cite": "Alis.Reactive.Assets/runtime/execution/partials/inject.ts:39"
+        },
+        {
+          "line": "main",
+          "text": "slotLoad.abortController.abort();",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:78"
+        },
+        {
+          "line": "redesign",
+          "text": ".Reactive(button => button.Click, p => p.Get(\"/Slots/Card\").Response(r => r.OnSuccess(s => s.Into(\"card-slot\")))))",
+          "cite": "tests/Alis.Reactive.Framework.App/Slots/Desk.cshtml:24"
+        },
+        {
+          "line": "redesign",
+          "text": ".Reactive(button => button.Click, p => p.Unload(\"card-slot\")))",
+          "cite": "tests/Alis.Reactive.Framework.App/Slots/Desk.cshtml:26"
+        },
+        {
+          "line": "redesign",
+          "text": "public PipelineBuilder<TModel> Unload(string elementId)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:316"
+        },
+        {
+          "line": "redesign",
+          "text": "const plans = discoverPlans(host, true).map(found => found.plan);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:30"
+        },
+        {
+          "line": "redesign",
+          "text": "announceUnmount(target);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:32"
+        },
+        {
+          "line": "redesign",
+          "text": "runInsertedScripts(target);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:35"
+        },
+        {
+          "line": "redesign",
+          "text": "startOwner(slotOwner(id), plans);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:39"
+        },
+        {
+          "line": "redesign",
+          "text": "for (const id of inside.reverse()) release(id);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:61"
+        },
+        {
+          "line": "redesign",
+          "text": "log.error(\"dispose.failed\", { error: toJavaScriptString(error), owner: this.name });",
+          "cite": "Alis.Reactive.Assets/runtime/objects/owner.ts:37"
+        },
+        {
+          "line": "redesign",
+          "text": "$\"The plan of {set.Value.View} sets the {set.Value.Content} of element '{set.Key}', a slot the plan of \" +",
+          "cite": "Alis.Reactive/Razor/RenderedPage.cs:81"
+        },
+        {
+          "line": "proposed",
+          "text": ".Into(\"resident-summary\")",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": ".OnSuccess(Content.Html, (summary, loaded) => loaded.Into(\"resident-summary\", summary.Body))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Listen(object, o => o.Event, (args, p) => ..)",
+          "doors": [
+            "N12.1"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "none",
+        "obj",
+        "call",
+        "do",
+        "request",
+        "set",
+        "listen",
+        "element"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:298-321"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Reactions/Steps.cs:161-190"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:138-151"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/RenderedPage.cs:70-86"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:281-290"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:24-88"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/owner.ts:32-40"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:58-89"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/partials/inject.ts:17-43"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/boot.ts:70-98"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:33-80"
+        }
+      ],
+      "core": [
+        "Q10",
+        "Q11",
+        "Q12",
+        "Q14",
+        "Q16"
+      ],
+      "meanings": [
+        {
+          "id": "M9.D1",
+          "meaning": "A load runs each script its content holds, other than a plan's, once and in document order, after the content has replaced the slot's and before the content is mounted and its owner starts (D12.3, D12.4); a plan's script is its plan, read and never run. Fragment parsing marks every script it creates as already started, so content set as HTML runs none of them, while the same partial rendered with the page runs its scripts as the parser meets them: a vendor's helper that writes the script that builds its widget works in a slot as it does on the page. An inserted script that throws is reported by the browser and throws to no one, as D12.4 states for the content's replacement."
+        },
+        {
+          "id": "M9.D2",
+          "meaning": "A load reads every plan its content holds before it releases anything. Content that holds a plan whose JSON does not parse stops the step with one error naming the slot, before the release, so the slot keeps its content, its owner and their listeners, and the steps after it run nothing. The loaded body is data the network brought, a real boundary, and a slot left half replaced would hold content with no owner."
+        }
+      ],
+      "oracle": "The DOM Standard's dispatch, whose inner invoke reports a listener's exception and runs the next listener (DOM Standard 2.9), and the HTML Standard: fragment parsing marks each script it creates as already started, so innerHTML runs none, a script element inserted by the DOM runs once, and custom element reactions are invoked with report (HTML Standard 4.13.6).",
+      "checker": [
+        "core:Q12",
+        "Ownership.tla:NoSlotOutlivesItsContainer",
+        "Ownership.tla:ListenersDoNotAccumulate",
+        "Ownership.tla:BootContentBelongsToItsSlot",
+        "Ownership.tla:ListenLeavesWithItsOwner",
+        "Ownership.tla:EveryOwnerReleasedPastAThrow",
+        "Ownership.tla:ThrownListenerRunsNothing",
+        "Ownership.tla:StepReplacesTheContent",
+        "Lanes.tla:FinallyRunsBeforeRelease",
+        "Run.tla:NothingRunsAfterAnAbort"
+      ],
+      "defects": [
+        {
+          "id": "X12.1",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.2",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.11",
+          "rung": "refusal"
+        },
+        {
+          "id": "X12.14",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.15",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.17",
+          "rung": "behavior"
+        },
+        {
+          "id": "M9.X2",
+          "rung": "behavior",
+          "defect": "Content a load puts in a slot runs none of its scripts, since fragment parsing marks each as already started, so a widget its vendor's script builds stays unbuilt in a slot while the same partial builds it on the page; or a script runs again at each later load of other content (M9.D1). Main runs them only through Syncfusion's append, which evaluates the scripts when its third argument is true, and only when the page holds Syncfusion (Alis.Reactive.Assets/runtime/execution/partials/inject.ts:31-36 at 623dd4a27)."
+        },
+        {
+          "id": "M9.X3",
+          "rung": "behavior",
+          "defect": "Loaded content that holds another slot's container with content the server rendered in it gives that content's plan to the slot it was loaded into, so the inner slot's first load or unload releases nothing and the plan's handlers run until the outer slot unloads (D12.1, D12.3). The redesign starts every plan of loaded content under the loaded slot (Alis.Reactive.Assets/runtime/plugins/slot.ts:30, Alis.Reactive.Assets/runtime/plugins/slot.ts:39 at 65fdf118d)."
+        },
+        {
+          "id": "M9.X4",
+          "rung": "behavior",
+          "defect": "Loaded content holding a plan whose JSON does not parse releases the slot and replaces its content before the plan is read, so the slot shows half loaded content with no owner, or the step goes on as if it loaded (M9.D2)."
+        },
+        {
+          "id": "M9.X5",
+          "rung": "behavior",
+          "defect": "A load or an unload of a slot whose element the page lacks, since it left with the slot around it, goes on as if it ran, or stops more than its own pipeline: it stops its own pipeline, as a missing element stops an element step's, and every other handler runs on (D10.21, D4.8)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X12.1",
+          "page": "A hall page whose bell raises the app event Rang and whose own handler writes the ring's count into page-heard; Open the board loads the board into board-slot, and the board holds note-slot, into which Pin a note to the board loads a note; the board's plan writes each ring's count into the page's board-heard and the note's plan into note-heard.",
+          "gesture": "Click Open the board, Pin a note to the board and Ring the bell, then Close the board and Ring the bell again.",
+          "outcome": "page-heard reads 2, board-heard and note-heard read 1, and board-slot is empty.",
+          "opposite": "With the board left open, the second ring shows board-heard and note-heard at 2.",
+          "defect": "Unloading the board releases the board's own owner and not the note's inside it, so the second ring still runs the note's handler and note-heard reads 2.",
+          "existing_test": "redesign WhenASlotLoadsAnAnswer.unloading_a_slot_releases_the_slots_inside_it"
+        },
+        {
+          "for": "X12.2",
+          "page": "A ward page whose Note a fall button raises the app event FallNoted and whose own handler adds \"The ward heard the note\" to the page's call list; Open Ada's card and Open Ben's card each load that resident's card into the card slot, and a card's plan handles FallNoted by adding \"{name} heard the note\" to the same list.",
+          "gesture": "Click Open Ada's card, Open Ben's card and Open Ada's card, then Note a fall.",
+          "outcome": "The call list reads \"The ward heard the note\" and \"Ada Byron heard the note\", once each.",
+          "opposite": "Clicking Close the card and Note a fall again adds \"The ward heard the note\" alone.",
+          "defect": "Each load subscribes the new card's handler beside those the loads before it left, so one note adds \"Ada Byron heard the note\" twice and \"Ben Okafor heard the note\" once."
+        },
+        {
+          "for": "X12.3",
+          "page": "An admission page whose form is a container whose live check runs the page's validator, which requires Address.Street with \"Name the street.\"; Load the address loads into a slot inside the form an address partial rendered for Address, which renders an input of Street.",
+          "gesture": "Click Load the address twice, then click into Street and press Tab with it empty.",
+          "outcome": "\"Name the street.\" shows beside Street.",
+          "opposite": "Typing 12 Elm Row into Street and pressing Tab shows no message beside it.",
+          "defect": "The live check is wired to the inputs the first load rendered, so the second load's Street shows no message when it loses focus empty."
+        },
+        {
+          "for": "X12.8",
+          "page": "A move-in page whose bell raises the app event BellRang and whose own handler writes the ring's count into page-heard; the slot move-in-step holds the resident step the server rendered with the page, whose plan writes each ring's count into resident-step-heard; Next loads the room step into move-in-step.",
+          "gesture": "Ring the bell, type Ann as the resident, click Next, then Ring the bell again.",
+          "outcome": "After the second ring page-heard reads 2 and resident-step-heard reads 1.",
+          "opposite": "Without Next, the second ring shows resident-step-heard at 2.",
+          "defect": "The resident step rendered with the page belongs to the page, so the first load leaves its handler running and resident-step-heard reads 2.",
+          "existing_test": "redesign WhenASlotStartsWithServerRenderedContent.a_step_rendered_with_the_page_stops_hearing_once_the_next_step_replaces_it"
+        },
+        {
+          "for": "X12.11",
+          "page": "A pass desk view whose one plan loads a visitor card into the element card when Show the card is clicked and, in its Sign out handler, sets the text of card to Signed out.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"The plan sets the text of element 'card', a slot this plan loads or unloads, so what the slot loaded would keep running under content it no longer shows. Empty the slot with Unload(\"card\"), and write the text into an element beside it.\"",
+          "opposite": "With Sign out writing Signed out into card-note beside the slot, the page renders, and clicking Show the card, then Sign out, shows Signed out beside the card while the card's own button still runs its handler.",
+          "defect": "The page renders, and Sign out replaces the card's markup with the text Signed out while the card's handlers keep running under content it no longer shows."
+        },
+        {
+          "for": "X12.14",
+          "page": "A ward page that renders a monitor component at the id monitor, whose plan's own handler of the monitor's Reading event writes the pulse into page-pulse; Open the card loads a card whose plan, when it loads, listens to the monitor reached by its id and writes each reading's pulse into the page's card-pulse; Take a reading makes the monitor raise Reading with the pulse typed beside it.",
+          "gesture": "Click Open the card, take a reading of 72, click Close the card, then take a reading of 75.",
+          "outcome": "After the first reading page-pulse and card-pulse read 72; after the second page-pulse reads 75 and card-pulse still reads 72.",
+          "opposite": "With the card left open, the second reading shows 75 in both.",
+          "defect": "The card's listen is not released with the card, so the second reading writes 75 into card-pulse; or the release removes the page's own handler as well, and page-pulse stays at 72."
+        },
+        {
+          "for": "X12.15",
+          "page": "A ward page holding a radio plugin whose unsubscribe throws, and a card slot; Open Ada's card loads Ada's card, whose plan listens to the radio's Call and writes card-heard, and which holds a slot whose content, rendered by the server, listens to Call and writes inner-heard; Open Ben's card loads Ben's card into the same slot, then writes \"Ben opened\" into after, and its Finally writes \"Ben settled\" into finally; Ben's card has a Count button that adds one to its tally and shows it; Call the ward makes the radio raise Call.",
+          "gesture": "Click Open Ada's card, then Open Ben's card, Call the ward and Count.",
+          "outcome": "Ben's card shows with its tally at 1, card-heard and inner-heard stay empty, finally reads \"Ben settled\", after stays empty, and the console's one error names Ada's card and its inner slot and the step that threw.",
+          "opposite": "With a radio whose unsubscribe returns normally, the same clicks show \"Ben opened\" in after and no console error.",
+          "defect": "The release stops at the first throw, so the inner slot keeps listening and inner-heard is written, or Ben's card never loads; or the release swallows the throw, and after reads \"Ben opened\" as if the release had been clean."
+        },
+        {
+          "for": "X12.17",
+          "page": "A card page holding a radio plugin whose unsubscribe throws and a tally; Open the card loads a card whose plan listens to the radio and whose Save posts and, on success, unloads the card's own slot; Save's Finally writes Saved into the card's note, then adds one to the page's tally and writes the tally into status.",
+          "gesture": "Click Open the card and Save, then Open the card again.",
+          "outcome": "status reads 1, the card slot empties after Save, and the second Open the card shows the card.",
+          "opposite": "With a radio whose unsubscribe returns normally, the same clicks show status 1 and no console error.",
+          "defect": "The release runs before the Finally, so its write into the card's note finds no element, the Finally stops and status stays empty; or the release's throw stops the unload and the card stays on the page."
+        },
+        {
+          "for": "M9.X2",
+          "page": "A hall page whose Open the board loads the board into board-slot, and whose Pin a note to the board loads into the board's note slot a note reading \"The hall closes at nine.\", whose stamp is written by a vendor helper as an empty element and a script that fills it with \"stamped by its own script\".",
+          "gesture": "Click Open the board, then Pin a note to the board.",
+          "outcome": "The note shows \"The hall closes at nine.\" and its stamp reads \"stamped by its own script\".",
+          "opposite": "Pinning the note a second time replaces it, and the page holds one stamp, reading \"stamped by its own script\".",
+          "defect": "The loaded content's script never runs, so the stamp stays empty; or a script left from the first note runs again, and two stamps or none show.",
+          "existing_test": "redesign WhenASlotLoadsAnAnswer.a_script_in_loaded_html_runs_as_a_vendors_script_that_builds_its_widget"
+        },
+        {
+          "for": "M9.X3",
+          "page": "A hall page whose bell raises the app event Rang and whose own handler writes the ring's count into page-heard; Open the board loads a board whose note slot holds a note the server rendered in it, whose plan writes each ring's count into the page's note-heard; Take the note down unloads the note slot.",
+          "gesture": "Click Open the board and Ring the bell, then Take the note down and Ring the bell again.",
+          "outcome": "After the second ring page-heard reads 2 and note-heard reads 1.",
+          "opposite": "Without Take the note down, the second ring shows note-heard at 2.",
+          "defect": "The note's plan belongs to the board's slot, so unloading the note slot releases nothing and the second ring writes 2 into note-heard."
+        },
+        {
+          "for": "M9.X4",
+          "page": "A noticeboard page whose Pin the notice loads a notice with its own plan into notice-slot and then writes \"the notice\" into pinned; Pin the torn notice writes \"the torn notice\" into pinning, loads content whose plan is not JSON into the same slot, and then writes into pinned; the notice's Mark the notice read writes read into notice-read.",
+          "gesture": "Click Pin the notice, then Pin the torn notice, then Mark the notice read.",
+          "outcome": "pinning reads \"the torn notice\", pinned still reads \"the notice\", the slot still shows Visiting hours change on Sunday, and notice-read reads read.",
+          "opposite": "Pinning the notice again replaces it with the same notice, and pinned reads \"the notice\".",
+          "defect": "The slot is released and replaced before the plan is read, so the notice's button is gone or runs nothing, or the step goes on and pinned is written.",
+          "existing_test": "redesign WhenLoadedHtmlCarriesPlans.loaded_html_whose_plan_is_not_json_is_refused_and_the_slot_keeps_what_it_showed"
+        },
+        {
+          "for": "M9.X5",
+          "page": "A hall page whose Pin a note to the board adds one to the page's tally and writes it into pin-tried, loads a note into note-slot, which the board holds, and writes the tally into pin-after; Close the board unloads board-slot; the bell's own handler writes the ring's count into page-heard.",
+          "gesture": "Click Open the board and Pin a note to the board, then Close the board, Pin a note to the board again and Ring the bell.",
+          "outcome": "pin-tried reads 2, pin-after reads 1, and page-heard reads 1.",
+          "opposite": "With the board left open, the second pin shows pin-tried and pin-after at 2.",
+          "defect": "The load of a slot no longer on the page goes on, so pin-after reads 2; or its stop ends more than its own pipeline, and the bell's handler leaves page-heard empty.",
+          "existing_test": "redesign WhenASlotLoadsAnAnswer.loading_into_a_slot_no_longer_on_the_page_fails_only_its_own_pipeline"
+        }
+      ],
+      "verdicts": []
+    }
+  ]
+}

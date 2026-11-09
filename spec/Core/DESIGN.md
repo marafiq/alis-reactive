@@ -2553,7 +2553,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   owner holds, a plan's boot is one pass, and the C# writer's position is its stack of open blocks, each with its stage
   and whether a step before it awaited (D11.4).
 
-**Schema nodes.** `do` and `let` with `await`, `all`, `request`, and the handler's policy, a field of `handler`
+**Schema nodes.** `do` and `let` with `await`, `all`, `request`, and the handler's policy, a field of `Handler`
 (Q19). The abort signals are the run's blocks' (D11.12), not the plan's: `HttpSend` carries none.
 
 **Checker.**
@@ -2812,7 +2812,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     slot outside it stays held until that slot unloads.
 
 **Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
-the statement `listen`, and `handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
+the statement `listen`, and `Handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
 plans name.
 
 **Checker.**
@@ -2838,7 +2838,8 @@ plans name.
 - `probe:ej2-event-put-back-after-destroy`
 
 **Doors.**
-- kept: `Into(element)`, `Unload(element)`, `Html.RenderPlan`, and the hub's and stream's triggers.
+- kept: `Into(element)`, `Unload(element)`, and the hub's and stream's triggers; `Html.RenderPlan` leaves, since the
+  plan block's end writes the plan (N14.2).
 - No door names an owner: a developer chooses where a plan renders, and ownership follows.
 - `N12.1` new: `listen`, the handler of an event of a live object a pipeline reaches (D12.8); its form goes to
   gate 2. It replaces the refusal of an event declared on an object a method returns, and the refusal of a listen on
@@ -3144,7 +3145,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   `Html.EditorFor`; the object-typed `IdGenerator.For<TModel>` both lines have leaves, since ALIS009 refuses `object` on
   the public surface.
 - `N14.1` new: `Html.PartialFor(m => m.Member, view)`, the typed partial for a member, on both hosts.
-- `N14.2` new: the plan as a block of its view, whose end renders it; its form goes to gate 2.
+- `N14.2` new: the plan as a block of its view, whose end renders it; it replaces `Html.RenderPlan` on both lines;
+  its form goes to gate 2.
 - `N14.3` new: the request container as a block of its view, which renders the container's element and its summary
   and returns its typed handle (D14.8), and `pipeline.Container<TModel>(containerId)` for another view; their forms go
   to gate 2.
