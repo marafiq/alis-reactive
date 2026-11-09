@@ -3336,7 +3336,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "8dc76f49471aa9e63bf7f51ec69c552a641e70f4",
+  "read_at_head": "a6c92757d14136fc6d6dd0887d189058f99d7e66",
   "step": {
     "failing": [
       "doors_mapped",
