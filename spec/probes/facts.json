@@ -1916,6 +1916,42 @@
       "probe": "AspNetCoreBinding",
       "expect": "core-query-day-time: Day=2026-11-09&At=13:30:00 binds 2026-11-09 13:30:00; At=13:30:00.5 binds 2026-11-09 13:30:00.5; At=13:30:00.5000000 binds 2026-11-09 13:30:00.5; Day=2026-11-09T00:00:00 binds 2026-11-09 13:30:00; System.Text.Json writes DateOnly \"2026-11-09\", TimeOnly 13:30 \"13:30:00\" and 13:30:00.5 \"13:30:00.5000000\"",
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-type-fullname-generic-prefix",
+      "statement": "A closed generic type's FullName, before its first bracket, is its definition's full name with each level's arity mark and nesting by '+', and GetGenericArguments gives every level's arguments, the outer level first.",
+      "host": "net10",
+      "oracle": ".NET 10 reflection, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-type-fullname-generic-prefix: ProbeHolder<int>.Nested<string>'s FullName before its first bracket is ProbeHolder`1+Nested`1, and its type arguments, outer level first, are Int32, String",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-type-array-generic-arguments",
+      "statement": "An array of a generic type is named List`1[] by Type.Name, and GetGenericArguments on it gives its element's arguments, so a name read by GetGenericArguments alone cannot tell List<int>[] from List<int>.",
+      "host": "net10",
+      "oracle": ".NET 10 reflection, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-type-array-generic-arguments: List<int>[]'s Name is List`1[], its IsArray True, and its GetGenericArguments gives Int32",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-contract-kind-declarers",
+      "statement": "System.Text.Json's contract writes a nullable, a string, a DateTime and a class with its own converter as one value (None), a list and an array as Enumerable, a dictionary as Dictionary, and a model class, generic or nested, as Object; the same System.Text.Json 10.0.12 package reads it on net48.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-contract-kind-declarers: Nullable`1 None, String None, DateTime None, ProbeOwnConverted None, List`1 Enumerable, Int32[] Enumerable, Dictionary`2 Dictionary, Person Object, Nested`1 Object",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "net48-type-fullname-closed-generic",
+      "statement": "On .NET Framework a closed generic type's FullName is its definition's full name, List`1, then its type arguments in brackets, each qualified by its assembly (mscorlib 4.0.0.0), so the text before the first bracket carries no assembly.",
+      "host": "net48",
+      "oracle": "dotnet/dotnet-api-docs main, Type.FullName's example output, snippets/csharp/System/Type/FullName/fullnameex1.cs",
+      "probe": "dotnet-api-docs/fullnameex1.cs.txt",
+      "expect": "// System.Collections.Generic.List`1[[System.String, mscorlib,",
+      "source": "spec/probes/dotnet-api-docs/fullnameex1.cs.txt:21"
     }
   ]
 }

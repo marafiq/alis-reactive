@@ -2981,9 +2981,30 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     `probe:mvc5-template-full-id`).
   - The element id is the class that declares the member, then MVC's id of the full name: `{Namespace_Class}__{Path}`
     (`probe:core-sanitized-id`). The declaring class is the one the expression tree's member names.
+  - A generic declaring class is named as C# writes it, with its type arguments' names, never with the assembly names
+    and versions its full name carries in them (C11, `probe:net48-type-fullname-closed-generic`): its `Type.FullName` up
+    to the first bracket, each level's arity mark replaced by that level's arguments from `Type.GetGenericArguments`,
+    the outer level first (`probe:core-type-fullname-generic-prefix`). A type argument is named by its `Type.Name`, a
+    nullable by its underlying type's name and `?` (`Nullable.GetUnderlyingType`), an array by its own `Type.Name`
+    (`Int32[]`, ``List`1[]``), which `Type.IsArray` finds before `Type.GetGenericArguments` is read, since that gives an
+    array its element's arguments (`probe:core-type-array-generic-arguments`), and any other generic type by its name
+    and its arguments' names. So `ChartEntry<FluidsReading>` in `Alis.Reactive.Framework.App.Partials` scopes
+    `Alis_Reactive_Framework_App_Partials_ChartEntry_FluidsReading_`, the redesign's id (X14.12), and a class nested in
+    a generic one is `Holder<Int32>.Inner`, where the redesign's `CSharpTypeName` wrote `Holder<T>.Inner<Int32>`.
+  - Two declaring classes share a scope only when they differ in a type argument's namespace alone, or in the
+    arguments of an array's element type; a page that renders inputs of both meets R14.3 in one plan and R14.6 across
+    plans.
   - So the page, a validator, an `EditorFor` template, a list-item partial and a partial for a member reach
     one id without knowing each other, and two views of different models that bind one name keep two ids.
-  - A lambda that names no member (`m => m`), and a member an interface declares, are refused.
+  - A lambda that names no member (`m => m`), and a member an interface declares, are refused. `Type.IsInterface` finds
+    the interface, and `Type.GetInterfaceMap`, which would map the member to the class's, is refused (C11, X14.13).
+  - An input binds a member of a class the app's JSON contract writes as an object, one rule on both hosts, since D2.4
+    reads the member's body path from that contract on net10: a type the contract writes as one value (`decimal?`,
+    `string`, `DateTime`, a class with its own converter) or as a list (`List<T>`, an array) holds no member there, so
+    an input of its member (`Value`, `Length`, `Count`) is refused (`probe:core-contract-kind-declarers`). A member `Nullable<T>` declares is
+    refused naming the nullable member to bind (X14.14), every other one naming the type and how the contract writes it
+    (X14.15). Chosen within the owner's yes at gate 1: C11 lifts the refusal of a generic declaring class, which also
+    refused `m => m.Dose.Value` and `m => m.Items.Count`, with the generic class's message. The owner can overrule it.
   - A lambda is bound only when MVC's name names each step it takes from the model: a member, a single-argument
     indexer, an array position. MVC stops its name at any other call (`Find(..)`, `Substring(1)`) and keeps what lies
     outside it, so the form would post the input under a name that binds nothing; the framework counts the steps
@@ -3015,8 +3036,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - That moves two refusals from render time to the browser, confirmed at gate 1 (C29).
   - At render, within one plan:
     - R14.1 an input or a partial whose lambda MVC's name does not name step by step from the model (a call that
-      is no indexer, a value the view holds), an input whose lambda names no member, or a member an interface
-      declares;
+      is no indexer, a value the view holds), an input whose lambda names no member, a member an interface declares,
+      or a member of a type the app's JSON contract writes as one value or a list (D14.3);
     - R14.2 an input, or a pipeline's read of one, under a prefix its view took after its plan started;
     - R14.3 an element id the plan renders twice;
     - R14.4 a step that sets the text or HTML of an element the same plan loads or unloads as a slot;
@@ -3053,6 +3074,10 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `probe:mvc5-viewdata-copy-shares-template-info`
 - `probe:core-partial-section-dropped`
 - `probe:mvc5-sections-checked-in-layouts-only`
+- `probe:core-type-fullname-generic-prefix`
+- `probe:net48-type-fullname-closed-generic`
+- `probe:core-type-array-generic-arguments`
+- `probe:core-contract-kind-declarers`
 - `Ownership.tla:BootContentBelongsToItsSlot`
 
 **Doors.**
@@ -3088,6 +3113,11 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   merged in the browser by plan id (`Alis.Reactive.Assets/runtime/lifecycle/merge-policy.ts:2-31`).
 - The redesign keeps a per-request record of ids, summaries, slots and contents set
   (`Alis.Reactive/Razor/RenderedPage.cs:29`).
+- The redesign names a generic declaring class by `CSharpTypeName` (`Alis.Reactive/Members/CSharpTypeName.cs:8-17`),
+  which reads `IsGenericType`, `GetElementType` and `GetArrayRank` beside C11's reads, and its scope reads `Namespace`
+  and `DeclaringType` (`Alis.Reactive/Inputs/IdGenerator.cs:63-73`); it refuses an interface declarer
+  (`Alis.Reactive/Inputs/IdGenerator.cs:52-57`). The POC refuses a generic declaring class and reads no contract for an
+  input, and stands until the rewrite's inputs unit (`spec/NOTES.md`, 2026-11-09, C11).
 
 **Defects.**
 - `X14.1` type: an input outside its plan's block does not compile: new:N14.2.
@@ -3111,6 +3141,23 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `X14.10` behavior: a list-item partial under `Members[1]` sends its inputs at position 1 in a JSON body.
 - `X14.11` behavior: on net48 a partial rendered by `PartialFor` leaves the page's own inputs posting under their
   names; the `verify-net48` run proves it.
+- `X14.12` behavior (D14.3): an input of `ChartEntry<FluidsReading>`'s `Initials` has the id
+  `Alis_Reactive_Framework_App_Partials_ChartEntry_FluidsReading___Initials`, so a label written with that id fills it,
+  and the endpoint binds what was typed; the redesign's
+  `tests/Alis.Reactive.Framework.PlaywrightTests/Partials/WhenAMembersClassIsGeneric.cs` proves it at 65fdf118d.
+- `X14.13` analyzer (D14.3, R14.1): an input of a member an interface declares is refused with "Input '{name}' binds a
+  member that {interface} declares. An input's id is scoped by the class that declares its member, so the page's
+  rules, sends and reads of it would not find it: type the view to the class, or a base class, that declares it." At
+  build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10. The redesign's
+  `tests/Alis.Reactive.Framework.PlaywrightTests/Partials/WhenAnInputsIdCannotFollowItsMember.cs` proves the message
+  where the view renders at 65fdf118d.
+- `X14.14` analyzer (D14.3, R14.1): an input of `m => m.Dose.Value` over a `decimal?` is refused with "Input
+  'm => m.Dose.Value' binds Value, which Decimal? declares, not a member of {model}: bind 'm => m.Dose', which takes
+  a Decimal?." At build by ALIS033, and where the view renders on code it does not follow
+  (D18.6): new:N18.10.
+- `X14.15` refusal (D14.3, R14.1): an input of `m => m.Items.Count` is refused with "Input 'm => m.Items.Count' binds
+  Count, which {List<Item>} declares, and the app's JSON options write {List<Item>} as {a list | one value}, so the
+  input has no body path: bind a member of a class they write as an object."
 
 ## Q15. Templates
 
@@ -4196,7 +4243,11 @@ plans (Q19).
   - the identity of a .NET member an array lambda calls, compared with the closed table of D6.5, never listed
     or invoked: `MemberInfo.Module` and `MemberInfo.MetadataToken`, which name a member's definition for every
     instantiation of a generic member, in `poc/Alis.Reactive.Poc/Conditions/TranslatedMembers.cs`.
-  Gate 1 granted three more, which the rewrite's list holds and the POC's does not:
+  Gate 1 granted four more, which the rewrite's list holds and the POC's does not:
+  - a declaring class's name for an input's id and its refusals, `Type.Name`, `Type.GetGenericArguments`,
+    `Type.IsArray`, `Nullable.GetUnderlyingType` and `Type.IsInterface`, beside the `Type.FullName` the POC's list holds,
+    in the file the rewrite's inputs unit names ids in (C11, D14.3); `Type.GetInterfaceMap`, which maps members, is
+    refused;
   - an enum's values and names for D9.13's rows, `Enum.GetValues(Type)` and `Enum.ToString`, with `Type.IsEnum` and
     `Nullable.GetUnderlyingType` to find the enum, in `EnumNames.cs`, the file the rewrite's request unit adds to the
     Types module (C37). The generic `Enum.GetValues<TEnum>()` is absent on net48, and no door reaches a
@@ -4208,8 +4259,9 @@ plans (Q19).
     factory on the declaration, which net48's runtime does not support;
   - `Expression.Compile` in validation, where the server runs a condition, a member read and a fixed operand, the tree
     the browser reads (Q16, C13).
-  The POC stands until the rewrite's request, declarations and validation units: it sends an enum a source holds as it
-  is held, and its `Enum.ToString` of a literal and its `new T()` are on no list in `WhenTheCoreIsCompiled`.
+  The POC stands until the rewrite's request, declarations, validation and inputs units: it sends an enum a source
+  holds as it is held, its `Enum.ToString` of a literal and its `new T()` are on no list in `WhenTheCoreIsCompiled`,
+  and it refuses a member a generic class declares.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):
@@ -4278,11 +4330,11 @@ plans (Q19).
     N18.7); ALIS031, `ShowErrors` outside a route (X16.21; N18.8); ALIS032, blocks (X5.13, X5.14, X6.8, X8.5, X8.9,
     X8.16, X8.17, X8.18, X8.25, X11.1, X17.13, X17.19; N18.9); ALIS033, lambdas, member lambdas and literals (X2.5,
     X3.11, X4.12, X6.2, X6.6, X6.10, X6.11, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.29, X6.30,
-    X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
+    X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3, X14.13, X14.14; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
     X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
     N18.13), and ALIS038, the flags door (X16.23 to X16.26; N16.5), new beside the moved ones.
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
-    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X7.13, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
+    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X7.13, X8.19, X8.20, X8.21, X8.22, X14.15, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
     URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5). A plan's version
     is the browser's, at boot (X19.3).
@@ -4346,7 +4398,8 @@ shapes, starts and the payload kind of each event.
   after another step, a second `Else` (D8.7); a result called in an `ElseIf`'s condition read after its `When`, and an
   async method under a term reached later (D4.7); a write to the payload after an awaited step, a request's own
   `WhileLoading` before its send and the rest of the request after it (D11.4), and inside a `listen` (D12.8); a step or an awaited read inside a list's lambda or a callback's answer (D6.8, D17.12).
-- `N18.10` new: ALIS033, the lambda analyzer: a member lambda that names the model (D2.5, D14.2); a dictionary of dates
+- `N18.10` new: ALIS033, the lambda analyzer: a member lambda that names the model (D2.5, D14.2); an input of a member
+  an interface or `Nullable<T>` declares (D14.3); a dictionary of dates
   written into a live member (D3.13); a constant literal no live number holds (D7.7, X7.13); in a list's lambda and a pipeline condition, a term outside the identity table
   (D6.5), a view value that computes (D6.7), and each comparison, ordering, cast, coalesce and lookup D6.12 to D6.14
   and N8.2 refuse by the types they read; a constant pattern outside D16.11's closed set (D6.15).

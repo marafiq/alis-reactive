@@ -189,11 +189,34 @@ try
     Console.WriteLine("core-stj-datetime-kind: " + DateTimeKinds());
     Console.WriteLine("core-stj-datetime-nested-kind: " + NestedDateTimeKinds());
     foreach (var line in LiveForm()) Console.WriteLine(line);
+    Console.WriteLine("core-type-fullname-generic-prefix: " + GenericPrefix());
+    Console.WriteLine("core-type-array-generic-arguments: " + ArrayOfGeneric());
+    Console.WriteLine("core-contract-kind-declarers: " + DeclarerKinds());
     await HttpProbes.Run(new Uri(app.Urls.First()));
 }
 finally
 {
     await app.StopAsync();
+}
+
+static string GenericPrefix()
+{
+    var declarer = typeof(ProbeHolder<int>.Nested<string>);
+    var full = declarer.FullName!;
+    return "ProbeHolder<int>.Nested<string>'s FullName before its first bracket is " + full[..full.IndexOf('[', StringComparison.Ordinal)] + ", and its type arguments, outer level first, are " + string.Join(", ", declarer.GetGenericArguments().Select(argument => argument.Name));
+}
+
+static string ArrayOfGeneric()
+{
+    var array = typeof(List<int>[]);
+    return "List<int>[]'s Name is " + array.Name + ", its IsArray " + array.IsArray + ", and its GetGenericArguments gives " + string.Join(", ", array.GetGenericArguments().Select(argument => argument.Name));
+}
+
+static string DeclarerKinds()
+{
+    var options = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web) { TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver() };
+    string Kind<T>() => typeof(T).Name + " " + options.GetTypeInfo(typeof(T)).Kind;
+    return string.Join(", ", Kind<decimal?>(), Kind<string>(), Kind<DateTime>(), Kind<ProbeOwnConverted>(), Kind<List<Person>>(), Kind<int[]>(), Kind<Dictionary<string, int>>(), Kind<Person>(), Kind<ProbeHolder<int>.Nested<string>>());
 }
 
 static string CallSite([System.Runtime.CompilerServices.CallerFilePath] string file = "", [System.Runtime.CompilerServices.CallerLineNumber] int line = 0)
@@ -373,6 +396,27 @@ static async Task<string> Form(HttpClient client, string path, string body)
 {
     using var response = await client.PostAsync(path, new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded"));
     return await response.Content.ReadAsStringAsync();
+}
+
+public sealed class ProbeHolder<T>
+{
+    public sealed class Nested<TOther>
+    {
+        public string? Name { get; set; }
+    }
+}
+
+[JsonConverter(typeof(ProbeOwnConvertedConverter))]
+public sealed class ProbeOwnConverted
+{
+    public decimal Amount { get; set; }
+}
+
+public sealed class ProbeOwnConvertedConverter : JsonConverter<ProbeOwnConverted>
+{
+    public override ProbeOwnConverted Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options) => new() { Amount = reader.GetDecimal() };
+
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, ProbeOwnConverted value, System.Text.Json.JsonSerializerOptions options) => writer.WriteNumberValue(value.Amount);
 }
 
 public sealed class ProbeRefusingDeclaration
