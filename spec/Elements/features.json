@@ -1,0 +1,360 @@
+{
+  "module": "Elements",
+  "features": [
+    {
+      "id": "M5.F1",
+      "summary": "An element found by the id the view gave it: its text and HTML set to a literal or a source, its classes added, removed and toggled, shown and hidden, and its children and classes read as lists.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:HtmlElement",
+        "Alis.Reactive:ElementContent",
+        "Alis.Reactive:ElementClassList",
+        "Alis.Reactive:ChildElement",
+        "Alis.Reactive:ElementBuilder<TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> ElementBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> HtmlElement!",
+        "Alis.Reactive:PipelineBuilder<TModel>.FromDom(string! elementId, string! member) -> ReactiveArray<string!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.FromDom<TElement>(string! elementId, string! member) -> ReactiveArray<TElement>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "p.Element(\"dom-total-classes\").SetText(p.FromDom(\"dom-card\", \"classList\").Count());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:12"
+        },
+        {
+          "line": "main",
+          "text": "p.Element(\"dom-high-risk-count\").SetText(p.FromDom<DomChild>(\"risk-list\", \"children\").Count(x => x.GetAttribute(\"data-risk\") == \"high\"));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:22-23"
+        },
+        {
+          "line": "main",
+          "text": "p.Element(\"dom-card\").AddClass(\"risk-extra\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:30"
+        },
+        {
+          "line": "main",
+          "text": "then.Element(\"dom-memory-yes\").Show()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:18"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element($\"{table}-seated\").Text.Set(seats.Count());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:26"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element($\"{table}-close-supervision\").Text.Set(seats.Count(seat => seat.GetAttribute(\"data-supervision\") == \"close\"));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:27"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element($\"{table}-risk-count\").Text.Set(flags.Where(flag => flag.StartsWith(\"risk-\")).Count());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:18"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element(table).ClassList.Add(\"risk-fall\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:40"
+        },
+        {
+          "line": "redesign",
+          "text": "other.Element($\"{table}-memory-care\").Hide()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:34"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4-seated\").Text.Set(pipeline.Element(\"table-4-seats\").Children.Count());",
+          "doors": [
+            "M5.N5",
+            "M5.N1",
+            "M5.N3",
+            "N5.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4-close-supervision\").Text.Set(pipeline.Element(\"table-4-seats\").Children.Count(seat => seat.GetAttribute(\"data-supervision\").Eq(\"close\")));",
+          "doors": [
+            "M5.N3",
+            "M5.N4",
+            "N8.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4-risk-count\").Text.Set(pipeline.Element(\"table-4\").Classes.Count(flag => flag.StartsWith(\"risk-\")));",
+          "doors": [
+            "M5.N1",
+            "M5.N2",
+            "N5.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4\").Classes.Add(\"risk-fall\");",
+          "doors": [
+            "M5.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"table-4-memory-care\").Show();",
+          "doors": [
+            "M5.N1"
+          ]
+        }
+      ],
+      "nodes": [
+        "set",
+        "do",
+        "let",
+        "if",
+        "call",
+        "get",
+        "op",
+        "lit",
+        "ref",
+        "fn",
+        "obj",
+        "element"
+      ],
+      "writes": [
+        "Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:52-73",
+        "Alis.Reactive/PlanModel/Reactions/Steps.cs:133-140",
+        "Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:106-110",
+        "Alis.Reactive/PlanAuthoring/Pipelines/ElementBuilder.cs:31-147",
+        "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Arrays.cs:50-59"
+      ],
+      "executes": [
+        "Alis.Reactive.Assets/runtime/grammar/execute.ts:35-48",
+        "Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93",
+        "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:154-190",
+        "Alis.Reactive.Assets/runtime/values/array-op-engine.ts:107-115"
+      ],
+      "core": [
+        "Q4",
+        "Q5",
+        "Q6",
+        "Q7",
+        "Q12",
+        "Q17"
+      ],
+      "meanings": [],
+      "oracle": "The HTML standard's textContent, innerHTML, classList, hidden, children, getAttribute and hasAttribute, as lib.dom types them in TypeScript 5.9.3, which the element's declaration mirrors (D5.3).",
+      "checker": [
+        "core:Q4",
+        "core:Q5",
+        "core:Q6",
+        "core:Q7",
+        "core:Q12"
+      ],
+      "defects": [
+        {
+          "id": "X7.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X6.56",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.15",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X12.12",
+          "rung": "behavior"
+        },
+        {
+          "id": "M5.X1",
+          "rung": "behavior",
+          "defect": "A note hidden by Hide shows again after Show, and a step on an element the page lacks stops its pipeline, so the step after it does not run (D4.1)."
+        },
+        {
+          "id": "M5.X2",
+          "rung": "behavior",
+          "defect": "A seat that lacks data-supervision is not counted as needing close supervision, since GetAttribute reads null for it, and HasAttribute counts a seat that holds data-wheelchair with no value."
+        },
+        {
+          "id": "M5.X3",
+          "rung": "behavior",
+          "defect": "A text set from a value that reads nothing shows nothing, and the step after it runs (D4.5)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X7.8",
+          "page": "A pump card with its class list and a summary panel.",
+          "gesture": "Click add, remove, toggle twice, then the toggle whose name reads nothing, then load the summary.",
+          "outcome": "The card holds the class after add, loses it after remove, gains and loses it on the two toggles, and keeps its classes when the name reads nothing; the summary shows its markup.",
+          "opposite": "HTML set from a value that reads nothing leaves the panel empty, where the text undefined would show.",
+          "defect": "classList.add(null) adds the class null, and innerHTML set to undefined shows undefined."
+        },
+        {
+          "for": "X6.56",
+          "page": "Lunch seating: two table cards, each with a seat list whose seats carry data-supervision, and a fall risk button.",
+          "gesture": "Open the page, then click the fall risk button of table 4.",
+          "outcome": "Table 4 shows 4 seated and 2 needing close supervision, and its flag count rises by one after the click.",
+          "opposite": "A station whose list holds a paged result stops at the count, and the text the step after it sets keeps its text.",
+          "defect": "An operation that calls filter on an HTMLCollection stops, or a count over a value with no iterator shows 0."
+        },
+        {
+          "for": "X12.12",
+          "page": "A card loaded into a slot, with a button that sets the slot's text.",
+          "gesture": "Load the card, then click the button.",
+          "outcome": "The step stops with one error that names the slot, and the card stays as it was loaded.",
+          "opposite": "Once the card's plan leaves and the slot holds no loaded content, the same button sets the text.",
+          "defect": "A text write over a slot leaves the loaded card's behavior running under content it no longer shows."
+        },
+        {
+          "for": "M5.X1",
+          "page": "A note with Show and Hide buttons, and a button whose step sets text on an element the page lacks before it sets the status.",
+          "gesture": "Click Hide, then Show, then the button with the missing element.",
+          "outcome": "The note hides, then shows; the status keeps its text after the third click.",
+          "opposite": "Show on a note that already shows leaves it showing.",
+          "defect": "A step on a missing element writes nothing and the pipeline runs on, so the status changes."
+        },
+        {
+          "for": "M5.X2",
+          "page": "A table whose seats carry data-supervision on two of three seats and data-wheelchair with no value on one.",
+          "gesture": "Open the page.",
+          "outcome": "Close supervision shows 2 and wheelchair seats shows 1.",
+          "opposite": "A seat whose data-supervision is the empty text is not counted as close.",
+          "defect": "A null attribute read compared as the text null, or a valueless attribute read as absent."
+        },
+        {
+          "for": "M5.X3",
+          "page": "A status line set from a payload field the payload lacks, then a second status set to Saved.",
+          "gesture": "Raise the event without the field.",
+          "outcome": "The first status is empty and the second shows Saved.",
+          "opposite": "Raised with the field, the first status shows its value.",
+          "defect": "Text set to undefined or null shows those words, or the stop of a missing value skips the next step."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "ElementBuilder<TModel>",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.AddClass(string! className) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N2"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.Hide() -> PipelineBuilder<TModel!>!",
+          "verdict": "kept",
+          "as": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.RemoveClass(string! className) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N2"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetHtml(string! html) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetHtml<TPayload>(TPayload source, System.Linq.Expressions.Expression<System.Func<TPayload, object!>!>! path) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Its path is typed object, which erases the value's type and which ALIS009 refuses on the public surface; the field is a typed source of the payload or the response, which Text.Set and Html.Set take.",
+          "carriers": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetHtml<TProp>(TypedSource<TProp>! source) -> ElementBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetText(string! text) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetText<TPayload>(TPayload source, System.Linq.Expressions.Expression<System.Func<TPayload, object!>!>! path) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Its path is typed object, which erases the value's type and which ALIS009 refuses on the public surface; the field is a typed source of the payload or the response, which Text.Set and Html.Set take.",
+          "carriers": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetText<TProp>(TypedSource<TProp>! source) -> ElementBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.SetText<TResponse>(ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object!>!>! path) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Its path is typed object, which erases the value's type and which ALIS009 refuses on the public surface; the field is a typed source of the payload or the response, which Text.Set and Html.Set take.",
+          "carriers": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.Show() -> PipelineBuilder<TModel!>!",
+          "verdict": "kept",
+          "as": [
+            "M5.N1"
+          ]
+        },
+        {
+          "door": "ElementBuilder<TModel>.ToggleClass(string! className) -> PipelineBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N2"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Element(string! elementId) -> ElementBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M5.N5"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.FromDom(string! elementId, string! member) -> ReactiveArray<string!>!",
+          "verdict": "refused",
+          "reason": "A string names the member it reads, which ALIS009 refuses; the element's classes are a declared iterator of text, and any other list a declaration declares with its iterator.",
+          "carriers": [
+            "M5.N2",
+            "N5.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.FromDom<TElement>(string! elementId, string! member) -> ReactiveArray<TElement>!",
+          "verdict": "refused",
+          "reason": "A string names the member it reads, which ALIS009 refuses; the element's children are a declared iterator whose items are typed.",
+          "carriers": [
+            "M5.N3",
+            "N5.7"
+          ]
+        }
+      ]
+    }
+  ]
+}

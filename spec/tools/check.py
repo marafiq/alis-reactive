@@ -59,7 +59,7 @@ HEDGES = [
 ]
 HEDGE = re.compile(r"\b(" + "|".join(re.escape(word).replace(r"\ ", r"\s+") for word in HEDGES) + r")\b", re.IGNORECASE)
 PROSE_KEYS = {
-    "meaning", "reason", "decision", "improvement", "page", "gesture", "outcome", "opposite", "defect",
+    "meaning", "reason", "decision", "improvement", "page", "gesture", "outcome", "opposite", "defect", "oracle",
     "summary", "why", "statement", "description",
 }
 
@@ -676,12 +676,344 @@ def feature_files():
     return sorted(SPEC.glob("*/features.json"))
 
 
-def check_features(what):
-    def run():
-        if not feature_files():
-            return result(False, "not started: no spec/<Module>/features.json")
-        return not_built(what)
-    return run
+FEATURE_ID = re.compile(r"^M(\d+)\.F\d+$")
+MODULE_DOOR = re.compile(r"^- `(M\d+\.N\d+)`", re.MULTILINE)
+MODULE_DEFECT = re.compile(r"^M(\d+)\.X\d+$")
+MODULE_MEANING = re.compile(r"^M(\d+)\.D\d+$")
+CORE_DEFECT = re.compile(r"^X\d+\.\d+$")
+DOOR_ID = re.compile(r"^(?:N\d+\.\d+|M\d+\.N\d+)$")
+VERDICT_KINDS = {"kept", "renamed", "refused"}
+SENTENCE_LINES = {"main": MAIN_SHA, "redesign": BASE_SHA, "proposed": None}
+FEATURE_STATUSES = {"both", "main-only", "redesign-only"}
+MAIN_SIDE = {"main-only", "both", "moved"}
+REDESIGN_SIDE = {"redesign-only", "both", "moved"}
+
+
+def module_names():
+    text = (SPEC / "CLAUDE.md").read_text()
+    section = text[text.index("## Modules"):]
+    names = {}
+    for number, name in re.findall(r"^\| (\d+) \| ([^|]+?) \|", section, re.MULTILINE):
+        names["".join(word[:1].upper() + word[1:] for word in name.split())] = int(number)
+    return names
+
+
+def module_doors():
+    return {door for path in SPEC.glob("*/module.md") for door in MODULE_DOOR.findall(path.read_text())}
+
+
+def core_defect_rungs():
+    rungs = {}
+    for lines in (design_sections() or {}).values():
+        for line in bullets(section_parts(lines).get("Defects", "")):
+            match = DEFECT.match(line)
+            if match:
+                rungs[match.group(1)] = match.group(2)
+    return rungs
+
+
+def is_prose(value):
+    return isinstance(value, str) and value.strip() != ""
+
+
+def cites_resolve(cites, sha=None):
+    found = []
+    for cite in cites if isinstance(cites, list) else []:
+        match = CITE.fullmatch(cite) if isinstance(cite, str) else None
+        if not match:
+            return False
+        path, first, last = match.groups()
+        needed = max(int(first), int(last or first))
+        sources = [sha] if sha else [BASE_SHA, MAIN_SHA]
+        found.append(any(line_count(each, path) >= needed for each in sources))
+    return bool(found) and all(found)
+
+
+def feature_model():
+    names = module_names()
+    rows = [row for row in table("doors.tsv") if row["scope"] == "spec"]
+    model = {"problems": [], "features": [], "rows": rows, "owners": [[] for _ in rows]}
+    seen = set()
+    for path in feature_files():
+        where = str(path.relative_to(REPO))
+        if path.parent.name not in names:
+            model["problems"].append(f"{where}: {path.parent.name} is no module of spec/CLAUDE.md")
+            continue
+        data = json.loads(path.read_text())
+        if data.get("module") != path.parent.name:
+            model["problems"].append(f"{where}: module is not {path.parent.name}")
+        for feature in data.get("features", []):
+            identifier = feature.get("id", "")
+            match = FEATURE_ID.match(identifier)
+            if not match or int(match.group(1)) != names[path.parent.name] or identifier in seen:
+                model["problems"].append(f"{where}: feature id {identifier!r} is not a new M{names[path.parent.name]}.F<n>")
+            seen.add(identifier)
+            model["features"].append(feature)
+    keys = {row["package"] + ":" + row["declaring_type"] for row in rows}
+    doors = {row["package"] + ":" + row["door"] for row in rows}
+    by_type = {}
+    by_claim = {}
+    for feature in model["features"]:
+        for key in feature.get("types", []):
+            if key not in keys:
+                model["problems"].append(f"{feature['id']}: type {key} has no spec row in doors.tsv")
+            by_type.setdefault(key, []).append(feature["id"])
+        for door in feature.get("claims", []):
+            if door not in doors:
+                model["problems"].append(f"{feature['id']}: claim {door} is no spec door in doors.tsv")
+            by_claim.setdefault(door, []).append(feature["id"])
+    for index, row in enumerate(rows):
+        claimed = by_claim.get(row["package"] + ":" + row["door"], [])
+        typed = by_type.get(row["package"] + ":" + row["declaring_type"], [])
+        if set(claimed) & set(typed):
+            model["problems"].append(f"{row['door']}: claimed by the feature that maps its type")
+        model["owners"][index] = claimed or typed
+    return model
+
+
+def owned_rows(model, feature_id):
+    return [row for row, owners in zip(model["rows"], model["owners"]) if owners == [feature_id]]
+
+
+def mapping_counts(model):
+    unmapped = sum(1 for owners in model["owners"] if not owners)
+    doubled = sum(1 for owners in model["owners"] if len(owners) > 1)
+    return {"features": len(model["features"]), "rows": len(model["rows"]), "mapped": len(model["rows"]) - unmapped - doubled, "unmapped": unmapped, "doubled": doubled}
+
+
+def feature_result(problems, counts, complete, done):
+    if problems:
+        return result(False, "; ".join(problems[:8]), **counts)
+    if not complete:
+        return result(False, f"every feature row valid; {counts['unmapped']} of {counts['rows']} spec doors in no feature", **counts)
+    return result(True, done, **counts)
+
+
+def check_doors_mapped():
+    if not feature_files():
+        return result(False, "not started: no spec/<Module>/features.json")
+    model = feature_model()
+    counts = mapping_counts(model)
+    problems = list(model["problems"])
+    if counts["doubled"]:
+        problems.append(f"{counts['doubled']} spec doors in two features")
+    return feature_result(problems, counts, counts["unmapped"] == 0, "every spec door in exactly one feature")
+
+
+def door_target_problems(feature, verdict, field, doors):
+    targets = verdict.get(field)
+    if not isinstance(targets, list) or not targets:
+        return [f"{feature['id']}: {verdict.get('door')} {verdict.get('verdict')} names no {field}"]
+    return [f"{feature['id']}: {verdict.get('door')} {field} {target} is no core or module door" for target in targets if not (DOOR_ID.match(target) and target in doors)]
+
+
+def verdict_problems(model, doors):
+    problems = []
+    for feature in model["features"]:
+        main_only = {row["door"] for row in owned_rows(model, feature["id"]) if row["status"] == "main-only"}
+        given = {}
+        for verdict in feature.get("verdicts", []):
+            door = verdict.get("door")
+            if door in given:
+                problems.append(f"{feature['id']}: two verdicts for {door}")
+            given[door] = verdict
+            if door not in main_only:
+                problems.append(f"{feature['id']}: verdict for {door}, no main-only door of this feature")
+            kind = verdict.get("verdict")
+            if kind not in VERDICT_KINDS:
+                problems.append(f"{feature['id']}: {door} verdict {kind!r} is not kept, renamed or refused")
+            elif kind == "renamed":
+                problems += door_target_problems(feature, verdict, "to", doors)
+            elif kind == "refused":
+                if not is_prose(verdict.get("reason")):
+                    problems.append(f"{feature['id']}: {door} refused with no reason")
+                problems += door_target_problems(feature, verdict, "carriers", doors)
+            elif "as" in verdict:
+                problems += door_target_problems(feature, {**verdict, "to": verdict["as"]}, "to", doors)
+        problems += [f"{feature['id']}: no verdict for main-only {door}" for door in sorted(main_only - set(given))]
+    return problems
+
+
+def check_verdicts():
+    if not feature_files():
+        return result(False, "not started: no spec/<Module>/features.json")
+    model = feature_model()
+    doors = all_new_doors(design_sections() or {}) | module_doors()
+    counts = mapping_counts(model)
+    main_only = [owners for row, owners in zip(model["rows"], model["owners"]) if row["status"] == "main-only"]
+    counts["main_only"] = len(main_only)
+    counts["main_only_in_features"] = sum(1 for owners in main_only if len(owners) == 1)
+    problems = model["problems"] + verdict_problems(model, doors)
+    return feature_result(problems, counts, counts["unmapped"] == 0, "every main-only door has a verdict, and every refusal names its carriers")
+
+
+def checker_problems(feature):
+    problems = []
+    checkers = feature.get("checker")
+    if not isinstance(checkers, list) or not checkers:
+        return [f"{feature['id']}: no checker"]
+    for checker in checkers:
+        core = re.fullmatch(r"core:(Q\d+)", checker)
+        if core:
+            if core.group(1) not in feature.get("core", []):
+                problems.append(f"{feature['id']}: checker {checker} names no core question the feature rests on")
+            continue
+        tla = re.fullmatch(r"(\w+)\.tla:(\w+)", checker)
+        defined, listed = tla_invariants(tla.group(1)) if tla else (None, set())
+        if not tla or defined is None or tla.group(2) not in defined or tla.group(2) not in listed:
+            problems.append(f"{feature['id']}: checker {checker} is no core:Qn and no checked TLC invariant")
+    return problems
+
+
+def sentence_problems(feature, doors):
+    problems = []
+    sentences = feature.get("sentences")
+    if not isinstance(sentences, list) or not sentences:
+        return [f"{feature['id']}: no sentence"]
+    for sentence in sentences:
+        line = sentence.get("line")
+        if line not in SENTENCE_LINES or not is_prose(sentence.get("text")):
+            problems.append(f"{feature['id']}: sentence {sentence.get('text')!r} has no line of main, redesign or proposed")
+        elif line == "proposed":
+            named = sentence.get("doors")
+            if not isinstance(named, list) or not named or any(door not in doors for door in named):
+                problems.append(f"{feature['id']}: proposed sentence {sentence['text']!r} names a door no core or module door")
+        elif not cites_resolve([sentence.get("cite")], SENTENCE_LINES[line]):
+            problems.append(f"{feature['id']}: {line} sentence {sentence['text']!r} cites no line at {line}'s SHA")
+    return problems
+
+
+def status_of(rows):
+    main = any(row["status"] in MAIN_SIDE for row in rows)
+    redesign = any(row["status"] in REDESIGN_SIDE for row in rows)
+    return "both" if main and redesign else "main-only" if main else "redesign-only" if redesign else None
+
+
+def core_problems(model, doors):
+    problems = []
+    sections = design_sections() or {}
+    kinds = spec_node_set()
+    for feature in model["features"]:
+        name = feature["id"]
+        if not is_prose(feature.get("summary")) or not is_prose(feature.get("oracle")):
+            problems.append(f"{name}: no summary or no oracle")
+        status = feature.get("status")
+        if status not in FEATURE_STATUSES or status != status_of(owned_rows(model, name)):
+            problems.append(f"{name}: status {status!r}, its doors say {status_of(owned_rows(model, name))!r}")
+        core = feature.get("core")
+        if not isinstance(core, list) or not core or any(question not in sections for question in core):
+            problems.append(f"{name}: core {core!r} is no list of answered questions")
+        nodes = feature.get("nodes")
+        if not isinstance(nodes, list) or not nodes or set(nodes) - kinds:
+            problems.append(f"{name}: nodes outside the schema: {sorted(set(nodes or []) - kinds)}")
+        for field in ("writes", "executes"):
+            if not cites_resolve(feature.get(field)):
+                problems.append(f"{name}: {field} cites no file:line at the redesign's or main's SHA")
+        for meaning in feature.get("meanings", []):
+            match = MODULE_MEANING.match(meaning.get("id", ""))
+            if not match or not is_prose(meaning.get("meaning")) or not name.startswith(f"M{match.group(1)}."):
+                problems.append(f"{name}: meaning {meaning.get('id')!r} is no M<module>.D<n> with its meaning")
+        problems += checker_problems(feature)
+        problems += sentence_problems(feature, doors)
+    return problems
+
+
+def check_features_core():
+    if not feature_files():
+        return result(False, "not started: no spec/<Module>/features.json")
+    model = feature_model()
+    doors = all_new_doors(design_sections() or {}) | module_doors()
+    counts = mapping_counts(model)
+    return feature_result(model["problems"] + core_problems(model, doors), counts, counts["unmapped"] == 0, "every feature rests on answered questions, schema nodes and checked invariants")
+
+
+def check_features_lost():
+    if not feature_files():
+        return result(False, "not started: no spec/<Module>/features.json")
+    model = feature_model()
+    lost = []
+    for feature in model["features"]:
+        for verdict in feature.get("verdicts", []):
+            carried = verdict.get("carriers") if verdict.get("verdict") == "refused" else verdict.get("to") if verdict.get("verdict") == "renamed" else [None]
+            if not carried:
+                lost.append(f"{feature['id']}: {verdict.get('door')}")
+    unmapped_types = sorted({row["package"] + ":" + row["declaring_type"] for row, owners in zip(model["rows"], model["owners"]) if not owners})
+    counts = {"lost": len(lost) + len(unmapped_types), "uncarried_doors": len(lost), "types_in_no_feature": len(unmapped_types)}
+    detail = "; ".join(lost[:4] + [f"{len(unmapped_types)} declaring types in no feature"]) if counts["lost"] else "features lost 0"
+    return result(counts["lost"] == 0 and not model["problems"], detail, **counts)
+
+
+def defect_problems(model, core_rungs, doors, analyzer_ids):
+    problems = []
+    seen = set()
+    for feature in model["features"]:
+        name = feature["id"]
+        for defect in feature.get("defects", []):
+            identifier, rung = defect.get("id", ""), defect.get("rung")
+            if rung not in RUNGS:
+                problems.append(f"{name}: {identifier} rung {rung!r}")
+            elif CORE_DEFECT.match(identifier):
+                if core_rungs.get(identifier) != rung:
+                    problems.append(f"{name}: {identifier} is no {rung} defect of spec/Core/DESIGN.md")
+            elif MODULE_DEFECT.match(identifier) and name.startswith(f"M{MODULE_DEFECT.match(identifier).group(1)}.") and identifier not in seen:
+                seen.add(identifier)
+                text = defect.get("defect", "")
+                named = set(re.findall(r"\b(?:N\d+\.\d+|M\d+\.N\d+)\b", text)) & doors
+                if not is_prose(text):
+                    problems.append(f"{name}: {identifier} states no defect")
+                elif rung == "type" and not (cites_resolve([cite.group(0) for cite in CITE.finditer(text)]) or named):
+                    problems.append(f"{name}: {identifier} type cites no resolving file:line and no door")
+                elif rung == "analyzer" and not (set(re.findall(r"\bALIS\d{3}\b", text)) & analyzer_ids or named):
+                    problems.append(f"{name}: {identifier} analyzer names no existing ALIS id and no door")
+                elif rung == "refusal" and not re.search(r"\"[^\"]{8,}\"", text):
+                    problems.append(f"{name}: {identifier} refusal quotes no message")
+            else:
+                problems.append(f"{name}: defect {identifier!r} is no core X<q>.<n> and no new M<module>.X<n>")
+        rungs = {defect.get("id"): defect.get("rung") for defect in feature.get("defects", [])}
+        problems += [f"{name}: promise for {promise.get('for')}, whose rung is {rungs[promise.get('for')]}, which the compiler proves" for promise in feature.get("promises", []) if rungs.get(promise.get("for")) in ("type", "analyzer")]
+    return problems
+
+
+def check_defects():
+    if not feature_files():
+        return result(False, "not started: no spec/<Module>/features.json")
+    model = feature_model()
+    doors = all_new_doors(design_sections() or {}) | module_doors()
+    analyzer_ids = {row["id"] for row in table("analyzers.tsv")}
+    counts = mapping_counts(model)
+    counts["defects"] = sum(len(feature.get("defects", [])) for feature in model["features"])
+    problems = model["problems"] + defect_problems(model, core_defect_rungs(), doors, analyzer_ids)
+    return feature_result(problems, counts, counts["unmapped"] == 0, "every defect on its rung; no promise for a type or analyzer defect")
+
+
+def promise_problems(model, tests):
+    problems = []
+    for feature in model["features"]:
+        name = feature["id"]
+        promised = {}
+        for promise in feature.get("promises", []):
+            promised.setdefault(promise.get("for"), []).append(promise)
+            missing = [field for field in ("page", "gesture", "outcome", "opposite", "defect") if not is_prose(promise.get(field))]
+            if missing:
+                problems.append(f"{name}: promise for {promise.get('for')} lacks {', '.join(missing)}")
+            test = promise.get("existing_test")
+            if test is not None and test not in tests:
+                problems.append(f"{name}: promise for {promise.get('for')} names {test!r}, no test of tests.tsv")
+        for defect in feature.get("defects", []):
+            if defect.get("rung") in ("refusal", "behavior") and defect.get("id") not in promised:
+                problems.append(f"{name}: {defect.get('rung')} defect {defect.get('id')} has no promise")
+        problems += [f"{name}: promise for {key}, no defect of this feature" for key in promised if key not in {defect.get("id") for defect in feature.get("defects", [])}]
+    return problems
+
+
+def check_promises():
+    if not feature_files():
+        return result(False, "not started: no spec/<Module>/features.json")
+    model = feature_model()
+    tests = {f"{row['line']} {row['fixture']}.{row['test']}" for row in table("tests.tsv")}
+    counts = mapping_counts(model)
+    counts["promises"] = sum(len(feature.get("promises", [])) for feature in model["features"])
+    return feature_result(model["problems"] + promise_problems(model, tests), counts, counts["unmapped"] == 0, "every refusal and behavior defect has a promise")
 
 
 def check_fluent():
@@ -766,15 +1098,15 @@ CHECKS = [
     ("history", "every regression SHA tied to a spec line", check_history),
     ("kinds", "grammar, schema and spec node sets equal; one handler per kind", check_kinds),
     ("gate1", "owner gate 1: the core design", check_gate(1)),
-    ("doors_mapped", "every public door mapped to one feature", check_features("the door mapping")),
-    ("verdicts", "every main-only door has a verdict; a refusal names its carriers", check_features("the main-only verdicts")),
-    ("features_core", "every feature mapped to the core", check_features("the core mapping")),
-    ("features_lost", "every module and feature on either line carried: features lost 0", check_features("the lost-feature count")),
+    ("doors_mapped", "every public door mapped to one feature", check_doors_mapped),
+    ("verdicts", "every main-only door has a verdict; a refusal names its carriers", check_verdicts),
+    ("features_core", "every feature mapped to the core", check_features_core),
+    ("features_lost", "every module and feature on either line carried: features lost 0", check_features_lost),
     ("fluent", "every module's sentences consistent", check_fluent),
     ("gate2", "owner gate 2: the fluent API", check_gate(2)),
     ("matrix", "every conformance cell promised for both reference components", check_matrix),
-    ("defects", "every defect on its highest rung; no test for a type or analyzer defect", check_features("the defect rungs")),
-    ("promises", "every refusal and behavior defect has a promise", check_features("the promises")),
+    ("defects", "every defect on its highest rung; no test for a type or analyzer defect", check_defects),
+    ("promises", "every refusal and behavior defect has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
     ("hedges", "zero hedge words", check_hedges),

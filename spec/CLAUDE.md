@@ -504,6 +504,8 @@ Alis.Reactive.Assets.
 | `spec/NOTES.md` | one entry per decision, fact or owner answer, two lines at most, with its evidence | appended by hand |
 | `spec/tools/check.py` | every check the brief's section 1 names, and a brief mode for the compact hook | hand |
 | `spec/STATE.json` | the phase, the step, each check's result and counts, the next action | `spec/tools/check.py` only |
+| `spec/Elements/module.md`, one per module folder | the core questions the module uses; its doors, "M5.N1" for module 5's first, each with what it replaces; the improvements it proposes, each with its evidence | hand |
+| `spec/Elements/features.json`, one per module folder | one entry per feature, "M5.F1" for module 5's first: its declaring types as "package:type"; the doors of another type it claims, as a module claims its entry doors on the pipeline builder; its sentences of main and the redesign, each cited at its SHA, and the proposed ones with their doors; its schema nodes; the C# that writes it and the runtime that executes it, cited at either SHA; its core questions; its own meanings, "M5.D1", only where no core answer gives one; its oracle; its checker, "core:Q4" or a checked TLC invariant; its defects, a core "X7.8" or its own "M5.X1", each with its rung; a promise for each refusal and behavior defect; its status; and a verdict for each main-only door: kept, renamed to doors, or refused with its reason and its carriers, each a core or module door | hand; the six feature checks of `spec/tools/check.py` read it |
 
 ## How a step runs
 
