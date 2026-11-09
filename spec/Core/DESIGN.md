@@ -884,8 +884,9 @@ Terms used throughout:
 - `X6.11` analyzer (D6.12): a date or a time in a comparison: "'{term}' compares dates or times, whose text neither
   orders nor equals as the instant does; compare them on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.12` refusal (D6.12): an ordering against a value the app's JSON writes as text: "'{term}' orders a value the
-  app's JSON writes as text, which does not order as the value does in .NET; compare it with == or !=, or order on
-  the server."
+  app's JSON writes as text, which does not order as the value does in .NET; {compare it with == or !=, or order on
+  the server, for a whole number, a decimal or an enum; order it on the server, for a float or a double, whose text
+  does not equal as the number does either}." A float's or double's cure names no equality, which X6.43 refuses.
 - `X6.13` analyzer (D6.12): an ordering of two members outside numbers and `char`: "'{term}' orders values the browser
   cannot order as .NET does; order numbers or a char, or order on the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.14` analyzer (D6.12): a cast that narrows: "'{term}' casts a number to a narrower one, which changes the value as
