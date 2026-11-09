@@ -244,7 +244,7 @@ A listen release says when release removes the listener the step added (D12.8):
 | `record` | | `fields`: a list of `RecordField` | an object built member by member (D7.4) |
 | `list` | | `items`: expressions | a list built from sources (N7.2) |
 | `op` | `op`: an operator | `args`: expressions | the operator over its arguments; `and`, `or` and `cond` evaluate a term only when it is reached (D4.7); a comparison over an argument that reads nothing reads nothing, null compares as .NET's lifted operators compare it, and `not`, `and` and `or` are SQL's three-valued logic with nothing as its unknown (D8.9) |
-| `signal` | nothing | | the run's abort signal, passed only to a method whose declaration names that argument (D17.11) |
+| `signal` | nothing | | the abort signal of the block it is read in (D11.12), passed only to a method whose declaration names that argument (D17.11) |
 
 `RecordField` carries `name`, a wire name, and `value`, an expression.
 

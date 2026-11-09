@@ -271,6 +271,24 @@
       "source": "spec/probes/fetch-redirect.mjs"
     },
     {
+      "id": "abort-signal-keeps-first-reason",
+      "statement": "An AbortSignal aborted a second time keeps the reason of its first abort.",
+      "host": "node",
+      "oracle": "the DOM Standard's signal abort, step 1 (\"If signal is aborted, then return.\"), as Node 24 implements it",
+      "probe": "abort-signal.mjs",
+      "expect": "abort-signal-keeps-first-reason: replace",
+      "source": "spec/probes/abort-signal.mjs"
+    },
+    {
+      "id": "fetch-aborted-signal-sends-nothing",
+      "statement": "A fetch given an already aborted signal rejects with the signal's reason and the server receives no request.",
+      "host": "node",
+      "oracle": "the Fetch Standard's fetch() method steps, step 4 (\"If requestObject's signal is aborted\"), as Node 24's fetch implements it",
+      "probe": "abort-signal.mjs",
+      "expect": "fetch-aborted-signal-sends-nothing: rejected with replace, received 0; unaborted sent, received 1",
+      "source": "spec/probes/abort-signal.mjs"
+    },
+    {
       "id": "ej2-methods-returning-promise",
       "statement": "120 documented-public EJ2 methods declare a Promise return type; the first found is BarcodeGenerator.exportAsBase64Image: Promise<string>.",
       "host": "node",
