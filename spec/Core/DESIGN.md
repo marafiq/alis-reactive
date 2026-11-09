@@ -2464,9 +2464,10 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     `Finally` layers have run to their first awaited step, as when a `replace` lands on a wait, so what an old
     `Finally` does before an await never undoes what the new run's `WhileLoading` shows. What it does after an await
     runs after that `WhileLoading`, since under `replace` it goes on to its end (X11.22): an element an app shows in
-    `WhileLoading` and hides in `Finally` is hidden by the old run while the new one loads, and the door for that is
-    the busy indicator, which the core counts per target (D10.21, `spec/Core/Composition.tla`). Neither TLA+ spec
-    models the second run, so the order is X11.24's, a Playwright promise of the rewrite's run unit.
+    `WhileLoading` and hides in `Finally` after an await is hidden by the old run while the new one loads, and the
+    door for that is the busy indicator, which the core counts per target (D10.21, `spec/Core/Composition.tla`). A
+    hide before the old `Finally`'s first await runs before the new run starts. Neither TLA+ spec models the second
+    run, so the order is X11.24's, a Playwright promise of the rewrite's run unit.
   - `all` ends when each of its blocks ended (D10.10, `Lanes.tla:JoinAfterEveryBranchTail`).
 - D11.12 The core's state machines are closed, each held in one place, its transitions its TLA+ spec's actions:
   - a run (D11.11, `spec/Core/Run.tla`), under its handler's policy and its owner's dispose (`spec/Core/Lanes.tla`);
