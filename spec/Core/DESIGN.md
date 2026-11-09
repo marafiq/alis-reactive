@@ -1091,10 +1091,10 @@ Terms used throughout:
   both operands of every condition operator, a request member (which Q9 places in the route, the
   query, the body or a header), a header, a dispatch payload member, and a method's, plugin's or hub's argument.
 - D7.2 The sources are closed, each a `TypedSource<T>`: a component's or plugin's member, a method's result
-  (`Method<T>`, `MethodAsync<T>`, a hub's `Invoke<T>`), a page URL member (`p.Url<TQuery>()`), a field of an event
-  payload or a pushed message, a field of a response body, an input's bound value (`p.Bound`), the result of an
-  array operation, a literal, an object built from sources, a list built from sources, and a value chosen from
-  sources by `IfNull` or `Choose` (D6.14).
+  (`Method<T>`, `MethodAsync<T>`, a hub's `Invoke<T>`), a page URL member (`pipeline.PageUrl<TPage>()`, N10.7), a
+  field of an event payload or a pushed message, a field of a response body, a member as its container sends it
+  (N13.1), the result of an array operation, a literal, an object built from sources, a list built from sources, and
+  a value chosen from sources by `IfNull` or `Choose` (D6.14).
 - D7.3 Every position takes a literal of its type and every source whose type is assignable to it:
   `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position. A set takes a source
   as `ITypedSource<out T>`, so a narrower reference type and a text without null reach it as they are. C# converts a
@@ -1585,7 +1585,7 @@ Terms used throughout:
   `Pipeline<TModel>` in every stage, both lambda forms and every file (N9.5), with its reason corrected: `Chained`
   runs a request after another succeeds, `Parallel` sends them at once, and a request in `Finally` runs after every
   outcome.
-- D9.18 `p.Url<TQuery>()` reads the page's own URL. It is a source (Q7), not a part of the request.
+- D9.18 `pipeline.PageUrl<TPage>()` (N10.7) reads the page's own URL. It is a source (Q7), not a part of the request.
 - D9.19 A member whose source holds an object or a list of objects is sent in a query or in form data as its
   fields, each keyed by its C# path (`Address.City`, `Lines[0].Name`, and a list of scalars inside an item as the
   repeated `Lines[0].Beds`) and read from the source by its JSON name (D2.6), as the binder reads them

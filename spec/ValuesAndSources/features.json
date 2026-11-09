@@ -1,0 +1,369 @@
+{
+  "module": "ValuesAndSources",
+  "features": [
+    {
+      "id": "M2.F1",
+      "summary": "A source: the one source type every value position takes, and each kind of source a declared member is: a component's or a plugin's property, a method's result, a payload's or a body's field.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:TypedSource<TProp>",
+        "Alis.Reactive:TypedComponentSource<TProp>",
+        "Alis.Reactive:TypedPluginSource<TProp>",
+        "Alis.Reactive:TypedPluginPropertySource<TProp>",
+        "Alis.Reactive:PayloadTypedSource<TPayload, TProp>"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": ".Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value())",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/DispatchSource/Index.cshtml:20"
+        },
+        {
+          "line": "redesign",
+          "text": ".Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/DispatchSource/Index.cshtml:19"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"resident-name\").Text.Set(pipeline.Input(m => m.Name).Component<NativeTextBox>().Value);",
+          "doors": [
+            "N14.4",
+            "M5.N5",
+            "M5.N1",
+            "M2.N1"
+          ]
+        }
+      ],
+      "nodes": [
+        "get",
+        "lit",
+        "obj",
+        "element",
+        "plugin",
+        "as",
+        "data",
+        "record",
+        "list",
+        "ref"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/TypedSource.cs:9-12"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/JsMembers.cs:17-73"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/TypedSource.cs:9-17"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/TypedComponentSource.cs:6-42"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/TypedPluginSource.cs:11-47"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/PayloadTypedSource.cs:11-34"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:25-39"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/values/evaluate.ts:24-64"
+        }
+      ],
+      "core": [
+        "Q2",
+        "Q3",
+        "Q7"
+      ],
+      "meanings": [],
+      "oracle": "The spec itself, where the framework is the authority: D7.1 and D7.2's closed positions and sources, D3.13's conversion and gate 1's P8 forms; and ECMAScript's Number type, which holds no whole number past 9007199254740991 exactly.",
+      "checker": [
+        "core:Q2",
+        "core:Q7",
+        "Absence.tla:MissingValueWritesNull",
+        "Schema.tla:ConversionsConvert"
+      ],
+      "defects": [
+        {
+          "id": "X2.1",
+          "rung": "type"
+        },
+        {
+          "id": "X3.1",
+          "rung": "type"
+        },
+        {
+          "id": "X7.1",
+          "rung": "type"
+        },
+        {
+          "id": "X7.3",
+          "rung": "type"
+        },
+        {
+          "id": "X7.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X7.10",
+          "rung": "refusal"
+        },
+        {
+          "id": "X7.13",
+          "rung": "refusal"
+        },
+        {
+          "id": "X7.14",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X7.5",
+          "page": "A resident card whose note is set from the note field of a monitor's alarm, and a monitor whose alarm button raises the alarm with or without its note.",
+          "gesture": "Click the alarm button that raises the alarm without its note.",
+          "outcome": "The card shows its empty note state.",
+          "opposite": "Raised with the note Fall at 3am, the card shows Fall at 3am.",
+          "defect": "The missing field stops the pipeline, so the card keeps its earlier note, or reaches the card as the text undefined."
+        },
+        {
+          "for": "X7.10",
+          "page": "A pump page whose step sets the pump's rate property from a response field its own JSON converter writes as text.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X7.10's message, naming the field and its own JSON converter.",
+          "opposite": "The same field with no converter of its own renders, and the pump shows the rate the response holds.",
+          "defect": "The converter's text reaches the live member, so the pump holds the text in place of its number."
+        },
+        {
+          "for": "X7.13",
+          "page": "A dose page whose step sets a pump's live number from the literal 9007199254740993.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X7.13's message, naming the pump's member and the value.",
+          "opposite": "The literal 9007199254740991 renders, and the pump shows 9007199254740991.",
+          "defect": "JavaScript reads the literal as 9007199254740992, so the page renders and the pump shows another dose."
+        },
+        {
+          "for": "X7.14",
+          "page": "An app whose JSON options write numbers as text; a supply search whose found supply's vial count is 5, and a stock counter that holds 1 and adds what its method is passed.",
+          "gesture": "Search for the supply, then click add.",
+          "outcome": "The counter shows 6.",
+          "opposite": "A found supply whose vial count is 0 leaves the counter at 1.",
+          "defect": "The text 5 reaches the method, so the counter shows 15."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "TypedSource<TProp>.TypedSource() -> void",
+          "verdict": "refused",
+          "reason": "Its constructor is on the public surface although no subclass outside the assembly compiles, since the read a subclass overrides is internal; the sources are D7.2's closed set, each made by its own door.",
+          "carriers": [
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "TypedComponentSource<TProp>",
+          "verdict": "renamed",
+          "to": [
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "TypedPluginSource<TProp>",
+          "verdict": "renamed",
+          "to": [
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "TypedPluginPropertySource<TProp>",
+          "verdict": "renamed",
+          "to": [
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PayloadTypedSource<TPayload, TProp>",
+          "verdict": "renamed",
+          "to": [
+            "M2.N1",
+            "N5.6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2.F2",
+      "summary": "The page's own URL as a source: a member of the page's class read from the path's placeholder or the query, as the action that rendered the page bound it.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:TypedUrlSource<TProp>",
+        "Alis.Reactive:UrlQuery<TQuery>"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.FromUrl(string! paramName) -> TypedUrlSource<string!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.FromUrl<T>(string! paramName) -> TypedUrlSource<T>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Url<TQuery>() -> UrlQuery<TQuery!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "p.When(p.FromUrl(\"tab\")).Eq(\"medications\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:31"
+        },
+        {
+          "line": "redesign",
+          "text": "var link = p.Url<MoveInLink>();",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/IntakeSheet/Index.cshtml:63"
+        },
+        {
+          "line": "redesign",
+          "text": ".Set(x => x.Wing, link.Get(q => q.Wing))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/IntakeSheet/Index.cshtml:85"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"open-tab\").Text.Set(pipeline.PageUrl<ChartPage>().Read(q => q.Tab));",
+          "doors": [
+            "N10.7",
+            "M5.N5",
+            "M5.N1"
+          ]
+        }
+      ],
+      "nodes": [
+        "get",
+        "obj",
+        "plugin",
+        "as"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:234"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/UrlQuery.cs:17-31"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Values/ValueExpression.cs:283-299"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:147-159"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/TypedUrlSource.cs:11-24"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:22-49"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/values/evaluate.ts:178-183"
+        }
+      ],
+      "core": [
+        "Q7",
+        "Q10"
+      ],
+      "meanings": [],
+      "oracle": "The two hosts' model binders, which bind a query key ignoring case (probe:core-query-key-case, probe:mvc5-query-key-case), as N10.7 states the page's URL reads; and the WHATWG URL Standard's URLSearchParams, whose get matches a key by case (probe:js-query-get-case).",
+      "checker": [
+        "core:Q7",
+        "core:Q10"
+      ],
+      "defects": [
+        {
+          "id": "M2.X1",
+          "rung": "behavior",
+          "defect": "A page opened at ?TAB=medications reads nothing for its Tab member, where both hosts bind the key ignoring case (N10.7)."
+        },
+        {
+          "id": "M2.X2",
+          "rung": "behavior",
+          "defect": "A query member whose key is absent or whose text does not convert to its type reads something other than its start: ?beds=abc for an int Beds initialized to 2 reads nothing or NaN, where the action bound 2 (N10.7)."
+        },
+        {
+          "id": "M2.X3",
+          "rung": "behavior",
+          "defect": "A placeholder member is read from the query in place of the path, so a page whose template is /Wards/{Ward}, opened at /Wards/East?ward=West, reads West or nothing for Ward (N10.7)."
+        },
+        {
+          "id": "M2.X4",
+          "rung": "type",
+          "defect": "A read of a member the page's class does not declare, or of the URL by a string that names a key, does not compile: Read takes a member lambda over the page's class, N10.7."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M2.X1",
+          "page": "A chart page typed by ChartPage, whose Tab member starts as vitals, and whose on-load sets the open tab's text from the page's URL's Tab.",
+          "gesture": "Open the page at ?TAB=medications.",
+          "outcome": "The open tab reads medications.",
+          "opposite": "Opened with no tab key, the open tab reads vitals.",
+          "defect": "The key is matched by case, so the open tab reads vitals or nothing."
+        },
+        {
+          "for": "M2.X2",
+          "page": "A ward page typed by WardPage, whose int Beds member starts as 2, and whose on-load sets the beds text from the page's URL's Beds.",
+          "gesture": "Open the page at ?beds=abc, then at ?beds=7.",
+          "outcome": "The beds text reads 2 after the first, and 7 after the second.",
+          "opposite": "Opened with no beds key, the beds text reads 2.",
+          "defect": "The unconvertible text reads nothing or NaN, so the beds text is empty or shows NaN after the first."
+        },
+        {
+          "for": "M2.X3",
+          "page": "A ward page whose URL template is /Wards/{Ward}, and whose on-load sets the ward text from the page's URL, read with that template, at its Ward.",
+          "gesture": "Open /Wards/East?ward=West.",
+          "outcome": "The ward text reads East.",
+          "opposite": "Read without the template, the ward text reads West, from the query.",
+          "defect": "The placeholder is read from the query, so the ward text reads West, or from nowhere, so it is empty."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "TypedUrlSource<TProp>",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.FromUrl(string! paramName) -> TypedUrlSource<string!>!",
+          "verdict": "refused",
+          "reason": "A string names the query key, which ALIS009 refuses, and the browser's URLSearchParams.get matches it by case where both hosts bind it ignoring case; the page's URL is typed by the page's class and read by a member lambda.",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.FromUrl<T>(string! paramName) -> TypedUrlSource<T>!",
+          "verdict": "refused",
+          "reason": "A string names the query key, which ALIS009 refuses, and the browser's URLSearchParams.get matches it by case where both hosts bind it ignoring case; the page's URL is typed by the page's class and read by a member lambda.",
+          "carriers": [
+            "N10.7"
+          ]
+        }
+      ]
+    }
+  ]
+}
