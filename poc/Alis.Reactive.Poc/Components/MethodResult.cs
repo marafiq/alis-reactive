@@ -16,7 +16,7 @@ public sealed class MethodResult<TResult> : TypedSource<TResult>
         Build = build;
     }
 
-    internal override Expression Expression => Build.InScope(_read);
+    internal override Expression Expression => _read;
 
     internal override PlanBuild Build { get; }
 

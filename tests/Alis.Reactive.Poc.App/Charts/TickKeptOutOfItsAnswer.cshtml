@@ -1,0 +1,25 @@
+@using Alis.Reactive.Poc.App.Charts
+@model ChartsPage
+@{
+    ViewData["Title"] = "Dose chart";
+    var plan = Html.ReactivePlan<ChartsPage>();
+}
+<h1>Dose chart</h1>
+
+@plan.DoseChart("chart")
+
+<p>Labelled: <span id="labelled"></span></p>
+
+@(plan.Button("by-day", "Label the ticks by day")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        ChartTick? labelled = null;
+        pipeline.Component<DoseChart>("chart").TickLabel.Set(tick =>
+        {
+            labelled = tick;
+            return tick.Label;
+        });
+        pipeline.Element("labelled").Text.Set(labelled!.Label);
+    }))
+
+@Html.RenderPlan(plan)

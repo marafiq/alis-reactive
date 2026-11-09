@@ -37,8 +37,6 @@ internal sealed class ArgumentsAt : Arguments
 
 internal sealed class Binding
 {
-    private readonly Expression _target;
-
     internal Binding(Expression target, PlanBuild build, ReadPresence members)
         : this(target, build, members, NoArguments.Instance)
     {
@@ -46,13 +44,13 @@ internal sealed class Binding
 
     internal Binding(Expression target, PlanBuild build, ReadPresence members, Arguments arguments)
     {
-        _target = target;
+        Target = target;
         Build = build;
         Members = members;
         Arguments = arguments;
     }
 
-    internal Expression Target => Build.InScope(_target);
+    internal Expression Target { get; }
 
     internal PlanBuild Build { get; }
 

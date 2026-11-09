@@ -81,6 +81,15 @@ public sealed class WhenADoseChartAsksForAnAnswer : AppPageTest
     }
 
     [Test]
+    public async Task a_ticks_arguments_kept_out_of_the_answer_are_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Charts/TickKeptOutOfItsAnswer");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: A callback's arguments are read outside the answer that receives them. Read them in the answer, such as tick => tick.Label.");
+    }
+
+    [Test]
     public async Task the_step_after_an_answer_the_chart_asked_for_runs()
     {
         await Open("/Charts/UnlabelledTick");

@@ -1,0 +1,17 @@
+@using Alis.Reactive.Poc.App.Cards
+@model CardsWard
+@{
+    var plan = Html.ReactivePlan<CardsWard>();
+}
+<p>Answered by: <span id="answered-by">nobody</span></p>
+
+@(plan.Button("listen-12", "Listen to room 12's call")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        PagerCall? call = null;
+        pipeline.When(pipeline.Plugin<WardPager>().LastHandled.Eq("12"))
+            .Then(handled => call = handled.Plugin<WardPager>().CallFor("12"));
+        pipeline.Listen(call!, c => c.Answered, (answered, heard) => heard.Element("answered-by").Text.Set(answered.By));
+    }))
+
+@Html.RenderPlan(plan)

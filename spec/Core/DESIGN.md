@@ -1095,10 +1095,13 @@ Terms used throughout:
   route or a `Chained` block reads every reply around it, so a chained request sends the first reply's body and the
   first request's members (`spec/api/HttpSurface/EveryStage.cs`). A read outside its block does not compile where it
   names the block's parameter (CS0103, `ReplyOutsideItsRoute` in `spec/api/refused.sh`); a bound value carried out
-  through a variable declared outside its block is the block analyzer's (N18.9); one carried out any other way (a
-  field, a collection, a helper that stores it) is refused where the view renders, naming the value and the block
-  that binds it, since only the render sees where it went. That one rule covers today's two refusals of this kind, an array item and a response
-  read outside their blocks. The browser runs each block in a child scope, so a value bound inside a branch
+  through a variable declared outside its block is the block analyzer's (N18.9), and the render refuses it too until
+  N18.9 is built; one carried out any other way (a field, a collection, a helper that stores it) is refused where the
+  view renders, naming the value and the block that binds it, since only the render sees where it went. That one rule
+  covers today's two refusals of this kind, an array item and a response read outside their blocks, and every value
+  a block binds by a name of its own: a reply in its routes, a method's result in its block, a list's item in its
+  lambda, a Listen's payload in its Listen and a callback's arguments in its answer, at whatever depth a step's value
+  reads it. The browser runs each block in a child scope, so a value bound inside a branch
   never reaches the steps after it.
 - D8.9 One meaning of comparison and logic, which every condition reads (D8.1). A comparison (`eq`, `neq`, `lt`,
   `lte`, `gt`, `gte`) whose operand reads nothing reads nothing, `neq` included: a value past a holder that holds

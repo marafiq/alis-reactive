@@ -59,9 +59,14 @@ export class WardPager {
     this.#listeners.delete(listener);
   }
 
-  page(room: string): void {
+  callFor(room: string): PagerCall {
     const call = this.#calls.get(room) ?? new PagerCall((by) => (this.lastLogged = by));
     this.#calls.set(room, call);
+    return call;
+  }
+
+  page(room: string): void {
+    const call = this.callFor(room);
     const paged: Paged = { room, handled: false, call, relief: null };
     for (const listener of [...this.#listeners]) listener(paged);
     if (paged.handled) this.lastHandled = room;

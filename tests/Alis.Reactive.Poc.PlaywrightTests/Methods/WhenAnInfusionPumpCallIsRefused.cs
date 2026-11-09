@@ -36,6 +36,31 @@ public sealed class WhenAnInfusionPumpCallIsRefused : AppPageTest
         await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(ReadOutsideItsBlock);
     }
 
+    [Test]
+    public async Task a_result_read_kept_out_of_its_branch_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Pumps/NoteKeptOutOfItsBranch");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(ReadOutsideItsBlock);
+    }
+
+    [Test]
+    public async Task a_returned_channel_kept_out_of_its_branch_and_paused_after_it_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Pumps/ChannelKeptOutOfItsBranch");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(ReadOutsideItsBlock);
+    }
+
+    [Test]
+    public async Task a_channel_kept_out_of_its_lambda_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Pumps/ChannelKeptOutOfItsLambda");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: A list's item is read outside the lambda that receives it. Read the item in its lambda, such as beds.Any(bed => bed.Free).");
+    }
+
     private const string ReadOutsideItsBlock =
         "InvalidOperationException: A method's result is read outside the block that called the method. Call the method in the block that reads its result, or in a block around it.";
 }

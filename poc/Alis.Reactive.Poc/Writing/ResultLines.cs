@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.Plan;
 
 namespace Alis.Reactive.Writing;
@@ -137,55 +138,61 @@ internal static class References
             case RequestStatement request:
                 Of(request.Send, whenReached: false, read);
                 return;
+            case LetStatement result:
+                Of(result.Expr, whenReached: false, read);
+                return;
             default:
                 throw new InvalidOperationException("A result's line is decided by the statements that read it, and this statement reads none.");
         }
     }
 
     internal static void Of(Expression expression, bool whenReached, Action<string, bool> read)
+        => Of(expression, whenReached, [], read);
+
+    private static void Of(Expression expression, bool whenReached, IReadOnlyList<string> bound, Action<string, bool> read)
     {
         switch (expression)
         {
             case RefExpression reference:
-                read(reference.Name, whenReached);
+                if (!bound.Contains(reference.Name)) read(reference.Name, whenReached);
                 return;
             case GetExpression get:
-                Of(get.Target, whenReached, read);
+                Of(get.Target, whenReached, bound, read);
                 return;
             case DataExpression data:
-                Of(data.Target, whenReached, read);
+                Of(data.Target, whenReached, bound, read);
                 return;
             case CallExpression call:
-                Of(call.Target, whenReached, read);
+                Of(call.Target, whenReached, bound, read);
                 foreach (var argument in call.Args)
                 {
-                    Of(argument, whenReached, read);
+                    Of(argument, whenReached, bound, read);
                 }
 
                 return;
             case FnExpression function:
-                Of(function.Body, whenReached: false, read);
+                Of(function.Body, whenReached: false, [.. bound, .. function.Params], read);
                 return;
             case AnswerExpression answer:
-                Of(answer.Body, whenReached: false, read);
+                Of(answer.Body, whenReached: false, [.. bound, answer.Arguments], read);
                 return;
             case OperatorExpression operation:
-                Operands(operation, whenReached, read);
+                Operands(operation, whenReached, bound, read);
                 return;
             case AsExpression conversion:
-                Of(conversion.Expr, whenReached, read);
+                Of(conversion.Expr, whenReached, bound, read);
                 return;
             case RecordExpression record:
                 foreach (var field in record.Fields)
                 {
-                    Of(field.Value, whenReached, read);
+                    Of(field.Value, whenReached, bound, read);
                 }
 
                 return;
             case ListExpression list:
                 foreach (var item in list.Items)
                 {
-                    Of(item, whenReached, read);
+                    Of(item, whenReached, bound, read);
                 }
 
                 return;
@@ -196,13 +203,13 @@ internal static class References
         }
     }
 
-    private static void Operands(OperatorExpression operation, bool whenReached, Action<string, bool> read)
+    private static void Operands(OperatorExpression operation, bool whenReached, IReadOnlyList<string> bound, Action<string, bool> read)
     {
         var laterTermsRunWhenReached = ReferenceEquals(operation.Op, Operator.And) || ReferenceEquals(operation.Op, Operator.Or)
             || ReferenceEquals(operation.Op, Operator.Coalesce) || ReferenceEquals(operation.Op, Operator.Cond);
         for (var position = 0; position < operation.Args.Count; position++)
         {
-            Of(operation.Args[position], whenReached || (laterTermsRunWhenReached && position > 0), read);
+            Of(operation.Args[position], whenReached || (laterTermsRunWhenReached && position > 0), bound, read);
         }
     }
 }

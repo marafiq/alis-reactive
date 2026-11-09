@@ -28,7 +28,10 @@ internal sealed class PlanBuild
     private readonly HashSet<string> _elseIfResults = new(StringComparer.Ordinal);
     private readonly List<string> _openReplies = [];
     private readonly HashSet<string> _replies = new(StringComparer.Ordinal);
-    private int _items;
+    private readonly HashSet<string> _items = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _answerArguments = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, string> _listenedPayloadOf = new(StringComparer.Ordinal);
+    private int _itemCount;
     private int _results;
     private int _requests;
     private int _values;
@@ -81,6 +84,7 @@ internal sealed class PlanBuild
                 "A step is written inside a pipeline, the callback a trigger runs: .Reactive(c => c.Click, p => ...).");
         }
 
+        References.Of(statement, (name, _) => RequireBoundWhereRead(name));
         var block = _open.Peek();
         _resultLines.Written(statement, block);
         block.Add(statement);
@@ -130,7 +134,11 @@ internal sealed class PlanBuild
     internal (string Payload, string Arguments) ListenNames()
     {
         var listen = (++_listens).ToString(CultureInfo.InvariantCulture);
-        return ("listened" + listen, "listenedArguments" + listen);
+        var payload = "listened" + listen;
+        var arguments = "listenedArguments" + listen;
+        _listenedPayloadOf[payload] = payload;
+        _listenedPayloadOf[arguments] = payload;
+        return (payload, arguments);
     }
 
     internal List<Statement> Block(Action body)
@@ -162,9 +170,19 @@ internal sealed class PlanBuild
             $"A live object takes a value as the app's options write its type, and '{form.Read}' is written by {form.Cause}; compare it with == or !=, or pass the value from the server.");
     }
 
-    internal string ItemName() => "item" + (++_items).ToString(CultureInfo.InvariantCulture);
+    internal string ItemName()
+    {
+        var name = "item" + (++_itemCount).ToString(CultureInfo.InvariantCulture);
+        _items.Add(name);
+        return name;
+    }
 
-    internal string AnswerArgumentsName() => ArgumentsName + (++_answers).ToString(CultureInfo.InvariantCulture);
+    internal string AnswerArgumentsName()
+    {
+        var name = ArgumentsName + (++_answers).ToString(CultureInfo.InvariantCulture);
+        _answerArguments.Add(name);
+        return name;
+    }
 
     internal Expression Result(CallExpression call)
     {
@@ -230,19 +248,37 @@ internal sealed class PlanBuild
         return new RefExpression(name);
     }
 
-    internal Expression InScope(Expression read)
+    private void RequireBoundWhereRead(string name)
     {
-        if (read is not RefExpression reference) return read;
-        var readsAReplyOutsideItsRoutes = _replies.Contains(reference.Name) && !_openReplies.Contains(reference.Name);
+        var readsAReplyOutsideItsRoutes = _replies.Contains(name) && !_openReplies.Contains(name);
         if (readsAReplyOutsideItsRoutes)
         {
             throw new InvalidOperationException(
                 "A request's reply is read outside its routes. Read the reply in the route that receives it: pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).");
         }
 
-        var readsAResultOutsideItsBlock = _resultBlocks.TryGetValue(reference.Name, out var block) && !_open.Contains(block);
-        if (!readsAResultOutsideItsBlock) return read;
-        if (_elseIfResults.Contains(reference.Name))
+        var readsAPayloadOutsideItsListen = _listenedPayloadOf.TryGetValue(name, out var payload) && !_payloads.Contains(payload);
+        if (readsAPayloadOutsideItsListen)
+        {
+            throw new InvalidOperationException(
+                "A Listen's payload is read outside the Listen that receives it. Read the payload in the Listen's pipeline: pipeline.Listen(source, s => s.Raised, (raised, pipeline) => ..).");
+        }
+
+        if (_items.Contains(name))
+        {
+            throw new InvalidOperationException(
+                "A list's item is read outside the lambda that receives it. Read the item in its lambda, such as beds.Any(bed => bed.Free).");
+        }
+
+        if (_answerArguments.Contains(name))
+        {
+            throw new InvalidOperationException(
+                "A callback's arguments are read outside the answer that receives them. Read them in the answer, such as tick => tick.Label.");
+        }
+
+        var readsAResultOutsideItsBlock = _resultBlocks.TryGetValue(name, out var block) && !_open.Contains(block);
+        if (!readsAResultOutsideItsBlock) return;
+        if (_elseIfResults.Contains(name))
         {
             throw new InvalidOperationException(
                 "A method's result called in an ElseIf's condition is read after its When, and the call runs only when the ElseIf is reached: call the method before the When to read its result after it.");

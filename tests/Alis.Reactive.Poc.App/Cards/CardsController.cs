@@ -45,6 +45,10 @@ public sealed class CardsController : Controller
 
     public IActionResult ListenOnNothing() => View(new CardsWard());
 
+    public IActionResult AnswerKeptOutOfItsListen() => View(new CardsWard());
+
+    public IActionResult CallKeptOutOfItsBranch() => View(new CardsWard());
+
     public IActionResult TextBeforeItsSlot() => View(new CardsWard());
 
     public IActionResult WardNotes() => PartialView();

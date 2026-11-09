@@ -99,6 +99,14 @@ public sealed class ResidentsController : Controller
 
     public IActionResult ReplyAfterItsRequest() => View(new ResidentLookup());
 
+    public IActionResult BodyKeptOutOfItsRoute() => View(new ResidentLookup());
+
+    public IActionResult HeadersKeptOutOfItsRoute() => View(new ResidentLookup());
+
+    public IActionResult ReasonKeptOutOfItsRoute() => View(new ResidentLookup());
+
+    public IActionResult StatusKeptOutOfTheCatchAll() => View(new ResidentLookup());
+
     private StatusCodeResult Repairing(params string[] notes)
     {
         Response.Headers.Append("X-Register-Note", notes);

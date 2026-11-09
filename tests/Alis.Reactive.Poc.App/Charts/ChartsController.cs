@@ -12,6 +12,8 @@ public sealed class ChartsController : Controller
 
     public IActionResult StepInAnAnswer() => View(new ChartsPage());
 
+    public IActionResult TickKeptOutOfItsAnswer() => View(new ChartsPage());
+
     public IActionResult UnlabelledTick() => View(new ChartsPage());
 }
 

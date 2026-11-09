@@ -20,6 +20,8 @@ public sealed class WardPager : Plugin
     public void Page(Arg<string> room) => Method([room]);
 
     public void Answer(Arg<string> room, Arg<string> by) => Method([room, by]);
+
+    public PagerCall CallFor(Arg<string> room) => ReturnedObject<PagerCall>([room]);
 }
 
 public sealed class PagerPaged : JsObject

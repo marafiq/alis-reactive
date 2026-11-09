@@ -40,6 +40,42 @@ public sealed class WhenARegisterRequestIsRefused : AppPageTest
     }
 
     [Test]
+    public async Task a_body_read_kept_out_of_its_route_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Residents/BodyKeptOutOfItsRoute");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: A request's reply is read outside its routes. Read the reply in the route that receives it: pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).");
+    }
+
+    [Test]
+    public async Task the_headers_kept_out_of_their_route_are_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Residents/HeadersKeptOutOfItsRoute");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: A request's reply is read outside its routes. Read the reply in the route that receives it: pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).");
+    }
+
+    [Test]
+    public async Task a_status_routes_body_read_kept_out_of_it_and_sent_by_a_later_request_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Residents/ReasonKeptOutOfItsRoute");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: A request's reply is read outside its routes. Read the reply in the route that receives it: pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).");
+    }
+
+    [Test]
+    public async Task the_status_kept_out_of_the_catch_all_and_tested_after_it_is_refused_where_the_view_renders()
+    {
+        await Page.GotoAsync(BaseUrl + "/Residents/StatusKeptOutOfTheCatchAll");
+
+        await Expect(Page.Locator(".titleerror")).ToHaveTextAsync(
+            "InvalidOperationException: A request's reply is read outside its routes. Read the reply in the route that receives it: pipeline.Get<TRequest>(url, request => ..).OnSuccess<TBody>((reply, pipeline) => ..).");
+    }
+
+    [Test]
     public async Task a_member_set_twice_is_refused_where_the_view_renders()
     {
         await Page.GotoAsync(BaseUrl + "/Residents/MemberSetTwice");
