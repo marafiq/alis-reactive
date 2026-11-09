@@ -3133,7 +3133,9 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `Ownership.tla:BootContentBelongsToItsSlot`
 
 **Doors.**
-- kept: `Html.ReactivePlan`, `Html.InputField`, `IdGenerator.For`, and MVC's own `Html.EditorFor`.
+- kept: `Html.ReactivePlan`, `Html.InputField` (M7.N2), `IdGenerator.For<TModel, TProp>` (M7.N1), and MVC's own
+  `Html.EditorFor`; the object-typed `IdGenerator.For<TModel>` both lines have leaves, since ALIS009 refuses `object` on
+  the public surface.
 - `N14.1` new: `Html.PartialFor(m => m.Member, view)`, the typed partial for a member, on both hosts.
 - `N14.2` new: the plan as a block of its view, whose end renders it; its form goes to gate 2.
 - `N14.3` new: the request container as a block of its view, which renders the container's element and its summary

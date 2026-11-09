@@ -1,0 +1,696 @@
+{
+  "module": "InputsAndIds",
+  "features": [
+    {
+      "id": "M7.F1",
+      "summary": "An input bound to a member of the view's model: Html.InputField with its label, required marker and hidden form, the bound field a component's render helper builds on, the render that registers the component at the member's id, and the declaration that makes a component an input, its typed value and the event that commits it; under MVC partials, each input binds under its view's prefix.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:InputFieldExtensions",
+        "Alis.Reactive:InputFieldOptions",
+        "Alis.Reactive:InputBoundFieldBase<THelper, TModel, TProp>",
+        "Alis.Reactive:InputBoundField<TModel, TProp>",
+        "Alis.Reactive:IInputComponent",
+        "Alis.Reactive:ComponentInput"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "Html.InputField(plan, m => m.Name, o => o.Required().Label(\"Resident Name\")).NativeTextBox(b => b.Placeholder(\"Full name\"));",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:20-21"
+        },
+        {
+          "line": "main",
+          "text": "string ValueMember { get; }",
+          "cite": "Alis.Reactive/Components/Contracts/IComponent.cs:20"
+        },
+        {
+          "line": "main",
+          "text": "const runtimeValue = runtimeObject.read(binding.valueMember);",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/gather.ts:168"
+        },
+        {
+          "line": "main",
+          "text": "var builder = new NativeCheckBoxBuilder<TModel, bool>(setup.Helper, setup.Expression, setup.RenderTarget);",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxHtmlExtensions.cs:25-28"
+        },
+        {
+          "line": "redesign",
+          "text": "Html.InputField(plan, m => m.Visitor, o => o.Required().Label(\"Visitor\")).Entry();",
+          "cite": "tests/Alis.Reactive.Framework.App/Inputs/Arrival.cshtml:10"
+        },
+        {
+          "line": "redesign",
+          "text": "Html.InputField(plan, m => m.Pass, o => o.Hidden().Label(\"Pass\")).HiddenEntry();",
+          "cite": "tests/Alis.Reactive.Framework.App/Inputs/Arrival.cshtml:14"
+        },
+        {
+          "line": "redesign",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBox.cs:29"
+        },
+        {
+          "line": "redesign",
+          "text": "var builder = new NativeCheckBoxBuilder<TModel, bool>(field.Helper, field.Expression, field.ElementId);",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBox.cs:62"
+        },
+        {
+          "line": "redesign",
+          "text": "return field.Render<global::Alis.Reactive.Native.NativeCheckBox>(builder);",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBox.cs:64"
+        },
+        {
+          "line": "redesign",
+          "text": "nextOfKinView.TemplateInfo.HtmlFieldPrefix = nameof(MoveInContactsModel.NextOfKin);",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Patterns/MoveInContacts/Index.cshtml:18"
+        },
+        {
+          "line": "redesign",
+          "text": "first.TemplateInfo.HtmlFieldPrefix = \"Members[0]\";",
+          "cite": "tests/Alis.Reactive.Framework.App/Inputs/Circle.cshtml:9"
+        },
+        {
+          "line": "redesign",
+          "text": "RefuseAPrefixTheViewTookAfterThePlanStarted(html.ViewData.TemplateInfo.HtmlFieldPrefix, plan.Context, bindingName);",
+          "cite": "Alis.Reactive/Razor/InputFieldExtensions.cs:87"
+        },
+        {
+          "line": "proposed",
+          "text": "Html.InputField(plan, m => m.Visitor, field => field.Required().Label(\"Visitor\")).NativeTextBox();",
+          "doors": [
+            "M7.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Html.InputField(plan, m => m.Pass, field => field.Hidden()).NativeHiddenField();",
+          "doors": [
+            "M7.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Html.PartialFor(m => m.NextOfKin, \"_ContactCard\")",
+          "doors": [
+            "N14.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Html.PartialFor(m => m.Members[1], \"_MemberCard\")",
+          "doors": [
+            "N14.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);",
+          "doors": [
+            "M7.N3"
+          ]
+        }
+      ],
+      "nodes": [
+        "model",
+        "get",
+        "as",
+        "op",
+        "lit",
+        "nothing",
+        "start"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/InputFieldExtensions.cs:36-111"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/InputField/InputBoundFieldBase.cs:20-73"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/InputBoundField.cs:24-105"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/ComponentInput.cs:25-55"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/InputFieldExtensions.cs:31-96"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/InputField/InputBoundFieldBase.cs:18-81"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/model.ts:42-60"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/model.ts:203-216"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/gather.ts:160-172"
+        }
+      ],
+      "core": [
+        "Q2",
+        "Q3",
+        "Q14",
+        "Q16",
+        "Q17"
+      ],
+      "meanings": [
+        {
+          "id": "M7.D1",
+          "meaning": "An input field rendered Hidden() renders its component alone: no label, no required marker and no message element. Its id and binding name are any input's (D14.3), a request sends it and a check reads it as any input, and since it has no message element its failure, the browser's verdict and the server's alike, shows in the request's summary place only (D16.13), never beside the field and never nowhere."
+        }
+      ],
+      "oracle": "MVC's own helpers on both hosts: NameFor under the view's TemplateInfo prefix, GetFullHtmlFieldName and the binder that reads the posted names back (probe:core-template-prefix-name, probe:mvc5-template-full-id), the ViewData copy that shares TemplateInfo on net48 and not on net10 (probe:mvc5-viewdata-copy-shares-template-info, probe:core-viewdata-copy-template-info); and the endpoint's validator, whose verdict a summary or a message element shows.",
+      "checker": [
+        "core:Q14",
+        "core:Q16",
+        "Ownership.tla:EveryLoadedFieldRegistered",
+        "Ownership.tla:FailureReachesSummary",
+        "Ownership.tla:InlineOnlyAtTheSentInput",
+        "Validation.tla:UnsentInputsUnread"
+      ],
+      "defects": [
+        {
+          "id": "X14.1",
+          "rung": "type"
+        },
+        {
+          "id": "X14.2",
+          "rung": "type"
+        },
+        {
+          "id": "X14.3",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X14.4",
+          "rung": "refusal"
+        },
+        {
+          "id": "X14.6",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X14.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X14.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X14.11",
+          "rung": "behavior"
+        },
+        {
+          "id": "X14.14",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X14.15",
+          "rung": "refusal"
+        },
+        {
+          "id": "M7.X1",
+          "rung": "behavior",
+          "defect": "A failure of an input rendered Hidden() shows nowhere, since it has no message element, or the field renders its label: its failure shows in the request's summary place only, and no label, marker or message element renders (M7.D1, D16.13)."
+        },
+        {
+          "id": "M7.X2",
+          "rung": "type",
+          "defect": "A field renders a component that is no input, which the plan can neither read nor check: Render<TComponent> requires TComponent : IInputComponent, new() (Alis.Reactive/Razor/InputBoundField.cs:59-60), where main threw where the view renders, \"rendered without registering an input component\" (Alis.Reactive/InputField/InputBoundFieldBase.cs:71-75), and M7.N3 keeps it a type."
+        },
+        {
+          "id": "M7.X3",
+          "rung": "behavior",
+          "defect": "An input is rechecked only on the element's change or blur, so a component that commits a value by its own event, which raises no DOM event, keeps a stale message: the live check runs on the event M7.N3 declares (D16.15)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X14.4",
+          "page": "A move-in view whose plan starts, then whose code sets ViewData.TemplateInfo.HtmlFieldPrefix to NextOfKin, then renders Html.InputField(plan, m => m.Name).",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"The field prefix of\" the view's path \"changed from none to 'NextOfKin' after its plan started, so input 'NextOfKin.Name' would post under a name its plan does not send or check.\"",
+          "opposite": "With the prefix set before the plan starts, the page renders, and its save posts NextOfKin.Name, which the endpoint binds and shows.",
+          "defect": "The input renders under NextOfKin.Name while its plan sends and checks Name, so the page renders, the save posts a name the plan's rule never checks, and the endpoint binds no name.",
+          "existing_test": "redesign WhenAViewsPrefixChangesAfterItsPlanStarts.an_input_under_a_prefix_set_after_its_plan_started_is_refused_naming_editorfor"
+        },
+        {
+          "for": "X14.9",
+          "page": "A move-in page that renders one contact card partial with Html.PartialFor twice, for NextOfKin and for Alternate; each card renders inputs of Name and Phone; Save posts the form and shows what the endpoint bound.",
+          "gesture": "Type Ada and 0101 in the next of kin card and Bo and 0202 in the alternate card, then click Save.",
+          "outcome": "The page shows next of kin Ada 0101 and alternate Bo 0202.",
+          "opposite": "With the alternate card left empty, the page shows next of kin Ada 0101 and alternate none.",
+          "defect": "Both cards render under one prefix or one id, so the endpoint binds one card's values for both members, or the alternate's typing lands in the next of kin's inputs, and the page shows Ada 0101 twice or alternate none.",
+          "existing_test": "redesign WhenAPartialIsRenderedForTwoMembers.each_rendering_sends_its_inputs_under_its_own_member"
+        },
+        {
+          "for": "X14.10",
+          "page": "A circle page that renders a member card partial with Html.PartialFor for Members[0] and for Members[1]; each card renders an input of Name; Save sends a JSON body and shows what the endpoint bound for each position.",
+          "gesture": "Type Ada in the second card's name and click Save.",
+          "outcome": "The page shows member 1 Ada and member 0 none.",
+          "opposite": "Typing Ada in the first card's name instead shows member 0 Ada and member 1 none.",
+          "defect": "The prefix Members[1] is read as one member named Members[1], so the JSON body carries Ada under a key the endpoint binds at no list position, and the page shows member 1 none.",
+          "existing_test": "redesign WhenAPartialIsRenderedForAListItem.a_rendering_sends_its_inputs_at_its_items_position_in_the_list"
+        },
+        {
+          "for": "X14.11",
+          "page": "On net48, a move-in page that renders its own Phone input, then the next of kin card with Html.PartialFor(m => m.NextOfKin, \"_ContactCard\"), then its own Email input; Save posts the form and shows what the endpoint bound.",
+          "gesture": "Type 0101 in the page's phone, Ada in the card's name and a@b.c in the page's email, then click Save.",
+          "outcome": "The page shows phone 0101, next of kin Ada and email a@b.c.",
+          "opposite": "On net10 the same page and the same typing show the same three values.",
+          "defect": "The partial's prefix is set on a ViewData copy, which shares the view's TemplateInfo on net48, so the email rendered after the card posts as NextOfKin.Email and the page shows email none."
+        },
+        {
+          "for": "X14.15",
+          "page": "A dose view whose input binds m => m.Items.Count, where Items is a List<Item> the app's JSON options write as a list.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"Input 'm => m.Items.Count' binds Count, which List<Item> declares, and the app's JSON options write List<Item> as a list, so the input has no body path: bind a member of a class they write as an object.\"",
+          "opposite": "An input of m => m.Items[0].Name renders, and its save posts Items[0].Name, which the endpoint binds.",
+          "defect": "The input renders and posts Items.Count, which binds nothing, so the number typed into it is lost with no word."
+        },
+        {
+          "for": "M7.X1",
+          "page": "An arrival form whose Pass input is rendered Hidden() with the label Pass, beside a Visitor input with its label, under a validator that requires Pass with \"The desk gives every visitor a pass.\"; the page opens with no pass.",
+          "gesture": "Click Sign in.",
+          "outcome": "The form's summary shows \"The desk gives every visitor a pass.\", no Pass label is on the page, the Visitor label is, and no request leaves the browser.",
+          "opposite": "Opened with the pass P-7, Sign in posts, and the page shows pass P-7.",
+          "defect": "The failure is placed at a message element the hidden field never rendered, so it shows nowhere while the browser holds the save, or the hidden field renders its label, so Pass shows on the page.",
+          "existing_test": "redesign WhenAFieldIsRendered.a_hidden_fields_message_goes_to_the_forms_summary"
+        },
+        {
+          "for": "M7.X3",
+          "page": "A care form whose care level is a choice component declaring its value Level and its committing event Picked, which its own code raises when the person picks a level and which raises no change event on the element; the validator requires a level other than None with \"Pick a care level.\"",
+          "gesture": "Click Save with no level, then focus the choice and pick Residential with the arrow key and Enter, without leaving the choice.",
+          "outcome": "After Save \"Pick a care level.\" shows beside the choice; after the pick it is gone, while the choice still has focus.",
+          "opposite": "Picking None the same way after Residential shows \"Pick a care level.\" beside the choice again.",
+          "defect": "The check listens to the element's change or blur, so the pick leaves \"Pick a care level.\" beside the choice until the person leaves it.",
+          "existing_test": "redesign WhenAnInputHoldsAnEnumMember.picking_a_member_rechecks_the_input_by_the_choices_own_event"
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "IInputComponent.ValueMember.get -> string!",
+          "verdict": "refused",
+          "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); an input also declares no event that commits its value, so the live check cannot follow a component that commits by its own event. The declaration names its typed value property and its committing event.",
+          "carriers": [
+            "M7.N3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M7.F2",
+      "summary": "The framework's id of the input a member binds: the class that declares the member, a generic one named as C# writes it, then MVC's id of the full binding name under the view's prefix, one id in every view that renders the member and two for two models; an interface's member, an id rendered twice in one plan and an id two live plans hold refused.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:IdGenerator"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "var scope = TypeScope(typeof(TModel));",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/IdGenerator.cs:33"
+        },
+        {
+          "line": "main",
+          "text": "public static string For(Type modelType, string propertyPath)",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/IdGenerator.cs:62"
+        },
+        {
+          "line": "main",
+          "text": "IdGenerator.TypeScope(typeof(IdGeneratorModel))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Patterns/IdGenerator/Index.cshtml:115"
+        },
+        {
+          "line": "main",
+          "text": "IdGenerator.For<IdGeneratorModel>(m => m.Amount)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Patterns/IdGenerator/Index.cshtml:119"
+        },
+        {
+          "line": "redesign",
+          "text": "return Scope(declarer) + \"__\" + ExpressionPathHelper.ToMvcElementId(mvcName);",
+          "cite": "Alis.Reactive/Inputs/IdGenerator.cs:60"
+        },
+        {
+          "line": "redesign",
+          "text": "if (declarer.IsInterface)",
+          "cite": "Alis.Reactive/Inputs/IdGenerator.cs:52"
+        },
+        {
+          "line": "redesign",
+          "text": "<label for=\"@(IdGenerator.For<Ward.Room>(m => m.Bed))\">Bed, by the id of its member</label>",
+          "cite": "tests/Alis.Reactive.Framework.App/Inputs/Room.cshtml:16"
+        },
+        {
+          "line": "redesign",
+          "text": "<label for=\"@(IdGenerator.For<Ward.Room, string?>(m => m.Note))\">Note, by the id of its typed member</label>",
+          "cite": "tests/Alis.Reactive.Framework.App/Inputs/Room.cshtml:17"
+        },
+        {
+          "line": "proposed",
+          "text": "<label for=\"@(IdGenerator.For<Ward.Room, string?>(m => m.Note))\">Note</label>",
+          "doors": [
+            "M7.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "<label for=\"@(IdGenerator.For<ChartEntry<FluidsReading>, string>(m => m.Initials))\">Initials</label>",
+          "doors": [
+            "M7.N1"
+          ]
+        }
+      ],
+      "nodes": [
+        "model",
+        "element",
+        "get"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Inputs/IdGenerator.cs:29-78"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Members/CSharpTypeName.cs:8-17"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Inputs/InputIdentity.cs:1-43"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/IdGenerator.cs:23-81"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:53-57"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/model.ts:52-55"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/runtime-plan.ts:139-147"
+        }
+      ],
+      "core": [
+        "Q12",
+        "Q14",
+        "Q18"
+      ],
+      "meanings": [],
+      "oracle": "MVC's id of a full field name on both hosts (TagBuilder.CreateSanitizedId under the app's IdAttributeDotReplacement, probe:core-sanitized-id, probe:mvc5-template-full-id), and the C# name of a declaring class as the compiler writes it (probe:core-type-fullname-generic-prefix, probe:net48-type-fullname-closed-generic, probe:core-type-array-generic-arguments).",
+      "checker": [
+        "core:Q14",
+        "core:Q12",
+        "Ownership.tla:BootContentBelongsToItsSlot"
+      ],
+      "defects": [
+        {
+          "id": "X14.5",
+          "rung": "refusal"
+        },
+        {
+          "id": "X14.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X14.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X14.12",
+          "rung": "behavior"
+        },
+        {
+          "id": "X14.13",
+          "rung": "analyzer"
+        },
+        {
+          "id": "M7.X4",
+          "rung": "behavior",
+          "defect": "The id is scoped by the view's model class, as main's TypeScope(typeof(TModel)) scopes it, so a partial typed to a base class of the page's model renders its input under another id than the page's read names, and the read finds no element (D14.3)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X14.5",
+          "page": "A departure view whose one plan renders Html.InputField(plan, m => m.Room) twice; its model is DeparturePage in the namespace Alis.Reactive.Framework.App.Inputs.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"Input 'Room' renders element id 'Alis_Reactive_Framework_App_Inputs_DeparturePage__Room' a second time in this plan: render the field once, or each copy for its own member with Html.PartialFor.\"",
+          "opposite": "With the field rendered once, the page renders, and its save sends the room typed into it.",
+          "defect": "Both copies render one id, so a room typed into the second is read through the first's id, the save sends the first copy's empty value, and the endpoint binds no room.",
+          "existing_test": "redesign WhenAFieldIsRenderedTwice.a_field_rendered_twice_on_one_plan_is_refused_naming_its_element_id"
+        },
+        {
+          "for": "X14.7",
+          "page": "A reception page whose plan renders an input of Name; a Load button loads into a slot a partial whose own plan renders an input of Name of the page's model class, which takes the same id, and whose handler on that input's change writes its value into the slot's note.",
+          "gesture": "Click Load, then type Ada in the slot's input and press Tab.",
+          "outcome": "The slot's note stays empty, and the console's one error names the id and both views.",
+          "opposite": "A slot partial whose input binds Phone loads, and typing 0101 there and pressing Tab shows 0101 in its note.",
+          "defect": "The slot's plan starts beside the page's, so its handler runs and the note shows Ada while two live inputs hold one id."
+        },
+        {
+          "for": "X14.8",
+          "page": "A desk page whose model holds NextOfKin and renders Html.EditorFor(m => m.NextOfKin); the template starts its own plan and renders an input of Name; the page's validator requires NextOfKin.Name with \"Name the next of kin.\", and the endpoint answers the same rule.",
+          "gesture": "Click Save with the name empty; type Ada in the template's input and click Save again.",
+          "outcome": "After the first save \"Name the next of kin.\" shows beside the template's input and no request leaves the browser; after the second the message is gone and the page shows next of kin Ada.",
+          "opposite": "On a desk page whose rule on NextOfKin.Name runs on the server only, the first save posts, and the server's \"Name the next of kin.\" shows beside the template's input.",
+          "defect": "The template's input takes an id the page's rule does not name, so the rule checks no input and the empty save posts, or the message shows only in the summary.",
+          "existing_test": "redesign WhenAPageEditsAMemberThroughItsTemplate.the_pages_rule_on_the_member_shows_its_message_beside_the_templates_field"
+        },
+        {
+          "for": "X14.12",
+          "page": "A fluids chart whose model's Entry is a ChartEntry<FluidsReading> declaring Initials, in Alis.Reactive.Framework.App.Partials; a label written for the id Alis_Reactive_Framework_App_Partials_ChartEntry_FluidsReading___Initials; Save posts and shows what the endpoint bound.",
+          "gesture": "Click the label, type AB and click Save.",
+          "outcome": "The typed AB lands in the Initials input, and the page shows initials AB.",
+          "opposite": "A label written for Alis_Reactive_Framework_App_Partials_ChartEntry_1__Initials focuses nothing, and typing after clicking it leaves the initials none.",
+          "defect": "The scope reads the generic class's full name, with its arity mark or its arguments' assembly names, so the label fills no input, the typing goes nowhere, and the page shows initials none.",
+          "existing_test": "redesign WhenAMembersClassIsGeneric.the_scope_is_the_namespace_and_the_csharp_name_with_other_characters_as_underscores"
+        },
+        {
+          "for": "M7.X4",
+          "page": "A lobby page whose model Resident derives from Person, which declares Name; a partial typed Person renders Html.InputField(plan, m => m.Name); the page's Greet button writes the value of pipeline.Input(m => m.Name)'s component into a greeting.",
+          "gesture": "Type Ada in the partial's input and click Greet.",
+          "outcome": "The greeting reads Ada.",
+          "opposite": "With the input emptied and Greet clicked again, the greeting reads nothing.",
+          "defect": "The id is scoped by the model class each view names, Person in the partial and Resident in the page, so Greet finds no element, its pipeline stops, and the greeting stays empty.",
+          "existing_test": "redesign WhenAPartialIsTypedToABaseClassOfThePagesModel.the_page_reads_the_partials_input_by_the_member"
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "static IdGenerator.For(System.Type! modelType, string! propertyPath) -> string!",
+          "verdict": "refused",
+          "reason": "A System.Type and a string that names a member path, which ALIS009 refuses on the public surface; the path is not checked against the type, and the scope is the model's, not the class that declares the member, so the id it gives differs from the input's wherever the member is declared on another class (D14.3).",
+          "carriers": [
+            "M7.N1"
+          ]
+        },
+        {
+          "door": "static IdGenerator.TypeScope(System.Type! type) -> string!",
+          "verdict": "refused",
+          "reason": "A System.Type in and a scope out, the model's full name with dots and plus signs made underscores: the scope is no id of its own, a generic type's full name carries its arguments' assembly names and versions (D14.3), and the id of a member is read whole from its lambda.",
+          "carriers": [
+            "M7.N1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M7.F3",
+      "summary": "A pipeline's reach to the input a member binds: its component, by the member's lambda under the view's prefix, typed by the member's value, and the member's value as its container sends it; another view's input by the id its member gives.",
+      "status": "both",
+      "types": [],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent>(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! expr) -> ComponentRef<TComponent, TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent, TOtherModel>(System.Linq.Expressions.Expression<System.Func<TOtherModel!, object!>!>! expr) -> ComponentRef<TComponent, TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent>(System.Linq.Expressions.Expression<System.Func<TModel!, object?>!>! expr) -> TComponent!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent, TOtherModel>(System.Linq.Expressions.Expression<System.Func<TOtherModel!, object?>!>! expr) -> TComponent!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Bound<TProp>(System.Linq.Expressions.Expression<System.Func<TModel!, TProp>!>! member) -> TypedSource<TProp>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "p.Component<FusionAutoComplete>(m => m.Physician).SetValue(\"smith\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml:13"
+        },
+        {
+          "line": "main",
+          "text": "s.Component<NativeHiddenField, FusionStepperWizardShellModel>(m => m.MaxUnlockedStep).SetValue(\"2\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Stepper/_WizardCareStep.cshtml:83"
+        },
+        {
+          "line": "main",
+          "text": "var elementId = IdGenerator.For<TOtherModel, object>(expr);",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:119"
+        },
+        {
+          "line": "redesign",
+          "text": "var thermostat = p.Component<Thermostat>(m => m.Target);",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/Thermostat/Index.cshtml:20"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(p.Bound(m => m.NextOfKin.Name)).IsNull()",
+          "cite": "tests/Alis.Reactive.Framework.App/Partials/Changeover.cshtml:29"
+        },
+        {
+          "line": "redesign",
+          "text": "=> Live<TComponent>(IdGenerator.For(expr));",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:162"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Input(m => m.Physician).Component<FusionAutoComplete>()",
+          "doors": [
+            "N14.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "request.Input(r => r.Note, pipeline.Input(v => v.Resident))",
+          "doors": [
+            "N14.4"
+          ]
+        }
+      ],
+      "nodes": [
+        "model",
+        "get",
+        "element"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:117-162"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Inputs/HtmlFieldPrefix.cs:1-29"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:99-121"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:11-40"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/model.ts:42-60"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:53-57"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/runtime-plan.ts:139-147"
+        }
+      ],
+      "core": [
+        "Q7",
+        "Q13",
+        "Q14"
+      ],
+      "meanings": [],
+      "oracle": "MVC's binding name and id of a member under the view's TemplateInfo prefix on both hosts (probe:core-template-prefix-name, probe:core-sanitized-id), the same derivation the input's render takes (D14.3), and the form's own submission set for the value a container sends (D13.3).",
+      "checker": [
+        "core:Q13",
+        "core:Q14",
+        "Validation.tla:UnsentInputsUnread"
+      ],
+      "defects": [
+        {
+          "id": "X13.1",
+          "rung": "behavior"
+        },
+        {
+          "id": "X13.2",
+          "rung": "behavior"
+        },
+        {
+          "id": "M7.X5",
+          "rung": "type",
+          "defect": "A reach of an input through an object-typed member lambda compiles over a member of any type and erases its type, so a request member of another type takes it: N14.4's pipeline.Input(m => m.Member) returns a BoundInput typed by the member's value, and a request's Input of a member of another type does not compile (CS0029)."
+        },
+        {
+          "id": "M7.X6",
+          "rung": "behavior",
+          "defect": "A pipeline in a partial's plan reaches an input by its member without the partial's prefix, or reaches another rendering's input, so each card of one partial reads the same element or none: the reach names the member under the prefix its plan started with (N14.4, D14.3)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X13.1",
+          "page": "A page holding two cards, a fluids card of the model FluidsCard and a weight card of the model WeightCard, each a partial with its own form whose input binds its model's Value; each card's Save posts its form and shows what its endpoint bound in the card.",
+          "gesture": "Type 250 in the fluids card and 70 in the weight card, then click the fluids card's Save and the weight card's Save.",
+          "outcome": "The fluids card shows 250 and the weight card shows 70.",
+          "opposite": "With the weight card left empty, its Save shows none and the fluids card still shows 250.",
+          "defect": "The read by binding name finds the page's first input named Value, so the weight card's save sends 250 and the weight card shows 250.",
+          "existing_test": "redesign WhenTwoPartialsOfOtherModelsBindOneName.a_partials_named_send_sends_the_input_it_rendered"
+        },
+        {
+          "for": "X13.2",
+          "page": "A form holding two inputs that bind Name, the page's own and one a partial of another model class renders inside the same form, each with its own id; Save posts the form and shows what the endpoint bound.",
+          "gesture": "Type Ada in the first input and Bo in the second, then click Save.",
+          "outcome": "No request leaves the browser, the bound text keeps its dash, and the console's one error names both element ids.",
+          "opposite": "With the partial's input bound to Nickname, Save posts and the page shows name Ada.",
+          "defect": "The form sends one of the two by page order, so a request leaves and the page shows name Ada or Bo, a value the endpoint cannot tell from the other."
+        },
+        {
+          "for": "M7.X6",
+          "page": "A contacts page that renders one contact card partial with Html.PartialFor for NextOfKin and for Alternate; each card's plan has a Copy button whose step sets the card's own echo to the value of pipeline.Input(m => m.Name)'s component.",
+          "gesture": "Type Ada in the next of kin card and Bo in the alternate card, then click each card's Copy.",
+          "outcome": "The next of kin card's echo reads Ada and the alternate card's reads Bo.",
+          "opposite": "With the alternate card's name emptied and its Copy clicked again, its echo reads nothing and the next of kin card's still reads Ada.",
+          "defect": "The reach drops the card's prefix, so both cards look for the id of Name with no prefix, which no input holds, and both pipelines stop with the echoes empty; or both reach the first card's input and both echo Ada.",
+          "existing_test": "redesign WhenAPartialIsRenderedForTwoMembers.a_step_naming_an_input_by_its_member_reaches_the_input_its_own_rendering_rendered"
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "PipelineBuilder<TModel>.Component<TComponent>(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! expr) -> ComponentRef<TComponent, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N14.4"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Component<TComponent, TOtherModel>(System.Linq.Expressions.Expression<System.Func<TOtherModel!, object!>!>! expr) -> ComponentRef<TComponent, TModel!>!",
+          "verdict": "refused",
+          "reason": "An object-typed lambda over another view's model, which ALIS009 refuses on the public surface and which erases the member's type. Each view's plan reaches its own inputs; another view's input is reached through the page's input table by the id its member gives (D14.2), or its value read as its container sends it.",
+          "carriers": [
+            "M7.N1",
+            "N13.1"
+          ]
+        }
+      ]
+    }
+  ]
+}
