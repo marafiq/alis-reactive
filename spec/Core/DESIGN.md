@@ -226,8 +226,8 @@ Terms used throughout:
 - D3.12 The time zone a view renders under is the app's choice, made per request where the view renders, as
   culture is (the owner, 2026-11-06: the framework allows the server to decide). The framework knows no
   reason for the choice: a community's configured zone, a user's or a facility's are the app's.
-  - When the app makes no choice, an instant uses the browser's clock, the decision of 2026-11-05; gate 1
-    confirms that default.
+  - When the app makes no choice, an instant uses the browser's clock, the decision of 2026-11-05,
+    confirmed at gate 1 (C23).
   - The app gives a `TimeZoneInfo` on both hosts, and the plan carries the zone as an IANA id. The browser
     computes a zone's offsets only from an IANA id (`probe:intl-iana-zone-offsets`) and refuses a Windows id
     (`probe:intl-windows-zone-id`).
@@ -547,7 +547,7 @@ Terms used throughout:
   declaration's constructor, and a base class's constructor (`Component`'s, `Plugin`'s) keeps what it is given. A
   declaration's arguments are refused at build when the build reads them (ALIS024, ALIS034), and where the view
   renders when the plan writes the declaration: a plugin's name with a dot is X17.27 in both places. `new T()` is a
-  read of `Activator`, which D18.1 lists on gate 1's ask.
+  read of `Activator`, which D18.1 lists since gate 1 (C12).
 
 **Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
 
@@ -1097,12 +1097,12 @@ Terms used throughout:
     element's text and HTML, a render helper's start, D17.13) is in the live form. A literal is written in it, and a
     source in the live form as it is held. A source in the app's form is written as held where both forms write its
     type alike; a number the app's form writes as text is converted to the live form's number by `as` (D3.13,
-    X7.14); an enum the two forms write otherwise is mapped through D9.13's rows when gate 1 grants D18.1's enum
-    read, and is refused where the view renders while it does not (X7.15); any other difference, a converter the
+    X7.14); an enum the two forms write otherwise is mapped through D9.13's rows, whose enum read D18.1 lists since
+    gate 1 (C37); any other difference, a converter the
     app's options add or a member's own converter, is refused where the view renders (X7.10), and a value its own
     converter writes is shown by the server.
   - Two sources a choice or a comparison joins (`IfNull`, `Choose`, D8.10) are taken in one form by the same rules:
-    a number the app's form writes as text is converted, an enum is mapped while gate 1's enum read is granted, and
+    a number the app's form writes as text is converted, an enum is mapped by D9.13's rows, and
     any other difference is refused (X7.11, X8.21).
   - A live number is a JavaScript number, so a literal written into one that JavaScript would read as another value
     is refused where the view renders, and by ALIS033 at build when it is a constant (X7.13): NaN and ±Infinity,
@@ -1191,10 +1191,6 @@ Terms used throughout:
 - `X7.14` behavior (D7.7): in an app whose options write numbers as text, a found supply's vial count of 5 is passed
   to a component's method that adds it to the 1 it holds and shows the total: it shows 6, where the text "5" would
   show "15"; set into the component's number member, it orders above 4.
-- `X7.15` refusal (D7.7): an enum the app's form writes otherwise than the live form, while gate 1's enum read is not
-  granted: "A live object takes '{Enum}' as {its number | its type's converter writes it}, and '{read}' holds it as
-  {the app's JSON converter} writes it; give '{Enum}' the converter both forms write by, or pass the value from the
-  server."
 - `X7.7` behavior (D7.3, N7.5): a fluid balance's intake widened to `int?` is written to its nullable target and
   ordered against it, over a 1000 ml target and within it, and an ordering with a null target does not hold, where
   JavaScript's `500 > null` does; a pump's summary widened to `string?` is passed as the caption's argument.
@@ -1469,11 +1465,11 @@ Terms used throughout:
   `Enum`'s own text for it, so a flags combination is its comma form, smallest first, which both hosts bind
   (`probe:core-query-flags-enum`, `probe:mvc5-enum-flags-comma`), whether or not the startup names the enum: C# holds
   a literal's value, so it needs no rows, and the `FlagsAttribute` read inside `Enum.ToString` is .NET's, as
-  System.Text.Json's reflection is its own (D18.1, whose gate 1 ask lists `Enum.ToString`). A literal whose text is
+  System.Text.Json's reflection is its own (D18.1, whose list holds `Enum.ToString` since gate 1, C37). A literal whose text is
   digits, a value no value and no combination names, is refused where the view renders (X9.22). An enum a source holds
   is in its held form (D4.2): the form its member's own `[JsonConverter]` writes, else its base form, the app's or the
   live form (D7.7). So C#
-  writes into the plan, beside the member, a row for each value `Enum.GetValues` lists (D18.1, gate 1): the value as
+  writes into the plan, beside the member, a row for each value `Enum.GetValues` lists (D18.1, C37): the value as
   System.Text.Json writes it at the source's type (a `T?` when the source is one, since a nullable member's own
   converter writes names only there, `probe:core-json-enum-nullable-member-converter`) under the source's held form,
   and its C# name. The browser sends the C# name of the row whose form it holds. A held form no row lists stops the
@@ -1587,8 +1583,8 @@ Terms used throughout:
     (`[Bind(Prefix)]`, net10's `[FromQuery(Name)]`) binds only prefixed keys (`probe:core-query-bind-prefix`,
     `probe:core-query-parameter-name`, `probe:mvc5-parameter-binding-name`, `probe:mvc5-prefix-no-fallback`), and a
     parameter named like one of its type's members binds none of them (`probe:core-query-parameter-name-collision`).
-    Both are per action, and a view names its action only by URL text, so their refusal waits for a build check that
-    links a request to its action, which no unit has built; it goes to gate 1 as a flag.
+    Both are per action, and a view names its action only by URL text, so no build check refuses them, since none links a
+    request to its action; gate 1 accepted both as MVC's binding, which the docs name (C25).
 
 - D9.21 The body formats are closed: none, JSON (D9.7), URL-encoded, multipart (D9.8), text and one file. Each
   sets its own `Content-Type` as fetch writes it: `application/json`, `application/x-www-form-urlencoded;charset=UTF-8`
@@ -1616,8 +1612,8 @@ Terms used throughout:
     for POST (`probe:mvc5-form-filled-any-method`).
   MVC 5's `[ValidateAntiForgeryToken]` reads the form alone (`probe:mvc5-antiforgery-reads-form-only`), so on net48 the
   header is read only by a filter that hands it to `AntiForgery.Validate(cookieToken, formToken)`
-  (`probe:mvc5-antiforgery-validate-tokens`). Whether the framework ships that filter is the owner's; it goes to
-  gate 1 as a flag.
+  (`probe:mvc5-antiforgery-validate-tokens`). The framework ships that filter, `[ValidateAntiForgeryHeader]`,
+  in the net48 host (gate 1, C10).
 - D9.23 A request's URL, query and headers follow their standards, and C# writes each part where the view renders.
   - The URL is an RFC 3986 URI reference: a path on the page's origin, or an absolute `http` or `https` URI, split
     into the parts of RFC 3986, section 3. Its path is segments, its query is the query, and a fragment is refused
@@ -2205,7 +2201,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   - `Parallel(params Action<Pipeline<TModel>>[] branches)`, each branch a pipeline, the steps after it its all-settled
     block; `OnAllSettled` leaves (D10.10).
   - net48 only: `[ValidateAntiForgeryHeader]`, a filter that reads the header, else the field, and hands it to
-    `AntiForgery.Validate(cookieToken, formToken)`; shipping it is the owner's (gate 1 flag, D9.22).
+    `AntiForgery.Validate(cookieToken, formToken)`; shipped in the net48 host (gate 1, C10, D9.22).
   - it replaces the POC's request doors (`poc/Alis.Reactive.Poc/Pipelines/Requests.cs`), each guard given its home:
     `Get(url)` becomes `Get(url)` on every verb, keeping the refusal of a placeholder no member fills, a fragment, and a
     URL that is neither a page path nor an http or https URI (`RequestUrls.Checked`). `Request.Into(id)` becomes the
@@ -3016,7 +3012,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   Across plans, the page meets them where it composes the plans, and each is one error there.
   - Composition is a real boundary: the plans were rendered apart, no plan can state what another holds,
     and no server object sees every view of a page (D14.1).
-  - That moves two refusals from render time to the browser, a gate-1 line of its own.
+  - That moves two refusals from render time to the browser, confirmed at gate 1 (C29).
   - At render, within one plan:
     - R14.1 an input or a partial whose lambda MVC's name does not name step by step from the model (a call that
       is no indexer, a value the view holds), an input whose lambda names no member, or a member an interface
@@ -3212,7 +3208,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     non-nullable text posted empty (`probe:core-form-implicit-required`). Under `[ApiController]` that error answers
     400 before the action runs (`probe:core-api-controller-implicit-required`), so on net10 the framework's
     registration marks each type a registered `ReactiveValidator` validates as one MVC does not validate, through a
-    metadata provider, and the binder's own errors stay. The mechanism is a gate-1 line. On net48 the framework's
+    metadata provider, and the binder's own errors stay. Gate 1 confirmed the mechanism (C31). On net48 the framework's
     bodies never meet MVC 5's implicit required: a value type that reads nothing is left out (D9.10).
   - The sandbox's endpoints call `Validate` and write `ErrorsByField` themselves, and read no binder refusal
     (`Alis.Reactive.SandboxApp/Areas/Sandbox/Controllers/Components/AppLevel/DrawerController.cs:48-51`).
@@ -3459,8 +3455,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   and the message element by the `_error` id (`:73-75`).
 - The server runs a condition, a member read and a fixed operand by `Expression.Compile`
   (`Alis.Reactive/Validation/Rules.cs:52`, `Alis.Reactive/Validation/Rules.cs:61`,
-  `Alis.Reactive/Validation/ModelMember.cs:62`, `Alis.Reactive/Members/Expressions.cs:28`); the four go to gate 1's
-  list of reflection exceptions.
+  `Alis.Reactive/Validation/ModelMember.cs:62`, `Alis.Reactive/Members/Expressions.cs:28`); the four are on D18.1's
+  list since gate 1 (C13), since the server runs the tree the browser reads.
 - A pattern with no JavaScript form stays on the server unannounced (`Alis.Reactive/Validation/Checks.cs:128-129`),
   and the rest pass to the browser with .NET's flags (`Alis.Reactive/Validation/Checks.cs:156-159`).
 - The browser's Url pattern (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:152`) against the server's
@@ -3801,7 +3797,7 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     ALIS015. A base is read from its heritage clause's type node, since the type at the clause carries the derived
     class's `this`.
   - A root's checks run as the code is typed. A reached declaration is checked at the end of the compilation, since
-    what reaches it can be anywhere in it, so the IDE shows those diagnostics on build (gate 1). A declaration a
+    what reaches it can be anywhere in it, so the IDE shows those diagnostics on build (accepted at gate 1, C32). A declaration a
     referenced assembly holds is checked by the build that compiles it.
 - D17.6 Every vendor package is pinned to one exact version, its sub-packages included, and its npm and NuGet
   versions move together (B16). The contract table of D17.5 is written by every build whose TypeScript inputs
@@ -4200,17 +4196,20 @@ plans (Q19).
   - the identity of a .NET member an array lambda calls, compared with the closed table of D6.5, never listed
     or invoked: `MemberInfo.Module` and `MemberInfo.MetadataToken`, which name a member's definition for every
     instantiation of a generic member, in `poc/Alis.Reactive.Poc/Conditions/TranslatedMembers.cs`.
-  D9.13's rows ask one more at gate 1: an enum's values and names, `Enum.GetValues(Type)` and `Enum.ToString`, with
-  `Type.IsEnum` and `Nullable.GetUnderlyingType` to find the enum, in `EnumNames.cs`, the file the rewrite's request
-  unit adds to the Types module. The
-  generic `Enum.GetValues<TEnum>()` is absent on net48, and no door reaches a `TEnum : struct, Enum`. Until the owner's
-  answer the POC sends an enum a source holds as it is held, and the landed `Enum.ToString` of a literal is on no list.
-  D5.12's declarations ask one more at gate 1: `Activator.CreateInstance<T>()`, which C# writes for `new T()` under a
-  `new()` constraint on net48 and net10 alike, calling the public parameterless constructor the compiler checked and
-  listing no member. The typed alternatives each cost the developer: a factory every door takes
-  (`pipeline.Component(() => new Monitor(), id)`), written at every reach of a declaration, or a static abstract
-  factory on the declaration, which net48's runtime does not support. Until the owner's answer the POC makes every
-  declaration by `new T()`, on no list.
+  Gate 1 granted three more, which the rewrite's list holds and the POC's does not:
+  - an enum's values and names for D9.13's rows, `Enum.GetValues(Type)` and `Enum.ToString`, with `Type.IsEnum` and
+    `Nullable.GetUnderlyingType` to find the enum, in `EnumNames.cs`, the file the rewrite's request unit adds to the
+    Types module (C37). The generic `Enum.GetValues<TEnum>()` is absent on net48, and no door reaches a
+    `TEnum : struct, Enum`;
+  - `Activator.CreateInstance<T>()` for D5.12's declarations, which C# writes for `new T()` under a `new()` constraint
+    on net48 and net10 alike, calling the public parameterless constructor the compiler checked and listing no member
+    (C12). The typed alternatives each cost the developer: a factory every door takes
+    (`pipeline.Component(() => new Monitor(), id)`), written at every reach of a declaration, or a static abstract
+    factory on the declaration, which net48's runtime does not support;
+  - `Expression.Compile` in validation, where the server runs a condition, a member read and a fixed operand, the tree
+    the browser reads (Q16, C13).
+  The POC stands until the rewrite's request, declarations and validation units: it sends an enum a source holds as it
+  is held, and its `Enum.ToString` of a literal and its `new T()` are on no list in `WhenTheCoreIsCompiled`.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):
@@ -4232,10 +4231,12 @@ plans (Q19).
     statements, and its `declaredBy:` is the compiler's (ALIS023); its `name:`, `optional:`, `nullable:` and
     `position:` are constants the build reads (ALIS024). An explicit interface member declares the JavaScript member
     of its simple name, as `[CallerMemberName]` names it;
-  - the method scan for `PureMethodAttribute`: gate 1 decides it, as an owner-listed exception or a typed door;
+  - the method scan for `PureMethodAttribute`: refused at gate 1 (C14); a model method carried into the plan is
+    decided when a real case raises it;
   - the `FlagsAttribute` read of `IsInEnum`: the typed door `Flags<TEnum>()` (N16.4, gate 1's P2), which ALIS038 holds
     to the `[Flags]` mark at build (N16.5);
-  - `Expression.Compile` in validation (Q16) and in the template writer (Q15): gate 1 decides each.
+  - `Expression.Compile` in validation (Q16): listed at gate 1 (C13, D18.1); in the template writer (Q15): not listed,
+    since the writer is the Fusion templates module's, which asks the owner for its own exception when it is onboarded.
   - an overridden member that a view's expression names (the owner, 2026-11-06: "Override cannot change it"). The
     expression carries the declaration (`d => d.Room` names `Person.Room`), and the derived class's contract holds
     the override. The member is named as the contract of the class that declares it names it, found up the member's
@@ -4254,7 +4255,7 @@ plans (Q19).
     refuses an override whose `JsonPropertyName` or `JsonIgnore`, its condition included, is not the one of the
     member it overrides, each link checked against the member it overrides.
 - D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
-  lists at gate 1 (N18.1): the members of `System.Reflection` that list, read, write or invoke members or read
+  listed at gate 1 (D18.1, N18.1): the members of `System.Reflection` that list, read, write or invoke members or read
   attributes, `Activator`, `Type.GetType` by name and `Expression.Compile`, except the owner's exceptions D18.1
   lists. It reads operations, not names: `new T()` over a type parameter, an `ITypeParameterObjectCreationOperation`
   whose source never names `Activator`, is an `Activator` read, which `WhenTheCoreIsCompiled`, reading the names the
@@ -4281,7 +4282,7 @@ plans (Q19).
     X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
     N18.13), and ALIS038, the flags door (X16.23 to X16.26; N16.5), new beside the moved ones.
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
-    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X7.13, X7.15, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
+    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X7.13, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
     URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5). A plan's version
     is the browser's, at boot (X19.3).
@@ -4514,7 +4515,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 - D20.8 On the server the framework has one `ActivitySource`, named "Alis.Reactive", from `System.Diagnostics`, with an
   activity for rendering a plan, the validation door (validator, rule set, failure count) and the error door. The app
   adds its own OpenTelemetry SDK and listens to that source. On net48 the source comes from the
-  `System.Diagnostics.DiagnosticSource` package, pinned, a gate-1 line, and joining an inbound `traceparent` takes the
+  `System.Diagnostics.DiagnosticSource` package, pinned to one version (gate 1, C8), and joining an inbound `traceparent` takes the
   app's ASP.NET instrumentation module, a fact the unit probes.
 - D20.9 Tracing changes nothing a plan does: on and off run the same statements in the same order with the same
   results, and the port returns nothing the runtime reads.
@@ -4608,7 +4609,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   state reads it closed.
 - D21.7 Authentication is the page's own: a stream and a hub send the page's cookies, and the server authorizes each
   connection and each hub method. A bearer token is not sent: `EventSource` sends no header, and SignalR puts a
-  token in the URL for WebSockets and server-sent events. A token door is a gate-1 line.
+  token in the URL for WebSockets and server-sent events. 1.0 has no token door (gate 1, C26).
 - D21.8 Tracing (Q20): a run a message starts is a child of the plan's trace context and records its transport and
   event. The server span that sent the message is not linked, since neither wire carries a trace context per
   message. Whether a hub invoke joins the server's hub activity depends on `@microsoft/signalr` carrying trace

@@ -57,7 +57,7 @@ takes the exponent only, an integer takes neither on both hosts).
 
 | Kind | Carries | Meaning |
 |------|---------|---------|
-| `clock` | nothing | the browser's clock and its offset (D3.12's default until gate 1) |
+| `clock` | nothing | the browser's clock and its offset (D3.12's default, confirmed at gate 1, C23) |
 | `zone` | `id`, an IANA time zone id | the app's zone for this request, written by C# from a `TimeZoneInfo` (N3.5) |
 
 ### Trace

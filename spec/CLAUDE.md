@@ -19,7 +19,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-05: any component can be onboarded on the core's public surface. Fusion and Native get
   nothing an app does not.
 - The owner, 2026-11-05: the core takes as few dependencies as it can, and each one is the owner's decision.
-  Dependency injection is one. Every dependency is pinned to one version.
+  Dependency injection is one. Every dependency is pinned to one version; at gate 1 (C7) the
+  DI abstractions take one exact version per target framework, set beside System.Text.Json's 10.0.12.
 - The owner, 2026-11-05: the HTTP module is requests and responses. What comes back from the server belongs
   to it: the status, the body, how the browser decodes it, and the error body each host sends.
 - The owner, 2026-11-05: work survives compaction. A correction is written here and in `spec/NOTES.md` the
@@ -117,10 +118,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   app's for what the server's JSON wrote and the live form for what a live object holds or hands, a payload declared
   as data included; the live form keeps the app's naming and nothing else its options set (every number a JSON
   number, every null written, no converter of the app's), so a live object takes a source in the app's form as held
-  where the forms agree, a number held as text converted, an enum mapped by D9.13's rows while gate 1's enum read is
-  granted, and refuses anything else (X7.10, X7.15); a literal JavaScript would read as another value is refused
-  (X7.13); and the type check requires `[JsonPropertyName]` on a member it checks against a name the vendor declares
-  (X17.48).
+  where the forms agree, a number held as text converted, an enum mapped by D9.13's rows, whose reads gate 1 granted
+  (C37), and refuses anything else (X7.10); a literal JavaScript would read as another value is refused (X7.13); and
+  the type check requires `[JsonPropertyName]` on a member it checks against a name the vendor declares (X17.48).
 - Chosen within the owner's yes, 2026-11-07: a view reads past a nullable member in a data lambda with no `!` where
   the browser reads nothing past null. CS8602, and CS8629 on `.Value`, are suppressed on an expression that reads the
   item, in the predicate of `Count`, `Where`, `Any`, `All` and `Find`, the field of `Select` and `Find`, and the path of
@@ -362,8 +362,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   item of a list of objects that reads nothing stops the request; a list member is sent only when declared `List<T>`; a
   member net10 binds under another name, a `[BindNever]` member and a member of another list type are marked in the
   generated table and refused where a view sends them, never at build, so an app's endpoints no framework view sends still
-  build. A parameter prefix and a parameter named like its type's member wait for a request-to-action link (gate 1).
-  Request.tla checks the first two over both hosts. The owner can overrule each.
+  build. A parameter prefix and a parameter named like its type's member bind none of the keys, accepted at gate 1 as
+  MVC's binding, which the docs name (C25). Request.tla checks the first two over both hosts. The owner can overrule
+  each.
 - The owner, 2026-11-07 (verbatim in `spec/NOTES.md`): the official default is C# 7.3, most of C# 8 works on net48 with
   few gotchas, so assume C# 8. An MVC 5 app is assumed at C# 8, so nothing the framework writes into an app needs
   C# 9 (no module initializer); generated code is written in C# 7.3 syntax, which compiles in an app left at the default.
@@ -383,7 +384,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   or model of the binder without a reason the owner accepts.
 - Chosen within the owner's yes, 2026-11-09, by precedent ("well solve 17c like you solve similar problems, it do not
   need me to give you decision"): D9.13's rows are written through HeldForm from the enum's values, never from a
-  generated table, and the reads that list the values wait for the owner at gate 1 (D18.1); a source's combination of
+  generated table, and the reads that list the values are D18.1's, granted at gate 1 (C37); a source's combination of
   an enum the app does not name as flags stops; a JSON body's enum is the form its endpoint binds. The owner can
   overrule each. Chosen within the owner's yes, 2026-11-09, gate 1's P2: an enum is flags to the framework only when
   the startup names it, `Flags<TEnum>()` (N16.4), never by a `FlagsAttribute` read; a source's value of it is split as
