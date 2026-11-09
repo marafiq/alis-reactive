@@ -671,7 +671,7 @@ The session will compact several times. The summary loses detail, so everything 
   - never hold the inventory in context: `check.py` holds it.
 
 ## 12. Agents: blind, small, verified
-- At most two at a time.
+- At most three at a time (the owner, 2026-11-09: "I'm giving you some liberty here between 2 and 3. Yes, but you gotta show results for it.").
 - **Each brief** is one small task with one output file under `spec/`. It contains:
   - the section of `spec/BRIEF.md` the task needs;
   - the exact input files;
