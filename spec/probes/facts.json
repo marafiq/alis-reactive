@@ -1952,6 +1952,42 @@
       "probe": "dotnet-api-docs/fullnameex1.cs.txt",
       "expect": "// System.Collections.Generic.List`1[[System.String, mscorlib,",
       "source": "spec/probes/dotnet-api-docs/fullnameex1.cs.txt:21"
+    },
+    {
+      "id": "dom-children-iterable",
+      "statement": "lib.dom types an element's children as HTMLCollection, which is no array, has no filter, map, some or find, and whose iterator yields Element.",
+      "host": "node",
+      "oracle": "TypeScript 5.9.3's lib.dom.d.ts and lib.dom.iterable.d.ts",
+      "probe": "dom-iterables.mjs",
+      "expect": "dom-children-iterable: Element's children is HTMLCollection, an array false, lacking filter, map, some, find, and its [Symbol.iterator] yields Element",
+      "source": "spec/probes/dom-iterables.mjs"
+    },
+    {
+      "id": "dom-classlist-iterable",
+      "statement": "lib.dom types an element's classList as DOMTokenList, which is no array, has no filter, map, some or find, and whose iterator yields string.",
+      "host": "node",
+      "oracle": "TypeScript 5.9.3's lib.dom.d.ts and lib.dom.iterable.d.ts",
+      "probe": "dom-iterables.mjs",
+      "expect": "dom-classlist-iterable: Element's classList is DOMTokenList, an array false, lacking filter, map, some, find, and its [Symbol.iterator] yields string",
+      "source": "spec/probes/dom-iterables.mjs"
+    },
+    {
+      "id": "js-array-from-text",
+      "statement": "Array.from iterates a text by code point, so a text with one astral character holds one item fewer than its length; a boxed text holds Symbol.iterator and a paged result does not.",
+      "host": "node",
+      "oracle": "Node 24's JavaScript engine",
+      "probe": "dom-iterables.mjs",
+      "expect": "js-array-from-text: Array.from of a text with one astral character holds 2 items where its length is 3; Symbol.iterator in Object(text) is true, and in a paged result is false",
+      "source": "spec/probes/dom-iterables.mjs"
+    },
+    {
+      "id": "typescript-lib-version",
+      "statement": "The lib.dom facts are read from TypeScript 5.9.3, the version the repo's package.json pins.",
+      "host": "node",
+      "oracle": "node_modules/typescript/package.json",
+      "probe": "dom-iterables.mjs",
+      "expect": "typescript-version: 5.9.3",
+      "source": "spec/probes/dom-iterables.mjs"
     }
   ]
 }

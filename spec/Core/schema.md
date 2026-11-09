@@ -278,6 +278,9 @@ same reader and compares the two as whole numbers at the larger scale, so "0.10"
 texts. An argument that reads nothing makes it read nothing, null equals null and no decimal, and any other value
 stops the pipeline. C# writes it for `==` over a decimal written as text, and `not` of it for `!=`; a decimal written
 as a JSON number keeps `eq` and `neq`.
+`toArray` is the array of the items its argument's `[Symbol.iterator]` yields, as `Array.from` reads them, where C#
+reads a list an object's iterator yields (D6.17): an argument that reads nothing or holds null reads nothing, and one
+with no iterator stops the pipeline; C# writes it over no other list.
 `nonNull` is its one argument's value, and stops the pipeline where that argument reads nothing or holds null. C#
 writes it for a `Select` field whose type holds no null, so the list a `Select` builds holds no value its item type
 cannot hold (D6.16); a `Sum`'s term is checked by its own operator.

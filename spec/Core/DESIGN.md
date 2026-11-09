@@ -548,8 +548,18 @@ Terms used throughout:
   declaration's arguments are refused at build when the build reads them (ALIS024, ALIS034), and where the view
   renders when the plan writes the declaration: a plugin's name with a dot is X17.27 in both places. `new T()` is a
   read of `Activator`, which D18.1 lists since gate 1 (C12).
+- D5.13 A live object whose type JavaScript iterates declares its iterator as it declares any member (D5.3): the type
+  declares `[Symbol.iterator]` and is no array, and the iterator yields live objects of a declaration or data of a C#
+  type. lib.dom's `HTMLCollection`, which an element's `children` holds, yields `Element`, and the `DOMTokenList` its
+  `classList` holds yields `string`; neither is an array, and neither has `filter`, `map`, `some` or `find`
+  (`probe:dom-children-iterable`, `probe:dom-classlist-iterable`), so `LiveObjects<T>`, the array a property holds
+  (D5.8), mirrors neither. Such an object takes the list operations of D6.2 over the items its iterator yields when the
+  operation runs (D6.17), beside its own members (`DOMTokenList`'s `add`, `HTMLCollection`'s `length`), and its items are
+  live objects or data as its iterator declares them (D6.8). The vendor contract writes the type each iterator yields
+  (D17.5), and the build refuses an iterator declared on a type that has none, items the iterator does not yield, and
+  `LiveObjects<T>` on a member whose type is no array.
 
-**Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
+**Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`; `op` (`toArray`, D6.17).
 
 **Checker.**
 - `probe:core-new-constraint-wraps`
@@ -558,6 +568,8 @@ Terms used throughout:
 - `probe:ej2-max-public-method-arity`
 - `probe:ej2-methods-past-four-arguments`
 - `probe:ej2-event-args-presence-marks`
+- `probe:dom-children-iterable`
+- `probe:dom-classlist-iterable`
 
 **Doors.**
 - kept, public for the component author: `JsObject`'s `Property`, `ReadOnly`, `WriteOnly`, `Method`,
@@ -583,6 +595,10 @@ Terms used throughout:
   named arguments, `Property<string>(optional: true)`, and their form goes to gate 2.
 - kept on a new holder: the whole declaration vocabulary on an event's payload, at any depth (D5.6), where the
   redesign's payload is already a `JsObject` (`Alis.Reactive/Components/Event.cs:14`).
+- `N5.7` new, its form gate 2's: a `JsObject`'s iterator, declared with the declaration of its items, live or data
+  (D5.13); the list operations of N6.1 and D6.10 take an object that declares one. It replaces the redesign's
+  `HtmlElement.Children` and `ElementClassList.Items`, each a `ReactiveArray` over a member read with no declaration
+  (`Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:52-53`, `Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:120-121`).
 
 **Evidence.**
 - B7: a custom event or a response is `Data<T>` (`Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:50`) while
@@ -623,6 +639,9 @@ Terms used throughout:
 - `X5.14` analyzer (D5.11): a result, a returned object or a returned list that a C# variable carries into another
   pipeline: "A method's result is read outside the block that called the method. Call the method in the block that
   reads its result, or in a block around it." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
+- `X5.15` analyzer (D5.13): `LiveObjects<T>` declared on an element's `children`, whose type `HTMLCollection` is no
+  array, an iterator declared on a type that has none, and an iterator whose items are not what the type yields, each
+  refused at build against the vendor contract: new:N5.7.
 
 ## Q6. Arrays
 
@@ -822,7 +841,19 @@ Terms used throughout:
   over the list itself is the door for that. A `Sum` keeps its own term: `sumInt`, `sumDouble` and `sumDecimal` stop on
   a term that reads nothing, so a `Sum`'s map writes no `nonNull`.
 
-**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`, `nonNull`).
+- D6.17 A list an object's iterator yields (D5.13) is read by `toArray`, the one operator that turns a value JavaScript
+  iterates into an array, and every operation of D6.2 reads that array: `call(op(toArray, classes), ["filter"], [fn])`.
+  C# writes `toArray` only over an object that declares an iterator, never over a list a declaration or the app's data
+  declares, whose operations call the list's own member (D6.3). It reads its value as D6.3 reads an operation's member,
+  with the iterator as the member: a value that reads nothing or holds null reads nothing, so the operation reads
+  nothing; a value that holds `[Symbol.iterator]` is the array of the items it yields when the operation runs, in
+  order, as `Array.from` gives them; and a value that lacks it stops the pipeline. A value that has the member is read as JavaScript reads it: a text iterates its
+  characters by code point (`probe:js-array-from-text`). The redesign writes `toArray` before every operation
+  (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:108`) and reads a missing value as a list of no item and a
+  text or a number as a list of one (`Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93`), so its count over a
+  list that reads nothing is 0, where D6.3 reads nothing.
+
+**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`, `nonNull`, `toArray`).
 
 **Checker.**
 - `Absence.tla:MissingListReadsNothing`
@@ -832,6 +863,8 @@ Terms used throughout:
 - `probe:core-json-decimal-text-written`
 - `probe:core-json-decimal-text-rounded`
 - `probe:core-json-double-text`
+- `probe:dom-children-iterable`
+- `probe:js-array-from-text`
 - `check:fluent`
 
 **Doors.**
@@ -866,6 +899,10 @@ Terms used throughout:
   `Alis.Reactive/Components/JsMembers.cs:140`) beside `Select` and `Count()` on an array
   (`Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:44`, `Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:93`).
 - B11: the method table is scanned for `PureMethodAttribute` (`Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:51-55`).
+- An element's children and classes are read as lists with no declaration and counted at lunch seating, its seats by
+  their attributes and its flags by name
+  (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/DomOps/Index.cshtml:16-32`), through a `toArray`
+  the redesign writes before every operation (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:108`).
 
 **Defects.**
 - `X6.1` type: a list cannot be counted two ways: new:N6.1 leaves one `Count()`.
@@ -1042,6 +1079,10 @@ Terms used throughout:
   `Select(d => (int?)d.Supply.Vials).Count(v => v == null)` shows 1.
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
+- `X6.56` behavior (D6.17): at lunch seating, a table's seats are counted from its seat list's children and those
+  needing close supervision by each seat's `data-supervision`, and its flags from its card's classes; a fall risk added
+  to the card is counted in the next step; and an object that declares an iterator but holds a paged result stops the
+  pipeline at the operation, and the step after it does not run.
 
 ## Q7. Every value position takes every source
 
@@ -3674,6 +3715,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     it returns a promise, whether it is optional, whether its read admits null or undefined, whether its write takes
     null, whether it is callable, and the type's bases by name. TypeScript's `private` and `protected`, `#private` and
     a JSDoc `@private` member are left out; a getter alone is read-only and a setter alone write-only.
+  - A type's `[Symbol.iterator]` is a member the table writes with the type it yields, as it writes an array's items,
+    so a declared iterator is checked as a declared list is (D5.13): on a type that has none, with items it does not
+    yield, and `LiveObjects<T>` on a type that is no array.
   - An MSBuild target (`poc/VendorContract.targets`) writes the table into obj/ before CoreCompile, incremental on the
     TypeScript inputs, so no `dotnet build` reads a stale one, and it is not committed: lib.dom alone holds 60,695
     members, and the table is a function of inputs review already reads. A developer who brings a component imports
