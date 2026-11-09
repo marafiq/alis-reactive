@@ -12,6 +12,15 @@ public sealed class CardsController : Controller
 
     public IActionResult Listed() => Json(new CareCard("Ada Byron"));
 
+    public async Task<EmptyResult> Broken()
+    {
+        Response.ContentType = "text/html; charset=utf-8";
+        Response.ContentLength = 1000;
+        await Response.WriteAsync("<h2>Ben Okafor</h2><p>Room 4");
+        await Response.Body.FlushAsync();
+        return new EmptyResult();
+    }
+
     public IActionResult RelativeUrl() => View(new CardsWard());
 
     public IActionResult FragmentUrl() => View(new CardsWard());

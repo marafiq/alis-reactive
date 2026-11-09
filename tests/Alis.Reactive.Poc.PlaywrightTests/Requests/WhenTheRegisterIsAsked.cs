@@ -308,6 +308,30 @@ public sealed class WhenTheRegisterIsAsked : AppPageTest
     }
 
     [Test]
+    public async Task the_route_for_every_other_outcome_reads_a_body_that_breaks_off_as_a_network_failure()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Broken");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#failure")).ToHaveTextAsync("The network failed");
+        await Expect(Page.Locator("#register-copy")).ToHaveTextAsync("");
+    }
+
+    [Test]
+    public async Task a_status_answer_whose_body_breaks_off_runs_the_route_for_every_other_outcome_as_a_network_failure()
+    {
+        await Open("/Residents/Lookup");
+        await Page.GetByLabel("Ward").FillAsync("Stranded");
+
+        await LookUp("Ada Byron");
+
+        await Expect(Page.Locator("#failure")).ToHaveTextAsync("The network failed");
+        await Expect(Page.Locator("#register-copy")).ToHaveTextAsync("");
+    }
+
+    [Test]
     public async Task the_route_for_every_other_outcome_reads_a_redirect_to_another_origin()
     {
         await Open("/Residents/Lookup");

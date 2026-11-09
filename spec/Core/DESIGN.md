@@ -1584,7 +1584,7 @@ contract `HttpSend`, which is no node kind.
   |---------|-------|
   | a 2xx status and a body of the declared kind | `OnSuccess` |
   | a status that is not 2xx | the route for that status, else the catch-all |
-  | the network failed | the catch-all |
+  | the network failed, or a body broke off while it was read | the catch-all |
   | a redirect that ended on another origin | the catch-all |
   | a 2xx status and a body not of the declared kind | the catch-all |
 
@@ -1659,8 +1659,9 @@ contract `HttpSend`, which is no node kind.
     taken against the response's own `Date`, so the browser's clock does not enter. A wait that would pass the
     30 seconds ends the retries at once, and the error route runs. A value in neither form is the server's
     defect: it is logged once as an error, and the standard wait runs.
-  - Retrying only when `Retry-After` is sent is refused: a network failure has no response, and a gateway's 502 or
-    504 comes from no app server, so neither carries the header, and those are the failures a retry exists for.
+  - Retrying only when `Retry-After` is sent is refused: a network failure hands the page no header, a body that
+    breaks off included, and a gateway's 502 or 504 comes from no app server, so neither carries the header, and those
+    are the failures a retry exists for.
 - D10.15 Across attempts, the request's check, guards and argument run once, and every attempt sends the same
   argument. `WhileLoading` runs once before the first attempt, the route once for the last attempt's outcome,
   and `Finally` once after it. An owner disposed between attempts ends the retries (Q11).
@@ -1945,7 +1946,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     content, `FailureOutcome`, a closed choice (S8) whose own converter writes each case as the plan's outcome,
     `status`, `network`, `redirect` and `content`, and which no converter the app's JSON options add for enums
     reaches, so a condition on it agrees with the browser; `Status`, 0 for a
-    network failure, the Fetch Standard's network error; `Headers`); `ResponseFile`, the data of a file body (`Name`, `Size`, `Type`); `Markup`, an HTML
+    network failure, a body that breaks off while it is read included, the Fetch Standard's network error; `Headers`); `ResponseFile`, the data of a file body (`Name`, `Size`, `Type`); `Markup`, an HTML
     body, the only text `Into(elementId, source)` takes; `BrowserFile` (lib.dom `File`), held by a file input's member;
     and `pipeline.PageUrl<TPage>()` or
     `PageUrl<TPage>(template)`, whose `Read(q => q.A.B)` reads a placeholder member from the path and any other from the

@@ -118,6 +118,19 @@ public sealed class WhenACardLoadsIntoASlot : AppPageTest
     }
 
     [Test]
+    public async Task a_card_whose_body_breaks_off_leaves_the_slot_as_it_was()
+    {
+        await Open("/Cards/Ward");
+        await Click("Open Ada's card");
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ada Byron");
+
+        await Click("Open the broken card");
+        await Expect(Page.Locator("#asked")).ToHaveTextAsync("Asked for the broken card");
+
+        await Expect(Page.Locator("#card h2")).ToHaveTextAsync("Ada Byron");
+    }
+
+    [Test]
     public async Task a_step_after_a_request_with_no_route_for_its_outcome_runs()
     {
         await Open("/Cards/Ward");

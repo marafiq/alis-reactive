@@ -13,11 +13,13 @@ public sealed class ResidentsController : Controller
     public IActionResult Lookup() => View(new ResidentLookup { Ward = "South" });
 
     [HttpGet("/Residents/Summary/{name}")]
-    public IActionResult Summary(ResidentQuery query)
+    public async Task<IActionResult> Summary(ResidentQuery query)
     {
         Response.Headers["x-register-copy"] = "Main register";
         return query.Ward switch
         {
+            "Broken" => await BreakingOff(StatusCodes.Status200OK),
+            "Stranded" => await BreakingOff(StatusCodes.Status404NotFound),
             "Annex" => Repairing("the register is being repaired"),
             "Lodge" => Repairing("the register is being repaired", "ask at the front desk"),
             "East" => Content("{\"name\": \"" + query.Name + "\", \"room\": \"12\"}", "text/plain"),
@@ -107,6 +109,16 @@ public sealed class ResidentsController : Controller
     {
         Response.Headers["x-register-copy"] = "Relocating desk";
         return Redirect("/Residents/Summary/" + Uri.EscapeDataString(name) + "?ward=South");
+    }
+
+    private async Task<EmptyResult> BreakingOff(int status)
+    {
+        Response.StatusCode = status;
+        Response.ContentType = "application/json";
+        Response.ContentLength = 1000;
+        await Response.WriteAsync("{\"reason\": \"The register stopped");
+        await Response.Body.FlushAsync();
+        return new EmptyResult();
     }
 
     private EmptyResult Dropped()

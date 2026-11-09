@@ -67,6 +67,13 @@
         pipeline.Element("asked").Text.Set("Asked for the unreachable card");
     }))
 
+@(plan.Button("open-broken", "Open the broken card")
+    .Reactive(button => button.Click, pipeline =>
+    {
+        pipeline.Get("/Cards/Broken").Into("card");
+        pipeline.Element("asked").Text.Set("Asked for the broken card");
+    }))
+
 @(plan.Button("close", "Close the card")
     .Reactive(button => button.Click, pipeline => pipeline.Unload("card")))
 
