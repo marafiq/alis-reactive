@@ -64,7 +64,10 @@ The meanings `M1.D1` to `M1.D3` are in `spec/TriggersAndPipelines/features.json`
   reflection (`Alis.Reactive/Razor/MarkupRaise.cs:24-31` at 65fdf118d, B11), names it in camel case whatever the app's
   options, and the browser hands every member over as text (`Alis.Reactive.Assets/runtime/plugins/document.ts:65-73`
   at 65fdf118d). M1.D3 writes the members from what the app's JSON contract writes, through the plan, and a handler
-  reads each scalar member through `as` with its shape, one read for markup and `Dispatch`. The refusals of a record, a
+  reads each scalar member through `as` with its shape, one read for markup and `Dispatch`. A member that holds null is
+  named in the core's `data-alis-null`: the redesign drops it (`Alis.Reactive/Razor/MarkupRaise.cs:26` at 65fdf118d) and
+  hands `{}` for markup with no payload (`Alis.Reactive.Assets/runtime/plugins/document.ts:65-73` at 65fdf118d), which
+  its reads take as missing, like null, while D4.2 reads a member a present payload lacks as its start. The refusals of a record, a
   list and a name an attribute cannot carry back stay (`Alis.Reactive/Razor/MarkupRaise.cs:36-56` at 65fdf118d); under
   an app whose naming starts a name with a capital letter, every markup payload member is refused, naming `Dispatch`.
 - Two declarations of one name are one DOM event, so a handler of one hears the other's dispatch with another payload

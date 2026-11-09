@@ -409,7 +409,7 @@
         },
         {
           "id": "M1.D3",
-          "meaning": "Markup raises its event on a click at or inside the element it marks, once per click, with the payload of the innermost marked element that holds the click's target; the core's document plugin listens to clicks once per page, in the capture phase, and reads only its own attributes on the target's ancestors. The payload is one attribute per member, data-alis-detail- and the member's name, holding its text: the form Html.Raises writes where the view renders and a Fusion template's event button fills in the browser, which D15.2 keeps as it is. Html.Raises writes each member as the plan's live form writes it, from the payload the app's JSON contract writes, with no reflection of the core's own: a text as itself, a number as its number, an enum and a date as the live form writes them, a boolean as true or false; a member that holds null is carried by no attribute, and markup that carries no attribute raises a detail of null (M1.D2). A record, a list, and a member whose name is not a lowercase letter followed by letters, digits or underscores, since the browser lowercases an attribute's name, are refused where the view renders, naming Dispatch. The handler of an app event reads each scalar member of its payload through as with the member's shape, so a member markup carried as text reads as its number, boolean, enum or date, and one Dispatch carried in the live form reads as it is."
+          "meaning": "Markup raises its event on a click at or inside the element it marks, once per click, with the payload of the innermost marked element that holds the click's target; the core's document plugin listens to clicks once per page, in the capture phase, and reads only its own attributes on the target's ancestors. The payload is one attribute per member, data-alis-detail- and the member's name, holding its text: the form Html.Raises writes where the view renders and a Fusion template's event button fills in the browser, which D15.2 keeps as it is. Html.Raises writes each member as the plan's live form writes it, from the payload the app's JSON contract writes, with no reflection of the core's own: a text as itself, a number as its number, an enum and a date as the live form writes them, a boolean as true or false; a member that holds null is carried by no attribute of its own and is named in one attribute of the core's, data-alis-null, which Html.Raises writes whenever it is given a payload, empty when no member holds null. The document plugin raises a detail of null only from a marked element that carries neither a member attribute nor data-alis-null, markup raised with no payload (M1.D2), and otherwise an object that holds each carried member's text and null for each member data-alis-null names, so a handler reads from markup what it reads from Dispatch of the same payload. A record, a list, and a member whose name is not a lowercase letter followed by letters, digits or underscores, since the browser lowercases an attribute's name, are refused where the view renders, naming Dispatch. The handler of an app event reads each scalar member of its payload through as with the member's shape, so a member markup carried as text reads as its number, boolean, enum or date, and one Dispatch carried in the live form reads as it is."
         }
       ],
       "oracle": "The DOM Standard: dispatchEvent runs an event's listeners synchronously in the order they were added and reports a listener's exception without stopping the dispatch, a CustomEvent carries its detail, and a click's target's ancestors are its path; the HTML Standard, which lowercases an attribute's name in an HTML document; and the spec itself for the payload's live form (gate 1's P8), its reads (D4.2) and the as conversion (D3.13).",
@@ -451,6 +451,11 @@
           "id": "M1.X5",
           "rung": "behavior",
           "defect": "An event that declares a payload, raised with none, stops its handler or shows the members' starts, where each read reads nothing and the handler runs on (M1.D2, D4.2)."
+        },
+        {
+          "id": "M1.X10",
+          "rung": "behavior",
+          "defect": "Markup hands a handler another payload than Dispatch of the same value: a member that holds null reads its start, or a payload whose members all hold null raises a detail of null, so its members read nothing (M1.D3, D4.2)."
         },
         {
           "id": "M1.X6",
@@ -495,6 +500,14 @@
           "outcome": "The party size's text is empty and the status reads Rung.",
           "opposite": "Raised with party size 3, the party size's text reads 3.",
           "defect": "The missing payload stops the handler, so Rung never shows, or its party size reads its start and shows 0."
+        },
+        {
+          "for": "M1.X10",
+          "page": "An escort desk whose handler of an escort request, whose Guide starts as the porter and whose Note starts null, shows No guide when the guide IsNull, else the guide; three buttons raise it from markup, one with the guide null and the note Late, one with both null, and one with no payload, and a fourth raises the first button's payload with Dispatch.",
+          "gesture": "Click the four buttons in turn, reading the guide text after each.",
+          "outcome": "The first, second and fourth clicks show No guide; the third empties the guide text.",
+          "opposite": "Raised from markup with the guide Ruth, the guide text shows Ruth.",
+          "defect": "Markup carries the null guide by no attribute, so the first click reads its start and shows the porter where Dispatch shows No guide, or the payload whose members all hold null raises null, so the second click empties the text."
         },
         {
           "for": "M1.X8",
