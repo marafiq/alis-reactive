@@ -226,10 +226,11 @@ internal sealed class WhenNothing : IChoice
 
 internal sealed class HttpResponse
 {
-    private HttpResponse(int status, HttpOutcome outcome, JsonElement body)
+    private HttpResponse(int status, HttpOutcome outcome, FetchHeaders headers, JsonElement body)
     {
         Status = status;
         Outcome = outcome;
+        Headers = headers;
         Body = body;
     }
 
@@ -237,7 +238,16 @@ internal sealed class HttpResponse
 
     public HttpOutcome Outcome { get; }
 
+    public FetchHeaders Headers { get; }
+
     public JsonElement Body { get; }
+}
+
+internal sealed class FetchHeaders
+{
+    private FetchHeaders()
+    {
+    }
 }
 
 [JsonConverter(typeof(ChoiceConverter<HttpMethod>))]

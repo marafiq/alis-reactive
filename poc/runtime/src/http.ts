@@ -13,22 +13,26 @@ export async function answered(sent: HttpSend, request: RequestStatement): Promi
   try {
     response = await fetch(url, { method: sent.method, headers });
   } catch (failed) {
-    return caught(request, sent, url, "network", 0, "the network failed: " + String(failed));
+    return caught(request, sent, url, "network", Response.error(), "the network failed: " + String(failed));
   }
   if (response.redirected && new URL(response.url).origin !== window.location.origin) {
-    return caught(request, sent, url, "redirect", response.status, "it was redirected to " + new URL(response.url).origin);
+    return caught(request, sent, url, "redirect", response, "it was redirected to " + new URL(response.url).origin);
   }
   if (!response.ok) return statusAnswer(request, response);
   const decoded = await decode(response, request.success.kind);
-  if (decoded.kind === "notOfKind") return caught(request, sent, url, "content", response.status, decoded.reason);
-  return { route: request.success.do, reply: { status: response.status, outcome: "success", body: decoded.body } };
+  if (decoded.kind === "notOfKind") return caught(request, sent, url, "content", response, decoded.reason);
+  return { route: request.success.do, reply: replyOf(response, "success", decoded.body) };
 }
 
 async function statusAnswer(request: RequestStatement, response: Response): Promise<Answer> {
   const route = request.statuses.find((each) => each.status === response.status);
-  if (route === undefined) return { route: request.otherwise.do, reply: { status: response.status, outcome: "status", body: null } };
+  if (route === undefined) return { route: request.otherwise.do, reply: replyOf(response, "status", null) };
   const decoded = await decode(response, route.kind);
-  return { route: route.do, reply: { status: response.status, outcome: "status", body: decoded.kind === "decoded" ? decoded.body : null } };
+  return { route: route.do, reply: replyOf(response, "status", decoded.kind === "decoded" ? decoded.body : null) };
+}
+
+function replyOf(response: Response, outcome: HttpOutcome, body: JsonValue): HttpResponse {
+  return { status: response.status, outcome, headers: response.headers, body };
 }
 
 function composed(request: HttpSend): string {
@@ -126,7 +130,7 @@ function isJson(mediaType: string): boolean {
   return mediaType === "application/json" || mediaType.endsWith("+json");
 }
 
-function caught(request: RequestStatement, sent: HttpSend, url: string, outcome: HttpOutcome, status: number, reason: string): Answer {
+function caught(request: RequestStatement, sent: HttpSend, url: string, outcome: HttpOutcome, response: Response, reason: string): Answer {
   console.error("[alis] " + sent.method + " " + url + " ended '" + outcome + "': " + reason + ".");
-  return { route: request.otherwise.do, reply: { status, outcome, body: null } };
+  return { route: request.otherwise.do, reply: replyOf(response, outcome, null) };
 }

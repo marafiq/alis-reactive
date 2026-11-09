@@ -102,6 +102,13 @@ public abstract class JsObject
         where TObject : JsObject, new()
         => Bound<TObject>(new Binding(new GetExpression(Binding.Target, [Member(name, declaredBy)], Binding.Read(optional)), Binding.Build, Binding.Below(optional || nullable)));
 
+    private protected TObject LiveObject<TObject>(TObject declaration, [CallerMemberName] string declaredBy = "")
+        where TObject : JsObject
+    {
+        declaration.Bind(new Binding(new GetExpression(Binding.Target, [Member(null, declaredBy)], Binding.Members), Binding.Build, Binding.Members));
+        return declaration;
+    }
+
     protected LiveObjects<TItem> LiveObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TItem : JsObject, new()
         => new(new GetExpression(Binding.Target, [Member(name, declaredBy)], Binding.Read(optional)), Binding.Build, Binding.Below(optional || nullable));

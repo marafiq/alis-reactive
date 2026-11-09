@@ -13,18 +13,24 @@ public sealed class ResidentsController : Controller
     public IActionResult Lookup() => View(new ResidentLookup { Ward = "South" });
 
     [HttpGet("/Residents/Summary/{name}")]
-    public IActionResult Summary(ResidentQuery query) => query.Ward switch
+    public IActionResult Summary(ResidentQuery query)
     {
-        "Annex" => StatusCode(StatusCodes.Status500InternalServerError),
-        "East" => Content("{\"name\": \"" + query.Name + "\", \"room\": \"12\"}", "text/plain"),
-        "North" => Content("{\"name\": \"" + query.Name, "application/json"),
-        "Respite" => Content("", "application/json"),
-        "Basement" => Dropped(),
-        "Moved" => Redirect("http://" + OtherHost() + ":" + Request.Host.Port + "/Residents/Elsewhere/" + Uri.EscapeDataString(query.Name)),
-        "West" => new ContentResult { StatusCode = StatusCodes.Status404NotFound, ContentType = "text/plain", Content = "{\"reason\": \"" + query.Name + " is not on the West register\"}" },
-        "Interim" => FromACopy(Answer(query)),
-        _ => Answer(query),
-    };
+        Response.Headers["x-register-copy"] = "Main register";
+        return query.Ward switch
+        {
+            "Annex" => Repairing("the register is being repaired"),
+            "Lodge" => Repairing("the register is being repaired", "ask at the front desk"),
+            "East" => Content("{\"name\": \"" + query.Name + "\", \"room\": \"12\"}", "text/plain"),
+            "North" => Content("{\"name\": \"" + query.Name, "application/json"),
+            "Respite" => Content("", "application/json"),
+            "Basement" => Dropped(),
+            "Relocated" => Relocating(query.Name),
+            "Moved" => Redirect("http://" + OtherHost() + ":" + Request.Host.Port + "/Residents/Elsewhere/" + Uri.EscapeDataString(query.Name)),
+            "West" => new ContentResult { StatusCode = StatusCodes.Status404NotFound, ContentType = "text/plain", Content = "{\"reason\": \"" + query.Name + " is not on the West register\"}" },
+            "Interim" => FromACopy(Answer(query)),
+            _ => Answer(query),
+        };
+    }
 
     [HttpGet("/Residents/Present/{name}")]
     public IActionResult Present(ResidentQuery query)
@@ -34,6 +40,9 @@ public sealed class ResidentsController : Controller
     public IActionResult Elsewhere(string name)
     {
         Response.Headers.AccessControlAllowOrigin = "*";
+        Response.Headers.AccessControlExposeHeaders = "X-Register-Copy";
+        Response.Headers["X-Register-Copy"] = "Elsewhere register";
+        Response.Headers["X-Register-Note"] = "kept at the annex";
         return Answer(new ResidentQuery { Name = name, Ward = "Moved" });
     }
 
@@ -72,6 +81,8 @@ public sealed class ResidentsController : Controller
 
     public IActionResult HeaderNamed(string name, string value) => View(new HeaderAsk { Name = name, Value = value });
 
+    public IActionResult ReplyHeaderNamed(string name) => View(new HeaderAsk { Name = name });
+
     public IActionResult RouteAfterAStep() => View(new ResidentLookup());
 
     public IActionResult RequestWrittenTwice() => View(new ResidentLookup());
@@ -85,6 +96,18 @@ public sealed class ResidentsController : Controller
     public IActionResult CatchAllTwice() => View(new ResidentLookup());
 
     public IActionResult ReplyAfterItsRequest() => View(new ResidentLookup());
+
+    private StatusCodeResult Repairing(params string[] notes)
+    {
+        Response.Headers.Append("X-Register-Note", notes);
+        return StatusCode(StatusCodes.Status500InternalServerError);
+    }
+
+    private RedirectResult Relocating(string name)
+    {
+        Response.Headers["x-register-copy"] = "Relocating desk";
+        return Redirect("/Residents/Summary/" + Uri.EscapeDataString(name) + "?ward=South");
+    }
 
     private EmptyResult Dropped()
     {

@@ -11,6 +11,8 @@ public class Response<TRequest> : JsObject
     }
 
     public ReadOnly<int> Status => ReadOnly<int>();
+
+    public ResponseHeaders Headers => LiveObject(new ResponseHeaders());
 }
 
 public sealed class Response<TRequest, TBody> : Response<TRequest>
@@ -20,6 +22,15 @@ public sealed class Response<TRequest, TBody> : Response<TRequest>
     }
 
     public ReadOnly<TBody> Body => ReadOnly<TBody>();
+}
+
+public sealed class ResponseHeaders : JsObject
+{
+    internal ResponseHeaders()
+    {
+    }
+
+    public MethodResult<string?> Get(string name) => Method<string?>([Fixed(HeaderNames.Readable(name))]);
 }
 
 public sealed class Markup
@@ -54,4 +65,6 @@ public sealed class Failure : JsObject
     public ReadOnly<FailureOutcome> Outcome => ReadOnly<FailureOutcome>();
 
     public ReadOnly<int> Status => ReadOnly<int>();
+
+    public ResponseHeaders Headers => LiveObject(new ResponseHeaders());
 }

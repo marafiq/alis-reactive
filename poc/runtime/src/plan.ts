@@ -107,6 +107,7 @@ export type HttpOutcome = "success" | "status" | "network" | "redirect" | "conte
 export interface HttpResponse {
   readonly status: number;
   readonly outcome: HttpOutcome;
+  readonly headers: Headers;
   readonly body: JsonValue;
 }
 

@@ -44,15 +44,20 @@
                 found.When(summary.Status.Eq(203))
                     .Then(copy => copy.Element("answered-by").Text.Set("Answered from a copy"))
                     .Else(register => register.Element("answered-by").Text.Set("Answered by the register"));
+                found.Element("register-copy").Text.Set(summary.Headers.Get("X-Register-Copy"));
             })
             .OnError<NoResident>(404, (missing, notFound) =>
             {
                 notFound.Element("lookup-route").Text.Set("Not on the register");
                 notFound.Element("lookup-status").Text.Set(missing.Body.Read(m => m.Reason));
+                notFound.Element("register-copy").Text.Set(missing.Headers.Get("X-Register-Copy"));
             })
             .OnError((failed, other) =>
             {
                 other.Element("lookup-status").Text.Set("The register could not answer");
+                other.Element("register-copy").Text.Set(failed.Headers.Get("X-Register-Copy"));
+                other.Element("register-note").Text.Set(failed.Headers.Get("X-Register-Note"));
+                other.Element("register-type").Text.Set(failed.Headers.Get("Content-Type"));
                 other.When(failed.Outcome.Eq(FailureOutcome.Status).And(failed.Status.Eq(500)))
                     .Then(status => status.Element("failure").Text.Set("The register failed with 500"))
                     .ElseIf(failed.Outcome.Eq(FailureOutcome.Network).And(failed.Status.Eq(0)))
@@ -67,6 +72,7 @@
 
 <p>Lookup: <strong id="lookup-status">not looked up</strong> <strong id="lookup-route"></strong> <strong id="answered-by"></strong></p>
 <p>Failure: <strong id="failure">none</strong></p>
+<p>Register copy: <strong id="register-copy">not read</strong>, its note: <strong id="register-note">not read</strong>, answered as <strong id="register-type">not read</strong></p>
 
 @(plan.Button("mark-present", "Mark present")
     .Reactive(button => button.Click, pipeline =>

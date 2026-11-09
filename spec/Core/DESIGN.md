@@ -1812,9 +1812,9 @@ contract `HttpSend`, which is no node kind.
   (`Lanes.tla:JoinAfterEveryBranchTail`). Every busy target a request held is released by the time its run ends,
   aborted or disposed (`Run.tla:ReleasedWhenEnded`).
 
-**Schema nodes.** `request`, its routes and its layers (D10.23), `get` of `ok` and `status` on the reply, the contract
-`HttpSend` and the reply, `HttpResponse`, with the fields `schema.md` lists for them, and the contract plugins `busy`
-and `notice` (D10.21).
+**Schema nodes.** `request`, its routes and its layers (D10.23), `get` of `status`, `outcome`, `body` and `request` on
+the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the reply, `HttpResponse`, with the fields
+`schema.md` lists for them, and the contract plugins `busy` and `notice` (D10.21).
 
 **Checker.**
 - `Request.tla:FailedCheckSendsNothing`
@@ -1866,7 +1866,7 @@ and `notice` (D10.21).
   route shows no other container's failures, since a message maps only to the inputs its own request sent (D13.3).
 - `N10.1` new: the error door on each host, `ValidationResult.ToErrorResponse()`: net10 a `ValidationProblemDetails`
   result, net48 a JSON result with status 400 and `TrySkipIisCustomErrors`, replacing the body each app builds by hand.
-- `N10.2` new: `HttpResponse`, the contract of what `send` returns (`ok`, `status`, `outcome`, `body`).
+- `N10.2` new: `HttpResponse`, the contract of what `send` returns (`status`, `outcome`, `body`).
 - `N10.3` new: the standard retry policy of D10.14 in the defaults, its attempts and first wait, and a request's
   opting out; the door's form goes to gate 2.
 - `N10.4` new: a condition on a part a request sends, on a chained request and on a parallel branch (D10.16),
@@ -1951,6 +1951,17 @@ and `notice` (D10.21).
     query by its C# path, as the action that rendered the page bound it, the member's start when the key is absent or
     its text does not convert. Keys are compared ignoring case, as both hosts bind them (`probe:core-query-key-case`,
     `probe:mvc5-query-key-case`), which `URLSearchParams.get` does not (`probe:js-query-get-case`).
+  - a reply's headers, on `Response<TRequest>` and `Failure`: `Headers.Get(name)` reads a header by the browser's
+    `Headers.get`, so a name matches in any case, a header the answer repeats reads its values joined by a comma and a
+    space, and a header the answer lacks reads null, as `Headers.get` types it (`string | null`, so
+    `MethodResult<string?>`), and a text set from it shows nothing (D5.3). Each outcome reads the headers of the answer
+    the browser hands the page (the Fetch Standard): a success, a status and a content outcome, the final answer's after
+    any redirect within the page's origin; a redirect to another origin, the final answer's as CORS filters them, the
+    CORS-safelisted response headers and those that origin names in `Access-Control-Expose-Headers`, so a header it does
+    not expose reads null; a network failure, the network error, none, so every header reads null. Refused where the
+    view renders (`poc/Alis.Reactive.Poc/Requests/HeaderNames.cs`): a name that is no token, by the token rule a request
+    header's name follows (D9.11), and `Set-Cookie` and `Set-Cookie2` in any case, the Fetch Standard's forbidden
+    response header names, which the browser never hands a page, so a read of either reads null on every answer.
   - the condensed doors, which write the plan the full form writes: `Set(r => r.M, value)`, placed by
     D9.4, D9.6 and D9.9 into `Path`, `Query` or the body the request names, else multipart (D10.22); `Form(form)` and
     `Inputs(container)`, sent as multipart fields and file parts, a GET's into its query; `Input(r => r.M, input)`,

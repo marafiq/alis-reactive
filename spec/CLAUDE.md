@@ -154,7 +154,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - Chosen within the owner's yes, 2026-11-07, unit 17a, and moved to N10.7's form in 17c(a3-ii), 2026-11-08: a request's
   routes are written on the request, `pipeline.Get<TRequest>(url, request => request.Set(r => r.Member, value or
   source)).OnSuccess<T>((reply, pipeline) => ..).OnError<T>(status, (reply, pipeline) => ..).OnError((failed, pipeline)
-  => ..)`; the body is `reply.Body`, a source read through the data path `MethodResult.Read` uses. The form is gate 2's.
+  => ..)`; the body is `reply.Body`, a source read through the data path `MethodResult.Read` uses, and a header is
+  `reply.Headers.Get(name)`, on every reply, read by the browser's `Headers.get` (N10.7). The form is gate 2's.
 - Chosen within the owner's yes, 2026-11-07, unit 16a: a declaration's value type is checked against its vendor's
   TypeScript at build (ALIS025), the rule `spec/Core/DESIGN.md` states for a payload ("The member's C# type is the API's
   value type") and the analyzer checked only for null: a property's value, both ways, a method's result, awaited or

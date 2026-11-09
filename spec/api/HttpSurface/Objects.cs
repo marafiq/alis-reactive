@@ -6,15 +6,6 @@ using Alis.Reactive.Values;
 
 namespace Alis.Reactive.Requests;
 
-public sealed class ResponseHeaders : JsObject
-{
-    private ResponseHeaders()
-    {
-    }
-
-    public MethodResult<string?> Get(string name) => throw new NotSupportedException();
-}
-
 public sealed class ResponseFile
 {
     public string Name { get; init; } = "";

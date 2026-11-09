@@ -9,14 +9,7 @@ public static class GetStandIns
 {
     extension<TRequest>(Response<TRequest> reply)
     {
-        public ResponseHeaders Headers => throw new NotSupportedException();
-
         public ReadOnly<TRequest> Request => throw new NotSupportedException();
-    }
-
-    extension(Failure failed)
-    {
-        public ResponseHeaders Headers => throw new NotSupportedException();
     }
 
     public static GetRequest<TModel, TRequest, Response<TRequest, TBody>> OnSuccess<TModel, TRequest, TBody>(

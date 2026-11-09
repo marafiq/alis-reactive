@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Alis.Reactive.Requests;
 
 namespace Alis.Reactive.Pipelines;
 
 internal static class RequestHeaders
 {
-    private const string TokenMarks = "!#$%&'*+-.^_`|~";
-
     private static readonly string[] SetByTheBrowser =
     [
         "Accept-Charset", "Accept-Encoding", "Access-Control-Request-Headers", "Access-Control-Request-Method", "Connection",
@@ -23,7 +22,7 @@ internal static class RequestHeaders
 
     internal static void RequireANewName(string name, IReadOnlyList<SentMember> sent)
     {
-        if (!IsAToken(name)) throw new ArgumentException($"'{name}' is no header name: a header name is letters, digits and {TokenMarks}, as X-Requested-With.", nameof(name));
+        HeaderNames.Checked(name);
         if (Is(name, "Content-Type")) throw new ArgumentException("Content-Type is set by the body door, and a request with no body sends none.", nameof(name));
         if (Is(name, "Accept")) throw new ArgumentException("Accept is set by the kind the success route reads, never by a header the view writes.", nameof(name));
         if (Is(name, "RequestVerificationToken")) throw new ArgumentException("RequestVerificationToken carries the antiforgery token, which the framework sends, never a header the view writes.", nameof(name));
@@ -46,8 +45,6 @@ internal static class RequestHeaders
         if (outside != default) throw new ArgumentException($"The header {name} holds '{outside}', which a header value does not carry: a header carries visible US-ASCII, spaces and tabs; send it in the query.", nameof(value));
         return trimmed;
     }
-
-    private static bool IsAToken(string name) => name.Length > 0 && name.All(character => character is (>= 'A' and <= 'Z') or (>= 'a' and <= 'z') or (>= '0' and <= '9') || TokenMarks.Contains(character));
 
     private static bool CarriedInAValue(char character) => character is '\t' or (>= ' ' and <= '~');
 

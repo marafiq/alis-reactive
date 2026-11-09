@@ -20,10 +20,11 @@ var options = (JsonSerializerOptions)planJson.GetField("Options", BindingFlags.S
 var root = core.GetType("Alis.Reactive.Plan.PlanDocument", throwOnError: true)!;
 var choice = core.GetType("Alis.Reactive.Plan.IChoice", throwOnError: true)!;
 var pathStep = core.GetType("Alis.Reactive.Plan.PathStep", throwOnError: true)!;
+var fetchHeaders = core.GetType("Alis.Reactive.Plan.FetchHeaders", throwOnError: true)!;
 
 var declarations = new SortedDictionary<string, string>(StringComparer.Ordinal);
 var visited = new HashSet<Type>();
-var contract = new Contract(options, choice, pathStep, declarations, visited);
+var contract = new Contract(options, choice, pathStep, fetchHeaders, declarations, visited);
 contract.Visit(root);
 contract.Visit(core.GetType("Alis.Reactive.Plan.HttpSend", throwOnError: true)!);
 contract.Visit(core.GetType("Alis.Reactive.Plan.HttpResponse", throwOnError: true)!);
@@ -36,7 +37,7 @@ File.WriteAllText(args[0], text.ToString());
 Console.WriteLine($"plan-contract: wrote {declarations.Count} declarations to {args[0]}");
 return 0;
 
-internal sealed class Contract(JsonSerializerOptions options, Type choice, Type pathStep, SortedDictionary<string, string> declarations, HashSet<Type> visited)
+internal sealed class Contract(JsonSerializerOptions options, Type choice, Type pathStep, Type fetchHeaders, SortedDictionary<string, string> declarations, HashSet<Type> visited)
 {
     internal string Visit(Type type)
     {
@@ -46,6 +47,7 @@ internal sealed class Contract(JsonSerializerOptions options, Type choice, Type 
         if (type == typeof(JsonElement)) return "JsonValue";
         if (choice.IsAssignableFrom(type)) return Choice(type);
         if (type == pathStep) return Declare(type, "export type PathStep = string | number;\n");
+        if (type == fetchHeaders) return "Headers";
 
         var info = options.GetTypeInfo(type);
         return info.Kind switch

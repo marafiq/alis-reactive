@@ -325,9 +325,10 @@ no argument type of its own (D9.1).
   The body kind each route decodes is its route's, not `HttpSend`'s (D10.23).
 
   A request's trace context is its run's and is not in `HttpSend` (D20.3).
-- `HttpResponse`, the reply a `request` binds in its routes and `chained` block (N10.2, N10.7, D10.23): `ok`, `status`, `outcome`, `headers`, `request`, the members as
-  the request sent them, `inputs`, the inputs it sent, each its binding name and the entry the inputs table held
-  (D10.18), and `body`, absent for kind none and every HEAD route.
+- `HttpResponse`, the reply a `request` binds in its routes and `chained` block (N10.2, N10.7, D10.23): `status`,
+  `outcome`, `headers`, the headers of the answer the browser hands the page, lib.dom's `Headers`, whose `get` a `call`
+  reads (N10.7), `request`, the members as the request sent them, `inputs`, the inputs it sent, each its binding name
+  and the entry the inputs table held (D10.18), and `body`, absent for kind none and every HEAD route.
 - `FormCheck`, the argument of `alis.form`'s `validate`: the registration's key, the body the request sends with its
   format and the inputs it read (D10.18), and the request's `FormPlace` (D16.5, N16.2). A check with no request reads
   its container's inputs as the body (N16.3).
