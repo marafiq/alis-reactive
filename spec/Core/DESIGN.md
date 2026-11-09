@@ -4033,7 +4033,7 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     response's partial. Until it has a door, a view reloads the list with a chained GET `Into` its container.
 
 **Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
-`handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
+`Handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
 plans (Q19).
 
 **Checker.**
@@ -4770,7 +4770,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   response kinds holds no stream kind, and the two decisions do not overlap.
 
 **Schema nodes.** The plugins `alis.stream` and `alis.hub`, their plugin data `stream` (new) and `hub`, each carrying
-`offer` (D21.11), the contract plugin `reconnect`, `handler` for message and lifecycle triggers, and `call` for a hub's
+`offer` (D21.11), the contract plugin `reconnect`, `Handler` for message and lifecycle triggers, and `call` for a hub's
 invoke and send.
 
 **Checker.**

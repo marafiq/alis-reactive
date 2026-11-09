@@ -45,7 +45,8 @@ module 7's.
 Each name is gate 2's; each door is the capability it carries.
 
 This module adds no door. Its doors are the core's: `Html.ReactivePlan`, kept; the plan as a block of its view, whose
-end writes the plan and which replaces `Html.RenderPlan` (N14.2); a request's `Into` (N10.7, D10.11); `Unload(element)`, kept (D12.9); and `listen` (N12.1).
+end writes the plan and which replaces `Html.RenderPlan` (N14.2); a request's `Into` (N10.7, D10.11);
+`Unload(element)`, kept (D12.9); and `listen` (N12.1).
 
 The meanings `M9.D1` and `M9.D2` are in `spec/PartialsAndSlots/features.json`, on the feature they give.
 

@@ -1,0 +1,709 @@
+{
+  "module": "Realtime",
+  "features": [
+    {
+      "id": "M10.F1",
+      "summary": "A server-sent event stream: a stream declared once, its events by name with their message types, shared by the endpoint that writes it through ASP.NET Core 10's TypedResults.ServerSentEvents and the view that listens to it; a trigger per declared event whose message is data; the lifecycle triggers reconnecting, reconnected and closed; its state and close as members of a JS object; held by every owner whose plans name it; the reconnect offer while it has given up; and net10 alone. Main names the event by a string and reads a class built in the view; the redesign declares the stream once and has no lifecycle trigger, no hold for a plan that only reads it, and an offer that a click hides before a connection opens.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:ServerPushStream",
+        "Alis.Reactive:ServerPushSource<TStream>"
+      ],
+      "claims": [
+        "Alis.Reactive:TriggerBuilder<TModel>.ServerPush<TStream, TArgs>(ServerPushSource<TStream!>! stream, System.Func<TStream!, Event<TArgs!>!>! eventSelector, System.Action<TArgs!, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.ServerPush<TStream>(ServerPushSource<TStream!>! stream, System.Func<TStream!, Event!>! eventSelector, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.ServerPush(string! url, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.ServerPush(string! url, string! eventType, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.ServerPush<TPayload>(string! url, string! eventType, System.Action<TPayload, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Stream<TStream>(ServerPushSource<TStream!>! stream) -> TStream!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public TriggerBuilder<TModel> ServerPush(string url, Action<PipelineBuilder<TModel>> pipeline)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:63"
+        },
+        {
+          "line": "main",
+          "text": "public TriggerBuilder<TModel> ServerPush<TPayload>(string url, string eventType,",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:88"
+        },
+        {
+          "line": "main",
+          "text": "Html.On(plan, t => t.ServerPush<FacilityAlert>($\"/api/facility-alerts?drill={drillId}\", \"facility-alert\",",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/RealTime/Index.cshtml:15"
+        },
+        {
+          "line": "main",
+          "text": "const eventPayload: Record<string, unknown> = JSON.parse(messageEvent.data);",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/server-push.ts:81"
+        },
+        {
+          "line": "main",
+          "text": "if (filter.kind === \"any\") return \"message\";",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/server-push.ts:119"
+        },
+        {
+          "line": "main",
+          "text": "showRetryIndicator(url, () => retrySSE(url, wiredBehaviors));",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/server-push.ts:57"
+        },
+        {
+          "line": "main",
+          "text": "const RETRY_ELEMENT_ID = \"alis-realtime-connection-retry-container\";",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/retry-indicator.ts:12"
+        },
+        {
+          "line": "redesign",
+          "text": "public static ServerPushSource<TStream> At<TStream>(string url)",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/ServerPushStream.cs:45"
+        },
+        {
+          "line": "redesign",
+          "text": "public ReadOnly<int> ReadyState => ReadOnly<int>();",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/ServerPushStream.cs:50"
+        },
+        {
+          "line": "redesign",
+          "text": "public void Close() => Method();",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/ServerPushStream.cs:53"
+        },
+        {
+          "line": "redesign",
+          "text": "public TriggerBuilder<TModel> ServerPush<TStream, TArgs>(ServerPushSource<TStream> stream,",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:75"
+        },
+        {
+          "line": "redesign",
+          "text": "public TStream Stream<TStream>(ServerPushSource<TStream> stream)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:198"
+        },
+        {
+          "line": "redesign",
+          "text": "public Event<RoundNews> News => Event<RoundNews>();",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/RoundDeclarations.cs:5"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class RoundNews : JsObject",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/RoundDeclarations.cs:10"
+        },
+        {
+          "line": "redesign",
+          "text": "await Write(Stream.News.Name, new { message = \"Ada is up\", count = news.Next() }, stopped);",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/RealtimeController.cs:46"
+        },
+        {
+          "line": "redesign",
+          "text": "await Response.WriteAsync($\"event: {name}\\ndata: {data}\\n\\n\", stopped);",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/RealtimeController.cs:162"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Stream(news).Close();",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/Round.cshtml:39"
+        },
+        {
+          "line": "redesign",
+          "text": "if (managed.subscriptions.size > 0) return;",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/stream.ts:63"
+        },
+        {
+          "line": "redesign",
+          "text": "return streams.get(url)?.source.readyState ?? EventSource.CLOSED;",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/stream.ts:75"
+        },
+        {
+          "line": "redesign",
+          "text": "log.error(\"message.unreadable\", { error: toJavaScriptString(error), url, event });",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/stream.ts:87"
+        },
+        {
+          "line": "redesign",
+          "text": "element.hidden = true;",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/retry-indicator.ts:50"
+        },
+        {
+          "line": "proposed",
+          "text": "t.ServerPush(alerts, s => s.Alert, (alert, p) => p.Element(\"alert\").Text.Set(alert.Read(a => a.Message)))",
+          "doors": [
+            "N21.1",
+            "N5.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "services.AddReactiveRealtime(live => live.ShowReconnect())",
+          "doors": [
+            "N21.7"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "stream",
+        "get",
+        "call",
+        "data",
+        "as",
+        "set"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/ServerPushStream.cs:31-69"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:69-99"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:198-205"
+        },
+        {
+          "line": "redesign",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/RealtimeController.cs:160-163"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:60-96"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/stream.ts:1-98"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/retry-indicator.ts:1-54"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/server-push.ts:1-122"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/retry-indicator.ts:1-58"
+        }
+      ],
+      "core": [
+        "Q5",
+        "Q7",
+        "Q11",
+        "Q12",
+        "Q21"
+      ],
+      "meanings": [
+        {
+          "id": "M10.D4",
+          "meaning": "A stream a step closes, through its close member, ends its connection for every owner that holds it: it is no outage, so it runs no closed steps and enters no reconnect offer's count (D21.5, D21.11), and no message reaches a handler after it. It opens again only when a hold after its last holder's release opens a new connection (D12.6)."
+        }
+      ],
+      "oracle": "The HTML Standard's server-sent events (HTML Standard 9.2): EventSource, the text/event-stream format with its event, data, id and retry fields, the reconnection that sends Last-Event-ID, the failure that sets readyState to CLOSED, and close(); and ASP.NET Core 10's TypedResults.ServerSentEvents.",
+      "checker": [
+        "core:Q21",
+        "core:Q12",
+        "Realtime.tla:IndicatorNeverHidesEarly",
+        "Realtime.tla:IndicatorNeverStaysShown",
+        "Realtime.tla:OfferNeverHidesEarly",
+        "Realtime.tla:OfferNeverStaysShown",
+        "Ownership.tla:OfferOnlyWhileHeld",
+        "Lanes.tla:SkippedTriggerStartsNothing",
+        "Lanes.tla:ReplacedRunRunsNoRoute"
+      ],
+      "defects": [
+        {
+          "id": "X5.1",
+          "rung": "type"
+        },
+        {
+          "id": "X21.1",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.2",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.6",
+          "rung": "type"
+        },
+        {
+          "id": "X21.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.11",
+          "rung": "refusal"
+        },
+        {
+          "id": "X21.12",
+          "rung": "behavior"
+        },
+        {
+          "id": "M10.X4",
+          "rung": "behavior",
+          "defect": "A stream a step closed runs its closed steps or shows the reconnect offer, as if the server had given up, or a message the endpoint writes after the close still runs a handler (M10.D4)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X21.1",
+          "page": "A nurses' station page whose stream WardBoard declares Bulletin and AllClear; the page's Bulletin handler adds one to a tally shown in bulletins, and its AllClear handler writes clear into all-clear; Send a torn bulletin makes the endpoint write a Bulletin whose data is the text a bulletin, not JSON, and then an AllClear whose data is {}.",
+          "gesture": "Click Send a torn bulletin.",
+          "outcome": "bulletins reads 0, all-clear reads clear, and the console holds one error naming the stream's URL and the event bulletin.",
+          "opposite": "Send a bulletin, whose data is {}, shows bulletins at 1, and the console holds no error.",
+          "defect": "The handler runs with nothing as its data and bulletins reads 1; or the parse error throws inside the listener, so no error names the event and the AllClear after it leaves all-clear empty.",
+          "existing_test": "redesign WhenTheServerClosesAStream.an_event_whose_data_is_not_json_runs_no_pipeline"
+        },
+        {
+          "for": "X21.2",
+          "page": "A ward page whose Open the bed card loads a bed card into bed-slot; the card's plan names the stream WardBoard only to read its state, its Show the board's state writing the state into board-state, and no handler of the page or the card listens to WardBoard; the page's stream Switchboard writes the count of open WardBoard connections into board-lines on each change.",
+          "gesture": "Click Open the bed card, then Show the board's state, then Close the bed card.",
+          "outcome": "board-state reads open and board-lines reads 1 while the card is loaded, and board-lines reads 0 after Close the bed card.",
+          "opposite": "Before Open the bed card, board-lines reads 0.",
+          "defect": "The stream is held only through its subscriptions, so a plan that only reads its state holds nothing: board-state reads closed and board-lines stays 0 (Alis.Reactive.Assets/runtime/realtime/stream.ts:75 at 65fdf118d)."
+        },
+        {
+          "for": "X21.3",
+          "page": "A nurses' station page whose stream WardBoard writes each News message's text into news, whose reconnecting steps write dropped into board-dropped and whose reconnected steps write back into board-back; Drop the board makes the endpoint end the stream's response after a retry field of 100 milliseconds and accept the browser's next connection; Post news makes the endpoint write a News message with the text typed beside it.",
+          "gesture": "Click Drop the board, then type Fall in room 4 and click Post news.",
+          "outcome": "board-dropped reads dropped, board-back reads back, and news reads Fall in room 4.",
+          "opposite": "Before Drop the board, board-dropped and board-back are empty, and Post news with Ada is up shows Ada is up in news.",
+          "defect": "A stream raises no lifecycle trigger, so board-dropped and board-back stay empty while the browser reconnects (Alis.Reactive.Assets/runtime/realtime/hub.ts:116 at 65fdf118d lists a hub's alone), or the message after the reconnection runs no handler and news stays empty."
+        },
+        {
+          "for": "X21.8",
+          "page": "A medication round page whose stream RoundNews's Dose handler posts the dose to /doses under the request defaults, whose busy indicator is the page's; Drop the round makes the endpoint end the stream's response after a retry field of 2000 milliseconds, the stream's reconnecting steps write dropped into round-dropped and its reconnected steps write back into round-back; Post a dose makes the endpoint write a Dose message, and /doses answers after one second.",
+          "gesture": "Click Drop the round, then, once round-back reads back, click Post a dose.",
+          "outcome": "The busy indicator stays hidden while round-dropped reads dropped and round-back is empty, shows once the dose's request is sent, and hides when that request settles.",
+          "opposite": "With the stream open and no dose posted, the busy indicator stays hidden.",
+          "defect": "The reconnection holds the busy indicator, so it shows for the whole outage; or the request a message's run sends is left out of the page's count, so the indicator never shows for it or hides before it settles."
+        },
+        {
+          "for": "X21.9",
+          "page": "A ward page under ShowReconnect() with the Native reconnect offer, whose plan names the stream WardBoard, and whose Open the bed card loads into bed-slot a card whose plan names the stream BedBoard; Close both boards makes both endpoints end their responses and answer the browser's next connection with 503, so both streams give up; Reopen the ward board makes WardBoard's endpoint answer again.",
+          "gesture": "Click Open the bed card and Close both boards, then Close the bed card, then Reopen the ward board and click Retry.",
+          "outcome": "One reconnect offer shows after Close both boards; it stays shown after Close the bed card; it hides once WardBoard opens after Retry.",
+          "opposite": "With the bed card open and only BedBoard given up, Close the bed card hides the offer.",
+          "defect": "The offer is a flag per connection, not a count, so it shows twice, or unloading the card hides it while WardBoard is still given up, or it stays shown after WardBoard opens."
+        },
+        {
+          "for": "X21.10",
+          "page": "A nurses' station page under ShowReconnect() with the Native reconnect offer, whose stream WardBoard gives up when Close the board makes its endpoint end its response and answer the browser's next connection with 503; Reopen the board makes the endpoint answer again; the endpoint's Welcome message, written to each connection it accepts, writes the number of connections accepted into board-call.",
+          "gesture": "Click Close the board, then Retry, then Reopen the board and Retry again.",
+          "outcome": "The offer stays shown after the first Retry, which the endpoint refuses, and hides after the second once board-call reads 2.",
+          "opposite": "Without Close the board, the offer never shows and board-call reads 1.",
+          "defect": "A click on Retry hides the offer before the stream opens, so it is hidden while the retry fails (Alis.Reactive.Assets/runtime/realtime/retry-indicator.ts:47-53 at 65fdf118d), or a failed retry leaves it hidden.",
+          "existing_test": "main WhenLiveConnectionDrops.clicking_retry_while_the_outage_continues_keeps_the_indicator_visible"
+        },
+        {
+          "for": "X21.11",
+          "page": "An activities board view that names the stream ActivityNews, in an app whose AddReactiveRealtime chooses neither ShowReconnect() nor NoReconnectOffer().",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"A page that names a stream or a hub needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime.\"",
+          "opposite": "Under NoReconnectOffer() the same view renders and shows the board's first news.",
+          "defect": "The view renders, and when the stream gives up the page shows no offer and runs no closed steps, so it goes stale with nothing on screen."
+        },
+        {
+          "for": "X21.12",
+          "page": "A nurses' station page under ShowReconnect() whose scripts provide no reconnect component, whose one plan names the stream WardBoard and writes each News message's text into news; Post news makes the endpoint write a News message with the text typed beside it.",
+          "gesture": "Open the page, then type Ada is up and click Post news.",
+          "outcome": "news stays empty, and the console holds one error naming reconnect.",
+          "opposite": "With the Native reconnect component on the page, Post news shows Ada is up in news and the console holds no error.",
+          "defect": "The stream opens and runs its handlers, so the missing offer shows only at the first outage, when the page offers nothing."
+        },
+        {
+          "for": "M10.X4",
+          "page": "A nurses' station page under ShowReconnect() with the Native reconnect offer, whose plan names the stream FacilityAlerts, whose Alert handler writes each alert's message into alert and whose closed steps write closed into alerts-closed; Stop live alerts closes the stream and writes stopped into alerts-state; Sound the all clear makes the endpoint write an Alert reading All clear.",
+          "gesture": "Click Stop live alerts, then Sound the all clear.",
+          "outcome": "alerts-state reads stopped, alert and alerts-closed stay empty, and the reconnect offer stays hidden.",
+          "opposite": "Without Stop live alerts, Sound the all clear shows All clear in alert.",
+          "defect": "The close is taken as the server giving up, so alerts-closed reads closed or the offer shows; or the All clear still runs the handler and alert reads All clear.",
+          "existing_test": "redesign WhenNurseStopsLiveAlerts.stopping_live_alerts_says_so_and_raises_no_reconnect_banner"
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "TriggerBuilder<TModel>.ServerPush(string! url, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It listens to a URL's unnamed messages with no declaration: the event is the browser's \"message\" (Alis.Reactive.Assets/runtime/execution/realtime/server-push.ts:119 at 623dd4a27) and the message has no type, so nothing the endpoint writes is checked against what the view reads. A server event is declared once with its name, the unnamed message declared under the name \"message\", and its message type, and the endpoint and the view share the declaration (N21.1, N21.2); its trigger reads the message as data typed Data<TMessage> (N5.1, D21.4).",
+          "carriers": [
+            "N21.1",
+            "N21.2",
+            "N5.1"
+          ]
+        },
+        {
+          "door": "TriggerBuilder<TModel>.ServerPush(string! url, string! eventType, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It names the server event by a string, eventType, so the endpoint that writes the event and the view that listens to it agree on nothing the compiler reads, and ALIS009 refuses a string that names an event on the public surface. The event is declared once with its message type and shared by the endpoint and the view (N21.1, N21.2), and its trigger reads the message as data typed Data<TMessage> (N5.1, D21.4).",
+          "carriers": [
+            "N21.1",
+            "N21.2",
+            "N5.1"
+          ]
+        },
+        {
+          "door": "TriggerBuilder<TModel>.ServerPush<TPayload>(string! url, string! eventType, System.Action<TPayload, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It names the server event by a string, eventType, so the endpoint that writes the event and the view that listens to it agree on nothing the compiler reads, and ALIS009 refuses a string that names an event on the public surface. Its payload is a class the view builds with new TPayload() and the endpoint never names (Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:88-94 at 623dd4a27), so the two sides can give one event two message types. The event is declared once with its message type and shared by the endpoint and the view (N21.1, N21.2), and its trigger reads the message as data typed Data<TMessage> (N5.1, D21.4).",
+          "carriers": [
+            "N21.1",
+            "N21.2",
+            "N5.1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M10.F2",
+      "summary": "A SignalR hub: a hub declared once, the pushes a view receives and the methods it invokes or sends, shared by the hub and the view; a trigger per declared push whose one object argument is data; the lifecycle triggers reconnecting, reconnected and closed; its state and connection id as members of a JS object; invoke and send as its async methods; held by every owner whose plans name it; the reconnect offer while it has given up; its client an asset of its own, linked only when a plan names a hub; and net10 alone. Main names the hub method by a string; the redesign declares the hub once, ships the client in the framework's script, and runs no closed steps for a start that gives up.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:SignalRHub",
+        "Alis.Reactive:SignalRSource<THub>",
+        "Alis.Reactive:SignalRConnectionState",
+        "Alis.Reactive:SignalRReconnectedArgs"
+      ],
+      "claims": [
+        "Alis.Reactive:TriggerBuilder<TModel>.SignalR<THub, TArgs>(SignalRSource<THub!>! hub, System.Func<THub!, Event<TArgs!>!>! eventSelector, System.Action<TArgs!, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.SignalR<THub>(SignalRSource<THub!>! hub, System.Func<THub!, Event!>! eventSelector, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.SignalR(string! hubUrl, string! methodName, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.SignalR<TPayload>(string! hubUrl, string! methodName, System.Action<TPayload, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Hub<THub>(SignalRSource<THub!>! hub) -> THub!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public TriggerBuilder<TModel> SignalR<TPayload>(string hubUrl, string methodName,",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:116"
+        },
+        {
+          "line": "main",
+          "text": "Html.On(plan, t => t.SignalR<NotificationPayload>(\"/hubs/notifications\", \"ReceiveNotification\",",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/RealTime/Index.cshtml:25"
+        },
+        {
+          "line": "main",
+          "text": "const reconnectDelays = [0, 2000, 10000, 30000] as const;",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts:22"
+        },
+        {
+          "line": "main",
+          "text": "if (managed) showRetryIndicator(hubUrl, () => retryConnection(hubUrl));",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts:40"
+        },
+        {
+          "line": "main",
+          "text": "managed.connection.stop();",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts:139"
+        },
+        {
+          "line": "main",
+          "text": "const payloadMatchesContract = payloadIsSingleArgument && payloadRecord !== undefined;",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts:161"
+        },
+        {
+          "line": "redesign",
+          "text": "/// by their camel-case JSON names. The SignalR client ships in the framework's script.",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/SignalRHub.cs:28"
+        },
+        {
+          "line": "redesign",
+          "text": "public static SignalRSource<THub> At<THub>(string url)",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/SignalRHub.cs:35"
+        },
+        {
+          "line": "redesign",
+          "text": "public ReadOnly<SignalRConnectionState> State => ReadOnly<SignalRConnectionState>();",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/SignalRHub.cs:40"
+        },
+        {
+          "line": "redesign",
+          "text": "public Event<SignalRReconnectedArgs> Reconnected => Event<SignalRReconnectedArgs>();",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/SignalRHub.cs:49"
+        },
+        {
+          "line": "redesign",
+          "text": "protected TypedSource<TResult> Invoke<TResult>(string? name = null, [CallerMemberName] string declaredBy = \"\")",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/SignalRHub.cs:84"
+        },
+        {
+          "line": "redesign",
+          "text": "public TriggerBuilder<TModel> SignalR<THub, TArgs>(SignalRSource<THub> hub,",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:107"
+        },
+        {
+          "line": "redesign",
+          "text": "public THub Hub<THub>(SignalRSource<THub> hub)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:219"
+        },
+        {
+          "line": "redesign",
+          "text": "public TypedSource<string> Acknowledge(Arg<string> nurse) => Invoke<string>(nurse);",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/RoundDeclarations.cs:31"
+        },
+        {
+          "line": "redesign",
+          "text": ".Reactive(button => button.Click, p => p.Element(\"ack\").Text.Set(p.Hub(feed).Acknowledge(\"Ada\"))))",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/Round.cshtml:47"
+        },
+        {
+          "line": "redesign",
+          "text": ".SignalR(line, h => h.Reconnected, (back, p) =>",
+          "cite": "tests/Alis.Reactive.Framework.App/Realtime/Line.cshtml:27"
+        },
+        {
+          "line": "redesign",
+          "text": "const retryDelays = [0, 2000, 10000] as const;",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/hub.ts:21"
+        },
+        {
+          "line": "redesign",
+          "text": "showRetryIndicator(url, () => retry(managed, url));",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/hub.ts:40"
+        },
+        {
+          "line": "redesign",
+          "text": "emitLifecycle(managed, \"close\", {});",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/hub.ts:87"
+        },
+        {
+          "line": "redesign",
+          "text": "removeRetryIndicator(url);",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/hub.ts:107"
+        },
+        {
+          "line": "redesign",
+          "text": "await managed.started;",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/hub.ts:129"
+        },
+        {
+          "line": "redesign",
+          "text": "log.error(\"method.payload-unexpected\", { hubUrl: url, method: event, count: args.length });",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/hub.ts:158"
+        },
+        {
+          "line": "proposed",
+          "text": "t.SignalR(residents, h => h.StatusChanged, (status, p) => p.Element(\"status\").Text.Set(status.Read(s => s.Status)))",
+          "doors": [
+            "N21.1",
+            "N5.1"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "hub",
+        "get",
+        "call",
+        "data",
+        "as",
+        "let",
+        "set"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/SignalRHub.cs:30-135"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:101-131"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:219-226"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:98-124"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/hub.ts:1-167"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/realtime/retry-indicator.ts:1-54"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts:1-171"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/retry-indicator.ts:1-58"
+        }
+      ],
+      "core": [
+        "Q5",
+        "Q7",
+        "Q11",
+        "Q12",
+        "Q21"
+      ],
+      "meanings": [
+        {
+          "id": "M10.D1",
+          "meaning": "Before a connection first opens, neither transport runs reconnecting or reconnected, since the page never held a connection: a stream whose first open meets a network error is reconnected by the browser, and a hub's first start is tried again on the SignalR client's own reconnect delays, the ones its automatic reconnection waits. A connection that gives up before it ever opened runs its closed steps and enters the reconnect offer's count (D21.11), as one that gave up after a drop does, so a page whose hub the server refuses from the start shows the same offer and runs the same closed steps as a page whose hub it hung up on."
+        },
+        {
+          "id": "M10.D2",
+          "meaning": "A connection that opens again after it was lost runs its reconnected steps, whether the transport reconnected by itself or a retry of the reconnect offer opened it after closed; a hub's reconnected hands the connection id the server now knows the page by. So a page that reloads its state on reconnected (D21.5) reloads it after every outage, the one a retry ended included."
+        },
+        {
+          "id": "M10.D3",
+          "meaning": "A hub's invoke or send that a step calls before the hub's first start settles waits for that start and runs once the hub connects, so an on-load handler can call the hub its own plan names. One called while the hub reconnects, after it closed, or after its first start gave up is rejected as the SignalR client rejects a call on a connection that is not connected, and the pipeline stops with one logged error and runs the Finally layers it is inside (D11.3)."
+        }
+      ],
+      "oracle": "ASP.NET Core SignalR's hub protocol and its JavaScript client, @microsoft/signalr pinned at 10.0.11: HubConnectionBuilder's withAutomaticReconnect, HubConnection's start, stop, on, off, invoke and send, its state and connectionId, and onreconnecting, onreconnected and onclose.",
+      "checker": [
+        "core:Q21",
+        "core:Q12",
+        "Ownership.tla:HubKeptWhileHeld",
+        "Ownership.tla:OfferOnlyWhileHeld",
+        "Realtime.tla:OfferNeverHidesEarly",
+        "Realtime.tla:OfferNeverStaysShown",
+        "Lanes.tla:SkippedTriggerStartsNothing"
+      ],
+      "defects": [
+        {
+          "id": "X12.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.7",
+          "rung": "type"
+        },
+        {
+          "id": "M10.X1",
+          "rung": "behavior",
+          "defect": "A hub whose first start the server refuses on every try shows the reconnect offer and runs no closed steps, or runs its reconnecting steps for a connection the page never held (M10.D1). The redesign shows the offer and runs no closed steps (Alis.Reactive.Assets/runtime/realtime/hub.ts:39-40, Alis.Reactive.Assets/runtime/realtime/hub.ts:80-88 at 65fdf118d)."
+        },
+        {
+          "id": "M10.X2",
+          "rung": "behavior",
+          "defect": "A retry of the reconnect offer that opens a hub the server hung up on runs no reconnected steps, so a page that reloads its state on reconnected misses what the outage held (M10.D2). The redesign's retry starts the hub again and raises nothing (Alis.Reactive.Assets/runtime/realtime/hub.ts:43-46 at 65fdf118d)."
+        },
+        {
+          "id": "M10.X3",
+          "rung": "behavior",
+          "defect": "An invoke an on-load handler calls runs before the hub's first start completes and is rejected, so the answer never shows; or an invoke during a reconnection waits for it instead of stopping its pipeline (M10.D3)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X12.5",
+          "page": "A ward page whose hub WardLine pushes StatusChanged with a resident and a status; the page's own handler writes each status's resident into page-status; Open Ada's card and Open Ben's card load the residents' cards into ada-slot and ben-slot, and each card's plan writes the status of its own resident into its own card-status; Post a status makes the hub push StatusChanged for the resident and the status typed beside it.",
+          "gesture": "Click Open Ada's card and Open Ben's card, then Close Ada's card, then type Ben and Resting and click Post a status.",
+          "outcome": "page-status reads Ben and Ben's card-status reads Resting.",
+          "opposite": "With both cards open, Post a status for Ada reading Awake shows Awake in Ada's card-status.",
+          "defect": "Unloading Ada's card stops the shared connection or removes Ben's card's handler, so Ben's card-status stays empty."
+        },
+        {
+          "for": "X12.6",
+          "page": "A ward page under ShowReconnect() with the Native reconnect offer, whose Open the bed card loads into bed-slot a card whose plan names the hub BedLine, which no other plan of the page names; Hang up the bed line makes the hub's server close the connection and refuse every connection after it, so the hub gives up.",
+          "gesture": "Click Open the bed card and Hang up the bed line, wait for the reconnect offer, then Close the bed card.",
+          "outcome": "The reconnect offer shows after Hang up the bed line and hides after Close the bed card.",
+          "opposite": "With the page's own plan also naming BedLine, Close the bed card keeps the offer shown.",
+          "defect": "The offer outlives the connection's last holder, so it stays shown with nothing left to retry, as main releases the hub without withdrawing it (Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts:134-141 at 623dd4a27).",
+          "existing_test": "redesign WhenASlotListensToALiveConnection.unloading_the_slot_whose_hub_the_server_hung_up_on_withdraws_its_retry_offer"
+        },
+        {
+          "for": "X21.4",
+          "page": "A ward page whose hub RoundFeed's StatusChanged handler writes each status's resident into status-resident and adds one to a tally shown in statuses; Ask for two statuses makes the hub call StatusChanged with two arguments, and Post a status calls it with one object for the resident typed beside it.",
+          "gesture": "Click Ask for two statuses, then type Ada and click Post a status.",
+          "outcome": "statuses reads 1, status-resident reads Ada, and the console holds one error naming the hub's URL and statusChanged.",
+          "opposite": "Post a status for Ada and then for Ben shows statuses at 2, and the console holds no error.",
+          "defect": "The handler runs with the first of the two arguments, so statuses reads 2; or the push throws inside the client's handler and no error names the method.",
+          "existing_test": "redesign WhenTheServerPushesToAPage.a_client_method_the_server_calls_with_anything_but_one_object_runs_no_pipeline"
+        },
+        {
+          "for": "X21.5",
+          "page": "A residents page whose plans name the stream FacilityAlerts and no hub, and a nurse line page whose plan names the hub WardLine and writes the call's number into line-call when the hub welcomes it.",
+          "gesture": "Open the residents page, then open the nurse line page.",
+          "outcome": "The residents page's network requests hold no SignalR asset, and the nurse line page's hold it once and show line-call at 1.",
+          "opposite": "The residents page shows the facility's first alert from its stream with no SignalR asset loaded.",
+          "defect": "The SignalR client ships in the framework's script, so every page loads it (Alis.Reactive/PlanAuthoring/Events/SignalRHub.cs:28 at 65fdf118d)."
+        },
+        {
+          "for": "M10.X1",
+          "page": "A nurse line page under ShowReconnect() with the Native reconnect offer, whose hub WardLine's endpoint refuses every connection while the line is refused, whose closed steps write closed into line-closed and whose reconnecting steps write dropped into line-dropped.",
+          "gesture": "Open the page with the line refused, and wait for the reconnect offer.",
+          "outcome": "line-closed reads closed, line-dropped stays empty, and the reconnect offer shows.",
+          "opposite": "With the line answered, the page shows line-call at 1, line-closed stays empty, and the offer stays hidden.",
+          "defect": "A start that fails its last try shows the offer and runs no closed steps, so line-closed stays empty; or it runs the reconnecting steps and line-dropped reads dropped.",
+          "existing_test": "redesign WhenTheServerDropsAHub.a_hub_the_server_refuses_on_every_try_is_offered_for_retry"
+        },
+        {
+          "for": "M10.X2",
+          "page": "A nurse line page under ShowReconnect() with the Native reconnect offer, whose hub WardLine's reconnected steps write back into line-back; Hang up the line makes the hub's server close the connection and refuse every connection until Answer the line again lets the next one in, and the hub's welcome writes the call's number into line-call.",
+          "gesture": "Click Hang up the line and wait for the reconnect offer, then click Answer the line again and Retry.",
+          "outcome": "line-call reads 2, line-back reads back, and the offer hides.",
+          "opposite": "Before Hang up the line, line-back is empty and line-call reads 1.",
+          "defect": "The retry opens the hub and runs no reconnected steps, so line-call reads 2 while line-back stays empty."
+        },
+        {
+          "for": "M10.X3",
+          "page": "A nurse line page whose on-load handler invokes the hub WardLine's Roster and writes its answer into roster, and whose hub answers Roster with Ada, Ben; its reconnecting steps write dropped into line-dropped and its reconnected steps write back into line-back; Drop the line makes the hub's server drop the connection and refuse the client's reconnections until Answer the line again; Ask for the roster invokes Roster again and writes the answer into roster-again.",
+          "gesture": "Open the page, then click Drop the line and, while line-dropped reads dropped, click Ask for the roster.",
+          "outcome": "roster reads Ada, Ben once the page opens, with no error in the console then; after Ask for the roster, roster-again stays empty and the console holds one error naming the hub and Roster.",
+          "opposite": "After Answer the line again and once line-back reads back, Ask for the roster shows Ada, Ben in roster-again with no new error.",
+          "defect": "The on-load invoke runs before the first start completes and is rejected, so roster stays empty and the console holds an error at every load; or the invoke during the reconnection waits for it and logs nothing."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "TriggerBuilder<TModel>.SignalR(string! hubUrl, string! methodName, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It names the hub's client method by a string, methodName, so the hub that calls the method and the view that listens to it agree on nothing the compiler reads, and ALIS009 refuses a string that names a method on the public surface. A hub's methods are declared once, for the pushes a view receives and the calls it makes, and shared by the hub and the view (N21.1); a push's trigger reads its one argument as data typed Data<TMessage> (N5.1, D21.4), and the hub's members, its state, its lifecycle and its methods, are a JS object's (N21.8).",
+          "carriers": [
+            "N21.1",
+            "N5.1",
+            "N21.8"
+          ]
+        },
+        {
+          "door": "TriggerBuilder<TModel>.SignalR<TPayload>(string! hubUrl, string! methodName, System.Action<TPayload, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It names the hub's client method by a string, methodName, so the hub that calls the method and the view that listens to it agree on nothing the compiler reads, and ALIS009 refuses a string that names a method on the public surface. Its payload is a class the view builds with new TPayload(), read by camel-case names whatever the hub writes (Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:111-122 at 623dd4a27). A hub's methods are declared once, for the pushes a view receives and the calls it makes, and shared by the hub and the view (N21.1); a push's trigger reads its one argument as data typed Data<TMessage> (N5.1, D21.4), and the hub's members, its state, its lifecycle and its methods, are a JS object's (N21.8).",
+          "carriers": [
+            "N21.1",
+            "N5.1",
+            "N21.8"
+          ]
+        }
+      ]
+    }
+  ]
+}
