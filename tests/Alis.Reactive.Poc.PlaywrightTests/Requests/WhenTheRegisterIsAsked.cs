@@ -18,6 +18,16 @@ public sealed class WhenTheRegisterIsAsked : AppPageTest
     }
 
     [Test]
+    public async Task a_step_written_after_a_request_reads_what_its_route_wrote()
+    {
+        await Open("/Residents/Lookup");
+
+        await LookUp("Helen Park");
+
+        await Expect(Page.Locator("#status-after-lookup")).ToHaveTextAsync("Helen Park");
+    }
+
+    [Test]
     public async Task a_member_of_an_object_the_answer_holds_is_shown()
     {
         await Open("/Residents/Lookup");

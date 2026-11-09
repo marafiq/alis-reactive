@@ -1,6 +1,6 @@
 import type { Handler, HeldRelease, Listening, ListenStatement, PathStep, PlanDocument, ReadPresence, Release, Statement } from "./plan";
 import { evaluate, walk, type Bound, type Context } from "./evaluate";
-import { begin } from "./execute";
+import { begin } from "./run";
 import { assertNever, Stop, value } from "./read";
 import type { Owner } from "./owners";
 import { plugin } from "./plugins";

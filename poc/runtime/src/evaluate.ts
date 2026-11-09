@@ -165,6 +165,12 @@ function invoke(call: CallExpression, context: Context): Read {
   return value(result.held);
 }
 
+export function bind(context: Context, name: string, read: Bound): Context {
+  const scope = new Map(context.scope);
+  scope.set(name, read);
+  return { ...context, scope };
+}
+
 function bound(name: string, context: Context): Read {
   const held = context.scope.get(name);
   if (held === undefined) throw new Error("The plan reads the name '" + name + "', which no block binds.");

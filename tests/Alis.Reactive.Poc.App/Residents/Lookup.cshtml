@@ -68,6 +68,7 @@
                     .Then(content => content.Element("failure").Text.Set("It answered what does not read as JSON"));
             });
         pipeline.Element("last-lookup").Text.Set(name);
+        pipeline.Element("status-after-lookup").Text.Set(pipeline.Element("lookup-status").Text);
     }))
 
 <p>Lookup: <strong id="lookup-status">not looked up</strong> <strong id="lookup-route"></strong> <strong id="answered-by"></strong></p>
@@ -80,7 +81,7 @@
             .OnSuccess(marked => marked.Element("presence").Text.Set("Marked present"))
             .OnError((_, unmarked) => unmarked.Element("presence").Text.Set("Not marked"))))
 <p>Presence: <strong id="presence">not marked</strong></p>
-<p>Last looked up: <strong id="last-lookup">nobody yet</strong></p>
+<p>Last looked up: <strong id="last-lookup">nobody yet</strong>, read after the lookup: <strong id="status-after-lookup">not read</strong></p>
 <p>Room <strong id="room">no resident yet</strong> in the <strong id="wing">no wing yet</strong> wing, <strong id="access">access unknown</strong></p>
 <p>Medicines: <strong id="signing">not read yet</strong></p>
 <p>Asked in <strong id="asked-ward">no ward yet</strong> at <strong id="asked-home">no home yet</strong></p>

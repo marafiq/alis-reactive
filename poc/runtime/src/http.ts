@@ -1,40 +1,82 @@
-import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart, RequestStatement, SentField, SentHeader, Statement, ValuePart } from "./plan";
+import type { BodyKind, HttpOutcome, HttpResponse, HttpSend, JsonValue, PathPart, RequestStatement, Route, SentField, SentHeader, Statement, StatusRoute, ValuePart } from "./plan";
 import { assertNever, Stop } from "./read";
 import { wireTexts } from "./wire";
 
-type BrokeOff = { readonly kind: "brokeOff"; readonly reason: string };
-
-type Decoded = { readonly kind: "decoded"; readonly body: JsonValue } | { readonly kind: "notOfKind"; readonly reason: string } | BrokeOff;
-
-type BodyText = { readonly kind: "read"; readonly text: string } | BrokeOff;
-
 export type Answer = { readonly route: readonly Statement[]; readonly reply: HttpResponse };
 
-export async function answered(sent: HttpSend, request: RequestStatement): Promise<Answer> {
-  const url = composed(sent);
-  const headers = headersOf(sent.headers);
-  let response: Response;
-  try {
-    response = await fetch(url, { method: sent.method, headers });
-  } catch (failed) {
-    return caught(request, sent, url, "network", Response.error(), "the network failed: " + String(failed));
-  }
-  if (response.redirected && new URL(response.url).origin !== window.location.origin) {
-    return caught(request, sent, url, "redirect", response, "it was redirected to " + new URL(response.url).origin);
-  }
-  if (!response.ok) return statusAnswer(request, sent, url, response);
-  const decoded = await decode(response, request.success.kind);
-  if (decoded.kind === "brokeOff") return caught(request, sent, url, "network", Response.error(), decoded.reason);
-  if (decoded.kind === "notOfKind") return caught(request, sent, url, "content", response, decoded.reason);
-  return { route: request.success.do, reply: replyOf(response, "success", decoded.body) };
+export interface Sendable {
+  readonly method: string;
+  readonly url: string;
+  readonly headers: Headers;
 }
 
-async function statusAnswer(request: RequestStatement, sent: HttpSend, url: string, response: Response): Promise<Answer> {
+export interface Reads {
+  readonly route: readonly Statement[];
+  readonly outcome: "success" | "status";
+  readonly kind: "html" | "json";
+}
+
+export type Picked = { readonly kind: "answered"; readonly answer: Answer } | { readonly kind: "reads"; readonly reads: Reads };
+
+type Decoded = { readonly kind: "decoded"; readonly body: JsonValue } | { readonly kind: "notOfKind"; readonly reason: string };
+
+export function prepared(sent: HttpSend): Sendable {
+  return { method: sent.method, url: composed(sent), headers: headersOf(sent.headers) };
+}
+
+export function picked(request: RequestStatement, sendable: Sendable, response: Response): Picked {
+  if (response.redirected && new URL(response.url).origin !== window.location.origin) {
+    return answered(caught(request, sendable, "redirect", response, "it was redirected to " + new URL(response.url).origin));
+  }
+  if (response.ok) return pickedBody(request, sendable, response, request.success, "success");
   const route = request.statuses.find((each) => each.status === response.status);
-  if (route === undefined) return { route: request.otherwise.do, reply: replyOf(response, "status", null) };
-  const decoded = await decode(response, route.kind);
-  if (decoded.kind === "brokeOff") return caught(request, sent, url, "network", Response.error(), decoded.reason);
-  return { route: route.do, reply: replyOf(response, "status", decoded.kind === "decoded" ? decoded.body : null) };
+  if (route === undefined) return answered({ route: request.otherwise.do, reply: replyOf(response, "status", null) });
+  return pickedBody(request, sendable, response, route, "status");
+}
+
+export function decoded(request: RequestStatement, sendable: Sendable, response: Response, reads: Reads, text: string): Answer {
+  const body = reads.kind === "html" ? { kind: "decoded" as const, body: text } : parsed(text, response, reads.kind);
+  if (body.kind === "decoded") return { route: reads.route, reply: replyOf(response, reads.outcome, body.body) };
+  return notOfKindAnswer(request, sendable, response, reads.route, reads.outcome, body.reason);
+}
+
+export function unreachable(request: RequestStatement, sendable: Sendable, failed: unknown): Answer {
+  return caught(request, sendable, "network", Response.error(), "the network failed: " + String(failed));
+}
+
+export function brokeOff(request: RequestStatement, sendable: Sendable, failed: unknown): Answer {
+  return caught(request, sendable, "network", Response.error(), "its body broke off while it was read: " + String(failed));
+}
+
+function pickedBody(request: RequestStatement, sendable: Sendable, response: Response, route: Route | StatusRoute, outcome: "success" | "status"): Picked {
+  const kind: BodyKind = route.kind;
+  switch (kind) {
+    case "none":
+      return answered({ route: route.do, reply: replyOf(response, outcome, null) });
+    case "html":
+      if (mediaTypeOf(response) !== "text/html") return answered(notOfKindAnswer(request, sendable, response, route.do, outcome, notOfKind(response, kind)));
+      return { kind: "reads", reads: { route: route.do, outcome, kind } };
+    case "json":
+      if (!isJson(mediaTypeOf(response))) return answered(notOfKindAnswer(request, sendable, response, route.do, outcome, notOfKind(response, kind)));
+      return { kind: "reads", reads: { route: route.do, outcome, kind } };
+    default:
+      return assertNever(kind);
+  }
+}
+
+function notOfKindAnswer(request: RequestStatement, sendable: Sendable, response: Response, route: readonly Statement[], outcome: "success" | "status", reason: string): Answer {
+  switch (outcome) {
+    case "success":
+      return caught(request, sendable, "content", response, reason);
+    case "status":
+      return { route, reply: replyOf(response, "status", null) };
+    default:
+      return assertNever(outcome);
+  }
+}
+
+function answered(answer: Answer): Picked {
+  return { kind: "answered", answer };
 }
 
 function replyOf(response: Response, outcome: HttpOutcome, body: JsonValue): HttpResponse {
@@ -101,34 +143,6 @@ function carriedInAHeader(text: string): boolean {
   return [...text].every((character) => character === "\t" || (character >= " " && character <= "~"));
 }
 
-async function decode(response: Response, kind: BodyKind): Promise<Decoded> {
-  const mediaType = mediaTypeOf(response);
-  switch (kind) {
-    case "html": {
-      if (mediaType !== "text/html") return notOfKind(response, kind);
-      const body = await bodyText(response);
-      return body.kind === "read" ? { kind: "decoded", body: body.text } : body;
-    }
-    case "json": {
-      if (!isJson(mediaType)) return notOfKind(response, kind);
-      const body = await bodyText(response);
-      return body.kind === "read" ? parsed(body.text, response, kind) : body;
-    }
-    case "none":
-      return { kind: "decoded", body: null };
-    default:
-      return assertNever(kind);
-  }
-}
-
-async function bodyText(response: Response): Promise<BodyText> {
-  try {
-    return { kind: "read", text: await response.text() };
-  } catch (failed) {
-    return { kind: "brokeOff", reason: "its body broke off while it was read: " + String(failed) };
-  }
-}
-
 function parsed(text: string, response: Response, kind: BodyKind): Decoded {
   if (text === "") return { kind: "decoded", body: null };
   try {
@@ -138,8 +152,8 @@ function parsed(text: string, response: Response, kind: BodyKind): Decoded {
   }
 }
 
-function notOfKind(response: Response, kind: BodyKind): Decoded {
-  return { kind: "notOfKind", reason: "its body is " + (response.headers.get("Content-Type") ?? "of no media type") + ", not " + kind };
+function notOfKind(response: Response, kind: BodyKind): string {
+  return "its body is " + (response.headers.get("Content-Type") ?? "of no media type") + ", not " + kind;
 }
 
 function mediaTypeOf(response: Response): string {
@@ -150,7 +164,7 @@ function isJson(mediaType: string): boolean {
   return mediaType === "application/json" || mediaType.endsWith("+json");
 }
 
-function caught(request: RequestStatement, sent: HttpSend, url: string, outcome: HttpOutcome, response: Response, reason: string): Answer {
-  console.error("[alis] " + sent.method + " " + url + " ended '" + outcome + "': " + reason + ".");
+function caught(request: RequestStatement, sendable: Sendable, outcome: HttpOutcome, response: Response, reason: string): Answer {
+  console.error("[alis] " + sendable.method + " " + sendable.url + " ended '" + outcome + "': " + reason + ".");
   return { route: request.otherwise.do, reply: replyOf(response, outcome, null) };
 }

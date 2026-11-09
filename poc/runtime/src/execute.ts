@@ -1,100 +1,69 @@
-import type { CallExpression, DoStatement, HttpSend, IfStatement, LetStatement, PathStep, RequestStatement, SetStatement, Statement } from "./plan";
-import { callee, called, evaluate, memberHolder, objectHolding, walk, type Bound, type Context } from "./evaluate";
-import { assertNever, heldOrNull, nothing, Stop, value, type Read } from "./read";
+import type { CallExpression, DoStatement, IfStatement, LetStatement, PathStep, RequestStatement, SetStatement, Statement } from "./plan";
+import { bind, callee, called, evaluate, memberHolder, objectHolding, walk, type Bound, type Context } from "./evaluate";
+import { assertNever, heldOrNull, Stop, value, type Read } from "./read";
 import { listenTo } from "./objects";
 import { requireNoSlotWithin } from "./held-slots";
-import { answered } from "./http";
+import { requestFrame } from "./request";
+import type { Frame, Settled, Stepped } from "./run";
 
 type Awaited = DoStatement | LetStatement;
 
-type Stepped = Exclude<Statement, IfStatement | RequestStatement>;
+type Plain = Exclude<Statement, IfStatement | RequestStatement>;
 
-interface Block {
+export interface Block {
+  readonly kind: "block";
   readonly statements: readonly Statement[];
   readonly next: number;
   readonly context: Context;
 }
 
-type Frames = readonly Block[];
-
-type Resumed = { readonly kind: "completed"; readonly context: Context } | { readonly kind: "opened"; readonly block: Block };
-
-type Step = Resumed | { readonly kind: "waits"; readonly settled: Promise<Resumed> };
-
-type Turn = { readonly status: "waiting"; readonly below: Frames; readonly top: Block; readonly settled: Promise<Resumed> } | { readonly status: "ended" };
-
-export function begin(statements: readonly Statement[], context: Context, stopped: (stop: Stop) => void): void {
-  drive([{ statements, next: 0, context }], stopped);
+export interface AwaitingCall {
+  readonly kind: "call";
+  readonly block: Block;
+  readonly statement: Awaited;
+  readonly call: CallExpression;
 }
 
-function drive(frames: Frames, stopped: (stop: Stop) => void): void {
-  let turn: Turn;
-  try {
-    turn = ranUntilItWaits(frames);
-  } catch (reason) {
-    ended(reason, stopped);
-    return;
-  }
-  if (turn.status === "ended") return;
-  const { below, top, settled } = turn;
-  void settled.then(
-    (resumed) => drive(applied(below, top, resumed), stopped),
-    (reason: unknown) => ended(reason, stopped),
-  );
-}
-
-function ended(reason: unknown, stopped: (stop: Stop) => void): void {
-  if (!(reason instanceof Stop)) throw reason;
-  stopped(reason);
-}
-
-function ranUntilItWaits(start: Frames): Turn {
-  let frames = start;
-  for (;;) {
-    const top = frames[frames.length - 1];
-    if (top === undefined) return { status: "ended" };
-    const below = frames.slice(0, -1);
-    const statement = top.statements[top.next];
-    if (statement === undefined) {
-      frames = below;
-      continue;
-    }
-    const step = stepped(statement, top.context);
-    const advanced: Block = { ...top, next: top.next + 1 };
-    if (step.kind === "waits") return { status: "waiting", below, top: advanced, settled: step.settled };
-    frames = applied(below, advanced, step);
-  }
-}
-
-function applied(below: Frames, top: Block, resumed: Resumed): Frames {
-  switch (resumed.kind) {
-    case "completed":
-      return [...below, { ...top, context: resumed.context }];
-    case "opened":
-      return [...below, top, resumed.block];
+export function blockStep(block: Block): Stepped {
+  const statement = block.statements[block.next];
+  if (statement === undefined) return { kind: "goes", top: [] };
+  const advanced: Block = { ...block, next: block.next + 1 };
+  if (awaits(statement)) return awaitedCall(statement, advanced);
+  switch (statement.kind) {
+    case "if":
+      return { kind: "goes", top: [advanced, branchOf(statement, advanced.context)] };
+    case "request":
+      return { kind: "goes", top: [advanced, requestFrame(statement, advanced.context)] };
     default:
-      return assertNever(resumed);
+      return { kind: "goes", top: [{ ...advanced, context: step(statement, advanced.context) }] };
   }
 }
 
-function stepped(statement: Statement, context: Context): Step {
-  if (awaits(statement)) {
-    return { kind: "waits", settled: settle(statement, context).then((read) => ({ kind: "completed", context: after(statement, context, read) })) };
+export function awaitSettled(waiting: AwaitingCall, settled: Settled): readonly Frame[] {
+  switch (settled.kind) {
+    case "fulfilled":
+      return [{ ...waiting.block, context: after(waiting.statement, waiting.block.context, value(settled.held)) }];
+    case "rejected":
+      throw rejection(waiting.call, settled.reason);
+    default:
+      return assertNever(settled);
   }
-  if (statement.kind === "if") {
-    const branch = holds(evaluate(statement.when, context)) ? statement.then : statement.else;
-    return { kind: "opened", block: { statements: branch, next: 0, context } };
-  }
-  if (statement.kind === "request") return { kind: "waits", settled: requested(statement, context) };
-  return { kind: "completed", context: step(statement, context) };
 }
 
-function requested(request: RequestStatement, context: Context): Promise<Resumed> {
-  const sent = heldOrNull(evaluate(request.send, context)) as HttpSend;
-  return answered(sent, request).then((answer) => ({
-    kind: "opened",
-    block: { statements: answer.route, next: 0, context: bound(context, request.reply, value(answer.reply)) },
-  }));
+function branchOf(statement: IfStatement, context: Context): Block {
+  return { kind: "block", statements: holds(evaluate(statement.when, context)) ? statement.then : statement.else, next: 0, context };
+}
+
+function awaitedCall(statement: Awaited, block: Block): Stepped {
+  const call = statement.expr;
+  if (call.kind !== "call") throw new Error("The plan awaits an expression that is no call.");
+  const result = called(call, block.context);
+  return { kind: "waits", waiting: { kind: "call", block, statement, call }, on: result.kind === "absent" ? undefined : result.held };
+}
+
+function rejection(call: CallExpression, reason: unknown): Stop {
+  if (reason instanceof Stop) return reason;
+  return new Stop(callee(call) + " rejected: " + (reason instanceof Error ? reason.message : String(reason)));
 }
 
 function holds(read: Read): boolean {
@@ -105,26 +74,11 @@ function awaits(statement: Statement): statement is Awaited {
   return (statement.kind === "do" || statement.kind === "let") && statement.await;
 }
 
-function settle(statement: Awaited, context: Context): Promise<Read> {
-  const expression = statement.expr;
-  if (expression.kind !== "call") return Promise.resolve(evaluate(expression, context));
-  const result = called(expression, context);
-  if (result.kind === "absent") return Promise.resolve(nothing);
-  return Promise.resolve(result.held).then(value, rejected(expression));
-}
-
-function rejected(call: CallExpression): (reason: unknown) => never {
-  return (reason) => {
-    if (reason instanceof Stop) throw reason;
-    throw new Stop(callee(call) + " rejected: " + (reason instanceof Error ? reason.message : String(reason)));
-  };
-}
-
 function after(statement: Awaited, context: Context, read: Read): Context {
-  return statement.kind === "let" ? bound(context, statement.name, read) : context;
+  return statement.kind === "let" ? bind(context, statement.name, read) : context;
 }
 
-function step(statement: Stepped, context: Context): Context {
+function step(statement: Plain, context: Context): Context {
   switch (statement.kind) {
     case "set":
       set(statement, context);
@@ -133,7 +87,7 @@ function step(statement: Stepped, context: Context): Context {
       evaluate(statement.expr, context);
       return context;
     case "let":
-      return bound(context, statement.name, atItsLine(statement, context));
+      return bind(context, statement.name, atItsLine(statement, context));
     case "listen":
       listenTo(statement, context);
       return context;
@@ -151,12 +105,6 @@ function atItsLine(statement: LetStatement, context: Context): Bound {
     default:
       return assertNever(statement.binds);
   }
-}
-
-function bound(context: Context, name: string, read: Bound): Context {
-  const scope = new Map(context.scope);
-  scope.set(name, read);
-  return { ...context, scope };
 }
 
 function set(statement: SetStatement, context: Context): void {
