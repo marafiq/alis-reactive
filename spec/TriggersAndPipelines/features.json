@@ -158,11 +158,11 @@
         },
         {
           "for": "X11.19",
-          "page": "A form whose submit button has two handlers that each write the hidden field the form posts, and no awaited step.",
-          "gesture": "Click submit.",
-          "outcome": "The server echoes the value the second handler wrote.",
-          "opposite": "With only the first handler, the server echoes the first handler's value.",
-          "defect": "A handler with no awaited step yields to a microtask, so the browser submits the form before either write and the server echoes the field's first value."
+          "page": "A chime, a test component whose own button raises its ring event from its own code and, as soon as its listeners return, shows the two values its handlers wrote; two handlers of ring, neither with an awaited step, each write one value.",
+          "gesture": "Click the chime's button.",
+          "outcome": "The chime shows both values, the first handler's and the second's.",
+          "opposite": "With an awaited step before the second handler's write, the chime shows the first value alone.",
+          "defect": "A handler continues in a microtask, so the chime reads before either write and shows neither value, or the second handler starts after the chime's turn and its value is missing."
         },
         {
           "for": "X11.6",
@@ -301,7 +301,7 @@
         },
         {
           "line": "proposed",
-          "text": "<button type=\"button\" @Html.Raises(CareEvents.Flagged, new ResidentFlagged { Room = 12, Reason = \"fall\" })>Flag room 12</button>",
+          "text": "<button type=\"button\" @Html.Raises(plan, CareEvents.Flagged, new ResidentFlagged { Room = 12, Reason = \"fall\" })>Flag room 12</button>",
           "doors": [
             "M1.N5"
           ]
@@ -318,7 +318,11 @@
         "get",
         "data",
         "start",
-        "nothing"
+        "nothing",
+        "as",
+        "number",
+        "boolean",
+        "date"
       ],
       "writes": [
         {
@@ -389,10 +393,12 @@
         }
       ],
       "core": [
+        "Q3",
         "Q4",
         "Q5",
         "Q7",
         "Q11",
+        "Q15",
         "Q17",
         "Q18"
       ],
@@ -403,10 +409,10 @@
         },
         {
           "id": "M1.D3",
-          "meaning": "Markup raises its event on a click at or inside the element it marks, once per click, with the payload of the innermost marked element that holds the click's target. The payload is one attribute holding its JSON in the live form, written by the plan's literal writer as Dispatch's literal is, so a number reaches the handler as a number, an enum in the form the live form writes it, and a record or a list as itself; markup with no payload raises a detail of null, as Dispatch with none does (M1.D2). The core's document plugin listens to clicks once per page, in the capture phase, and reads only its own attribute on the target's ancestors."
+          "meaning": "Markup raises its event on a click at or inside the element it marks, once per click, with the payload of the innermost marked element that holds the click's target; the core's document plugin listens to clicks once per page, in the capture phase, and reads only its own attributes on the target's ancestors. The payload is one attribute per member, data-alis-detail- and the member's name, holding its text: the form Html.Raises writes where the view renders and a Fusion template's event button fills in the browser, which D15.2 keeps as it is. Html.Raises writes each member as the plan's live form writes it, from the payload the app's JSON contract writes, with no reflection of the core's own: a text as itself, a number as its number, an enum and a date as the live form writes them, a boolean as true or false; a member that holds null is carried by no attribute, and markup that carries no attribute raises a detail of null (M1.D2). A record, a list, and a member whose name is not a lowercase letter followed by letters, digits or underscores, since the browser lowercases an attribute's name, are refused where the view renders, naming Dispatch. The handler of an app event reads each scalar member of its payload through as with the member's shape, so a member markup carried as text reads as its number, boolean, enum or date, and one Dispatch carried in the live form reads as it is."
         }
       ],
-      "oracle": "The DOM Standard: dispatchEvent runs an event's listeners synchronously in the order they were added and reports a listener's exception without stopping the dispatch, a CustomEvent carries its detail, and a click's target's ancestors are its path; and the spec itself for the payload's live form (gate 1's P8) and its reads (D4.2).",
+      "oracle": "The DOM Standard: dispatchEvent runs an event's listeners synchronously in the order they were added and reports a listener's exception without stopping the dispatch, a CustomEvent carries its detail, and a click's target's ancestors are its path; the HTML Standard, which lowercases an attribute's name in an HTML document; and the spec itself for the payload's live form (gate 1's P8), its reads (D4.2) and the as conversion (D3.13).",
       "checker": [
         "Run.tla:SecondHandlerStartsInTheTurn",
         "Absence.tla:StopEndsOnlyItsHandler",
@@ -429,7 +435,17 @@
         {
           "id": "M1.X4",
           "rung": "behavior",
-          "defect": "Markup raises with the wrong payload or the wrong number of times: a click inside a marked item nested in another raises the outer one's payload or both, a number arrives as text, or a click outside every marked element raises one (M1.D3)."
+          "defect": "Markup raises with the wrong payload or the wrong number of times: a click inside a marked item nested in another raises the outer one's payload or both, a number markup carried as text is read as text, or a click outside every marked element raises one (M1.D3)."
+        },
+        {
+          "id": "M1.X8",
+          "rung": "refusal",
+          "defect": "Markup that raises a payload holding a record or a list writes it as text or drops it, where it is refused where the view renders with the redesign's message: \"Raise a payload that holds a record or a list from a pipeline, with p.Dispatch.\" (M1.D3)."
+        },
+        {
+          "id": "M1.X9",
+          "rung": "refusal",
+          "defect": "Markup that raises a member whose name an attribute cannot carry back reaches the handler under a lowercased name that reads nothing, where it is refused where the view renders with the redesign's message: \"Rename it, or raise the payload from a pipeline, with p.Dispatch.\" (M1.D3)."
         },
         {
           "id": "M1.X5",
@@ -466,11 +482,11 @@
         },
         {
           "for": "M1.X4",
-          "page": "A visitor list whose item raises Announced with party size 12, the gate's capacity 9 and an escort record named Ward clerk, the item holding a nested button that raises Announced with party size 1 and capacity 9, and a paragraph outside every item; the handler shows the party size, the escort's name, and Over capacity when the party size is greater than the capacity, else Within capacity.",
+          "page": "A visitor list whose item raises Announced with party size 12, the gate's capacity 9 and the type a coach party, the item holding a nested button that raises Announced with party size 1, capacity 9 and the type a visitor, and a paragraph outside every item; the handler shows the type, the party size, and Over capacity when the party size is greater than the capacity, else Within capacity.",
           "gesture": "Click the nested button, then the item around it, then the paragraph.",
-          "outcome": "After the first click the handler shows 1 and Within capacity; after the second it shows 12, Ward clerk and Over capacity; after the third it still shows 12, Ward clerk and Over capacity.",
+          "outcome": "After the first click the handler shows a visitor, 1 and Within capacity; after the second it shows a coach party, 12 and Over capacity; after the third it still shows a coach party, 12 and Over capacity.",
           "opposite": "An item raised with party size 4 and capacity 9 shows Within capacity.",
-          "defect": "The nested click raises the outer item's payload or raises twice, the two numbers arrive as text and compare 12 below 9 so Over capacity never shows, the escort record is refused or lost, or the paragraph's click raises an event."
+          "defect": "The nested click raises the outer item's payload or raises twice, the two numbers are read as the texts 12 and 9 and compare 12 below 9 so Over capacity never shows, or the paragraph's click raises an event."
         },
         {
           "for": "M1.X5",
@@ -479,6 +495,24 @@
           "outcome": "The party size's text is empty and the status reads Rung.",
           "opposite": "Raised with party size 3, the party size's text reads 3.",
           "defect": "The missing payload stops the handler, so Rung never shows, or its party size reads its start and shows 0."
+        },
+        {
+          "for": "M1.X8",
+          "page": "A gate whose visitor item raises Announced with an escort record beside its party size.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with one error naming the escort member and Dispatch, and no gate renders.",
+          "opposite": "The same item raising only a party size and a type renders, and its click raises Announced.",
+          "defect": "The record is written as the text [object Object] or dropped, so the page renders and the handler reads a wrong escort or nothing.",
+          "existing_test": "redesign WhenMarkupRaisesAnEvent.markup_raising_a_payload_that_holds_a_record_is_refused_naming_the_fix"
+        },
+        {
+          "for": "M1.X9",
+          "page": "A signed visit whose markup raises a payload member the app names VisitorName by its JsonPropertyName.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with one error naming the member, its name VisitorName, and Dispatch.",
+          "opposite": "The same member named visitorName renders, and a click shows the visitor's name.",
+          "defect": "The browser lowercases the attribute's name, so the page renders and the handler reads nothing for VisitorName.",
+          "existing_test": "redesign WhenMarkupRaisesAnEvent.markup_raising_a_member_named_so_no_attribute_carries_it_back_is_refused_naming_the_fix"
         }
       ],
       "verdicts": [

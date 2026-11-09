@@ -6,6 +6,8 @@ itself, declared once, raised by a dispatch step or from markup, and heard with 
 
 ## Core questions
 
+- Q3: a value held as text reaches a typed position through `as` with its shape (D3.13), the read a handler gives each
+  scalar member of an app event's payload, so markup's text and `Dispatch`'s live form read alike (M1.D3).
 - Q4: a stop ends its own handler only, and never reaches what raised the event, a dispatch step included (D4.8); an
   app event's payload is data, so a member it lacks reads its start, and a payload that holds nothing reads nothing
   (D4.2).
@@ -17,11 +19,13 @@ itself, declared once, raised by a dispatch step or from markup, and heard with 
   (D11.5); a dispatch is a trigger like any other (D11.6, G9); every stage is a block (D11.10).
 - Q12: a run belongs to the owner of the plan that holds its handler, the page or a slot, and its owner's dispose ends
   it (D11.8).
+- Q15: a Fusion template's event button raises an app event by filling markup's payload attributes in the browser,
+  and D15.2 keeps templates as they are, so markup's payload form stays the one that button fills.
 - Q17: a handler's payload is a path into its listener's arguments, `[0, "detail"]` for an app event and `[]` for one
   declared with no payload (D17.4); listeners subscribe in the order D17.3 states: a page's plans in the order the page
   holds their scripts, one plan's handlers in its order, a slot's plans when its load starts them.
-- Q18: no run-time reflection reads a payload's members (D18.1); a literal payload is written by the plan's literal
-  writer under the app's JSON contract.
+- Q18: no run-time reflection of the core's own reads a payload's members (D18.1); a payload is written from what the
+  app's JSON contract writes, through the plan that holds the app's options.
 
 ## Doors
 
@@ -40,9 +44,11 @@ Each name is gate 2's; each door is the capability it carries.
   document (M1.D2), its payload a literal of `TPayload` or a `TypedSource<TPayload>` (N7.1 builds one from sources).
   It replaces the redesign's four `Dispatch` overloads and `DispatchPayloadBuilder`, and main's `Dispatch(string)`,
   `Dispatch<TPayload>(string, ..)` and `DispatchWith`.
-- `M1.N5` new: `Html.Raises(appEvent)` and `Html.Raises(appEvent, payload)`, markup that raises a declared app event
-  on a click at or inside the element it marks (M1.D3). It replaces the redesign's `Raises`, which carries one
-  attribute per payload member.
+- `M1.N5` new: `Html.Raises(plan, appEvent)` and `Html.Raises(plan, appEvent, payload)`, markup that raises a declared
+  app event on a click at or inside the element it marks (M1.D3). It takes the plan, which carries the app's JSON options on
+  both hosts, so the helper names and writes each member from no other store. It replaces the
+  redesign's `Raises`, which takes no plan, reads its members by run-time reflection and names them in camel case
+  whatever the app's options.
 - `M1.N6` new: ALIS039, the app event analyzer: two `AppEvent` declarations whose event names are equal, in the
   compilation that declares them, the name read from the constant `name:` or the declaring member's name. The
   framework's packages declare no app event, so an app's own compilation holds every declaration ALIS039 reads; two of
@@ -52,12 +58,15 @@ The meanings `M1.D1` to `M1.D3` are in `spec/TriggersAndPipelines/features.json`
 
 ## Improvements
 
-- One concept, one door: the redesign raises an app event from markup through `MarkupRaise` and from a pipeline
-  through `DispatchStep`, with two payload forms. Markup writes each member as an attribute's text by run-time
-  reflection (`Alis.Reactive/Razor/MarkupRaise.cs:24-31` at 65fdf118d, B11), refuses a record or a list and a member
-  whose name an attribute cannot carry back (`Alis.Reactive/Razor/MarkupRaise.cs:36-56` at 65fdf118d), and the browser
-  reads every member back as text (`Alis.Reactive.Assets/runtime/plugins/document.ts:65-73` at 65fdf118d). M1.D3
-  carries the payload as `Dispatch` does: one JSON attribute in the live form, written with no reflection, any shape.
+- Markup keeps one attribute per payload member, since a Fusion template's event button fills the same attributes in
+  the browser (`Alis.Reactive.Fusion/Templates/TemplateElements.cs:34-56` at 65fdf118d) and D15.2 keeps templates as
+  they are; how C# writes them and how a handler reads them change. The redesign writes each member by run-time
+  reflection (`Alis.Reactive/Razor/MarkupRaise.cs:24-31` at 65fdf118d, B11), names it in camel case whatever the app's
+  options, and the browser hands every member over as text (`Alis.Reactive.Assets/runtime/plugins/document.ts:65-73`
+  at 65fdf118d). M1.D3 writes the members from what the app's JSON contract writes, through the plan, and a handler
+  reads each scalar member through `as` with its shape, one read for markup and `Dispatch`. The refusals of a record, a
+  list and a name an attribute cannot carry back stay (`Alis.Reactive/Razor/MarkupRaise.cs:36-56` at 65fdf118d); under
+  an app whose naming starts a name with a capital letter, every markup payload member is refused, naming `Dispatch`.
 - Two declarations of one name are one DOM event, so a handler of one hears the other's dispatch with another payload
   type. The redesign's own test app declares `DeskEvents.Rang` as an `AppEvent<BellRang>` and `HallEvents.Rang` as an
   `AppEvent<HallBellRang>` (`tests/Alis.Reactive.Framework.App/Slots/DeskPage.cs:43`,
