@@ -1,0 +1,563 @@
+{
+  "module": "TriggersAndPipelines",
+  "features": [
+    {
+      "id": "M1.F1",
+      "summary": "A handler and the run it starts: the view's trigger door, on load once its owner has started, a pipeline whose steps run in the trigger's turn until one waits, two handlers of one event in the order they subscribed, and the handler's policy over a run still in flight.",
+      "status": "both",
+      "types": [],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>",
+        "Alis.Reactive:TriggerBuilder<TModel>",
+        "Alis.Reactive:TriggerBuilder<TModel>.DomReady(System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:static HtmlExtensions.On<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, System.Action<TriggerBuilder<TModel!>!>! trigger) -> void",
+        "Alis.Reactive:static HtmlExtensions.On<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, System.Action<TriggerBuilder<TModel!>!>! trigger) -> void"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "Html.On(plan, t => t.DomReady(p =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/Events/Index.cshtml:9"
+        },
+        {
+          "line": "redesign",
+          "text": "Html.On(plan, t => t.DomReady(p =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/Events/Index.cshtml:8"
+        },
+        {
+          "line": "proposed",
+          "text": "Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Dispatch(RoundEvents.Started)));",
+          "doors": [
+            "M1.N1",
+            "M1.N4",
+            "M1.N2"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "none",
+        "do",
+        "let",
+        "stop"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/HtmlExtensions.cs:56-67"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:31-34"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:133-137"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:36-41"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/HtmlExtensions.cs:52-63"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:27-33"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plans/start.ts:18-30"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plans/start.ts:43-67"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:80-85"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/boot.ts:46-60"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/triggers/trigger.ts:37-45"
+        }
+      ],
+      "core": [
+        "Q4",
+        "Q11",
+        "Q12",
+        "Q17"
+      ],
+      "meanings": [
+        {
+          "id": "M1.D1",
+          "meaning": "On load runs once per start of its owner, after every handler that start subscribes has subscribed: at boot, every handler of every plan the page holds, a server-rendered slot's included; at a slot's load, every handler of the plans that load starts. The on-load handlers then run in D17.3's subscription order, so an on-load's dispatch reaches every handler its start subscribed and every handler the page subscribed before it. Neither line's on load carries a payload, so its handler's payload path is []."
+        }
+      ],
+      "oracle": "The spec itself, where the framework is the authority: Run.tla and Lanes.tla for a run, its order and its policy; and the DOM Standard's event dispatch, which calls an event's listeners in the order they were added.",
+      "checker": [
+        "Run.tla:SyncRunEndsInItsTurn",
+        "Run.tla:SecondHandlerStartsInTheTurn",
+        "Run.tla:NothingRunsAfterAnAbort",
+        "Lanes.tla:SkippedTriggerStartsNothing",
+        "Lanes.tla:ReplacedRunRunsNothingAfter",
+        "Absence.tla:StopEndsOnlyItsHandler",
+        "core:Q12",
+        "core:Q17"
+      ],
+      "defects": [
+        {
+          "id": "X11.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X11.19",
+          "rung": "behavior"
+        },
+        {
+          "id": "X11.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X11.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X11.24",
+          "rung": "behavior"
+        },
+        {
+          "id": "X11.1",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X11.17",
+          "rung": "analyzer"
+        },
+        {
+          "id": "M1.X1",
+          "rung": "behavior",
+          "defect": "An on-load handler runs before a handler its start subscribes, so its dispatch is lost: a page's on load that dispatches an event a later plan of the page handles, and a slot's on load that dispatches an event its own plan and the page handle (M1.D1)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X11.10",
+          "page": "A nurse call button with two handlers of its click: the first sets the call's text from Idle to Heard, awaits the call desk's async acknowledge, then sets the desk's text to Acknowledged; the second copies the call's text into the empty pager.",
+          "gesture": "Click the call button, then release the desk's acknowledgement.",
+          "outcome": "Before the release the pager reads Heard and the desk reads Waiting; after it the desk reads Acknowledged.",
+          "opposite": "With the second handler subscribed first, the pager copies Idle.",
+          "defect": "The second handler waits for the first one's await, so the pager stays empty before the release, or the first never goes on and the desk keeps Waiting."
+        },
+        {
+          "for": "X11.19",
+          "page": "A form whose submit button has two handlers that each write the hidden field the form posts, and no awaited step.",
+          "gesture": "Click submit.",
+          "outcome": "The server echoes the value the second handler wrote.",
+          "opposite": "With only the first handler, the server echoes the first handler's value.",
+          "defect": "A handler with no awaited step yields to a microtask, so the browser submits the form before either write and the server echoes the field's first value."
+        },
+        {
+          "for": "X11.6",
+          "page": "A ward list whose change handler, under replace, loads the ward's rooms into a room list; the server answers the first ward after the second.",
+          "gesture": "Pick ward East, then ward West before East answers, then release East's answer.",
+          "outcome": "The room list shows West's rooms after both answers.",
+          "opposite": "Under overlap, the room list shows East's rooms after its late answer.",
+          "defect": "The first run is not cut, so East's late answer overwrites West's rooms."
+        },
+        {
+          "for": "X11.7",
+          "page": "A save button whose handler, under skip, posts the chart; the server holds the answer until the test releases it, and counts the posts it received.",
+          "gesture": "Click save twice before the answer, then release it.",
+          "outcome": "The server received one post, and the status reads Saved once.",
+          "opposite": "A click after the answer sends a second post.",
+          "defect": "The second click starts a run while the first is in flight, so the server receives two posts."
+        },
+        {
+          "for": "X11.24",
+          "page": "A bell whose click handler, under replace, logs rang and its round, sends a request whose route rings the bell again on round 1 and whose Finally logs finally and the round, then logs after and the round.",
+          "gesture": "Click the bell once.",
+          "outcome": "The log reads rang 1 finally 1 rang 2 finally 2 after 2.",
+          "opposite": "Under overlap the log holds after 1 as well.",
+          "defect": "The new run starts before the old Finally, so the log reads rang 1 rang 2 finally 1, or the old run's after-step runs."
+        },
+        {
+          "for": "M1.X1",
+          "page": "A page with two plans: the first's on load dispatches RoundStarted, the second's handler of RoundStarted writes Round started; a slot whose plan's on load dispatches SlotOpened, handled by the slot's own plan and by the page's.",
+          "gesture": "Open the page, then load the slot.",
+          "outcome": "The page shows Round started; after the load, both the slot's text and the page's text read Slot opened.",
+          "opposite": "A dispatch of an event no plan handles changes no text.",
+          "defect": "On load runs before the second plan or the slot's plan subscribes, so Round started or the slot's Slot opened never shows."
+        }
+      ],
+      "verdicts": []
+    },
+    {
+      "id": "M1.F2",
+      "summary": "An app event: declared once as a static member, raised by a Dispatch step or from markup, and heard by its handlers with its typed payload, a literal or an object built from sources.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:AppEvent",
+        "Alis.Reactive:AppEvent<TPayload>",
+        "Alis.Reactive:DispatchPayloadBuilder<TPayload, TModel>",
+        "Alis.Reactive:HtmlExtensions"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Dispatch(AppEvent! appEvent) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Dispatch(string! eventName) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Dispatch<TPayload>(AppEvent<TPayload!>! appEvent) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Dispatch<TPayload>(AppEvent<TPayload!>! appEvent, System.Action<DispatchPayloadBuilder<TPayload!, TModel!>!>! configure) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Dispatch<TPayload>(AppEvent<TPayload!>! appEvent, TPayload! payload) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Dispatch<TPayload>(string! eventName, TPayload payload) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.DispatchWith<TPayload>(string! eventName, System.Action<DispatchPayloadBuilder<TPayload!, TModel!>!>! configure) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.CustomEvent(AppEvent! appEvent, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.CustomEvent(string! eventName, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.CustomEvent<TPayload>(AppEvent<TPayload!>! appEvent, System.Action<Data<TPayload!>!, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.CustomEvent<TPayload>(AppEvent<TPayload!>! appEvent, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+        "Alis.Reactive:TriggerBuilder<TModel>.CustomEvent<TPayload>(string! eventName, System.Action<TPayload, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "p.Dispatch(\"test\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/Events/Index.cshtml:13"
+        },
+        {
+          "line": "main",
+          "text": "Html.On(plan, t => t.CustomEvent<EventsViewModel>(\"test-received\", (payload, p) =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/Events/Index.cshtml:23"
+        },
+        {
+          "line": "main",
+          "text": "p.Dispatch(\"final\", new EventsViewModel { EventName = \"done\" });",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/Events/Index.cshtml:27"
+        },
+        {
+          "line": "main",
+          "text": "p.DispatchWith<DispatchSourceModel>(\"transfer\", d => d .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value()) .Set(x => x.Status, \"active\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/DispatchSource/Index.cshtml:19-21"
+        },
+        {
+          "line": "redesign",
+          "text": "public static readonly AppEvent Opened = AppEvent.Declare();",
+          "cite": "tests/Alis.Reactive.Framework.App/Subscriptions/GatePage.cs:43"
+        },
+        {
+          "line": "redesign",
+          "text": "Html.On(plan, t => t.CustomEvent(EventsEvents.Test, p =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/Events/Index.cshtml:15"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Dispatch(EventsEvents.Final, new EventsViewModel { EventName = \"done\" });",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/Events/Index.cshtml:26"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Dispatch<DispatchSourceModel>(DispatchSourceEvents.Transfer, d => d .Set(x => x.Name, p.Component<NativeTextBox>(m => m.Name).Value) .Set(x => x.Status, \"active\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/CoreBehaviors/DispatchSource/Index.cshtml:18-20"
+        },
+        {
+          "line": "redesign",
+          "text": ".CustomEvent(GateEvents.Announced, (announced, p) =>",
+          "cite": "tests/Alis.Reactive.Framework.App/Subscriptions/Gate.cshtml:15"
+        },
+        {
+          "line": "redesign",
+          "text": "<li @Html.Raises(GateEvents.Announced, new Announcement { Type = \"a visitor\", PartySize = 1 })>",
+          "cite": "tests/Alis.Reactive.Framework.App/Subscriptions/Gate.cshtml:32"
+        },
+        {
+          "line": "proposed",
+          "text": "public static readonly AppEvent<ResidentFlagged> Flagged = AppEvent.Declare<ResidentFlagged>();",
+          "doors": [
+            "M1.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Html.On(plan, trigger => trigger.CustomEvent(CareEvents.Flagged, (flagged, pipeline) => pipeline.Element(\"flagged-room\").Text.Set(flagged.Read(x => x.Room))));",
+          "doors": [
+            "M1.N3",
+            "N5.6",
+            "M5.N5",
+            "M5.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Dispatch(CareEvents.Flagged, pipeline.Object<ResidentFlagged>(flagged => flagged.Set(x => x.Room, pipeline.Component<NativeNumericTextBox>(\"room\").Value).Set(x => x.Reason, \"fall\")));",
+          "doors": [
+            "M1.N4",
+            "N7.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "<button type=\"button\" @Html.Raises(CareEvents.Flagged, new ResidentFlagged { Room = 12, Reason = \"fall\" })>Flag room 12</button>",
+          "doors": [
+            "M1.N5"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "none",
+        "do",
+        "call",
+        "obj",
+        "lit",
+        "record",
+        "get",
+        "data",
+        "start",
+        "nothing"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/AppEvent.cs:24-75"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:46-102"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/DispatchPayloadBuilder.cs:31-71"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Reactions/Steps.cs:144-159"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:39-67"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:139-144"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/HtmlExtensions.cs:81-128"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/MarkupRaise.cs:19-34"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:43-83"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/DispatchPayloadBuilder.cs:28-81"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:38-58"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:17-20"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:51-73"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:86-93"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:196-200"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/triggers/trigger.ts:47-55"
+        }
+      ],
+      "core": [
+        "Q4",
+        "Q5",
+        "Q7",
+        "Q11",
+        "Q17",
+        "Q18"
+      ],
+      "meanings": [
+        {
+          "id": "M1.D2",
+          "meaning": "A dispatch raises its event on the document as a CustomEvent whose detail is the payload in the live form (gate 1's P8), or null when it carries none. The DOM runs the event's listeners inside the dispatch, in the order they subscribed, so each of its handlers runs up to its first awaited step before the step after Dispatch runs (D11.5); a stop in a handler ends that handler only, and the dispatching pipeline goes on (D4.8). A handler reads its payload as data (D4.2): a member the payload lacks reads its start, and a payload of null reads nothing, so a dispatch with no payload of an event that declares one runs its handlers with every member reading nothing."
+        },
+        {
+          "id": "M1.D3",
+          "meaning": "Markup raises its event on a click at or inside the element it marks, once per click, with the payload of the innermost marked element that holds the click's target. The payload is one attribute holding its JSON in the live form, written by the plan's literal writer as Dispatch's literal is, so a number reaches the handler as a number, an enum in the form the live form writes it, and a record or a list as itself; markup with no payload raises a detail of null, as Dispatch with none does (M1.D2). The core's document plugin listens to clicks once per page, in the capture phase, and reads only its own attribute on the target's ancestors."
+        }
+      ],
+      "oracle": "The DOM Standard: dispatchEvent runs an event's listeners synchronously in the order they were added and reports a listener's exception without stopping the dispatch, a CustomEvent carries its detail, and a click's target's ancestors are its path; and the spec itself for the payload's live form (gate 1's P8) and its reads (D4.2).",
+      "checker": [
+        "Run.tla:SecondHandlerStartsInTheTurn",
+        "Absence.tla:StopEndsOnlyItsHandler",
+        "Absence.tla:DataAbsentReadsItsStart",
+        "Absence.tla:NullHolderReadsNothing",
+        "core:Q7",
+        "core:Q17"
+      ],
+      "defects": [
+        {
+          "id": "M1.X2",
+          "rung": "behavior",
+          "defect": "A dispatch's handlers run after the step that follows Dispatch, or a stop in one of them stops the dispatching pipeline, so the dispatcher's next text is written before the handler's or never (M1.D2, D4.8)."
+        },
+        {
+          "id": "M1.X3",
+          "rung": "behavior",
+          "defect": "A payload built from sources reaches its handler in another shape: a nested member arrives outside its holder, a literal member beside the sources is lost, or a source is read when the page renders rather than when the step runs (M1.D2, N7.1)."
+        },
+        {
+          "id": "M1.X4",
+          "rung": "behavior",
+          "defect": "Markup raises with the wrong payload or the wrong number of times: a click inside a marked item nested in another raises the outer one's payload or both, a number arrives as text, or a click outside every marked element raises one (M1.D3)."
+        },
+        {
+          "id": "M1.X5",
+          "rung": "behavior",
+          "defect": "An event that declares a payload, raised with none, stops its handler or shows the members' starts, where each read reads nothing and the handler runs on (M1.D2, D4.2)."
+        },
+        {
+          "id": "M1.X6",
+          "rung": "analyzer",
+          "defect": "Two AppEvent declarations of one event name in one compilation compile, so a handler of one hears the other's dispatch with another payload type: ALIS039, new:M1.N6."
+        },
+        {
+          "id": "M1.X7",
+          "rung": "type",
+          "defect": "A dispatch whose payload is not its event's payload type, or a handler that reads a member its event's payload does not declare, does not compile: Dispatch takes AppEvent<TPayload> with a TPayload or a TypedSource<TPayload>, and the handler's payload is a Data<TPayload>, M1.N4 and M1.N3."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M1.X2",
+          "page": "A desk whose button's handler dispatches CallLogged, then copies the pager's text into the desk's status; CallLogged has two handlers: the first sets the log's text to Logged and then reads a component the page lacks, which stops it, the second sets the pager's text from Idle to Paged.",
+          "gesture": "Click the button.",
+          "outcome": "The log reads Logged, the pager reads Paged, and the desk's status reads Paged.",
+          "opposite": "With no handler of CallLogged, the desk's status copies Idle.",
+          "defect": "The handlers run after the dispatcher's next step, so the status reads Idle, the first handler's stop ends the dispatch, so the pager keeps Idle, or it ends the dispatcher, so the status keeps its text."
+        },
+        {
+          "for": "M1.X3",
+          "page": "A transfer form with a name input and a destination ward input bound to a nested member, whose button dispatches Transfer built from both with the reason literal fall; the handler shows the name, the destination's ward and the reason.",
+          "gesture": "Type Ada and East, click the button, then change the ward to West and click again.",
+          "outcome": "The handler shows Ada, East and fall, then Ada, West and fall.",
+          "opposite": "With the ward input left empty, the ward's text shows nothing and the name still shows Ada.",
+          "defect": "The ward arrives outside its destination so its text shows nothing, fall is lost beside the sources, or the second click shows East again."
+        },
+        {
+          "for": "M1.X4",
+          "page": "A visitor list whose item raises Announced with party size 12, the gate's capacity 9 and an escort record named Ward clerk, the item holding a nested button that raises Announced with party size 1 and capacity 9, and a paragraph outside every item; the handler shows the party size, the escort's name, and Over capacity when the party size is greater than the capacity, else Within capacity.",
+          "gesture": "Click the nested button, then the item around it, then the paragraph.",
+          "outcome": "After the first click the handler shows 1 and Within capacity; after the second it shows 12, Ward clerk and Over capacity; after the third it still shows 12, Ward clerk and Over capacity.",
+          "opposite": "An item raised with party size 4 and capacity 9 shows Within capacity.",
+          "defect": "The nested click raises the outer item's payload or raises twice, the two numbers arrive as text and compare 12 below 9 so Over capacity never shows, the escort record is refused or lost, or the paragraph's click raises an event."
+        },
+        {
+          "for": "M1.X5",
+          "page": "A gate whose bell button raises Announced with no payload; its handler writes the party size's text, then writes Rung.",
+          "gesture": "Click the bell button.",
+          "outcome": "The party size's text is empty and the status reads Rung.",
+          "opposite": "Raised with party size 3, the party size's text reads 3.",
+          "defect": "The missing payload stops the handler, so Rung never shows, or its party size reads its start and shows 0."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "TriggerBuilder<TModel>.CustomEvent(string! eventName, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the event, which ALIS009 refuses, and a dispatcher and a handler that spell it apart never meet; the event is declared once and named by its declaration.",
+          "carriers": [
+            "M1.N2",
+            "M1.N3"
+          ]
+        },
+        {
+          "door": "TriggerBuilder<TModel>.CustomEvent<TPayload>(string! eventName, System.Action<TPayload, PipelineBuilder<TModel!>!>! pipeline) -> TriggerBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the event, which ALIS009 refuses, and a dispatcher and a handler that spell it apart never meet; the event is declared once and named by its declaration. Its payload is a new TPayload the handler reads through a path typed object, which erases each member's type; the handler's payload is a Data<TPayload> read with Read.",
+          "carriers": [
+            "M1.N2",
+            "M1.N3",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Dispatch(string! eventName) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the event, which ALIS009 refuses, and a dispatcher and a handler that spell it apart never meet; the event is declared once and named by its declaration.",
+          "carriers": [
+            "M1.N2",
+            "M1.N4"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Dispatch<TPayload>(string! eventName, TPayload payload) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the event, which ALIS009 refuses, and a dispatcher and a handler that spell it apart never meet; the event is declared once and named by its declaration.",
+          "carriers": [
+            "M1.N2",
+            "M1.N4"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.DispatchWith<TPayload>(string! eventName, System.Action<DispatchPayloadBuilder<TPayload!, TModel!>!>! configure) -> PipelineBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the event, which ALIS009 refuses, and a dispatcher and a handler that spell it apart never meet; the event is declared once and named by its declaration. Its payload is built by a builder of its own beside GatherBuilder; the one object builder is N7.1, and its refusal of a payload with no field leaves, since Dispatch(appEvent) raises an event with none.",
+          "carriers": [
+            "M1.N2",
+            "M1.N4",
+            "N7.1"
+          ]
+        },
+        {
+          "door": "DispatchPayloadBuilder<TPayload, TModel>.Set(System.Linq.Expressions.Expression<System.Func<TPayload!, bool>!>! field, bool value) -> DispatchPayloadBuilder<TPayload!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N7.1"
+          ]
+        },
+        {
+          "door": "DispatchPayloadBuilder<TPayload, TModel>.Set(System.Linq.Expressions.Expression<System.Func<TPayload!, int>!>! field, int value) -> DispatchPayloadBuilder<TPayload!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N7.1"
+          ]
+        },
+        {
+          "door": "DispatchPayloadBuilder<TPayload, TModel>.Set(System.Linq.Expressions.Expression<System.Func<TPayload!, string!>!>! field, string! value) -> DispatchPayloadBuilder<TPayload!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N7.1"
+          ]
+        },
+        {
+          "door": "DispatchPayloadBuilder<TPayload, TModel>.Set<TProp>(System.Linq.Expressions.Expression<System.Func<TPayload!, TProp>!>! field, TypedSource<TProp>! source) -> DispatchPayloadBuilder<TPayload!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N7.1"
+          ]
+        }
+      ]
+    }
+  ]
+}
