@@ -289,7 +289,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   because lib.dom alone holds 60,695 members and a stale committed copy could compile green. A component or plugin
   declaration names its type with `[Mirrors(module, type)]`; nullability follows variance (what the member reads fits
   the C# type, what the C# type writes fits the member); a drift a browser test arranges on purpose carries
-  `SuppressMessage` naming the test. The owner can overrule it.
+  `SuppressMessage` naming the test. The owner can overrule it. Chosen within the owner's yes, 2026-11-09, gate 1's
+  P11: a member's JSDoc `@default null` is part of its API, so the contract reads the member as holding null and cites
+  the tag's d.ts file and line, and a `T?` declaration of it (NumericTextBox's `value: number`) needs no suppression;
+  the suppression set stays the one above (D5.3, D17.5, X17.44).
 - Chosen within the owner's yes, 2026-11-07, reversing D7.3's `OrNull()` at a struct's set on a new fact (the contract
   makes every `T | null` member a `T?`, and the POC's census broke 178 writes): a set on `Property<T?>` or
   `WriteOnly<T?>` takes a `T` source as C# assignment does (`NullableWrites`, N7.6), a door added to the public surface.

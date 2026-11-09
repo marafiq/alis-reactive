@@ -1000,6 +1000,33 @@
       "source": "spec/probes/ej2-emit-type.mjs"
     },
     {
+      "id": "ej2-numerictextbox-value-default-null",
+      "statement": "Syncfusion types NumericTextBox's value as number, with no null, and documents its default as null at numerictextbox.d.ts:67, so the contract reads it as holding null.",
+      "host": "node",
+      "oracle": "EJ2 declarations under node_modules/@syncfusion (ej2-inputs 33.1.47, ej2-calendars 33.1.44), read by the TypeScript compiler 5.9.3",
+      "probe": "ej2-documented-defaults.mjs",
+      "expect": "ej2-numerictextbox-value-default-null: NumericTextBox.value documents @default null, typed number at @syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:67 (ej2-inputs 33.1.47)",
+      "source": "spec/probes/ej2-documented-defaults.mjs"
+    },
+    {
+      "id": "ej2-datepicker-value-default-null",
+      "statement": "Syncfusion types DatePicker's value as Date, with no null, and documents its default as null at datepicker.d.ts:83, so the contract reads it as holding null.",
+      "host": "node",
+      "oracle": "EJ2 declarations under node_modules/@syncfusion (ej2-inputs 33.1.47, ej2-calendars 33.1.44), read by the TypeScript compiler 5.9.3",
+      "probe": "ej2-documented-defaults.mjs",
+      "expect": "ej2-datepicker-value-default-null: DatePicker.value documents @default null, typed Date at @syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:83 (ej2-calendars 33.1.44)",
+      "source": "spec/probes/ej2-documented-defaults.mjs"
+    },
+    {
+      "id": "ej2-default-null-under-stated",
+      "statement": "The 15 Syncfusion packages a program of DropDownList, MultiSelect, NumericTextBox, DatePicker and Grid loads hold 271 public writable class properties documented @default null and typed with no null, each of which the contract reads as holding null.",
+      "host": "node",
+      "oracle": "EJ2 declarations under node_modules/@syncfusion (ej2-inputs 33.1.47, ej2-calendars 33.1.44), read by the TypeScript compiler 5.9.3",
+      "probe": "ej2-documented-defaults.mjs",
+      "expect": "ej2-default-null-under-stated: 271 public writable class properties in 15 packages document @default null and are typed with no null",
+      "source": "spec/probes/ej2-documented-defaults.mjs"
+    },
+    {
       "id": "core-query-object-fields",
       "statement": "A query binds an object member's fields from the member's C# name, a dot and each field's C# name; an IReadOnlyList field that starts as [] takes no item.",
       "host": "net10",

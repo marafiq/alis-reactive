@@ -464,7 +464,9 @@ Terms used throughout:
     of a live object declared neither optional nor nullable stops when that object holds nothing, as any member of it
     does, and the members of a live object declared optional or nullable read nothing while it holds nothing.
   - Value. The member's C# type is the API's value type, nullable where the API's value is: `string | null` is
-    `string?`, `number | null` is `decimal?`. Null is a value that data holds and a declaration states, never a
+    `string?`, `number | null` is `decimal?`. A value the API types with no null and documents `@default null` holds
+    null until it is set, so it is nullable too: NumericTextBox's `value: number` is `decimal?`, as the contract reads
+    it (D17.5). Null is a value that data holds and a declaration states, never a
     state of the framework (the owner, 2026-11-06: "That is about the framework, not about the value"). A payload
     whose API is `{ name: string; dateOfBirth: Date; birthCountry: string | null }` declares `ReadOnly<string> Name`,
     `ReadOnly<DateTime> DateOfBirth` and `ReadOnly<string?> BirthCountry`; a null country reads as null, and a text
@@ -3314,6 +3316,20 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     the C# type, so a read that admits null is `T?`, and what the C# type writes fits the member, so a `T?` write needs
     a member that takes null. A live object or a returned object the API can hold as null or undefined is checked at
     the object it holds otherwise; when it holds nothing, a read through it stops its pipeline (D5.5).
+  - A member whose JSDoc `@default` text is `null` holds null until a value is set, and the vendor's documentation is
+    part of its API (D5.3): the contract reads its type with null added, so its read admits null and its write, where
+    it has one, takes null, and writes beside it the tag's file, relative to its package, and line, which ALIS019's
+    message cites where the null is the documentation's. NumericTextBox's `value: number`
+    (`@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:67`, `probe:ej2-numerictextbox-value-default-null`)
+    is `Property<decimal?>` with no suppression, and `Property<decimal>` of it is ALIS019, as on any member that reads
+    null; DatePicker's `value: Date` (`@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:83`) is
+    `Property<DateTime?>`; a live object such a member holds is declared `nullable: true`. A member whose type and
+    documentation both say non-null keeps ALIS019 for a `T?` write. The 15 Syncfusion packages a program of these two,
+    DropDownList, MultiSelect and Grid loads hold 271 public writable class properties documented `@default null` and
+    typed with no null (`probe:ej2-default-null-under-stated`), each read so with no suppression. The POC's script
+    reads JSDoc only for `@private` (`poc/tools/vendor-contract.mjs:56`) and writes nullability from the type alone
+    (`poc/tools/vendor-contract.mjs:245`, `poc/tools/vendor-contract.mjs:250`, `poc/tools/vendor-contract.mjs:265-266`),
+    so its analyzer refuses a `decimal?` write of `value` (`poc/Alis.Reactive.Poc.Analyzers/MirrorsAnalyzer.cs:310-313`).
   - A drift a browser test arranges on purpose carries `SuppressMessage` whose justification names the test, and
     `WhenAContractDriftIsSuppressed` fails on a name no Playwright test declares.
   - A declared event is one the type declares (ALIS020, POC 13b), read from the type alone: a property of the event's
@@ -3543,6 +3559,8 @@ plans (Q19).
 - `probe:ej2-emit-type-phantom`
 - `probe:ej2-emit-type-resolved`
 - `probe:ej2-emit-type-arguments`
+- `probe:ej2-numerictextbox-value-default-null`
+- `probe:ej2-default-null-under-stated`
 
 **Doors.**
 - kept: `ComponentVendor.Define`, `ComponentVendor.DefineCallbackProperties`, `ComponentVendor.Native`,
@@ -3645,6 +3663,10 @@ plans (Q19).
   ALIS016, a nullability that disagrees ALIS019, a type it does not hold ALIS037, and a payload read by its members
   where the argument is `any` ALIS021; the contract writes it in the rewrite's analyzer unit, before Fusion's
   onboarding declares a payload: new:N17.2.
+- `X17.44` analyzer (D5.3, D17.5): a `Property<decimal?>` declaration of NumericTextBox's `value: number`, documented
+  `@default null`, builds with no suppression, the contract citing
+  `@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:67`; `Property<decimal>` of it is ALIS019, its message
+  citing that line; a `T?` write to a member whose type and documentation both say non-null stays ALIS019: new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every
