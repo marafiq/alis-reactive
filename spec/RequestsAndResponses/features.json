@@ -1,0 +1,1507 @@
+{
+  "module": "RequestsAndResponses",
+  "features": [
+    {
+      "id": "M6.F1",
+      "summary": "The typed request: its method, a URL parsed into text and placeholders, the members it sends by a C# path to the path, the query, the headers and one body format, the inputs it sends by naming a form, a container or one input, and each value's wire form as the endpoint binds it on both hosts.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:GatherBuilder<TModel>",
+        "Alis.Reactive:GatherBuilder<TRequest, TModel>",
+        "Alis.Reactive:GatherExtensions",
+        "Alis.Reactive:HttpRequestBuilder<TModel>",
+        "Alis.Reactive:RequestExtensions",
+        "Alis.Reactive:RequestStart<TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Get(string! url) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Post(string! url) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Post(string! url, System.Action<GatherBuilder<TModel!>!>! gather) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Put(string! url, System.Action<GatherBuilder<TModel!>!>! gather) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Delete(string! url) -> HttpRequestBuilder<TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "p.Get(Url.SandboxRoute(\"Residents\", \"Http\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:10"
+        },
+        {
+          "line": "main",
+          "text": "p.Post(Url.SandboxRoute(\"Save\", \"Http\"), g => g.Static(\"name\", \"John Doe\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:76"
+        },
+        {
+          "line": "main",
+          "text": "p.Put(Url.SandboxRoute(\"UpdateResident\", \"Http\"), g => g .Static(\"name\", \"Updated Name\") .Static(\"facilityId\", \"1\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:204-206"
+        },
+        {
+          "line": "main",
+          "text": "t.Delete(Url.SandboxRoute(\"DeleteResident\", \"Http\", new { id = 42 }))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:243"
+        },
+        {
+          "line": "main",
+          "text": ".Gather(g => g.Static(\"q\", \"John\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:317"
+        },
+        {
+          "line": "main",
+          "text": ".FromUrl(\"tab\") .FromUrl(\"facilityId\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:425-426"
+        },
+        {
+          "line": "main",
+          "text": ".RouteParam(\"id\", p.FromUrl<int>(\"residentId\")) .Header(\"X-Tab\", p.FromUrl(\"tab\")) .FromUrl(\"facilityId\", \"facility\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:475-477"
+        },
+        {
+          "line": "main",
+          "text": "p.Post(Url.SandboxRoute(\"SubmitResident\", \"Drawer\"), g => g.IncludeAll())",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:38"
+        },
+        {
+          "line": "main",
+          "text": "g.Include<FusionAutoComplete, AutoCompleteModel>(m => m.Physician))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml:21"
+        },
+        {
+          "line": "main",
+          "text": ".Gather(g => g.FromEvent(args, x => x.Text, \"MedicationType\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml:139"
+        },
+        {
+          "line": "main",
+          "text": ".AsFormData()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FileUpload/Index.cshtml:47"
+        },
+        {
+          "line": "main",
+          "text": "g.Include(action.Content(), \"action\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Button/Index.cshtml:145"
+        },
+        {
+          "line": "main",
+          "text": ".Header(\"X-Category\", args, x => x.Category)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/HttpMixing/Index.cshtml:297"
+        },
+        {
+          "line": "redesign",
+          "text": ".Gather<FrontDeskResident>(g => g.Set(x => x.ResidentId, link.Get(q => q.Resident)))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:34"
+        },
+        {
+          "line": "redesign",
+          "text": ".Gather<FrontDeskResident>(g => g .Set(x => x.ResidentId, link.Get(q => q.Resident)) .Header(\"X-Family\", link.Get(q => q.Family)) .Header(\"X-Wing\", week.Get(x => x.Wing)))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:51-54"
+        },
+        {
+          "line": "redesign",
+          "text": ".Gather<HoldVisitRequest>(g => g .Set(x => x.SlotId, args.Added)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:89-90"
+        },
+        {
+          "line": "redesign",
+          "text": ".Set(x => x.Source, \"front-desk\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:93"
+        },
+        {
+          "line": "redesign",
+          "text": ".AsJson()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:95"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Post(Url.SandboxRoute(\"SubmitResident\", \"Drawer\")).Gather(g => g.Form())",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:36"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Post(Url.SandboxRoute(\"SaveShiftNote\", \"Drawer\")).Gather(g => g.Form(\"shift-note-form\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_ShiftNotePartial.cshtml:19"
+        },
+        {
+          "line": "redesign",
+          "text": ".Gather(g => g.Form(m => m.Value, m => m.ResidentId))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_CareLevelQuickEditCard.cshtml:45"
+        },
+        {
+          "line": "redesign",
+          "text": ".AsFormData()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FileUpload/Index.cshtml:70"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<IntakeRequest>(\"/Wards/{ward}/Intake\", request => request.Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Form(intake))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<IntakeRequest>(\"/Wards/{ward}/Intake\", request => request.Path(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Multipart(body => body.Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward)).Form(intake)))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Get<FrontDeskResident>(holdsUrl, request => request.Query(r => r.ResidentId, link.Read(q => q.Resident)).Header(\"X-Family\", link.Read(q => q.Family)))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<HoldVisitRequest>(holdUrl, request => request.Set(r => r.SlotId, slot).Set(r => r.Source, \"front-desk\"))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<CareLevelCorrection>(updateUrl, request => request.Input(r => r.CareLevel, pipeline.Input(m => m.Value)).Input(r => r.ResidentId, pipeline.Input(m => m.ResidentId)))",
+          "doors": [
+            "N10.7",
+            "N9.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<AdmissionRequest>(admitUrl, request => request.Inputs(admission))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Head<PhotoQuery>(\"/Residents/{residentId}/Photo\", request => request.Path(r => r.ResidentId, resident.Read(r => r.Id)))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "services.AddReactiveRequests(requests => requests.Antiforgery(AntiforgeryIn.Header).Header(\"X-Requested-With\", \"XMLHttpRequest\"))",
+          "doors": [
+            "N10.7",
+            "N9.6"
+          ]
+        }
+      ],
+      "nodes": [
+        "request",
+        "record",
+        "list",
+        "lit",
+        "get",
+        "as",
+        "op",
+        "file",
+        "if"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:47-220"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:16-54"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:9-64"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/RequestStart.cs:13-47"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Requests/RequestStep.cs:118-163"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:16-305"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/GatherExtensions.cs:11-90"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:16-62"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Http.cs:6-61"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:58-130"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/gather.ts:1-180"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/http-fetch.ts:1-71"
+        }
+      ],
+      "core": [
+        "Q2",
+        "Q3",
+        "Q7",
+        "Q9",
+        "Q16",
+        "Q18"
+      ],
+      "meanings": [],
+      "oracle": "RFC 9110's methods and header fields, RFC 3986's URI reference and path segment, the URL Standard's application/x-www-form-urlencoded, the Fetch Standard's request bodies and forbidden request headers, RFC 7578's multipart/form-data, and the binder of each host as the probes pin it: net10's MVC model binding and System.Text.Json input formatter, MVC 5's DefaultModelBinder and value providers.",
+      "checker": [
+        "core:Q9",
+        "core:Q7",
+        "Request.tla:EveryPlaceholderFilled",
+        "Request.tla:PathHoldsScalarText",
+        "Request.tla:FileOnlyInFormData",
+        "Request.tla:NothingBindsAsDeclared",
+        "Request.tla:ObjectNothingBindsAsDeclared",
+        "Request.tla:ItemNothingBindsAsDeclared",
+        "Request.tla:FailedConditionLeavesThePartOut"
+      ],
+      "defects": [
+        {
+          "id": "X9.1",
+          "rung": "type"
+        },
+        {
+          "id": "X9.2",
+          "rung": "type"
+        },
+        {
+          "id": "X9.3",
+          "rung": "type"
+        },
+        {
+          "id": "X9.4",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X9.5",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X9.6",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X9.7",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X9.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.11",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.12",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X9.13",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.14",
+          "rung": "type"
+        },
+        {
+          "id": "X9.15",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.16",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.17",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.18",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.19",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.20",
+          "rung": "refusal"
+        },
+        {
+          "id": "X9.21",
+          "rung": "refusal"
+        },
+        {
+          "id": "X9.22",
+          "rung": "refusal"
+        },
+        {
+          "id": "X9.23",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.24",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.25",
+          "rung": "behavior"
+        },
+        {
+          "id": "X9.26",
+          "rung": "refusal"
+        },
+        {
+          "id": "X10.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.21",
+          "rung": "type"
+        },
+        {
+          "id": "X10.22",
+          "rung": "type"
+        },
+        {
+          "id": "X10.23",
+          "rung": "type"
+        },
+        {
+          "id": "X10.27",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X10.28",
+          "rung": "refusal"
+        },
+        {
+          "id": "M6.X5",
+          "rung": "behavior",
+          "defect": "A HEAD request reads a body or runs a route of a kind other than none: HEAD sends no body, its routes are of kind none, its Accept is */* and its route reads the status and the headers (D9.3, D10.6, D10.19, N10.7); an action answers HEAD only under [HttpHead] on both hosts, so a HEAD to an [HttpGet] action on net10 runs the route for 405."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X9.8",
+          "page": "A census form whose request posts a JSON body with Set(r => r.Beds, census.Read(c => c.Ward.Beds)), Beds an int that the request class starts at 1; the server's census answers with Ward holding null. The endpoint echoes the Beds it bound and whether its model is valid.",
+          "gesture": "Click Load census, then Send.",
+          "outcome": "The echo reads Beds 1, valid.",
+          "opposite": "With a census whose Ward holds Beds 3, the echo reads Beds 3, valid.",
+          "defect": "The member sent as JSON null, which net10 binds as no instance, so the echo reads invalid; or sent as 0, so the echo reads Beds 0."
+        },
+        {
+          "for": "X9.9",
+          "page": "A chart button whose GET goes to /Residents/{residentId}, its residentId read as picked.Read(r => r.Room.ResidentId) over a picked resident whose Room holds null; its WhileLoading sets the status to Loading, its Finally sets it to Done, and the step after the request writes After into the log.",
+          "gesture": "Click Show chart with the resident whose room holds null.",
+          "outcome": "The status reads Done, the log keeps its dash, and the network log holds no request to /Residents.",
+          "opposite": "With a resident whose Id is 42, the network log holds GET /Residents/42 and the log reads After.",
+          "defect": "The request sent to /Residents/ or /Residents/undefined, so the network log holds it; or Finally skipped, so the status keeps Loading; or the step after run, so the log reads After."
+        },
+        {
+          "for": "X9.10",
+          "page": "A room button whose GET goes to /Rooms/{code}, its code read from a text box, with a Finally that sets the status to Done.",
+          "gesture": "Type a/b into the code and click Open room.",
+          "outcome": "The status reads Done and the network log holds no request to /Rooms.",
+          "opposite": "With the code B12, the network log holds GET /Rooms/B12.",
+          "defect": "The slash encoded as %2F and sent, which net10 hands the action still encoded, so the network log holds a request; or Finally skipped, so the status keeps its dash."
+        },
+        {
+          "for": "X9.11",
+          "page": "A search box whose GET sends Query(r => r.Term, search value); the endpoint echoes the Term it bound into a text.",
+          "gesture": "Type a b+c&d and click Search.",
+          "outcome": "The echo reads a b+c&d.",
+          "opposite": "With the term plain, the echo reads plain.",
+          "defect": "The plus sent unencoded, so the echo reads a b c&d; or the ampersand left raw, so the query splits and the echo reads a b+c."
+        },
+        {
+          "for": "X9.13",
+          "page": "An applicant form whose POST sends Header(\"X-Applicant\", name box's value) and a WhileLoading that writes Sending into the status.",
+          "gesture": "Type Zoë into the name and click Apply.",
+          "outcome": "No request reaches the network log, the status keeps Waiting, and the console holds one error naming X-Applicant.",
+          "opposite": "With the name Zoe, the endpoint echoes X-Applicant Zoe.",
+          "defect": "The value handed to fetch, which throws or sends a mangled byte, so the status reads Sending or the endpoint echoes a name; or the request stops with no console line naming the header."
+        },
+        {
+          "for": "X9.15",
+          "page": "A native form intake holding Name and a hand-written input named Code, a select named Ward outside the form's element with form=\"intake\", under the antiforgery field place; a POST sends Form(intake) as URL-encoded, and the endpoint echoes Ward, Code and the number of antiforgery fields it read.",
+          "gesture": "Type Ada, pick East, type A7 into Code and click Admit.",
+          "outcome": "The echo reads Ward East, Code A7, fields 1.",
+          "opposite": "With the select's form attribute removed, the echo reads Ward none.",
+          "defect": "The control outside the element dropped, so Ward reads none; the hand-written input dropped, so Code reads none; or the form's own antiforgery field kept beside the framework's, so fields reads 2."
+        },
+        {
+          "for": "X9.16",
+          "page": "An intake form holding a Contact fieldset with Phone, and Name outside the fieldset; one button's POST sends Inputs(contact), another's sends Inputs(intake); the endpoint echoes the members it received.",
+          "gesture": "Type Ada and 555, click Send contact, then Send all.",
+          "outcome": "The first echo reads Phone 555 alone; the second reads Name Ada, Phone 555.",
+          "opposite": "With Phone left empty, the first echo reads Phone with no value.",
+          "defect": "The fieldset's request sends the whole form, so the first echo reads Name Ada too; or the form's request skips nested elements, so the second lacks Phone."
+        },
+        {
+          "for": "X9.17",
+          "page": "A partial view of model Visit rendered into the page, beside a POST of model Admission whose Inputs names the partial's container by its id.",
+          "gesture": "Load the partial, then click Admit.",
+          "outcome": "The network log holds no request, and the console holds one error naming the container's id, Visit and Admission.",
+          "opposite": "With the container rendered under Admission, the endpoint echoes the admission's members.",
+          "defect": "The container's inputs sent under the wrong model, so the network log holds the POST; or the request stops with no console line naming both models."
+        },
+        {
+          "for": "X9.18",
+          "page": "A shift picker component holding night-shift, the held form of Night under JsonStringEnumMemberName, sets r => r.Shift of a GET's query; the endpoint echoes the Shift it bound.",
+          "gesture": "Pick Night and click Find staff.",
+          "outcome": "The URL holds Shift=Night and the echo reads Night.",
+          "opposite": "With Day picked, the URL holds Shift=Day.",
+          "defect": "The held form sent as it is, so the URL holds Shift=night-shift and the echo reads its start, Day."
+        },
+        {
+          "for": "X9.19",
+          "page": "A shift picker component that the test sets to hold dusk, a form no value of the Shift enum is held as, sets r => r.Shift of a GET whose step after writes Sent into the log.",
+          "gesture": "Click Hold dusk, then Find staff.",
+          "outcome": "The network log holds no request, the log keeps its dash, and the console names r => r.Shift and the forms day-shift and night-shift.",
+          "opposite": "With night-shift held, the URL holds Shift=Night and the log reads Sent.",
+          "defect": "The unknown form sent, so the URL holds Shift=dusk; or the request skipped with the pipeline going on, so the log reads Sent."
+        },
+        {
+          "for": "X9.20",
+          "page": "A view whose GET sets r => r.Ward from a picker of the Ward enum whose EastWing and EastAnnex each carry JsonStringEnumMemberName(\"east\").",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where it renders with \"'r => r.Ward' holds EastWing and EastAnnex in one form, \\\"east\\\", under the app's options, so the browser cannot tell which one it holds; give one of them a JsonStringEnumMemberName of its own.\"",
+          "opposite": "With EastAnnex named east-annex, the page renders and picking East Annex sends Ward=EastAnnex.",
+          "defect": "The page renders and sends Ward=EastWing for either value."
+        },
+        {
+          "for": "X9.21",
+          "page": "A view whose GET sets r => r.Shift from a component whose Shift member carries its own converter that writes Day as {\"code\":0}.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where it renders with \"'r => r.Shift' holds Day as {\\\"code\\\":0} under its own JSON converter, and a request sends one text or number per member; send a member written as text or a number.\"",
+          "opposite": "With the converter removed, the page renders and picking Day sends Shift=Day.",
+          "defect": "The page renders and sends Shift=[object Object]."
+        },
+        {
+          "for": "X9.22",
+          "page": "A view whose GET sets r => r.Shift to a shift the view computes from its model, which holds 5 when the view renders, a value no member of the Shift enum names.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where it renders with \"'r => r.Shift' is set to 5, which no value of its enum names: net10 refuses it and MVC 5 binds it, so the hosts bind it apart; set a value its enum names.\"",
+          "opposite": "With the model's shift holding 1, the page renders and the request sends Shift=Night.",
+          "defect": "The page renders and sends Shift=5, which net10 refuses and MVC 5 binds."
+        },
+        {
+          "for": "X9.23",
+          "page": "A roster whose GET sends r => r.Shifts, a List<Shift?>, from a source holding Day, nothing and Night; the endpoint echoes the count of items it bound and each item, null as none.",
+          "gesture": "Click Send roster.",
+          "outcome": "The echo reads 3 items: Day, none, Night.",
+          "opposite": "With the source holding Day and Night, the echo reads 2 items: Day, Night.",
+          "defect": "The item that reads nothing left out, so the echo reads 2 items; or sent as its start, so the middle item reads Day."
+        },
+        {
+          "for": "X9.24",
+          "page": "A care plan picker holding Weekend, Mon under the app's string enum converter sets r => r.Care, a flags enum the startup names with Flags<CareDays>(); a second page under the app's numbers holds 97; each GET's endpoint echoes the Care it bound.",
+          "gesture": "Click Send care on the first page, then on the second.",
+          "outcome": "Both URLs hold Care=Mon%2C+Weekend and both echoes read Mon, Weekend.",
+          "opposite": "With Mon alone held, the URL holds Care=Mon.",
+          "defect": "The held text sent as it is, so the URL holds Care=Weekend%2C+Mon; or 97 sent as its number, so the echo reads 97."
+        },
+        {
+          "for": "X9.25",
+          "page": "A care plan picker that the test sets to hold 129, Mon with the bit 128 that no value of the flags enum names, sets r => r.Care of a GET whose step after writes Sent.",
+          "gesture": "Click Hold 129, then Send care.",
+          "outcome": "The network log holds no request, the log keeps its dash, and the console names r => r.Care and 129.",
+          "opposite": "With 97 held, the URL holds Care=Mon%2C+Weekend and the log reads Sent.",
+          "defect": "The value sent as 129 or as Mon alone, so the network log holds the GET; or the pipeline going on, so the log reads Sent."
+        },
+        {
+          "for": "X10.10",
+          "page": "A note form whose POST sets r => r.Note, a string? the request class starts at none, from the note box under When(the Include note box is checked); the endpoint echoes the Note it bound.",
+          "gesture": "Leave Include note unchecked, type late and click Save.",
+          "outcome": "The echo reads none.",
+          "opposite": "With Include note checked, the echo reads late.",
+          "defect": "The member sent as JSON null or as an empty field, so the echo reads null or nothing in place of none."
+        },
+        {
+          "for": "M6.X5",
+          "page": "A photo badge whose HEAD goes to an action under [HttpHead] that answers 200 with an ETag header, its route of kind none writing the status and Headers.Get(\"ETag\") into texts; a second button sends HEAD to an action under [HttpGet] alone.",
+          "gesture": "Click Check photo, then Check the other.",
+          "outcome": "The first writes 200 and the ETag \"v7\"; the second runs the route for 405 and writes 405.",
+          "opposite": "A GET to the first action writes 200 and the photo's size from its body.",
+          "defect": "The HEAD read as a JSON route, so the empty body runs the catch-all and no 200 shows; or HEAD answered as GET, so the second writes 200."
+        },
+        {
+          "for": "X9.26",
+          "page": "An app whose AddReactiveRequests names no antiforgery choice, and a view whose Save button posts its intake to /Intake.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where it renders with \"'POST /Intake' sends no antiforgery token, since the app chose none: call Antiforgery(AntiforgeryIn.Header), Antiforgery(AntiforgeryIn.FormField) or NoAntiforgery() in AddReactiveRequests.\"",
+          "opposite": "With Antiforgery(AntiforgeryIn.Header) in AddReactiveRequests, the page renders and Save posts the intake with the token in its header.",
+          "defect": "The page renders and Save posts with no token, which the server's antiforgery check refuses."
+        },
+        {
+          "for": "X10.28",
+          "page": "An app that never calls AddReactiveRequests, and a view whose Load button gets the rounds from /Rounds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where it renders with \"'GET /Rounds' is rendered in an app that never called AddReactiveRequests; call services.AddReactiveRequests(requests => ..) once at startup.\"",
+          "opposite": "With AddReactiveRequests called at startup, the page renders and Load shows the rounds.",
+          "defect": "The page renders and Load runs with no defaults, so a 500 from /Rounds shows nothing and no busy indicator shows while it waits."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "GatherBuilder<TModel>",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.FromEvent<TPayload, TProp>(TPayload args, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path, string! param) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It names a payload's member by a lambda beside a placeholder argument and the sent key by a string, main's second syntax for a source; the payload's member is a source read with Read, and Set(r => r.Member, source) sends it (D8.6, D9.15).",
+          "carriers": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.FromUrl(string! paramName) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the page's query key and another string the sent key, which ALIS009 refuses on the public surface, and the key is matched by case where both hosts bind it ignoring case; Set(r => r.Member, pipeline.PageUrl<TPage>().Read(q => q.Member)) reads and sends it by members (D9.15, D9.18).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.FromUrl(string! paramName, string! asParam) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the page's query key and another string the sent key, which ALIS009 refuses on the public surface, and the key is matched by case where both hosts bind it ignoring case; Set(r => r.Member, pipeline.PageUrl<TPage>().Read(q => q.Member)) reads and sends it by members (D9.15, D9.18).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.FromUrl<T>(string! paramName) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the page's query key and another string the sent key, which ALIS009 refuses on the public surface; Set(r => r.Member, pipeline.PageUrl<TPage>().Read(q => q.Member)) reads it typed by the page's own class and sends it by the request's member (D9.15, D9.18).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.FromUrl<T>(string! paramName, string! asParam) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the page's query key and another string the sent key, which ALIS009 refuses on the public surface; Set(r => r.Member, pipeline.PageUrl<TPage>().Read(q => q.Member)) reads it typed by the page's own class and sends it by the request's member (D9.15, D9.18).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.Header(string! name, string! value) -> GatherBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.Header<TPayload, TProp>(string! name, TPayload args, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It reads a payload's member through a placeholder argument and a lambda, main's second syntax for a source; Header(name, source) takes the payload's member as the source Read returns (D8.6, D9.11).",
+          "carriers": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.Header<TProp>(string! name, TypedSource<TProp>! source) -> GatherBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.IncludeAll() -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It sends every registered input of the page, which no request names: a request names what it sends, a native form by Form(form), any container by Inputs(container) and one input by Input (D9.15).",
+          "carriers": [
+            "N10.7",
+            "N9.2"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.Plugin<T>(TypedPluginSource<T>! source, string! paramName) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the sent key, which ALIS009 refuses on the public surface; a plugin's member is a source like any other, and Set(r => r.Member, source) sends it under the request's member (Q7, D9.15).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.RouteParam(string! paramName, int value) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the placeholder, which ALIS009 refuses on the public surface; Path(r => r.Member, value) fills it from a member of the request's own type, and a placeholder no member fills is refused (D9.4).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.RouteParam(string! paramName, long value) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the placeholder, which ALIS009 refuses on the public surface; Path(r => r.Member, value) fills it from a member of the request's own type, and a placeholder no member fills is refused (D9.4).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.RouteParam(string! paramName, string! value) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the placeholder, which ALIS009 refuses on the public surface; Path(r => r.Member, value) fills it from a member of the request's own type, and a placeholder no member fills is refused (D9.4).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.RouteParam<TPayload, TProp>(string! paramName, TPayload args, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the placeholder and a lambda over a placeholder argument reads the payload, main's second syntax for a source; Path(r => r.Member, source) takes the payload's member as the source Read returns (D8.6, D9.4).",
+          "carriers": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.RouteParam<TProp>(string! paramName, TypedSource<TProp>! source) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the placeholder, which ALIS009 refuses on the public surface; Path(r => r.Member, source) fills it from a member of the request's own type, and a placeholder no member fills is refused (D9.4).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherBuilder<TModel>.Static(string! param, object! value) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the member and an object holds the value, which ALIS009 refuses on the public surface; Set(r => r.Member, value) names the member by the request's own type and takes a literal or a source of the member's type (D9.15).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "GatherExtensions",
+          "verdict": "refused",
+          "reason": "A static class of Include overloads that send one component's value; Input(r => r.Member, pipeline.Input(m => m.Member)) sends one input under the request member's binding name, typed by the value both lambdas share, and Set sends any component member as a source (D9.15).",
+          "carriers": [
+            "N10.7",
+            "N9.3"
+          ]
+        },
+        {
+          "door": "HttpRequestBuilder<TModel>.Delete(string! url) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "HttpRequestBuilder<TModel>.Gather(System.Action<GatherBuilder<TModel!>!>! gather) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "HttpRequestBuilder<TModel>.Get(string! url) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "HttpRequestBuilder<TModel>.Post(string! url) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "HttpRequestBuilder<TModel>.Put(string! url) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Delete(string! url) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Get(string! url) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Post(string! url) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Post(string! url, System.Action<GatherBuilder<TModel!>!>! gather) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Put(string! url, System.Action<GatherBuilder<TModel!>!>! gather) -> HttpRequestBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "static GatherExtensions.Include<TComponent, TModel>(this GatherBuilder<TModel!>! self, System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! expr) -> GatherBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7",
+            "N9.3"
+          ]
+        },
+        {
+          "door": "static GatherExtensions.Include<TComponent, TModel>(this GatherBuilder<TModel!>! self, string! refId, string! name) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the component and another the sent key, which ALIS009 refuses on the public surface; Input names the input by its model member and the key by the request's member (D9.15).",
+          "carriers": [
+            "N10.7",
+            "N9.3"
+          ]
+        },
+        {
+          "door": "static GatherExtensions.Include<TModel, TProp>(this GatherBuilder<TModel!>! self, TypedComponentSource<TProp>! source) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "It sends a component member under a key the member's own name gives, so the request's type does not type it; Set(r => r.Member, source) sends a component member, a source like any other, under the request's member (Q7, D9.15).",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "static GatherExtensions.Include<TModel, TProp>(this GatherBuilder<TModel!>! self, TypedComponentSource<TProp>! source, string! paramName) -> GatherBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string names the sent key, which ALIS009 refuses on the public surface; Set(r => r.Member, source) sends the component member under the request's member (Q7, D9.15).",
+          "carriers": [
+            "N10.7"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M6.F2",
+      "summary": "The request's flow and its response: one lifecycle from the check through WhileLoading, the send under the retry policy, one route by a closed set of outcomes and its declared body kind, Finally and Chained, Parallel's settled steps, the defaults that compose into every request, the busy indicator and the notice, and the reply a typed object whose status, headers and body are sources in its route.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:ResponseBuilder<TModel>",
+        "Alis.Reactive:ResponseBody<TResponse>",
+        "Alis.Reactive:ParallelBuilder<TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive:HttpRequestBuilder<TModel>.WhileLoading(System.Action<PipelineBuilder<TModel!>!>! pipeline) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:HttpRequestBuilder<TModel>.Finally(System.Action<PipelineBuilder<TModel!>!>! pipeline) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:HttpRequestBuilder<TModel>.Response(System.Action<ResponseBuilder<TModel!>!>! response) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:HttpRequestBuilder<TModel>.Validate<TValidationSource>(string! formId) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:HttpRequestBuilder<TModel>.Validate<TValidationSource>(string! formId, string! ruleSet) -> HttpRequestBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Parallel(params System.Action<HttpRequestBuilder<TModel!>!>![]! branches) -> ParallelBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Into(string! elementId) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.ValidationErrors(string! formId) -> PipelineBuilder<TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": ".WhileLoading(l => l.Element(\"load-spinner\").Show())",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:11"
+        },
+        {
+          "line": "main",
+          "text": ".Response(r => r .OnSuccess<ResidentsResponse>((json, s) =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:12-13"
+        },
+        {
+          "line": "main",
+          "text": "s.Element(\"load-first\").SetText(json, x => x.First);",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:16"
+        },
+        {
+          "line": "main",
+          "text": ".Response(r => r.OnSuccess(s => s.Into(\"native-action-link-grid\")))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:26"
+        },
+        {
+          "line": "main",
+          "text": ".OnError(400, e =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:87"
+        },
+        {
+          "line": "main",
+          "text": ".Chained(c => c .Get(Url.SandboxRoute(\"Facilities\", \"Http\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:122-123"
+        },
+        {
+          "line": "main",
+          "text": "p.Parallel( a => a.Get(Url.SandboxRoute(\"Residents\", \"Http\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:159-160"
+        },
+        {
+          "line": "main",
+          "text": ").OnAllSettled(s =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:174"
+        },
+        {
+          "line": "main",
+          "text": ".Finally(f => f.Element(\"finally-spinner\").Hide());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/Http/Index.cshtml:813"
+        },
+        {
+          "line": "main",
+          "text": ".Validate<DrawerResidentValidator>(\"drawer-resident-form\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:39"
+        },
+        {
+          "line": "main",
+          "text": "e.ValidationErrors(\"drawer-resident-form\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:55"
+        },
+        {
+          "line": "main",
+          "text": ".OnError<InPlaceEditorCommitError>((err, e) =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FusionInPlaceEditor/Partials/_AllergiesQuickEditCard.cshtml:50"
+        },
+        {
+          "line": "redesign",
+          "text": ".WhileLoading(l => loading.Show())",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:35"
+        },
+        {
+          "line": "redesign",
+          "text": ".OnSuccess<ResidentWeekResponse>((week, s) =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:37"
+        },
+        {
+          "line": "redesign",
+          "text": ".OnError<DeskMessage>(404, (unknown, e) =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:44"
+        },
+        {
+          "line": "redesign",
+          "text": ".Chained<ResidentWeekResponse>((week, holds) => holds.Get(holdsUrl)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:50"
+        },
+        {
+          "line": "redesign",
+          "text": ".Finally(f => loading.Hide());",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:62"
+        },
+        {
+          "line": "redesign",
+          "text": "arrival.Parallel( badge => badge.Post(badgeUrl)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:195-196"
+        },
+        {
+          "line": "redesign",
+          "text": ".OnError(failed => failed.Element(\"desk-status\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:203"
+        },
+        {
+          "line": "redesign",
+          "text": ".Response(r => r.OnSuccess(s => s.Into(\"alis-drawer-content\"))))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:207"
+        },
+        {
+          "line": "redesign",
+          "text": ".OnAllSettled(done =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Brought/VisitPlanner/FrontDesk.cshtml:208"
+        },
+        {
+          "line": "redesign",
+          "text": ".Validate<DrawerResidentValidator>(\"drawer-resident-form\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:37"
+        },
+        {
+          "line": "redesign",
+          "text": "e.ValidationErrors(\"drawer-resident-form\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:59"
+        },
+        {
+          "line": "redesign",
+          "text": ".Validate<DischargeRules>(\"discharge-form\", \"Draft\")))",
+          "cite": "tests/Alis.Reactive.Framework.App/Validation/DischargeRefused.cshtml:16"
+        },
+        {
+          "line": "proposed",
+          "text": ".OnSuccess<IntakeCreated>((created, done) => done.Notice().Success(\"Resident admitted\"))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": ".Chained((created, next) => next.Get<SummaryQuery>(\"/Residents/{residentId}/Summary\", query => query.Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id))).Into(\"resident-summary\"))",
+          "doors": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": ".Validate<IntakeValidator>()",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": ".OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success(\"Resident admitted\"))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": ".OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": ".OnError<DeskMessage>(404, (unknown, pipeline) => pipeline.Element(\"desk-status\").Text.Set(unknown.Body.Read(m => m.Message)))",
+          "doors": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": ".OnError((failed, pipeline) => pipeline.When(failed.Outcome.Eq(FailureOutcome.Network)).Then(offline => offline.Element(\"desk-status\").Text.Set(\"The desk is offline.\")))",
+          "doors": [
+            "N10.7",
+            "N8.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Parallel(badge => badge.Post<HoldVisitRequest>(badgeUrl, request => request.Set(r => r.SlotId, earliest)), card => card.Get<FrontDeskSlot>(arrivalUrl, request => request.Set(r => r.SlotId, earliest)).Into(\"alis-drawer-content\"));",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "services.AddReactiveRequests(requests => requests.Antiforgery(AntiforgeryIn.Header).ShowBusy().ShowValidationErrors().Retry(3, TimeSpan.FromSeconds(2)))",
+          "doors": [
+            "N10.7",
+            "N10.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": ".Busy(\"resident-summary\")",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Get(\"/Census/Export\").Download()",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(\"chart-version\").Text.Set(chart.Headers.Get(\"ETag\"))",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "return validation.ToErrorResponse();",
+          "doors": [
+            "N10.1"
+          ]
+        }
+      ],
+      "nodes": [
+        "request",
+        "get",
+        "call",
+        "data",
+        "let",
+        "if",
+        "plugin",
+        "nothing"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/ResponseBuilder.cs:17-143"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:56-131"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/ParallelBuilder.cs:16-45"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Requests/ParallelStep.cs:10-37"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Requests/RequestStep.cs:75-116"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Requests/RequestStep.cs:165-235"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/ResponseBuilder.cs:15-129"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/ParallelBuilder.cs:15-54"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/ResponseBody.cs:36-56"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:64-118"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:28-57"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:155-170"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/http.ts:27-58"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/http.ts:123-225"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/http.ts:240-268"
+        }
+      ],
+      "core": [
+        "Q4",
+        "Q5",
+        "Q8",
+        "Q10",
+        "Q11",
+        "Q12",
+        "Q16"
+      ],
+      "meanings": [],
+      "oracle": "RFC 9110's status codes and Retry-After, RFC 6585's 429, RFC 8259's JSON, RFC 6266's Content-Disposition, the Fetch Standard's redirect, network error and CORS-exposed response headers, the WHATWG Encoding Standard's TextDecoder, WAI-ARIA's aria-busy, .NET's standard resilience handler for the retry numbers, and ASP.NET Core's ValidationProblemDetails for the error body.",
+      "checker": [
+        "core:Q10",
+        "core:Q11",
+        "Request.tla:FailedCheckSendsNothing",
+        "Request.tla:FinallyRunsWhenLoadingRan",
+        "Request.tla:OneRouteRuns",
+        "Request.tla:SuccessWithNoRouteRunsNone",
+        "Request.tla:FailureRunsTheCatchAll",
+        "Request.tla:ChainedOnlyAfterSuccess",
+        "Request.tla:ChainedOnlyWhenItsConditionHolds",
+        "Request.tla:StepsAfterRunUnlessStopped",
+        "Request.tla:RetriesOnlyWhatIsRetryable",
+        "Request.tla:RetryStopsAtItsAttempts",
+        "Request.tla:OneLifecycleAcrossAttempts",
+        "Request.tla:EachLayerPairs",
+        "Request.tla:HoldSpansTheSend",
+        "Request.tla:FailedGuardHoldsNothing",
+        "Lanes.tla:AllSettledAfterEveryRequest",
+        "Lanes.tla:JoinAfterEveryBranchTail",
+        "Composition.tla:IndicatorNeverHidesEarly",
+        "Composition.tla:IndicatorNeverStaysShown",
+        "Composition.tla:HoldOncePerRequest",
+        "Composition.tla:NoticeOncePerFailure",
+        "Run.tla:InnerFinallyFirst",
+        "Run.tla:FinallyRunsOnce",
+        "Run.tla:FinallyRunsWhenLoaded",
+        "Run.tla:FinallyOnlyWhenLoaded",
+        "Run.tla:ReleasedWhenEnded",
+        "Ownership.tla:FailureReachesSummary",
+        "Ownership.tla:InlineOnlyAtTheSentInput",
+        "Schema.tla:RefsReadTheirBlock"
+      ],
+      "defects": [
+        {
+          "id": "X10.1",
+          "rung": "type"
+        },
+        {
+          "id": "X10.2",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.9",
+          "rung": "type"
+        },
+        {
+          "id": "X10.11",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.12",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.13",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.14",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.15",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.16",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.17",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.18",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X10.19",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.20",
+          "rung": "behavior"
+        },
+        {
+          "id": "X10.24",
+          "rung": "type"
+        },
+        {
+          "id": "X10.25",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X10.26",
+          "rung": "analyzer"
+        },
+        {
+          "id": "M6.X1",
+          "rung": "behavior",
+          "defect": "A redirect that ends on another origin is followed into a route of its status: the outcome is redirect, so the catch-all runs with Failure.Outcome redirect and one error is logged naming the request, and no success route and no status route runs (D10.4, D10.5, N10.7)."
+        },
+        {
+          "id": "M6.X2",
+          "rung": "behavior",
+          "defect": "A text or HTML body is decoded as UTF-8 whatever its charset, as fetch's text() decodes it: the route's text is decoded by the charset its Content-Type names through TextDecoder, else as UTF-8 (D10.6)."
+        },
+        {
+          "id": "M6.X3",
+          "rung": "behavior",
+          "defect": "A file route names its download by the plain filename or by the URL when the response carries filename*: the name is RFC 6266's filename* before filename, and the last segment of the request's path only when the response carries neither (D10.20)."
+        },
+        {
+          "id": "M6.X4",
+          "rung": "behavior",
+          "defect": "A reply's header is read by its case, a repeated header reads its first value only, or a header the answer lacks shows a placeholder text: Headers.Get(name) reads as the browser's Headers.get reads, a name in any case, a repeated header's values joined by a comma and a space, and a missing one as null, which a text set from it shows as nothing (D10.19, N10.7, D5.3)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X10.2",
+          "page": "A notes page whose request defaults send X-Requested-With: XMLHttpRequest, a GET of JSON with a route for 401 that writes Session expired and a catch-all that writes Request failed; a second page with the same request and no such default header. The test signs the session out on the server before each click.",
+          "gesture": "Click Refresh notes on the first page, then on the second.",
+          "outcome": "The first writes Session expired; the second writes Request failed.",
+          "opposite": "With the session signed in, both pages write the notes.",
+          "defect": "The redirect to the login page followed, so the first writes Request failed or reads the login page as notes; or the X-Responded-JSON status ignored on net48, so the first writes Request failed."
+        },
+        {
+          "for": "X10.3",
+          "page": "A summary card whose GET writes the resident's name on success, writes Offline into the error text in its catch-all, and whose Finally writes Done into the status; the card is the request's busy target under ShowBusy(). The test drops the connection.",
+          "gesture": "Click Load summary.",
+          "outcome": "The error text reads Offline, the status reads Done, and the card's busy indicator and aria-busy are gone.",
+          "opposite": "With the server answering 200, the card shows the name and no Offline.",
+          "defect": "The catch-all not run, so Offline never shows; Finally not run, so Done never shows; or the indicator left on the card."
+        },
+        {
+          "for": "X10.4",
+          "page": "An admission form whose validator requires Name, a POST that checks it, and a step after the request that writes Sent into the log.",
+          "gesture": "Leave Name empty and click Admit.",
+          "outcome": "Name shows its message, the network log holds no request, and the log keeps its dash.",
+          "opposite": "With Name filled, the network log holds the POST and the log reads Sent.",
+          "defect": "The request sent despite the failed check, so the network log holds it; or the pipeline going on, so the log reads Sent."
+        },
+        {
+          "for": "X10.5",
+          "page": "An admission form of Name and Room.Number, whose server answers 400 with {\"errors\": {\"Name\": [\"Name is taken\"], \"Room.Number\": [\"Room is full\"]}} from ValidationResult.ToErrorResponse(), on net10.",
+          "gesture": "Fill both inputs and click Admit.",
+          "outcome": "Name shows Name is taken, Room shows Room is full, and the summary lists both.",
+          "opposite": "Answered 200, no message shows.",
+          "defect": "The keys read as camel case or by a guessed shape, so neither input shows its message; or the summary alone shows them."
+        },
+        {
+          "for": "X10.6",
+          "page": "Two Parallel GETs that the test app answers after 1 and 3 seconds, each route appending its name to a log, and a step after Parallel appending settled.",
+          "gesture": "Click Load both.",
+          "outcome": "After 3 seconds the log reads fast, slow, settled, with settled once.",
+          "opposite": "With both answered at once, the log ends with settled once.",
+          "defect": "The steps after Parallel run after the first answer, so the log reads fast, settled, slow; or once per branch, so settled shows twice."
+        },
+        {
+          "for": "X10.7",
+          "page": "The X10.5 admission form on the net48 host under IIS, whose action answers through ValidationResult.ToErrorResponse() with TrySkipIisCustomErrors set.",
+          "gesture": "Fill both inputs and click Admit.",
+          "outcome": "Name shows Name is taken and Room shows Room is full.",
+          "opposite": "Answered 200, no message shows.",
+          "defect": "IIS replaces the 400's body with its own error page, so no input shows a message and the catch-all runs."
+        },
+        {
+          "for": "X10.8",
+          "page": "A census GET under the defaults' retry policy, which the test app answers 503 and then 200; its WhileLoading appends loading to a log, its Finally appends done, and a counting busy component counts its show calls.",
+          "gesture": "Click Load census.",
+          "outcome": "The census shows, the log reads loading, done once, and the busy count reads 1.",
+          "opposite": "With NoRetry(), the 503 runs the error route and the census keeps its dash.",
+          "defect": "Each attempt runs WhileLoading and Finally, so the log reads loading, loading, done, done; the busy indicator shown per attempt, so the count reads 2; or the 503 routed at once, so the census never shows."
+        },
+        {
+          "for": "X10.11",
+          "page": "An intake POST whose success writes Admitted, its Chained GET under When(the Print badge box is checked) loading the badge, and a step after the request writing After.",
+          "gesture": "Leave Print badge unchecked and click Admit.",
+          "outcome": "The status reads Admitted, the log reads After, and the network log holds no badge request.",
+          "opposite": "With Print badge checked, the badge loads.",
+          "defect": "The chained request sent despite its condition, so the network log holds it; or its failed condition stopping the pipeline, so the log keeps its dash."
+        },
+        {
+          "for": "X10.12",
+          "page": "A request written only as Post<AdmissionRequest>(url, request => request.Form(admission)).OnSuccess(..), under defaults with ShowValidationErrors(); the server answers 400 with an error at Name.",
+          "gesture": "Click Admit.",
+          "outcome": "Name shows the server's message inside the admission form, and the form's summary lists it.",
+          "opposite": "Under defaults without ShowValidationErrors(), the catch-all notice shows and Name shows nothing.",
+          "defect": "The default route unaware of the request's own form, so the message shows nowhere or at another form's summary."
+        },
+        {
+          "for": "X10.13",
+          "page": "A medication grid that sorts and edits the rows a GET's JSON body sets into it; the success route's Chained POST sends the body's rows, and the endpoint echoes their order and first dose.",
+          "gesture": "Click Load, change the first row's dose in the grid, then Send.",
+          "outcome": "The echo reads the server's order and the server's first dose.",
+          "opposite": "With the grid left untouched, the echo reads the same.",
+          "defect": "The response shared with the grid, so the echo reads the grid's sorted order or the edited dose."
+        },
+        {
+          "for": "X10.14",
+          "page": "Two Parallel GETs whose routes each write their name into one text; the test app answers the first after 2 seconds and the second after 1.",
+          "gesture": "Click Load both.",
+          "outcome": "The text reads first.",
+          "opposite": "With the first answered after 1 second and the second after 2, the text reads second.",
+          "defect": "Routes run in authored order rather than arrival, so the text reads second in the first case."
+        },
+        {
+          "for": "X10.15",
+          "page": "A GET under the defaults' retry policy whose route for 500 appends error to a log; the test app counts the attempts it receives. A second GET is answered 503 and then 200.",
+          "gesture": "Click Load on the first, then Load on the second.",
+          "outcome": "The first logs error once and the app counted 1 attempt; the second shows its success text.",
+          "opposite": "With NoRetry() on the second, its 503 route runs.",
+          "defect": "A 500 retried, so the app counts 2 attempts; or a 503 not retried, so the second runs its error route."
+        },
+        {
+          "for": "X10.16",
+          "page": "Two Parallel GETs whose success routes set one summary card, answered after 1 and 5 seconds; a second page whose two GETs set two cards.",
+          "gesture": "Click Load on the first page, then on the second.",
+          "outcome": "On the first page the card's indicator and aria-busy stay until 5 seconds; on the second the first card's hide at 1 second and the second card's stay to 5.",
+          "opposite": "With both answered at once, every indicator hides together.",
+          "defect": "The indicator hidden at the first answer, so the shared card shows no indicator from 1 second; or one target held for both, so the first card stays busy to 5 seconds."
+        },
+        {
+          "for": "X10.17",
+          "page": "A GET whose Busy names the element summary-panel, rendered by a partial the page has not loaded yet; its WhileLoading writes Loading.",
+          "gesture": "Click Load summary before loading the partial.",
+          "outcome": "The network log holds no request and the status keeps Waiting.",
+          "opposite": "After the partial loads, the GET is sent and the panel shows the indicator.",
+          "defect": "The request sent with no target, so the network log holds it; or WhileLoading run, so the status reads Loading."
+        },
+        {
+          "for": "X10.19",
+          "page": "Two Parallel GETs with no Busy, each success route setting one component's value from its JSON body, answered after 1 and 3 seconds; a third GET whose route sets a text only inside a When.",
+          "gesture": "Click Load both, then Load third.",
+          "outcome": "Each component's element shows the indicator until its own answer and the page's indicator never shows; the third shows the page's indicator.",
+          "opposite": "With Busy(\"panel\") on both, only the panel shows the indicator.",
+          "defect": "The page's indicator shown for the two components, or the third holding the element its When writes."
+        },
+        {
+          "for": "X10.20",
+          "page": "A page under ShowBusy() that loads no script providing busy, and a GET whose WhileLoading writes Loading.",
+          "gesture": "Click Load.",
+          "outcome": "The network log holds no request, the status keeps Waiting, and the console holds one error naming busy.",
+          "opposite": "With NativeLoader's script loaded, the GET is sent.",
+          "defect": "The request sent with no indicator, so the network log holds it; or the missing contract found only at the first failure."
+        },
+        {
+          "for": "M6.X1",
+          "page": "A GET of JSON whose action redirects to another origin, with a success route that writes Loaded, a route for 302 that writes Moved, and a catch-all that writes the failure's Outcome.",
+          "gesture": "Click Load.",
+          "outcome": "The status reads redirect, and the console holds one error naming the request and the redirect.",
+          "opposite": "With the action redirecting within the page's origin to JSON, the status reads Loaded.",
+          "defect": "The redirect not told apart: followed into the other origin's answer, so the status reads Loaded or Moved, or read as a network failure, so it reads network."
+        },
+        {
+          "for": "M6.X2",
+          "page": "A GET of text whose action answers café with Content-Type text/plain; charset=windows-1252, its route setting a text from the body.",
+          "gesture": "Click Load note.",
+          "outcome": "The text reads café.",
+          "opposite": "Answered in UTF-8 with charset utf-8, the text reads café.",
+          "defect": "The body decoded as UTF-8, so the text reads caf with a replacement character."
+        },
+        {
+          "for": "M6.X3",
+          "page": "An export GET with Download() whose action answers a file with Content-Disposition holding filename=\"Resume.pdf\" and filename*=UTF-8''R%C3%A9sum%C3%A9.pdf; a second action answers with no Content-Disposition at /Exports/census.csv.",
+          "gesture": "Click Export, then Export census.",
+          "outcome": "The first download is named Résumé.pdf and the second census.csv.",
+          "opposite": "An action that answers only filename=\"Plan.pdf\" downloads Plan.pdf.",
+          "defect": "The plain filename taken first, so the first is Resume.pdf; or the second named download or the response's media type."
+        },
+        {
+          "for": "M6.X4",
+          "page": "A GET whose route sets three texts from Headers.Get(\"etag\"), Headers.Get(\"X-Ward\") and Headers.Get(\"X-Missing\"); the action answers ETag \"v7\" and X-Ward twice, East and West.",
+          "gesture": "Click Load.",
+          "outcome": "The texts read \"v7\", East, West and nothing.",
+          "opposite": "With X-Ward sent once as East, the second text reads East.",
+          "defect": "The name read by its case, so the first text reads nothing; the repeated header read once, so the second reads East; or the missing one shown as null or undefined."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "PipelineBuilder<TModel>.Parallel(params System.Action<HttpRequestBuilder<TModel!>!>![]! branches) -> ParallelBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "ResponseBody<TResponse>",
+          "verdict": "renamed",
+          "to": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "ResponseBody<TResponse>.Read<TProp>(System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! expression) -> TypedSource<TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "ResponseBuilder<TModel>.Chained(System.Action<HttpRequestBuilder<TModel!>!>! request) -> ResponseBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "ResponseBuilder<TModel>.OnError<TError>(System.Action<ResponseBody<TError!>!, PipelineBuilder<TModel!>!>! pipeline) -> ResponseBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A catch-all that reads a typed error body: D10.5's catch-all also serves a network failure, a redirect to another origin and a body not of the declared kind, none of which carries a body of the type, so it reads Failure (Outcome, Status, Headers); a typed error body is read by the route for its status, OnError<T>(status, ..). A typed body for a status no route names has no carrier yet: the next HTTP unit designs it (spec/NOTES.md, 2026-11-09), and gate 2 names it.",
+          "carriers": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "ResponseBuilder<TModel>.OnError<TError>(int statusCode, System.Action<ResponseBody<TError!>!, PipelineBuilder<TModel!>!>! pipeline) -> ResponseBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        },
+        {
+          "door": "ResponseBuilder<TModel>.OnSuccess<TResponse>(System.Action<ResponseBody<TResponse!>!, PipelineBuilder<TModel!>!>! pipeline) -> ResponseBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N10.7"
+          ]
+        }
+      ]
+    }
+  ]
+}

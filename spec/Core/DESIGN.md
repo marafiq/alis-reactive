@@ -1733,10 +1733,11 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `probe:mvc5-query-key-case`
 - `probe:js-query-get-case`
 **Doors.**
-- kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:58-62`), `Gather` and
-  `Gather<TRequest>`, `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`), `Header`,
-  `AsJson`, `AsFormData`, and `Form(formId)` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:146`), its meaning
-  narrowed to a native form's submission set and its argument the form's typed handle (D9.15, N18.3). The inputs of an
+- kept: `Get`, `Post`, `Put` and `Delete` (`Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:14-32`), as N10.7's
+  verbs; `GatherBuilder.Set` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`) as N10.7's `Set`; `Header`,
+  in the request lambda; and `Form(formId)` (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:146`), its meaning
+  narrowed to a native form's submission set and its argument the form's typed handle (D9.15, N18.3). `Gather` and
+  `Gather<TRequest>` go to N10.7's request lambda, and `AsJson` and `AsFormData` to its body doors. The inputs of an
   element of another kind that it sent are `Inputs(container)`'s.
 - refused: `Form()`, the inputs of the form the request checks, since a request names what it sends; its feature is
   carried by `Form(form)` and `Inputs(container)` (D9.15).
@@ -1818,7 +1819,7 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   member; send a member written as text or a number."
 - `X9.22` refusal: a literal its enum does not name is refused where the view renders with "'r => r.Shift' is set to
   5, which no value of its enum names: net10 refuses it and MVC 5 binds it, so the hosts bind it apart; set a value
-  its enum names."
+  its enum names." At build by ALIS030 for a constant: new:N18.7.
 - `X9.23` behavior: a `List<Shift?>` member whose source holds an item that reads nothing sends an empty field there,
   and the endpoint binds a null item (D9.10).
 - `X9.24` behavior: a component holding "Weekend, Mon", the held form of `Mon | Sat | Sun` under the app's string
@@ -1826,6 +1827,10 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   endpoint reads Mon, Weekend. Under the app's numbers a component holding 97 sends the same.
 - `X9.25` behavior: a component holding 129, `Mon` with the bit 128 that no value of its flags enum names, sets a request
   member; the request sends nothing, no later step runs, and the console names the member and the value it holds.
+- `X9.26` refusal (D9.22): a POST, PUT or DELETE rendered in an app whose `AddReactiveRequests` makes no antiforgery
+  choice is refused where the view renders with "'{method} {url}' sends no antiforgery token, since the app chose
+  none: call Antiforgery(AntiforgeryIn.Header), Antiforgery(AntiforgeryIn.FormField) or NoAntiforgery() in
+  AddReactiveRequests."
 
 ## Q10. The request's flow and its response
 
@@ -1894,8 +1899,8 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - D10.10 `Parallel` sends its requests at once. Each runs its own route as its response arrives, a stop in one
   ends that one only, and the steps after `Parallel` run once, after every request settled, whatever each
   outcome. `OnAllSettled` writes the same plan as those steps, after the `all` statement in the same block
-  (`Alis.Reactive/PlanModel/Requests/ParallelStep.cs:28-35`): one meaning behind two doors, whose verdict goes
-  to gate 2.
+  (`Alis.Reactive/PlanModel/Requests/ParallelStep.cs:28-35`): one meaning behind two doors, so it leaves and the steps
+  after `Parallel` carry it (N10.7).
 - D10.11 `Into(element)` loads the success body's HTML into the element as a slot (Q12): what the element held
   unloads first.
 - D10.12 Request defaults are configured once in C# and hold headers (D9.12), the busy indicator and the notice
@@ -2131,9 +2136,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `probe:mvc5-file-name-rfc2231`
 
 **Doors.**
-- kept: `Response`, `OnSuccess`, `OnSuccess<T>`, `OnError`, `OnError(status)` and their typed forms, `Chained`,
-  `Parallel` with `OnAllSettled`, `WhileLoading`, `Finally`, `Into` and `Validate`, which checks the body its request
-  sends (D16.2). `ValidationErrors(formId)` (`Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:291`) becomes
+- kept: `OnSuccess`, `OnSuccess<T>`, `OnError` and `OnError(status)` with its typed form, as routes on the request
+  (N10.7), `Chained`, `Parallel`, `WhileLoading`, `Finally`, `Into` and `Validate`, which checks the body its request
+  sends (D16.2); `Response(..)`'s builder goes to those routes, and `OnAllSettled` to the steps after `Parallel` (D10.10). `ValidationErrors(formId)` (`Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:291`) becomes
   `ShowErrors(problem)`, a step of a request's route that shows the problem as that request's failures (D16.13); a
   route shows no other container's failures, since a message maps only to the inputs its own request sent (D13.3).
 - `N10.1` new: the error door on each host, `ValidationResult.ToErrorResponse()`: net10 a `ValidationProblemDetails`
@@ -2364,6 +2369,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   new:N9.5.
 - `X10.27` analyzer (N10.7): a request's parts object written by two statements, and a request held in a variable and
   written twice (a second `Chained` among them), each of which compiles: new:N18.7.
+- `X10.28` refusal (N10.7): a request rendered in an app that never called `AddReactiveRequests` is refused where the
+  view renders with "'{method} {url}' is rendered in an app that never called AddReactiveRequests; call
+  services.AddReactiveRequests(requests => ..) once at startup."
 
 ## Q11. Lanes and time
 
@@ -4435,7 +4443,7 @@ shapes, starts and the payload kind of each event.
   holds, a placeholder only `Query` names, and a member lambda that is not a member path (D9.4); on a constant header
   name, one that is no token, one given twice, `Content-Type`, `Accept`, the antiforgery header, `traceparent`,
   `tracestate`, `baggage`, the Fetch Standard's forbidden request headers and the method overrides (D9.11), and on a
-  constant value one outside RFC 9110's field value (D9.23); a JSON body member under a number-keyed dictionary (D14.5); a second `Busy` or `NoBusy`,
+  constant value one outside RFC 9110's field value (D9.23); a constant value no member of its enum names (X9.22); a JSON body member under a number-keyed dictionary (D14.5); a second `Busy` or `NoBusy`,
   `Busy` beside `NoDefaults()` (D10.21), a status outside 300 to 599, a second route for one status and a second
   catch-all (D10.13); a staged value used more than once, a request's parts object written by two statements or a
   request held in a variable and written twice or after another step, so a door a stage removes cannot come back
