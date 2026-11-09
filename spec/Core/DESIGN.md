@@ -2686,7 +2686,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   any other object (D12.8). An element that no longer holds the object a handler subscribed to is read as one whose
   host destroyed that object, listeners and all. A listener is marked released before its removal runs, so one whose
   removal threw, which its vendor still holds, runs nothing when its object raises, and a callback property whose
-  put-back threw keeps that listener, which runs nothing. A check that throws is that listener's error, and its removal
+  put-back threw keeps the framework's function, which calls the value it replaced and no listener (D17.3). A check that throws is that listener's error, and its removal
   is not called.
 - D12.6 A hub or a stream is held by every owner whose plans name it. The connection opens at the first hold
   and closes at the last release, and its retry offer goes with it. A step reaches only a held connection.
@@ -2725,12 +2725,14 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     on it starts when its step runs and leaves at its owner's release, the page's included (X12.14);
   - is refused where the view renders on a component a payload or a returned object hands over whose vendor names no
     element path, since its release could not tell a destroyed component from a living one;
-  - stops the pipeline the step is in when its object lacks a listening member (a subscribe or an unsubscribe, or a
-    returned subscribe gives back no remover), as a member a declaration names must be there; the listener a
-    returned subscribe added runs nothing. A handler meets the same when it starts: its unsubscribe is looked up with
-    its subscribe, and a handler whose object lacks either, or whose returned subscribe gives back no remover, does
-    not start and the listener that subscribe added runs nothing, since no release could remove what it added (the
-    POC 14 decision in `spec/CLAUDE.md`). The build refuses each of these where it reads the listening (D17.5).
+  - stops the pipeline the step is in when its object lacks a listening member (a subscribe or an unsubscribe, a
+    returned subscribe that gives back no remover, or a callback property it lacks or that refuses the framework's
+    function, D17.3), as a member a declaration names must be there; the listener a returned subscribe added runs
+    nothing. A handler meets the same when it starts: its unsubscribe is looked up with its subscribe, and a handler
+    whose object lacks either, whose returned subscribe gives back no remover, or whose callback property is absent or
+    refuses the framework's function, does not start and the listener that subscribe added runs nothing, since no
+    release could remove what it added (the POC 14 decision in `spec/CLAUDE.md`). The build refuses each of these where
+    it reads the listening (D17.5); an object frozen at run time, or a setter that throws, is met in the browser alone.
   The object's declaration carries its listening, a vendor's listening kind (D17.3), as a plugin's does: an
   `EventedObject` declares its `EventListening`, and a component, an `EventedObject` too, has its vendor's.
   Ownership.tla carries the step (`ListenA`) and a collection (`Collect`) under three invariants, each with its
@@ -3557,13 +3559,36 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     objects. An element whose lookup finds nothing stops the pipeline that reaches it, as one that holds no object at a
     path does (D4.1). The runtime holds no code for a lookup: the reference oxygen gauge, whose library keeps its
     gauges in a `WeakMap` of its own, needed none;
-  - how a listener subscribes, one of three: a subscribe and unsubscribe method pair; a property the driver
-    assigns the listener to, its previous value put back at release; a subscribe method that returns the
-    function that removes the listener (`const off = store.subscribe(listener)`), which release calls. A property
-    holds one listener, so a second handler of the same object's callback property is refused where the view renders
-    (X17.16); the first would be replaced without a word. The doors are `ComponentVendor.Define(name, objectPath,
-    subscribe, unsubscribe)`, `ComponentVendor.DefineCallbackProperties(name, objectPath)` and
-    `ComponentVendor.DefineReturnedUnsubscriber(name, objectPath, subscribe)` (N17.7);
+  - how a listener subscribes, one of three: a subscribe and unsubscribe method pair; a callback property, which
+    holds one function of the framework's per object and property, its previous value put back at release; a
+    subscribe method that returns the function that removes the listener (`const off = store.subscribe(listener)`),
+    which release calls. The doors are `ComponentVendor.Define(name, objectPath, subscribe, unsubscribe)`,
+    `ComponentVendor.DefineCallbackProperties(name, objectPath)` and `ComponentVendor.DefineReturnedUnsubscriber(name,
+    objectPath, subscribe)` (N17.7). A callback property's listeners chain, gate 1's P4 (`spec/Core/CallbackProperty.tla`):
+    - The first listener of an object's property, a handler's or a `listen` step's (D12.8), assigns the framework's
+      function, which keeps the value it replaced; every later listener joins that function's list, and the property
+      is not written again. The vendor's call runs the replaced value first, with the vendor's `this` and arguments,
+      then each listener once, in the order it subscribed: a page's plans in the order the page holds their scripts,
+      two handlers of one plan in the plan's order (D11.5), a slot's plans when its load starts them, a nested slot's
+      where its script sits in that content, a `listen` step's when the step runs, a slot's plan on a component the
+      page rendered included (D12.8), and a reloaded slot's after every listener still live. The call returns
+      what the replaced value returned, and nothing when it held no function, since a listener answers nothing
+      (D4.8); a throw from the replaced value reaches the vendor's call after every listener ran, as it reached it
+      before any listened. A function whose declared return takes no `undefined` is a callback, and an event on it is
+      refused at build (D17.5, X17.16), so no listener owes the vendor an answer.
+    - A release removes its own listener from any place in the list. The last release puts the replaced value back,
+      and only while the property still holds the framework's function, so a value a script assigned meanwhile stays.
+    - A script that assigns the property replaces the framework's function and its listeners with it, as assignment
+      does: they run nothing more, and their releases write nothing. The next listener assigns a new function over
+      the script's value, which that function calls first, and it holds only the listeners that subscribe after it.
+    - An object that lacks the property or refuses the assignment (a frozen object, a property that is not writable or
+      has a getter and no setter, a setter that throws) meets the first listener as an object that lacks a listening
+      member does (D12.8): a handler does not start and a `listen` step stops its pipeline, with one error naming the
+      object and the property, and nothing is assigned. A put-back the object refuses is that listener's release error
+      (D12.4, D12.5): the framework's function stays, calling the replaced value and no listener.
+    - The function is its object's: after its host destroys or restarts the component, a release meets D12.5's check
+      and writes nothing, to the old object or the new, and the first listener on the new object assigns that object
+      its own function.
   - what a listener receives (D17.4);
   - where the object holds its element, a path from the object (`elementPath:` on each door, `element` for EJ2's
     components, empty for the element itself), which a listen on a component a payload hands over reads to tell when
@@ -3648,8 +3673,12 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
       return holds a function and nothing else: a return that holds null or undefined is ALIS019, a function that
       returns a promise ALIS017, a gap to name as a `MethodAt` that returns one is, and any other type ALIS018, since
       the driver keeps that function and calls it at release (`poc/runtime/src/objects.ts:208-213`). A callback
-      property's event is a property the type lets the driver write, the listener assigned and the previous value put
-      back (`poc/runtime/src/objects.ts:201-206`), so a read-only one is ALIS018.
+      property's event is a property the type lets the driver write, the framework's function assigned and the
+      previous value put back (`poc/runtime/src/objects.ts:201-206`), so a read-only one is ALIS018. Its function's
+      declared return takes `undefined` (`void`, `undefined`, a union that holds either, or an untyped shape, which
+      takes any type), since a listener answers nothing (D4.8): a return that takes none is an answer its vendor
+      reads, a callback (D17.12), so an event on it is ALIS018 (X17.16). EJ2's `EmitType<T>` returns `void` and lib.dom's
+      event handler properties return `any`, so both pass.
     - A reached `EventedObject` is checked at each type the reach binds it to, as its members are.
     - A vendor a referenced assembly defines is checked by the build that compiles it, on that build's
       declarations, since its initializer is metadata to an analyzer in any other. On a declaration in another
@@ -3892,6 +3921,12 @@ plans (Q19).
 - `Ownership.tla:NoUnsubscribeOnDestroyed`
 - `Ownership.tla:ListenersDoNotAccumulate`
 - `Run.tla:WritesAfterTheTurnAreRefused`
+- `CallbackProperty.tla:EveryHearerHearsOnceInOrder`
+- `CallbackProperty.tla:AThrowSkipsNoHandler`
+- `CallbackProperty.tla:ALiveHandlerKeepsTheFrameworksFunction`
+- `CallbackProperty.tla:TheLastReleasePutsBackItsValue`
+- `CallbackProperty.tla:ARefusedAssignmentStartsNoHandler`
+- `CallbackProperty.tla:AReplacedObjectIsNotWritten`
 - `probe:ej2-methods-returning-promise`
 - `probe:ej2-destroy-removes-instance`
 - `probe:ej2-max-public-method-arity`
@@ -3943,6 +3978,23 @@ plans (Q19).
 - G5: the driver switches only on the listening kind (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:28-33`),
   and a vendor is the data `ComponentVendor` carries (`Alis.Reactive/Vendors/ComponentVendor.cs:38-52`).
 - B12: what a listener receives is read by `instanceof` (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:89-92`).
+- The redesign chains a callback property's listeners: each subscribe wraps the value the property holds and calls it
+  first, and a release marks its wrapper and, only while the property holds that wrapper, puts back the first live value
+  under it (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:55-75`). Its tests pin the replaced value called
+  first, two handlers in plan order, either owner released first and an absent property as a boundary error
+  (`Alis.Reactive.Assets/runtime/__tests__/vendor-driver.test.ts:45`,
+  `Alis.Reactive.Assets/runtime/__tests__/vendor-driver.test.ts:61`,
+  `Alis.Reactive.Assets/runtime/__tests__/vendor-driver.test.ts:92`,
+  `Alis.Reactive.Assets/runtime/__tests__/vendor-driver.test.ts:112`), and in the browser a slot's handler after the
+  page's, a slot's release that leaves the page's, and a release from the middle
+  (`tests/Alis.Reactive.Framework.PlaywrightTests/Vendors/WhenListenersShareACallbackProperty.cs:11`,
+  `tests/Alis.Reactive.Framework.PlaywrightTests/Vendors/WhenListenersShareACallbackProperty.cs:24`,
+  `tests/Alis.Reactive.Framework.PlaywrightTests/Vendors/WhenListenersShareACallbackProperty.cs:43`). Each subscribe
+  writes the property (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:64`), a write that throws in a module's
+  strict code on a frozen object or a read-only property (`Alis.Reactive.Assets/runtime/grammar/paths.ts:42`), so a
+  later listener meets a refusal its first did not; and a throw from the replaced value leaves through every wrapper,
+  so no listener runs. P4 keeps the chain and its order, with one function per object and property that writes at its
+  first listener alone and runs every listener past that throw.
 - B15: FusionGrid declares its three exports with `Method()` (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:207-213`),
   while EJ2's grid declaration returns a `Promise` from `excelExport` at line 3849 of its `grid.d.ts`, and 120 EJ2
   public methods declare one (`probe:ej2-methods-returning-promise`).
@@ -4042,10 +4094,30 @@ plans (Q19).
   with the page's items, and the component shows them.
 - `X17.13` analyzer: an awaited read inside a callback's answer is refused where the view renders with "A callback
   answers its vendor at once, so its answer cannot wait for an async method or a request." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
-- `X17.16` analyzer (D17.3): a second handler of one object's callback property: "'{event}' is a callback property,
-  which holds one listener, so a second handler would replace the first. Write both pipelines in one handler." In one view by ALIS003, and where the view renders for handlers across views (D18.6): new:N18.14.
+- `X17.16` analyzer (D17.3, D17.5, D17.12): an event declared on a callback property whose function's declared return
+  takes no `undefined`, an answer its vendor reads, is ALIS018 with "'{event}' returns {type}, an answer its vendor
+  reads, and a handler answers nothing. Declare it as Callback<TArgs, TResult> and write the answer as an expression.":
+  new:N17.2.
 - `X17.17` behavior (D17.3): a call bell whose event is a callback property runs its handler with the ring's room,
   and a ward feed whose subscribe method returns its unsubscriber runs its handler with the update's message.
+- `X17.49` behavior (D17.3; `CallbackProperty.tla:EveryHearerHearsOnceInOrder`, `CallbackProperty.tla:AThrowSkipsNoHandler`):
+  a page bell's callback property heard by two handlers of the page's plan and by a `listen` in a slot's plan and in a
+  slot's nested in it (D12.8): a ring runs the bell's own function first, then each listener once in the order it
+  subscribed; a closed slot's listener stops, from the middle of the list or its end, and the rest go on; a reloaded
+  slot's listener runs after the others; a ring whose own function throws runs every listener, and the bell meets the
+  throw.
+- `X17.50` behavior (D17.3; `CallbackProperty.tla:ALiveHandlerKeepsTheFrameworksFunction`,
+  `CallbackProperty.tla:TheLastReleasePutsBackItsValue`): the bell's property holds the framework's function while any
+  handler listens and its own function again after the last slot closes; a script that assigns it silences every
+  handler, a slot loaded after it runs the script's function first, then its handler, and the last release leaves the
+  script's function.
+- `X17.51` behavior (D17.3, D12.8; `CallbackProperty.tla:ARefusedAssignmentStartsNoHandler`): a frozen bell starts no
+  handler of a slot loaded after the freeze and shows one error naming the bell and its property, and a `listen` on it
+  stops its pipeline; a bell frozen while handlers listen keeps them, and the last release's put-back is its error,
+  after which a ring runs the bell's own function and no handler.
+- `X17.52` behavior (D17.3, D12.5; `CallbackProperty.tla:AReplacedObjectIsNotWritten`): a bell its host restarts while a
+  slot listens: the slot's release writes nothing to the old bell or the new, and a slot loaded after the restart hears
+  the new bell.
 - `X17.18` analyzer (D17.4): an argument at a position read on a declaration that is neither an event's payload nor a
   callback's arguments: "An argument at a position is what a listener or a callback receives: declare it on an
   event's payload or a callback's arguments." At build by ALIS034, and where the view renders on code it does not follow (D18.6): new:N18.12.
@@ -4190,29 +4262,29 @@ plans (Q19).
 - D18.6 A rule the source states sits on its highest rung (the owner, 2026-11-08): a type stages the door, else an
   analyzer refuses it at build, else it is refused where the view renders. The render takes only what the build
   cannot see, a closed set: the app's options (its JSON options, its culture, its startup choices), a value the view
-  holds when it renders, and the plan as the render composes it (partials, slots, ids, handlers across views). Each
-  analyzer runs the same check, with the same message, that the render keeps for code the analyzer does not follow
-  (a helper method a block calls); a line of this design that says a rule the build sees is refused where the view
-  renders means both.
+  holds when it renders, and the plan as the render composes it (partials, slots, ids). Each analyzer runs the same
+  check, with the same message, that the render keeps for code the analyzer does not follow (a helper method a block
+  calls); a line of this design that says a rule the build sees is refused where the view renders means both.
   - Moved to an analyzer, by family: ALIS030, the request (X9.5, X9.6, X9.7, X9.12, X10.18, X10.25, X14.6, X20.6;
     N18.7); ALIS031, `ShowErrors` outside a route (X16.21; N18.8); ALIS032, blocks (X5.13, X5.14, X6.8, X8.5, X8.9,
     X8.16, X8.17, X8.18, X8.25, X11.1, X17.13, X17.19; N18.9); ALIS033, lambdas, member lambdas and literals (X2.5,
     X3.11, X4.12, X6.2, X6.6, X6.10, X6.11, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.29, X6.30,
     X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
     X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
-    N18.13), and ALIS038, the flags door (X16.23 to X16.26; N16.5), new beside the moved ones; ALIS003, a callback
-    property's second handler in one view (X17.16; N18.14).
+    N18.13), and ALIS038, the flags door (X16.23 to X16.26; N16.5), new beside the moved ones.
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
     X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X7.13, X7.15, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
-    URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5, and X17.16's handlers across views). A plan's version
+    URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5). A plan's version
     is the browser's, at boot (X19.3).
   - Every analyzer of both lines has its verdict. ALIS001, a `When` given no `Then`: kept, retargeted to the
     conditions of `Pipeline<TModel>` in every block and file. ALIS002, main's one request per action link: kept as
     ALIS008 on the action's block, since an action's handler is a block (D11.10). ALIS003, a second `Reactive` for
-    one event: kept, narrowed to an event its vendor delivers through a callback property, which holds one listener
-    (X17.16 in one view, N18.14); two handlers of an event its vendor lets many hear are D11.5's meaning, each with its
-    own policy (`tests/Alis.Reactive.Poc.PlaywrightTests/Events/WhenAnAlarmIsAcknowledged.cs:18`). ALIS004: kept, retargeted
+    one event on one builder chain (`Alis.Reactive.Analyzers/ReactiveEvent/DuplicateReactiveEventAnalyzer.cs:21`):
+    refused, since two handlers of one event are D11.5's meaning, each with its own policy, whatever the vendor's
+    listening kind (`tests/Alis.Reactive.Poc.PlaywrightTests/Events/WhenAnAlarmIsAcknowledged.cs:18`), a callback
+    property's chained as D17.3 states (gate 1's P4); one pipeline for both is one `Reactive`, the door its message
+    names, and an event on a callback property that answers its vendor is ALIS018 (X17.16). ALIS004: kept, retargeted
     (N18.6). ALIS005, a rule only the server runs, reported as information: kept on `ReactiveValidator<T>`, so the
     developer sees where each rule runs. ALIS006, main's warning on a condition with no browser form: kept, an error
     (N18.11). ALIS007, a second `Chained`: the chain does not compile, since `Chained` ends the request's sentence
@@ -4275,8 +4347,6 @@ shapes, starts and the payload kind of each event.
 - `N18.13` new: ALIS035, the row-action analyzer: a `NativeActionLink` whose block's one request at its own level is no
   GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
   `Inputs`, `Input` or a header (D17.15).
-- `N18.14` new: ALIS003 narrowed and retargeted: a second handler, in one view, of an event its vendor delivers through
-  a callback property (D17.3), on `Reactive` of every component and plugin, in every file.
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), and an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4).

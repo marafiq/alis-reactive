@@ -95,7 +95,7 @@ listening: `method`, `assignment` or `returned`. `Vendor.payload` of 65fdf118d l
 | Kind | Carries | Meaning |
 |------|---------|---------|
 | `method` | `subscribe`, `unsubscribe`: the object's method names | listen and unlisten by calling them with the event name and the listener |
-| `assignment` | nothing | listen by assigning the listener to the object's member named by the event, and put the member's previous value back at release |
+| `assignment` | nothing | listen through one function of the framework's per object and member, assigned to the member the event names at its first listener, which calls the member's previous value, then each listener once in the order it subscribed; the last release puts that value back while the member still holds the function (D17.3) |
 | `returned` | `subscribe`: the object's method name | listen by calling it with the event name and the listener; release calls the function it returned (D17.3) |
 
 ## Object locators
