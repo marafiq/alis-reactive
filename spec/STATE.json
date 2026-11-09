@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 355,
+        "defects": 356,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1268,7 +1268,7 @@
     },
     "defects": {
       "counts": {
-        "defects": 213,
+        "defects": 214,
         "doubled": 0,
         "features": 14,
         "mapped": 778,
@@ -1418,7 +1418,7 @@
         "doubled": 0,
         "features": 14,
         "mapped": 778,
-        "promises": 137,
+        "promises": 138,
         "rows": 8909,
         "unmapped": 8131
       },
@@ -1428,7 +1428,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 378,
+        "defects": 379,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -3336,7 +3336,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "417396cfa593defa7aa99fa66fef712cb2d87bdf",
+  "read_at_head": "e592e3e6d36ea93c99c9ea281426f25e82529fe1",
   "step": {
     "failing": [
       "doors_mapped",
