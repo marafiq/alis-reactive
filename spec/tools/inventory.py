@@ -12,6 +12,7 @@ BASE = "65fdf118d1498a8285db84a43c4da81dfaa0ea3e"
 MAIN = "623dd4a272f8134fb692985fd04ae7151954c9f0"
 LINES = {"redesign": BASE, "main": MAIN}
 OUT_OF_SCOPE = {"Alis.Reactive.NativeTagHelpers", "Alis.Reactive.DesignSystem"}
+NET10_ONLY = ("SignalR", "ServerPush")
 REDESIGN_PACKAGES = {
     "Alis.Reactive": ["net48", "net10.0"],
     "Alis.Reactive.Fusion": ["net48", "net10.0"],
@@ -172,7 +173,8 @@ def match_doors(redesign, main):
     for package, main_package, tfm, door, raw, main_raw in rows:
         status = ("both" if package == main_package else "moved") if raw and main_raw else "redesign-only" if raw else "main-only"
         owner = package or main_package
-        scope = "out" if owner in OUT_OF_SCOPE else "spec"
+        realtime_on_net48 = tfm == "net48" and any(word in door for word in NET10_ONLY)
+        scope = "out" if owner in OUT_OF_SCOPE or realtime_on_net48 else "spec"
         table.append((owner, main_package, scope, tfm, declaring_type(door), status, door, raw, main_raw))
     return table
 
