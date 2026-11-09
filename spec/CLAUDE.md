@@ -157,9 +157,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   constructor), so neither holds a nullable. A listen on a component a payload hands over is removed at release only
   while the element it held when it listened still holds it at the vendor's object path, the rule a handler's release
   follows; the vendor names where its object holds its element with an element path. Refused where the view renders: a
-  listen on a component reached by its element's id, and on one whose vendor names no element path. Whether a listen on
-  a component reached by id becomes the door a slot's plan lacks for a page component (14a-i's gate 1 flag (3)) is
-  the owner's.
+  listen on one whose vendor names no element path. Chosen within the owner's yes, 2026-11-09, gate 1's P5, answering
+  14a-i's flag (3): a listen on a component reached by its element's id is the door a slot's plan has to a component
+  the page rendered, released by the element it reached, so its vendor needs no element path (D12.8).
 - Chosen within the owner's yes, 2026-11-07, unit 17a, and moved to N10.7's form in 17c(a3-ii), 2026-11-08: a request's
   routes are written on the request, `pipeline.Get<TRequest>(url, request => request.Set(r => r.Member, value or
   source)).OnSuccess<T>((reply, pipeline) => ..).OnError<T>(status, (reply, pipeline) => ..).OnError((failed, pipeline)

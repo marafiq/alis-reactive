@@ -2608,9 +2608,13 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     holds its element (D17.3), the step reads that element when it listens and holds it weakly beside the object and
     the listener, and a host that destroyed or restarted the component took the listener with it. A vendor whose
     destroy clears the element (Chart.js nulls its canvas) changes nothing, since the release never reads it again;
-  - is refused where the view renders on a component reached by its element's id, whose events are heard where it
-    renders, with `.Reactive`; and on a component whose vendor names no element path, since its release could not
-    tell a destroyed component from a living one;
+  - on a component reached by its element's id is the door a slot's plan has to a component the page rendered (gate
+    1's P5): the step holds that element weakly beside the object and the listener, and the release removes the
+    listener only while the element still holds the object at the vendor's object path, D12.5's rule, so its vendor
+    needs no element path. A plan hears a component it renders with `.Reactive` from the plan's start; a `listen`
+    on it starts when its step runs and leaves at its owner's release, the page's included (X12.14);
+  - is refused where the view renders on a component a payload or a returned object hands over whose vendor names no
+    element path, since its release could not tell a destroyed component from a living one;
   - stops the pipeline the step is in when its object lacks a listening member (a subscribe or an unsubscribe, or a
     returned subscribe gives back no remover), as a member a declaration names must be there; the listener a
     returned subscribe added runs nothing. A handler meets the same when it starts: its unsubscribe is looked up with
@@ -2657,7 +2661,8 @@ plans name.
 - kept: `Into(element)`, `Unload(element)`, `Html.RenderPlan`, and the hub's and stream's triggers.
 - No door names an owner: a developer chooses where a plan renders, and ownership follows.
 - `N12.1` new: `listen`, the handler of an event of a live object a pipeline reaches (D12.8); its form goes to
-  gate 2. It replaces the refusal of an event declared on an object a method returns. POC 14d's form:
+  gate 2. It replaces the refusal of an event declared on an object a method returns, and the refusal of a listen on
+  a component reached by its element's id (gate 1's P5). POC 14d's form:
   `pipeline.Listen(object, o => o.Event, (args, p) => ..)` on an `EventedObject`, a `JsObject` whose constructor
   takes its `EventListening`; a listen on an object whose declaration carries no listening does not compile.
 
@@ -2720,6 +2725,9 @@ plans name.
   steps before it ran and the steps after it run nothing; so does one that writes over notes a closed card loaded
   into a slot outside it. Once the only plan that named a slot leaves and the slot holds no loaded content, a step
   writes over it.
+- `X12.14` behavior (D12.8): a card a slot loads listens to the page's monitor, reached by its element's id, and
+  shows each reading the monitor raises; after the slot unloads, the monitor's next reading changes no card text,
+  and the page's own `.Reactive` handler of the same event still shows it.
 - `X12.13` behavior (D12.5): after a monitor's host restarts it, destroying the component and putting a new object
   on its element, the new object's event runs none of the plan's handlers, and closing the card that held it calls
   nothing on it.
@@ -3426,7 +3434,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   - where the object holds its element, a path from the object (`elementPath:` on each door, `element` for EJ2's
     components, empty for the element itself), which a listen on a component a payload hands over reads to tell when
     its host destroyed it (D12.8). A vendor that names none is a whole vendor: its components are reached by id and
-    heard with `.Reactive`, and only a `Listen` on one is refused.
+    heard with `.Reactive` or a `listen`, and only a `listen` on one a payload or a returned object hands over is
+    refused.
 
   An object is found when a step reaches it and when a handler subscribes; a component constructed on
   `alis:mount` is subscribed once it is (Q12). The runtime names no vendor. The core knows the DOM's `EventTarget` as the platform's own vendor, and no
