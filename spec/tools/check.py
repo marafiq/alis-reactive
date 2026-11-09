@@ -65,7 +65,7 @@ PROSE_KEYS = {
 
 
 def git(*args):
-    return subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, text=True).stdout.strip()
+    return subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, text=True).stdout.rstrip("\n")
 
 
 def result(passed, detail, **counts):
