@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Localization;
@@ -125,6 +126,63 @@ try
     var namedLiterals = new System.Text.Json.JsonSerializerOptions { NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowNamedFloatingPointLiterals };
     var noNumber = double.NaN;
     Console.WriteLine("core-json-double-text: -0.0 writes " + System.Text.Json.JsonSerializer.Serialize(-0.0, namedLiterals) + " and equals 0.0 " + (-0.0 == 0.0) + "; NaN writes " + System.Text.Json.JsonSerializer.Serialize(noNumber, namedLiterals) + " and equals NaN " + (noNumber == double.NaN));
+    var flagNumbers = new System.Text.Json.JsonSerializerOptions();
+    var flagNames = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
+    var flagCamel = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter(System.Text.Json.JsonNamingPolicy.CamelCase) } };
+    var monSatSun = ProbeCare.Mon | ProbeCare.Sat | ProbeCare.Sun;
+    var strayBit = ProbeCare.Mon | (ProbeCare)128;
+    Console.WriteLine("core-json-flags-forms: Mon|Sat|Sun writes " + System.Text.Json.JsonSerializer.Serialize(monSatSun, flagNumbers) + " under the app's numbers, " + System.Text.Json.JsonSerializer.Serialize(monSatSun, flagNames) + " under a string converter and " + System.Text.Json.JsonSerializer.Serialize(monSatSun, flagCamel) + " in camel case; Mon|Tue writes " + System.Text.Json.JsonSerializer.Serialize(ProbeMondays.Mon | ProbeMondays.Tue, flagNames) + " where JsonStringEnumMemberName names Mon monday; Mon|128, a bit no value names, writes " + System.Text.Json.JsonSerializer.Serialize(strayBit, flagNumbers) + ", " + System.Text.Json.JsonSerializer.Serialize(strayBit, flagNames) + " and " + System.Text.Json.JsonSerializer.Serialize(strayBit, flagCamel) + "; 0 of an enum with no value for zero writes " + System.Text.Json.JsonSerializer.Serialize((ProbeRota)0, flagNumbers) + ", " + System.Text.Json.JsonSerializer.Serialize((ProbeRota)0, flagNames) + " and " + System.Text.Json.JsonSerializer.Serialize((ProbeRota)0, flagCamel));
+    string commaName;
+    try
+    {
+        commaName = "writes " + System.Text.Json.JsonSerializer.Serialize(ProbeCommaName.Plain, flagNames);
+    }
+    catch (InvalidOperationException refused)
+    {
+        commaName = "throws " + refused.GetType().Name;
+    }
+    Console.WriteLine("core-json-flags-comma-name: under a string converter Plain of a flags enum whose other member is named \"a, b\" " + commaName);
+    Console.WriteLine("core-query-flags-closure: Care=Mon%2C%20Weekend binds " + await client.GetStringAsync("/f/care?Care=Mon%2C%20Weekend") + "; Care=Weekend%2C%20Mon binds " + await client.GetStringAsync("/f/care?Care=Weekend%2C%20Mon") + "; Care=monday%2C%20Tue binds " + await client.GetStringAsync("/f/care?Care=monday%2C%20Tue") + "; Care=128 binds " + await client.GetStringAsync("/f/care?Care=128") + "; Rota=0 binds " + await client.GetStringAsync("/f/rota?Rota=0") + "; Overlap=7 binds " + await client.GetStringAsync("/f/overlap?Overlap=7") + "; Overlap=X%2C%20Y%2C%20Z binds " + await client.GetStringAsync("/f/overlap?Overlap=X%2C%20Y%2C%20Z"));
+    var flagRules = new InlineValidator<ProbeFlagged>();
+    flagRules.RuleFor(flagged => flagged.Care).IsInEnum();
+    flagRules.RuleFor(flagged => flagged.Rota).IsInEnum();
+    flagRules.RuleFor(flagged => flagged.Overlap).IsInEnum();
+    flagRules.RuleFor(flagged => flagged.Access).IsInEnum();
+    flagRules.RuleFor(flagged => flagged.Composite).IsInEnum();
+    flagRules.RuleFor(flagged => flagged.OneValue).IsInEnum();
+    flagRules.RuleFor(flagged => flagged.Shared).IsInEnum();
+    string FlagVerdict(ProbeFlagged flagged, string member) => flagRules.Validate(flagged).Errors.Any(error => error.PropertyName == member) ? "fails" : "passes";
+    Console.WriteLine("fv-flags-is-in-enum: FluentValidation 12.1.1's IsInEnum over a [Flags] enum: Care 3 " + FlagVerdict(new ProbeFlagged { Care = (ProbeCare)3 }, "Care") + ", 97 " + FlagVerdict(new ProbeFlagged { Care = (ProbeCare)97 }, "Care") + ", 0 " + FlagVerdict(new ProbeFlagged { Care = 0 }, "Care") + ", 128 " + FlagVerdict(new ProbeFlagged { Care = (ProbeCare)128 }, "Care") + "; Rota 0 " + FlagVerdict(new ProbeFlagged { Rota = 0 }, "Rota") + " with " + flagRules.Validate(new ProbeFlagged { Rota = 0 }).Errors.Single(error => error.PropertyName == "Rota").ErrorMessage + "; Overlap 7 " + FlagVerdict(new ProbeFlagged { Overlap = (ProbeOverlap)7 }, "Overlap") + "; over an enum with no [Flags] whose values are 1 and 2, 3 " + FlagVerdict(new ProbeFlagged { OneValue = (ProbeOneValue)3 }, "OneValue"));
+    async Task<string> FlagsAgree<TEnum>(string route, Func<long, ProbeFlagged> flagged, string member, long top) where TEnum : struct, Enum
+    {
+        var rows = Enum.GetValues<TEnum>().Select(value => (Number: Convert.ToInt64(value, CultureInfo.InvariantCulture), Name: value.ToString())).OrderByDescending(row => row.Number).ToList();
+        for (long number = 0; number <= top; number++)
+        {
+            var rest = number;
+            var taken = new List<string>();
+            if (number == 0)
+            {
+                var zero = rows.Where(row => row.Number == 0).Select(row => row.Name).FirstOrDefault();
+                if (zero is null) rest = -1;
+                else taken.Add(zero);
+            }
+            foreach (var row in rows.Where(row => row.Number != 0 && rest > 0 && (rest & row.Number) == row.Number))
+            {
+                rest &= ~row.Number;
+                taken.Add(row.Name);
+            }
+            taken.Reverse();
+            var split = rest == 0 ? string.Join(", ", taken) : null;
+            var validates = FlagVerdict(flagged(number), member) == "passes";
+            var bindsNumber = !(await client.GetStringAsync(route + "=" + number.ToString(CultureInfo.InvariantCulture))).Contains("(errors", StringComparison.Ordinal);
+            var bindsSplit = split is null || await client.GetStringAsync(route + "=" + Uri.EscapeDataString(split)) == split + " (" + number.ToString(CultureInfo.InvariantCulture) + ")";
+            var text = Enum.ToObject(typeof(TEnum), number).ToString();
+            var agrees = validates == bindsNumber && bindsNumber == (split is not null) && bindsSplit && text == (split ?? number.ToString(CultureInfo.InvariantCulture));
+            if (!agrees) return typeof(TEnum).Name + " differs at " + number.ToString(CultureInfo.InvariantCulture) + ": FluentValidation " + (validates ? "passes" : "fails") + ", net10 " + (bindsNumber ? "binds" : "binds nothing") + ", the split " + (split ?? "leaves bits");
+        }
+        return typeof(TEnum).Name + " agrees on every value from 0 to " + top.ToString(CultureInfo.InvariantCulture);
+    }
+    Console.WriteLine("core-flags-split-agrees: FluentValidation's IsInEnum, net10's binding of the number and of the split's text, Enum.ToString and the split: " + await FlagsAgree<ProbeCare>("/f/care?Care", number => new ProbeFlagged { Care = (ProbeCare)number }, "Care", 255) + "; " + await FlagsAgree<ProbeRota>("/f/rota?Rota", number => new ProbeFlagged { Rota = (ProbeRota)number }, "Rota", 7) + "; " + await FlagsAgree<ProbeAccess>("/f/access?Access", number => new ProbeFlagged { Access = (ProbeAccess)number }, "Access", 31) + "; " + await FlagsAgree<ProbeComposite>("/f/composite?Composite", number => new ProbeFlagged { Composite = (ProbeComposite)number }, "Composite", 7) + "; " + await FlagsAgree<ProbeOverlap>("/f/overlap?Overlap", number => new ProbeFlagged { Overlap = (ProbeOverlap)number }, "Overlap", 15) + "; " + await FlagsAgree<ProbeShared>("/f/shared?Shared", number => new ProbeFlagged { Shared = (ProbeShared)number }, "Shared", 15));
     await HttpProbes.Run(new Uri(app.Urls.First()));
 }
 finally
@@ -313,6 +371,121 @@ public sealed class ProbeEnumBody
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public ProbeShift Watch { get; set; }
+}
+
+[Flags]
+public enum ProbeCare
+{
+    None = 0,
+    Mon = 1,
+    Tue = 2,
+    Sat = 32,
+    Sun = 64,
+    Weekend = Sat | Sun,
+}
+
+[Flags]
+public enum ProbeRota
+{
+    Early = 1,
+    Late = 2,
+}
+
+[Flags]
+public enum ProbeOverlap
+{
+    X = 5,
+    Y = 6,
+    Z = 3,
+}
+
+[Flags]
+public enum ProbeAccess
+{
+    None = 0,
+    Read = 1,
+    Write = 2,
+    ReadWrite = Read | Write,
+    Admin = 4,
+    All = ReadWrite | Admin,
+    Audit = 8,
+}
+
+[Flags]
+public enum ProbeShared
+{
+    X = 1,
+    Y = 3,
+    Z = 6,
+}
+
+[Flags]
+public enum ProbeComposite
+{
+    Both = 3,
+}
+
+public enum ProbeOneValue
+{
+    A = 1,
+    B = 2,
+}
+
+[Flags]
+public enum ProbeMondays
+{
+    [JsonStringEnumMemberName("monday")]
+    Mon = 1,
+    Tue = 2,
+}
+
+[Flags]
+public enum ProbeCommaName
+{
+    [JsonStringEnumMemberName("a, b")]
+    Both = 1,
+    Plain = 2,
+}
+
+public sealed class ProbeFlagged
+{
+    public ProbeCare Care { get; set; }
+
+    public ProbeRota Rota { get; set; } = ProbeRota.Early;
+
+    public ProbeOverlap Overlap { get; set; } = ProbeOverlap.X;
+
+    public ProbeAccess Access { get; set; }
+
+    public ProbeComposite Composite { get; set; } = ProbeComposite.Both;
+
+    public ProbeOneValue OneValue { get; set; } = ProbeOneValue.A;
+
+    public ProbeShared Shared { get; set; } = ProbeShared.X;
+}
+
+public sealed class FlagsProbeController : ControllerBase
+{
+    [HttpGet("/f/care")]
+    public string Care(ProbeFlagged query) => Bound(query.Care);
+
+    [HttpGet("/f/rota")]
+    public string Rota(ProbeFlagged query) => Bound(query.Rota);
+
+    [HttpGet("/f/overlap")]
+    public string Overlap(ProbeFlagged query) => Bound(query.Overlap);
+
+    [HttpGet("/f/access")]
+    public string Access(ProbeFlagged query) => Bound(query.Access);
+
+    [HttpGet("/f/shared")]
+    public string Shared(ProbeFlagged query) => Bound(query.Shared);
+
+    [HttpGet("/f/composite")]
+    public string Composite(ProbeFlagged query) => Bound(query.Composite);
+
+    private string Bound<TEnum>(TEnum value) where TEnum : struct, Enum
+        => value + " (" + Convert.ToInt64(value, CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture) + ")" + (ModelState.IsValid ? "" : " (errors " + string.Join(",", ModelState.Where(entry => entry.Value!.Errors.Count > 0).Select(entry => entry.Key)) + ")");
 }
 
 [Flags]

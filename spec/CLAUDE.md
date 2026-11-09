@@ -373,8 +373,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   or model of the binder without a reason the owner accepts.
 - Chosen within the owner's yes, 2026-11-09, by precedent ("well solve 17c like you solve similar problems, it do not
   need me to give you decision"): D9.13's rows are written through HeldForm from the enum's values, never from a
-  generated table, and the reads that list the values wait for the owner at gate 1 (D18.1); a source's flags
-  combination stops (gate 1); a JSON body's enum is the form its endpoint binds. The owner can overrule each.
+  generated table, and the reads that list the values wait for the owner at gate 1 (D18.1); a source's combination of
+  an enum the app does not name as flags stops; a JSON body's enum is the form its endpoint binds. The owner can
+  overrule each. Chosen within the owner's yes, 2026-11-09, gate 1's P2: an enum is flags to the framework only when
+  the startup names it, `Flags<TEnum>()` (N16.4), never by a `FlagsAttribute` read; a source's value of it is split as
+  `Enum.ToString` splits it and sent as that text, and `IsInEnum` over it is FluentValidation's flags meaning on both
+  sides; ALIS038 admits the door only over a `[Flags]` enum whose values are from 0 to 2^53 - 1 and disjoint or nested
+  (D9.13, D16.10, N16.5). The form is gate 2's. The owner can overrule it.
 - The owner, 2026-11-07: a request is the HTTP message, and the core holds its parts: the method, the path, the query,
   the headers and a body with its media type, JSON and multipart form data (a form that uploads files among them);
   the response's status and its body as JSON, text or HTML. The methods are GET, HEAD, OPTIONS, POST, PUT and DELETE (OPTIONS by the owner's "OPTIONS support is

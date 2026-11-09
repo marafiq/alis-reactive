@@ -345,13 +345,16 @@ no argument type of its own (D9.1).
   | `instant` | nothing | an instant, as `spec/Core/DateWire.tla` writes it with the clock's offset (D3.8) |
   | `written` | nothing | a value System.Text.Json writes as one text or number, sent as it is held |
   | `enum` | `values`: a list of `EnumValue` | the `name` of the value whose `held` equals what the source holds; a held form no value lists stops the request (D9.13) |
+  | `flags` | `values`: a list of `FlagValue`, the largest `number` first | the names of the values `Enum.ToString`'s split takes from what the source holds, the smallest first, joined by ", "; what the split cannot read stops the request (D9.13, N16.4) |
   | `list` | `item`: a scalar form; `itemWhenNothing`: `empty` or `stop` | one field per item, each in the item's form; an item that reads nothing is an empty field or stops the request (D9.10) |
 
   A scalar form is every form but `list`. `EnumValue` carries `held`, the JSON text, number or boolean System.Text.Json
   writes for one value of the enum, at the source's type under the source's held form (D4.2), and `name`, that value's
   C# name. A value written as anything else, and two values the browser reads as one `held`, are refused where the view
   renders, so every `held` is a `lit` of a scalar. A value that holds nothing, or null, reads nothing, and the member is
-  sent by D9.10's `whenNothing`: `leave` or `empty`.
+  sent by D9.10's `whenNothing`: `leave` or `empty`. `FlagValue` carries `held` and `name` as `EnumValue` does, and
+  `number`, the value's number, an integer from 0 to 9,007,199,254,740,991 (N16.5); `flags` is written only for an
+  enum the app names as flags (N16.4).
 - `HttpResponse`, the reply a `request` binds in its routes and `chained` block (N10.2, N10.7, D10.23): `status`,
   `outcome`, `headers`, the headers of the answer the browser hands the page, lib.dom's `Headers`, whose `get` a `call`
   reads (N10.7), `request`, the members as the request sent them, `inputs`, the inputs it sent, each its binding name
@@ -459,5 +462,6 @@ The diff beyond the kinds, each with the decision that makes it:
 - `HttpSend`'s methods become six and its bodies six formats, and it gains `antiforgery` and `busy`; its `retry`
   takes the defaults' numbers only (D9.3, D9.21, D9.22, D10.14, D10.21);
 - `HttpResponse` gains `headers`, `request` and `inputs` (N10.7, D10.18), and `FormPlace` joins `FormCheck` (D16.13);
-- `HttpSend`'s wire forms gain `enum`, and a list's `item` is a scalar form in place of a kind's text (D9.13);
+- `HttpSend`'s wire forms gain `enum` and `flags`, and a list's `item` is a scalar form in place of a kind's text (D9.13,
+  N16.4);
 - plugin data `hub` and `stream` gain `offer` (D21.11).

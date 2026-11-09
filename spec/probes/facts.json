@@ -1144,6 +1144,60 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-json-flags-forms",
+      "statement": "System.Text.Json writes a flags combination as its values' held forms joined by \", \", the largest first, under a string converter and in camel case, and as its number under the app's numbers; a combination with a bit no value names, and zero of an enum with no value for zero, as its number under all three.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-flags-forms: Mon|Sat|Sun writes 97 under the app's numbers, \"Weekend, Mon\" under a string converter and \"weekend, mon\" in camel case; Mon|Tue writes \"monday, Tue\" where JsonStringEnumMemberName names Mon monday; Mon|128, a bit no value names, writes 129, 129 and 129; 0 of an enum with no value for zero writes 0, 0 and 0",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-flags-comma-name",
+      "statement": "System.Text.Json refuses a flags enum one of whose member names holds a comma, whichever of its values it writes.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-flags-comma-name: under a string converter Plain of a flags enum whose other member is named \"a, b\" throws InvalidOperationException",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-flags-closure",
+      "statement": "A query binds a flags enum's C# names in either order, and binds nothing for a JsonStringEnumMemberName name, a bit no value names, zero of an enum with no value for zero, and the union of two values that share a bit with neither holding the other.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-flags-closure: Care=Mon%2C%20Weekend binds Mon, Weekend (97); Care=Weekend%2C%20Mon binds Mon, Weekend (97); Care=monday%2C%20Tue binds None (0) (errors Care); Care=128 binds None (0) (errors Care); Rota=0 binds Early (1) (errors Rota); Overlap=7 binds X (5) (errors Overlap); Overlap=X%2C%20Y%2C%20Z binds X (5) (errors Overlap)",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "fv-flags-is-in-enum",
+      "statement": "FluentValidation's IsInEnum over a [Flags] enum passes a value that is the union of the values whose bits it holds, so zero only where a value is zero and a union of overlapping values too; over an enum with no [Flags] it passes only a declared value.",
+      "host": "net10",
+      "oracle": "FluentValidation 12.1.1",
+      "probe": "AspNetCoreBinding",
+      "expect": "fv-flags-is-in-enum: FluentValidation 12.1.1's IsInEnum over a [Flags] enum: Care 3 passes, 97 passes, 0 passes, 128 fails; Rota 0 fails with 'Rota' has a range of values which does not include '0'.; Overlap 7 passes; over an enum with no [Flags] whose values are 1 and 2, 3 fails",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-flags-split-agrees",
+      "statement": "Over flags enums whose values are disjoint or nested, FluentValidation's IsInEnum, net10's binding of the number and of the split's text, Enum.ToString and .NET's flags split agree on every value; over values that share a bit with neither holding the other they part on one enum and agree on another.",
+      "host": "net10",
+      "oracle": "FluentValidation 12.1.1, ASP.NET Core 10 MVC model binding and .NET 10's Enum",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-flags-split-agrees: FluentValidation's IsInEnum, net10's binding of the number and of the split's text, Enum.ToString and the split: ProbeCare agrees on every value from 0 to 255; ProbeRota agrees on every value from 0 to 7; ProbeAccess agrees on every value from 0 to 31; ProbeComposite agrees on every value from 0 to 7; ProbeOverlap differs at 7: FluentValidation passes, net10 binds nothing, the split leaves bits; ProbeShared agrees on every value from 0 to 15",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "js-bitwise-int32",
+      "statement": "JavaScript's & reads its operands as 32-bit integers, while BigInt's & is exact, and a number past 2**53 is not held exactly.",
+      "host": "node",
+      "oracle": "node's ECMAScript Number and BigInt",
+      "probe": "js-bits.mjs",
+      "expect": "js-bitwise-int32: 2**32 & 2**32 is 0 and 2**31 & 2**31 is -2147483648, while as BigInt 2**52 & 2**52 is 4503599627370496; 2**53 + 1 reads as 9007199254740992",
+      "source": "spec/probes/js-bits.mjs"
+    },
+    {
       "id": "core-query-member-names",
       "statement": "A member declared [FromQuery(Name)], [BindProperty(Name)] or [ModelBinder(Name)] binds only under that name, not its C# name, and a [BindNever] member binds under neither.",
       "host": "net10",

@@ -1360,19 +1360,50 @@ Terms used throughout:
   In a query, form data, a path segment or a header an enum is its C# name on both hosts, which net10 and MVC 5 bind
   ignoring case; the name `JsonStringEnumMemberName` gives it binds nothing there
   (`probe:core-query-enum-member-name`, `probe:mvc5-enum-name-ignores-case`). C# writes a literal enum by its C# name,
-  `Enum`'s own text for it, so a flags combination is its comma form, which both hosts bind
-  (`probe:core-query-flags-enum`, `probe:mvc5-enum-flags-comma`); a value its enum does not name is refused where the
-  view renders. An enum a source holds is in its held form (D4.2): the form its member's own `[JsonConverter]` writes,
-  else the app's JSON options. So C# writes into the plan, beside the member, a row for each value `Enum.GetValues`
-  lists (D18.1, gate 1): the value as System.Text.Json writes it at the source's type (a `T?` when the source is one,
-  since a nullable member's own converter writes names only there, `probe:core-json-enum-nullable-member-converter`)
-  under the source's held form, and its C# name. The browser sends the C# name of the row whose form it holds. A held
-  form no row lists stops the request, naming the member; a flags combination no value names is among them, a gate 1
-  flag. Two values written in one form the browser cannot tell apart (`probe:core-json-enum-held-alike`), and a value
-  written as anything but a JSON text, number or boolean, are refused where the view renders. In a JSON body an enum
-  is the form its endpoint binds: on net10 the request member's System.Text.Json form under MVC's `JsonOptions`
+  `Enum`'s own text for it, so a flags combination is its comma form, smallest first, which both hosts bind
+  (`probe:core-query-flags-enum`, `probe:mvc5-enum-flags-comma`), whether or not the startup names the enum: C# holds
+  a literal's value, so it needs no rows, and the `FlagsAttribute` read inside `Enum.ToString` is .NET's, as
+  System.Text.Json's reflection is its own (D18.1, whose gate 1 ask lists `Enum.ToString`). A literal whose text is
+  digits, a value no value and no combination names, is refused where the view renders (X9.22). An enum a source holds
+  is in its held form (D4.2): the form its member's own `[JsonConverter]` writes, else the app's JSON options. So C#
+  writes into the plan, beside the member, a row for each value `Enum.GetValues` lists (D18.1, gate 1): the value as
+  System.Text.Json writes it at the source's type (a `T?` when the source is one, since a nullable member's own
+  converter writes names only there, `probe:core-json-enum-nullable-member-converter`) under the source's held form,
+  and its C# name. The browser sends the C# name of the row whose form it holds. A held form no row lists stops the
+  request, naming the member; a combination of an enum the app does not name as flags is among them (X9.19). Two
+  values written in one form the browser cannot tell apart (`probe:core-json-enum-held-alike`), and a value written as
+  anything but a JSON text, number or boolean, are refused where the view renders. In a JSON body an enum is the form
+  its endpoint binds: on net10 the request member's System.Text.Json form under MVC's `JsonOptions`
   (`probe:core-frombody-enum-forms`), on net48 its C# name, since MVC 5 binds a JSON body through its model binder
   (`probe:mvc5-json-binds-through-binder`); C# writes the rows from the held form to it, with the JSON body's door.
+  An enum the app names as flags (N16.4, gate 1's P2) is sent by the wire form `flags`:
+  - C# writes each row with the value's number too, the largest number first, the order in which `Enum.ToString`
+    splits a flags value.
+  - The browser reads what the source holds as one number: a held text is split at ", ", each part the held form of a
+    row, and is the union of the parts' numbers; a held number, under rows held as numbers, is itself. It splits that
+    number as `Enum.ToString` does, taking in order each row whose bits all lie in what is left until nothing is, and
+    zero as the row whose number is zero, and sends the C# names it took, the smallest first, joined by ", ":
+    `Enum.ToString`'s own text for the value, which both hosts bind (`probe:core-query-flags-closure`,
+    `probe:mvc5-enum-flags-comma`). So a held "Weekend, Mon" or "Mon, Sat, Sun" under a string converter, and a held 97
+    under the app's numbers, are each sent as `Mon, Weekend`.
+  - What the split cannot read stops the request, naming the member: a part no row holds, a held number under rows
+    held as text and a held text under rows held as numbers, a held number that is no integer from 0 to
+    9,007,199,254,740,991, bits no row takes, and zero with no row for zero. net10 binds nothing for a bit no value
+    names or for zero with no value for zero (`probe:core-query-flags-closure`), and System.Text.Json writes either
+    as its number under every form (`probe:core-json-flags-forms`).
+  - The split at ", " reads every held text System.Text.Json writes, since it joins a combination's held forms by ", "
+    (`probe:core-json-flags-forms`) and refuses a flags enum whose member name holds a comma
+    (`probe:core-json-flags-comma-name`).
+  - The browser tests bits on exact integers, since JavaScript's `&` reads 32 bits (`probe:js-bitwise-int32`), and
+    ALIS038 admits only an enum whose values are from 0 to 9,007,199,254,740,991 and pairwise disjoint or one inside
+    the other (N16.5): JavaScript holds no larger integer exactly, and a negative value's bits are its underlying
+    type's, which a held number does not carry. Over such an enum the split takes a value exactly when
+    FluentValidation's `IsInEnum` passes it and net10 binds it, since the largest value inside what is left holds every
+    value of a union it shares a bit with, so taking it leaves a union of the rest (`probe:core-flags-split-agrees`
+    checks it on every value of four such enums, and shows `X = 5, Y = 6, Z = 3` parting at 7).
+  - A literal is `Enum.ToString`'s text for its value, which is this split's text, so a literal and a source holding one
+    value send one text where both apply (`probe:core-flags-split-agrees`). A list's items are split one by one, and in
+    a JSON body the split value is written in the form its endpoint binds, with the JSON body's door.
 - D9.14 A hidden input is an input: it binds by its binding name and shape, and a request sends it when the
   container it sends holds it (D9.15).
 - D9.15 What a request sends is closed, and holds on a page with many forms or none (the owner, 2026-11-08):
@@ -1497,12 +1528,17 @@ Terms used throughout:
     its request before it is sent; fetch itself refuses a line break and a character past Latin-1
     (`probe:js-header-values`).
 **Schema nodes.** `request`, its `send` a `record`, `list`, `lit`, `get`, `as` and `op`; the shape `file`; the
-contract `HttpSend`, which is no node kind, and its wire forms, `enum` among them (D9.13).
+contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flags` among them (D9.13).
 
 **Checker.**
 - `probe:core-frombody-enum-forms`
 - `probe:core-json-enum-nullable-member-converter`
 - `probe:core-json-enum-held-alike`
+- `probe:core-json-flags-forms`
+- `probe:core-json-flags-comma-name`
+- `probe:core-query-flags-closure`
+- `probe:core-flags-split-agrees`
+- `probe:js-bitwise-int32`
 - `Request.tla:EveryPlaceholderFilled`
 - `Request.tla:PathHoldsScalarText`
 - `Request.tla:FileOnlyInFormData`
@@ -1580,7 +1616,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` among the
   defaults live in a startup file.
 - `N9.6` new: the request defaults of D9.12 and D10.12, configured once in C#; their door's form goes to gate 2.
 - `N9.7` new: `Query<TQuery>(q => q.Set(x => x.Member, value or source))` on POST, PUT and DELETE.
-- `N9.8` new: the wire form `enum` of `HttpSend`, written by `poc/Alis.Reactive.Poc/Types/EnumNames.cs`; no public door.
+- `N9.8` new: the wire forms `enum` and `flags` of `HttpSend`, written by `EnumNames.cs`, the file the rewrite's request
+  unit adds to the Types module; no public door. `flags` serves a source whose enum the app names with N16.4; a literal
+  enum is `Enum.ToString`'s text (D9.13).
 
 **Evidence.**
 - B6: the request is a record of string-named fields (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:101`) typed by
@@ -1636,6 +1674,11 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` among the
   its enum names."
 - `X9.23` behavior: a `List<Shift?>` member whose source holds an item that reads nothing sends an empty field there,
   and the endpoint binds a null item (D9.10).
+- `X9.24` behavior: a component holding "Weekend, Mon", the held form of `Mon | Sat | Sun` under the app's string
+  converter, sets a request member whose enum the app names as flags; the URL holds `Care=Mon%2C+Weekend` and the
+  endpoint reads Mon, Weekend. Under the app's numbers a component holding 97 sends the same.
+- `X9.25` behavior: a component holding 129, `Mon` with the bit 128 that no value of its flags enum names, sets a request
+  member; the request sends nothing, no later step runs, and the console names the member and the value it holds.
 
 ## Q10. The request's flow and its response
 
@@ -3030,7 +3073,13 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     (`Alis.Reactive/Validation/Checks.cs:166-170`);
   - `CreditCard`: the Luhn sum over the digits once spaces and dashes are taken out (`Alis.Reactive/Validation/Checks.cs:180-193`);
   - `PrecisionScale`: the digits and decimals of the number;
-  - `IsInEnum`: membership in the enum's names and numbers;
+  - `IsInEnum`: membership in the enum's names and numbers, as `Enum.IsDefined` reads it. Over an enum the app names
+    as flags (N16.4) it is FluentValidation's flags meaning, which FluentValidation keys on `FlagsAttribute`: a value
+    is in the enum when it is the union of the enum's values whose bits it holds all, so zero is in it only when a
+    value is zero (`probe:fv-flags-is-in-enum`). C# writes each value's number into the rule, and the browser tests
+    the bits as D9.13's split does. ALIS038 admits the door only over an enum `[Flags]` marks, whose values are
+    disjoint or one inside the other (N16.5), so the rule, net10's binding and D9.13's split agree on every value
+    (`probe:core-flags-split-agrees`);
   - `Url()`: an http or https URL by the standards, parsed by `System.Uri` on the server and by the URL Standard's
     `URL` in the browser, scheme `http` or `https`. The two parsers agree on every probe row, where today's browser
     pattern disagrees with the server on two (`probe:core-uri-absolute`, `probe:whatwg-url-http`, `probe:js-url-pattern`).
@@ -3123,6 +3172,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `probe:js-url-pattern`
 - `probe:whatwg-url-http`
 - `probe:js-regex-translated`
+- `probe:fv-flags-is-in-enum`
+- `probe:core-flags-split-agrees`
 - `Ownership.tla:RulesLeaveWithTheirOwner`
 - `Ownership.tla:FailureReachesSummary`
 - `Ownership.tla:InlineOnlyAtTheSentInput`
@@ -3167,6 +3218,21 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   under the default rule set, over the container's inputs as it sends them; a failure shows as D16.13 places it and
   stops its pipeline. It carries `Validate<TValidator>(formId)` of both lines; the form of naming a rule set goes to
   gate 2.
+- `N16.4` new: `Flags<TEnum>()`, `where TEnum : struct, Enum`, which names a flags enum once at startup, on both hosts.
+  The framework knows an enum is flags by it alone, through the door's type argument (D18.1's generics), and reads no
+  `FlagsAttribute` (D18.3). An enum it does not name is one value to the framework: `IsInEnum` reads it as
+  `Enum.IsDefined` does on both sides, and a combination a source holds stops its request (D9.13). A literal is
+  `Enum.ToString`'s text whether or not the door names its enum (D9.13). D9.13's wire form and D16.10's `IsInEnum`, on
+  the server and in the browser, read the same declaration. Its form, and the startup call it is written in, go to gate 2.
+- `N16.5` new: ALIS038, the flags analyzer, which reads `[Flags]` and an enum's constants at build. It refuses
+  `Flags<TEnum>()` over an enum `[Flags]` does not mark, over one with a value outside 0 to 9,007,199,254,740,991
+  (D9.13), over one with two values that share a bit with neither holding the other, and over a type parameter, which
+  names no enum the build sees. The rule on shared bits is the one the split's agreement rests on: under it the split,
+  FluentValidation's `IsInEnum` and net10's binding agree on every value, and it refuses some enums on which they agree
+  too (`X = 1, Y = 3, Z = 6`, `probe:core-flags-split-agrees`). At the compilation's end, in a compilation that makes
+  the startup call, it refuses an `IsInEnum`, and a request member a source fills, over an enum `[Flags]` marks that no
+  `Flags<TEnum>()` names. A use in a compilation without the startup call (a validator in another assembly, a view MVC
+  5 compiles on its first request) meets the meaning of an enum the app does not name (N16.4).
 
 **Evidence.**
 - G10: a rule written once reaches both sides. `NotEmpty` reaches the browser, and `Must` stays on the server
@@ -3193,6 +3259,10 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   and the rest pass to the browser with .NET's flags (`Alis.Reactive/Validation/Checks.cs:156-159`).
 - The browser's Url pattern (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:152`) against the server's
   `Uri.TryCreate` (`Alis.Reactive/Validation/Checks.cs:206-207`).
+- `IsInEnum` reads `FlagsAttribute` (`Alis.Reactive/Validation/Checks.cs:420`); over a flags enum it passes a value
+  whose bits all lie in its values, zero among them where FluentValidation fails zero of an enum with no value for
+  zero (`Alis.Reactive/Validation/Checks.cs:428`), and it leaves a flags enum to the server
+  (`Alis.Reactive/Validation/Checks.cs:432`).
 - G2: validation adds no grammar node; a check is `$form.validate` over plugin data, and the body it checks is a
   `fn` the plan writes (`Alis.Reactive/PlanModel/Validation/FormWriter.cs:19-30`).
 
@@ -3240,6 +3310,30 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   shows "Name is required." once.
 - `X16.21` analyzer: `ShowErrors` on a pipeline that is no request's route: "ShowErrors shows a request's failures,
   and this pipeline is no request's route; call it inside OnError or OnSuccess." At build by ALIS031, and where the view renders on code it does not follow (D18.6): new:N18.8.
+- `X16.22` behavior: a save that leaves out `Care`, an enum the app names as flags whose model starts it at
+  `Mon | Tue`, passes `IsInEnum` in the browser, and the endpoint saves Mon, Tue; a save that leaves out `Rota`, an enum
+  the app names as flags with no value for zero, which starts at 0, shows "'Rota' has a range of values which does not
+  include '0'." in the browser and sends nothing, as FluentValidation's `IsInEnum` answers on the server
+  (`probe:fv-flags-is-in-enum`).
+- `X16.23` analyzer: `Flags<TEnum>()` over an enum `[Flags]` does not mark: "Flags<Shift>() names Shift as a flags
+  enum, and Shift has no [Flags], so FluentValidation and System.Text.Json read it as one value; mark Shift [Flags], or
+  take the call out." At build by ALIS038: new:N16.5.
+- `X16.24` analyzer: `Flags<TEnum>()` over two values that share a bit with neither holding the other:
+  "Flags<Overlap>() names Overlap, whose values X (5) and Y (6) share a bit and neither holds the other; the framework
+  splits a combination only over values that are disjoint or one inside the other, where its split, FluentValidation's
+  IsInEnum and net10's binding agree on every value; give each value bits no other value shares, or make one hold the
+  other." At build by ALIS038: new:N16.5.
+- `X16.25` analyzer: `Flags<TEnum>()` over a value outside 0 to 9,007,199,254,740,991: "Flags<Access>() names Access,
+  whose value Archive is 9007199254740992, outside 0 to 9007199254740991, the range the browser's split reads, since
+  JavaScript holds no larger integer exactly and a held number does not carry a negative value's bits; keep every value
+  of a flags enum inside it, and a negative one as the union of the values it stands for." At build by ALIS038:
+  new:N16.5.
+- `X16.26` analyzer: in a compilation that makes the startup call, an `IsInEnum` over an enum `[Flags]` marks that no
+  `Flags<TEnum>()` names: "IsInEnum reads CareDays, which [Flags] marks and the startup does not name, as one value,
+  where FluentValidation reads it as flags; name it with Flags<CareDays>() at startup.", and a request member a source
+  fills over one:
+  "'r => r.Care' sends CareDays, which [Flags] marks and the startup does not name, so a combination its source holds
+  stops the request; name it with Flags<CareDays>() at startup." At build by ALIS038: new:N16.5.
 
 ## Q17. Vendors and inversion
 
@@ -3805,7 +3899,8 @@ plans (Q19).
     or invoked: `MemberInfo.Module` and `MemberInfo.MetadataToken`, which name a member's definition for every
     instantiation of a generic member, in `poc/Alis.Reactive.Poc/Conditions/TranslatedMembers.cs`.
   D9.13's rows ask one more at gate 1: an enum's values and names, `Enum.GetValues(Type)` and `Enum.ToString`, with
-  `Type.IsEnum` and `Nullable.GetUnderlyingType` to find the enum, in `poc/Alis.Reactive.Poc/Types/EnumNames.cs`. The
+  `Type.IsEnum` and `Nullable.GetUnderlyingType` to find the enum, in `EnumNames.cs`, the file the rewrite's request
+  unit adds to the Types module. The
   generic `Enum.GetValues<TEnum>()` is absent on net48, and no door reaches a `TEnum : struct, Enum`. Until the owner's
   answer the POC sends an enum a source holds as it is held, and the landed `Enum.ToString` of a literal is on no list.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
@@ -3829,8 +3924,9 @@ plans (Q19).
     statements, and its `declaredBy:` is the compiler's (ALIS023); its `name:`, `optional:`, `nullable:` and
     `position:` are constants the build reads (ALIS024). An explicit interface member declares the JavaScript member
     of its simple name, as `[CallerMemberName]` names it;
-  - the method scan for `PureMethodAttribute` and the `FlagsAttribute` read of `IsInEnum`: gate 1 decides each,
-    as an owner-listed exception or a typed door;
+  - the method scan for `PureMethodAttribute`: gate 1 decides it, as an owner-listed exception or a typed door;
+  - the `FlagsAttribute` read of `IsInEnum`: the typed door `Flags<TEnum>()` (N16.4, gate 1's P2), which ALIS038 holds
+    to the `[Flags]` mark at build (N16.5);
   - `Expression.Compile` in validation (Q16) and in the template writer (Q15): gate 1 decides each.
   - an overridden member that a view's expression names (the owner, 2026-11-06: "Override cannot change it"). The
     expression carries the declaration (`d => d.Room` names `Person.Room`), and the derived class's contract holds
@@ -3874,7 +3970,8 @@ plans (Q19).
     X3.11, X4.12, X6.2, X6.6, X6.10, X6.11, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.29, X6.30,
     X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
     X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
-    N18.13), new beside the moved ones; ALIS003, a callback property's second handler in one view (X17.16; N18.14).
+    N18.13), and ALIS038, the flags door (X16.23 to X16.26; N16.5), new beside the moved ones; ALIS003, a callback
+    property's second handler in one view (X17.16; N18.14).
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
     X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
