@@ -1268,25 +1268,25 @@
     },
     "defects": {
       "counts": {
-        "defects": 35,
+        "defects": 63,
         "doubled": 0,
-        "features": 5,
-        "mapped": 164,
+        "features": 7,
+        "mapped": 490,
         "rows": 8909,
-        "unmapped": 8745
+        "unmapped": 8419
       },
-      "detail": "every feature row valid; 8745 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
       "pass": false
     },
     "doors_mapped": {
       "counts": {
         "doubled": 0,
-        "features": 5,
-        "mapped": 164,
+        "features": 7,
+        "mapped": 490,
         "rows": 8909,
-        "unmapped": 8745
+        "unmapped": 8419
       },
-      "detail": "every feature row valid; 8745 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
       "pass": false
     },
     "evidence": {
@@ -1300,21 +1300,21 @@
     "features_core": {
       "counts": {
         "doubled": 0,
-        "features": 5,
-        "mapped": 164,
+        "features": 7,
+        "mapped": 490,
         "rows": 8909,
-        "unmapped": 8745
+        "unmapped": 8419
       },
-      "detail": "every feature row valid; 8745 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
       "pass": false
     },
     "features_lost": {
       "counts": {
-        "lost": 692,
-        "types_in_no_feature": 692,
+        "lost": 675,
+        "types_in_no_feature": 675,
         "uncarried_doors": 0
       },
-      "detail": "692 declaring types in no feature",
+      "detail": "675 declaring types in no feature",
       "pass": false
     },
     "fluent": {
@@ -1334,7 +1334,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 36,
+        "files": 38,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1416,13 +1416,13 @@
     "promises": {
       "counts": {
         "doubled": 0,
-        "features": 5,
-        "mapped": 164,
-        "promises": 25,
+        "features": 7,
+        "mapped": 490,
+        "promises": 41,
         "rows": 8909,
-        "unmapped": 8745
+        "unmapped": 8419
       },
-      "detail": "every feature row valid; 8745 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
       "pass": false
     },
     "questions": {
@@ -2915,14 +2915,14 @@
         "Schema": {
           "Schema.cfg": {
             "green": true,
-            "hash": "198b93e10a51ca189ea6edeab5d3645cdf5dc26bb28192f2ced3389a6bf88a7c",
+            "hash": "408d782a4e3a65c8f7f852d2769e64b7e2cef44088e5f524e187e84b42fb2a52",
             "line": "Model checking completed. No error has been found.",
             "states": "108121 states generated, 107438 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Schema.violates.ConversionsConvert.cfg": {
             "green": false,
-            "hash": "23e0bbe876ab4a351c6f6e99c57b2eff7cc6d863434379c2064e48772a48d717",
+            "hash": "2db97a36b008d83021965b4b06e6dc562b7fb6a3e1e847bcd581303c216b9b7e",
             "line": "violated: ConversionsConvert",
             "states": "",
             "violated": [
@@ -2931,7 +2931,7 @@
           },
           "Schema.violates.DecimalTextComparedByValue.cfg": {
             "green": false,
-            "hash": "14bda32b2b53dd15c00bddf0b63a34f7df75660030044638fbf5934bccdfff1f",
+            "hash": "ea40a5258f83a8b735cf3c7fef1e3f84c18b85c640e8d0b63e922b52e71f1d6a",
             "line": "violated: DecimalTextComparedByValue",
             "states": "",
             "violated": [
@@ -2940,7 +2940,7 @@
           },
           "Schema.violates.KindsHandledOnce.cfg": {
             "green": false,
-            "hash": "3ce802a318874414e9cfa549eb832ac831cf3c215f4351d781f3460bf3f06e4f",
+            "hash": "644685e0bec8c2b582c86e8b351667b80cc3396befdc630ed09fc7a1b9cac61e",
             "line": "violated: KindsHandledOnce",
             "states": "",
             "violated": [
@@ -2949,7 +2949,7 @@
           },
           "Schema.violates.NullableWrapsOnce.cfg": {
             "green": false,
-            "hash": "0c10177c51143ba1b55cc92052bbc3d88f413b96521a4eed2fc33368dc9e1b98",
+            "hash": "3635e2a1f44304d7c6c924a8b015432c7dd15c6182b7d6ffee26d802a8e690f1",
             "line": "violated: NullableWrapsOnce",
             "states": "",
             "violated": [
@@ -2958,7 +2958,7 @@
           },
           "Schema.violates.OperatorsClosed.cfg": {
             "green": false,
-            "hash": "29eff21919ad2de6568ab360aa82b4ba651645ada2f5c1dc298338153c6636c6",
+            "hash": "4c2fc232fb4b96673fd9d836c0355e5d0128259478ab1ae55753bd224ebd24fc",
             "line": "violated: OperatorsClosed",
             "states": "",
             "violated": [
@@ -2967,7 +2967,7 @@
           },
           "Schema.violates.PatternsAreLiterals.cfg": {
             "green": false,
-            "hash": "6e5ed05f25684a6c24c12b11acc89e123609e604d973b30ff6dcf0e99f032358",
+            "hash": "234c6dd5aa5a49ba4ae1f368402253d39590ad1cf0b76cca2aa158931d2c214f",
             "line": "violated: PatternsAreLiterals",
             "states": "",
             "violated": [
@@ -2976,7 +2976,7 @@
           },
           "Schema.violates.ReachDecimalTextEquality.cfg": {
             "green": false,
-            "hash": "dfb2e6b8fa1ecedb0ac750700d8d3a3df28863873d16e4acba30076081c39f84",
+            "hash": "a504e496c678e6fc19000a57d9d70ec4b03afa4f1548d72d3565af27316de827",
             "line": "violated: ReachDecimalTextEquality",
             "states": "",
             "violated": [
@@ -2985,7 +2985,7 @@
           },
           "Schema.violates.ReachDeepRead.cfg": {
             "green": false,
-            "hash": "2d4db15447123db59b6717bc66ff56fc06a22d527b0ac732d59d1f6655aa1a60",
+            "hash": "558b7f7dfe5bd871ad780c18435a72a59a85798621675c587cb40f5987bfbd7b",
             "line": "violated: ReachDeepRead",
             "states": "",
             "violated": [
@@ -2994,25 +2994,25 @@
           },
           "Schema.violates.ReachNestedRead.cfg": {
             "green": false,
-            "hash": "8e23c7712af0fd41ae6d12d569f45420ce8687afe30eb09af53d40cafd68e4af",
+            "hash": "e671ec414fb35ed030c2f020b85e8533bc61b46a843e4afd942a2db404ab34bf",
             "line": "violated: ReachNestedRead",
-            "states": "1939 states generated, 1878 distinct states found, 725 states left on queue.",
+            "states": "1792 states generated, 1742 distinct states found, 617 states left on queue.",
             "violated": [
               "ReachNestedRead"
             ]
           },
           "Schema.violates.ReachReplyInANestedBlock.cfg": {
             "green": false,
-            "hash": "8abce240706827f58f53e2f5f26a5c446151754b3afc4a190caac1f36f03752c",
+            "hash": "0378c9be2c24c4c90df4c275b834f152c71342d96bd1d7791110463501e0e756",
             "line": "violated: ReachReplyInANestedBlock",
-            "states": "2596 states generated, 2511 distinct states found, 1128 states left on queue.",
+            "states": "2408 states generated, 2314 distinct states found, 1066 states left on queue.",
             "violated": [
               "ReachReplyInANestedBlock"
             ]
           },
           "Schema.violates.ReachSelectFieldStops.cfg": {
             "green": false,
-            "hash": "c77c43e65a957530723be5e19e5e0eff1414ed02c90a12529ceaf5c3137c76cb",
+            "hash": "0784bfd5e56ccc37c14dd369b9f8d1d9b18ee4105fcfbf8f151f53080950ef03",
             "line": "violated: ReachSelectFieldStops",
             "states": "",
             "violated": [
@@ -3021,7 +3021,7 @@
           },
           "Schema.violates.ReadsTakeNoEach.cfg": {
             "green": false,
-            "hash": "257916602fb718c58c36d73d13d502a4d71b9dd0cb5798e223dcc1d2f0b91451",
+            "hash": "b1f815e5be6cc7cef431dff4297d929e3466eb4124d9dfd787940568a428f46f",
             "line": "violated: ReadsTakeNoEach",
             "states": "",
             "violated": [
@@ -3030,16 +3030,16 @@
           },
           "Schema.violates.RefsReadTheirBlock.cfg": {
             "green": false,
-            "hash": "e2d1e46b2aa5e575e891c4d8c9c79b3c9e889315b8ea51f5b58864ef5c42514f",
+            "hash": "a2bce1e71963720032912f505f567116d4ecfb6e906081bac95e0aced5d02ef1",
             "line": "violated: RefsReadTheirBlock",
-            "states": "3369 states generated, 2835 distinct states found, 1404 states left on queue.",
+            "states": "3992 states generated, 3307 distinct states found, 1829 states left on queue.",
             "violated": [
               "RefsReadTheirBlock"
             ]
           },
           "Schema.violates.SelectFieldHoldsItsType.cfg": {
             "green": false,
-            "hash": "5c7b866cbb368d9e6a6c89ef3eb9082e662f671ed5d4b5e6761fe830b06ce4dd",
+            "hash": "bce94cd4eee3b7e13ce2b7b1693fe999cb6b87a19e9c7415799c81a2eed6a74a",
             "line": "violated: SelectFieldHoldsItsType",
             "states": "",
             "violated": [
@@ -3048,9 +3048,9 @@
           },
           "Schema.violates.SetsWriteAMember.cfg": {
             "green": false,
-            "hash": "cc056c166135a2bf7d5657c179d8a8311b1b9f22f98867a40f816f769651d2be",
+            "hash": "4d7c185b54e3e3decb930ca6810b1edbbe31d0ef23509a494e2a08d4ea64c99d",
             "line": "violated: SetsWriteAMember",
-            "states": "1033 states generated, 1020 distinct states found, 12 states left on queue.",
+            "states": "1033 states generated, 1020 distinct states found, 8 states left on queue.",
             "violated": [
               "SetsWriteAMember"
             ]
@@ -3324,19 +3324,19 @@
     "verdicts": {
       "counts": {
         "doubled": 0,
-        "features": 5,
+        "features": 7,
         "main_only": 4156,
-        "main_only_in_features": 66,
-        "mapped": 164,
+        "main_only_in_features": 160,
+        "mapped": 490,
         "rows": 8909,
-        "unmapped": 8745
+        "unmapped": 8419
       },
-      "detail": "every feature row valid; 8745 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
       "pass": false
     }
   },
   "passed": 14,
-  "read_at_head": "45d79944e2cd56783aeeaf5867d0db05243daee7",
+  "read_at_head": "b173ad7439435441ccaaa0ac1c802868b3929b03",
   "step": {
     "failing": [
       "doors_mapped",
