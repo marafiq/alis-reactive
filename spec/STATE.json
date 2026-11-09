@@ -1268,7 +1268,7 @@
     },
     "defects": {
       "counts": {
-        "defects": 130,
+        "defects": 131,
         "doubled": 0,
         "features": 9,
         "mapped": 546,
@@ -1418,7 +1418,7 @@
         "doubled": 0,
         "features": 9,
         "mapped": 546,
-        "promises": 81,
+        "promises": 82,
         "rows": 8909,
         "unmapped": 8363
       },
@@ -3336,7 +3336,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "8105b6f6b538f57893342851adf5632c65911b6e",
+  "read_at_head": "3e1210e4e3e2564d6c4ef12ec58b6925e9fd708c",
   "step": {
     "failing": [
       "doors_mapped",
