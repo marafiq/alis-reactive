@@ -131,7 +131,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   its handler starts, and a handler whose object lacks it, or whose returned subscribe gives back no remover, does not
   start (the second's listener runs nothing), since no release could remove what it added. Plans start in the order
   the page holds their scripts. A slot announces the unmount of its content whether or not a plan gave it an owner
-  (D12.3). `HttpSend` is a literal in the POC, which has no `record` node.
+  (D12.3). `HttpSend` is a literal in the POC, which has no `record` node. Chosen within the owner's yes, 2026-11-09,
+  gate 1's P13: the build checks the same listening members against the declaration's type wherever it reads the
+  listening (a vendor or `EventListening` in the declaration's own compilation, its names constants); a vendor a
+  referenced assembly defines is checked by that assembly's build, and on another build's declaration, as one computed
+  at run time, it is met where a handler starts (D17.5, X17.45).
 - Chosen within the owner's yes, 2026-11-07, POC 14d: a `listen` block reads the bindings of the blocks around it, and binds
   its payload and arguments under names of its own; a write to the payload of the event around it is refused where the
   view renders, and so is a listen on an object declared optional or nullable. An object whose events a pipeline listens

@@ -2516,7 +2516,10 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     tell a destroyed component from a living one;
   - stops the pipeline the step is in when its object lacks a listening member (a subscribe or an unsubscribe, or a
     returned subscribe gives back no remover), as a member a declaration names must be there; the listener a
-    returned subscribe added runs nothing, as a handler's does (D17.3).
+    returned subscribe added runs nothing. A handler meets the same when it starts: its unsubscribe is looked up with
+    its subscribe, and a handler whose object lacks either, or whose returned subscribe gives back no remover, does
+    not start and the listener that subscribe added runs nothing, since no release could remove what it added (the
+    POC 14 decision in `spec/CLAUDE.md`). The build refuses each of these where it reads the listening (D17.5).
   The object's declaration carries its listening, a vendor's listening kind (D17.3), as a plugin's does: an
   `EventedObject` declares its `EventListening`, and a component, an `EventedObject` too, has its vendor's.
   Ownership.tla carries the step (`ListenA`) and a collection (`Collect`) under three invariants, each with its
@@ -3339,8 +3342,36 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     parameter names no event, so a vendor that dispatches events its types do not name is typed first: an event map
     on an EventTarget, a literal union on its subscribe method, and `declare global { interface HTMLElementEventMap }`
     for an element's own event. The contract writes each method's events by reference (`keys:lib.dom:HTMLElementEventMap`)
-    rather than expanded, which would add 33,725 lines. The C# vendor's listening is not read: a vendor a referenced
-    package defines is metadata to an analyzer, so its subscribe method is checked where a handler starts (D17.3).
+    rather than expanded, which would add 33,725 lines.
+  - A declaration that declares an event has its listening (D17.3) checked against its type and bases at build,
+    since a handler subscribes only to a declared event:
+    - The build reads a listening in three places, its names constants as ALIS034 reads a vendor's name: a
+      component's `Vendor` body, which is `ComponentVendor.Native`, a `ComponentVendor.Define`,
+      `DefineCallbackProperties` or `DefineReturnedUnsubscriber` call, or a read of a static property or field whose
+      initializer in the same compilation is that call; a plugin's base constructor argument, an `EventListening`, or
+      none, which is `EventTarget`; and an `EventedObject`'s `Listening` override. `ComponentVendor.Native` and
+      `EventListening.EventTarget` are the method pair `addEventListener` and `removeEventListener`.
+    - By kind: a method pair's subscribe and unsubscribe are each a member the type or its bases make public (ALIS016)
+      that can be called (ALIS018), since the driver calls both with the event's name and the listener
+      (`poc/runtime/src/objects.ts:195-199`). A returned unsubscriber's subscribe is the same, and what its signatures
+      return holds a function and nothing else: a return that holds null or undefined is ALIS019, a function that
+      returns a promise ALIS017, a gap to name as a `MethodAt` that returns one is, and any other type ALIS018, since
+      the driver keeps that function and calls it at release (`poc/runtime/src/objects.ts:208-213`). A callback
+      property's event is a property the type lets the driver write, the listener assigned and the previous value put
+      back (`poc/runtime/src/objects.ts:201-206`), so a read-only one is ALIS018.
+    - A reached `EventedObject` is checked at each type the reach binds it to, as its members are.
+    - A vendor a referenced assembly defines is checked by the build that compiles it, on that build's
+      declarations, since its initializer is metadata to an analyzer in any other. On a declaration in another
+      build, and for names or a vendor computed at run time, the listening is met in the browser: a handler whose
+      object lacks a listening member does not start, and a `listen` on one stops its pipeline (D12.8).
+    - The contract already writes what the check reads: an unsubscribe is a member line, its events read as a
+      subscribe's are (`poc/tools/vendor-contract.mjs:194-209`, `poc/tools/vendor-contract.mjs:255-259`), and a
+      method's return is its `value` holds (`poc/tools/vendor-contract.mjs:258`), a function with no members written
+      `function` (`poc/tools/vendor-contract.mjs:151-153`) and a return that admits null flagged `returnsnull`
+      (`poc/tools/vendor-contract.mjs:50`); the POC app's contract lists `VitalsMonitor off method callable
+      name:alarm,name:silenced` and `WardFeed subscribe value function`. The POC's analyzer reads no listening: no file
+      of `poc/Alis.Reactive.Poc.Analyzers` names `Listening`, `ComponentVendor` or `Define`, so today each of these
+      is met only in the browser.
   - Every `vendor-contract.tsv` the build passes is read, and a type two of them list is listed twice (ALIS015).
   - A declaration a component or plugin reaches is checked at the type its vendor's API gives what reaches it (POC
     13c, D5.3): `LiveObject` at the member's read type and `LiveObjects` at its element, `ReturnedObject` at the
@@ -3667,6 +3698,11 @@ plans (Q19).
   `@default null`, builds with no suppression, the contract citing
   `@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:67`; `Property<decimal>` of it is ALIS019, its message
   citing that line; a `T?` write to a member whose type and documentation both say non-null stays ALIS019: new:N17.2.
+- `X17.45` analyzer (D17.3, D17.5): on a declaration that declares an event, a listening the build reads whose
+  subscribe or unsubscribe its type and bases do not make public (ALIS016) or that cannot be called (ALIS018); a
+  returned unsubscriber's subscribe whose return holds null or undefined (ALIS019), a function that returns a promise
+  (ALIS017) or anything but a function (ALIS018); a callback property's event its type makes read-only (ALIS018):
+  new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every
