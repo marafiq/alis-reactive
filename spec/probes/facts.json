@@ -964,6 +964,42 @@
       "source": "spec/probes/ej2-event-args.mjs"
     },
     {
+      "id": "ej2-emit-type-phantom",
+      "statement": "Syncfusion's EmitType<T>, the type of every EJ2 event property, names its type parameter nowhere in its own type, so T is phantom.",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 declarations under node_modules/@syncfusion (ej2-calendars 33.1.44), read by the TypeScript compiler 5.9.3",
+      "probe": "ej2-emit-type.mjs",
+      "expect": "ej2-emit-type-phantom: EmitType<T> at ej2-base/src/base.d.ts:8 names no T in its type",
+      "source": "spec/probes/ej2-emit-type.mjs"
+    },
+    {
+      "id": "ej2-emit-type-resolved",
+      "statement": "TypeScript gives DropDownList.change, declared EmitType<ChangeEventArgs>, the type EmitType<T>, the type argument dropped, and its listener's first parameter is any.",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 declarations under node_modules/@syncfusion (ej2-calendars 33.1.44), read by the TypeScript compiler 5.9.3",
+      "probe": "ej2-emit-type.mjs",
+      "expect": "ej2-emit-type-resolved: DropDownList.change, declared EmitType<ChangeEventArgs>, resolves to EmitType<T>, whose listener's first parameter is any",
+      "source": "spec/probes/ej2-emit-type.mjs"
+    },
+    {
+      "id": "ej2-emit-type-members",
+      "statement": "The 15 Syncfusion packages a program of DropDownList, MultiSelect, NumericTextBox, DatePicker and Grid loads declare 895 public EmitType members, 124 of them on those five classes.",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 declarations under node_modules/@syncfusion (ej2-calendars 33.1.44), read by the TypeScript compiler 5.9.3",
+      "probe": "ej2-emit-type.mjs",
+      "expect": "ej2-emit-type-members: 895 public in 15 packages, 124 declared by DropDownList, MultiSelect, NumericTextBox, DatePicker, Grid",
+      "source": "spec/probes/ej2-emit-type.mjs"
+    },
+    {
+      "id": "ej2-emit-type-arguments",
+      "statement": "Of those 895 EmitType members, 611 pass a Syncfusion named type, 191 Object, 79 a lib type (Event among them), 12 a union and 2 any.",
+      "host": "node",
+      "oracle": "EJ2 33.1.47 declarations under node_modules/@syncfusion (ej2-calendars 33.1.44), read by the TypeScript compiler 5.9.3",
+      "probe": "ej2-emit-type.mjs",
+      "expect": "ej2-emit-type-arguments: 611 a vendor's named type, 191 Object, 79 a lib type, 12 a union, 2 any",
+      "source": "spec/probes/ej2-emit-type.mjs"
+    },
+    {
       "id": "core-query-object-fields",
       "statement": "A query binds an object member's fields from the member's C# name, a dot and each field's C# name; an IReadOnlyList field that starts as [] takes no item.",
       "host": "net10",

@@ -300,7 +300,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   what it hands (the current pump typed `InfusionPump<PumpChannel>`), and suppressed naming its test only where a
   browser test arranges it (an older build's bed or alarm). A positional door on a declaration no listener or callback
   hands is refused at the build, not first where the view renders (X17.30). Root checks stay live and reached checks
-  run at the compilation's end. The owner can overrule it.
+  run at the compilation's end. The owner can overrule it. Chosen within the owner's yes, 2026-11-09, gate 1's P10: a
+  callable property typed by an alias with one type parameter its own type does not name, whose function types its
+  first parameter `any`, hands that type argument as its listener's first parameter, read from the declared type node,
+  so Syncfusion's `EmitType<ChangeEventArgs>` hands `ChangeEventArgs` (D17.5, X17.43).
 - Chosen within the owner's yes, 2026-11-07: presence is the member's mark, not its holder's (D5.3). An optional member
   that its holder lacks or holds as undefined is absent, since TypeScript's `?` admits both (a class field compiled to
   ES2022 holds undefined): it reads nothing, a call of it runs nothing, and a write sets it. An optional member of a

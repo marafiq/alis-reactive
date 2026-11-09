@@ -3340,6 +3340,19 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     A primitive, `unknown`, `any`, a tuple or a function where a live object is declared, one object where the API
     holds a list and a list where it holds one object are ALIS021, the cure naming the vendor's TypeScript. A callback
     answer declared `T?` where the function's result takes no null is ALIS019.
+  - A callable property whose declared type is a reference to a type alias with one type parameter that the alias's
+    own type does not name, and whose function types its first parameter `any`, hands its listener at position 0 the
+    type argument the reference passes, the payload the alias documents; every later position is the function's.
+    Syncfusion types every event so: `EmitType<T> = AngularEventEmitter & ((arg?: any, ...rest: any[]) => void)`
+    (`@syncfusion/ej2-base/src/base.d.ts:8`, `probe:ej2-emit-type-phantom`), and `change: EmitType<ChangeEventArgs>`
+    hands `ChangeEventArgs`, with null beside it, since `arg?` is optional and an optional parameter holds null. The
+    argument is read from the member's declared type node, as a base is read from its heritage clause's: TypeScript
+    gives the member's type as `EmitType<T>`, the argument dropped (`probe:ej2-emit-type-resolved`). It is checked as
+    any type the reach meets: a named type at its members, a union at each type it holds, a list as a list, and an
+    untyped shape as it is, so a payload read by its members is ALIS016 at `Object`, lib.es5's interface (191 of
+    Syncfusion's 895 public `EmitType` members), and ALIS021 at `any` (2), and a payload that reads no member passes,
+    as the reach checks only a payload read by its members (`probe:ej2-emit-type-arguments`). Every other alias, and a
+    function whose first parameter is typed, reads as its resolved type.
   - A declaration's type is a type its vendor's API holds, D5.3's value mark, checked by the type check (POC 16a,
     `poc/Alis.Reactive.Poc.Analyzers/HeldValues.cs`). POC 16a gave it ALIS025
     (`poc/Alis.Reactive.Poc.Analyzers/Rules.cs:20`), the id POC 13f gave the override analyzer of N18.5 first
@@ -3383,9 +3396,16 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     list's element, the object itself, a function, null, or another type by its text. For the arguments and answers
     above it also writes a method's own parameters and the parameters and return of a type's own call, each
     parameter with TypeScript's optional mark and its rest mark, and the parameters and return of a function any
-    parameter holds. The POC's script writes no method's parameters (`poc/tools/vendor-contract.mjs:255-260`), a
+    parameter holds. It writes a callable property's position 0 from its alias's type argument by the bullet above.
+    The POC's script writes no method's parameters (`poc/tools/vendor-contract.mjs:255-260`), a
     type's own call as flags alone (`poc/tools/vendor-contract.mjs:306-311`), and a function a parameter holds as
-    `function` alone (`poc/tools/vendor-contract.mjs:151-153`). A type the vendor does not name
+    `function` alone (`poc/tools/vendor-contract.mjs:151-153`). It reads an alias's type arguments only to name a type
+    (`poc/tools/vendor-contract.mjs:93`) and to find a free type parameter (`poc/tools/vendor-contract.mjs:120`), and
+    writes a callable property's parameters from its resolved function (`poc/tools/vendor-contract.mjs:167-180`,
+    `poc/tools/vendor-contract.mjs:268`), so DropDownList's `change` holds `parameter:0 other any`, every Syncfusion
+    payload read by its members reaches `any` at its first parameter
+    (`poc/Alis.Reactive.Poc.Analyzers/VendorContract.cs:89-93`, `poc/Alis.Reactive.Poc.Analyzers/ReachWalk.cs:118`),
+    and the reach reports ALIS021 (`poc/Alis.Reactive.Poc.Analyzers/ReachWalk.cs:151`). A type the vendor does not name
     (an instantiation such as `CustomEvent<Noted>`, a base such as `InfusionPump<PumpChannel>`, an object literal type)
     is listed as its own type, members resolved and flattened, named `CustomEvent#210` with its text shown in messages.
     A type that holds a free type parameter (a method's own generic) is written by its text only: C# never supplies a
@@ -3520,6 +3540,9 @@ plans (Q19).
 - `probe:ej2-methods-returning-promise`
 - `probe:ej2-destroy-removes-instance`
 - `probe:ej2-max-public-method-arity`
+- `probe:ej2-emit-type-phantom`
+- `probe:ej2-emit-type-resolved`
+- `probe:ej2-emit-type-arguments`
 
 **Doors.**
 - kept: `ComponentVendor.Define`, `ComponentVendor.DefineCallbackProperties`, `ComponentVendor.Native`,
@@ -3617,6 +3640,11 @@ plans (Q19).
   (the type check): new:N17.2.
 - `X17.42` analyzer (D17.4, D17.5): `Argument<T>(n)` whose `T` is no type the parameter at `n` holds, and
   `CallItself<T>` whose `T` is no type the declared type's own call returns (the type check): new:N17.2.
+- `X17.43` analyzer (D17.4, D17.5): a payload a Syncfusion event hands, `change: EmitType<ChangeEventArgs>`, is
+  checked at `ChangeEventArgs`, the type argument its alias does not name: a member that type does not declare is
+  ALIS016, a nullability that disagrees ALIS019, a type it does not hold ALIS037, and a payload read by its members
+  where the argument is `any` ALIS021; the contract writes it in the rewrite's analyzer unit, before Fusion's
+  onboarding declares a payload: new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every
