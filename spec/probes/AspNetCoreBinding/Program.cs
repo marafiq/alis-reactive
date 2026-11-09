@@ -21,7 +21,7 @@ var german = new CultureInfo("de-DE");
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture(german),
-    SupportedCultures = [german],
+    SupportedCultures = CultureInfo.GetCultures(CultureTypes.AllCultures),
     SupportedUICultures = [german],
 });
 app.UseCors();
@@ -193,6 +193,7 @@ try
     Console.WriteLine("core-type-array-generic-arguments: " + ArrayOfGeneric());
     Console.WriteLine("core-contract-kind-declarers: " + DeclarerKinds());
     await HttpProbes.Run(new Uri(app.Urls.First()));
+    await DateProbes.Run(new Uri(app.Urls.First()));
 }
 finally
 {

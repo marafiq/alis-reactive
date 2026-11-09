@@ -1988,6 +1988,240 @@
       "probe": "dom-iterables.mjs",
       "expect": "typescript-version: 5.9.3",
       "source": "spec/probes/dom-iterables.mjs"
+    },
+    {
+      "id": "core-date-compares-ticks",
+      "statement": "On .NET 10, DateTime compares by Ticks whatever its Kind, DateTimeOffset by its UTC instant (EqualsExact alone reads the offset), DateOnly by DayNumber, TimeOnly and TimeSpan by Ticks, and a nullable by the lifted operators: null equals null, and no ordering with null holds.",
+      "host": "net10",
+      "oracle": ".NET 10 base class library operators",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-date-compares-ticks: a Utc and a Local DateTime of one wall time are == True; one tick later is > True; 2026-11-09T10:00:00-08:00 == 2026-11-09T18:00:00+00:00 True, EqualsExact False; a DateOnly orders as its DayNumber True; a TimeOnly one tick later is > True; TimeSpan 1.02:00:00 > 23:00:00 True; -00:00:00.5 < 0 True; a null DateTime? == null True, < a value False, > a value False, != a value True",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-stj-date-time-forms",
+      "statement": "System.Text.Json writes a DateTimeOffset at offset zero with +00:00, a DateTime's fraction trimmed to its last nonzero digit up to seven, DateTime.MinValue and MaxValue, a TimeOnly with seven places, a DateOnly as its day, and a TimeSpan in the constant form [-][d.]hh:mm:ss[.fffffff], from TimeSpan.MinValue to MaxValue; a Utc DateTime written with Z reads back with the Ticks of its wall time.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-date-time-forms: DateTimeOffset at offset zero \"2026-11-09T18:00:00+00:00\"; DateTime with half a second \"2026-11-09T08:30:00.5\", with one tick \"2026-11-09T08:30:00.0000001\", MinValue \"0001-01-01T00:00:00\", MaxValue \"9999-12-31T23:59:59.9999999\"; a Utc DateTime written \"2026-11-09T08:30:00Z\" reads back with the Ticks of its wall time True; TimeOnly with one tick \"08:30:00.0000001\"; DateOnly MinValue \"0001-01-01\"; TimeSpan \"1.02:00:00\", \"-00:00:00.5000000\", MaxValue \"10675199.02:48:05.4775807\", MinValue \"-10675199.02:48:05.4775808\"",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-query-date-forms",
+      "statement": "In a query, under the invariant culture, MVC binds each form the date keys read as its fields: a DateTime's day alone and with a time of minutes, seconds or seven places; a DateTimeOffset with -05:00, Z or +05:30; a DateOnly's day; a TimeOnly of minutes, seconds or seven places; and a TimeSpan of hh:mm, d.hh:mm:ss, a negative fraction, TimeSpan.MaxValue and seven places.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-date-forms: Wall 2026-10-27 binds its fields; Wall 2026-10-27T08:30 binds its fields; Wall 2026-10-27T08:30:15 binds its fields; Wall 2026-10-27T08:30:15.1234567 binds its fields; Seen 2026-10-27T08:30:15.1234567-05:00 binds its fields; Seen 2026-10-27T08:30Z binds its fields; Seen 2026-10-27T08:30:15+05:30 binds its fields; Day 2026-10-27 binds its fields; Starts 08:30 binds its fields; Starts 08:30:15 binds its fields; Starts 08:30:15.1234567 binds its fields; Length 08:30 binds its fields; Length 1.02:00:00 binds its fields; Length -00:00:00.5 binds its fields; Length 10675199.02:48:05.4775807 binds its fields; Length 08:30:15.1234567 binds its fields",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-form-date-forms-every-culture",
+      "statement": "In form data, under each request culture .NET 10 knows, MVC binds every form of core-query-date-forms as its fields where the culture's calendar is Gregorian; under the cultures whose calendar is not, every form but the day alone binds its fields, and the day alone binds in the culture's calendar under some.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-date-forms-every-culture: every request bound under its own culture True; under every culture whose calendar is Gregorian, each form binds its fields True; under every other culture, each form but the day alone binds its fields True, and the day alone binds otherwise under some True",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-form-day-calendar",
+      "statement": "Under th-TH, form data's 2026-10-27 alone binds a DateTime and a DateOnly in the Thai Buddhist calendar, as 1483-10-27, while the same day with a time, as 2026-10-27T00:00 or 2026-10-27T00:00:00, binds 2026-10-27.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-day-calendar: under th-TH, Wall=1483-10-27T00:00:00.0000000, WallMinute=2026-10-27T00:00:00.0000000, WallSecond=2026-10-27T00:00:00.0000000, Day=1483-10-27; Day 2026-10-27T00:00:00 binds Day=2026-10-27",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-bound-refused-values",
+      "statement": "In a query, MVC refuses a time of 24:00 or a minute or second of 60, a day that no month holds, an offset past 14 hours and an instant before year 1, and a TimeSpan past MaxValue or with a minute of 60; it binds a TimeSpan of 24:00:00 as 24 days, and eight places of a fraction rounded to seven.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-bound-refused-values: Starts 24:00 binds refused; Starts 08:60 binds refused; Starts 08:30:60 binds refused; Day 2026-02-30 binds refused; Wall 2026-02-30T08:30 binds refused; Wall 2026-10-27T24:00 binds refused; Seen 2026-10-27T08:30+15:00 binds refused; Seen 0001-01-01T00:00+01:00 binds refused; Length 24:00:00 binds Length=24.00:00:00; Length 08:60:00 binds refused; Length 10675199.02:48:05.4775808 binds refused; Starts 08:30:15.12345678 binds Starts=08:30:15.1234568; Wall 2026-10-27T08:30:15.12345678 binds Wall=2026-10-27T08:30:15.1234568",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-bound-offset-into-datetime",
+      "statement": "A DateTime text with an offset is read three ways on the server: MVC 10's query and form binding take that instant's UTC wall time, System.Text.Json takes the UTC wall time for Z and the server clock's wall time for any other offset, and DateTime.Parse with no style, which MVC 5's converter calls, takes the server clock's wall time; a DateTimeOffset text with no offset binds at the server clock's offset.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-bound-offset-into-datetime: a DateTime in a query or form data, 2026-10-27T10:00:00Z or 2026-10-27T05:00:00-05:00, binds that instant's UTC wall time True; System.Text.Json reads the Z text as that UTC wall time, kind Utc, True, and the -05:00 text as the server clock's wall time, kind Local, True; DateTime.Parse with no style, which MVC 5's converter calls, reads each as the server clock's wall time, kind Local, True; a DateTimeOffset with no offset, 2026-10-27T10:00:00, binds at the server clock's offset for that wall time True",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-bound-lenient-forms",
+      "statement": "In a query, MVC binds texts outside the date keys' forms: a TimeOnly of 7:00, 7:00 PM and 8:30:15, a DateOnly and a DateTime of 10/27/2026, a DateTime with a space for T, a TimeSpan of 5 as five days and of 8:30, and a DateTimeOffset of 10/27/2026 08:30 -05:00.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-bound-lenient-forms: Starts 7:00 binds Starts=07:00:00.0000000; Starts 7:00 PM binds Starts=19:00:00.0000000; Starts 8:30:15 binds Starts=08:30:15.0000000; Day 10/27/2026 binds Day=2026-10-27; Wall 10/27/2026 binds Wall=2026-10-27T00:00:00.0000000; Wall 2026-10-27 08:30 binds Wall=2026-10-27T08:30:00.0000000; Length 5 binds Length=5.00:00:00; Length 8:30 binds Length=08:30:00; Seen 10/27/2026 08:30 -05:00 binds Seen=2026-10-27T13:30:00.0000000Z",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-implicit-instant-server-clock",
+      "statement": "C# converts a DateTime to a DateTimeOffset at the server clock's offset for its wall time, and a Utc one at +00:00, keeping the wall fields.",
+      "host": "net10",
+      "oracle": ".NET 10 base class library operators",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-implicit-instant-server-clock: a DateTime converts to a DateTimeOffset at the server clock's offset for its wall time True; a Utc one at +00:00 True; the conversion keeps the wall fields and reads no zone of the view True",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "core-stj-own-date-converters",
+      "statement": "Under the app's options with no converter of its own, the contract's converter for DateTime, DateTimeOffset, DateOnly, TimeOnly and TimeSpan is System.Text.Json's own, reference-equal to JsonMetadataServices' instance; a DateTime converter the app adds replaces it in the contract.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-own-date-converters: under the app's options the contract's converter is System.Text.Json's own: DateTime True, DateTimeOffset True, DateOnly True, TimeOnly True, TimeSpan True; with a DateTime converter the app adds, DateTime False and the app's True",
+      "source": "spec/probes/AspNetCoreBinding/DateProbes.cs"
+    },
+    {
+      "id": "js-dates-zone",
+      "statement": "js-dates.mjs reads its dates in America/New_York, set inside the script before its first Date, whatever zone the caller runs under.",
+      "host": "node",
+      "oracle": "ECMAScript Date and BigInt in Node 24 (V8), the engine of Chromium",
+      "probe": "js-dates.mjs",
+      "expect": "js-dates-zone: America/New_York",
+      "source": "spec/probes/js-dates.mjs"
+    },
+    {
+      "id": "js-date-wall-gap",
+      "statement": "In New York, a Date built from 02:30 on 2026-03-08, a wall time daylight saving skips, holds 03:30 and orders after 03:15 by getTime.",
+      "host": "node",
+      "oracle": "ECMAScript Date and BigInt in Node 24 (V8), the engine of Chromium",
+      "probe": "js-dates.mjs",
+      "expect": "js-date-wall-gap: new Date(2026, 2, 8, 2, 30) holds 03:30 and orders after 03:15 by getTime true",
+      "source": "spec/probes/js-dates.mjs"
+    },
+    {
+      "id": "js-date-wall-overlap",
+      "statement": "In New York, 45 minutes after 01:30 on 2026-11-01 is 01:15 on the wall, so a Date's getTime orders a later moment after a wall time that orders before it.",
+      "host": "node",
+      "oracle": "ECMAScript Date and BigInt in Node 24 (V8), the engine of Chromium",
+      "probe": "js-dates.mjs",
+      "expect": "js-date-wall-overlap: 45 minutes after 01:30 on 2026-11-01 holds 01:15, a later moment whose wall time orders first true",
+      "source": "spec/probes/js-dates.mjs"
+    },
+    {
+      "id": "js-date-milliseconds",
+      "statement": "A Date holds milliseconds: 2026-11-09T08:30:00.1234567 and 2026-11-09T08:30:00.123 build one time.",
+      "host": "node",
+      "oracle": "ECMAScript Date and BigInt in Node 24 (V8), the engine of Chromium",
+      "probe": "js-dates.mjs",
+      "expect": "js-date-milliseconds: 2026-11-09T08:30:00.1234567 and 2026-11-09T08:30:00.123 hold one time true",
+      "source": "spec/probes/js-dates.mjs"
+    },
+    {
+      "id": "js-date-utc-text-as-moment",
+      "statement": "A DateTime text with Z read as a moment shows another wall time: 2026-11-09T08:30:00Z shows 03:30 in New York.",
+      "host": "node",
+      "oracle": "ECMAScript Date and BigInt in Node 24 (V8), the engine of Chromium",
+      "probe": "js-dates.mjs",
+      "expect": "js-date-utc-text-as-moment: 2026-11-09T08:30:00Z read as a moment shows 03:30 in New York",
+      "source": "spec/probes/js-dates.mjs"
+    },
+    {
+      "id": "js-key-text-order",
+      "statement": "Fixed-width date key texts compare by < and sort by code unit in the order of the ticks they spell, from 0001-01-01 to 9999-12-31T23:59:59.9999999.",
+      "host": "node",
+      "oracle": "ECMAScript Date and BigInt in Node 24 (V8), the engine of Chromium",
+      "probe": "js-dates.mjs",
+      "expect": "js-key-text-order: date keys in tick order compare by < true, sort by code unit into tick order true",
+      "source": "spec/probes/js-dates.mjs"
+    },
+    {
+      "id": "js-span-key-order",
+      "statement": "A TimeSpan's ticks plus 2^63, written as 20 digits through BigInt, compare by < in tick order from TimeSpan.MinValue to MaxValue, negatives included, where a JavaScript number cannot hold TimeSpan.MaxValue's ticks.",
+      "host": "node",
+      "oracle": "ECMAScript Date and BigInt in Node 24 (V8), the engine of Chromium",
+      "probe": "js-dates.mjs",
+      "expect": "js-span-key-order: the ticks plus 2^63 as 20 digits, from TimeSpan.MinValue through -0.5 s, 0, 1 tick, 23 h and 1.02:00:00 to TimeSpan.MaxValue, compare by < in tick order true, each 20 long true, the ticks of -0.5 s as a JavaScript number true and of TimeSpan.MaxValue false",
+      "source": "spec/probes/js-dates.mjs"
+    },
+    {
+      "id": "net48-datetime-compares-ticks",
+      "statement": "On net48, DateTime orders by its InternalTicks.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTime.cs.txt",
+      "expect": "return t1.InternalTicks < t2.InternalTicks;",
+      "source": "spec/probes/referencesource/DateTime.cs.txt:1516"
+    },
+    {
+      "id": "net48-datetime-equals-ticks",
+      "statement": "On net48, DateTime's == compares its InternalTicks.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTime.cs.txt",
+      "expect": "return d1.InternalTicks == d2.InternalTicks;",
+      "source": "spec/probes/referencesource/DateTime.cs.txt:1508"
+    },
+    {
+      "id": "net48-datetime-ticks-drop-kind",
+      "statement": "On net48, a DateTime's InternalTicks mask its Kind out, so a Utc and a Local DateTime of one wall time compare equal.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTime.cs.txt",
+      "expect": "return (Int64)(dateData & TicksMask);",
+      "source": "spec/probes/referencesource/DateTime.cs.txt:419"
+    },
+    {
+      "id": "net48-datetimeoffset-compares-utc",
+      "statement": "On net48, DateTimeOffset orders by its UTC instant.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTimeOffset.cs.txt",
+      "expect": "return left.UtcDateTime < right.UtcDateTime;",
+      "source": "spec/probes/referencesource/DateTimeOffset.cs.txt:859"
+    },
+    {
+      "id": "net48-datetimeoffset-equals-utc",
+      "statement": "On net48, DateTimeOffset's == compares its UTC instant.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTimeOffset.cs.txt",
+      "expect": "return left.UtcDateTime == right.UtcDateTime;",
+      "source": "spec/probes/referencesource/DateTimeOffset.cs.txt:851"
+    },
+    {
+      "id": "net48-timespan-compares-ticks",
+      "statement": "On net48, TimeSpan orders by its ticks.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/TimeSpan.cs.txt",
+      "expect": "return t1._ticks < t2._ticks;",
+      "source": "spec/probes/referencesource/TimeSpan.cs.txt:367"
+    },
+    {
+      "id": "net48-implicit-instant-local-offset",
+      "statement": "On net48, a DateTime that is not Utc converts to a DateTimeOffset at the server clock's offset for it.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTimeOffset.cs.txt",
+      "expect": "offset = TimeZoneInfo.GetLocalUtcOffset(dateTime, TimeZoneInfoOptions.NoThrowOnInvalidTime);",
+      "source": "spec/probes/referencesource/DateTimeOffset.cs.txt:73"
+    },
+    {
+      "id": "mvc5-timespan-parse",
+      "statement": "MVC 5 binds a TimeSpan through TimeSpanConverter, which calls TimeSpan.Parse under the binding's culture.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/TimeSpanConverter.cs.txt",
+      "expect": "return TimeSpan.Parse(text, culture);",
+      "source": "spec/probes/referencesource/TimeSpanConverter.cs.txt:61"
+    },
+    {
+      "id": "mvc5-datetimeoffset-parse",
+      "statement": "MVC 5 binds a DateTimeOffset through DateTimeOffsetConverter, which calls DateTimeOffset.Parse under the binding's culture.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTimeOffsetConverter.cs.txt",
+      "expect": "return DateTimeOffset.Parse(text, formatInfo);",
+      "source": "spec/probes/referencesource/DateTimeOffsetConverter.cs.txt:76"
     }
   ]
 }
