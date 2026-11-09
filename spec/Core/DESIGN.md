@@ -1286,7 +1286,7 @@ Terms used throughout:
   `null` binds null over the start (`probe:core-json-null-object`).
 
   A list item that reads nothing, in a query or form data, is sent by this closed table, which C# writes into the
-  plan from the item type the generated table names (D9.20):
+  plan from the item type the app's JSON contract names (D18.2), a nullable enum among the nullable value types:
 
   | The item's type | Query or form data |
   |-----------------|--------------------|
@@ -1306,14 +1306,23 @@ Terms used throughout:
   the configured one. An app that sends `X-Requested-With: XMLHttpRequest` on every request configures it there.
   The browser adds no header but W3C Trace Context's `traceparent` and `tracestate` while the plan's trace is on
   (D20.3), and `traceparent` and `baggage` on a retry (D20.11), each to the page's own origin only.
-- D9.13 A literal member, `Set(member, value)`, is written where the view renders, encoded as the endpoint
-  binds it. In a query or form data an enum is its C# name on both hosts, which net10 and MVC 5 bind ignoring case;
-  the name `JsonStringEnumMemberName` gives it binds nothing there (`probe:core-query-enum-member-name`,
-  `probe:mvc5-enum-name-ignores-case`). An enum a source holds is in its held form (D4.2): the form its member's own
-  `[JsonConverter]` writes, else the app's JSON options. So C# writes into the plan each value's held form beside its
-  C# name, from the values the generated table lists (D9.20), and the browser sends the C# name of the value whose form
-  it holds. A held form no value writes stops the request, naming the member; a flags combination is among them,
-  though both hosts bind its comma form (`probe:core-query-flags-enum`, `probe:mvc5-enum-flags-comma`), a gate 1 flag. In a JSON body an enum is its System.Text.Json form.
+- D9.13 A literal member, `Set(member, value)`, is written where the view renders, encoded as the endpoint binds it.
+  In a query, form data, a path segment or a header an enum is its C# name on both hosts, which net10 and MVC 5 bind
+  ignoring case; the name `JsonStringEnumMemberName` gives it binds nothing there
+  (`probe:core-query-enum-member-name`, `probe:mvc5-enum-name-ignores-case`). C# writes a literal enum by its C# name,
+  `Enum`'s own text for it, so a flags combination is its comma form, which both hosts bind
+  (`probe:core-query-flags-enum`, `probe:mvc5-enum-flags-comma`); a value its enum does not name is refused where the
+  view renders. An enum a source holds is in its held form (D4.2): the form its member's own `[JsonConverter]` writes,
+  else the app's JSON options. So C# writes into the plan, beside the member, a row for each value `Enum.GetValues`
+  lists (D18.1, gate 1): the value as System.Text.Json writes it at the source's type (a `T?` when the source is one,
+  since a nullable member's own converter writes names only there, `probe:core-json-enum-nullable-member-converter`)
+  under the source's held form, and its C# name. The browser sends the C# name of the row whose form it holds. A held
+  form no row lists stops the request, naming the member; a flags combination no value names is among them, a gate 1
+  flag. Two values written in one form the browser cannot tell apart (`probe:core-json-enum-held-alike`), and a value
+  written as anything but a JSON text, number or boolean, are refused where the view renders. In a JSON body an enum
+  is the form its endpoint binds: on net10 the request member's System.Text.Json form under MVC's `JsonOptions`
+  (`probe:core-frombody-enum-forms`), on net48 its C# name, since MVC 5 binds a JSON body through its model binder
+  (`probe:mvc5-json-binds-through-binder`); C# writes the rows from the held form to it, with the JSON body's door.
 - D9.14 A hidden input is an input: it binds by its binding name and shape, and a request sends it when the
   container it sends holds it (D9.15).
 - D9.15 What a request sends is closed, and holds on a page with many forms or none (the owner, 2026-11-08):
@@ -1438,9 +1447,12 @@ Terms used throughout:
     its request before it is sent; fetch itself refuses a line break and a character past Latin-1
     (`probe:js-header-values`).
 **Schema nodes.** `request`, its `send` a `record`, `list`, `lit`, `get`, `as` and `op`; the shape `file`; the
-contract `HttpSend`, which is no node kind.
+contract `HttpSend`, which is no node kind, and its wire forms, `enum` among them (D9.13).
 
 **Checker.**
+- `probe:core-frombody-enum-forms`
+- `probe:core-json-enum-nullable-member-converter`
+- `probe:core-json-enum-held-alike`
 - `Request.tla:EveryPlaceholderFilled`
 - `Request.tla:PathHoldsScalarText`
 - `Request.tla:FileOnlyInFormData`
@@ -1518,6 +1530,7 @@ contract `HttpSend`, which is no node kind.
   defaults live in a startup file.
 - `N9.6` new: the request defaults of D9.12 and D10.12, configured once in C#; their door's form goes to gate 2.
 - `N9.7` new: `Query<TQuery>(q => q.Set(x => x.Member, value or source))` on POST, PUT and DELETE.
+- `N9.8` new: the wire form `enum` of `HttpSend`, written by `poc/Alis.Reactive.Poc/Types/EnumNames.cs`; no public door.
 
 **Evidence.**
 - B6: the request is a record of string-named fields (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:101`) typed by
@@ -1558,6 +1571,21 @@ contract `HttpSend`, which is no node kind.
   only, and the form's request sends both.
 - `X9.17` behavior: a request that reaches a container by its id under a model it was not rendered for stops before
   it sends, the network log holds no request, and the console names the id and both models.
+- `X9.18` behavior: a component holding `"night-shift"`, the held form of `Night` under `JsonStringEnumMemberName`, sets
+  a request member, and the endpoint reads `Night`.
+- `X9.19` behavior: a component holding a form no value of its enum is held as sends nothing, no later step runs, and
+  the console names the member and the forms its enum is held as.
+- `X9.20` refusal: an enum two of whose values are written in one form is refused where the view renders with
+  "'r => r.Ward' holds EastWing and EastAnnex in one form, \"east\", under the app's options, so the browser cannot tell
+  which one it holds; give one of them a JsonStringEnumMemberName of its own."
+- `X9.21` refusal: an enum whose held form writes a value as an object is refused where the view renders with
+  "'r => r.Shift' holds Day as {\"code\":0} under its own JSON converter, and a request sends one text or number per
+  member; send a member written as text or a number."
+- `X9.22` refusal: a literal its enum does not name is refused where the view renders with "'r => r.Shift' is set to
+  5, which no value of its enum names: net10 refuses it and MVC 5 binds it, so the hosts bind it apart; set a value
+  its enum names."
+- `X9.23` behavior: a `List<Shift?>` member whose source holds an item that reads nothing sends an empty field there,
+  and the endpoint binds a null item (D9.10).
 
 ## Q10. The request's flow and its response
 
@@ -3569,6 +3597,10 @@ plans (Q19).
   - the identity of a .NET member an array lambda calls, compared with the closed table of D6.5, never listed
     or invoked: `MemberInfo.Module` and `MemberInfo.MetadataToken`, which name a member's definition for every
     instantiation of a generic member, in `poc/Alis.Reactive.Poc/Conditions/TranslatedMembers.cs`.
+  D9.13's rows ask one more at gate 1: an enum's values and names, `Enum.GetValues(Type)` and `Enum.ToString`, with
+  `Type.IsEnum` and `Nullable.GetUnderlyingType` to find the enum, in `poc/Alis.Reactive.Poc/Types/EnumNames.cs`. The
+  generic `Enum.GetValues<TEnum>()` is absent on net48, and no door reaches a `TEnum : struct, Enum`. Until the owner's
+  answer the POC sends an enum a source holds as it is held, and the landed `Enum.ToString` of a literal is on no list.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):

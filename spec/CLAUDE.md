@@ -355,6 +355,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-07: "we really do not want take control mvc binding - must have solid reasons to do it". The framework
   writes the keys and values MVC's own binder reads, pinned by probes on both hosts, and adds no value provider, binder
   or model of the binder without a reason the owner accepts.
+- Chosen within the owner's yes, 2026-11-09, by precedent ("well solve 17c like you solve similar problems, it do not
+  need me to give you decision"): D9.13's rows are written through HeldForm from the enum's values, never from a
+  generated table, and the reads that list the values wait for the owner at gate 1 (D18.1); a source's flags
+  combination stops (gate 1); a JSON body's enum is the form its endpoint binds. The owner can overrule each.
 - The owner, 2026-11-07: a request is the HTTP message, and the core holds its parts: the method, the path, the query,
   the headers and a body with its media type, JSON and multipart form data (a form that uploads files among them);
   the response's status and its body as JSON, text or HTML. The methods are GET, HEAD, OPTIONS, POST, PUT and DELETE (OPTIONS by the owner's "OPTIONS support is

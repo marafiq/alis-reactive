@@ -109,6 +109,13 @@ try
     Console.WriteLine("core-query-parameter-name: [FromQuery(Name = \"q\")] with Count=3 binds " + await client.GetStringAsync("/q/query-name?Count=3") + "; with q.Count=3 binds " + await client.GetStringAsync("/q/query-name?q.Count=3"));
     Console.WriteLine("core-query-parameter-prefix: Count=3 binds " + await client.GetStringAsync("/q/plain?Count=3") + "; counts.Count=3 binds " + await client.GetStringAsync("/q/plain?counts.Count=3") + "; counts.Count=3&Count=4 binds " + await client.GetStringAsync("/q/plain?counts.Count=3&Count=4"));
     Console.WriteLine("core-query-parameter-name-collision: Collide(ProbeSearch term) with Term=a&Count=3 binds " + await client.GetStringAsync("/q/collide?Term=a&Count=3") + "; with term.Term=a&term.Count=3 binds " + await client.GetStringAsync("/q/collide?term.Term=a&term.Count=3"));
+    Console.WriteLine("core-frombody-enum-forms: under the app's default options {\"shift\":1,\"watch\":\"night-shift\"} binds " + await Json(client, "/q/enum-json", "{\"shift\":1,\"watch\":\"night-shift\"}") + " | {\"shift\":\"Night\"} binds " + await Json(client, "/q/enum-json", "{\"shift\":\"Night\"}") + " | {\"watch\":\"Night\"} binds " + await Json(client, "/q/enum-json", "{\"watch\":\"Night\"}"));
+    var webContract = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web) { TypeInfoResolver = new System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver() };
+    var own = webContract.GetTypeInfo(typeof(ProbeDose)).Properties.Single(property => property.Name == "maybe").CustomConverter!;
+    var underOwn = new System.Text.Json.JsonSerializerOptions(webContract) { Converters = { own } };
+    Console.WriteLine("core-json-enum-nullable-member-converter: a ProbeShift? member's own JsonStringEnumConverter is " + own.GetType().Name + "; under it Night writes " + System.Text.Json.JsonSerializer.Serialize<ProbeShift?>(ProbeShift.Night, underOwn) + " at ProbeShift? and " + System.Text.Json.JsonSerializer.Serialize(ProbeShift.Night, underOwn) + " at ProbeShift");
+    var camelNames = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter(System.Text.Json.JsonNamingPolicy.CamelCase) } };
+    Console.WriteLine("core-json-enum-held-alike: under a camel-case string converter ABC writes " + System.Text.Json.JsonSerializer.Serialize(ProbeClash.ABC, camelNames) + " and Abc writes " + System.Text.Json.JsonSerializer.Serialize(ProbeClash.Abc, camelNames));
     Console.WriteLine("core-json-null-object: {\"kept\":null} binds " + await Json(client, "/q/handover-json", "{\"kept\":null}") + " | {} binds " + await Json(client, "/q/handover-json", "{}"));
     await HttpProbes.Run(new Uri(app.Urls.First()));
 }
@@ -248,6 +255,26 @@ public enum ProbeShift
     Night,
 }
 
+public enum ProbeClash
+{
+    ABC,
+    Abc,
+}
+
+public sealed class ProbeDose
+{
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ProbeShift? Maybe { get; set; }
+}
+
+public sealed class ProbeEnumBody
+{
+    public ProbeShift Shift { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ProbeShift Watch { get; set; }
+}
+
 [Flags]
 public enum ProbeDays
 {
@@ -314,6 +341,9 @@ public sealed class QueryProbeController : ControllerBase
     public string ReadOnlyLists(HandoverQuery query)
         => "Held=[" + string.Join(", ", query.Held.Select(LineText)) + "] Bare=" + (query.Bare is null ? "null" : "[" + string.Join(",", query.Bare) + "]")
            + " Handover=" + HandoverText(query.Handover) + Errors();
+
+    [HttpPost("/q/enum-json")]
+    public string EnumJson([FromBody] ProbeEnumBody? body) => (body is null ? "nothing" : "Shift=" + body.Shift + " Watch=" + body.Watch) + Errors();
 
     [HttpGet("/q/shift")]
     public string Shift(HandoverQuery query) => "Shift=" + query.Shift + " Shifts=[" + string.Join(",", query.Shifts.Select(shift => shift?.ToString() ?? "null")) + "]" + Errors();

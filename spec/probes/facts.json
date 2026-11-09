@@ -1045,6 +1045,33 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-frombody-enum-forms",
+      "statement": "A [FromBody] member binds an enum in the form its own contract reads: under the app's default options a number, not the C# name; a member with its own string converter its JsonStringEnumMemberName, not the C# name.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-enum-forms: under the app's default options {\"shift\":1,\"watch\":\"night-shift\"} binds Shift=Night Watch=Night | {\"shift\":\"Night\"} binds nothing (errors $.shift) | {\"watch\":\"Night\"} binds nothing (errors $.watch)",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-enum-nullable-member-converter",
+      "statement": "A nullable enum member's own string converter is a NullableConverter: it writes names at the nullable type and leaves the enum itself to the options.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-enum-nullable-member-converter: a ProbeShift? member's own JsonStringEnumConverter is NullableConverter`1; under it Night writes \"night-shift\" at ProbeShift? and 1 at ProbeShift",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-enum-held-alike",
+      "statement": "A camel-case string converter writes two values whose names differ only in case as one text.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-enum-held-alike: under a camel-case string converter ABC writes \"abc\" and Abc writes \"abc\"",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
       "id": "core-query-flags-enum",
       "statement": "A query binds a flags enum from System.Text.Json's comma form, from repeated keys and from its number.",
       "host": "net10",
