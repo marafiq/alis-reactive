@@ -1405,10 +1405,10 @@
     },
     "probes": {
       "counts": {
-        "facts": 221,
-        "net10": 99,
-        "net48": 68,
-        "node": 54
+        "facts": 247,
+        "net10": 109,
+        "net48": 77,
+        "node": 61
       },
       "detail": "every fact printed by its probe or found at its source line",
       "pass": true
@@ -3336,7 +3336,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "e092022746f637092f77896e4a55dcd250d35c61",
+  "read_at_head": "b2dbfbef5751161fc3ac34fe5c55270384dec45e",
   "step": {
     "failing": [
       "doors_mapped",
