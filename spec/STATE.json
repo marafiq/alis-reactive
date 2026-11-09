@@ -3372,7 +3372,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "b2544408def2d3f006fcf403e12e46a979b93af4",
+  "read_at_head": "182084488bffd14bfa710a6725c635143e23d2d9",
   "step": {
     "failing": [
       "doors_mapped",
