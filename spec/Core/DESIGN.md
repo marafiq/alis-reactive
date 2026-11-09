@@ -3673,7 +3673,11 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     term and its branches, and a callback's answer.
   - Its events listen by a vendor's listening kinds (D17.3): `EventTarget`, `addEventListener` and
     `removeEventListener`, unless the declaration names another with `EventListening`. The plan's locator carries the
-    plugin's name and its listening, and its object id is `$plugin:` and its name, so no element id meets it.
+    plugin's name and its listening, and its object id is `$plugin:` and its name, so no element id meets it. It
+    carries the declaration's listening for a plugin that declares no event too, a core plugin as `alis.model` among
+    them (gate 1's P14, kept): no handler reads it there, since a handler names an event the declaration declares, and
+    the build checks a listening it reads only on a declaration that declares an event (X17.45). A `none` there would
+    name a kind twice (S3) and make the runtime narrow a shape the plan controls, for no behavior.
   - A declaration calls the object itself with `CallItself`, a `call` with no path, applied with `this` undefined:
     the doors of a plugin that is a function (main's `Command()` and `Function<T>()`, the redesign's `name: ""`).
   - The page provides a plugin by pushing `{ name, instance }` onto `window.__alisPlugins`. Boot reads the queue before
