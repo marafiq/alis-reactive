@@ -472,7 +472,7 @@ Terms used throughout:
     `T | undefined`, is declared with `nullable: true`, and its members read nothing while it holds nothing.
   - The vendor contract analyzer (D17.5) checks both marks against the API, a reference type's nullability by its
     nullable annotation, so neither drifts from the vendor: nullability by variance (ALIS019), a live object's
-    `nullable: true` included, and presence both ways (ALIS022).
+    `nullable: true` included, the type by its kind (D17.5's type check), and presence both ways (ALIS022).
   - Data the app types with its own C# type (a response body, a pushed message, the value past a declared member,
     the value a method returns) reads its start where a field is absent and null where the field holds null (D4.2);
     on an event's payload X4.3 states both.
@@ -3292,9 +3292,52 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     A primitive, `unknown`, `any`, a tuple or a function where a live object is declared, one object where the API
     holds a list and a list where it holds one object are ALIS021, the cure naming the vendor's TypeScript. A callback
     answer declared `T?` where the function's result takes no null is ALIS019.
+  - A declaration's type is a type its vendor's API holds, D5.3's value mark, checked by the type check (POC 16a,
+    `poc/Alis.Reactive.Poc.Analyzers/HeldValues.cs`). POC 16a gave it ALIS025
+    (`poc/Alis.Reactive.Poc.Analyzers/Rules.cs:20`), the id POC 13f gave the override analyzer of N18.5 first
+    (`poc/Alis.Reactive.Poc.Analyzers/OverridesAnalyzer.cs:10`): the override analyzer keeps ALIS025, and the
+    type check is ALIS037, an id no other rule holds. It checks by kind in a closed set: text
+    (`string`, `char`, `Guid`, an enum), a number (the numeric types, an enum), a boolean, a date (`DateTime`,
+    `DateTimeOffset`, which a read also takes from text, since data carries a date as text), a list of these, and an
+    object whose members, each by its JSON name, the vendor's type declares or takes through a string index signature
+    as the index's type; a member the vendor's type does not hold is refused with its path. The vendor's untyped
+    shapes (`any`, `unknown`, `object`, `{}`, `Object`) take any type. Refused, each a gap to name: a value that holds
+    a promise, a function, nothing, more than one kind, or a type no C# kind mirrors. A read fits every type the API
+    holds, and a write fits one of them. The POC checks a property's value both ways and the result of a method or a
+    callable property, awaited or not (`poc/Alis.Reactive.Poc.Analyzers/MirrorsAnalyzer.cs:103-111`). The rewrite's
+    analyzer unit checks every other value a call passes or a callback answers against the same contract:
+    - Each argument of a call by D5.9's six method kinds, `CallItself` and `MethodAt`, as a write: item n of the list
+      at parameter n of the function the call reaches (a method's, the declared type's own for `CallItself`, the
+      function a listener or callback hands at its position for `MethodAt`), a rest parameter taking every later
+      item. A list agrees when one of the function's signatures takes it whole, as TypeScript picks an overload, so
+      the contract writes each signature's parameters apart. A parameter typed by the function's own type parameter
+      is checked at its constraint, at any depth, and one with no constraint takes any type. An item is typed by its
+      door: `Arg<T>` and `Fixed<T>` at `T`; `Pass<TDeclared, TSource>` at `TDeclared`, the type the declaration
+      states, since `TSource` is the view's and derives from it; the run's abort signal (D17.11) at lib.dom's
+      `AbortSignal`; an `Answer` as a callback's answer. Its type fits by the type check; a `T?` item needs a
+      parameter that takes null or undefined (ALIS019); an item past the parameters is ALIS016; a parameter
+      TypeScript marks neither optional (`?` or a default value) nor rest, given no item, is ALIS022; an `Answer`
+      fits only a function the parameter takes, and no other item fits a function (ALIS018). The POC reads no
+      argument list (`poc/Alis.Reactive.Poc.Analyzers/Use.cs:43-52`).
+    - A callback's answer, of a `Callback<TArgs, TResult>` property and of an `Answer` an argument passes: `TResult`
+      fits the function's return by the type check as a write, its nullability by ALIS019, and `TArgs` is reached at
+      the function's parameters as the bullet above reaches a callback's arguments, so an `Answer` a method takes
+      reaches its arguments through that method's parameter. A date the answer holds, against a `Date` the function
+      returns, is refused, a gap to name: an answer reaches its vendor as the plan writes it, a date as text (POC
+      12c), where D3.13 gives a property's set and a method's argument their `Date`. The POC checks an answer's
+      nullability alone (`MirrorsAnalyzer.cs:93-97`, `MirrorsAnalyzer.cs:280-286`).
+    - `Argument<T>(n)`'s `T` fits the parameter it reads by the type check as a read, as a payload's member does; the
+      POC checks its presence and nullability alone (`MirrorsAnalyzer.cs:122-135`).
+    - `CallItself<T>`'s result fits the return of the declared type's own call by the type check and ALIS019; the
+      POC checks only that the type is callable and returns no promise (`MirrorsAnalyzer.cs:266-278`).
   - The contract writes what each member holds as `holds` lines: a read's type, a method's return (a promise's
     value), a callable's parameters and a listener's parameters for each event it takes, each part a named type, a
-    list's element, the object itself, a function, null, or another type by its text. A type the vendor does not name
+    list's element, the object itself, a function, null, or another type by its text. For the arguments and answers
+    above it also writes a method's own parameters and the parameters and return of a type's own call, each
+    parameter with TypeScript's optional mark and its rest mark, and the parameters and return of a function any
+    parameter holds. The POC's script writes no method's parameters (`poc/tools/vendor-contract.mjs:255-260`), a
+    type's own call as flags alone (`poc/tools/vendor-contract.mjs:306-311`), and a function a parameter holds as
+    `function` alone (`poc/tools/vendor-contract.mjs:151-153`). A type the vendor does not name
     (an instantiation such as `CustomEvent<Noted>`, a base such as `InfusionPump<PumpChannel>`, an object literal type)
     is listed as its own type, members resolved and flattened, named `CustomEvent#210` with its text shown in messages.
     A type that holds a free type parameter (a method's own generic) is written by its text only: C# never supplies a
@@ -3303,9 +3346,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     ALIS015. A base is read from its heritage clause's type node, since the type at the clause carries the derived
     class's `this`.
   - A root's checks run as the code is typed. A reached declaration is checked at the end of the compilation, since
-    what reaches it can be anywhere in it, so the IDE shows those diagnostics on build (gate 1). An `Answer(..)` a
-    method takes reaches its arguments through that method's parameters and waits for argument agreement (gate 1);
-    a declaration a referenced assembly holds is checked by the build that compiles it.
+    what reaches it can be anywhere in it, so the IDE shows those diagnostics on build (gate 1). A declaration a
+    referenced assembly holds is checked by the build that compiles it.
 - D17.6 Every vendor package is pinned to one exact version, its sub-packages included, and its npm and NuGet
   versions move together (B16). The contract table of D17.5 is written by every build whose TypeScript inputs
   changed, so a vendor's drift fails the build at the upgrade.
@@ -3513,6 +3555,20 @@ plans (Q19).
   reaches it, and ALIS021 reports a reach that type gives no object, no list or a list: new:N17.2.
 - `X17.30` analyzer: `Argument(n)` and `MethodAt(n)` are checked against the parameters a listener or callback is
   handed, and ALIS018 reports one on a declaration handed none: new:N17.2.
+- `X17.39` analyzer (D5.3, D17.5): ALIS037, the type check, reports a type its vendor's API does not hold, on a property's value
+  read or written and on the result of a method or a callable property, awaited or not, and on the data past them
+  member by member: new:N17.2.
+- `X17.40` analyzer (D5.9, D17.5): an argument that disagrees with the parameter of the function its call reaches, by
+  `Method`, `MethodAsync`, `ReturnedObject`, `ReturnedObjects`, `CallItself` or `MethodAt`, where no signature takes
+  the whole list: its type (the type check), a `T?` where the parameter takes no null (ALIS019), an argument past the
+  parameters (ALIS016), a required parameter given none (ALIS022), and an `Answer` where the parameter takes no
+  function, or another argument where it takes only a function (ALIS018): new:N17.2.
+- `X17.41` analyzer (D17.5, D17.12): a callback's answer, of a `Callback` property or an `Answer` a method takes,
+  whose type the function's return does not take (the type check), whose arguments' declaration the function's
+  parameters do not hand (ALIS016 to ALIS022, as a reach), or which holds a date where the function returns a `Date`
+  (the type check): new:N17.2.
+- `X17.42` analyzer (D17.4, D17.5): `Argument<T>(n)` whose `T` is no type the parameter at `n` holds, and
+  `CallItself<T>` whose `T` is no type the declared type's own call returns (the type check): new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every

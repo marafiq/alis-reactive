@@ -157,8 +157,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   => ..)`; the body is `reply.Body`, a source read through the data path `MethodResult.Read` uses, and a header is
   `reply.Headers.Get(name)`, on every reply, read by the browser's `Headers.get` (N10.7). The form is gate 2's.
 - Chosen within the owner's yes, 2026-11-07, unit 16a: a declaration's value type is checked against its vendor's
-  TypeScript at build (ALIS025), the rule `spec/Core/DESIGN.md` states for a payload ("The member's C# type is the API's
-  value type") and the analyzer checked only for null: a property's value, both ways, a method's result, awaited or
+  TypeScript at build (ALIS037, the type check, which POC 16a numbered ALIS025, the override analyzer's id, D17.5), the rule
+  `spec/Core/DESIGN.md` states for a payload ("The member's C# type is the API's value type") and the analyzer
+  checked only for null: a property's value, both ways, a method's result, awaited or
   not, and the data past them member by member by their JSON names. The closed set: text (string, char, Guid, an
   enum), a number (the numeric types, an enum), a boolean, a date (DateTime, DateTimeOffset, read from text too, since
   data carries a date as text), a list of these, and an object whose members the vendor's type declares, or takes
@@ -167,7 +168,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   refused, on the declaration's line, with its path. The vendor's untyped shapes (any, unknown, object, Object) take
   any type. Refused, each a gap to name: a member that holds a promise, a function, nothing, or more than one kind
   of value. A component reached where its vendor hands a base of the type it mirrors is refused on the reaching line
-  (ALIS021). Not yet checked: a callback's answer, a listener's argument at a position, a method's arguments.
+  (ALIS021). Chosen within the owner's yes, 2026-11-09, gate 1's P12: a method's arguments, a callback's answer, a
+  listener's argument at a position and the result of a call of the object itself are checked against the same
+  contract, built in the rewrite's analyzer unit (D17.5, X17.40 to X17.42).
 - The owner, 2026-11-07, walking the SDK map and a native input: "please take my input about keeping the quality high, as we
   have to onboard 100 of components". Onboarding is judged as one of hundreds: a rough edge in a declaration is
   repeated in every component that meets it. Approved on the walk: a payload, and what it holds, nests in its component's
