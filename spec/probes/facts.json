@@ -289,6 +289,24 @@
       "source": "spec/probes/abort-signal.mjs"
     },
     {
+      "id": "js-number-fifteen-digits",
+      "statement": "Every decimal of at most fifteen significant digits that JavaScript reads as a number reads back as the same decimal.",
+      "host": "node",
+      "oracle": "ECMA-262's Number parse and Number::toString, as Node 24 implements them",
+      "probe": "js-number-digits.mjs",
+      "expect": "js-number-fifteen-digits: 0 of 100000 decimals of fifteen significant digits read back otherwise",
+      "source": "spec/probes/js-number-digits.mjs"
+    },
+    {
+      "id": "js-number-safe-integer",
+      "statement": "JavaScript holds every whole number up to Number.MAX_SAFE_INTEGER exactly and reads 9007199254740993 as 9007199254740992; a decimal of seventeen digits can still read back as itself.",
+      "host": "node",
+      "oracle": "ECMA-262's Number.MAX_SAFE_INTEGER and Number parse, as Node 24 implements them",
+      "probe": "js-number-digits.mjs",
+      "expect": "js-number-safe-integer: MAX_SAFE_INTEGER 9007199254740991; 9007199254740991 reads 9007199254740991; 9007199254740993 reads 9007199254740992; 12.345678901234567 reads 12.345678901234567",
+      "source": "spec/probes/js-number-digits.mjs"
+    },
+    {
       "id": "ej2-methods-returning-promise",
       "statement": "120 documented-public EJ2 methods declare a Promise return type; the first found is BarcodeGenerator.exportAsBase64Image: Promise<string>.",
       "host": "node",
@@ -1834,6 +1852,60 @@
       "oracle": ".NET 10's System.Text.Json",
       "probe": "AspNetCoreBinding",
       "expect": "core-stj-datetime-nested-kind: under the app's options {\"when\":\"2026-11-09T08:30:00Z\",\"until\":\"2026-11-09T08:30:00Z\",\"charted\":\"2026-11-09T08:30:00Z\"}; with a wall-time converter after the app's {\"when\":\"2026-11-09T08:30:00\",\"until\":\"2026-11-09T08:30:00\",\"charted\":\"2026-11-09T08:30:00Z\"}",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-options-converter-beats-type",
+      "statement": "A converter in the app's options takes precedence over an enum type's own [JsonConverter].",
+      "host": "net10",
+      "oracle": ".NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-options-converter-beats-type: an enum whose type carries JsonStringEnumConverter<T> writes \"left\" under the app's camel-case enum converter",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-live-writer",
+      "statement": "The app's options copied with Strict number handling, Never ignore and no converter write every number as a JSON number, every null member, an enum as its number and an enum whose type carries a converter by its name; the app's options write the same object's numbers as text, drop its null member and write its enums by the options' converter.",
+      "host": "net10",
+      "oracle": ".NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-live-writer: under the app's options {\"step\":\"0.5\",\"position\":\"left\",\"cell\":\"data\",\"count\":\"2\"}; with Strict numbers, Never ignore and no converter {\"step\":0.5,\"position\":\"Left\",\"cell\":0,\"count\":2,\"note\":null}",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-live-keeps-type-statements",
+      "statement": "Under the live writer a class's own [JsonNumberHandling] and a member's own [JsonConverter] still write.",
+      "host": "net10",
+      "oracle": ".NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-live-keeps-type-statements: a class's own number handling {\"vials\":\"3\"}; a member's own converter {\"cell\":\"Data\"}",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-live-keeps-naming",
+      "statement": "The live writer keeps the app's naming policy.",
+      "host": "net10",
+      "oracle": ".NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-live-keeps-naming: under no naming policy {\"Step\":0.5,\"Position\":\"Left\",\"Cell\":0,\"Count\":2,\"Note\":null}",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-live-nan",
+      "statement": "System.Text.Json under Strict number handling throws on NaN.",
+      "host": "net10",
+      "oracle": ".NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-live-nan: a NaN under Strict numbers throws ArgumentException",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-live-source-generated",
+      "statement": "A source-generated context's options, copied and reset, drop the number handling, ignore condition and converters the context's options name and keep the type's own converter.",
+      "host": "net10",
+      "oracle": ".NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-live-source-generated: a context's options {\"step\":\"0.5\",\"position\":\"Left\",\"cell\":\"Data\",\"count\":\"2\"}; reset {\"step\":0.5,\"position\":\"Left\",\"cell\":0,\"count\":2,\"note\":null}",
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {

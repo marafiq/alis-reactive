@@ -32,7 +32,7 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | number, finite | itself |
 | text, blank | nothing |
 | an input's text | that number, parsed as the endpoint's host binds the member's .NET type under the view's culture (D3.11); text that host refuses converts to nothing |
-| a URL parameter's text | that number, parsed under the invariant culture with `NumberStyles.Float` |
+| a URL parameter's text, or a number the app's form holds as text (D7.7) | that number, parsed under the invariant culture with `NumberStyles.Float` |
 | boolean | 1 or 0 |
 | date or instant | its milliseconds since 1970-01-01T00:00:00Z |
 

@@ -112,9 +112,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   text is compared by `==` and `!=` by value through the operator `eqDecimal`, since 0.10m and 0.1m write "0.10" and
   "0.1"; its ordering stays refused, and the POC refuses its equality until the rewrite builds it (D6.12).
 - Chosen within the owner's yes, 2026-11-07: a source carries the form its value is held in. A value written beside
-  it (a condition's literal, `IfNull`'s fallback, `Choose`'s literal arm) is written in that form. A live object (a
-  property set, an argument, a vendor's answer) refuses a source in its own form, because every literal set into a
-  live object is written as the app's options write its type (D7.7, D8.10, POC 13f-iii).
+  it (a condition's literal, `IfNull`'s fallback, `Choose`'s literal arm) is written in that form (D7.7, D8.10, POC
+  13f-iii). Chosen within the owner's yes, 2026-11-09, gate 1's P8: who wrote a value decides its base form, the
+  app's for what the server's JSON wrote and the live form for what a live object holds or hands, a payload declared
+  as data included; the live form keeps the app's naming and nothing else its options set (every number a JSON
+  number, every null written, no converter of the app's), so a live object takes a source in the app's form as held
+  where the forms agree, a number held as text converted, an enum mapped by D9.13's rows while gate 1's enum read is
+  granted, and refuses anything else (X7.10, X7.15); a literal JavaScript would read as another value is refused
+  (X7.13); and the type check requires `[JsonPropertyName]` on a member it checks against a name the vendor declares
+  (X17.48).
 - Chosen within the owner's yes, 2026-11-07: a view reads past a nullable member in a data lambda with no `!` where
   the browser reads nothing past null. CS8602, and CS8629 on `.Value`, are suppressed on an expression that reads the
   item, in the predicate of `Count`, `Where`, `Any`, `All` and `Find`, the field of `Select` and `Find`, and the path of
@@ -170,7 +176,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `spec/Core/DESIGN.md` states for a payload ("The member's C# type is the API's value type") and the analyzer
   checked only for null: a property's value, both ways, a method's result, awaited or
   not, and the data past them member by member by their JSON names. The closed set: text (string, char, Guid, an
-  enum, and on net10 DateOnly and TimeOnly, by gate 1's P9), a number (the numeric types, an enum), a boolean, a
+  enum whose type carries a string converter, and on net10 DateOnly and TimeOnly, by gate 1's P9), a number (the
+  numeric types, any other enum, by gate 1's P8), a boolean, a
   date (DateTime, DateTimeOffset, read from text too, since data carries a date as text), a list of these, and an
   object whose members the vendor's type declares, or takes through a string index signature as the index's type. A
   member

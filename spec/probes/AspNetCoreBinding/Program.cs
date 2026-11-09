@@ -188,6 +188,7 @@ try
     Console.WriteLine("core-query-day-time: " + await DayTime(client));
     Console.WriteLine("core-stj-datetime-kind: " + DateTimeKinds());
     Console.WriteLine("core-stj-datetime-nested-kind: " + NestedDateTimeKinds());
+    foreach (var line in LiveForm()) Console.WriteLine(line);
     await HttpProbes.Run(new Uri(app.Urls.First()));
 }
 finally
@@ -305,6 +306,37 @@ static string NestedDateTimeKinds()
     return "under the app's options " + System.Text.Json.JsonSerializer.Serialize(visit, app) + "; with a wall-time converter after the app's " + System.Text.Json.JsonSerializer.Serialize(visit, written);
 }
 
+static IEnumerable<string> LiveForm()
+{
+    var app = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)
+    {
+        NumberHandling = JsonNumberHandling.AllowReadingFromString | JsonNumberHandling.WriteAsString,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    };
+    app.Converters.Add(new JsonStringEnumConverter(System.Text.Json.JsonNamingPolicy.CamelCase));
+    static System.Text.Json.JsonSerializerOptions Live(System.Text.Json.JsonSerializerOptions options)
+    {
+        var live = new System.Text.Json.JsonSerializerOptions(options) { NumberHandling = JsonNumberHandling.Strict, DefaultIgnoreCondition = JsonIgnoreCondition.Never };
+        live.Converters.Clear();
+        return live;
+    }
+    var spinner = new ProbeLiveSpinner { Step = 0.5m, Position = ProbeLivePosition.Left, Cell = ProbeLiveCell.Data, Count = 2, Note = null };
+    string Written<T>(T value, System.Text.Json.JsonSerializerOptions options) => System.Text.Json.JsonSerializer.Serialize(value, options);
+    string NaN()
+    {
+        try { return "writes " + Written(double.NaN, Live(app)); }
+        catch (ArgumentException exception) { return "throws " + exception.GetType().Name; }
+    }
+    var pascal = new System.Text.Json.JsonSerializerOptions { PropertyNamingPolicy = null };
+    var generated = new System.Text.Json.JsonSerializerOptions(ProbeLiveContext.Default.Options);
+    yield return "core-stj-options-converter-beats-type: an enum whose type carries JsonStringEnumConverter<T> writes " + Written(ProbeLivePosition.Left, app) + " under the app's camel-case enum converter";
+    yield return "core-stj-live-writer: under the app's options " + Written(spinner, app) + "; with Strict numbers, Never ignore and no converter " + Written(spinner, Live(app));
+    yield return "core-stj-live-keeps-type-statements: a class's own number handling " + Written(new ProbeLiveSupply { Vials = 3 }, Live(app)) + "; a member's own converter " + Written(new ProbeLiveCoded { Cell = ProbeLiveCell.Data }, Live(app));
+    yield return "core-stj-live-keeps-naming: under no naming policy " + Written(spinner, Live(pascal));
+    yield return "core-stj-live-nan: a NaN under Strict numbers " + NaN();
+    yield return "core-stj-live-source-generated: a context's options " + Written(spinner, generated) + "; reset " + Written(spinner, Live(generated));
+}
+
 static IEnumerable<decimal> DecimalSweep()
 {
     var random = new Random(15);
@@ -376,6 +408,38 @@ public sealed class ProbeUtcConverter : JsonConverter<DateTime>
 
     public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime value, System.Text.Json.JsonSerializerOptions options)
         => writer.WriteStringValue(value.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture) + "Z");
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter<ProbeLivePosition>))]
+public enum ProbeLivePosition { Left, Right }
+
+public enum ProbeLiveCell { Data, Header }
+
+public sealed class ProbeLiveSpinner
+{
+    public decimal Step { get; init; }
+    public ProbeLivePosition Position { get; init; }
+    public ProbeLiveCell Cell { get; init; }
+    public int Count { get; init; }
+    public string? Note { get; init; }
+}
+
+[JsonNumberHandling(JsonNumberHandling.WriteAsString)]
+public sealed class ProbeLiveSupply
+{
+    public int Vials { get; init; }
+}
+
+public sealed class ProbeLiveCoded
+{
+    [JsonConverter(typeof(JsonStringEnumConverter<ProbeLiveCell>))]
+    public ProbeLiveCell Cell { get; init; }
+}
+
+[JsonSourceGenerationOptions(System.Text.Json.JsonSerializerDefaults.Web, NumberHandling = JsonNumberHandling.WriteAsString, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, Converters = new[] { typeof(JsonStringEnumConverter<ProbeLiveCell>) })]
+[JsonSerializable(typeof(ProbeLiveSpinner))]
+public sealed partial class ProbeLiveContext : System.Text.Json.Serialization.JsonSerializerContext
+{
 }
 
 public sealed class ProbeVisitTimes

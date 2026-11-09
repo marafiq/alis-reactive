@@ -191,7 +191,8 @@ Terms used throughout:
     Local `DateTime` with the server's offset and a Utc one with `Z` (`probe:core-stj-datetime-kind`), which `as date`
     reads as an instant, so the plan's writer adds, after the app's converters, one that writes a `DateTime` as
     Unspecified: it reaches every member, a `DateTime?` too, while a converter the app registers for `DateTime` comes
-    first and a member's own `[JsonConverter]` keeps its form (D4.2) (`probe:core-stj-datetime-nested-kind`). The
+    first and a member's own `[JsonConverter]` keeps its form (D4.2) (`probe:core-stj-datetime-nested-kind`); the live
+    form takes no converter of the app's, so there the plan's own writes every `DateTime` (D7.7). The
     framework decides by the type, never by a value's `Kind`: an instant is a `DateTimeOffset`.
   - On net10 a `DateOnly` is the text `yyyy-MM-dd` and a `TimeOnly` the text `HH:mm:ss`, with seven places of a
     second's fraction when it has one, as System.Text.Json writes them, and net10 binds each text in a query
@@ -245,7 +246,9 @@ Terms used throughout:
   (D5.3).
   - C# writes `as(value, shape)` where that type holds a date: `DateTime` is `date` and `DateTimeOffset` is
     `instant`, each `nullable` when it is nullable, inside `object(fields)` that names only the members holding one,
-    and `array(item)`. A type that holds no date is written as the plan writes it, with no `as`.
+    and `array(item)`. The same walk writes `number{of, text: invariant}` at each number a source in the app's form
+    holds as text, so it reaches the live member as its number (D7.7). A type that holds no date and no such number is
+    written as the plan writes it, with no `as`.
   - The shape comes from the app's contract (D18.1): a type test of the member's `JsonTypeInfo` against
     `JsonTypeInfo<DateTime>` and its kin, its members and its item type, with no read of a `System.Type` member.
   - Refused where the view renders: a dictionary whose values hold dates, since `object(fields)` names its members
@@ -671,7 +674,8 @@ Terms used throughout:
   A `decimal` total past `decimal.MaxValue` stops the pipeline, as .NET throws `OverflowException`. The plan writes
   `Sum` as the operator `sumInt`, `sumDouble` or `sumDecimal` over the `map` of its term, one operator over the whole
   list, so a decimal's point is placed once and an int's range is checked at each term. A list that reads nothing
-  sums to nothing (D6.3); a list with no item sums to 0, as .NET's does. A `decimal` term is a JSON number or the
+  sums to nothing (D6.3); a list with no item sums to 0, as .NET's does. Each total is a JavaScript number, in the
+  live form (D7.7), as `poc/runtime/src/sums.ts` returns it. A `decimal` term is a JSON number or the
   decimal text the app writes for it (`JsonNumberHandling.WriteAsString` writes 0.10m as "0.10"), added the same way;
   a term its own converter writes, or any other term written unlike the options, is refused (D6.12, X6.39). Each term
   is read by the one decimal reader, which `eqDecimal` shares (D6.12): a JSON number at its double's shortest text, or
@@ -706,7 +710,8 @@ Terms used throughout:
   operation over a `string` is refused at compile time by an `[Obsolete(error: true)]` overload (CS0619).
 - D6.12 A comparison in a list's lambda over data compares the item's members with each other or with the values the
   view holds (D6.7), by closed rules C# checks where the view renders:
-  - A value the view holds is written through the app's JSON options as the type of the member it is compared with,
+  - A value the view holds is written in the list's base form (D7.7), through the app's JSON options for data the
+    server wrote and in the live form for a list a live object holds, as the type of the member it is compared with,
     taken under the conversion the compiler adds to compare an enum or a `char` as its number: `DoseStatus.Due` is
     "due" when the app writes enums by name, and `'I'` is "I". A member written unlike the options is compared in its
     own form (the last rule).
@@ -747,7 +752,9 @@ Terms used throughout:
     (`probe:core-json-double-text`). A fraction written as text is refused in a lookup of a list the view holds
     (X6.54), since `includes` compares the texts. A whole number written as text equals as its number does, and is
     ordered by no rule.
-  - A member written unlike the app's options holds its own form: by its own JSON converter (`[JsonConverter]` on
+  - A member written unlike its list's base form (D7.7) holds its own form, and a refusal names that base as {base}:
+    "the app's options" for data the server wrote, "JavaScript's value" for a list a live object holds. A member holds
+    its own form by its own JSON converter (`[JsonConverter]` on
     the member, `JsonPropertyInfo.CustomConverter`), or by number handling whose writing bits (`WriteAsString`,
     `AllowNamedFloatingPointLiterals`) differ from the options', set on the member or on its class, for a number or
     a list or dictionary of numbers, the members it reaches (chosen within the owner's yes, 2026-11-07, built in
@@ -769,7 +776,7 @@ Terms used throughout:
   the view renders: a key written as a JSON number compares as numbers (`compareNumbers`), a `bool` puts false first
   (`compareBooleans`), a `char` compares by its code unit (`compareOrdinal`), and null comes first, as
   `Comparer<T>.Default` puts it. A nullable value key binds the overload whose sample is the underlying type's value.
-  A key written unlike the app's options, by its own converter or number handling, is refused (D6.12, X6.39).
+  A key written unlike its list's base form (D7.7), by its own converter or number handling, is refused (D6.12, X6.39).
   Text with no comparer, or with the comparer of the view's culture (`StringComparer.CurrentCulture`), orders by
   the view's culture (Decision 3, a, the owner, 2026-11-06): `compareCulture`, the browser's `Intl.Collator` under
   the plan's collation (D3.11). It matches .NET 10 on ICU on every word and every BMP character probed outside the
@@ -972,16 +979,16 @@ Terms used throughout:
   server."
 - `X6.39` refusal (D6.12): a member written unlike the app's options, used in a computation of a list's lambda (a
   sort key, a `Sum` term through a cast, a lookup in a list the view holds): "'{member}' is written by {its own JSON
-  converter, its own JSON number handling, its class's JSON number handling}, unlike the app's options, so the
+  converter, its own JSON number handling, its class's JSON number handling}, unlike {base}, so the
   browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."
 - `X6.40` refusal (D6.12): an ordering of a member written unlike the app's options, by its own converter or by its
-  class's number handling: "'{term}' orders '{member}', which {cause} writes unlike the app's options, so the
+  class's number handling: "'{term}' orders '{member}', which {cause} writes unlike {base}, so the
   browser does not order it as .NET does; order it on the server."
 - `X6.41` refusal (D6.12): a member of a type that is not a scalar, written by its own converter, compared with a
-  value: "'{term}' compares '{member}', which {cause} writes unlike the app's options, and .NET compares the object
+  value: "'{term}' compares '{member}', which {cause} writes unlike {base}, and .NET compares the object
   it holds; compare it on the server."
 - `X6.42` refusal (D6.12): two members compared where one is written unlike the app's options: "'{term}' compares
-  two members, and {cause} writes '{member}' unlike the app's options, so the browser does not compare them as .NET
+  two members, and {cause} writes '{member}' unlike {base}, so the browser does not compare them as .NET
   does; compare them on the server."
 - `X6.43` refusal (D6.12): a `float` or `double` the JSON writes as text, or a `decimal` its own converter writes as
   text, compared: "'{term}' compares {a float or double the JSON writes as text, whose text does not equal as the
@@ -1064,17 +1071,49 @@ Terms used throughout:
   where the view renders for the constructs JavaScript reads differently from .NET; a pattern read in the
   browser cannot be checked.
 - D7.7 A source carries the form its value is held in (D6.12, built in POC 13f-iii, chosen within the owner's yes,
-  2026-11-07). A member's `Read`, a `Find`'s field and a `Select`'s list take the form of the member they read;
-  `OrNull`, `Where`, `OrderBy` and `Find` pass their source's form on; a computed value (a count, a sum, a
-  comparison) and a live object's member are in the app's options' form. A value written beside such a source is
-  written in its form: a condition's literal (D8.10), `IfNull`'s fallback and `Choose`'s literal arm (X7.12). A
-  choice between two sources where either is in its own form is refused (X7.11). A live object takes a value as the
-  app's options write its type, the form every literal set into it is written in, so a property set, a method's or
-  plugin's argument and a vendor's answer refuse a source in its own form (X7.10); an element's text and HTML are
-  property sets, so they refuse it too, and a value its own converter writes is shown by the server. A request sends a
-  source to a member its endpoint binds by its own contract: a member with the same converter or number handling reads
-  it back, so the request unit (Q9, the rewrite) compares the source's form with the target member's and refuses a
-  difference.
+  2026-11-07), and who wrote the value decides its base form (gate 1's P8, decided within the owner's yes):
+  - the app's form, the app's options' writing of its type: a response body, success or error (Q10), a pushed
+    message (Q21), and data read past either;
+  - the live form, what a live object holds or hands: a member of a component, plugin or element, a method's result,
+    an event's payload, argument or callback argument, one declared as data included (D5.6), since the vendor's
+    JavaScript wrote it, and data read past any of these; a computed value (a count, a sum, a comparison), which the
+    browser computes as a JavaScript number or boolean (D6.11); and an object or list built from sources (N7.2).
+  The live form is System.Text.Json's writing of the type with the app's naming policies and its contract (its
+  resolver, a source-generated context's included) and nothing else the options set: every number a JSON number,
+  every null member written, and no converter but the plan's own `DateTime` converter (D3.9)
+  (`probe:core-stj-live-writer`, `probe:core-stj-live-keeps-naming`, `probe:core-stj-live-source-generated`). The
+  names stay the app's, by the owner's line on JSON naming (`spec/CLAUDE.md`, 2026-11-06), so an app's own rows set into
+  a grid and read back from its event keep their names. A null member is written because a `T?` write the type check
+  takes (ALIS019) must reach the vendor, where an app's `WhenWritingNull` drops it. What a type states for itself
+  holds in both forms: `[JsonPropertyName]`, `[JsonIgnore]`, a member's or class's `[JsonNumberHandling]`, a member's
+  `[JsonConverter]`, and an enum type's own `[JsonConverter]` with its `[JsonStringEnumMemberName]`
+  (`probe:core-stj-live-keeps-type-statements`). So an enum is its number in the live form unless its type carries a
+  string converter, while in the app's form a converter the options add takes precedence over the type's
+  (`probe:core-stj-options-converter-beats-type`).
+  - A member's `Read`, a `Find`'s field and a `Select`'s list take the form of the member they read; `OrNull`,
+    `Where`, `OrderBy` and `Find` pass their source's form on. A value written beside a source is written in its
+    form: a condition's literal (D8.10), `IfNull`'s fallback and `Choose`'s literal arm (X7.12).
+  - What a step writes into a live object (a property set, a method's or plugin's argument, a vendor's answer, an
+    element's text and HTML, a render helper's start, D17.13) is in the live form. A literal is written in it, and a
+    source in the live form as it is held. A source in the app's form is written as held where both forms write its
+    type alike; a number the app's form writes as text is converted to the live form's number by `as` (D3.13,
+    X7.14); an enum the two forms write otherwise is mapped through D9.13's rows when gate 1 grants D18.1's enum
+    read, and is refused where the view renders while it does not (X7.15); any other difference, a converter the
+    app's options add or a member's own converter, is refused where the view renders (X7.10), and a value its own
+    converter writes is shown by the server.
+  - Two sources a choice or a comparison joins (`IfNull`, `Choose`, D8.10) are taken in one form by the same rules:
+    a number the app's form writes as text is converted, an enum is mapped while gate 1's enum read is granted, and
+    any other difference is refused (X7.11, X8.21).
+  - A live number is a JavaScript number, so a literal written into one that JavaScript would read as another value
+    is refused where the view renders, and by ALIS033 at build when it is a constant (X7.13): NaN and ±Infinity,
+    which no JSON number holds (`probe:core-stj-live-nan`); a `decimal` of more than 15 significant digits, the
+    digits every double carries back (`probe:js-number-fifteen-digits`); and a whole number past ±9007199254740991,
+    `Number.MAX_SAFE_INTEGER` (`probe:js-number-safe-integer`). The rule refuses some longer literals JavaScript
+    reads back (`12.345678901234567`), and in return it needs no double arithmetic, so it holds alike on both hosts.
+    A number data holds reaches the vendor as the nearest double, as its `number` holds it.
+  - A request sends a source to a member its endpoint binds by its own contract: a member with the same converter or
+    number handling reads it back, so the request unit (Q9, the rewrite) compares the source's form, the live form
+    for a live source, with the target member's and refuses a difference.
 - D7.6 A source that reads nothing writes `null` into a property, an argument and a payload member. At an
   element's text and HTML it shows nothing, and at a class it changes nothing (D4.5): a class name is bound by a
   `let`, and the element's `classList` method runs only where it holds a value, as the redesign's class change does
@@ -1136,15 +1175,26 @@ Terms used throughout:
   "undefined".
 - `X7.9` behavior (D7.3, N7.6): a census whose count is `int?`, as its TypeScript reads `number | null`, shows the
   count a step writes from an `int` sum or count.
-- `X7.10` refusal (D7.7): a source in its own form set into a property, passed as an argument or answered to a
-  vendor: "A live object takes a value as the app's options write its type, and '{read}' is written by {cause};
-  compare it with == or !=, or pass the value from the server."
-- `X7.11` refusal (D7.7): `IfNull` or `Choose` between two sources where either is in its own form: "A choice joins
-  '{read}', which {cause} writes unlike the app's options, with another value read from the page; choose between it
-  and a value the view writes, or choose on the server."
+- `X7.10` refusal (D7.7): a source in the app's form, or in its own form, that the live form writes otherwise, set
+  into a property, passed as an argument or answered to a vendor: "A live object takes '{type}' as JavaScript holds
+  it, and '{read}' is written by {its own JSON converter | the app's JSON converter}; pass the value from the server."
+- `X7.11` refusal (D7.7): `IfNull` or `Choose` between two sources the two forms write otherwise: "A choice joins
+  '{read}', which {cause} writes unlike {base}, with another value read from the page; choose between it and a value
+  the view writes, or choose on the server."
 - `X7.12` behavior (D7.7): `IfNull(DoseStatus.Given)` over a found chart that reads nothing compares equal to
   `DoseStatus.Given`, its fallback written as the member's own converter writes it, and so does `Choose`'s literal arm
   beside a found chart.
+- `X7.13` refusal (D7.7): a literal written into a live number that JavaScript reads as another value: "'{member}'
+  holds a JavaScript number, and {value} is {NaN or an infinity, which no JSON number holds | a decimal of more than 15
+  significant digits | a whole number past 9007199254740991}, which JavaScript reads as another value; write a finite
+  number of at most 15 significant digits." At build by ALIS033 for a constant: new:N18.10.
+- `X7.14` behavior (D7.7): in an app whose options write numbers as text, a found supply's vial count of 5 is passed
+  to a component's method that adds it to the 1 it holds and shows the total: it shows 6, where the text "5" would
+  show "15"; set into the component's number member, it orders above 4.
+- `X7.15` refusal (D7.7): an enum the app's form writes otherwise than the live form, while gate 1's enum read is not
+  granted: "A live object takes '{Enum}' as {its number | its type's converter writes it}, and '{read}' holds it as
+  {the app's JSON converter} writes it; give '{Enum}' the converter both forms write by, or pass the value from the
+  server."
 - `X7.7` behavior (D7.3, N7.5): a fluid balance's intake widened to `int?` is written to its nullable target and
   ordered against it, over a 1000 ml target and within it, and an ordering with a null target does not hold, where
   JavaScript's `500 > null` does; a pump's summary widened to `string?` is passed as the caption's argument.
@@ -1213,7 +1263,8 @@ Terms used throughout:
   condition. So `d.Carer.Name != "Ruth"` and `!(d.Carer.Name == "Ruth")` agree over a dose whose carer is null:
   neither holds, where .NET throws. A member the item lacks reads its start first (D4.2): `d.Ward != "North"` holds
   over a dose the app wrote with no `ward`, as it holds over the null the endpoint binds for it.
-- D8.10 A pipeline condition over a source in its own form (D7.7) follows D6.12's rules (POC 13f-iii): a literal it is
+- D8.10 A pipeline condition over a source reads it in its form, the app's or the live form (D7.7), and over a source
+  in its own form follows D6.12's rules (POC 13f-iii); two sources in the two base forms meet by D7.7's rules: a literal it is
   compared with by `Eq` or `NotEq` is written in its form, and an ordering (X8.19), a type that is not a scalar (X8.20),
   two sources where either is in its own form (X8.21), and a `float` or `double` written as text or a `decimal` its own
   converter writes as text (X8.22) are refused. A `decimal` the options or number handling write as text is compared
@@ -1298,12 +1349,12 @@ Terms used throughout:
 - `X8.18` analyzer (D8.7): a second `Else`, or an `ElseIf` after the `Else`, of one `When`: "An Else ends its When:
   write each ElseIf before it, and every step of the remaining case in that one Else." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 - `X8.19` refusal (D8.10): an ordering of a source in its own form: "A condition orders '{read}', which {cause} writes
-  unlike the app's options, so the browser does not order it as .NET does; order it on the server."
+  unlike {base}, so the browser does not order it as .NET does; order it on the server."
 - `X8.20` refusal (D8.10): a source of a type that is not a scalar, in its own converter's form, compared with a
-  value: "A condition compares '{read}', which {cause} writes unlike the app's options, and .NET compares the object
+  value: "A condition compares '{read}', which {cause} writes unlike {base}, and .NET compares the object
   it holds; compare it on the server."
 - `X8.21` refusal (D8.10): two sources compared where either is in its own form: "A condition compares two values,
-  and {cause} writes '{read}' unlike the app's options, so the browser does not compare them as .NET does; compare
+  and {cause} writes '{read}' unlike {base}, so the browser does not compare them as .NET does; compare
   them on the server."
 - `X8.22` refusal (D8.10): a `float` or `double` the JSON writes as text, or a `decimal` its own converter writes as
   text, compared with a value: "A condition compares {a float or double the JSON writes as text, whose text does not
@@ -1420,7 +1471,8 @@ Terms used throughout:
   a literal's value, so it needs no rows, and the `FlagsAttribute` read inside `Enum.ToString` is .NET's, as
   System.Text.Json's reflection is its own (D18.1, whose gate 1 ask lists `Enum.ToString`). A literal whose text is
   digits, a value no value and no combination names, is refused where the view renders (X9.22). An enum a source holds
-  is in its held form (D4.2): the form its member's own `[JsonConverter]` writes, else the app's JSON options. So C#
+  is in its held form (D4.2): the form its member's own `[JsonConverter]` writes, else its base form, the app's or the
+  live form (D7.7). So C#
   writes into the plan, beside the member, a row for each value `Enum.GetValues` lists (D18.1, gate 1): the value as
   System.Text.Json writes it at the source's type (a `T?` when the source is one, since a nullable member's own
   converter writes names only there, `probe:core-json-enum-nullable-member-converter`) under the source's held form,
@@ -3644,11 +3696,23 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     (`poc/Alis.Reactive.Poc.Analyzers/Rules.cs:20`), the id POC 13f gave the override analyzer of N18.5 first
     (`poc/Alis.Reactive.Poc.Analyzers/OverridesAnalyzer.cs:10`): the override analyzer keeps ALIS025, and the
     type check is ALIS037, an id no other rule holds. It checks by kind in a closed set: text
-    (`string`, `char`, `Guid`, an enum), a number (the numeric types, an enum), a boolean, a date (`DateTime`,
+    (`string`, `char`, `Guid`, an enum whose type carries a string converter), a number (the numeric types, any other
+    enum), a boolean, a date (`DateTime`,
     `DateTimeOffset`, which a read also takes from text, since data carries a date as text), a list of these, and an
     object whose members, each by its JSON name, the vendor's type declares or takes through a string index signature
     as the index's type; a member the vendor's type does not hold is refused with its path. The vendor's untyped
-    shapes (`any`, `unknown`, `object`, `{}`, `Object`) take any type. Refused, each a gap to name: a value that holds
+    shapes (`any`, `unknown`, `object`, `{}`, `Object`) take any type. The check reads the live form a value takes
+    (D7.7, gate 1's P8): an enum against a literal union or an enum of the vendor's fits when every value it writes
+    (its `[JsonStringEnumMemberName]`, its name or its number) is one the vendor takes, for a write, and every
+    literal the vendor holds is one it writes, for a read (X17.46); a member or class whose own `[JsonNumberHandling]`
+    writes a number as text, and a member's own `[JsonConverter]` or a converter on a type that is no enum, fit only
+    the untyped shapes (X17.47); and a data member checked against a member the vendor's type declares by name
+    carries `[JsonPropertyName]` with that name (X17.48), since the live form keeps the app's naming, which the build
+    cannot see, and a declaration names its members by their JavaScript names. A member the vendor reaches through
+    an index signature or an untyped shape keeps the app's naming, so an app's own rows keep their names. The POC
+    takes an enum as text or a number (`poc/Alis.Reactive.Poc.Analyzers/HeldValues.cs:123`) and names a data member
+    that has no `[JsonPropertyName]` by camel case (`poc/Alis.Reactive.Poc.Analyzers/HeldValues.cs:303`), so a
+    Pascal-case app passes the build and writes "Name" where the vendor reads "name". Refused, each a gap to name: a value that holds
     a promise, a function, nothing, more than one kind, or a type no C# kind mirrors. A read fits every type the API
     holds, and a write fits one of them. The POC checks a property's value both ways and the result of a method or a
     callable property, awaited or not (`poc/Alis.Reactive.Poc.Analyzers/MirrorsAnalyzer.cs:103-111`). The rewrite's
@@ -3747,7 +3811,7 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   to by a method pair, an assignment or a returned unsubscriber (D17.3), and runs a pipeline as any handler does.
 - D17.13 A render helper starts its component in the state the model gives it, written as the plan writes a literal.
   `field.ValueJson` is the member's value, read through MVC with no compile and written by the plan's one literal
-  writer under the app's JSON options, `"null"` when a holder on the way holds nothing; `field.Json(options)` writes
+  writer in the live form (D7.7), `"null"` when a holder on the way holds nothing; `field.Json(options)` writes
   the helper's starting options the same way, so a date, an enum and a number reach the component's code in the
   forms the plan's own values take. After a failed post the value is the model's, as the action leaves it, on both
   hosts: net10 keeps no typed form of an attempted value (its converter is internal, and a value provider's result
@@ -3792,7 +3856,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     (D4.2), and `Element`, the control the user activated, a component (D11.4). Every module works in that block.
   - `Render(row, text)` writes the control with the id `{rowsId}-{position}-{n}`, n counting that action's renders
     from 0, and records one entry: the id and the values of the row's members the action's block reads, written by
-    the plan's literal writer under the app's JSON options. The entries are one literal at the plan's end (D14.7), so
+    the plan's literal writer in the live form (D7.7), since the helper's plugin receives them and hands each back as
+    its payload's `Row`. The entries are one literal at the plan's end (D14.7), so
     the plan grows by one entry per control and holds no member the block does not read. The handler is written once
     per action, where both lines write a whole plan per link.
   - The action's handler starts on load (D11.6), calls its helper's plugin with the entries, and listens to the one
@@ -3946,6 +4011,14 @@ plans (Q19).
   returned unsubscriber's subscribe whose return holds null or undefined (ALIS019), a function that returns a promise
   (ALIS017) or anything but a function (ALIS018); a callback property's event its type makes read-only (ALIS018):
   new:N17.2.
+- `X17.46` analyzer (D7.7, D17.5): ALIS037 on an enum against the vendor's literal union or enum: "'{member}' takes
+  {literals}, and '{Enum}' is written {as its number | by its names}: {give '{Enum}' [JsonConverter(typeof(JsonStringEnumConverter<{Enum}>))] | remove its converter | name '{Enum}.{Value}' [JsonStringEnumMemberName(\"{literal}\")] | declare a value that writes '{literal}'}": new:N17.2.
+- `X17.47` analyzer (D7.7, D17.5): ALIS037 on a member written by its own JSON converter or number handling against a
+  vendor member that declares a kind: "'{path}' is written by its own JSON {converter | number handling}, and
+  '{vendor}' holds {kind}: a live member holds JavaScript's value; remove it from '{path}'": new:N17.2.
+- `X17.48` analyzer (D7.7, D17.5): ALIS037 on a data member checked against a member the vendor's type declares by
+  name, with no `[JsonPropertyName]`: "'{path}' is named by the app's JSON naming, which the build cannot see, and
+  '{vendor}' names it '{name}': give it [JsonPropertyName(\"{name}\")]": new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
 - `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every
@@ -4130,7 +4203,7 @@ plans (Q19).
     N18.13), and ALIS038, the flags door (X16.23 to X16.26; N16.5), new beside the moved ones; ALIS003, a callback
     property's second handler in one view (X17.16; N18.14).
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
-    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
+    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X7.13, X7.15, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
     URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5, and X17.16's handlers across views). A plan's version
     is the browser's, at boot (X19.3).
@@ -4193,7 +4266,7 @@ shapes, starts and the payload kind of each event.
   async method under a term reached later (D4.7); a write to the payload after an awaited step, a request's own
   `WhileLoading` before its send and the rest of the request after it (D11.4), and inside a `listen` (D12.8); a step or an awaited read inside a list's lambda or a callback's answer (D6.8, D17.12).
 - `N18.10` new: ALIS033, the lambda analyzer: a member lambda that names the model (D2.5, D14.2); a dictionary of dates
-  written into a live member (D3.13); in a list's lambda and a pipeline condition, a term outside the identity table
+  written into a live member (D3.13); a constant literal no live number holds (D7.7, X7.13); in a list's lambda and a pipeline condition, a term outside the identity table
   (D6.5), a view value that computes (D6.7), and each comparison, ordering, cast, coalesce and lookup D6.12 to D6.14
   and N8.2 refuse by the types they read; a constant pattern outside D16.11's closed set (D6.15).
 - `N18.11` new: ALIS006 kept as an error, the validator analyzer: a condition with no browser form outside
