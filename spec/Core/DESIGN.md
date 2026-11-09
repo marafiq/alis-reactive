@@ -3717,7 +3717,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     a JSDoc `@private` member are left out; a getter alone is read-only and a setter alone write-only.
   - A type's `[Symbol.iterator]` is a member the table writes with the type it yields, as it writes an array's items,
     so a declared iterator is checked as a declared list is (D5.13): on a type that has none, with items it does not
-    yield, and `LiveObjects<T>` on a type that is no array.
+    yield, and `LiveObjects<T>` on a type that is no array. The POC's script writes no iterator
+    (`poc/tools/vendor-contract.mjs:136-157`) and its `Element` declares no children, so X5.15 is the rewrite's
+    contract unit, not the POC's.
   - An MSBuild target (`poc/VendorContract.targets`) writes the table into obj/ before CoreCompile, incremental on the
     TypeScript inputs, so no `dotnet build` reads a stale one, and it is not committed: lib.dom alone holds 60,695
     members, and the table is a function of inputs review already reads. A developer who brings a component imports

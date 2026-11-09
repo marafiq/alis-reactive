@@ -122,17 +122,44 @@
         "element"
       ],
       "writes": [
-        "Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:52-73",
-        "Alis.Reactive/PlanModel/Reactions/Steps.cs:133-140",
-        "Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:106-110",
-        "Alis.Reactive/PlanAuthoring/Pipelines/ElementBuilder.cs:31-147",
-        "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Arrays.cs:50-59"
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:52-73"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Reactions/Steps.cs:133-140"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:106-110"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/ElementBuilder.cs:31-147"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Arrays.cs:50-59"
+        }
       ],
       "executes": [
-        "Alis.Reactive.Assets/runtime/grammar/execute.ts:35-48",
-        "Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93",
-        "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:154-190",
-        "Alis.Reactive.Assets/runtime/values/array-op-engine.ts:107-115"
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:35-48"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:154-190"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/values/array-op-engine.ts:107-115"
+        }
       ],
       "core": [
         "Q4",
@@ -176,12 +203,12 @@
         {
           "id": "M5.X2",
           "rung": "behavior",
-          "defect": "A seat that lacks data-supervision is not counted as needing close supervision, since GetAttribute reads null for it, and HasAttribute counts a seat that holds data-wheelchair with no value."
+          "defect": "A seat's GetAttribute reads null for an attribute the seat lacks, a value: Eq(\"close\") does not hold over it and NotEq(\"close\") does (D8.9); and HasAttribute holds for an attribute with no value."
         },
         {
           "id": "M5.X3",
           "rung": "behavior",
-          "defect": "A text set from a value that reads nothing shows nothing, and the step after it runs (D4.5)."
+          "defect": "A text set from a value that reads nothing, an optional member its holder lacks (D5.3), shows nothing, and the step after it runs (D4.5)."
         }
       ],
       "promises": [
@@ -219,19 +246,19 @@
         },
         {
           "for": "M5.X2",
-          "page": "A table whose seats carry data-supervision on two of three seats and data-wheelchair with no value on one.",
+          "page": "A table of four seats: two with data-supervision close, one with standard, one with no data-supervision, and one seat holding data-wheelchair with no value.",
           "gesture": "Open the page.",
-          "outcome": "Close supervision shows 2 and wheelchair seats shows 1.",
-          "opposite": "A seat whose data-supervision is the empty text is not counted as close.",
-          "defect": "A null attribute read compared as the text null, or a valueless attribute read as absent."
+          "outcome": "Close supervision shows 2, not close shows 2, and wheelchair seats show 1.",
+          "opposite": "A count of seats holding data-hoist, which no seat holds, shows 0.",
+          "defect": "GetAttribute's null read as nothing, so not close shows 1, or HasAttribute reading a valueless attribute as absent, so wheelchair seats show 0."
         },
         {
           "for": "M5.X3",
-          "page": "A status line set from a payload field the payload lacks, then a second status set to Saved.",
-          "gesture": "Raise the event without the field.",
+          "page": "An event whose payload declares an optional note member; its handler sets the first status from the note, then sets the second status to Saved.",
+          "gesture": "Raise the event without the note.",
           "outcome": "The first status is empty and the second shows Saved.",
-          "opposite": "Raised with the field, the first status shows its value.",
-          "defect": "Text set to undefined or null shows those words, or the stop of a missing value skips the next step."
+          "opposite": "Raised with the note Ward round, the first status shows Ward round.",
+          "defect": "The missing note shown as the text undefined or null, or the missing value stopping the pipeline so the second status keeps its text."
         }
       ],
       "verdicts": [

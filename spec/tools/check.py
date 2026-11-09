@@ -694,7 +694,7 @@ def module_names():
     section = text[text.index("## Modules"):]
     names = {}
     for number, name in re.findall(r"^\| (\d+) \| ([^|]+?) \|", section, re.MULTILINE):
-        names["".join(word[:1].upper() + word[1:] for word in name.split())] = int(number)
+        names["".join(word[:1].upper() + word[1:] for word in re.split(r"[\s-]+", name) if word)] = int(number)
     return names
 
 
@@ -714,6 +714,33 @@ def core_defect_rungs():
 
 def is_prose(value):
     return isinstance(value, str) and value.strip() != ""
+
+
+def cited_text(sha, cite):
+    match = CITE.fullmatch(cite) if isinstance(cite, str) else None
+    if not match:
+        return ""
+    path, first, last = match.groups()
+    lines = git("show", f"{sha}:{path}").splitlines()
+    return "".join(lines[int(first) - 1:int(last or first)])
+
+
+def without_space(text):
+    return re.sub(r"\s+", "", text)
+
+
+def tagged_cites_problems(feature, field):
+    cites = feature.get(field)
+    if not isinstance(cites, list) or not cites:
+        return [f"{feature['id']}: {field} cites nothing"]
+    problems = []
+    for cite in cites:
+        line = cite.get("line") if isinstance(cite, dict) else None
+        if line not in ("main", "redesign") or not cites_resolve([cite.get("cite")], SENTENCE_LINES[line]):
+            problems.append(f"{feature['id']}: {field} {cite!r} resolves at no SHA of its line")
+    if feature.get("status") in ("both", "redesign-only") and not any(isinstance(cite, dict) and cite.get("line") == "redesign" for cite in cites):
+        problems.append(f"{feature['id']}: {field} cites nothing at the State SHA, the redesign's")
+    return problems
 
 
 def cites_resolve(cites, sha=None):
@@ -880,6 +907,8 @@ def sentence_problems(feature, doors):
                 problems.append(f"{feature['id']}: proposed sentence {sentence['text']!r} names a door no core or module door")
         elif not cites_resolve([sentence.get("cite")], SENTENCE_LINES[line]):
             problems.append(f"{feature['id']}: {line} sentence {sentence['text']!r} cites no line at {line}'s SHA")
+        elif without_space(sentence["text"]) not in without_space(cited_text(SENTENCE_LINES[line], sentence["cite"])):
+            problems.append(f"{feature['id']}: {line} sentence {sentence['text']!r} is not at {sentence['cite']}")
     return problems
 
 
@@ -907,8 +936,7 @@ def core_problems(model, doors):
         if not isinstance(nodes, list) or not nodes or set(nodes) - kinds:
             problems.append(f"{name}: nodes outside the schema: {sorted(set(nodes or []) - kinds)}")
         for field in ("writes", "executes"):
-            if not cites_resolve(feature.get(field)):
-                problems.append(f"{name}: {field} cites no file:line at the redesign's or main's SHA")
+            problems += tagged_cites_problems(feature, field)
         for meaning in feature.get("meanings", []):
             match = MODULE_MEANING.match(meaning.get("id", ""))
             if not match or not is_prose(meaning.get("meaning")) or not name.startswith(f"M{match.group(1)}."):
