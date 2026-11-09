@@ -520,7 +520,7 @@ Terms used throughout:
     on an event's payload X4.3 states both.
 
 - D5.4 A dotted member at any depth reads the declared steps as required and every step past the declared
-  member as optional, as two nested `get`s split at the boundary.
+  member as data, which reads its start when absent (D4.2): a `get` of the declared steps and a `data` node past them.
 - D5.5 A returned live object (`ReturnedObject<T>`) reads and calls its declared members as required. A returned value
   (`Method<T>`) is data.
 - D5.6 An event's payload is declared as what its listener receives, with the whole vocabulary. A live payload is
@@ -570,7 +570,8 @@ Terms used throughout:
   (D17.5), and the build refuses an iterator declared on a type that has none, items the iterator does not yield, and
   `LiveObjects<T>` on a member whose type is no array.
 
-**Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`; `op` (`toArray`, D6.17).
+**Schema nodes.** `obj`, `get`, `call` with `members`; `data` past a declared member (D5.4); `Handler.path`; `op`
+(`toArray`, D6.17).
 
 **Checker.**
 - `probe:core-new-constraint-wraps`
@@ -617,8 +618,9 @@ Terms used throughout:
   `Alis.Reactive.SandboxApp/Areas/Sandbox/Models/HttpPipeline/RealTime/RealTimeModel.cs:8-10`).
 - G7: one recursive vocabulary, `Object<T>`, `Objects<T>`, `MethodAsync<int>`
   (`tests/Alis.Reactive.Framework.App/Components/Slate/Slate.cs:20-28`).
-- A returned object reads optional today (`Alis.Reactive/PlanModel/Values/Target.cs:123`), so a declared method on
-  it reads as nothing when absent; D5.5 makes it required.
+- A returned object's members read and write as optional today (`Alis.Reactive/PlanModel/Values/Target.cs:123`,
+  `Alis.Reactive/PlanModel/Reactions/Steps.cs:88`), while its methods are called as required
+  (`Alis.Reactive/PlanModel/Reactions/Steps.cs:114`); D5.5 makes every member required.
 
 **Defects.**
 - `X5.1` type: a pushed message cannot be written to: new:N5.1 types it `Data<TMessage>`, which has no `Set`.
@@ -628,7 +630,8 @@ Terms used throughout:
 - `X5.5` type: a property's object cannot be mistaken for a method's returned object, and no member scan
   decides it: new:N5.2.
 - `X5.6` type: a vendor method with more arguments than a declaration door takes: new:N5.3 takes any number.
-- `X5.4` behavior: a field of the object a property holds reads nothing when the object lacks it.
+- `X5.4` behavior: a field of the object a property holds reads its start when the object lacks it (D4.2), and
+  nothing when the property holds null.
 - `X5.7` behavior: a payload field its API marks optional, which the vendor leaves out, reads nothing and the text
   it sets shows nothing; a required field the vendor leaves out stops its pipeline, and the step after it does not
   run.
@@ -2373,7 +2376,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     keeping a status from 300 to 599 and one route a status, ALIS030's (N18.7); `Routes.OnError(otherwise)`
     becomes `OnError((failed, pipeline) => ..)` with `Failure`, and main's typed catch-all `OnError<TError>(..)` becomes
     `OnError<TError>((failed, pipeline) => ..)` with `Failure<TError>`, keeping one catch-all, ALIS030's.
-    `ResponseBody<TBody>.Read(path)` becomes `Body.Read(path)`, data that reads as nothing when absent. The POC's kinds by
+    `ResponseBody<TBody>.Read(path)` becomes `Body.Read(path)`, data that reads its start when absent (D4.2). The POC's kinds by
     door (HTML for `Get(url)`, JSON for `Get<TRequest>`) become the kind each route names, which the plan carries on the
     route, and `Accept` is written from the success route's kind (D10.6): a request with no success route reads none.
 

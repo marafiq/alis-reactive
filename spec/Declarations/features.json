@@ -1,0 +1,779 @@
+{
+  "module": "Declarations",
+  "features": [
+    {
+      "id": "M11.F1",
+      "summary": "A live object's declaration: a JsObject class that mirrors the vendor's typed API member for member, each member declared by the door of its JavaScript kind (Property, ReadOnly, WriteOnly, LiveObject, LiveObjects, Method, Method<T>, MethodAsync, MethodAsync<T>, ReturnedObject, ReturnedObjects) and named by its declaring C# member; its presence and nullability marks, so an absent required member stops its pipeline and an optional one reads nothing; a method's arguments as one list of typed Args of any arity, a Field among them; a method's result bound once at its line; and a promise where the declaration says a value, which stops. Main declares each component's members as static extensions that name every member by a string; the redesign declares them on JsObject, tells an object's kind by a member scan, takes at most four arguments, reads a returned object's members as optional and runs on past a plain method's promise.",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:JsObject",
+        "Alis.Reactive:Property<TValue>",
+        "Alis.Reactive:ReadOnly<TValue>",
+        "Alis.Reactive:WriteOnly<TValue>",
+        "Alis.Reactive:PropertyExtensions",
+        "Alis.Reactive:Arg",
+        "Alis.Reactive:Arg<T>",
+        "Alis.Reactive:Field",
+        "Alis.Reactive:Field<TValue>"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "ComponentProperty<decimal>.Named(\"min\");",
+          "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "ComponentMethod.Named(\"increment\");",
+          "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:26"
+        },
+        {
+          "line": "main",
+          "text": "return self.EmitSet(ValueProperty, ValueExpression.Literal(value));",
+          "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:36"
+        },
+        {
+          "line": "redesign",
+          "text": "public abstract class JsObject",
+          "cite": "Alis.Reactive/Components/JsObject.cs:49"
+        },
+        {
+          "line": "redesign",
+          "text": "protected Property<TValue> Property<TValue>(string? name = null, [CallerMemberName] string declaredBy = \"\")",
+          "cite": "Alis.Reactive/Components/JsObject.cs:81"
+        },
+        {
+          "line": "redesign",
+          "text": "protected TObject Object<TObject>(string? name = null, [CallerMemberName] string declaredBy = \"\")",
+          "cite": "Alis.Reactive/Components/JsObject.cs:101"
+        },
+        {
+          "line": "redesign",
+          "text": "=> DeclaresMethod(declaredBy)",
+          "cite": "Alis.Reactive/Components/JsObject.cs:103"
+        },
+        {
+          "line": "redesign",
+          "text": "protected void Method(Arg first, Arg second, Arg third, Arg fourth, string? name = null, [CallerMemberName] string declaredBy = \"\")",
+          "cite": "Alis.Reactive/Components/JsObject.cs:182"
+        },
+        {
+          "line": "redesign",
+          "text": "var members = GetType()",
+          "cite": "Alis.Reactive/Components/JsObject.cs:367"
+        },
+        {
+          "line": "redesign",
+          "text": "return JsonMemberName.Of(declaredBy);",
+          "cite": "Alis.Reactive/Components/JsObject.cs:390"
+        },
+        {
+          "line": "redesign",
+          "text": "public TypedSource<TResult> Get<TResult>(Expression<Func<TValue, TResult>> path)",
+          "cite": "Alis.Reactive/Components/JsMembers.cs:37"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class WriteOnly<TValue>",
+          "cite": "Alis.Reactive/Components/JsMembers.cs:80"
+        },
+        {
+          "line": "redesign",
+          "text": "public static void Set<TValue>(this Property<TValue?> property, TypedSource<TValue> source)",
+          "cite": "Alis.Reactive/Components/JsMembers.cs:183"
+        },
+        {
+          "line": "redesign",
+          "text": "public static implicit operator Arg(Field field)",
+          "cite": "Alis.Reactive/Components/JsMembers.cs:218"
+        },
+        {
+          "line": "redesign",
+          "text": "public static Field<TValue> Of<TRow, TValue>(Expression<Func<TRow, TValue>> member)",
+          "cite": "Alis.Reactive/Members/Field.cs:34"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static string Of(MemberInfo member) => member.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? Of(member.Name);",
+          "cite": "Alis.Reactive/Members/JsonMemberName.cs:11"
+        },
+        {
+          "line": "redesign",
+          "text": "Text = Field.Of(text).Name,",
+          "cite": "Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownList.cs:103"
+        },
+        {
+          "line": "redesign",
+          "text": "public SlateHeader Header => Object<SlateHeader>();",
+          "cite": "tests/Alis.Reactive.Framework.App/Components/Slate/Slate.cs:20"
+        },
+        {
+          "line": "redesign",
+          "text": "public void Place(Arg<string> text, Arg<decimal> number, Arg<bool> flag, Arg<DateTime> day) => Method(text, number, flag, day);",
+          "cite": "tests/Alis.Reactive.Framework.App/Components/Slate/Slate.cs:38"
+        },
+        {
+          "line": "redesign",
+          "text": "public void Save() => MethodAsync();",
+          "cite": "tests/Alis.Reactive.Framework.App/Components/Slate/Slate.cs:52"
+        },
+        {
+          "line": "redesign",
+          "text": "public void StartSaving() => Method(name: \"save\");",
+          "cite": "tests/Alis.Reactive.Framework.App/Components/Slate/Slate.cs:56"
+        },
+        {
+          "line": "redesign",
+          "text": "slate.StartSaving();",
+          "cite": "tests/Alis.Reactive.Framework.App/Members/Methods.cshtml:48"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element(\"went-on-status\").Text.Set(slate.Status);",
+          "cite": "tests/Alis.Reactive.Framework.App/Members/Methods.cshtml:49"
+        },
+        {
+          "line": "redesign",
+          "text": "result.catch(error => log.error(\"call.rejected\", { error: toJavaScriptString(error) }));",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:47"
+        },
+        {
+          "line": "redesign",
+          "text": "internal override PathMembers Members => PathMembers.Optional;",
+          "cite": "Alis.Reactive/PlanModel/Values/Target.cs:123"
+        },
+        {
+          "line": "redesign",
+          "text": "return new[] { G.Set(root, prefix.Concat(_path).ToList(), _shape, value, _target.Members) };",
+          "cite": "Alis.Reactive/PlanModel/Reactions/Steps.cs:88"
+        },
+        {
+          "line": "redesign",
+          "text": "return new[] { G.Do(G.Call(root, prefix.Concat(_path).ToList(), args, _argShapes, Shape.Any, PathMembers.Required), _awaits) };",
+          "cite": "Alis.Reactive/PlanModel/Reactions/Steps.cs:114"
+        },
+        {
+          "line": "proposed",
+          "text": "public PumpPanel Panel => LiveObject<PumpPanel>();",
+          "doors": [
+            "N5.5"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public LiveObjects<PumpChannel> Channels => LiveObjects<PumpChannel>();",
+          "doors": [
+            "N5.5"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public BedRow FindRow(Arg<string> resident) => ReturnedObject<BedRow>([resident], nullable: true);",
+          "doors": [
+            "N5.2",
+            "N5.3",
+            "N5.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public void Program(Arg<string> drug, Arg<decimal> rate, Arg<decimal> volume, Arg<DateTime> start, Arg<string> ward) => Method([drug, rate, volume, start, ward]);",
+          "doors": [
+            "N5.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public ReadOnly<string> Caption => ReadOnly<string>(optional: true);",
+          "doors": [
+            "N5.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "p.Element(\"slot-label\").Text.Set(planner.Slot.Read(s => s.Label));",
+          "doors": [
+            "N5.6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pump.Limit.Set(pump.Rate);",
+          "doors": [
+            "N7.6"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "get",
+        "call",
+        "set",
+        "do",
+        "let",
+        "data"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/JsObject.cs:49-391"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/JsMembers.cs:17-269"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Members/Field.cs:20-56"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Reactions/Steps.cs:88-114"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:9-76"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:31-60"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/paths.ts:13-87"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:45-72"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:35-58"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/runtime-path.ts:1-131"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:1-90"
+        }
+      ],
+      "core": [
+        "Q2",
+        "Q4",
+        "Q5",
+        "Q7",
+        "Q11",
+        "Q17",
+        "Q18"
+      ],
+      "meanings": [
+        {
+          "id": "M11.D1",
+          "meaning": "A declared member's JavaScript name is the constant name: its door gives, else the simple name of the C# member that declares it, as [CallerMemberName] gives it, converted by System.Text.Json's camel-case policy (JsonNamingPolicy.CamelCase), whatever naming the app's JSON options choose. The name is a member of the vendor's object (D2.7), not a member of data the app's contract writes (D2.9), so the app's naming never renames a vendor member, and data the declaration reads past it (D4.2), a Field among it, follows the app's naming. An event's name is derived the same way."
+        }
+      ],
+      "oracle": "The vendor's TypeScript declarations as TypeScript 5.9.3 types them: a member's optional mark (?), a value typed with | null or | undefined, a method's parameters and its return type, Promise<T> among them; and ECMAScript's property read, assignment and call, which the declaration mirrors member for member (D5.3).",
+      "checker": [
+        "core:Q5",
+        "core:Q4",
+        "Absence.tla:RequiredAbsentStops",
+        "Absence.tla:PromiseWhereValueStops",
+        "Absence.tla:UnawaitedPromiseStops",
+        "Absence.tla:NullHolderReadsNothing"
+      ],
+      "defects": [
+        {
+          "id": "X4.1",
+          "rung": "type"
+        },
+        {
+          "id": "X4.2",
+          "rung": "behavior"
+        },
+        {
+          "id": "X4.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.5",
+          "rung": "type"
+        },
+        {
+          "id": "X5.6",
+          "rung": "type"
+        },
+        {
+          "id": "X5.9",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X5.11",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.12",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.14",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X11.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "M11.X1",
+          "rung": "behavior",
+          "defect": "A declared member's default name follows the app's JSON naming, so under a snake-case app a declaration's SetRate calls set_rate, which the vendor's object lacks, and the pipeline stops; or data read past a declared member follows camel case where the app writes snake case (M11.D1, D2.9)."
+        },
+        {
+          "id": "M11.X2",
+          "rung": "behavior",
+          "defect": "A Field names its member in camel case whatever the app's JSON naming, as Field.Of does today by its JsonPropertyName else camel case (Alis.Reactive/Members/JsonMemberName.cs:11 at 65fdf118d), so a component handed the field reads a member the app's data does not hold (D2.9, M11.D1)."
+        },
+        {
+          "id": "M11.X3",
+          "rung": "behavior",
+          "defect": "A write to, or a read of, a member an object a method returned lacks gives the object that member or reads nothing, and a read through a returned object that is nothing, declared without nullable: true, reads nothing, where each stops its pipeline (D5.3, D5.5). The redesign reads and writes a returned object's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:123, Alis.Reactive/PlanModel/Reactions/Steps.cs:88 at 65fdf118d), while it calls them as required (Alis.Reactive/PlanModel/Reactions/Steps.cs:114 at 65fdf118d)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X4.2",
+          "page": "A medication room page with two infusion pumps of one declaration, which declares Alarms, a ReadOnly<int>, and Drug, a Property<string>: pump-a, an older pump, has no alarms member, and pump-b holds 3 alarms; both hold the drug Heparin. Count pump A's alarms writes counting into alarms-tried, pump-a's Alarms into alarms-read and counted into alarms-done; Count pump B's alarms writes pump-b's Alarms into b-alarms and counted into b-done; Read pump A's drug writes pump-a's Drug into drug-read.",
+          "gesture": "Click Count pump A's alarms, then Read pump A's drug.",
+          "outcome": "drug-read reads Heparin, alarms-tried reads counting, and alarms-read and alarms-done are empty.",
+          "opposite": "Count pump B's alarms shows 3 in b-alarms and counted in b-done.",
+          "defect": "The read of the member pump A lacks reads nothing and the pipeline goes on, so alarms-done reads counted; or the stop ends more than its own pipeline, so drug-read stays empty.",
+          "existing_test": "redesign WhenADeclarationIsNewerThanItsComponent.a_read_of_a_member_the_component_does_not_have_fails_only_its_own_pipeline"
+        },
+        {
+          "for": "X4.5",
+          "page": "A medication room page with two infusion pumps whose prime returns a promise that resolves once the pump shows primed: pump-a's declaration declares Prime() with Method, and pump-b's declares it with MethodAsync. Prime pump A writes priming into prime-tried, calls pump-a's Prime() and writes primed into prime-done; Prime pump B calls pump-b's Prime() and writes primed into b-prime-done; Read pump A's drug writes pump-a's Drug, Heparin, into drug-read.",
+          "gesture": "Click Prime pump A, wait until pump A shows primed, then click Read pump A's drug.",
+          "outcome": "drug-read reads Heparin, prime-tried reads priming, and prime-done is empty.",
+          "opposite": "Prime pump B shows primed in b-prime-done once pump B shows primed.",
+          "defect": "The pipeline goes on past the call whose promise nobody awaits, so prime-done reads primed (Alis.Reactive.Assets/runtime/grammar/execute.ts:45-47 at 65fdf118d)."
+        },
+        {
+          "for": "X5.3",
+          "page": "A ward page with a bed board whose declaration declares RowFor(Arg<int> room), a ReturnedObject<BedRow> whose BedRow declares Mark() and Flag(); this board's rows have mark and lack flag, and the board holds the ward South. Mark room 4 calls RowFor(4).Mark(), which shows Room 4 (marked) on the board, and writes marked into mark-done; Flag room 4 writes flagging into flag-tried, calls RowFor(4).Flag() and writes flagged into flag-done; Read the ward writes the board's Ward into ward-read.",
+          "gesture": "Click Flag room 4, then Read the ward.",
+          "outcome": "ward-read reads South, flag-tried reads flagging, and flag-done is empty.",
+          "opposite": "Mark room 4 shows Room 4 (marked) on the board and marked in mark-done.",
+          "defect": "The call of the method the returned row lacks runs nothing and the pipeline goes on, so flag-done reads flagged; or the stop ends more than its own pipeline, so ward-read stays empty.",
+          "existing_test": "redesign WhenADeclarationIsNewerThanItsComponent.a_call_of_a_method_an_object_a_method_returned_does_not_have_fails_only_its_own_pipeline"
+        },
+        {
+          "for": "X5.4",
+          "page": "A visit planner page whose planner's declaration declares Slot, a Property<VisitSlot> of the app's class VisitSlot with a string Label and an int Seats that starts at 2; the planner holds the slot {\"label\": \"Morning\"} with no seats. Show the slot writes the slot's Label and Seats, each read past the declared member, into slot-label and slot-seats, then adds one to the page's tally and writes it into slot-shown; Clear the slot sets the planner's Slot to null; Hold the evening slot sets it to {\"label\": \"Evening\", \"seats\": 5}.",
+          "gesture": "Click Show the slot, then Clear the slot and Show the slot again.",
+          "outcome": "After the first Show the slot, slot-label reads Morning and slot-seats reads 2; after the second, slot-label and slot-seats are empty and slot-shown reads 2.",
+          "opposite": "Hold the evening slot, then Show the slot, shows Evening in slot-label and 5 in slot-seats.",
+          "defect": "The absent Seats reads nothing, so slot-seats is empty after the first Show the slot (D4.2 reads it as System.Text.Json binds it, 2); or a slot that holds null stops the pipeline, so slot-shown keeps 1."
+        },
+        {
+          "for": "X5.11",
+          "page": "A medication room page with an infusion pump whose declaration declares Summary(), a Method<string> the pump answers with its rate, as 25 ml/h, and counts in the asked counter it shows; SetRate(Arg<decimal> rate); and Channels, a LiveObjects<PumpChannel> whose items declare IsRunning(), a Method<bool> each channel counts in the checks counter it shows. The pump has three channels with channel 2 stopped, and Stop channel 3 stops channel 3. Read the summary twice binds Summary() once and writes it into summary-1 and summary-2; Call the summary twice writes one call of Summary() into call-1 and another into call-2; Hold the summary binds Summary(), calls SetRate(40), then writes the bound summary into held-summary and a new Summary() into new-summary; Count the running channels writes the count of channels whose IsRunning() is true into running.",
+          "gesture": "Click Read the summary twice, Call the summary twice, Hold the summary and Count the running channels, in that order.",
+          "outcome": "After Read the summary twice the asked counter reads 1 and summary-1 and summary-2 read 25 ml/h; after Call the summary twice it reads 3; held-summary reads 25 ml/h and new-summary 40 ml/h; running reads 2 and each channel's checks counter reads 1.",
+          "opposite": "Clicking Stop channel 3 and then Count the running channels shows running at 1 and each checks counter at 2.",
+          "defect": "A bound result is called at each read, so the asked counter reads 2 after Read the summary twice; or two calls run once; or the held summary is called again after SetRate and reads 40 ml/h; or IsRunning() is called once for the list or before the step, so running misses channel 3 stopped since."
+        },
+        {
+          "for": "X5.12",
+          "page": "A medication room page with two infusion pumps of one declaration. On pump-old, an older pump: Silence(), which pump-old lacks; Label(), a Method<string>, where pump-old holds label as the text Ward pump; Flush(), declared with Method, and Volume(), a Method<int>, each of which pump-old answers with a promise. Silence pump A, Read pump A's label, Flush pump A and Read pump A's volume each write their own name into tried and, after the call, into done; Read pump A's drug writes pump-old's Drug, Heparin, into drug-read. On pump-new: Note(Arg<string?> text) shows the text it receives, (null) for null and (undefined) for undefined; LastDose(), a Method<DoseRecord> pump-new answers with a nurse of null; MissingDose(), which pump-new answers with undefined. Note nothing passes a null literal, Note the last dose passes LastDose()'s Nurse, and Note the missing dose passes MissingDose()'s Nurse; Flush pump B calls pump-new's Flush(), which answers no promise, and writes flushed into b-done.",
+          "gesture": "Click Silence pump A, Read pump A's label, Flush pump A and Read pump A's volume, each followed by Read pump A's drug; then click Note nothing, Note the last dose and Note the missing dose.",
+          "outcome": "After each of the four, drug-read reads Heparin, tried reads that button's name and done is empty; pump-new's note reads (null) after each of the three notes.",
+          "opposite": "Flush pump B writes flushed into b-done.",
+          "defect": "One of the four calls runs on, so done reads its name; or a null reaches the method as undefined or as the text null, so the note reads (undefined) or null."
+        },
+        {
+          "for": "X11.3",
+          "page": "A ward page with a bed board whose declaration declares Lock() with Method, while the board's lock returns a promise that rejects while the board is in use, and Unlock() with MethodAsync, whose promise resolves; the board holds the ward South. Lock the board writes locking into lock-tried, calls Lock() and writes locked into lock-done; Unlock the board calls Unlock() and writes unlocked into unlock-done; Read the ward writes the board's Ward into ward-read.",
+          "gesture": "Click Lock the board, then Read the ward.",
+          "outcome": "ward-read reads South, lock-tried reads locking, and lock-done is empty.",
+          "opposite": "Unlock the board shows unlocked in unlock-done.",
+          "defect": "The step after the call runs, so lock-done reads locked though the board refused the lock (Alis.Reactive.Assets/runtime/grammar/execute.ts:45-47 at 65fdf118d); or the rejection stops more than its own pipeline, so ward-read stays empty."
+        },
+        {
+          "for": "M11.X1",
+          "page": "A medication room page in an app whose JSON options name members in snake case, with an infusion pump that shows 10 ml/h and whose declaration declares SetRate(Arg<decimal> rate) with no name:. Set the rate to 25 calls SetRate(25), which the pump shows as 25 ml/h, and writes set into rate-done. Read the order gets /orders/last, which answers {\"max_rate\": 40}, and writes its MaxRate, of the app's class OrderLimit, into max-rate; Read the camel order gets /orders/camel, which answers {\"maxRate\": 40}, and writes its MaxRate into camel-rate.",
+          "gesture": "Click Set the rate to 25, then Read the order.",
+          "outcome": "The pump shows 25 ml/h, rate-done reads set, and max-rate reads 40.",
+          "opposite": "Read the camel order shows 0 in camel-rate, the start of a member the snake-case contract does not name.",
+          "defect": "The declared name follows the app's naming, so the call reaches set_rate, which the pump lacks: the pump keeps 10 ml/h and rate-done stays empty; or the data read follows camel case, so max-rate reads 0 and camel-rate 40."
+        },
+        {
+          "for": "M11.X2",
+          "page": "A care board page in an app whose JSON options name members in snake case, with a board holding the residents [{\"name\": \"Ada\", \"care_level\": 2}, {\"name\": \"Ben\", \"care_level\": 1}, {\"name\": \"Cy\", \"care_level\": 3}] as the app writes them, listed Ada, Ben, Cy; the board's declaration declares SortBy(Field field), which orders its rows by the member the field names. Sort by care level calls SortBy(Field.Of((Resident r) => r.CareLevel)).",
+          "gesture": "Click Sort by care level.",
+          "outcome": "The board lists Ben, Ada, Cy.",
+          "opposite": "Before the click the board lists Ada, Ben, Cy.",
+          "defect": "The field is named careLevel, so the board orders by a member no row holds and keeps Ada, Ben, Cy."
+        },
+        {
+          "for": "M11.X3",
+          "page": "A ward page with a bed board whose declaration declares FindRow(Arg<string> resident), a ReturnedObject<BedRow> declared without nullable: true, whose BedRow declares Label, a ReadOnly<string>, and Note, a Property<string>; this board's rows have label and lack note, the board has a row for Ada Byron and none for Zed, and it holds the ward South. Note Ada's row writes noting into note-tried, sets FindRow(\"Ada\").Note to seen at handover and writes noted into note-done; Read Zed's row writes reading into read-tried, FindRow(\"Zed\").Label into row-label and read into read-done; Read Ada's row writes FindRow(\"Ada\").Label into ada-label; Read the ward writes the board's Ward into ward-read.",
+          "gesture": "Click Note Ada's row, then Read Zed's row, then Read the ward.",
+          "outcome": "ward-read reads South; note-tried reads noting and note-done is empty; read-tried reads reading, and row-label and read-done are empty.",
+          "opposite": "Read Ada's row shows Ada Byron in ada-label.",
+          "defect": "The write gives Ada's row a note and note-done reads noted, or the read through no row reads nothing and read-done reads read, as the redesign's returned objects read and write as optional."
+        }
+      ],
+      "verdicts": []
+    },
+    {
+      "id": "M11.F2",
+      "summary": "An event a declaration has and the payload its listener receives: Event<TArgs> declared on the object's own JsObject and named by its declaring member, or Event with no payload; the payload declared as what the listener receives, a JsObject with the whole vocabulary at any depth, its members marked required or optional and nullable as the vendor's typed API marks them, so a required member the vendor leaves out stops the handler, an optional one reads nothing, a null reads as null, and a write to an object the payload holds changes that object. Main selects an event through a TypedEvent value its packages build with the event's name as a string, and writes to the payload only through IReactionEmitter, an append handle with internal members; the redesign declares the event on JsObject and reads every payload member as optional.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:Event",
+        "Alis.Reactive:Event<TArgs>",
+        "Alis.Reactive:NoPayload",
+        "Alis.Reactive:TypedEvent<TArgs>",
+        "Alis.Reactive:IReactionEmitter"
+      ],
+      "claims": [
+        "Alis.Reactive:JsObject.Event(string? name = null, string! declaredBy = \"\") -> Event!",
+        "Alis.Reactive:JsObject.Event<TArgs>(string? name = null, string! declaredBy = \"\") -> Event<TArgs!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public sealed class TypedEvent<TArgs>",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/TypedEvent.cs:12"
+        },
+        {
+          "line": "main",
+          "text": "public string ObjectEvent { get; }",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/TypedEvent.cs:15"
+        },
+        {
+          "line": "main",
+          "text": "public TArgs Args { get; }",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/TypedEvent.cs:18"
+        },
+        {
+          "line": "main",
+          "text": "\"expanded\", new FusionAccordionExpandedArgs());",
+          "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionEvents.cs:15"
+        },
+        {
+          "line": "main",
+          "text": "internal void AddStep(ReactionGraph step);",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/IReactionEmitter.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), \"preventDefaultAction\", ValueExpression.Literal(true)));",
+          "cite": "Alis.Reactive.Fusion/Components/FusionAutoComplete/Events/FusionAutoCompleteOnFiltering.cs:44"
+        },
+        {
+          "line": "main",
+          "text": "return {};",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:44"
+        },
+        {
+          "line": "redesign",
+          "text": "public class Event<TArgs>",
+          "cite": "Alis.Reactive/Components/Event.cs:13"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class Event : Event<NoPayload>",
+          "cite": "Alis.Reactive/Components/Event.cs:35"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class NoPayload : JsObject",
+          "cite": "Alis.Reactive/Components/Event.cs:44"
+        },
+        {
+          "line": "redesign",
+          "text": "protected Event<TArgs> Event<TArgs>(string? name = null, [CallerMemberName] string declaredBy = \"\")",
+          "cite": "Alis.Reactive/Components/JsObject.cs:282"
+        },
+        {
+          "line": "redesign",
+          "text": "public NewerRow Row => Object<NewerRow>();",
+          "cite": "tests/Alis.Reactive.Framework.App/Vendors/NewerSlate.cs:44"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Element(\"added-row\").Text.Set(added.Row.Label);",
+          "cite": "tests/Alis.Reactive.Framework.App/Vendors/NewerDeclaration.cshtml:13"
+        },
+        {
+          "line": "redesign",
+          "text": "internal override PathMembers Members => PathMembers.Optional;",
+          "cite": "Alis.Reactive/PlanModel/Values/Target.cs:80"
+        },
+        {
+          "line": "proposed",
+          "text": "public ReadOnly<string> Note => ReadOnly<string>(optional: true);",
+          "doors": [
+            "N5.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public BedRow Row => LiveObject<BedRow>();",
+          "doors": [
+            "N5.5"
+          ]
+        }
+      ],
+      "nodes": [
+        "get",
+        "set",
+        "call",
+        "data",
+        "ref"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/Event.cs:13-46"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/JsObject.cs:282-293"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/TypedEvent.cs:12-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/IReactionEmitter.cs:13-20"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:20-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/paths.ts:13-43"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:10-45"
+        }
+      ],
+      "core": [
+        "Q4",
+        "Q5",
+        "Q11",
+        "Q17"
+      ],
+      "meanings": [],
+      "oracle": "The vendor's TypeScript declaration of the event and of the arguments its listener receives, as TypeScript 5.9.3 types them, a member's optional mark (?) and | null among them; and ECMAScript's property read, assignment and call on the object the listener is handed, which the payload's declaration mirrors (D5.6).",
+      "checker": [
+        "core:Q5",
+        "core:Q17",
+        "Absence.tla:RequiredAbsentStops",
+        "Absence.tla:DataAbsentReadsItsStart",
+        "Run.tla:WritesAfterTheTurnAreRefused"
+      ],
+      "defects": [
+        {
+          "id": "X4.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X5.10",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X4.3",
+          "page": "A medication round page with a dose cart that holds the round Morning and raises DoseGiven, whose payload is declared with Resident, a required ReadOnly<string>, and Note, a ReadOnly<DoseNote> of the app's class DoseNote with an int Refills. Give a dose without a resident makes the cart raise DoseGiven with no resident and the note {}, and Give Ada's dose raises it with the resident Ada Byron and the note {}. The page's DoseGiven handler writes the note's Refills into refills, then the resident into given-to, then recorded into dose-recorded; Read the round writes the cart's Round into round-read.",
+          "gesture": "Click Give a dose without a resident, then Read the round.",
+          "outcome": "round-read reads Morning, refills reads 0, and given-to and dose-recorded are empty.",
+          "opposite": "Give Ada's dose shows 0 in refills, Ada Byron in given-to and recorded in dose-recorded.",
+          "defect": "The absent resident reads nothing and the handler goes on, so dose-recorded reads recorded, as the redesign reads a payload's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d); or the note's absent Refills reads nothing or stops, so refills is empty."
+        },
+        {
+          "for": "X5.7",
+          "page": "A call bell page with two call bells of one declaration, whose Answered payload declares Room, a required ReadOnly<string>, and Note, a ReadOnly<string> declared optional: true, as the bell's typed API marks note?. Answer room 4 makes bell-a raise Answered with the room 4 and no note; Answer room 4 with a note raises it with the room 4 and the note Water please; Answer the silent bell makes bell-b raise it with the note Fell asleep and no room. bell-a's handler writes the note into a-note, the room into a-room and answered into a-done; bell-b's handler writes the note into b-note, the room into b-room and answered into b-done; Read bell A writes bell-a's Calls, its count of calls, into a-calls.",
+          "gesture": "Click Answer room 4, then Answer the silent bell, then Read bell A.",
+          "outcome": "a-note is empty, a-room reads 4 and a-done reads answered; b-note reads Fell asleep, and b-room and b-done are empty; a-calls reads 1.",
+          "opposite": "Answer room 4 with a note shows Water please in a-note and 4 in a-room.",
+          "defect": "The optional note the bell leaves out stops the handler, so a-room stays empty; or the required room bell B leaves out reads nothing and the handler goes on, so b-done reads answered."
+        },
+        {
+          "for": "X5.8",
+          "page": "A resident card page with a card that raises Opened, whose payload declares Name, a ReadOnly<string>, and BirthCountry, a ReadOnly<string?>, as the card's typed API types it string | null. Open Ben's card raises Opened with the name Ben Ng and the country Ireland, and Open Ada's card with the name Ada Byron and the country null. The handler writes the country into country, then the name into card-opened.",
+          "gesture": "Click Open Ben's card, then Open Ada's card.",
+          "outcome": "country is empty and card-opened reads Ada Byron.",
+          "opposite": "After Open Ben's card alone, country reads Ireland and card-opened reads Ben Ng.",
+          "defect": "The null reads as the text null, so country reads null; or a null the declaration admits stops the handler, so card-opened keeps Ben Ng."
+        },
+        {
+          "for": "X5.10",
+          "page": "A ward page with a bed board that raises RowChosen, whose payload declares Row, a LiveObject<BedRow>, the board's own row object, whose BedRow declares Note, a Property<string>, and Highlight(); the board shows each row's note beside it and highlights a row whose highlight is called. Choose room 4 makes the board raise RowChosen for its room 4 row, and the handler sets the payload's Row.Note to seen at handover and calls Row.Highlight().",
+          "gesture": "Click Choose room 4.",
+          "outcome": "The board's room 4 row shows seen at handover and is highlighted.",
+          "opposite": "The room 5 row shows no note and is not highlighted after the click, as room 4 did before it.",
+          "defect": "The write lands on a copy of the row, so the board's room 4 row shows no note; or the call of Highlight() runs nothing, so the row is not highlighted."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "TypedEvent<TArgs>",
+          "verdict": "refused",
+          "reason": "Main's event value: a component's events class builds one per event with the event's name and a payload object made in C# (Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionEvents.cs:13-15 at 623dd4a27), and its constructor is internal, so only the framework's packages make one and a brought component has none. The rewrite declares an event on the object's own JsObject with Event<TArgs>, kept by Q5, its payload a declaration with the whole vocabulary (D5.6) at the place the event's declaration states (N17.1).",
+          "carriers": [
+            "N17.1"
+          ]
+        },
+        {
+          "door": "TypedEvent<TArgs>.Args.get -> TArgs",
+          "verdict": "refused",
+          "reason": "The payload placeholder a handler reads from, an object built in C# with new TArgs() (Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionEvents.cs:15 at 623dd4a27). The rewrite hands the handler the payload as its declaration, whose members carry the presence and value marks of the vendor's typed API (N5.4) and whose data reads past a member with Read (N5.6).",
+          "carriers": [
+            "N5.4",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "TypedEvent<TArgs>.ObjectEvent.get -> string!",
+          "verdict": "refused",
+          "reason": "The event's JavaScript name as a string a C# author writes (\"expanded\", Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionEvents.cs:15 at 623dd4a27), a string that names an event, which ALIS009 refuses on the public surface. The rewrite names the event by the member that declares it (M11.D1), with its payload's place (N17.1).",
+          "carriers": [
+            "N17.1"
+          ]
+        },
+        {
+          "door": "IReactionEmitter",
+          "verdict": "refused",
+          "reason": "An append handle whose members are internal (Alis.Reactive/PlanAuthoring/Pipelines/IReactionEmitter.cs:17-19 at 623dd4a27), through which a component package's helper writes to or calls on an event's object by member names written as strings, \"preventDefaultAction\" and \"updateData\" (Alis.Reactive.Fusion/Components/FusionAutoComplete/Events/FusionAutoCompleteOnFiltering.cs:44, Alis.Reactive.Fusion/Components/FusionAutoComplete/Events/FusionAutoCompleteOnFiltering.cs:63 at 623dd4a27), so only the framework's packages reach it. The rewrite declares those members on the payload's own declaration (D5.6): a property the handler writes, and a method it calls with any number of arguments (N5.3), at the place the event states (N17.1).",
+          "carriers": [
+            "N5.3",
+            "N17.1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M11.F3",
+      "summary": "Data: Data<T>, a value the plan reads and never writes or calls, for an event payload declared as plain data, a response body, a pushed message, a value a method returns and the items of a list of data; a member of it read with Read, named as the app's JSON options name it, reading its start where the data lacks it and nothing past a holder that holds null. The redesign reads it with Get, which names the member by its JsonPropertyName else camel case whatever the app's options; main reads a response body through ResponseBody<T> with an object-typed path.",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:Data<TData>"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "redesign",
+          "text": "public sealed class Data<TData> : TypedSource<TData>",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/Data.cs:26"
+        },
+        {
+          "line": "redesign",
+          "text": "public TypedSource<TResult> Get<TResult>(Expression<Func<TData, TResult>> path)",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/Data.cs:40"
+        },
+        {
+          "line": "redesign",
+          "text": "return new MemberRead<TResult>(() => _data, ExpressionPathHelper.ToJsonPath(path));",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/Data.cs:43"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static string Of(MemberInfo member) => member.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? Of(member.Name);",
+          "cite": "Alis.Reactive/Members/JsonMemberName.cs:11"
+        },
+        {
+          "line": "main",
+          "text": "ResponseBody<TResponse> source,",
+          "cite": "Alis.Reactive.Fusion/Components/FusionAutoComplete/Events/FusionAutoCompleteOnFiltering.cs:58"
+        },
+        {
+          "line": "main",
+          "text": "Expression<Func<TResponse, object?>> path)",
+          "cite": "Alis.Reactive.Fusion/Components/FusionAutoComplete/Events/FusionAutoCompleteOnFiltering.cs:59"
+        },
+        {
+          "line": "proposed",
+          "text": "p.Element(\"room\").Text.Set(admitted.Read(a => a.Room));",
+          "doors": [
+            "N5.6"
+          ]
+        }
+      ],
+      "nodes": [
+        "data",
+        "get",
+        "ref"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Events/Data.cs:26-45"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Components/FusionAutoComplete/Events/FusionAutoCompleteOnFiltering.cs:55-65"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/paths.ts:13-28"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:49-54"
+        }
+      ],
+      "core": [
+        "Q2",
+        "Q4",
+        "Q5"
+      ],
+      "meanings": [],
+      "oracle": "RFC 8259 JSON as System.Text.Json writes and binds it under the app's JSON options: a member's name by JsonPropertyName else the naming policy, and the value a member the JSON lacks binds to (D2.9, D4.2).",
+      "checker": [
+        "core:Q5",
+        "core:Q4",
+        "Absence.tla:DataAbsentReadsItsStart",
+        "Absence.tla:NullHolderReadsNothing"
+      ],
+      "defects": [
+        {
+          "id": "X5.2",
+          "rung": "type"
+        }
+      ],
+      "promises": [],
+      "verdicts": []
+    }
+  ]
+}
