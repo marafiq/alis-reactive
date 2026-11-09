@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 330,
+        "defects": 331,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1094,8 +1094,8 @@
     },
     "probes": {
       "counts": {
-        "facts": 198,
-        "net10": 86,
+        "facts": 199,
+        "net10": 87,
         "net48": 67,
         "node": 45
       },
@@ -1110,7 +1110,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 353,
+        "defects": 354,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -2309,14 +2309,14 @@
         "Schema": {
           "Schema.cfg": {
             "green": true,
-            "hash": "cf21cde4c99dbf51e0e9df83ce1fdf890cadcbbd7a175cd5a5f5c07c340768e1",
+            "hash": "198b93e10a51ca189ea6edeab5d3645cdf5dc26bb28192f2ced3389a6bf88a7c",
             "line": "Model checking completed. No error has been found.",
-            "states": "107466 states generated, 106783 distinct states found, 0 states left on queue.",
+            "states": "108121 states generated, 107438 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Schema.violates.ConversionsConvert.cfg": {
             "green": false,
-            "hash": "8d5508d4421ea32a34ed1954c86d47f4257fb4719f661b249de8c314e169974d",
+            "hash": "23e0bbe876ab4a351c6f6e99c57b2eff7cc6d863434379c2064e48772a48d717",
             "line": "violated: ConversionsConvert",
             "states": "",
             "violated": [
@@ -2325,7 +2325,7 @@
           },
           "Schema.violates.DecimalTextComparedByValue.cfg": {
             "green": false,
-            "hash": "0637f3a07b2cb7eafba50f6c2b1d3fb65563394c94b0044db88b0bfc43ebac2c",
+            "hash": "14bda32b2b53dd15c00bddf0b63a34f7df75660030044638fbf5934bccdfff1f",
             "line": "violated: DecimalTextComparedByValue",
             "states": "",
             "violated": [
@@ -2334,7 +2334,7 @@
           },
           "Schema.violates.KindsHandledOnce.cfg": {
             "green": false,
-            "hash": "c84f8abe2d76916153dc2385cae1c38b5466cf4cb365aadf1853342d520c3152",
+            "hash": "3ce802a318874414e9cfa549eb832ac831cf3c215f4351d781f3460bf3f06e4f",
             "line": "violated: KindsHandledOnce",
             "states": "",
             "violated": [
@@ -2343,7 +2343,7 @@
           },
           "Schema.violates.NullableWrapsOnce.cfg": {
             "green": false,
-            "hash": "995b2ddfd8b749df9962308a54830ff25fccacd04b237bb406362f762d00ec62",
+            "hash": "0c10177c51143ba1b55cc92052bbc3d88f413b96521a4eed2fc33368dc9e1b98",
             "line": "violated: NullableWrapsOnce",
             "states": "",
             "violated": [
@@ -2352,7 +2352,7 @@
           },
           "Schema.violates.OperatorsClosed.cfg": {
             "green": false,
-            "hash": "8949de92702ed6aa4ec591241df6b10fcb3495fb6a8807e3a2883b093c650da8",
+            "hash": "29eff21919ad2de6568ab360aa82b4ba651645ada2f5c1dc298338153c6636c6",
             "line": "violated: OperatorsClosed",
             "states": "",
             "violated": [
@@ -2361,7 +2361,7 @@
           },
           "Schema.violates.PatternsAreLiterals.cfg": {
             "green": false,
-            "hash": "749c4916248887efdd3f2d76278e9235cc86271cb2f344aae2968527ce94e2cf",
+            "hash": "6e5ed05f25684a6c24c12b11acc89e123609e604d973b30ff6dcf0e99f032358",
             "line": "violated: PatternsAreLiterals",
             "states": "",
             "violated": [
@@ -2370,7 +2370,7 @@
           },
           "Schema.violates.ReachDecimalTextEquality.cfg": {
             "green": false,
-            "hash": "4ea7fd5ad260cfe5ab42086e3d4f72b317fef73572a2e0c92018cb20d99173aa",
+            "hash": "dfb2e6b8fa1ecedb0ac750700d8d3a3df28863873d16e4acba30076081c39f84",
             "line": "violated: ReachDecimalTextEquality",
             "states": "",
             "violated": [
@@ -2379,7 +2379,7 @@
           },
           "Schema.violates.ReachDeepRead.cfg": {
             "green": false,
-            "hash": "ea6dd90d3da74e155afab79d81be3ab645c7992ef8a258be06479691526431e0",
+            "hash": "2d4db15447123db59b6717bc66ff56fc06a22d527b0ac732d59d1f6655aa1a60",
             "line": "violated: ReachDeepRead",
             "states": "",
             "violated": [
@@ -2388,25 +2388,34 @@
           },
           "Schema.violates.ReachNestedRead.cfg": {
             "green": false,
-            "hash": "3bfad2ab2a5cbee882a2e347c0c36be960f542ba6e5c7d8008e266765e07ab4d",
+            "hash": "8e23c7712af0fd41ae6d12d569f45420ce8687afe30eb09af53d40cafd68e4af",
             "line": "violated: ReachNestedRead",
-            "states": "1272 states generated, 1203 distinct states found, 697 states left on queue.",
+            "states": "1939 states generated, 1878 distinct states found, 725 states left on queue.",
             "violated": [
               "ReachNestedRead"
             ]
           },
           "Schema.violates.ReachReplyInANestedBlock.cfg": {
             "green": false,
-            "hash": "a43e6d532beacffca071c5fba8a1bec7a06acbcf953a4ff48d1f1424fc951723",
+            "hash": "8abce240706827f58f53e2f5f26a5c446151754b3afc4a190caac1f36f03752c",
             "line": "violated: ReachReplyInANestedBlock",
-            "states": "1997 states generated, 1914 distinct states found, 1269 states left on queue.",
+            "states": "2596 states generated, 2511 distinct states found, 1128 states left on queue.",
             "violated": [
               "ReachReplyInANestedBlock"
             ]
           },
+          "Schema.violates.ReachSelectFieldStops.cfg": {
+            "green": false,
+            "hash": "c77c43e65a957530723be5e19e5e0eff1414ed02c90a12529ceaf5c3137c76cb",
+            "line": "violated: ReachSelectFieldStops",
+            "states": "",
+            "violated": [
+              "ReachSelectFieldStops"
+            ]
+          },
           "Schema.violates.ReadsTakeNoEach.cfg": {
             "green": false,
-            "hash": "fc894c0b48dc4aef7997c2a06f45c84040fe879238d6749e5395b03b9faed9e1",
+            "hash": "257916602fb718c58c36d73d13d502a4d71b9dd0cb5798e223dcc1d2f0b91451",
             "line": "violated: ReadsTakeNoEach",
             "states": "",
             "violated": [
@@ -2415,18 +2424,27 @@
           },
           "Schema.violates.RefsReadTheirBlock.cfg": {
             "green": false,
-            "hash": "ac13f8d8bbd4cf5b35c65080204a75cebd4dab91abfbefefe474451a7f6696ad",
+            "hash": "e2d1e46b2aa5e575e891c4d8c9c79b3c9e889315b8ea51f5b58864ef5c42514f",
             "line": "violated: RefsReadTheirBlock",
-            "states": "3270 states generated, 2611 distinct states found, 1821 states left on queue.",
+            "states": "3369 states generated, 2835 distinct states found, 1404 states left on queue.",
             "violated": [
               "RefsReadTheirBlock"
             ]
           },
+          "Schema.violates.SelectFieldHoldsItsType.cfg": {
+            "green": false,
+            "hash": "5c7b866cbb368d9e6a6c89ef3eb9082e662f671ed5d4b5e6761fe830b06ce4dd",
+            "line": "violated: SelectFieldHoldsItsType",
+            "states": "",
+            "violated": [
+              "SelectFieldHoldsItsType"
+            ]
+          },
           "Schema.violates.SetsWriteAMember.cfg": {
             "green": false,
-            "hash": "e93573a9fc60370ba45d446966587722339979a5ce12be21112af8ce4d4d7de4",
+            "hash": "cc056c166135a2bf7d5657c179d8a8311b1b9f22f98867a40f816f769651d2be",
             "line": "violated: SetsWriteAMember",
-            "states": "375 states generated, 362 distinct states found, 10 states left on queue.",
+            "states": "1033 states generated, 1020 distinct states found, 12 states left on queue.",
             "violated": [
               "SetsWriteAMember"
             ]
@@ -2704,7 +2722,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "6070a841c99a7639e1c24f45fe37a5ef3a1a0376",
+  "read_at_head": "e4c652bd08b151dd3b2b5e82f0abd8b0f3fed0a9",
   "step": {
     "failing": [
       "gate1"
