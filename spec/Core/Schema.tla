@@ -4,7 +4,7 @@ EXTENDS Naturals, Sequences, FiniteSets
 CONSTANT Mutant
 
 Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARead", "AsOfAny", "PatternReadInBrowser",
-            "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock", "DecimalTextComparedAsText"}
+            "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock", "DecimalTextComparedAsText", "SelectFieldUnchecked"}
 
 ASSUME Mutant \in Mutants
 
@@ -42,7 +42,7 @@ Operators == {"eq", "neq", "lt", "lte", "gt", "gte", "and", "or", "not", "add", 
               "cond", "nullableValue", "truthy", "empty", "matches", "toArray", "finite", "compareNumbers", "compareOrdinal",
               "compareBooleans", "compareCulture", "merge", "trim", "trimStart", "trimEnd", "upperInvariant", "lowerInvariant",
               "upper", "lower", "upperTurkic", "lowerTurkic", "contains", "startsWith", "endsWith", "nullOrEmpty", "includes",
-              "sumInt", "sumDouble", "sumDecimal", "eqDecimal"}
+              "sumInt", "sumDouble", "sumDecimal", "eqDecimal", "nonNull"}
 
 OperatorSwitch == Operators
 
@@ -54,7 +54,9 @@ Leaf(k) == [k |-> k, c |-> <<>>, p |-> <<>>, s |-> "string", o |-> "eq", h |-> "
 
 DecimalText == [Leaf("data") EXCEPT !.h = "decimalText"]
 
-Leaves == {Leaf("lit"), Leaf("obj"), DecimalText}
+FieldHoldingNoNull == [Leaf("data") EXCEPT !.h = "holdsNoNull"]
+
+Leaves == {Leaf("lit"), Leaf("obj"), DecimalText, FieldHoldingNoNull}
 
 Paths == {<<"member">>, <<"each">>}
 
@@ -68,6 +70,8 @@ ExprsTo(d) ==
         \cup {[k |-> "get", c |-> <<e>>, p |-> path, s |-> "string", o |-> "eq", h |-> "value"] : e \in below, path \in Paths}
         \cup {[k |-> "as", c |-> <<e>>, p |-> <<>>, s |-> shape, o |-> "eq", h |-> "value"] : e \in below, shape \in {"number", "any"}}
         \cup {[k |-> "op", c |-> <<e, x>>, p |-> <<>>, s |-> "string", o |-> op, h |-> "value"] : e \in below, x \in below, op \in WrittenOps}
+        \cup {[k |-> "op", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "nonNull", h |-> "value"] : e \in below}
+        \cup {[k |-> "fn", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "eq", h |-> "value"] : e \in below}
 
 RECURSIVE Nodes(_)
 Nodes(e) == {e} \cup UNION {Nodes(e.c[i]) : i \in DOMAIN e.c}
@@ -81,6 +85,8 @@ WriterAccepts(e) ==
     /\ (e.k = "op" /\ e.o = "matches") => (e.c[2].k = "lit" \/ Mutant = "PatternReadInBrowser")
     /\ (e.k = "op" /\ e.o \in {"eq", "neq"}) => ((\A i \in DOMAIN e.c : e.c[i].h # "decimalText") \/ Mutant = "DecimalTextComparedAsText")
     /\ (e.k = "op" /\ e.o = "eqDecimal") => \A i \in DOMAIN e.c : e.c[i].h = "decimalText"
+    /\ e.k = "fn" => (e.c[1].h # "holdsNoNull" \/ Mutant = "SelectFieldUnchecked")
+    /\ (e.k = "op" /\ e.o = "nonNull") => e.c[1].h = "holdsNoNull"
 
 ShapeLeaves == {[k |-> k, c |-> <<>>] : k \in {"string", "file", "any"}}
 
@@ -194,6 +200,8 @@ PatternsAreLiterals == \A n \in Nodes(expr) : (n.k = "op" /\ n.o = "matches") =>
 
 DecimalTextComparedByValue == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in {"eq", "neq"}) => \A i \in DOMAIN n.c : n.c[i].h # "decimalText"
 
+SelectFieldHoldsItsType == \A n \in Nodes(expr) : n.k = "fn" => n.c[1].h # "holdsNoNull"
+
 NullableWrapsOnce == \A n \in ShapeNodes(shape) : n.k = "nullable" => n.c[1].k # "nullable"
 
 SetsWriteAMember == \A i \in DOMAIN log : log[i].k = "set" => log[i].len >= 1
@@ -213,5 +221,7 @@ ReachReplyInANestedBlock ==
 ReachDeepRead == ~(plane = "expr" /\ expr.k = "as" /\ expr.c[1].k = "get" /\ expr.c[1].c[1].k = "obj")
 
 ReachDecimalTextEquality == ~(plane = "expr" /\ expr.k = "op" /\ expr.o = "eqDecimal" /\ expr.c[1].h = "decimalText" /\ expr.c[2].h = "decimalText")
+
+ReachSelectFieldStops == ~(plane = "expr" /\ expr.k = "fn" /\ expr.c[1].k = "op" /\ expr.c[1].o = "nonNull" /\ expr.c[1].c[1].h = "holdsNoNull")
 
 ====

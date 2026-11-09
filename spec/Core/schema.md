@@ -259,7 +259,7 @@ A listen release says when release removes the listener the step added (D12.8):
 | `unbound` | nothing | the pipeline stops: the binding cannot create a holder on the path, or a holder on it is polymorphic |
 
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
-`neg`, `coalesce`, `cond`, `nullableValue`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
+`neg`, `coalesce`, `cond`, `nullableValue`, `nonNull`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
 `sumDouble`, `sumDecimal` and `eqDecimal`.
 `toNumber`,
@@ -278,6 +278,9 @@ same reader and compares the two as whole numbers at the larger scale, so "0.10"
 texts. An argument that reads nothing makes it read nothing, null equals null and no decimal, and any other value
 stops the pipeline. C# writes it for `==` over a decimal written as text, and `not` of it for `!=`; a decimal written
 as a JSON number keeps `eq` and `neq`.
+`nonNull` is its one argument's value, and stops the pipeline where that argument reads nothing or holds null. C#
+writes it for a `Select` field whose type holds no null, so the list a `Select` builds holds no value its item type
+cannot hold (D6.16); a `Sum`'s term is checked by its own operator.
 `compareNumbers`, `compareOrdinal`, `compareBooleans` and `compareCulture` compare two sort keys to -1, 0 or 1, null
 first, by the comparison C# picks from the key's type (D6.13); the redesign's `order` compared whatever came by its
 JavaScript type. `compareCulture` compares two texts with the browser's `Intl.Collator` under the plan's

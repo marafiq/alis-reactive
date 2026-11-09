@@ -1781,6 +1781,15 @@
       "probe": "AspNetCoreBinding",
       "expect": "core-new-constraint-wraps: under new T() a constructor's throw reaches the caller as TargetInvocationException whose inner is InvalidOperationException: Plugin name 'alis.log' is refused.; Activator on its stack True",
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-select-past-null",
+      "statement": ".NET's Select runs its selector only when its consumer reads an item: past a null holder it throws in ToList, Sum and Count, and not in Any over a list, which reads the count alone, or in First when the first item is whole; a cast of a null nullable to int throws, a cast to int? does not.",
+      "host": "net10",
+      "oracle": ".NET 10's System.Linq",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-select-past-null: over a dose whose supply is null and whose count is null, Select(d => d.Supply.Vials).ToList() throws NullReferenceException; .Sum() throws NullReferenceException; .Count() throws NullReferenceException; .Any() runs; .First() runs; Select(d => (int)d.Count).ToList() throws InvalidOperationException; Select(d => (int?)d.Count).ToList() runs",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
     }
   ]
 }

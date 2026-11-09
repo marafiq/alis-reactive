@@ -775,12 +775,27 @@ Terms used throughout:
   pattern the view holds (Decision 2, the owner, 2026-11-06). A pattern read from the item, or null when the view
   renders, is refused (X6.38). A text that reads nothing or holds null reads nothing, as every text operator does
   (`spec/Core/translated-members.md`), where .NET throws `ArgumentNullException`.
+- D6.16 A `Select` builds its whole list where it is read, one item per item of its list, so a list never holds a value
+  its item type cannot hold (gate 1's P6). A field that reads nothing, past a holder that holds null or as a cast of a
+  null nullable (D6.14), is null in its list when the field's C# type holds null (a reference type, a `Nullable<T>`),
+  as D6.14 reads nothing where .NET throws, and stops the pipeline when it holds none (`int`, `decimal`, `bool`, an
+  enum, a date, any other struct), as a `Sum` term (D6.11) and an `OrderBy` key (D6.13) stop. C# writes the field of
+  such a type as `op(nonNull, field)`, which is the field's value and stops the pipeline where it reads nothing or
+  holds null; C# decides by the field's type argument itself, `default(TField) is null`, which reads no type
+  information. So `Select(d => d.Supply.Vials)` stops on a dose whose supply is null, and
+  `Select(d => (int?)d.Supply.Vials)` holds null for it. .NET's `Select` is lazy and throws when its consumer runs the
+  field on an item: `ToList`, `Sum` and `Count()` throw past a null (`probe:core-select-past-null`), so the plan stops
+  where .NET throws, except a `Select(..).Any()` over a list, which net10 answers from the list's count alone; `Any()`
+  over the list itself is the door for that. A `Sum` keeps its own term: `sumInt`, `sumDouble` and `sumDecimal` stop on
+  a term that reads nothing, so a `Sum`'s map writes no `nonNull`.
 
-**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`).
+**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`, `nonNull`).
 
 **Checker.**
 - `Absence.tla:MissingListReadsNothing`
 - `Schema.tla:DecimalTextComparedByValue`: no `eq` or `neq` the C# writes takes a decimal written as text
+- `Schema.tla:SelectFieldHoldsItsType`: no `Select` field of a type that holds no null is written bare
+- `probe:core-select-past-null`
 - `probe:core-json-decimal-text-written`
 - `probe:core-json-decimal-text-rounded`
 - `probe:core-json-double-text`
@@ -801,12 +816,13 @@ Terms used throughout:
   past a holder that holds null reads nothing (D4.2, D6.14, D8.9). An expression tree refuses `?.` (CS8072), so
   without it a view writes `round.Carer!.Name`, a `!` that claims what the plan does not need. The doors are a closed
   set, matched by the method's definition and never by its name alone: the predicate of `Count`, `Where`, `Any`, `All`
-  and `Find`, the field of `Select` and of `Find(predicate, field)` (D6.9), the path of `ReadOnly<T>.Read` and of
+  and `Find`, the field of `Select` whose type holds null (D6.16) and of `Find(predicate, field)` (D6.9), the path of
+  `ReadOnly<T>.Read` and of
   `MethodResult<T>.Read`, and an `Any`, `All` or `Count` predicate nested in any data lambda (D6.8). The warning is
   suppressed only on an expression that reads an item, the split `LambdaCondition` reads by: a value the view holds
   (`Model.Cover.Name`, a captured local) is read where the view renders and refused there when it is null (D6.7), so
-  its warning stays. It stays where null stops the pipeline: a `Sum` term (D6.11) and an `OrderBy` or
-  `OrderByDescending` key (D6.13). It stays on an argument (CS8604, `Contains(null)` stops, X6.19), on a lambda over a
+  its warning stays. It stays where null stops the pipeline: a `Sum` term (D6.11), an `OrderBy` or
+  `OrderByDescending` key (D6.13) and a `Select` field whose type holds no null (D6.16). It stays on an argument (CS8604, `Contains(null)` stops, X6.19), on a lambda over a
   list the server holds, and on an input named by a member path (`InputField`, `pipeline.Input`), where MVC's own
   `TextBoxFor` warns the same in the same view. A cast from a nullable to its value, `(int)d.Priority`, reads as its
   `Value` does (D6.14), so CS8629 on it is suppressed in the same doors (POC 13g-ii).
@@ -985,8 +1001,11 @@ Terms used throughout:
   0.10m || d.Copay == 0.25m, or look it up on the server."
 - `X6.46` analyzer: a read past a nullable member in the predicate, field or path of a door that reads nothing past
   null builds with no `!` under warnings as errors, and so does a cast of a nullable there; the same read in a `Sum`
-  term, an `OrderBy` key, a value the view holds, a lambda over a list the server holds or an input's member path
+  term, an `OrderBy` key, a `Select` field whose type holds no null (D6.16), a value the view holds, a lambda over a list the server holds or an input's member path
   still warns: new:N6.3 (POC 13g, 13g-ii).
+- `X6.55` behavior (D6.16): over three doses, one of whose supply is null, a pipeline that shows
+  `Select(d => d.Supply.Vials).Count()` stops before it shows a count and logs the field, where the same page's
+  `Select(d => (int?)d.Supply.Vials).Count(v => v == null)` shows 1.
 - `X6.7` behavior: a list that holds a paged result (`{ result, count }`) where the declaration says a list stops
   the pipeline at its operation; a list that reads nothing reads nothing and the pipeline goes on (D6.3).
 

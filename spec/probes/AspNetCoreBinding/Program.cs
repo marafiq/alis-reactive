@@ -184,6 +184,7 @@ try
     }
     Console.WriteLine("core-flags-split-agrees: FluentValidation's IsInEnum, net10's binding of the number and of the split's text, Enum.ToString and the split: " + await FlagsAgree<ProbeCare>("/f/care?Care", number => new ProbeFlagged { Care = (ProbeCare)number }, "Care", 255) + "; " + await FlagsAgree<ProbeRota>("/f/rota?Rota", number => new ProbeFlagged { Rota = (ProbeRota)number }, "Rota", 7) + "; " + await FlagsAgree<ProbeAccess>("/f/access?Access", number => new ProbeFlagged { Access = (ProbeAccess)number }, "Access", 31) + "; " + await FlagsAgree<ProbeComposite>("/f/composite?Composite", number => new ProbeFlagged { Composite = (ProbeComposite)number }, "Composite", 7) + "; " + await FlagsAgree<ProbeOverlap>("/f/overlap?Overlap", number => new ProbeFlagged { Overlap = (ProbeOverlap)number }, "Overlap", 15) + "; " + await FlagsAgree<ProbeShared>("/f/shared?Shared", number => new ProbeFlagged { Shared = (ProbeShared)number }, "Shared", 15));
     Console.WriteLine("core-new-constraint-wraps: under new T() a constructor's throw reaches the caller as " + MadeByNew<ProbeRefusingDeclaration>());
+    Console.WriteLine("core-select-past-null: over a dose whose supply is null and whose count is null, " + SelectPastNull());
     await HttpProbes.Run(new Uri(app.Urls.First()));
 }
 finally
@@ -242,6 +243,33 @@ static string MadeByNew<T>() where T : new()
     }
 }
 
+static string SelectPastNull()
+{
+    var doses = new List<ProbeSelectDose> { new() { Supply = new ProbeSelectSupply { Vials = 2 }, Count = 1 }, new() { Supply = null, Count = null } };
+    string Run(string name, Func<object> run)
+    {
+        try
+        {
+            run();
+            return name + " runs";
+        }
+        catch (Exception thrown)
+        {
+            return name + " throws " + thrown.GetType().Name;
+        }
+    }
+    return string.Join("; ", new[]
+    {
+        Run("Select(d => d.Supply.Vials).ToList()", () => doses.Select(d => d.Supply!.Vials).ToList()),
+        Run(".Sum()", () => doses.Select(d => d.Supply!.Vials).Sum()),
+        Run(".Count()", () => doses.Select(d => d.Supply!.Vials).Count()),
+        Run(".Any()", () => doses.Select(d => d.Supply!.Vials).Any()),
+        Run(".First()", () => doses.Select(d => d.Supply!.Vials).First()),
+        Run("Select(d => (int)d.Count).ToList()", () => doses.Select(d => (int)d.Count!).ToList()),
+        Run("Select(d => (int?)d.Count).ToList()", () => doses.Select(d => (int?)d.Count).ToList()),
+    });
+}
+
 static IEnumerable<decimal> DecimalSweep()
 {
     var random = new Random(15);
@@ -283,6 +311,18 @@ static async Task<string> Form(HttpClient client, string path, string body)
 public sealed class ProbeRefusingDeclaration
 {
     public ProbeRefusingDeclaration() => throw new InvalidOperationException("Plugin name 'alis.log' is refused.");
+}
+
+public sealed class ProbeSelectSupply
+{
+    public int Vials { get; set; }
+}
+
+public sealed class ProbeSelectDose
+{
+    public ProbeSelectSupply? Supply { get; set; }
+
+    public int? Count { get; set; }
 }
 
 public sealed class Person
