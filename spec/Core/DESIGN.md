@@ -868,7 +868,9 @@ Terms used throughout:
 - `check:fluent`
 
 **Doors.**
-- existing: `ReactiveArray` (`Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:44`, `Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:93`).
+- kept: `ReactiveArray`'s operation names (D6.2; `Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:44`,
+  `Alis.Reactive/PlanAuthoring/Arrays/ReactiveArray.cs:93`), as extension methods on the source (D6.10, N6.1), so
+  `ReactiveArray`, `ReactiveValue` and `p.From` leave (module 4, `spec/ArrayLambdas/module.md`).
 - `N6.1` new: `LiveObjects<TItem>.Count()` and `LiveObjects<TItem>.Select(..)`, replacing `Count` and `Each`, beside
   `At(n)` and `Where(..)`; the same operations over a list of data are extension methods on
   `ITypedSource<IEnumerable<TItem>>` (`DataLists`, POC 4, D6.10).
@@ -1043,8 +1045,9 @@ Terms used throughout:
 - `X6.47` behavior (D6.14): `(int)d.Priority != 2` counts the two doses whose priority is not 2 and drops the one
   whose priority is null, as `d.Priority.Value != 2` does; `d.Priority == (int)routine`, a view's `int?` that holds 2,
   counts the two doses of priority 2. `OrderBy(d => (int)d.Priority!)` and `Sum(d => (int)d.Priority!)` stop the
-  pipeline at the dose whose priority is null, where .NET throws; `Select(d => (int)d.Priority)` holds null for it in
-  its list, as `Select(d => d.Priority.Value)` does, so `Count(p => p != 2)` counts it.
+  pipeline at the dose whose priority is null, where .NET throws, and so do `Select(d => (int)d.Priority)` and
+  `Select(d => d.Priority.Value)`, a field whose type holds no null (D6.16); `Select(d => d.Priority)` holds null for it
+  in its list, so `Count(p => p != 2)` counts it.
 - `X6.48` refusal (D6.14): a value the view holds, null when the view renders, cast to its value: "'none' is null when
   the view renders, and the cast takes its value, which .NET refuses; compare the nullable itself, such as d =>
   d.Priority == limit."
@@ -4448,7 +4451,7 @@ shapes, starts and the payload kind of each event.
   an interface or `Nullable<T>` declares (D14.3); a dictionary of dates
   written into a live member (D3.13); a constant literal no live number holds (D7.7, X7.13); in a list's lambda and a pipeline condition, a term outside the identity table
   (D6.5), a view value that computes (D6.7), and each comparison, ordering, cast, coalesce and lookup D6.12 to D6.14
-  and N8.2 refuse by the types they read; a constant pattern outside D16.11's closed set (D6.15); in a pipeline condition, a constant `MinLength` below zero (M3.D1, M3.X4).
+  and N8.2 refuse by the types they read; a constant pattern outside D16.11's closed set (D6.15); in a pipeline condition, a constant `MinLength` below zero (M3.D1, M3.X4); a constant position below zero given to `At` (D1.1, M4.X10).
 - `N18.11` new: ALIS006 kept as an error, the validator analyzer: a condition with no browser form outside
   `WhenOnServer` and `UnlessOnServer`, a constant pattern outside D16.11's closed set or with an option other than
   `CultureInvariant`, and on net48 a model type with no public parameterless constructor (D16.6, D16.11).
