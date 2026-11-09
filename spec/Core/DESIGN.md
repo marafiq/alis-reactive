@@ -2461,9 +2461,12 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   - An abort the run's own step causes lands when that step returns, before the next (`Run.tla:NothingRunsAfterAnAbort`):
     a step that loads or unloads the slot its owner holds, whose release waits for that return (D12.4), and a step
     that raises its handler's own event under `replace`. The new run starts after the old run's cut has landed and its
-    `Finally` layers have run to their first awaited step, as when a `replace` lands on a wait, so an old `Finally`
-    never clears what the new run's `WhileLoading` showed. Neither TLA+ spec models the second run, so a browser log
-    proves this order: the 17c(b1) slice's re-entrant bell.
+    `Finally` layers have run to their first awaited step, as when a `replace` lands on a wait, so what an old
+    `Finally` does before an await never undoes what the new run's `WhileLoading` shows. What it does after an await
+    runs after that `WhileLoading`, since under `replace` it goes on to its end (X11.22): an element an app shows in
+    `WhileLoading` and hides in `Finally` is hidden by the old run while the new one loads, and the door for that is
+    the busy indicator, which the core counts per target (D10.21, `spec/Core/Composition.tla`). Neither TLA+ spec
+    models the second run, so the order is X11.24's, a Playwright promise of the rewrite's run unit.
   - `all` ends when each of its blocks ended (D10.10, `Lanes.tla:JoinAfterEveryBranchTail`).
 - D11.12 The core's state machines are closed, each held in one place, its transitions its TLA+ spec's actions:
   - a run (D11.11, `spec/Core/Run.tla`), under its handler's policy and its owner's dispose (`spec/Core/Lanes.tla`);
@@ -2611,6 +2614,10 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `X11.23` behavior (D11.8): a slot unloaded while its request's defaults' `Finally` awaits: the step after that
   await does not run, and the request's busy target hides (`Run.tla:DisposedRunNeverWaits`,
   `Run.tla:ReleasedWhenEnded`).
+- `X11.24` behavior (D11.11): under `replace`, a bell's handler logs "rang" and its round, then sends a request whose
+  route rings the same bell on round 1 and whose `Finally` logs "finally" and the round, then logs "after" and the
+  round: the log reads "rang 1 finally 1 rang 2 finally 2 after 2", the old run's `Finally` before the new run's first
+  step and no step after the old request (`Run.tla:NothingRunsAfterAnAbort`).
 - `X11.17` analyzer (D11.10): C#'s own branching (`if`, `?:`, `switch`, `try`, `return`) in any block: ALIS004,
   new:N18.6.
 
