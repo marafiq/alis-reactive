@@ -2154,7 +2154,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   replacing N9.3, N9.7, N10.2 and N10.5's open forms:
   - startup, once on each host: `services.AddReactiveRequests(requests => ..)` with `Antiforgery(AntiforgeryIn.Header)`,
     `Antiforgery(AntiforgeryIn.FormField)` or `NoAntiforgery()`, `Header(name, value)`, `ShowBusy()`,
-    `ShowValidationErrors()`, `WhileLoading`, `Finally`, `OnError(status, ..)`, `OnError(..)` and `Retry(attempts,
+    `ShowValidationErrors()`, `WhileLoading`, `Finally`, `OnError(status, ..)`, `OnError(..)` or `OnError<TError>(..)` and `Retry(attempts,
     firstWait)`; a defaults pipeline is `Pipeline<NoModel>`, so it names no view member. The call is required: a view
     that renders a request in an app without it is refused, naming it. A default `Header(name, value)` takes text
     only: no page exists at startup, so there is no source to read; a header read from the page goes on the request. A
@@ -2207,7 +2207,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     POC refuses a list in a path segment (`poc/Alis.Reactive.Poc/Types/WireForms.cs`), since no C# constraint names a
     scalar.
   - the routes, on the request: `OnSuccess(Content.<kind>, (reply, pipeline) => ..)`, `OnError(status, Content.<kind>,
-    (reply, pipeline) => ..)` and the catch-all `OnError((failed, pipeline) => ..)`, with the readers `Content.None`,
+    (reply, pipeline) => ..)` and the catch-all `OnError((failed, pipeline) => ..)` or, typed, `OnError<TError>((failed,
+    pipeline) => ..)`, with the readers `Content.None`,
     `Content.Json<T>()`, `Content.Text`, `Content.Html` and `Content.File` (D10.6). `OnSuccess<T>` returns a request that
     carries `T`, so its `Chained((reply, next) => ..)` receives the typed reply by construction. `Validate<TValidator>()`,
     `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the body the request sends (Q16); `Busy(elementId, ..)`,
@@ -2222,7 +2223,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     content, `FailureOutcome`, a closed choice (S8) whose own converter writes each case as the plan's outcome,
     `status`, `network`, `redirect` and `content`, and which no converter the app's JSON options add for enums
     reaches, so a condition on it agrees with the browser; `Status`, 0 for a
-    network failure, a body that breaks off while it is read included, the Fetch Standard's network error; `Headers`); `ResponseFile`, the data of a file body (`Name`, `Size`, `Type`); `Markup`, an HTML
+    network failure, a body that breaks off while it is read included, the Fetch Standard's network error; `Headers`);
+    `Failure<TError>`, the typed catch-all's reply, which adds `Body`, a data read of the JSON body when its outcome is
+    status and the body parses, and nothing for a network, redirect or content outcome (D4.2); `ResponseFile`, the data of a file body (`Name`, `Size`, `Type`); `Markup`, an HTML
     body, the only text `Into(elementId, source)` takes; `BrowserFile` (lib.dom `File`), held by a file input's member;
     and `pipeline.PageUrl<TPage>()` or
     `PageUrl<TPage>(template)`, whose `Read(q => q.A.B)` reads a placeholder member from the path and any other from the
@@ -2264,7 +2267,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     a stage written a second time and a route written after another step. `Routes.OnSuccess` becomes `OnSuccess(Content.<kind>, ..)` and `OnSuccess<T>`, one
     by type; `Routes.OnError(status, ..)` becomes `OnError(status, Content.<kind>, ..)` and `OnError<T>(status, ..)`,
     keeping a status from 300 to 599 and one route a status, ALIS030's (N18.7); `Routes.OnError(otherwise)`
-    becomes `OnError((failed, pipeline) => ..)` with `Failure`, keeping one, ALIS030's.
+    becomes `OnError((failed, pipeline) => ..)` with `Failure`, and main's typed catch-all `OnError<TError>(..)` becomes
+    `OnError<TError>((failed, pipeline) => ..)` with `Failure<TError>`, keeping one catch-all, ALIS030's.
     `ResponseBody<TBody>.Read(path)` becomes `Body.Read(path)`, data that reads as nothing when absent. The POC's kinds by
     door (HTML for `Get(url)`, JSON for `Get<TRequest>`) become the kind each route names, which the plan carries on the
     route, and `Accept` is written from the success route's kind (D10.6): a request with no success route reads none.
@@ -2372,6 +2376,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `X10.28` refusal (N10.7): a request rendered in an app that never called `AddReactiveRequests` is refused where the
   view renders with "'{method} {url}' is rendered in an app that never called AddReactiveRequests; call
   services.AddReactiveRequests(requests => ..) once at startup."
+- `X10.29` behavior (N10.7): a typed catch-all, `OnError<TError>((failed, pipeline) => ..)`, reads the JSON body of a
+  status no route names through `failed.Body`, and `Body` reads nothing after a network failure, while `Outcome` reads
+  `network`.
 
 ## Q11. Lanes and time
 

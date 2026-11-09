@@ -6,6 +6,17 @@ using Alis.Reactive.Values;
 
 namespace Alis.Reactive.Requests;
 
+public sealed class Failure<TError> : JsObject
+{
+    public ReadOnly<FailureOutcome> Outcome => throw new NotSupportedException();
+
+    public ReadOnly<int> Status => throw new NotSupportedException();
+
+    public ResponseHeaders Headers => throw new NotSupportedException();
+
+    public ReadOnly<TError> Body => throw new NotSupportedException();
+}
+
 public sealed class ResponseFile
 {
     public string Name { get; init; } = "";

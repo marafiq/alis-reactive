@@ -1284,6 +1284,10 @@
           "id": "M6.X4",
           "rung": "behavior",
           "defect": "A reply's header is read by its case, a repeated header reads its first value only, or a header the answer lacks shows a placeholder text: Headers.Get(name) reads as the browser's Headers.get reads, a name in any case, a repeated header's values joined by a comma and a space, and a missing one as null, which a text set from it shows as nothing (D10.19, N10.7, D5.3)."
+        },
+        {
+          "id": "X10.29",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -1446,6 +1450,14 @@
           "outcome": "The texts read \"v7\", East, West and nothing.",
           "opposite": "With X-Ward sent once as East, the second text reads East.",
           "defect": "The name read by its case, so the first text reads nothing; the repeated header read once, so the second reads East; or the missing one shown as null or undefined."
+        },
+        {
+          "for": "X10.29",
+          "page": "A bed form whose Save posts to /Beds with a typed catch-all, OnError<CommitError>, that writes the body's Message into the error text and the outcome into the outcome text; the test's server answers 409 with a body whose message is Bed taken, or drops the connection.",
+          "gesture": "Click Save while the server answers 409, then click Save while it drops the connection.",
+          "outcome": "After the 409 the error text reads Bed taken and the outcome reads status; after the dropped connection the error text is empty and the outcome reads network.",
+          "opposite": "With a route written for 409, that route runs and the error text stays empty.",
+          "defect": "The catch-all reads no body, so the error text stays empty after the 409, or its Body keeps the last body read, so the error text still reads Bed taken after the dropped connection."
         }
       ],
       "verdicts": [
@@ -1481,9 +1493,8 @@
         },
         {
           "door": "ResponseBuilder<TModel>.OnError<TError>(System.Action<ResponseBody<TError!>!, PipelineBuilder<TModel!>!>! pipeline) -> ResponseBuilder<TModel!>!",
-          "verdict": "refused",
-          "reason": "A catch-all that reads a typed error body: D10.5's catch-all also serves a network failure, a redirect to another origin and a body not of the declared kind, none of which carries a body of the type, so it reads Failure (Outcome, Status, Headers); a typed error body is read by the route for its status, OnError<T>(status, ..). A typed body for a status no route names has no carrier yet: the next HTTP unit designs it (spec/NOTES.md, 2026-11-09), and gate 2 names it.",
-          "carriers": [
+          "verdict": "renamed",
+          "to": [
             "N10.7"
           ]
         },

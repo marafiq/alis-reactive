@@ -219,4 +219,17 @@ public static class RequestDoors
         sent.Into("beds").Chained((loaded, next) => next.Into("bed-copy", loaded.Body));
         sent.Download().Chained((saved, next) => next.Element("export-name").Text.Set(saved.Body.Read(f => f.Name)));
     }
+
+    public static void TypedCatchAll(Pipeline<IntakeView> pipeline)
+    {
+        pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
+            .OnError<CommitError>((failed, shown) => shown.Element("error").Text.Set(failed.Body.Read(e => e.Message)));
+        pipeline.Get<BedQuery>("/Wards/{ward}/Beds", request => request.Path(r => r.Ward, "north"))
+            .OnError((Failure<CommitError> failed, Pipeline<IntakeView> shown) => shown.Element("error").Text.Set(failed.Body.Read(e => e.Message)));
+    }
+}
+
+public sealed class CommitError
+{
+    public string Message { get; set; } = "";
 }

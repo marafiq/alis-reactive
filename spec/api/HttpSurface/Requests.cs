@@ -93,6 +93,8 @@ public sealed class OptionsRequest<TModel, TRequest>
 
     public OptionsRequest<TModel, TRequest> OnError(Action<Failure, Pipeline<TModel>> failed) => throw new NotSupportedException();
 
+    public OptionsRequest<TModel, TRequest> OnError<TError>(Action<Failure<TError>, Pipeline<TModel>> failed) => throw new NotSupportedException();
+
     public OptionsRequest<TModel, TRequest> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
         => throw new NotSupportedException();
@@ -128,6 +130,8 @@ public sealed class OptionsRequest<TModel, TRequest, TReply>
         => throw new NotSupportedException();
 
     public OptionsRequest<TModel, TRequest, TReply> OnError(Action<Failure, Pipeline<TModel>> failed) => throw new NotSupportedException();
+
+    public OptionsRequest<TModel, TRequest, TReply> OnError<TError>(Action<Failure<TError>, Pipeline<TModel>> failed) => throw new NotSupportedException();
 
     public OptionsRequest<TModel, TRequest, TReply> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
@@ -176,6 +180,8 @@ public sealed class PostRequest<TModel, TRequest>
 
     public PostRequest<TModel, TRequest> OnError(Action<Failure, Pipeline<TModel>> failed) => throw new NotSupportedException();
 
+    public PostRequest<TModel, TRequest> OnError<TError>(Action<Failure<TError>, Pipeline<TModel>> failed) => throw new NotSupportedException();
+
     public PostRequest<TModel, TRequest> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
         => throw new NotSupportedException();
@@ -209,6 +215,8 @@ public sealed class PostRequest<TModel, TRequest, TReply>
         => throw new NotSupportedException();
 
     public PostRequest<TModel, TRequest, TReply> OnError(Action<Failure, Pipeline<TModel>> failed) => throw new NotSupportedException();
+
+    public PostRequest<TModel, TRequest, TReply> OnError<TError>(Action<Failure<TError>, Pipeline<TModel>> failed) => throw new NotSupportedException();
 
     public PostRequest<TModel, TRequest, TReply> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
@@ -255,6 +263,8 @@ public sealed class PutRequest<TModel, TRequest>
 
     public PutRequest<TModel, TRequest> OnError(Action<Failure, Pipeline<TModel>> failed) => throw new NotSupportedException();
 
+    public PutRequest<TModel, TRequest> OnError<TError>(Action<Failure<TError>, Pipeline<TModel>> failed) => throw new NotSupportedException();
+
     public PutRequest<TModel, TRequest> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
         => throw new NotSupportedException();
@@ -290,6 +300,8 @@ public sealed class PutRequest<TModel, TRequest, TReply>
         => throw new NotSupportedException();
 
     public PutRequest<TModel, TRequest, TReply> OnError(Action<Failure, Pipeline<TModel>> failed) => throw new NotSupportedException();
+
+    public PutRequest<TModel, TRequest, TReply> OnError<TError>(Action<Failure<TError>, Pipeline<TModel>> failed) => throw new NotSupportedException();
 
     public PutRequest<TModel, TRequest, TReply> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
@@ -338,6 +350,8 @@ public sealed class DeleteRequest<TModel, TRequest>
 
     public DeleteRequest<TModel, TRequest> OnError(Action<Failure, Pipeline<TModel>> failed) => throw new NotSupportedException();
 
+    public DeleteRequest<TModel, TRequest> OnError<TError>(Action<Failure<TError>, Pipeline<TModel>> failed) => throw new NotSupportedException();
+
     public DeleteRequest<TModel, TRequest> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
         => throw new NotSupportedException();
@@ -373,6 +387,8 @@ public sealed class DeleteRequest<TModel, TRequest, TReply>
         => throw new NotSupportedException();
 
     public DeleteRequest<TModel, TRequest, TReply> OnError(Action<Failure, Pipeline<TModel>> failed) => throw new NotSupportedException();
+
+    public DeleteRequest<TModel, TRequest, TReply> OnError<TError>(Action<Failure<TError>, Pipeline<TModel>> failed) => throw new NotSupportedException();
 
     public DeleteRequest<TModel, TRequest, TReply> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>

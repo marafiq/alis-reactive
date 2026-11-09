@@ -41,5 +41,7 @@ public sealed class RequestDefaults
 
     public RequestDefaults OnError(Action<Failure, Pipeline<NoModel>> failed) => throw new NotSupportedException();
 
+    public RequestDefaults OnError<TError>(Action<Failure<TError>, Pipeline<NoModel>> failed) => throw new NotSupportedException();
+
     public RequestDefaults Retry(int attempts, TimeSpan firstWait) => throw new NotSupportedException();
 }

@@ -28,6 +28,14 @@ public static class GetStandIns
         this GetRequest<TModel, TRequest> request, int status, NoContent content, Action<Response<TRequest>, Pipeline<TModel>> error)
         => throw new NotSupportedException();
 
+    public static GetRequest<TModel, TRequest> OnError<TModel, TRequest, TError>(
+        this GetRequest<TModel, TRequest> request, Action<Failure<TError>, Pipeline<TModel>> failed)
+        => throw new NotSupportedException();
+
+    public static GetRequest<TModel, TRequest, TReply> OnError<TModel, TRequest, TReply, TError>(
+        this GetRequest<TModel, TRequest, TReply> request, Action<Failure<TError>, Pipeline<TModel>> failed)
+        => throw new NotSupportedException();
+
     public static GetRequest<TModel, TRequest> Validate<TModel, TRequest, TValidator>(this GetRequest<TModel, TRequest> request)
         where TValidator : ReactiveValidator<TRequest>
         => throw new NotSupportedException();

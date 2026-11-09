@@ -216,7 +216,7 @@ A request's parts are closed (D10.23, S2):
 | layer | | `whileLoading`, `finally`: blocks |
 | route | `kind`: the body kind it decodes, none, JSON, text, HTML or file for a success, none, JSON, text or HTML for an error (D10.6) | `do`: a block |
 | status route | `status`: a number from 300 to 599 (D10.13); `kind`, as a route's | `do`: a block |
-| otherwise route | no `kind`: its reply is a `Failure`, which has no body to decode (N10.7) | `do`: a block |
+| otherwise route | `kind`: none, its reply a `Failure`, or JSON, its reply a `Failure<TError>` whose `Body` reads the body of a status outcome (N10.7) | `do`: a block |
 
 A request that takes no defaults has one layer, its own. A route the view wrote no block for has kind none and an empty
 `do`, so every part is present.
