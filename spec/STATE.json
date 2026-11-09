@@ -1267,13 +1267,26 @@
       }
     },
     "defects": {
-      "counts": {},
-      "detail": "not started: no spec/<Module>/features.json",
+      "counts": {
+        "defects": 7,
+        "doubled": 0,
+        "features": 1,
+        "mapped": 70,
+        "rows": 8909,
+        "unmapped": 8839
+      },
+      "detail": "every feature row valid; 8839 of 8909 spec doors in no feature",
       "pass": false
     },
     "doors_mapped": {
-      "counts": {},
-      "detail": "not started: no spec/<Module>/features.json",
+      "counts": {
+        "doubled": 0,
+        "features": 1,
+        "mapped": 70,
+        "rows": 8909,
+        "unmapped": 8839
+      },
+      "detail": "every feature row valid; 8839 of 8909 spec doors in no feature",
       "pass": false
     },
     "evidence": {
@@ -1285,13 +1298,23 @@
       "pass": true
     },
     "features_core": {
-      "counts": {},
-      "detail": "not started: no spec/<Module>/features.json",
+      "counts": {
+        "doubled": 0,
+        "features": 1,
+        "mapped": 70,
+        "rows": 8909,
+        "unmapped": 8839
+      },
+      "detail": "every feature row valid; 8839 of 8909 spec doors in no feature",
       "pass": false
     },
     "features_lost": {
-      "counts": {},
-      "detail": "not started: no spec/<Module>/features.json",
+      "counts": {
+        "lost": 703,
+        "types_in_no_feature": 703,
+        "uncarried_doors": 0
+      },
+      "detail": "703 declaring types in no feature",
       "pass": false
     },
     "fluent": {
@@ -1311,7 +1334,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 30,
+        "files": 32,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1391,8 +1414,15 @@
       "pass": true
     },
     "promises": {
-      "counts": {},
-      "detail": "not started: no spec/<Module>/features.json",
+      "counts": {
+        "doubled": 0,
+        "features": 1,
+        "mapped": 70,
+        "promises": 6,
+        "rows": 8909,
+        "unmapped": 8839
+      },
+      "detail": "every feature row valid; 8839 of 8909 spec doors in no feature",
       "pass": false
     },
     "questions": {
@@ -3292,13 +3322,21 @@
       }
     },
     "verdicts": {
-      "counts": {},
-      "detail": "not started: no spec/<Module>/features.json",
+      "counts": {
+        "doubled": 0,
+        "features": 1,
+        "main_only": 4156,
+        "main_only_in_features": 32,
+        "mapped": 70,
+        "rows": 8909,
+        "unmapped": 8839
+      },
+      "detail": "every feature row valid; 8839 of 8909 spec doors in no feature",
       "pass": false
     }
   },
   "passed": 14,
-  "read_at_head": "42a22fa7f34d8fc6a01434182c7762b4a15cdab4",
+  "read_at_head": "9f628e79e6b6573a750f65f510c81970a84786d1",
   "step": {
     "failing": [
       "doors_mapped",
