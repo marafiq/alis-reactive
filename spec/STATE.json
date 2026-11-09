@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 337,
+        "defects": 343,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1256,10 +1256,10 @@
     },
     "probes": {
       "counts": {
-        "facts": 205,
-        "net10": 90,
+        "facts": 213,
+        "net10": 96,
         "net48": 67,
-        "node": 48
+        "node": 50
       },
       "detail": "every fact printed by its probe or found at its source line",
       "pass": true
@@ -1272,7 +1272,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 360,
+        "defects": 366,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -3046,7 +3046,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "b6889a625d36496d1f089195666e39e18e41c300",
+  "read_at_head": "dcdd9bcb6be08baab487b62c5aba930a0ffdddf4",
   "step": {
     "failing": [
       "gate1"
