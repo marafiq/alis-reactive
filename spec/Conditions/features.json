@@ -477,7 +477,7 @@
         {
           "door": "PipelineBuilder<TModel>.Confirm(string! message) -> GuardBuilder<TModel!>!",
           "verdict": "refused",
-          "reason": "A user's decision is no core door (D17.9): main writes a condition kind of its own, answered by window.alis.confirm, which only Fusion's confirm dialog sets (`Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:103` at 623dd4a27). The condition reads a component's async boolean method, NativeConfirm's or any onboarded component's, as any source is read.",
+          "reason": "A user's decision is no core door (D17.9): main writes a condition kind of its own, answered by a confirm function the page's global object holds, which only Fusion's confirm dialog sets (`Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:103` at 623dd4a27). The condition reads a component's async boolean method, NativeConfirm's or any onboarded component's, as any source is read.",
           "carriers": [
             "N17.3",
             "N17.4"
@@ -512,7 +512,7 @@
         {
           "door": "ConditionStart<TModel>.Confirm(string! message) -> GuardBuilder<TModel!>!",
           "verdict": "refused",
-          "reason": "A user's decision is no core door (D17.9): main writes a condition kind of its own, answered by window.alis.confirm, which only Fusion's confirm dialog sets (`Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:103` at 623dd4a27). The condition reads a component's async boolean method, NativeConfirm's or any onboarded component's, as any source is read.",
+          "reason": "A user's decision is no core door (D17.9): main writes a condition kind of its own, answered by a confirm function the page's global object holds, which only Fusion's confirm dialog sets (`Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:103` at 623dd4a27). The condition reads a component's async boolean method, NativeConfirm's or any onboarded component's, as any source is read.",
           "carriers": [
             "N17.3",
             "N17.4"
