@@ -1268,25 +1268,25 @@
     },
     "defects": {
       "counts": {
-        "defects": 63,
+        "defects": 130,
         "doubled": 0,
-        "features": 7,
-        "mapped": 490,
+        "features": 9,
+        "mapped": 546,
         "rows": 8909,
-        "unmapped": 8419
+        "unmapped": 8363
       },
-      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8363 of 8909 spec doors in no feature",
       "pass": false
     },
     "doors_mapped": {
       "counts": {
         "doubled": 0,
-        "features": 7,
-        "mapped": 490,
+        "features": 9,
+        "mapped": 546,
         "rows": 8909,
-        "unmapped": 8419
+        "unmapped": 8363
       },
-      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8363 of 8909 spec doors in no feature",
       "pass": false
     },
     "evidence": {
@@ -1300,21 +1300,21 @@
     "features_core": {
       "counts": {
         "doubled": 0,
-        "features": 7,
-        "mapped": 490,
+        "features": 9,
+        "mapped": 546,
         "rows": 8909,
-        "unmapped": 8419
+        "unmapped": 8363
       },
-      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8363 of 8909 spec doors in no feature",
       "pass": false
     },
     "features_lost": {
       "counts": {
-        "lost": 675,
-        "types_in_no_feature": 675,
+        "lost": 671,
+        "types_in_no_feature": 671,
         "uncarried_doors": 0
       },
-      "detail": "675 declaring types in no feature",
+      "detail": "671 declaring types in no feature",
       "pass": false
     },
     "fluent": {
@@ -1334,7 +1334,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 38,
+        "files": 40,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1416,13 +1416,13 @@
     "promises": {
       "counts": {
         "doubled": 0,
-        "features": 7,
-        "mapped": 490,
-        "promises": 41,
+        "features": 9,
+        "mapped": 546,
+        "promises": 81,
         "rows": 8909,
-        "unmapped": 8419
+        "unmapped": 8363
       },
-      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8363 of 8909 spec doors in no feature",
       "pass": false
     },
     "questions": {
@@ -3324,19 +3324,19 @@
     "verdicts": {
       "counts": {
         "doubled": 0,
-        "features": 7,
+        "features": 9,
         "main_only": 4156,
-        "main_only_in_features": 160,
-        "mapped": 490,
+        "main_only_in_features": 164,
+        "mapped": 546,
         "rows": 8909,
-        "unmapped": 8419
+        "unmapped": 8363
       },
-      "detail": "every feature row valid; 8419 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 8363 of 8909 spec doors in no feature",
       "pass": false
     }
   },
   "passed": 14,
-  "read_at_head": "b173ad7439435441ccaaa0ac1c802868b3929b03",
+  "read_at_head": "8105b6f6b538f57893342851adf5632c65911b6e",
   "step": {
     "failing": [
       "doors_mapped",
