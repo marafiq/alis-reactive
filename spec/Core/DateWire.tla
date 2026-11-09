@@ -3,7 +3,8 @@ EXTENDS Integers
 
 CONSTANT Mutant
 
-Mutants == {"none", "DateSentWithOffset", "MidnightWritesTime", "PageDayOffset", "EmptyInstantSentAsEarliest"}
+Mutants == {"none", "DateSentWithOffset", "MidnightWritesTime", "PageDayOffset", "EmptyInstantSentAsEarliest",
+            "DayWritesTime", "TimeWritesDay"}
 
 ASSUME Mutant \in Mutants
 
@@ -12,13 +13,14 @@ MinutesOfDay == {0, 30, 1410}
 Offsets == {-60, 0, 60}
 PageDay == 1
 
-VARIABLES offset, kind, present, day, minute
+VARIABLES offset, kind, clrKind, present, day, minute
 
-vars == <<offset, kind, present, day, minute>>
+vars == <<offset, kind, clrKind, present, day, minute>>
 
 Init ==
     /\ offset \in [Days -> Offsets]
-    /\ kind \in {"date", "instant"}
+    /\ kind \in {"date", "instant", "day", "time"}
+    /\ clrKind \in {"Unspecified", "Local", "Utc"}
     /\ present \in BOOLEAN
     /\ day \in Days
     /\ minute \in MinutesOfDay
@@ -38,6 +40,10 @@ DateText ==
     Text("text", day, minute, minute # 0 \/ Mutant = "MidnightWritesTime",
          Mutant = "DateSentWithOffset", offset[day])
 
+DayText == Text("text", day, 0, Mutant = "DayWritesTime", FALSE, 0)
+
+TimeText == Text("text", IF Mutant = "TimeWritesDay" THEN day ELSE 0, minute, TRUE, FALSE, 0)
+
 InstantText ==
     Text("text", day, minute, TRUE, TRUE,
          IF Mutant = "PageDayOffset" THEN offset[PageDay] ELSE offset[day])
@@ -45,7 +51,10 @@ InstantText ==
 Sent ==
     IF ~present
       THEN IF kind = "instant" /\ Mutant = "EmptyInstantSentAsEarliest" THEN Earliest ELSE Text("nothing", 0, 0, FALSE, FALSE, 0)
-      ELSE IF kind = "date" THEN DateText ELSE InstantText
+      ELSE IF kind = "date" THEN DateText
+      ELSE IF kind = "day" THEN DayText
+      ELSE IF kind = "time" THEN TimeText
+      ELSE InstantText
 
 ParsedUtc(text) == text.day * 1440 + text.minute - text.zone
 
@@ -63,7 +72,13 @@ InstantCarriesItsClockOffset ==
         /\ Sent.minute = minute
         /\ ParsedUtc(Sent) = Utc
 
+DayIsItsDayAlone == (present /\ kind = "day") => (Sent.day = day /\ ~Sent.time /\ ~Sent.hasZone)
+
+TimeIsItsTimeAlone == (present /\ kind = "time") => (Sent.day = 0 /\ Sent.minute = minute /\ ~Sent.hasZone)
+
 NothingWritesNoText == ~present => Sent.form = "nothing"
+
+ReachUtcKindWritten == ~(present /\ kind = "date" /\ clrKind = "Utc" /\ ~Sent.hasZone /\ Sent.minute = minute)
 
 ReachOffsetChangesBetweenDays == ~(present /\ kind = "instant" /\ day # PageDay /\ offset[day] # offset[PageDay])
 

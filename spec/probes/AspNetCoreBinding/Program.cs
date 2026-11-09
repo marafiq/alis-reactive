@@ -185,6 +185,9 @@ try
     Console.WriteLine("core-flags-split-agrees: FluentValidation's IsInEnum, net10's binding of the number and of the split's text, Enum.ToString and the split: " + await FlagsAgree<ProbeCare>("/f/care?Care", number => new ProbeFlagged { Care = (ProbeCare)number }, "Care", 255) + "; " + await FlagsAgree<ProbeRota>("/f/rota?Rota", number => new ProbeFlagged { Rota = (ProbeRota)number }, "Rota", 7) + "; " + await FlagsAgree<ProbeAccess>("/f/access?Access", number => new ProbeFlagged { Access = (ProbeAccess)number }, "Access", 31) + "; " + await FlagsAgree<ProbeComposite>("/f/composite?Composite", number => new ProbeFlagged { Composite = (ProbeComposite)number }, "Composite", 7) + "; " + await FlagsAgree<ProbeOverlap>("/f/overlap?Overlap", number => new ProbeFlagged { Overlap = (ProbeOverlap)number }, "Overlap", 15) + "; " + await FlagsAgree<ProbeShared>("/f/shared?Shared", number => new ProbeFlagged { Shared = (ProbeShared)number }, "Shared", 15));
     Console.WriteLine("core-new-constraint-wraps: under new T() a constructor's throw reaches the caller as " + MadeByNew<ProbeRefusingDeclaration>());
     Console.WriteLine("core-select-past-null: over a dose whose supply is null and whose count is null, " + SelectPastNull());
+    Console.WriteLine("core-query-day-time: " + await DayTime(client));
+    Console.WriteLine("core-stj-datetime-kind: " + DateTimeKinds());
+    Console.WriteLine("core-stj-datetime-nested-kind: " + NestedDateTimeKinds());
     await HttpProbes.Run(new Uri(app.Urls.First()));
 }
 finally
@@ -270,6 +273,38 @@ static string SelectPastNull()
     });
 }
 
+static async Task<string> DayTime(HttpClient client)
+{
+    static string Written<T>(T value) => System.Text.Json.JsonSerializer.Serialize(value);
+    return "Day=2026-11-09&At=13:30:00 binds " + await client.GetStringAsync("/d/day?Day=2026-11-09&At=13%3A30%3A00")
+        + "; At=13:30:00.5 binds " + await client.GetStringAsync("/d/day?Day=2026-11-09&At=13%3A30%3A00.5")
+        + "; At=13:30:00.5000000 binds " + await client.GetStringAsync("/d/day?Day=2026-11-09&At=13%3A30%3A00.5000000")
+        + "; Day=2026-11-09T00:00:00 binds " + await client.GetStringAsync("/d/day?Day=2026-11-09T00%3A00%3A00&At=13%3A30%3A00")
+        + "; System.Text.Json writes DateOnly " + Written(new DateOnly(2026, 11, 9)) + ", TimeOnly 13:30 " + Written(new TimeOnly(13, 30))
+        + " and 13:30:00.5 " + Written(new TimeOnly(13, 30, 0, 500));
+}
+
+static string DateTimeKinds()
+{
+    var wall = new DateTime(2026, 11, 9, 8, 30, 0);
+    static string Written(DateTime value) => System.Text.Json.JsonSerializer.Serialize(value).Trim('"');
+    var local = Written(DateTime.SpecifyKind(wall, DateTimeKind.Local));
+    var localCarriesOffset = local.StartsWith("2026-11-09T08:30:00", StringComparison.Ordinal) && local.Length == 25 && (local[19] == '+' || local[19] == '-');
+    var unspecifiedOfEach = new[] { DateTimeKind.Local, DateTimeKind.Utc }.All(kind => Written(DateTime.SpecifyKind(DateTime.SpecifyKind(wall, kind), DateTimeKind.Unspecified)) == "2026-11-09T08:30:00");
+    return "a Local DateTime writes its wall time with an offset " + localCarriesOffset + "; a Utc one writes " + Written(DateTime.SpecifyKind(wall, DateTimeKind.Utc))
+        + "; an Unspecified one writes " + Written(wall) + "; a Local or Utc one made Unspecified writes 2026-11-09T08:30:00 " + unspecifiedOfEach;
+}
+
+static string NestedDateTimeKinds()
+{
+    var app = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web);
+    var written = new System.Text.Json.JsonSerializerOptions(app);
+    written.Converters.Add(new ProbeWallTimeConverter());
+    var utc = DateTime.SpecifyKind(new DateTime(2026, 11, 9, 8, 30, 0), DateTimeKind.Utc);
+    var visit = new ProbeVisitTimes { When = utc, Until = utc, Charted = utc };
+    return "under the app's options " + System.Text.Json.JsonSerializer.Serialize(visit, app) + "; with a wall-time converter after the app's " + System.Text.Json.JsonSerializer.Serialize(visit, written);
+}
+
 static IEnumerable<decimal> DecimalSweep()
 {
     var random = new Random(15);
@@ -323,6 +358,34 @@ public sealed class ProbeSelectDose
     public ProbeSelectSupply? Supply { get; set; }
 
     public int? Count { get; set; }
+}
+
+public sealed class ProbeWallTimeConverter : JsonConverter<DateTime>
+{
+    public override DateTime Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        => DateTime.SpecifyKind(reader.GetDateTime(), DateTimeKind.Unspecified);
+
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime value, System.Text.Json.JsonSerializerOptions options)
+        => writer.WriteStringValue(DateTime.SpecifyKind(value, DateTimeKind.Unspecified));
+}
+
+public sealed class ProbeUtcConverter : JsonConverter<DateTime>
+{
+    public override DateTime Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        => reader.GetDateTime();
+
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime value, System.Text.Json.JsonSerializerOptions options)
+        => writer.WriteStringValue(value.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture) + "Z");
+}
+
+public sealed class ProbeVisitTimes
+{
+    public DateTime When { get; set; }
+
+    public DateTime? Until { get; set; }
+
+    [JsonConverter(typeof(ProbeUtcConverter))]
+    public DateTime Charted { get; set; }
 }
 
 public sealed class Person
@@ -522,6 +585,21 @@ public sealed class ProbeFlagged
     public ProbeOneValue OneValue { get; set; } = ProbeOneValue.A;
 
     public ProbeShared Shared { get; set; } = ProbeShared.X;
+}
+
+public sealed class ProbeDayTime
+{
+    public DateOnly Day { get; set; }
+
+    public TimeOnly At { get; set; }
+}
+
+public sealed class DayProbeController : ControllerBase
+{
+    [HttpGet("/d/day")]
+    public string Day(ProbeDayTime query)
+        => query.Day.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + " " + query.At.ToString("HH:mm:ss.FFFFFFF", CultureInfo.InvariantCulture).TrimEnd('.')
+            + (ModelState.IsValid ? "" : " (errors " + string.Join(",", ModelState.Where(entry => entry.Value!.Errors.Count > 0).Select(entry => entry.Key)) + ")");
 }
 
 public sealed class FlagsProbeController : ControllerBase

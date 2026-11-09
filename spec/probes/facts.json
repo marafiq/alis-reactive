@@ -1790,6 +1790,33 @@
       "probe": "AspNetCoreBinding",
       "expect": "core-select-past-null: over a dose whose supply is null and whose count is null, Select(d => d.Supply.Vials).ToList() throws NullReferenceException; .Sum() throws NullReferenceException; .Count() throws NullReferenceException; .Any() runs; .First() runs; Select(d => (int)d.Count).ToList() throws InvalidOperationException; Select(d => (int?)d.Count).ToList() runs",
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-datetime-kind",
+      "statement": "System.Text.Json writes a Local DateTime with the server's offset, a Utc one with Z and an Unspecified one with no offset, and a Local or Utc DateTime made Unspecified writes its wall time with no offset.",
+      "host": "net10",
+      "oracle": ".NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-datetime-kind: a Local DateTime writes its wall time with an offset True; a Utc one writes 2026-11-09T08:30:00Z; an Unspecified one writes 2026-11-09T08:30:00; a Local or Utc one made Unspecified writes 2026-11-09T08:30:00 True",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-stj-datetime-nested-kind",
+      "statement": "A DateTime converter added after the app's options' own reaches every DateTime and DateTime? member of an object, and a member's own [JsonConverter] keeps its form.",
+      "host": "net10",
+      "oracle": ".NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-datetime-nested-kind: under the app's options {\"when\":\"2026-11-09T08:30:00Z\",\"until\":\"2026-11-09T08:30:00Z\",\"charted\":\"2026-11-09T08:30:00Z\"}; with a wall-time converter after the app's {\"when\":\"2026-11-09T08:30:00\",\"until\":\"2026-11-09T08:30:00\",\"charted\":\"2026-11-09T08:30:00Z\"}",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-query-day-time",
+      "statement": "net10 binds a DateOnly from yyyy-MM-dd and a TimeOnly from HH:mm:ss, with a fraction too, in a query, and System.Text.Json writes them as yyyy-MM-dd and HH:mm:ss with seven places of a fraction when it has one.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and .NET 10's System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-query-day-time: Day=2026-11-09&At=13:30:00 binds 2026-11-09 13:30:00; At=13:30:00.5 binds 2026-11-09 13:30:00.5; At=13:30:00.5000000 binds 2026-11-09 13:30:00.5; Day=2026-11-09T00:00:00 binds 2026-11-09 13:30:00; System.Text.Json writes DateOnly \"2026-11-09\", TimeOnly 13:30 \"13:30:00\" and 13:30:00.5 \"13:30:00.5000000\"",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
     }
   ]
 }

@@ -170,9 +170,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `spec/Core/DESIGN.md` states for a payload ("The member's C# type is the API's value type") and the analyzer
   checked only for null: a property's value, both ways, a method's result, awaited or
   not, and the data past them member by member by their JSON names. The closed set: text (string, char, Guid, an
-  enum), a number (the numeric types, an enum), a boolean, a date (DateTime, DateTimeOffset, read from text too, since
-  data carries a date as text), a list of these, and an object whose members the vendor's type declares, or takes
-  through a string index signature as the index's type. A member
+  enum, and on net10 DateOnly and TimeOnly, by gate 1's P9), a number (the numeric types, an enum), a boolean, a
+  date (DateTime, DateTimeOffset, read from text too, since data carries a date as text), a list of these, and an
+  object whose members the vendor's type declares, or takes through a string index signature as the index's type. A
+  member
   the vendor's type declares and the data lacks reads its start (D4.2 unchanged); a member it does not declare is
   refused, on the declaration's line, with its path. The vendor's untyped shapes (any, unknown, object, Object) take
   any type. Refused, each a gap to name: a member that holds a promise, a function, nothing, or more than one kind

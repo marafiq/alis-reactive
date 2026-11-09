@@ -184,6 +184,19 @@ Terms used throughout:
   - A `DateTime` is never sent with an offset: System.Text.Json reads an offset into a `DateTime` as the
     server's local time (`probe:core-stj-offset-into-datetime`), which moves the wall time by the server's
     clock.
+  - A `DateTime` is its wall fields whatever its `Kind` (gate 1's P9): a `DateTime` C# writes into the plan (a
+    literal, a member of an object literal, a request member a literal fills) is those fields with no offset, unless
+    a converter of the app's or of the member writes it, so `DateTime.Now` is the server's wall time and
+    `DateTime.UtcNow` UTC's, in every browser. System.Text.Json writes a
+    Local `DateTime` with the server's offset and a Utc one with `Z` (`probe:core-stj-datetime-kind`), which `as date`
+    reads as an instant, so the plan's writer adds, after the app's converters, one that writes a `DateTime` as
+    Unspecified: it reaches every member, a `DateTime?` too, while a converter the app registers for `DateTime` comes
+    first and a member's own `[JsonConverter]` keeps its form (D4.2) (`probe:core-stj-datetime-nested-kind`). The
+    framework decides by the type, never by a value's `Kind`: an instant is a `DateTimeOffset`.
+  - On net10 a `DateOnly` is the text `yyyy-MM-dd` and a `TimeOnly` the text `HH:mm:ss`, with seven places of a
+    second's fraction when it has one, as System.Text.Json writes them, and net10 binds each text in a query
+    (`probe:core-query-day-time`). Each holds no date (D3.13), so it reaches an element's text, a live member and the
+    wire as that text, and a list's lambda refuses comparing either (D6.12). net48 has neither type.
 - D3.10 A JSON response is System.Text.Json's on both hosts, written by a framework door. That means a
   `DateTime` with no offset, a UTC `DateTime` with `Z`, and a `DateTimeOffset` with its offset
   (`probe:core-stj-date-forms`).
@@ -241,6 +254,9 @@ Terms used throughout:
     instance, keeps its identity and prototype; only a plain object or array that holds a date as text is copied
     with it converted (`spec/Core/conversions.md`).
   - Data a step sends to the server keeps the wire text (D3.8).
+  - The shape is the declared type's: a type the app's options make polymorphic is shaped by the members of the type
+    the declaration names, so a date only a derived type holds reaches the vendor as its text. A date a callback's
+    answer returns reaches its vendor as text (D17.12), refused where the vendor's function returns a `Date` (X17.41).
   - The redesign wrote these shapes by reflection over the type (`Alis.Reactive/Components/ArgumentShape.cs`,
     `ClrShape.SerializedProperties`); the contract carries the same feature.
 
@@ -251,6 +267,11 @@ Terms used throughout:
 - `DateWire.tla:DateTimeCarriesNoOffset`
 - `DateWire.tla:InstantCarriesItsClockOffset`
 - `DateWire.tla:NothingWritesNoText`
+- `DateWire.tla:DayIsItsDayAlone`
+- `DateWire.tla:TimeIsItsTimeAlone`
+- `probe:core-stj-datetime-kind`
+- `probe:core-stj-datetime-nested-kind`
+- `probe:core-query-day-time`
 - `probe:core-form-decimal-culture`
 - `probe:core-query-decimal-invariant`
 - `probe:mvc5-form-current-culture`
@@ -311,6 +332,11 @@ Terms used throughout:
 - `X3.10` behavior (D3.13): a visit planner receives as a `Date` a date a step passes, one inside an object, each
   date of a list, a date a step sets as its property and a date an event carries as text; it receives an instant as
   that moment, a nullable date's null as null, and the suggestion its own method returns, a class instance, as it is.
+- `X3.13` behavior (D3.9): a view that sets an element's text from `DateTime.UtcNow` and `DateTime.Now`, rendered
+  at a known moment, shows each one's wall time with no offset in a browser whose clock is in another zone, and a
+  request member a Utc `DateTime` literal fills binds that wall time as an Unspecified `DateTime`.
+- `X3.14` behavior (D3.9): on net10 a request member of type `DateOnly` a literal fills sends `2026-11-09` and one of
+  type `TimeOnly` sends `13:30:00`, and the endpoint binds both; an element's text set from them shows the same text.
 - `X3.11` analyzer (D3.13): a dictionary of dates: "A value written into a live member is a dictionary whose values
   hold dates. A date reaches a live member by its member's name: pass the entries as a list of objects that name each
   key." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
