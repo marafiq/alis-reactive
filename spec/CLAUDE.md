@@ -107,7 +107,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `JsonStringEnumConverter` compares as it is written; every other computation with it is refused, and a path past
   its own converter is refused on every data read (D4.2, D6.12, POC 13f-ii). This departs from D6.12's earlier
   "refuses it in a comparison", because the probe wrote the compared value through the member's form with no
-  reflection. A fraction written as text is refused in equality too: 0.10m and 0.1m write "0.10" and "0.1".
+  reflection. A `float` or `double` written as text is refused in equality too (-0 writes "-0", NaN equals its own
+  text). Chosen within the owner's yes, 2026-11-09, gate 1's P15: a `decimal` the options or number handling write as
+  text is compared by `==` and `!=` by value through the operator `eqDecimal`, since 0.10m and 0.1m write "0.10" and
+  "0.1"; its ordering stays refused, and the POC refuses its equality until the rewrite builds it (D6.12).
 - Chosen within the owner's yes, 2026-11-07: a source carries the form its value is held in. A value written beside
   it (a condition's literal, `IfNull`'s fallback, `Choose`'s literal arm) is written in that form. A live object (a
   property set, an argument, a vendor's answer) refuses a source in its own form, because every literal set into a

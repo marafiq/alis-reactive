@@ -1135,6 +1135,33 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-json-decimal-text-written",
+      "statement": "System.Text.Json writes a decimal as text as an optional minus, digits and at most 28 places, its digits within decimal.MaxValue's: 1392 decimals, at each scale from 0 to 28 and of both signs, with zero, one, the largest 96-bit digits and 20 seeded random digits each.",
+      "host": "net10",
+      "oracle": "System.Text.Json in .NET 10 under JsonNumberHandling.WriteAsString",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-decimal-text-written: 1392 of 1392 decimals at scales 0 to 28 write as text an optional minus, digits and at most 28 places within decimal.MaxValue's digits",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-decimal-text-rounded",
+      "statement": "System.Text.Json reads a decimal text past 28 places by rounding it to 28, so it equals a decimal its text does not, and refuses a text past decimal.MaxValue.",
+      "host": "net10",
+      "oracle": "System.Text.Json in .NET 10 under JsonNumberHandling.AllowReadingFromString",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-decimal-text-rounded: 0.10000000000000000000000000001 as text reads 0.1000000000000000000000000000, equal to 0.1 True; 79228162514264337593543950336 as text reads refused",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
+      "id": "core-json-double-text",
+      "statement": "System.Text.Json writes -0.0 as the text -0, which .NET equals to 0.0, and NaN as the text NaN, which .NET equals to no double.",
+      "host": "net10",
+      "oracle": "System.Text.Json in .NET 10 under JsonNumberHandling.WriteAsString and AllowNamedFloatingPointLiterals",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-json-double-text: -0.0 writes \"-0\" and equals 0.0 True; NaN writes \"NaN\" and equals NaN False",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
       "id": "mvc5-parameter-binding-name",
       "statement": "MVC 5 binds a parameter under its [Bind(Prefix)], else under its own name.",
       "host": "net48",

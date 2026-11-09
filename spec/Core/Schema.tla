@@ -4,7 +4,7 @@ EXTENDS Naturals, Sequences, FiniteSets
 CONSTANT Mutant
 
 Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARead", "AsOfAny", "PatternReadInBrowser",
-            "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock"}
+            "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock", "DecimalTextComparedAsText"}
 
 ASSUME Mutant \in Mutants
 
@@ -39,7 +39,10 @@ Handlers == [k \in Kinds |->
     ELSE {"trace"}]
 
 Operators == {"eq", "neq", "lt", "lte", "gt", "gte", "and", "or", "not", "add", "sub", "mul", "mod", "neg", "coalesce",
-              "cond", "truthy", "empty", "matches", "toArray", "finite", "order", "merge"}
+              "cond", "nullableValue", "truthy", "empty", "matches", "toArray", "finite", "compareNumbers", "compareOrdinal",
+              "compareBooleans", "compareCulture", "merge", "trim", "trimStart", "trimEnd", "upperInvariant", "lowerInvariant",
+              "upper", "lower", "upperTurkic", "lowerTurkic", "contains", "startsWith", "endsWith", "nullOrEmpty", "includes",
+              "sumInt", "sumDouble", "sumDecimal", "eqDecimal"}
 
 OperatorSwitch == Operators
 
@@ -47,22 +50,24 @@ WalkSteps == {"member", "index"}
 
 Converting == ShapeKinds \ {"any"}
 
-Leaf(k) == [k |-> k, c |-> <<>>, p |-> <<>>, s |-> "string", o |-> "eq"]
+Leaf(k) == [k |-> k, c |-> <<>>, p |-> <<>>, s |-> "string", o |-> "eq", h |-> "value"]
 
-Leaves == {Leaf("lit"), Leaf("obj")}
+DecimalText == [Leaf("data") EXCEPT !.h = "decimalText"]
+
+Leaves == {Leaf("lit"), Leaf("obj"), DecimalText}
 
 Paths == {<<"member">>, <<"each">>}
 
-WrittenOps == {"eq", "matches", "toNumber"}
+WrittenOps == {"eq", "eqDecimal", "matches", "toNumber"}
 
 RECURSIVE ExprsTo(_)
 ExprsTo(d) ==
     IF d = 0 THEN Leaves
     ELSE LET below == ExprsTo(d - 1) IN
         below
-        \cup {[k |-> "get", c |-> <<e>>, p |-> path, s |-> "string", o |-> "eq"] : e \in below, path \in Paths}
-        \cup {[k |-> "as", c |-> <<e>>, p |-> <<>>, s |-> shape, o |-> "eq"] : e \in below, shape \in {"number", "any"}}
-        \cup {[k |-> "op", c |-> <<e, x>>, p |-> <<>>, s |-> "string", o |-> op] : e \in below, x \in below, op \in WrittenOps}
+        \cup {[k |-> "get", c |-> <<e>>, p |-> path, s |-> "string", o |-> "eq", h |-> "value"] : e \in below, path \in Paths}
+        \cup {[k |-> "as", c |-> <<e>>, p |-> <<>>, s |-> shape, o |-> "eq", h |-> "value"] : e \in below, shape \in {"number", "any"}}
+        \cup {[k |-> "op", c |-> <<e, x>>, p |-> <<>>, s |-> "string", o |-> op, h |-> "value"] : e \in below, x \in below, op \in WrittenOps}
 
 RECURSIVE Nodes(_)
 Nodes(e) == {e} \cup UNION {Nodes(e.c[i]) : i \in DOMAIN e.c}
@@ -74,6 +79,8 @@ WriterAccepts(e) ==
     /\ e.k = "as" => (e.s # "any" \/ Mutant = "AsOfAny")
     /\ e.k = "op" => (e.o \in Operators \/ Mutant = "ConversionOperatorKept")
     /\ (e.k = "op" /\ e.o = "matches") => (e.c[2].k = "lit" \/ Mutant = "PatternReadInBrowser")
+    /\ (e.k = "op" /\ e.o \in {"eq", "neq"}) => ((\A i \in DOMAIN e.c : e.c[i].h # "decimalText") \/ Mutant = "DecimalTextComparedAsText")
+    /\ (e.k = "op" /\ e.o = "eqDecimal") => \A i \in DOMAIN e.c : e.c[i].h = "decimalText"
 
 ShapeLeaves == {[k |-> k, c |-> <<>>] : k \in {"string", "file", "any"}}
 
@@ -185,6 +192,8 @@ ConversionsConvert == \A n \in Nodes(expr) : n.k = "as" => n.s \in Converting
 
 PatternsAreLiterals == \A n \in Nodes(expr) : (n.k = "op" /\ n.o = "matches") => n.c[2].k = "lit"
 
+DecimalTextComparedByValue == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in {"eq", "neq"}) => \A i \in DOMAIN n.c : n.c[i].h # "decimalText"
+
 NullableWrapsOnce == \A n \in ShapeNodes(shape) : n.k = "nullable" => n.c[1].k # "nullable"
 
 SetsWriteAMember == \A i \in DOMAIN log : log[i].k = "set" => log[i].len >= 1
@@ -202,5 +211,7 @@ ReachReplyInANestedBlock ==
         /\ \E j \in 1..(i - 1) : log[j].k = "let" /\ log[j].n = "reply" /\ log[j].b # log[i].b /\ Encloses(log[j].b, log[i].b))
 
 ReachDeepRead == ~(plane = "expr" /\ expr.k = "as" /\ expr.c[1].k = "get" /\ expr.c[1].c[1].k = "obj")
+
+ReachDecimalTextEquality == ~(plane = "expr" /\ expr.k = "op" /\ expr.o = "eqDecimal" /\ expr.c[1].h = "decimalText" /\ expr.c[2].h = "decimalText")
 
 ====

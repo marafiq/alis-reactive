@@ -117,6 +117,14 @@ try
     var camelNames = new System.Text.Json.JsonSerializerOptions { Converters = { new JsonStringEnumConverter(System.Text.Json.JsonNamingPolicy.CamelCase) } };
     Console.WriteLine("core-json-enum-held-alike: under a camel-case string converter ABC writes " + System.Text.Json.JsonSerializer.Serialize(ProbeClash.ABC, camelNames) + " and Abc writes " + System.Text.Json.JsonSerializer.Serialize(ProbeClash.Abc, camelNames));
     Console.WriteLine("core-json-null-object: {\"kept\":null} binds " + await Json(client, "/q/handover-json", "{\"kept\":null}") + " | {} binds " + await Json(client, "/q/handover-json", "{}"));
+    var decimalsAsText = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web) { NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString };
+    var written = DecimalSweep().Select(value => System.Text.Json.JsonSerializer.Serialize(value, decimalsAsText).Trim('"')).ToList();
+    Console.WriteLine("core-json-decimal-text-written: " + written.Count(ReadsAsDecimalText) + " of " + written.Count + " decimals at scales 0 to 28 write as text an optional minus, digits and at most 28 places within decimal.MaxValue's digits");
+    var pastPlaces = System.Text.Json.JsonSerializer.Deserialize<decimal>("\"0.10000000000000000000000000001\"", decimalsAsText);
+    Console.WriteLine("core-json-decimal-text-rounded: 0.10000000000000000000000000001 as text reads " + pastPlaces.ToString(CultureInfo.InvariantCulture) + ", equal to 0.1 " + (pastPlaces == 0.1m) + "; 79228162514264337593543950336 as text reads " + DecimalTextRead("\"79228162514264337593543950336\"", decimalsAsText));
+    var namedLiterals = new System.Text.Json.JsonSerializerOptions { NumberHandling = JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowNamedFloatingPointLiterals };
+    var noNumber = double.NaN;
+    Console.WriteLine("core-json-double-text: -0.0 writes " + System.Text.Json.JsonSerializer.Serialize(-0.0, namedLiterals) + " and equals 0.0 " + (-0.0 == 0.0) + "; NaN writes " + System.Text.Json.JsonSerializer.Serialize(noNumber, namedLiterals) + " and equals NaN " + (noNumber == double.NaN));
     await HttpProbes.Run(new Uri(app.Urls.First()));
 }
 finally
@@ -159,6 +167,38 @@ static string ErrorsOf(string body)
 {
     using var document = System.Text.Json.JsonDocument.Parse(body);
     return document.RootElement.GetProperty("errors").GetRawText();
+}
+
+static IEnumerable<decimal> DecimalSweep()
+{
+    var random = new Random(15);
+    for (byte scale = 0; scale <= 28; scale++)
+    {
+        foreach (var negative in new[] { false, true })
+        {
+            yield return new decimal(0, 0, 0, negative, scale);
+            yield return new decimal(1, 0, 0, negative, scale);
+            yield return new decimal(-1, -1, -1, negative, scale);
+            yield return new decimal(int.MaxValue, int.MaxValue, int.MaxValue, negative, scale);
+            for (var n = 0; n < 20; n++) yield return new decimal(random.Next(), random.Next(), random.Next(), negative, scale);
+        }
+    }
+}
+
+static bool ReadsAsDecimalText(string text)
+    => Regex.IsMatch(text, @"^-?[0-9]+(\.[0-9]{1,28})?$")
+       && System.Numerics.BigInteger.Parse(text.TrimStart('-').Replace(".", "", StringComparison.Ordinal), CultureInfo.InvariantCulture) <= System.Numerics.BigInteger.Parse("79228162514264337593543950335", CultureInfo.InvariantCulture);
+
+static string DecimalTextRead(string json, System.Text.Json.JsonSerializerOptions options)
+{
+    try
+    {
+        return System.Text.Json.JsonSerializer.Deserialize<decimal>(json, options).ToString(CultureInfo.InvariantCulture);
+    }
+    catch (System.Text.Json.JsonException)
+    {
+        return "refused";
+    }
 }
 
 static async Task<string> Form(HttpClient client, string path, string body)

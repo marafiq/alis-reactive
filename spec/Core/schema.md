@@ -261,7 +261,7 @@ A listen release says when release removes the listener the step added (D12.8):
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
 `neg`, `coalesce`, `cond`, `nullableValue`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
-`sumDouble` and `sumDecimal`.
+`sumDouble`, `sumDecimal` and `eqDecimal`.
 `toNumber`,
 `toDate`, `toBoolean` and `toText` leave: `as` converts (D3.2, N3.1). The pattern of `matches` is a `lit` (D7.5,
 D16.11). The text operators carry .NET's meaning (`spec/Core/translated-members.md`) where JavaScript's own methods
@@ -270,7 +270,14 @@ argument that is nothing as the text "null". `includes` looks for an item in a l
 `lit`, and reads nothing when the item reads nothing, where a `call` of JavaScript's `includes` would pass null.
 `sumInt`, `sumDouble` and `sumDecimal` take the list a `map` of the term reads and add it as .NET adds that number
 type (D6.11): one operator over the whole list, where JavaScript's `reduce` would add a decimal as a double and
-carry no range.
+carry no range. `sumDecimal` reads each term by the one decimal reader: a JSON number at its double's shortest text,
+or a text of an optional `-`, digits and an optional `.` with one to 28 digits, whose digits without the point are at
+most decimal.MaxValue's; any other term, and one past 28 places or those digits, stops the pipeline.
+`eqDecimal` compares two decimals by value, as .NET's decimal equality does (D6.12): it reads each argument by the
+same reader and compares the two as whole numbers at the larger scale, so "0.10" equals "0.1" where `eq` compares two
+texts. An argument that reads nothing makes it read nothing, null equals null and no decimal, and any other value
+stops the pipeline. C# writes it for `==` over a decimal written as text, and `not` of it for `!=`; a decimal written
+as a JSON number keeps `eq` and `neq`.
 `compareNumbers`, `compareOrdinal`, `compareBooleans` and `compareCulture` compare two sort keys to -1, 0 or 1, null
 first, by the comparison C# picks from the key's type (D6.13); the redesign's `order` compared whatever came by its
 JavaScript type. `compareCulture` compares two texts with the browser's `Intl.Collator` under the plan's

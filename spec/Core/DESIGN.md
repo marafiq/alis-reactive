@@ -636,7 +636,15 @@ Terms used throughout:
   list, so a decimal's point is placed once and an int's range is checked at each term. A list that reads nothing
   sums to nothing (D6.3); a list with no item sums to 0, as .NET's does. A `decimal` term is a JSON number or the
   decimal text the app writes for it (`JsonNumberHandling.WriteAsString` writes 0.10m as "0.10"), added the same way;
-  a term its own converter writes, or any other term written unlike the options, is refused (D6.12, X6.39). Any other term, null among them, stops the pipeline, as these three types have no null to add; a term that reads
+  a term its own converter writes, or any other term written unlike the options, is refused (D6.12, X6.39). Each term
+  is read by the one decimal reader, which `eqDecimal` shares (D6.12): a JSON number at its double's shortest text, or
+  a text of an optional `-`, digits and an optional `.` with one to 28 digits, whose digits without the point are at
+  most decimal.MaxValue's 79228162514264337593543950335, the form System.Text.Json writes a decimal as text in at every
+  scale (`probe:core-json-decimal-text-written`); leading zeros and a minus on zero read as .NET reads them, "007" as 7
+  and "-0" as 0. A text or a number past 28 places or past those digits is no decimal the app writes and stops the
+  pipeline, where .NET rounds a text past 28 places when it reads it and refuses one past decimal.MaxValue
+  (`probe:core-json-decimal-text-rounded`); the POC's sum reads such a text with no limit on its places or digits
+  (`poc/runtime/src/sums.ts:7`). Any other term, null among them, stops the pipeline, as these three types have no null to add; a term that reads
   nothing, past a holder that holds null, is null in the `map`, so it stops too. A term member the item lacks reads
   its start first (D4.2), so `Sum(d => d.Refills)` adds 0 for a dose the app omitted at 0.
 - D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted` and
@@ -683,10 +691,25 @@ Terms used throughout:
     `DoseSeal`'s implicit operator to text), is refused at every position of a list's lambda (X6.49), as it is in `??`
     (X6.33): the browser has no conversion the app wrote. `decimal`'s exact conversions are the closed set the lambda
     reads through, keyed as `TranslatedMembers` keys its table.
-  - A fraction (`float`, `double`, `decimal`) written as text is refused in equality as in ordering (X6.43): equal
-    fractions write unequal text (0.10m is "0.10" and 0.1m is "0.1"), and `double.NaN` written "NaN" equals its own
-    text where .NET's NaN equals nothing. A whole number written as text equals as its number does, and is ordered
-    by no rule.
+  - A `decimal` that the app's options or number handling, the member's or its class's, write as text is compared by
+    `==` and `!=` by value, as .NET's decimal equality compares it (gate 1's P15): equal decimals write unequal text,
+    0.10m "0.10" and 0.1m "0.1". C# writes `op(eqDecimal, a, b)` for `==` and `op(not, op(eqDecimal, a, b))` for
+    `!=` wherever they take such a decimal: a member and a value, two members, and in a pipeline condition a source
+    and a value or two sources (D8.10). `eqDecimal` reads each argument by D6.11's decimal reader and compares the two
+    as whole numbers at the larger of their scales, with no binary fraction: "0.10" equals "0.1", "-0" equals
+    "0.00", and "0.1000000000000000000000000001" differs from "0.1", which one double holds. An argument that reads
+    nothing makes it read nothing, so `!=` reads nothing there too (D8.9's `not`); null equals null and no decimal,
+    as .NET's lifted `==` decides; a value in which the reader holds no decimal stops the pipeline, as a `Sum` term
+    does. A decimal written as a JSON number keeps `eq` and `neq`, since 0.10 and 0.1 parse to one number. A
+    `decimal` its own converter writes as text is refused (X6.43): the converter decides its text, so the browser does
+    not hold the value .NET compares. Ordering a decimal written as text stays refused (X6.12, X6.28, X6.39, X6.40): it needs a comparator under a
+    sort's null-first order and four orderings under .NET's lifted one, where equality needs one operator. The POC
+    refuses decimal text in equality until the rewrite builds `eqDecimal` (X6.53, X8.26).
+  - A `float` or `double` written as text is refused in equality as in ordering (X6.43): -0.0 writes "-0" where it
+    equals 0.0, and `double.NaN` written "NaN" equals its own text where .NET's NaN equals nothing
+    (`probe:core-json-double-text`). A fraction written as text is refused in a lookup of a list the view holds
+    (X6.54), since `includes` compares the texts. A whole number written as text equals as its number does, and is
+    ordered by no rule.
   - A member written unlike the app's options holds its own form: by its own JSON converter (`[JsonConverter]` on
     the member, `JsonPropertyInfo.CustomConverter`), or by number handling whose writing bits (`WriteAsString`,
     `AllowNamedFloatingPointLiterals`) differ from the options', set on the member or on its class, for a number or
@@ -695,7 +718,7 @@ Terms used throughout:
     compared with such a member by `==` or `!=` is written in that form, the options copied with the member's
     converter first or its number handling set, so `d.Charted == DoseStatus.Given` compares "Given" where the app's
     options write "given". Equality takes the member only when the compared type is a scalar (X6.41), and the
-    fraction rule above holds for its form. Every other use refuses it, because the browser does not hold the value
+    fraction rules above hold for its form. Every other use refuses it, because the browser does not hold the value
     .NET computes with: an ordering (X6.40), a comparison of two members (X6.42), and any other computation in the
     lambda, a predicate's bool, a .NET member it is the receiver or the argument of (`charted.Contains(d.Charted)`),
     `??`, `?:`, an order key (D6.13) and a `Sum` term (D6.11) (X6.39). Two reads take the member as the browser
@@ -742,10 +765,14 @@ Terms used throughout:
   renders, is refused (X6.38). A text that reads nothing or holds null reads nothing, as every text operator does
   (`spec/Core/translated-members.md`), where .NET throws `ArgumentNullException`.
 
-**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`).
+**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`).
 
 **Checker.**
 - `Absence.tla:MissingListReadsNothing`
+- `Schema.tla:DecimalTextComparedByValue`: no `eq` or `neq` the C# writes takes a decimal written as text
+- `probe:core-json-decimal-text-written`
+- `probe:core-json-decimal-text-rounded`
+- `probe:core-json-double-text`
 - `check:fluent`
 
 **Doors.**
@@ -902,9 +929,10 @@ Terms used throughout:
 - `X6.42` refusal (D6.12): two members compared where one is written unlike the app's options: "'{term}' compares
   two members, and {cause} writes '{member}' unlike the app's options, so the browser does not compare them as .NET
   does; compare them on the server."
-- `X6.43` refusal (D6.12): a fraction the JSON writes as text, compared: "'{term}' compares a fraction the JSON
-  writes as text, whose text neither equals nor orders as the number does, as 0.10 and 0.1; compare it on the
-  server."
+- `X6.43` refusal (D6.12): a `float` or `double` the JSON writes as text, or a `decimal` its own converter writes as
+  text, compared: "'{term}' compares {a float or double the JSON writes as text, whose text does not equal as the
+  number does, as -0 and 0 or NaN and NaN; a decimal its own converter writes as text, whose text the converter
+  decides}; compare it on the server."
 - `X6.45` behavior (D6.12): `Select(d => d.Charted).Count(s => s == DoseStatus.Given)` counts the three charts the
   converter writes "Given"; `Select(d => d.Supply.Vials).Sum(v => v)` is refused by X6.39's message, the item held as
   text.
@@ -933,6 +961,17 @@ Terms used throughout:
   server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.51` behavior (D6.12): `d.Charge > freeCharge`, a `decimal` member and a view's `int`, counts the two charged
   doses through `decimal`'s own conversion from `int`.
+- `X6.53` behavior (D6.12, gate 1's P15): `Count(d => d.Copay == 0.10m)`, over copays their own number handling
+  writes as text, counts the doses holding "0.10" and "0.1" and not one holding "0.1000000000000000000000000001", and
+  `!=` counts the others; under options that write numbers as text, `d.Charge == d.Claim` keeps a dose whose two hold
+  0.10 and 0.1; a decimal read past a holder that holds null is kept by neither `==` nor `!=`; a copay that holds
+  "abc" stops the pipeline, and the step after it does not run. The POC refuses the comparison
+  (`tests/Alis.Reactive.Poc.PlaywrightTests/Comparisons/WhenAMemberWrittenByItsOwnJsonIsRefused.cs:34-39`) until the
+  rewrite builds `eqDecimal`, whose unit turns that test into this one.
+- `X6.54` refusal (D6.12): `Contains` of a fraction the JSON writes as text, over a list the view holds: "'{term}'
+  looks for a fraction the JSON writes as text, and the browser's lookup compares its text, which does not equal as
+  the number does, as 0.10 and 0.1 or -0 and 0; compare a decimal with == for each value, such as d => d.Copay ==
+  0.10m || d.Copay == 0.25m, or look it up on the server."
 - `X6.46` analyzer: a read past a nullable member in the predicate, field or path of a door that reads nothing past
   null builds with no `!` under warnings as errors, and so does a cast of a nullable there; the same read in a `Sum`
   term, an `OrderBy` key, a value the view holds, a lambda over a list the server holds or an input's member path
@@ -1107,7 +1146,8 @@ Terms used throughout:
   `lte`, `gt`, `gte`) whose operand reads nothing reads nothing, `neq` included: a value past a holder that holds
   null holds none, and no comparison with it holds (D8.5). Null is a value the data holds, compared as .NET's lifted operators
   compare it: `eq` of null and null holds, `neq` of null and a value holds, and an ordering with null does not hold,
-  though JavaScript's `null <= 2` is true. Equality is JavaScript's `===`; an ordering is JavaScript's `<` over the
+  though JavaScript's `null <= 2` is true. Equality is JavaScript's `===`, and over a decimal written as text
+  `eqDecimal`, by value (D6.12); an ordering is JavaScript's `<` over the
   numbers and one-character texts D6.12 admits. `not`, `and` and `or` are SQL's three-valued logic with nothing as its
   unknown: `not` of nothing is nothing; `and` is false when a term is false, true when both are true, and nothing
   otherwise; `or` is true when a term is true, false when both are false, and nothing otherwise. A term runs only when
@@ -1118,7 +1158,9 @@ Terms used throughout:
   over a dose the app wrote with no `ward`, as it holds over the null the endpoint binds for it.
 - D8.10 A pipeline condition over a source in its own form (D7.7) follows D6.12's rules (POC 13f-iii): a literal it is
   compared with by `Eq` or `NotEq` is written in its form, and an ordering (X8.19), a type that is not a scalar (X8.20),
-  two sources where either is in its own form (X8.21) and a fraction written as text (X8.22) are refused.
+  two sources where either is in its own form (X8.21), and a `float` or `double` written as text or a `decimal` its own
+  converter writes as text (X8.22) are refused. A `decimal` the options or number handling write as text is compared
+  by `Eq` and `NotEq` through `eqDecimal`, by value (D6.12, X8.26).
 
 **Schema nodes.** `op` (the comparison, text, membership and value tests, `and`, `or`, `not`); `if`.
 
@@ -1206,11 +1248,17 @@ Terms used throughout:
 - `X8.21` refusal (D8.10): two sources compared where either is in its own form: "A condition compares two values,
   and {cause} writes '{read}' unlike the app's options, so the browser does not compare them as .NET does; compare
   them on the server."
-- `X8.22` refusal (D8.10): a fraction the JSON writes as text compared with a value: "A condition compares a
-  fraction the JSON writes as text, whose text neither equals nor orders as the number does, as 0.10 and 0.1;
-  compare it on the server."
+- `X8.22` refusal (D8.10): a `float` or `double` the JSON writes as text, or a `decimal` its own converter writes as
+  text, compared with a value: "A condition compares {a float or double the JSON writes as text, whose text does not
+  equal as the number does, as -0 and 0 or NaN and NaN; a decimal its own converter writes as text, whose text the
+  converter decides}; compare it on the server."
 - `X8.23` behavior (D8.10): a found chart and a component's data read to `Charted` equal `DoseStatus.Given` as the
   member's own converter writes it, "Given" where the app writes "given".
+- `X8.26` behavior (D8.10, gate 1's P15): `When(cart.Doses.Find(d => d.Medicine == "Aspirin", d => d.Copay).Eq(0.10m))`
+  runs its `Then` for an aspirin dose whose copay, written as text by its own number handling, holds "0.1", and its
+  `Else` for one that holds "0.125"; `NotEq(0.10m)` runs the other branch of each. The POC refuses the condition
+  (`tests/Alis.Reactive.Poc.PlaywrightTests/Comparisons/WhenASourceInItsOwnJsonIsRefused.cs:34-39`) until the rewrite
+  builds `eqDecimal`, whose unit turns that test into this one.
 - `X8.24` type (D8.8): a route's reply read after its request, outside the route, does not compile:
   `spec/api/HttpSurface/refused/ReplyOutsideItsRoute.CS0103.cs.txt:13`.
 - `X8.25` analyzer (D11.10, D8.8): a step written on the pipeline of a block around its own, and a bound value
@@ -3742,7 +3790,7 @@ plans (Q19).
     X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
     N18.13), new beside the moved ones; ALIS003, a callback property's second handler in one view (X17.16; N18.14).
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
-    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X7.10, X7.11, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
+    X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X7.10, X7.11, X8.19, X8.20, X8.21, X8.22, X18.8), its culture
     (X6.36), its startup choices (X21.11), a value the view holds when it renders (X6.15, X6.24, X6.48, X14.4, and a
     URL, status, header or pattern computed there), and the plan as composed (X12.11, X14.5, and X17.16's handlers across views). A plan's version
     is the browser's, at boot (X19.3).
@@ -3902,6 +3950,7 @@ shapes, starts and the payload kind of each event.
 - `Schema.tla:NullableWrapsOnce`
 - `Schema.tla:SetsWriteAMember`
 - `Schema.tla:RefsReadTheirBlock`
+- `Schema.tla:DecimalTextComparedByValue`
 - `check:kinds`, which reads the grammar and `plan.schema.json` at 65fdf118d, schema.md's kinds table and Schema.tla's
   node set, and checks each today line holds its case.
 

@@ -91,6 +91,8 @@ as JavaScript's `includes` does (NaN equal to NaN, as .NET's default equality).
 | `HashSet<T>.Contains(item)` | refused, as `Enumerable.Contains` over a set is: the set compares by its comparer, which the plan never sees, naming `ToArray()` |
 
 A list that is null when the view renders is refused, so is a list of objects (the browser compares objects by
-reference) and a comparer passed to `Contains`. A list the item holds is refused, naming `Any`
+reference) and a comparer passed to `Contains`. A list of fractions the app's JSON writes as text is refused too
+(X6.54), since `includes` compares the texts: 0.10m writes "0.10" where 0.1m writes "0.1", and -0.0 writes "-0"
+where 0.0 writes "0". A list the item holds is refused, naming `Any`
 (`d.Hours.Any(hour => hour == 8)`). On net48 `text.Contains(c)` binds `Enumerable.Contains<char>` over the text,
 translated as the text test `contains`.
