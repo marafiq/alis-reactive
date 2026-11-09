@@ -2425,7 +2425,12 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   only while its element still holds, at the vendor's object path, the object the listener was added to. A
   component its host destroyed took its listeners with it, and the owner calls nothing on it. EJ2's destroy
   takes the component off its element (`probe:ej2-destroy-removes-instance`), so the rule names no vendor.
-  Main's check of Syncfusion's `isDestroyed` in the runtime is refused for that reason.
+  Main's check of Syncfusion's `isDestroyed` in the runtime is refused for that reason. A handler holds the object
+  it subscribed to when its plan started (D12.4), so after a restart (its host destroys the component and puts a
+  new object at the vendor's object path on the same element) the new object hears none of the plan's handlers,
+  and the release calls nothing on it. A `listen` step that reaches the new object adds its own listener, as for
+  any other object (D12.8). An element that no longer holds the object a handler subscribed to is read as one whose
+  host destroyed that object, listeners and all.
 - D12.6 A hub or a stream is held by every owner whose plans name it. The connection opens at the first hold
   and closes at the last release, and its retry offer goes with it. A step reaches only a held connection.
 - D12.7 Live validation is one capture-phase listener per page. An input an event reaches is checked by the
@@ -2526,6 +2531,15 @@ plans name.
     (`Alis.Reactive.Assets/runtime/root.ts:58-77`, `Alis.Reactive.Assets/runtime/root.ts:84-89`).
   - 893ed624a on main checks `isDestroyed`, and acd5f47fe answers it with `stillHolds`: D12.5
     (`Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:16-18`).
+- Both lines subscribe a handler once, to the object its element holds when its plan is wired, and remove the
+  listener from that object alone, so the new object a restart puts on the same element hears none of the plan's
+  handlers: D12.5. Main reads the object
+  (`Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:81`, through
+  `Alis.Reactive.Assets/runtime/events/resolver.ts:16-21`) when a plan's behaviors are wired
+  (`Alis.Reactive.Assets/runtime/lifecycle/boot.ts:38`) and adds and removes its listener on that object
+  (`Alis.Reactive.Assets/runtime/events/event-fusion.ts:23-37`); the redesign subscribes each handler as its owner
+  starts (`Alis.Reactive.Assets/runtime/plans/start.ts:46`) and removes it only while the element still holds the
+  object it read then (`Alis.Reactive.Assets/runtime/objects/plan-objects.ts:37-42`).
 - An owner runs its disposers in reverse and knows nothing of runs (`Alis.Reactive.Assets/runtime/objects/owner.ts:32-40`).
 - A slot announces the unmount of its content before replacing it (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38`).
 - The redesign refuses a plan that sets a slot's text or HTML, across the plans one response renders
@@ -2556,6 +2570,9 @@ plans name.
   steps before it ran and the steps after it run nothing; so does one that writes over notes a closed card loaded
   into a slot outside it. Once the only plan that named a slot leaves and the slot holds no loaded content, a step
   writes over it.
+- `X12.13` behavior (D12.5): after a monitor's host restarts it, destroying the component and putting a new object
+  on its element, the new object's event runs none of the plan's handlers, and closing the card that held it calls
+  nothing on it.
 
 ## Q13. Where state lives
 
