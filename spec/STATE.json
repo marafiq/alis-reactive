@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 343,
+        "defects": 347,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -16,8 +16,8 @@
     },
     "core_tlc": {
       "counts": {
-        "met": 6,
-        "specs": 6
+        "met": 7,
+        "specs": 7
       },
       "detail": "every spec green, every invariant killed by its mutant, every witness reached",
       "pass": true,
@@ -172,6 +172,132 @@
             "states": "1118898 states generated, 861908 distinct states found, 32244 states left on queue.",
             "violated": [
               "UnawaitedPromiseStops"
+            ]
+          }
+        },
+        "CallbackProperty": {
+          "CallbackProperty.cfg": {
+            "green": true,
+            "hash": "10d914050f7ffca08b6084946bfa8f9598107e96009b5f59c766ac972828c63e",
+            "line": "Model checking completed. No error has been found.",
+            "states": "5531954 states generated, 1681659 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "CallbackProperty.violates.ALiveHandlerKeepsTheFrameworksFunction.cfg": {
+            "green": false,
+            "hash": "0dcad403f6d532906157395931ee29cd37da03c1c84a060b557e5d5db2794f31",
+            "line": "violated: ALiveHandlerKeepsTheFrameworksFunction",
+            "states": "3739 states generated, 2055 distinct states found, 1294 states left on queue.",
+            "violated": [
+              "ALiveHandlerKeepsTheFrameworksFunction"
+            ]
+          },
+          "CallbackProperty.violates.ARefusedAssignmentStartsNoHandler.cfg": {
+            "green": false,
+            "hash": "b42586aeb6983a581d46689d505bafb57ae050135ce7af90d28c1b424debc2c2",
+            "line": "violated: ARefusedAssignmentStartsNoHandler",
+            "states": "225 states generated, 183 distinct states found, 136 states left on queue.",
+            "violated": [
+              "ARefusedAssignmentStartsNoHandler"
+            ]
+          },
+          "CallbackProperty.violates.AReplacedObjectIsNotWritten.cfg": {
+            "green": false,
+            "hash": "bcad6678e39b9d68b0a2a554d098001d61531b719929b5703007bfef0eb4d224",
+            "line": "violated: AReplacedObjectIsNotWritten",
+            "states": "15021 states generated, 7539 distinct states found, 4434 states left on queue.",
+            "violated": [
+              "AReplacedObjectIsNotWritten"
+            ]
+          },
+          "CallbackProperty.violates.AThrowSkipsNoHandler.cfg": {
+            "green": false,
+            "hash": "6cf2a71266bd5ae1783a0cb0987d606d2c851bc426ffbb95abf3dad1fdd5cfd8",
+            "line": "violated: AThrowSkipsNoHandler",
+            "states": "266 states generated, 233 distinct states found, 171 states left on queue.",
+            "violated": [
+              "AThrowSkipsNoHandler"
+            ]
+          },
+          "CallbackProperty.violates.EveryHearerHearsOnceInOrder.cfg": {
+            "green": false,
+            "hash": "f1d8768c1e1edd519c2cc087158e4d0a4c654a46bbd6e0876c60b7bda2da76f2",
+            "line": "violated: EveryHearerHearsOnceInOrder",
+            "states": "166 states generated, 161 distinct states found, 122 states left on queue.",
+            "violated": [
+              "EveryHearerHearsOnceInOrder"
+            ]
+          },
+          "CallbackProperty.violates.ReachAThrowThenEveryHandler.cfg": {
+            "green": false,
+            "hash": "63baf77ceead2fd8095193261f9cf42a3ce262e3bcac08f82f173ce3511dbbd1",
+            "line": "violated: ReachAThrowThenEveryHandler",
+            "states": "496 states generated, 357 distinct states found, 253 states left on queue.",
+            "violated": [
+              "ReachAThrowThenEveryHandler"
+            ]
+          },
+          "CallbackProperty.violates.ReachAssignmentRefused.cfg": {
+            "green": false,
+            "hash": "71454c2477ebddd66d773b84e34dcd6707c487c1918f3a411fab984fc92b4bd2",
+            "line": "violated: ReachAssignmentRefused",
+            "states": "5530 states generated, 2914 distinct states found, 1773 states left on queue.",
+            "violated": [
+              "ReachAssignmentRefused"
+            ]
+          },
+          "CallbackProperty.violates.ReachPutBackRefused.cfg": {
+            "green": false,
+            "hash": "b973e7f518fa4a7a8952b2bea8d433830c750ae1af0db18d64cc90efc0e7dbcd",
+            "line": "violated: ReachPutBackRefused",
+            "states": "31822 states generated, 15724 distinct states found, 9387 states left on queue.",
+            "violated": [
+              "ReachPutBackRefused"
+            ]
+          },
+          "CallbackProperty.violates.ReachReleaseFromTheMiddle.cfg": {
+            "green": false,
+            "hash": "8d5efb0d56bc32250ceaea999df558331a91a25b8cc0d875932b7882bf1a00c8",
+            "line": "violated: ReachReleaseFromTheMiddle",
+            "states": "32890 states generated, 16272 distinct states found, 9575 states left on queue.",
+            "violated": [
+              "ReachReleaseFromTheMiddle"
+            ]
+          },
+          "CallbackProperty.violates.ReachReleasedAfterRestart.cfg": {
+            "green": false,
+            "hash": "7185899550f8475b90221e06c0fdd50754168ff5be96b966285c78f287dd679f",
+            "line": "violated: ReachReleasedAfterRestart",
+            "states": "65046 states generated, 31543 distinct states found, 18418 states left on queue.",
+            "violated": [
+              "ReachReleasedAfterRestart"
+            ]
+          },
+          "CallbackProperty.violates.ReachScriptBetweenSubscribes.cfg": {
+            "green": false,
+            "hash": "b648f78a5e8e40bce1ef852e4377a5b64491efa0bf9338865959716306119d7b",
+            "line": "violated: ReachScriptBetweenSubscribes",
+            "states": "848 states generated, 542 distinct states found, 373 states left on queue.",
+            "violated": [
+              "ReachScriptBetweenSubscribes"
+            ]
+          },
+          "CallbackProperty.violates.ReachThreeOwnersHearOneCallback.cfg": {
+            "green": false,
+            "hash": "f7263c86c25e049f5a71ff2ca10acd5e1c515eda519c2a6b492601fda6f037df",
+            "line": "violated: ReachThreeOwnersHearOneCallback",
+            "states": "4647 states generated, 2478 distinct states found, 1530 states left on queue.",
+            "violated": [
+              "ReachThreeOwnersHearOneCallback"
+            ]
+          },
+          "CallbackProperty.violates.TheLastReleasePutsBackItsValue.cfg": {
+            "green": false,
+            "hash": "7736eb2b34e855b473f514d96515edc01e3214322218d9ba8714bb736737737c",
+            "line": "violated: TheLastReleasePutsBackItsValue",
+            "states": "17094 states generated, 8548 distinct states found, 5005 states left on queue.",
+            "violated": [
+              "TheLastReleasePutsBackItsValue"
             ]
           }
         },
@@ -1272,7 +1398,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 366,
+        "defects": 370,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1292,8 +1418,8 @@
     },
     "tlc": {
       "counts": {
-        "met": 12,
-        "specs": 12
+        "met": 13,
+        "specs": 13
       },
       "detail": "every spec green, every invariant killed by its mutant, every witness reached",
       "pass": true,
@@ -1448,6 +1574,132 @@
             "states": "1118898 states generated, 861908 distinct states found, 32244 states left on queue.",
             "violated": [
               "UnawaitedPromiseStops"
+            ]
+          }
+        },
+        "CallbackProperty": {
+          "CallbackProperty.cfg": {
+            "green": true,
+            "hash": "10d914050f7ffca08b6084946bfa8f9598107e96009b5f59c766ac972828c63e",
+            "line": "Model checking completed. No error has been found.",
+            "states": "5531954 states generated, 1681659 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "CallbackProperty.violates.ALiveHandlerKeepsTheFrameworksFunction.cfg": {
+            "green": false,
+            "hash": "0dcad403f6d532906157395931ee29cd37da03c1c84a060b557e5d5db2794f31",
+            "line": "violated: ALiveHandlerKeepsTheFrameworksFunction",
+            "states": "3739 states generated, 2055 distinct states found, 1294 states left on queue.",
+            "violated": [
+              "ALiveHandlerKeepsTheFrameworksFunction"
+            ]
+          },
+          "CallbackProperty.violates.ARefusedAssignmentStartsNoHandler.cfg": {
+            "green": false,
+            "hash": "b42586aeb6983a581d46689d505bafb57ae050135ce7af90d28c1b424debc2c2",
+            "line": "violated: ARefusedAssignmentStartsNoHandler",
+            "states": "225 states generated, 183 distinct states found, 136 states left on queue.",
+            "violated": [
+              "ARefusedAssignmentStartsNoHandler"
+            ]
+          },
+          "CallbackProperty.violates.AReplacedObjectIsNotWritten.cfg": {
+            "green": false,
+            "hash": "bcad6678e39b9d68b0a2a554d098001d61531b719929b5703007bfef0eb4d224",
+            "line": "violated: AReplacedObjectIsNotWritten",
+            "states": "15021 states generated, 7539 distinct states found, 4434 states left on queue.",
+            "violated": [
+              "AReplacedObjectIsNotWritten"
+            ]
+          },
+          "CallbackProperty.violates.AThrowSkipsNoHandler.cfg": {
+            "green": false,
+            "hash": "6cf2a71266bd5ae1783a0cb0987d606d2c851bc426ffbb95abf3dad1fdd5cfd8",
+            "line": "violated: AThrowSkipsNoHandler",
+            "states": "266 states generated, 233 distinct states found, 171 states left on queue.",
+            "violated": [
+              "AThrowSkipsNoHandler"
+            ]
+          },
+          "CallbackProperty.violates.EveryHearerHearsOnceInOrder.cfg": {
+            "green": false,
+            "hash": "f1d8768c1e1edd519c2cc087158e4d0a4c654a46bbd6e0876c60b7bda2da76f2",
+            "line": "violated: EveryHearerHearsOnceInOrder",
+            "states": "166 states generated, 161 distinct states found, 122 states left on queue.",
+            "violated": [
+              "EveryHearerHearsOnceInOrder"
+            ]
+          },
+          "CallbackProperty.violates.ReachAThrowThenEveryHandler.cfg": {
+            "green": false,
+            "hash": "63baf77ceead2fd8095193261f9cf42a3ce262e3bcac08f82f173ce3511dbbd1",
+            "line": "violated: ReachAThrowThenEveryHandler",
+            "states": "496 states generated, 357 distinct states found, 253 states left on queue.",
+            "violated": [
+              "ReachAThrowThenEveryHandler"
+            ]
+          },
+          "CallbackProperty.violates.ReachAssignmentRefused.cfg": {
+            "green": false,
+            "hash": "71454c2477ebddd66d773b84e34dcd6707c487c1918f3a411fab984fc92b4bd2",
+            "line": "violated: ReachAssignmentRefused",
+            "states": "5530 states generated, 2914 distinct states found, 1773 states left on queue.",
+            "violated": [
+              "ReachAssignmentRefused"
+            ]
+          },
+          "CallbackProperty.violates.ReachPutBackRefused.cfg": {
+            "green": false,
+            "hash": "b973e7f518fa4a7a8952b2bea8d433830c750ae1af0db18d64cc90efc0e7dbcd",
+            "line": "violated: ReachPutBackRefused",
+            "states": "31822 states generated, 15724 distinct states found, 9387 states left on queue.",
+            "violated": [
+              "ReachPutBackRefused"
+            ]
+          },
+          "CallbackProperty.violates.ReachReleaseFromTheMiddle.cfg": {
+            "green": false,
+            "hash": "8d5efb0d56bc32250ceaea999df558331a91a25b8cc0d875932b7882bf1a00c8",
+            "line": "violated: ReachReleaseFromTheMiddle",
+            "states": "32890 states generated, 16272 distinct states found, 9575 states left on queue.",
+            "violated": [
+              "ReachReleaseFromTheMiddle"
+            ]
+          },
+          "CallbackProperty.violates.ReachReleasedAfterRestart.cfg": {
+            "green": false,
+            "hash": "7185899550f8475b90221e06c0fdd50754168ff5be96b966285c78f287dd679f",
+            "line": "violated: ReachReleasedAfterRestart",
+            "states": "65046 states generated, 31543 distinct states found, 18418 states left on queue.",
+            "violated": [
+              "ReachReleasedAfterRestart"
+            ]
+          },
+          "CallbackProperty.violates.ReachScriptBetweenSubscribes.cfg": {
+            "green": false,
+            "hash": "b648f78a5e8e40bce1ef852e4377a5b64491efa0bf9338865959716306119d7b",
+            "line": "violated: ReachScriptBetweenSubscribes",
+            "states": "848 states generated, 542 distinct states found, 373 states left on queue.",
+            "violated": [
+              "ReachScriptBetweenSubscribes"
+            ]
+          },
+          "CallbackProperty.violates.ReachThreeOwnersHearOneCallback.cfg": {
+            "green": false,
+            "hash": "f7263c86c25e049f5a71ff2ca10acd5e1c515eda519c2a6b492601fda6f037df",
+            "line": "violated: ReachThreeOwnersHearOneCallback",
+            "states": "4647 states generated, 2478 distinct states found, 1530 states left on queue.",
+            "violated": [
+              "ReachThreeOwnersHearOneCallback"
+            ]
+          },
+          "CallbackProperty.violates.TheLastReleasePutsBackItsValue.cfg": {
+            "green": false,
+            "hash": "7736eb2b34e855b473f514d96515edc01e3214322218d9ba8714bb736737737c",
+            "line": "violated: TheLastReleasePutsBackItsValue",
+            "states": "17094 states generated, 8548 distinct states found, 5005 states left on queue.",
+            "violated": [
+              "TheLastReleasePutsBackItsValue"
             ]
           }
         },
@@ -3046,7 +3298,7 @@
     }
   },
   "passed": 13,
-  "read_at_head": "dcdd9bcb6be08baab487b62c5aba930a0ffdddf4",
+  "read_at_head": "912583e9fdd6882a8e72c8f2ce8aa4a2fceb099f",
   "step": {
     "failing": [
       "gate1"
