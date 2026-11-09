@@ -1,0 +1,987 @@
+{
+  "module": "Conditions",
+  "features": [
+    {
+      "id": "M3.F1",
+      "summary": "A pipeline's branch: When, ElseIf and Else over a TypedSource<bool> that comparisons, the value, text and membership tests and And, Or and Not build, in authored order, the first that holds winning; each branch a block and a lexical scope; a user's decision read as a component's async boolean.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:ConditionStart<TModel>",
+        "Alis.Reactive:ConditionSourceBuilder<TModel, TProp>",
+        "Alis.Reactive:ConditionSourceBuilder<TModel, TProp, TNext>",
+        "Alis.Reactive:ConditionOperators",
+        "Alis.Reactive:ConditionExtensions",
+        "Alis.Reactive:GuardBuilder<TModel>",
+        "Alis.Reactive:Guard<TModel>",
+        "Alis.Reactive:AllGuard<TModel>",
+        "Alis.Reactive:AnyGuard<TModel>",
+        "Alis.Reactive:GroupGuard<TModel>",
+        "Alis.Reactive:GroupAll<TModel>",
+        "Alis.Reactive:GroupAny<TModel>",
+        "Alis.Reactive:BranchBuilder<TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Confirm(string! message) -> GuardBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.When<TPayload, TProp>(TPayload payload, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.When<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.When<TResponse, TProp>(ResponseBody<TResponse!>! responseBody, System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "p.When(args, x => x.Score).Gte(90)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/Guards/Index.cshtml:22"
+        },
+        {
+          "line": "main",
+          "text": ".ElseIf(args, x => x.Score).Gte(80)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/Guards/Index.cshtml:24"
+        },
+        {
+          "line": "main",
+          "text": "p.When(args, x => x.Deadline).Gt(new DateTime(2026, 6, 1))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/Guards/Index.cshtml:49"
+        },
+        {
+          "line": "main",
+          "text": ".And(g => g.When(args, x => x.Status).Eq(\"active\"))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/Guards/Index.cshtml:60"
+        },
+        {
+          "line": "main",
+          "text": "p.Confirm(\"Are you sure you want to proceed?\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/Guards/Index.cshtml:137"
+        },
+        {
+          "line": "main",
+          "text": "s.When(json, j => j.Status).Eq(\"approved\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/ResponseConditions/Index.cshtml:23"
+        },
+        {
+          "line": "main",
+          "text": "p.When(comp.Value()).NotNull()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/AutoComplete/Index.cshtml:56"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(pain).Gte(4) .Then(t => t.Element(\"plan\").Text.Set(\"Call the doctor\")) .ElseIf(pain).Gte(2)",
+          "cite": "tests/Alis.Reactive.Framework.App/Conditions/CarePlan.cshtml:19-21"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(pain).Gt(1).And(risk).Gt(1).And(g => g.When(pain).Eq(5).Or(risk).Eq(5))",
+          "cite": "tests/Alis.Reactive.Framework.App/Conditions/Groups.cshtml:31"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(p.Component<Meter>(\"pain\").Level).Gte(4) .And(g => g.Confirm(\"Call the doctor?\"))",
+          "cite": "tests/Alis.Reactive.Framework.App/Conditions/Decisions.cshtml:20-21"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(name).In(\"Ada\", \"Ben\")",
+          "cite": "tests/Alis.Reactive.Framework.App/Conditions/Names.cshtml:56"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(labels).ArrayContains(\"Row 3\")",
+          "cite": "tests/Alis.Reactive.Framework.App/Conditions/Round.cshtml:22"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(pain).Truthy()",
+          "cite": "tests/Alis.Reactive.Framework.App/Conditions/Levels.cshtml:46"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(args.Get(x => x.Score)).Gte(90)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Conditions/SupportedSyntax/Index.cshtml:14"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(pain.Gte(4)).Then(then => then.Element(\"plan\").Text.Set(\"Call the doctor\")).ElseIf(pain.Gte(2)).Then(then => then.Element(\"plan\").Text.Set(\"Give pain relief\")).Else(otherwise => otherwise.Element(\"plan\").Text.Set(\"No action\"));",
+          "doors": [
+            "N8.2",
+            "M5.N5",
+            "M5.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(pain.Gt(1).And(risk.Gt(1)).And(pain.Eq(5).Or(risk.Eq(5)))).Then(then => then.Element(\"watch\").Text.Set(\"Watch closely\"));",
+          "doors": [
+            "N8.2",
+            "M5.N5",
+            "M5.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(name.In(\"Ada\", \"Ben\").And(room.Matches(\"^[A-Z][0-9]{2}$\"))).Then(then => then.Element(\"on-round\").Text.Set(\"On the round\"));",
+          "doors": [
+            "M3.N1",
+            "N8.2",
+            "M5.N5",
+            "M5.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(args.Read(x => x.Score).Gte(90)).Then(then => then.Element(\"grade\").Text.Set(\"A\"));",
+          "doors": [
+            "N5.6",
+            "N8.2",
+            "M5.N5",
+            "M5.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(approval.Body.Read(body => body.Status).Eq(\"approved\")).Then(then => then.Element(\"status\").Text.Set(\"Approved\"));",
+          "doors": [
+            "N10.7",
+            "N5.6",
+            "N8.2",
+            "M5.N5",
+            "M5.N1"
+          ]
+        }
+      ],
+      "nodes": [
+        "if",
+        "op",
+        "lit",
+        "get",
+        "data",
+        "call",
+        "let",
+        "nothing",
+        "start"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/ConditionExtensions.cs:17-35"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/ConditionSourceBuilder.cs:25-127"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:13-175"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/GuardBuilder.cs:29-185"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/BranchBuilder.cs:16-50"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/ConditionStart.cs:12-30"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Conditions.cs:15-58"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/ConditionSourceBuilder.cs:18-237"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/GuardBuilder.cs:16-158"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/BranchBuilder.cs:16-106"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Conditions/ConditionStart.cs:11-57"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:60-65"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:88-113"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/operators.ts:4-8"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/operators.ts:71-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:325-348"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/conditions.ts:39-60"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/compare-engine.ts:81-110"
+        }
+      ],
+      "core": [
+        "Q4",
+        "Q5",
+        "Q7",
+        "Q8",
+        "Q11",
+        "Q17"
+      ],
+      "meanings": [
+        {
+          "id": "M3.D1",
+          "meaning": "Each value, text and membership test reads as the .NET term it stands for, written in the one core's operators under D8.9, as the lambda door reads the same term (spec/Core/translated-members.md). IsNull is eq of the source and null, NotNull is neq: a member the data lacks reads its start first (D4.2), so IsNull holds over one whose start is null, and a value past a holder that holds null reads nothing, so neither IsNull nor NotNull holds over it, as HasValue reads in a list's lambda. IsEmpty over a text is string.IsNullOrEmpty, the nullOrEmpty operator, which holds on nothing, null and the empty text; over a list it is the empty operator, which holds on nothing, null and a list with no item; NotEmpty is not of IsEmpty, so it holds on none of them. Contains, StartsWith and EndsWith compare ordinally, as the lambda door's Contains(string) and StartsWith and EndsWith with StringComparison.Ordinal compare; Matches is Regex.IsMatch over a literal pattern D16.11's reader copies where the view renders (D7.5); MinLength(n) is gte of the text's Length in UTF-16 code units and n, a constant n below zero refused at build and a source n read as .NET reads text.Length >= n. Each text test reads nothing on a text that reads nothing or holds null, and stops its pipeline on a value that is not text. In over literal values is includes of the source in them, each written in the source's form (D8.10); In over a source that holds a list (N7.3) reads as that list's Any(item => item == value) (D6.2, D8.9), when the condition runs; NotIn is not of In, and both read nothing on a source that reads nothing; Between(low, high) is gte of low and lte of high, both bounds included, so it holds over no null. A condition that reads nothing does not hold, so its branch does not run (D8.5)."
+        }
+      ],
+      "oracle": "The C# language specification: an if statement and its else if nesting, the conditional logical operators that read their right operand only when the left does not decide, and the lifted operators over Nullable<T>; .NET's string.IsNullOrEmpty, the ordinal Contains, StartsWith and EndsWith, Regex.IsMatch and String.Length, through spec/Core/translated-members.md; and the spec itself for nothing (D8.9), a block's scope (D8.8) and a source's form (D8.10).",
+      "checker": [
+        "Absence.tla:ConditionTermsLazy",
+        "Absence.tla:NullHolderReadsNothing",
+        "Run.tla:NothingRunsWhileItWaits",
+        "Schema.tla:RefsReadTheirBlock",
+        "Schema.tla:PatternsAreLiterals",
+        "Schema.tla:DecimalTextComparedByValue",
+        "Schema.tla:OperatorsClosed",
+        "core:Q8",
+        "core:Q4",
+        "core:Q11"
+      ],
+      "defects": [
+        {
+          "id": "X8.1",
+          "rung": "type"
+        },
+        {
+          "id": "X8.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.5",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X8.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.9",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X8.10",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X8.11",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.13",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.14",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.15",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.16",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X8.17",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X8.18",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X8.19",
+          "rung": "refusal"
+        },
+        {
+          "id": "X8.20",
+          "rung": "refusal"
+        },
+        {
+          "id": "X8.21",
+          "rung": "refusal"
+        },
+        {
+          "id": "X8.22",
+          "rung": "refusal"
+        },
+        {
+          "id": "X8.23",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.24",
+          "rung": "type"
+        },
+        {
+          "id": "X8.25",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X8.26",
+          "rung": "behavior"
+        },
+        {
+          "id": "M3.X1",
+          "rung": "behavior",
+          "defect": "A value test over nothing reads as JavaScript reads it: IsNull holds over a member past a holder that holds null, NotNull holds there too, or IsEmpty does not hold over nothing, so a branch runs that M3.D1 does not run, or the reverse (M3.D1, M3.N1)."
+        },
+        {
+          "id": "M3.X2",
+          "rung": "type",
+          "defect": "A When, ElseIf, And or Or over a source that is no TypedSource<bool> compiles, and the browser tests it by JavaScript's truthiness: N8.2's When and ElseIf take a TypedSource<bool>, and And, Or and Not extend one."
+        },
+        {
+          "id": "M3.X3",
+          "rung": "analyzer",
+          "defect": "A When given no Then compiles and writes no branch, so its condition is lost without a word: ALIS001, kept and retargeted to the conditions of every block and file (Q18)."
+        },
+        {
+          "id": "M3.X4",
+          "rung": "analyzer",
+          "defect": "A MinLength given a constant below zero compiles, where the redesign refuses it where the view renders: at build by ALIS033's pipeline-condition checks, new:N18.10, and where the view renders on code the analyzer does not follow (D18.6), with the redesign's message, \"Condition minimum text length must be zero or greater.\""
+        }
+      ],
+      "promises": [
+        {
+          "for": "X8.4",
+          "page": "A pain meter and a plan text: When the pain is at least 4 the plan reads Call the doctor, ElseIf it is at least 2 the plan reads Give pain relief, Else No action; each branch also writes its own word into a log.",
+          "gesture": "Set the pain to 5 and click Assess, then set it to 3 and click, then set it to 1 and click.",
+          "outcome": "The plan reads Call the doctor, then Give pain relief, then No action, and after each click the log holds that branch's word alone: doctor, relief, none.",
+          "opposite": "At pain 5 the ElseIf's condition holds too, and the log never reads relief after that click.",
+          "defect": "A later branch whose condition holds runs too, so pain 5 logs relief, or the Else runs after a branch that held, so No action overwrites the plan."
+        },
+        {
+          "for": "X8.6",
+          "page": "A discharge button whose When, the resident's balance equal to 0, holds a {} body of three steps: set the status to Clearing, write Cleared into the log, set the status to Discharged; a step after the branch writes Done.",
+          "gesture": "Set the balance to 0 and click Discharge.",
+          "outcome": "The status reads Discharged, the log reads Cleared, and Done shows.",
+          "opposite": "With a balance of 40 the status keeps Pending, the log stays empty, and Done still shows.",
+          "defect": "The branch runs one of its steps alone, runs them out of order so the status ends at Clearing, or runs them while its condition does not hold."
+        },
+        {
+          "for": "X8.11",
+          "page": "A booking test component whose async Reserve sets its text from Open to Reserved when the test releases it; a button's When, the room free, holds an awaited call to Reserve, and the step after the branch copies the booking's text into the summary.",
+          "gesture": "Mark the room free and click Book, then release the reservation.",
+          "outcome": "Before the release the summary is empty; after it the summary reads Reserved.",
+          "opposite": "With the room taken, the summary reads Open at once, with nothing to release.",
+          "defect": "The step after the branch runs before Reserve settles, so the summary reads Open, or it waits on a branch not taken, so the summary stays empty."
+        },
+        {
+          "for": "X8.13",
+          "page": "A pain meter and a visit calendar test component whose IsOpen counts its calls in a text on the page; one button's condition is the pain below 4 And IsOpen, another's the pain at least 4 Or IsOpen.",
+          "gesture": "Set the pain to 5 and click both buttons, then set it to 1 and click both again.",
+          "outcome": "At pain 5 the count reads 0 after both clicks; at pain 1 it reads 2.",
+          "opposite": "With IsOpen read on its own line before the When, the count rises by one on every click.",
+          "defect": "The right term is called whatever the left term reads, so the count reads 2 at pain 5, or it is never called, so the count stays 0 at pain 1."
+        },
+        {
+          "for": "X8.14",
+          "page": "A pain meter and two test components that count their calls in texts on the page, a nurse whose IsFree answers at once and a doctor whose async IsFree the test releases: When the pain is at least 8 the plan reads Ambulance, ElseIf the nurse IsFree it reads Nurse, ElseIf the doctor IsFree it reads Doctor, Else Wait.",
+          "gesture": "Set the pain to 9 and click Assess; set it to 5 with the nurse free and click; set it to 5 with the nurse busy, click, and release the doctor's answer yes.",
+          "outcome": "At 9 the plan reads Ambulance and both counts read 0; with the nurse free it reads Nurse, the nurse's count 1 and the doctor's 0; with the nurse busy it reads Doctor only after the release, and the doctor's count reads 1.",
+          "opposite": "Released with no, the plan reads Wait.",
+          "defect": "An ElseIf's method runs though a branch before it held, so a count rises at pain 9, or the doctor's answer is not awaited, so the plan reads Wait or Doctor before the release."
+        },
+        {
+          "for": "X8.15",
+          "page": "A fluid balance test component whose Measure returns its millilitres: Check measures 100 ml, sets the balance to 999 ml, then When the measured result is below 500 sets the status to Low; Restore measures 600 ml, and When that result is above 500 its branch sets the balance to 999 ml and then to the result.",
+          "gesture": "Click Check, then click Restore.",
+          "outcome": "After Check the status reads Low and the balance shows 999 ml; after Restore the balance shows 600 ml.",
+          "opposite": "With Check's measure written after the set, the status stays empty.",
+          "defect": "A term or a branch calls Measure again where it reads the result, so Check reads 999 and Low never shows, or Restore sets the balance back to 999 ml."
+        },
+        {
+          "for": "X8.23",
+          "page": "A medication chart whose doses the server writes with the app's camel-case enum names, the Status member carrying its own JsonStringEnumConverter with no naming policy; a button's When, the status of the dose found for Aspirin equal to DoseStatus.Given, sets the round to Given, Else Due.",
+          "gesture": "Load a chart whose Aspirin dose is given and click Check, then load one whose Aspirin dose is due and click.",
+          "outcome": "The round reads Given, then Due.",
+          "opposite": "A chart with no Aspirin dose reads Due.",
+          "defect": "The literal is written in the app's form, given, so it never equals the member's Given and the round reads Due for the given dose."
+        },
+        {
+          "for": "X8.26",
+          "page": "A cart whose doses carry a Copay decimal that its own number handling writes as text; one button's When, the copay of the dose found for Aspirin equal to 0.10m, sets the price to Ten pence, Else Other; another's When, the same copay NotEq 0.10m, sets the note to Differs, Else Same.",
+          "gesture": "Load a cart whose Aspirin copay holds 0.1 and click both buttons, then load one whose copay holds 0.125 and click both.",
+          "outcome": "With 0.1 the price reads Ten pence and the note Same; with 0.125 the price reads Other and the note Differs.",
+          "opposite": "A cart whose Aspirin copay holds 0.10 reads Ten pence and Same, as 0.1 does.",
+          "defect": "The copay is compared as text, so 0.1 never equals the written 0.10, the price reads Other and the note Differs."
+        },
+        {
+          "for": "M3.X1",
+          "page": "An announcement handler whose payload declares a Visitor with a Name: When the visitor's name IsNull the gate reads No name, ElseIf it is NotNull the gate reads Named, Else Unknown; a second When, the name IsEmpty, sets the badge to Blank, Else Filled.",
+          "gesture": "Raise the announcement with a visitor whose name holds null, then with a visitor that holds null, then with the name Ada.",
+          "outcome": "The null name reads No name and Blank; the null visitor reads Unknown and Blank; Ada reads Named and Filled.",
+          "opposite": "A visitor the app wrote with no name member reads its start, null, so the gate reads No name.",
+          "defect": "IsNull or NotNull holds past the null visitor, so the gate reads No name or Named where it reads Unknown, or IsEmpty does not hold over nothing, so the badge reads Filled."
+        },
+        {
+          "for": "X8.19",
+          "page": "A dose list whose Strength member carries its own JsonNumberHandling that writes it as text; a button's When orders the found dose's strength above 5.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with one error naming the strength's read and its number handling and ending order it on the server, and no button renders.",
+          "opposite": "The same order over a strength the app writes as a JSON number renders, and its branch runs for a strength of 10.",
+          "defect": "The page renders and the browser orders the text 10 below 5, so the branch never runs for a strength of 10."
+        },
+        {
+          "for": "X8.20",
+          "page": "A resident list whose Address member carries its own JsonConverter that writes it as one text; a button's When compares the found resident's address with an Address the view holds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with one error naming the address's read and its converter and ending compare it on the server.",
+          "opposite": "A comparison of the address's Postcode text renders, and its branch runs for the same postcode.",
+          "defect": "The page renders and the branch runs by the texts the converter wrote, where .NET compares the two Address objects and the condition does not hold."
+        },
+        {
+          "for": "X8.21",
+          "page": "A page with two dose lists whose Status enum one writes through the app's camel-case options and the other through its own JsonStringEnumConverter; a button's When compares the two found statuses.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with one error naming the own-form read and its converter and ending compare them on the server.",
+          "opposite": "Two statuses both written through the app's options render, and the branch runs when both are Given.",
+          "defect": "The page renders and the browser compares given with Given, so two equal statuses never hold."
+        },
+        {
+          "for": "X8.22",
+          "page": "A pump list whose Offset double the app's number handling writes as text; a button's When compares the found pump's offset with 0.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with one error naming the double written as text and ending compare it on the server.",
+          "opposite": "The same comparison over an offset written as a JSON number renders, and its branch runs for an offset of -0.",
+          "defect": "The page renders and the browser compares the text -0 with 0, so the branch does not run where .NET's -0.0 == 0.0 holds."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "PipelineBuilder<TModel>.Confirm(string! message) -> GuardBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A user's decision is no core door (D17.9): main writes a condition kind of its own, answered by window.alis.confirm, which only Fusion's confirm dialog sets (`Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:103` at 623dd4a27). The condition reads a component's async boolean method, NativeConfirm's or any onboarded component's, as any source is read.",
+          "carriers": [
+            "N17.3",
+            "N17.4"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.When<TPayload, TProp>(TPayload payload, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it.",
+          "carriers": [
+            "N8.2",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.When<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.When<TResponse, TProp>(ResponseBody<TResponse!>! responseBody, System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it. A route's body is reply.Body.",
+          "carriers": [
+            "N8.2",
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "ConditionStart<TModel>.Confirm(string! message) -> GuardBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A user's decision is no core door (D17.9): main writes a condition kind of its own, answered by window.alis.confirm, which only Fusion's confirm dialog sets (`Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:103` at 623dd4a27). The condition reads a component's async boolean method, NativeConfirm's or any onboarded component's, as any source is read.",
+          "carriers": [
+            "N17.3",
+            "N17.4"
+          ]
+        },
+        {
+          "door": "ConditionStart<TModel>.When<TPayload, TProp>(TPayload payload, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it.",
+          "carriers": [
+            "N8.2",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "ConditionStart<TModel>.When<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionStart<TModel>.When<TResponse, TProp>(ResponseBody<TResponse!>! responseBody, System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it. A route's body is reply.Body.",
+          "carriers": [
+            "N8.2",
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "BranchBuilder<TModel>.ElseIf<TPayload, TProp>(TPayload payload, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it.",
+          "carriers": [
+            "N8.2",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "BranchBuilder<TModel>.ElseIf<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "BranchBuilder<TModel>.ElseIf<TResponse, TProp>(ResponseBody<TResponse!>! responseBody, System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it. A route's body is reply.Body.",
+          "carriers": [
+            "N8.2",
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "GuardBuilder<TModel>.And(System.Func<ConditionStart<TModel!>!, GuardBuilder<TModel!>!>! inner) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "GuardBuilder<TModel>.And<TPayload, TProp>(TPayload payload, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it.",
+          "carriers": [
+            "N8.2",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "GuardBuilder<TModel>.And<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "GuardBuilder<TModel>.And<TResponse, TProp>(ResponseBody<TResponse!>! responseBody, System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it. A route's body is reply.Body.",
+          "carriers": [
+            "N8.2",
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "GuardBuilder<TModel>.Or(System.Func<ConditionStart<TModel!>!, GuardBuilder<TModel!>!>! inner) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "GuardBuilder<TModel>.Or<TPayload, TProp>(TPayload payload, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it.",
+          "carriers": [
+            "N8.2",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "GuardBuilder<TModel>.Or<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "GuardBuilder<TModel>.Or<TResponse, TProp>(ResponseBody<TResponse!>! responseBody, System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! path) -> ConditionSourceBuilder<TModel!, TProp>!",
+          "verdict": "refused",
+          "reason": "A payload or a response body and a path lambda is main's second syntax for a source, which D8.6 refuses: the member is a typed source, read with Read, and the condition is a comparison or test over it. A route's body is reply.Body.",
+          "carriers": [
+            "N8.2",
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>",
+          "verdict": "refused",
+          "reason": "A builder staged between a source and its test is a type no view names: each comparison and test is an extension method on the typed source that returns a TypedSource<bool>, which When and ElseIf take and And, Or and Not compose.",
+          "carriers": [
+            "N8.2",
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.ArrayContains(object! item) -> GuardBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "The item is an object, which ALIS009 refuses on the public surface, compared by JavaScript's equality whatever the list's item type. A list a source holds is tested with the list operations' Any(predicate) (D6.2) and a typed comparison of its item.",
+          "carriers": [
+            "N6.1",
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Between(TProp low, TProp high) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Contains(string! substring) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.EndsWith(string! suffix) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Eq(TProp operand) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Eq(TypedSource<TProp>! right) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Falsy() -> GuardBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "JavaScript's truthiness has no .NET reading: 0, the empty text and NaN read false. A TypedSource<bool> is its own condition and Not its negation; a number is compared, a text or a list tested by IsEmpty or NotEmpty, and a value that can hold null tested by IsNull or NotNull.",
+          "carriers": [
+            "N8.2",
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Gt(TProp operand) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Gt(TypedSource<TProp>! right) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Gte(TProp operand) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Gte(TypedSource<TProp>! right) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.In(params TProp[]! values) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.IsEmpty() -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.IsNull() -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Lt(TProp operand) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Lt(TypedSource<TProp>! right) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Lte(TProp operand) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Lte(TypedSource<TProp>! right) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Matches(string! pattern) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.MinLength(int length) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.NotEmpty() -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.NotEq(TProp operand) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.NotEq(TypedSource<TProp>! right) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N8.2"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.NotIn(params TProp[]! values) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.NotNull() -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.StartsWith(string! prefix) -> GuardBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M3.N1"
+          ]
+        },
+        {
+          "door": "ConditionSourceBuilder<TModel, TProp>.Truthy() -> GuardBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "JavaScript's truthiness has no .NET reading: 0, the empty text and NaN read false. A TypedSource<bool> is its own condition and Not its negation; a number is compared, a text or a list tested by IsEmpty or NotEmpty, and a value that can hold null tested by IsNull or NotNull.",
+          "carriers": [
+            "N8.2",
+            "M3.N1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M3.F2",
+      "summary": "The one condition core every condition writes, a pipeline's, a list predicate's and a validator's: the comparisons, the text, membership and value tests, and all, any and not, with one meaning of comparison and logic over null and nothing.",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:Condition",
+        "Alis.Reactive:Comparison",
+        "Alis.Reactive:TextTest",
+        "Alis.Reactive:ValueTest"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "redesign",
+          "text": "p.When(held.Any(file => file.Type == \"pdf\" || file.Type == \"PDF\")).Truthy()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/FileUpload/Index.cshtml:50"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(alerts.Any(a => a.Severity == AlertSeverity.Critical && !a.Acknowledged)).Truthy()",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ShiftReport/Index.cshtml:25"
+        },
+        {
+          "line": "redesign",
+          "text": "residents.Count(r => r.Status != CensusStatus.InResidence)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Native/ArrayOps/Index.cshtml:23"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(alerts.Any(alert => alert.Severity == AlertSeverity.Critical && !alert.Acknowledged)).Then(then => then.Element(\"escalate\").Text.Set(\"Escalate\"));",
+          "doors": [
+            "N6.1",
+            "N8.1",
+            "N8.2",
+            "M5.N5",
+            "M5.N1"
+          ]
+        }
+      ],
+      "nodes": [
+        "op",
+        "fn",
+        "lit",
+        "data",
+        "get",
+        "nothing",
+        "start"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Conditions/Condition.cs:24-149"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Conditions/Condition.cs:186-260"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Conditions/Comparison.cs:6-111"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:68-113"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Validation/BrowserCondition.cs:11-53"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/evaluate.ts:88-113"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/operators.ts:4-8"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/operators.ts:71-77"
+        }
+      ],
+      "core": [
+        "Q4",
+        "Q6",
+        "Q8"
+      ],
+      "meanings": [],
+      "oracle": "SQL's three-valued logic (ISO/IEC 9075), the truth tables of AND, OR and NOT with unknown, for nothing; the C# language specification's lifted operators over Nullable<T> for null; and spec/Core/translated-members.md for each .NET member a term names.",
+      "checker": [
+        "Absence.tla:ConditionTermsLazy",
+        "Absence.tla:NullHolderReadsNothing",
+        "Absence.tla:DataAbsentReadsItsStart",
+        "Schema.tla:OperatorsClosed",
+        "core:Q8",
+        "core:Q4"
+      ],
+      "defects": [
+        {
+          "id": "X8.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X8.12",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X8.7",
+          "page": "A dose round whose server writes three doses: one in ward North with priority 1, one with no ward member and priority 3, and one in ward South whose priority holds null; four texts count the doses where d.Ward != \"North\", where !(d.Ward == \"North\"), where d.Priority != 2 and where d.Priority <= 2.",
+          "gesture": "Open the round and click Count.",
+          "outcome": "The counts read 2, 2, 3 and 1.",
+          "opposite": "With the dose that has no ward written in ward North, the first two counts read 1.",
+          "defect": "The missing ward reads nothing rather than its start, so both first counts read 1, or null orders as 0, so the last count reads 2."
+        },
+        {
+          "for": "X8.8",
+          "page": "A visit list whose server writes visit A, carer Ruth in ward South, and visit B, whose carer holds null, in ward North; one text counts the visits where v.Carer.Name == \"Ruth\" || v.Ward == \"North\", another where !(v.Carer.Name == \"Ruth\" && v.Ward == \"South\").",
+          "gesture": "Open the visits and click Count.",
+          "outcome": "The counts read 2 and 1.",
+          "opposite": "With visit B written in ward South, the counts read 1 and 0.",
+          "defect": "Two-valued logic reads nothing as false, so with B in ward South the second count reads 1, or nothing stops the predicate, so B is never counted and the first count reads 1."
+        },
+        {
+          "for": "X8.12",
+          "page": "A vital-signs handler whose payload declares Pulse as a nullable int: When the pulse is below 80 the status reads Calm and the log reads checked, Else the status reads Unknown.",
+          "gesture": "Raise the reading with a pulse that holds null.",
+          "outcome": "The status reads Unknown and the log stays empty.",
+          "opposite": "Raised with a pulse of 70, the status reads Calm and the log reads checked.",
+          "defect": "JavaScript's null < 80 holds, so the null pulse reads Calm and the log reads checked."
+        }
+      ],
+      "verdicts": []
+    }
+  ]
+}

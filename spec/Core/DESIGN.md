@@ -1175,8 +1175,8 @@ Terms used throughout:
 - `N7.1` new: `p.Object<T>(o => o.Set(x => x.Member, source))`, a `TypedSource<T>` built member by member,
   replacing `DispatchPayloadBuilder<TPayload, TModel>` as a builder of its own.
 - `N7.2` new: `p.List<T>([first, second])`, a `TypedSource<IReadOnlyList<T>>` built from sources.
-- `N7.3` new: a source overload on `Contains`, `StartsWith`, `EndsWith`, `MinLength`, `Between` and the
-  membership tests in `ConditionOperators`.
+- `N7.3` new: a source overload on `Contains`, `StartsWith`, `EndsWith`, `MinLength`, `Between`, `In` and `NotIn`,
+  module 3's tests (`M3.N1` in `spec/Conditions/module.md`).
 - `N7.6` new, POC 13a: `NullableWrites.Set` on `Property<T?>` and `WriteOnly<T?>` taking a source of `T`, an
   extension in `Alis.Reactive.Components` beside the members it widens. The contract check makes every member a vendor
   types `T | null` a `T?` (Syncfusion's DropDownList types `value`, `text` and `index` so), and 178 writes of the POC
@@ -1314,8 +1314,8 @@ Terms used throughout:
 - `check:fluent`
 
 **Doors.**
-- kept: the pipeline door, `ConditionSourceBuilder` and `ConditionOperators`
-  (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:16`).
+- kept: the pipeline door, `When`, `ElseIf` and `Else` (`Alis.Reactive/PlanAuthoring/Conditions/ConditionExtensions.cs:17`);
+  `ConditionSourceBuilder` and `ConditionOperators` go to N8.2's comparisons and module 3's tests (`M3.N1`).
 - `N8.2` new, its form gate 2's: the comparisons (`Eq`, `NotEq`, `Gt`, `Gte`, `Lt`, `Lte`) and `And`, `Or` and `Not`
   are extension methods on a typed source that return a `TypedSource<bool>`, which `When` and `ElseIf` take and a live
   list's predicate returns, so one comparison API serves both. Each refuses where the view renders what the lambda
@@ -4448,7 +4448,7 @@ shapes, starts and the payload kind of each event.
   an interface or `Nullable<T>` declares (D14.3); a dictionary of dates
   written into a live member (D3.13); a constant literal no live number holds (D7.7, X7.13); in a list's lambda and a pipeline condition, a term outside the identity table
   (D6.5), a view value that computes (D6.7), and each comparison, ordering, cast, coalesce and lookup D6.12 to D6.14
-  and N8.2 refuse by the types they read; a constant pattern outside D16.11's closed set (D6.15).
+  and N8.2 refuse by the types they read; a constant pattern outside D16.11's closed set (D6.15); in a pipeline condition, a constant `MinLength` below zero (M3.D1, M3.X4).
 - `N18.11` new: ALIS006 kept as an error, the validator analyzer: a condition with no browser form outside
   `WhenOnServer` and `UnlessOnServer`, a constant pattern outside D16.11's closed set or with an option other than
   `CultureInvariant`, and on net48 a model type with no public parameterless constructor (D16.6, D16.11).

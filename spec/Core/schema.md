@@ -259,7 +259,7 @@ A listen release says when release removes the listener the step added (D12.8):
 | `unbound` | nothing | the pipeline stops: the binding cannot create a holder on the path, or a holder on it is polymorphic |
 
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
-`neg`, `coalesce`, `cond`, `nullableValue`, `nonNull`, `truthy`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
+`neg`, `coalesce`, `cond`, `nullableValue`, `nonNull`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
 `sumDouble`, `sumDecimal` and `eqDecimal`.
 `toNumber`,

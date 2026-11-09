@@ -39,7 +39,7 @@ Handlers == [k \in Kinds |->
     ELSE {"trace"}]
 
 Operators == {"eq", "neq", "lt", "lte", "gt", "gte", "and", "or", "not", "add", "sub", "mul", "mod", "neg", "coalesce",
-              "cond", "nullableValue", "truthy", "empty", "matches", "toArray", "finite", "compareNumbers", "compareOrdinal",
+              "cond", "nullableValue", "empty", "matches", "toArray", "finite", "compareNumbers", "compareOrdinal",
               "compareBooleans", "compareCulture", "merge", "trim", "trimStart", "trimEnd", "upperInvariant", "lowerInvariant",
               "upper", "lower", "upperTurkic", "lowerTurkic", "contains", "startsWith", "endsWith", "nullOrEmpty", "includes",
               "sumInt", "sumDouble", "sumDecimal", "eqDecimal", "nonNull"}
