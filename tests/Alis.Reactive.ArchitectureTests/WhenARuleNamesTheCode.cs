@@ -21,7 +21,10 @@ public class WhenARuleNamesTheCode
         ["FusionX", "XxxBuilder", "vX", "Namespace_Type__Member_Path", "file:line", "target <- source", "[component] [framework] playwright [behavior]"];
     private static readonly string[] WhatTheRulesForbid =
         ["page.evaluate()", "window.alis", "InternalsVisibleTo", "vi.mock", "spyOn", "writes_a_let_statement", "set_prop_mutation_writes_value_to_ej2_instance"];
-    private static readonly string[] NotInTheRepo = [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid];
+    private static readonly string[] VendorTypes = ["EmitType", "ChangeEventArgs"];
+    private static readonly string[] OperatorsTheSpecDecides = ["eqDecimal"];
+    private static readonly string[] NotInTheRepo =
+        [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. OperatorsTheSpecDecides];
 
     private static readonly CSharpParseOptions ForNet10 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols("NET6_0_OR_GREATER");
     private static readonly CSharpParseOptions ForNet48 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols("NET48");
