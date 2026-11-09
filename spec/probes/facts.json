@@ -1772,6 +1772,15 @@
       "probe": "spec/probes/aspnetwebstack/NameValueCollectionValueProvider.cs.txt",
       "expect": "new Dictionary<string, ValueProviderResultPlaceholder>(StringComparer.OrdinalIgnoreCase);",
       "source": "spec/probes/aspnetwebstack/NameValueCollectionValueProvider.cs.txt:131"
+    },
+    {
+      "id": "core-new-constraint-wraps",
+      "statement": "A constructor's throw under new T() reaches the caller wrapped in TargetInvocationException, through Activator, since C# compiles new T() under a new() constraint to Activator.CreateInstance<T>().",
+      "host": "net10",
+      "oracle": ".NET 10's Activator",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-new-constraint-wraps: under new T() a constructor's throw reaches the caller as TargetInvocationException whose inner is InvalidOperationException: Plugin name 'alis.log' is refused.; Activator on its stack True",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
     }
   ]
 }

@@ -511,10 +511,19 @@ Terms used throughout:
   when its line runs, and one that reads nothing passes null (D7.6). A result is read in the block that called its
   method and in the blocks inside it (D8.8); a C# variable that carries it into another pipeline, or out of its
   block, is refused where the view renders (X5.14). A `MethodAsync<T>` result binds by `let` with `await` (D4.3).
+- D5.12 The core makes a declaration (a component, a plugin, a live payload, every `JsObject` a member reaches)
+  by `new T()` under the `new()` constraint each door that names one carries, and C# compiles `new T()` to
+  `Activator.CreateInstance<T>()` on both targets, and on net10 a constructor's throw reaches the developer wrapped in
+  `TargetInvocationException` (`probe:core-new-constraint-wraps`). So no refusal of the core is thrown from a
+  declaration's constructor, and a base class's constructor (`Component`'s, `Plugin`'s) keeps what it is given. A
+  declaration's arguments are refused at build when the build reads them (ALIS024, ALIS034), and where the view
+  renders when the plan writes the declaration: a plugin's name with a dot is X17.27 in both places. `new T()` is a
+  read of `Activator`, which D18.1 lists on gate 1's ask.
 
 **Schema nodes.** `obj`, `get`, `call` with `members`; `Handler.path`.
 
 **Checker.**
+- `probe:core-new-constraint-wraps`
 - `Absence.tla:RequiredAbsentStops`
 - `Absence.tla:DataAbsentReadsItsStart`
 - `probe:ej2-max-public-method-arity`
@@ -3903,6 +3912,12 @@ plans (Q19).
   unit adds to the Types module. The
   generic `Enum.GetValues<TEnum>()` is absent on net48, and no door reaches a `TEnum : struct, Enum`. Until the owner's
   answer the POC sends an enum a source holds as it is held, and the landed `Enum.ToString` of a literal is on no list.
+  D5.12's declarations ask one more at gate 1: `Activator.CreateInstance<T>()`, which C# writes for `new T()` under a
+  `new()` constraint on net48 and net10 alike, calling the public parameterless constructor the compiler checked and
+  listing no member. The typed alternatives each cost the developer: a factory every door takes
+  (`pipeline.Component(() => new Monitor(), id)`), written at every reach of a declaration, or a static abstract
+  factory on the declaration, which net48's runtime does not support. Until the owner's answer the POC makes every
+  declaration by `new T()`, on no list.
 - D18.2 One item-type finder: the contract's element type for a collection, and the key and element types for a
   dictionary. The three finders of today leave.
 - D18.3 Each reflection site of today gets its verdict (B11):
@@ -3948,7 +3963,9 @@ plans (Q19).
 - D18.4 An analyzer fails the build on any reflection call in a shipped package outside the exceptions the owner
   lists at gate 1 (N18.1): the members of `System.Reflection` that list, read, write or invoke members or read
   attributes, `Activator`, `Type.GetType` by name and `Expression.Compile`, except the owner's exceptions D18.1
-  lists. A type's identity stays open to the framework (D18.1). The POC bans the whole `System.Reflection`
+  lists. It reads operations, not names: `new T()` over a type parameter, an `ITypeParameterObjectCreationOperation`
+  whose source never names `Activator`, is an `Activator` read, which `WhenTheCoreIsCompiled`, reading the names the
+  source writes, misses. A type's identity stays open to the framework (D18.1). The POC bans the whole `System.Reflection`
   namespace; each owner-listed read of it sits in a method that carries `SuppressMessage` for RS0030, and the list
   of D18.1 holds every read.
 - D18.5 Every door on the public surface is typed (ALIS009). The three strings of B13 become typed doors:
