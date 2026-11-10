@@ -820,3 +820,5 @@
   Evidence: AnalyzerHelpers.cs:13-19 and UntypedComponentApiAnalyzer.cs:124-133 at 65fdf118d, UntypedComponentApiAnalyzer.cs:87-93 at 623dd4a27, read by the lead; DESIGN:1863 and :1868 at b6525b23a.
 - 2026-11-09 for gate 2, from module 20: M20.D1 checks the whole public surface of any compilation that carries a slice table, naming no package, and refuses an exemption with an empty reason; designed default: as M20.D1 says, and root CLAUDE.md's "whole public surface of the shipped packages" changes with it, which is the owner's line.
   Evidence: AnalyzerHelpers.cs:13-19 at 65fdf118d names Fusion, Native and NativeTagHelpers; root CLAUDE.md, Rules, "Typed APIs only".
+- 2026-11-09 check, by the lead: every core defect is placed in exactly one feature, and the defects check lists each one no feature places; 31 are, 7 of them Q7's (X7.2 to X7.12), which module 2 owns and never placed, the rest modules 22, 23, 25 and 26's.
+  Evidence: check_defects at f9151b5bd passed on a full row set with any core defect unplaced; DESIGN:1298-1329.

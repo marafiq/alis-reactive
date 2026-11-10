@@ -1052,8 +1052,18 @@ def check_defects():
     analyzer_ids = {row["id"] for row in table("analyzers.tsv")}
     counts = mapping_counts(model)
     counts["defects"] = sum(len(feature.get("defects", [])) for feature in model["features"])
-    problems = model["problems"] + defect_problems(model, core_defect_rungs(), doors, analyzer_ids)
-    return feature_result(problems, counts, counts["unmapped"] == 0, "every defect on its rung; no promise for a type or analyzer defect")
+    rungs = core_defect_rungs()
+    problems = model["problems"] + defect_problems(model, rungs, doors, analyzer_ids)
+    unplaced = unplaced_core_defects(model, rungs)
+    counts["core_defects_unplaced"] = len(unplaced)
+    if not problems and unplaced:
+        return result(False, f"every feature row valid; {counts['unmapped']} of {counts['rows']} spec doors in no feature; core defects no feature places: {', '.join(unplaced)}", **counts)
+    return feature_result(problems, counts, counts["unmapped"] == 0, "every defect on its rung, every core defect in a feature; no promise for a type or analyzer defect")
+
+
+def unplaced_core_defects(model, rungs):
+    placed = {defect.get("id") for feature in model["features"] for defect in feature.get("defects", [])}
+    return sorted(set(rungs) - placed, key=lambda defect: tuple(int(part) for part in defect[1:].split(".")))
 
 
 def promise_problems(model, tests):
@@ -1175,7 +1185,7 @@ CHECKS = [
     ("fluent", "every module's sentences consistent", check_fluent),
     ("gate2", "owner gate 2: the fluent API", check_gate(2)),
     ("matrix", "every conformance cell promised for both reference components", check_matrix),
-    ("defects", "every defect on its highest rung; no test for a type or analyzer defect", check_defects),
+    ("defects", "every defect on its highest rung, every core defect in a feature; no test for a type or analyzer defect", check_defects),
     ("promises", "every refusal and behavior defect has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
