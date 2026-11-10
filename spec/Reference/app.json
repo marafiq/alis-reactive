@@ -17,9 +17,7 @@
   },
   "partKinds": {
     "native": "a plain-DOM input or element the core's doors render or reach",
-    "conformance": "ConformanceComponent",
-    "conformanceElement": "ConformanceElement, the second custom component",
-    "peer": "ConformancePeer, the component a payload hands",
+    "conformance": "a declaration of the conformance library, spec/Reference/native.json, named by the part's declares",
     "fusion": "a Syncfusion component through its Fusion slice; never a part of a core module's test",
     "nativeSlice": "a Native slice's component (NativeDrawer, NativeToast, NativeConfirm, NativeLoader, NativeActionLink, NativeCheckList and the rest)",
     "plugin": "a plugin by name",
@@ -161,7 +159,8 @@
         {
           "id": "census",
           "kind": "conformance",
-          "role": "the census panel, the screen's custom widget"
+          "role": "the census panel, the screen's custom widget",
+          "declares": "ConformanceComponent"
         }
       ]
     },
@@ -218,7 +217,8 @@
         {
           "id": "carePicker",
           "kind": "conformance",
-          "role": "the care level picker, the screen's custom widget"
+          "role": "the care level picker, the screen's custom widget",
+          "declares": "ConformanceComponent"
         },
         {
           "id": "nativeInputs",
@@ -325,7 +325,8 @@
         {
           "id": "carePanel",
           "kind": "conformance",
-          "role": "the care panel, the record's custom widget: vitals monitor, visit planner and call bell"
+          "role": "the care panel, the record's custom widget: vitals monitor, visit planner and call bell",
+          "declares": "ConformanceComponent"
         },
         {
           "id": "radio",
@@ -402,7 +403,8 @@
         {
           "id": "scanner",
           "kind": "conformance",
-          "role": "the dose scanner, the round's custom widget"
+          "role": "the dose scanner, the round's custom widget",
+          "declares": "ConformanceComponent"
         }
       ]
     },
@@ -494,27 +496,48 @@
       "id": "bench",
       "area": "bench",
       "title": "Component bench",
-      "user": "test infrastructure: ConformanceComponent, ConformanceElement and ConformancePeer with every variation of their members, events and versions",
+      "user": "test infrastructure: the conformance library's declarations, ConformanceComponent, ConformancePeer, ConformanceElement, ConformanceRegistered, ConformanceStore and ConformanceCallbacks, with every variation of their members, events, vendors and versions",
       "parts": [
         {
           "id": "conformance",
           "kind": "conformance",
-          "role": "ConformanceComponent"
-        },
-        {
-          "id": "conformanceElement",
-          "kind": "conformanceElement",
-          "role": "ConformanceElement"
+          "declares": "ConformanceComponent",
+          "role": "the first custom component, an object its element holds"
         },
         {
           "id": "peer",
-          "kind": "peer",
-          "role": "ConformancePeer"
+          "kind": "conformance",
+          "declares": "ConformancePeer",
+          "role": "the component ConformanceComponent's payloads hand over"
+        },
+        {
+          "id": "element",
+          "kind": "conformance",
+          "declares": "ConformanceElement",
+          "role": "the second custom component, a custom element that is its own object"
+        },
+        {
+          "id": "registered",
+          "kind": "conformance",
+          "declares": "ConformanceRegistered",
+          "role": "an object kept off its element, found by a plugin lookup"
+        },
+        {
+          "id": "store",
+          "kind": "conformance",
+          "declares": "ConformanceStore",
+          "role": "an object whose subscribe returns its unsubscriber"
+        },
+        {
+          "id": "callbacks",
+          "kind": "conformance",
+          "declares": "ConformanceCallbacks",
+          "role": "an object heard through its callback properties"
         },
         {
           "id": "plugins",
           "kind": "plugin",
-          "role": "the bench's plugins: EventTarget, plain object, callback property, registry and two scripts that provide one name"
+          "role": "the bench's plugins: EventTarget, plain object, callback property, the lookup conformance-registry and two scripts that provide one name"
         }
       ]
     },
@@ -5407,7 +5430,7 @@
         "net10"
       ],
       "parts": [
-        "conformanceElement"
+        "element"
       ],
       "harness": [
         "seed"
@@ -6460,7 +6483,7 @@
         "net10"
       ],
       "parts": [
-        "conformanceElement"
+        "element"
       ],
       "harness": [
         "seed"
@@ -6475,7 +6498,7 @@
         "net10"
       ],
       "parts": [
-        "conformanceElement",
+        "registered",
         "plugins"
       ],
       "harness": [
@@ -6491,7 +6514,7 @@
         "net10"
       ],
       "parts": [
-        "conformanceElement"
+        "store"
       ],
       "harness": [
         "seed"
@@ -6506,7 +6529,7 @@
         "net10"
       ],
       "parts": [
-        "conformanceElement"
+        "callbacks"
       ],
       "harness": [
         "seed"
@@ -6551,7 +6574,8 @@
         "net10"
       ],
       "parts": [
-        "conformanceElement"
+        "callbacks",
+        "store"
       ],
       "harness": [
         "seed"
@@ -6627,7 +6651,7 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "callbacks"
       ],
       "harness": [
         "seed"
@@ -6642,7 +6666,7 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "callbacks"
       ],
       "harness": [
         "seed"
@@ -6657,7 +6681,7 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "callbacks"
       ],
       "harness": [
         "seed"
@@ -6672,7 +6696,7 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "callbacks"
       ],
       "harness": [
         "seed",
@@ -6739,7 +6763,7 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "callbacks"
       ],
       "harness": [
         "seed"
@@ -6754,7 +6778,7 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "callbacks"
       ],
       "harness": [
         "seed"
@@ -6769,7 +6793,7 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "callbacks"
       ],
       "harness": [
         "seed"
@@ -6789,7 +6813,6 @@
       ],
       "harness": [
         "seed",
-        "drop",
         "gc",
         "gate"
       ]

@@ -302,11 +302,11 @@
         },
         {
           "for": "X19.4",
-          "page": "A ward page that renders a bed monitor test component on the native vendor, its element its object, listened to by addEventListener and removeEventListener, and focusable, and two partials, each with its own plan. The keypad partial's plan handles the monitor's keydown, whose payload is the KeyboardEvent, the listener's first argument, and writes its Key into pressed-key. The alarm partial's plan handles the monitor's alarm, a CustomEvent whose payload is its detail, and writes its Room into alarm-room. The monitor's own Sound the alarm button raises alarm with the detail of the room the page renders it for, 4.",
-          "gesture": "Click the monitor and press 7, then click Sound the alarm.",
-          "outcome": "pressed-key reads 7 and alarm-room reads 4.",
-          "opposite": "Pressing 8 shows 8 in pressed-key, and the page rendered with the monitor for room 5 shows 5 in alarm-room after Sound the alarm.",
-          "defect": "The payload's place is the vendor's, one kind per vendor as the redesign carries it and merges plans' vendors by it (Alis.Reactive/Grammar/PlanDocument.cs:32-46 at 65fdf118d), or the first plan's for the vendor name both plans share. Read as the element, the native vendor's kind (Alis.Reactive/Vendors/ComponentVendor.cs:59-63 at 65fdf118d), the keydown hands the handler the monitor (Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:91 at 65fdf118d), which has no key, so pressed-key stays empty; read as the first argument, the alarm hands it the CustomEvent, which has no room, so alarm-room stays empty."
+          "page": "The bench page renders a ConformanceElement at the id element, declared with ComponentVendor.Native, for room 4, and two partials, each with its own plan. The keypad partial's plan handles the element's Keydown, whose payload is the KeyboardEvent, the listener's first argument, and writes its Key into pressed-key. The signal partial's plan handles the element's Opened, whose payload is the CustomEvent its Open with room button dispatches, and writes its Detail's Room into opened-room.",
+          "gesture": "Click the element's key field and press 7, then click its Open with room button.",
+          "outcome": "pressed-key reads 7 and opened-room reads 4.",
+          "opposite": "Pressing 8 shows 8 in pressed-key, and the page rendered with the element for room 5 shows 5 in opened-room after Open with room.",
+          "defect": "The payload's place is the vendor's, one kind per vendor as the redesign carries it and merges plans' vendors by it (Alis.Reactive/Grammar/PlanDocument.cs:32-46 at 65fdf118d), or the first plan's for the vendor name both plans share. Read as the element, the native vendor's kind (Alis.Reactive/Vendors/ComponentVendor.cs:59-63 at 65fdf118d), each event hands its handler the element (Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:91 at 65fdf118d), which has neither a key nor a detail, so pressed-key and opened-room stay empty; read as a CustomEvent's detail for both, the keydown hands its handler the KeyboardEvent's detail, 0, which has no key, so pressed-key stays empty."
         }
       ],
       "verdicts": [

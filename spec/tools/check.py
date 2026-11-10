@@ -1623,16 +1623,52 @@ MATRIX_NO_KINDS = {"templates"}
 MATRIX_COMPILER_RUNGS = {"type", "analyzer"}
 MATRIX_REFUSING_RUNGS = {"type", "analyzer", "refusal"}
 MATRIX_GAP = re.compile(r'public static void (\w+)\([^)]*\) => NoDoor\.Position\("([^":]+):')
-MATRIX_VENDOR = ("name", "objectPath", "subscribe", "unsubscribe")
+VENDOR_LOCATE = {"path": {"path"}, "element": set(), "plugin": {"plugin"}}
+VENDOR_LISTENING = {"pair": {"subscribe", "unsubscribe"}, "callbackProperty": set(), "returnedUnsubscriber": {"subscribe"}}
+VENDOR_ELEMENT_PATHS = {"named", "element", "none"}
+VENDOR_NATIVE = {"name": "native", "locate": {"kind": "element"},
+                 "listening": {"kind": "pair", "subscribe": "addEventListener", "unsubscribe": "removeEventListener"}, "elementPath": ""}
 MATRIX_POC15 = re.compile(r"^event\.poc15\.(\w+)\.(payload|held)\.(before|after)$")
 MATRIX_TYPE_KINDS = {"component", "live", "payload", "data"}
 MATRIX_CALLED = {"method", "methodValue", "methodAsync", "methodAsyncValue", "returnedObject", "returnedObjects"}
+MATRIX_POSITIONAL = {"argument", "methodAt"}
 MATRIX_DOORS = {
-    "property": "Property<", "readOnly": "ReadOnly<", "writeOnly": "WriteOnly<", "liveObject": "LiveObject<",
-    "liveObjects": "LiveObjects<", "method": "Method", "methodValue": "Method<", "methodAsync": "MethodAsync",
-    "methodAsyncValue": "MethodAsync<", "returnedObject": "ReturnedObject<", "returnedObjects": "ReturnedObjects<",
-    "callback": "Callback<", "event": "Event<", "component": "LiveObject<",
+    "property": ("Property<",), "readOnly": ("ReadOnly<",), "writeOnly": ("WriteOnly<",), "liveObject": ("LiveObject<",),
+    "liveObjects": ("LiveObjects<",), "method": ("Method",), "methodValue": ("Method<",), "methodAsync": ("MethodAsync",),
+    "methodAsyncValue": ("MethodAsync<",), "returnedObject": ("ReturnedObject<",), "returnedObjects": ("ReturnedObjects<",),
+    "callback": ("Callback<",), "event": ("Event", "Event<"), "component": ("LiveObject<",), "argument": ("Argument<",),
+    "methodAt": ("MethodAt",),
 }
+
+
+def door_fits(kind, door):
+    return any(door == form or (form.endswith("<") and door.startswith(form)) for form in MATRIX_DOORS.get(kind, ()))
+
+
+def vendor_kinds(vendor):
+    element_path = vendor.get("elementPath")
+    return {"locate": vendor.get("locate", {}).get("kind"), "listening": vendor.get("listening", {}).get("kind"),
+            "elementPath": "none" if element_path is None else "element" if element_path == "" else "named"}
+
+
+def vendor_problems(name, vendor):
+    if not vendor:
+        return [f"the component {name} carries no vendor data"]
+    problems = [f"the component {name}'s vendor has no name"] if not is_prose(vendor.get("name")) else []
+    for axis, closed in [("locate", VENDOR_LOCATE), ("listening", VENDOR_LISTENING)]:
+        held = vendor.get(axis) or {}
+        needed = closed.get(held.get("kind"))
+        if needed is None:
+            problems.append(f"the component {name}'s vendor {axis} is {held.get('kind')!r}, none of D17.3's {sorted(closed)}")
+            continue
+        given = set(held) - {"kind"}
+        problems += [f"the component {name}'s {held['kind']} {axis} names no {part}" for part in sorted(needed) if not is_prose(held.get(part))]
+        problems += [f"the component {name}'s {held['kind']} {axis} carries {part}, which D17.3 gives it none of" for part in sorted(given - needed)]
+    element_path = vendor.get("elementPath")
+    problems += [f"the component {name}'s element path is {element_path!r}, no path"] if element_path is not None and not isinstance(element_path, str) else []
+    native = vendor.get("name") == VENDOR_NATIVE["name"]
+    problems += [f"the component {name}'s vendor is named native and is not ComponentVendor.Native's shape"] if native and vendor != VENDOR_NATIVE else []
+    return problems
 
 
 def matrix_brief_bullets():
@@ -1694,18 +1730,22 @@ def native_declaration_problems(types):
     for declared in types.values():
         names = [member["js"] for member in declared["members"]]
         problems += ([f"ConformanceComponent's {declared['name']} is a {declared['kind']!r} type"] if declared["kind"] not in MATRIX_TYPE_KINDS else [])
-        vendor = declared.get("vendor") or {}
-        problems += ([f"the component {declared['name']} carries no vendor data"] if declared["kind"] == "component" and not all(is_prose(vendor.get(part)) for part in MATRIX_VENDOR) else [])
+        problems += vendor_problems(declared["name"], declared.get("vendor")) if declared["kind"] == "component" else []
+        problems += [f"the {declared['kind']} {declared['name']} carries vendor data, which only a component does"] if declared["kind"] != "component" and "vendor" in declared else []
         problems += [f"{declared['name']} declares {name} twice" for name in sorted({name for name in names if names.count(name) > 1})]
         for member in declared["members"]:
             label = f"{declared['name']}.{member['js']}"
-            door = MATRIX_DOORS.get(member["kind"])
-            exact = door is not None and not door.endswith("<")
-            fits = door is not None and (member["door"] == door if exact else member["door"].startswith(door))
-            problems += ([f"{label} is a {member['kind']} declared by {member['door']}"] if declared["kind"] != "data" and not fits else [])
+            problems += ([f"{label} is a {member['kind']} declared by {member['door']}"] if declared["kind"] != "data" and not door_fits(member["kind"], member["door"]) else [])
+            positional = member["kind"] in MATRIX_POSITIONAL
+            problems += ([f"{label} is declared with {member['door']}, which only a payload declaration takes (D17.4, X17.18)"] if positional and declared["kind"] != "payload" else [])
+            problems += ([f"{label} names no argument position"] if positional and not isinstance(member.get("position"), int) else [])
+            problems += ([f"{label} names an argument position, which only Argument<T>(n) and MethodAt(n) take"] if not positional and "position" in member else [])
             reached = types.get(member.get("type"))
             problems += ([f"{label} holds {member['type']}, no declared type"] if "type" in member and reached is None else [])
             problems += ([f"{label} holds a component, {member.get('type')} is no component"] if member["kind"] == "component" and (reached or {}).get("kind") != "component" else [])
+            handed = member["kind"] == "component" and (reached or {}).get("kind") == "component"
+            problems += ([f"{label} hands {member['type']}, whose vendor names no element path, so a listen on it is refused (D17.3)"]
+                         if handed and (reached.get("vendor") or {}).get("elementPath") is None else [])
     return problems
 
 
@@ -1957,6 +1997,27 @@ def app_placement_problems(app, where, entry, screens, hosts, module, rung):
     return problems
 
 
+def app_vendor_problems(screens, used):
+    native = json.loads((SPEC / "Reference" / "native.json").read_text())
+    components = {declared["name"]: declared for declared in native["types"] if declared["kind"] == "component"}
+    declared_by, problems = {}, []
+    for screen in screens.values():
+        for part in (part for part in screen["parts"] if part["kind"] == "conformance"):
+            name = part.get("declares")
+            problems += [f"{screen['id']}'s {part['id']} declares {name!r}, no component of native.json"] if name not in components else []
+            declared_by.setdefault(name, []).append((screen["id"], part["id"]))
+    problems += [f"native.json's {name} is the declaration of no conformance part" for name in components if name not in declared_by]
+    axes = {"locate": set(VENDOR_LOCATE), "listening": set(VENDOR_LISTENING), "elementPath": VENDOR_ELEMENT_PATHS}
+    held = {axis: set() for axis in axes}
+    for name, places in declared_by.items():
+        if name in components and any(place in used for place in places):
+            for axis, kind in vendor_kinds(components[name].get("vendor") or {}).items():
+                held[axis].add(kind)
+    problems += [f"no placed test reaches a conformance declaration whose vendor {axis} is {kind} (D17.3)"
+                 for axis, kinds in axes.items() for kind in sorted(kinds - held[axis])]
+    return problems
+
+
 def check_app():
     path = SPEC / "Reference" / "app.json"
     if not path.exists():
@@ -1987,10 +2048,11 @@ def check_app():
     problems += [f"{feature} {defect} #{index} runs on no screen" for (feature, defect, index) in tests if (feature, defect, index) not in placed]
     problems += [f"{kind} {name} runs on no screen" for kind, name in sorted(references - set(reached))]
     problems += [f"{screen['id']}'s {part['id']} is used by no test" for screen in screens.values() for part in screen["parts"] if (screen["id"], part["id"]) not in used]
+    problems += app_vendor_problems(screens, used)
     rewrite = sorted(f"{entry['feature']} {entry['for']} #{entry['index']}" for entry in app["placements"] if entry.get("rewrite"))
     problems += [f"{len(rewrite)} tests put the environment on a care screen, which the harness does: {', '.join(rewrite[:6])}"] if rewrite else []
     detail = (f"{len(placed)} feature tests and {len(reached)} cell tests on {len(screens)} screens under {len(hosts)} hosts; "
-              "no core test loads Syncfusion")
+              "no core test loads Syncfusion, and a placed test reaches every D17.3 vendor kind on a conformance declaration")
     return result(not problems, "; ".join(problems[:6]) or detail, screens=len(screens), hosts=len(hosts), placed=len(placed),
                   cells=len(reached), rewrite=len(rewrite), problems=len(problems))
 

@@ -33,10 +33,15 @@
       "kind": "component",
       "vendor": {
         "name": "conformance-component",
-        "objectPath": "conformanceComponent",
-        "subscribe": "addEventListener",
-        "unsubscribe": "removeEventListener",
-        "payload": "the listener's first argument (D17.4)"
+        "locate": {
+          "kind": "path",
+          "path": "conformanceComponent"
+        },
+        "listening": {
+          "kind": "pair",
+          "subscribe": "addEventListener",
+          "unsubscribe": "removeEventListener"
+        }
       },
       "members": [
         {
@@ -411,17 +416,24 @@
           "csharp": "Handed",
           "type": "ConformancePeer"
         }
-      ]
+      ],
+      "what": "the first custom component: a TypeScript object its element holds at conformanceComponent, an EventTarget heard by addEventListener and removeEventListener"
     },
     {
       "name": "ConformancePeer",
       "kind": "component",
       "vendor": {
         "name": "conformance-peer",
-        "objectPath": "conformancePeer",
-        "subscribe": "addEventListener",
-        "unsubscribe": "removeEventListener",
-        "payload": "the listener's first argument (D17.4)"
+        "locate": {
+          "kind": "path",
+          "path": "conformancePeer"
+        },
+        "listening": {
+          "kind": "pair",
+          "subscribe": "addEventListener",
+          "unsubscribe": "removeEventListener"
+        },
+        "elementPath": "element"
       },
       "members": [
         {
@@ -445,6 +457,250 @@
           "door": "Event<Change>",
           "csharp": "Change",
           "type": "Change"
+        }
+      ],
+      "what": "the component ConformanceComponent's payloads hand over, on an element of its own, holding that element at element so a listen on it tells when its host destroyed it"
+    },
+    {
+      "name": "ConformanceElement",
+      "kind": "component",
+      "what": "the second custom component: the custom element conformance-element, its controls in an open shadow root, whose element is its object, declared with the platform's own vendor, ComponentVendor.Native",
+      "vendor": {
+        "name": "native",
+        "locate": {
+          "kind": "element"
+        },
+        "listening": {
+          "kind": "pair",
+          "subscribe": "addEventListener",
+          "unsubscribe": "removeEventListener"
+        },
+        "elementPath": ""
+      },
+      "members": [
+        {
+          "js": "opened",
+          "kind": "event",
+          "ts": "opened: a CustomEvent its Open with room button dispatches with the detail { room }, and its Open with no room button with none",
+          "door": "Event<ElementSignal>",
+          "csharp": "Opened",
+          "type": "ElementSignal"
+        },
+        {
+          "js": "keydown",
+          "kind": "event",
+          "ts": "keydown: the KeyboardEvent its shadow root's focused key field raises, composed to the element",
+          "door": "Event<ElementKey>",
+          "csharp": "Keydown",
+          "type": "ElementKey"
+        }
+      ]
+    },
+    {
+      "name": "ElementSignal",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "type",
+          "kind": "readOnly",
+          "ts": "readonly type: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Type"
+        },
+        {
+          "js": "detail",
+          "kind": "readOnly",
+          "ts": "readonly detail: OpenedDetail | null",
+          "door": "ReadOnly<OpenedDetail?>",
+          "csharp": "Detail",
+          "type": "OpenedDetail"
+        }
+      ]
+    },
+    {
+      "name": "OpenedDetail",
+      "kind": "data",
+      "members": [
+        {
+          "js": "room",
+          "kind": "property",
+          "ts": "room: string",
+          "door": "string",
+          "csharp": "Room"
+        }
+      ]
+    },
+    {
+      "name": "ElementKey",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "key",
+          "kind": "readOnly",
+          "ts": "readonly key: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Key"
+        }
+      ]
+    },
+    {
+      "name": "ConformanceRegistered",
+      "kind": "component",
+      "what": "an object the conformance library keeps in a WeakMap of its own, off its element, found by the lookup the library registers as the plugin conformance-registry and heard by on and off",
+      "vendor": {
+        "name": "conformance-registered",
+        "locate": {
+          "kind": "plugin",
+          "plugin": "conformance-registry"
+        },
+        "listening": {
+          "kind": "pair",
+          "subscribe": "on",
+          "unsubscribe": "off"
+        }
+      },
+      "members": [
+        {
+          "js": "reading",
+          "kind": "readOnly",
+          "ts": "readonly reading: number",
+          "door": "ReadOnly<int>",
+          "csharp": "Reading"
+        },
+        {
+          "js": "threshold",
+          "kind": "property",
+          "ts": "threshold: number, shown beside the element",
+          "door": "Property<int>",
+          "csharp": "Threshold"
+        },
+        {
+          "js": "raise",
+          "kind": "method",
+          "ts": "raise(): void, showing Alarm raised",
+          "door": "Method",
+          "csharp": "Raise()"
+        },
+        {
+          "js": "lower",
+          "kind": "method",
+          "ts": "lower(): void, showing Alarm lowered",
+          "door": "Method",
+          "csharp": "Lower()"
+        },
+        {
+          "js": "alarmed",
+          "kind": "event",
+          "ts": "alarmed: on('alarmed', listener) calls listener with no argument when its Sound the alarm button is clicked",
+          "door": "Event",
+          "csharp": "Alarmed"
+        }
+      ]
+    },
+    {
+      "name": "ConformanceStore",
+      "kind": "component",
+      "what": "an object its element holds at conformanceStore, whose subscribe returns the function that removes the listener it added, and which shows the count of listeners it holds as subscribers: n",
+      "vendor": {
+        "name": "conformance-store",
+        "locate": {
+          "kind": "path",
+          "path": "conformanceStore"
+        },
+        "listening": {
+          "kind": "returnedUnsubscriber",
+          "subscribe": "subscribe"
+        }
+      },
+      "members": [
+        {
+          "js": "posted",
+          "kind": "event",
+          "ts": "posted: subscribe('posted', listener) calls listener(posted: Posted) when its Post an update button is clicked, and returns () => void",
+          "door": "Event<Posted>",
+          "csharp": "Posted",
+          "type": "Posted"
+        }
+      ]
+    },
+    {
+      "name": "Posted",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "message",
+          "kind": "readOnly",
+          "ts": "readonly message: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Message"
+        }
+      ]
+    },
+    {
+      "name": "ConformanceCallbacks",
+      "kind": "component",
+      "what": "an object its element holds at conformanceCallbacks, heard through its callback properties; its own code assigns onRaised a function that appends own to its log before any listener",
+      "vendor": {
+        "name": "conformance-callbacks",
+        "locate": {
+          "kind": "path",
+          "path": "conformanceCallbacks"
+        },
+        "listening": {
+          "kind": "callbackProperty"
+        }
+      },
+      "members": [
+        {
+          "js": "onRaised",
+          "kind": "event",
+          "ts": "onRaised: ((raised: RaisedRoom) => void) | null, called when its Raise room 7 button is clicked",
+          "door": "Event<RaisedRoom>",
+          "csharp": "OnRaised",
+          "type": "RaisedRoom"
+        },
+        {
+          "js": "onSearch",
+          "kind": "event",
+          "ts": "onSearch: ((query: string, show: (names: string[]) => void) => void) | null, called as its search box is typed into; show lists the names it is given under the box",
+          "door": "Event<SearchArgs>",
+          "csharp": "OnSearch",
+          "type": "SearchArgs"
+        }
+      ]
+    },
+    {
+      "name": "RaisedRoom",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "room",
+          "kind": "readOnly",
+          "ts": "readonly room: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Room"
+        }
+      ]
+    },
+    {
+      "name": "SearchArgs",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "query",
+          "kind": "argument",
+          "ts": "the first argument, query: string",
+          "door": "Argument<string>",
+          "csharp": "Query",
+          "position": 0
+        },
+        {
+          "js": "show",
+          "kind": "methodAt",
+          "ts": "the second argument, show(names: string[]): void",
+          "door": "MethodAt",
+          "csharp": "Show(Arg<IReadOnlyList<string>> names)",
+          "position": 1
         }
       ]
     },
