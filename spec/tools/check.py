@@ -2262,8 +2262,19 @@ def app_tests():
             for promise in feature.get("promises", []):
                 key = (feature["id"], promise["for"], seen[promise["for"]])
                 seen[promise["for"]] += 1
-                tests[key] = {"module": path.parent.name, "rung": rungs.get(promise["for"])}
+                tests[key] = {"module": path.parent.name, "rung": rungs.get(promise["for"]), "page": promise.get("page", "")}
     return tests
+
+
+NAMED_COMPONENT = re.compile(r"\b((?:Native|Fusion)[A-Z]\w*)")
+NOT_COMPONENTS = ("FusionTemplate", "NativeComponent")
+
+
+def app_named_part_problems(where, page, entry, screens):
+    listed = " ".join(json.dumps(part) for part in screens.get(entry["screen"], {}).get("parts", []) if part["id"] in entry["parts"])
+    held = set(NAMED_COMPONENT.findall(listed))
+    named = {name for name in NAMED_COMPONENT.findall(page) if not name.startswith(NOT_COMPONENTS)}
+    return [f"{where}'s page names {name}, which no part it lists holds" for name in sorted(named) if not any(name.startswith(part) for part in held)]
 
 
 def app_reference_tests():
@@ -2378,6 +2389,8 @@ def check_app():
         used |= {(entry["screen"], part) for part in entry["parts"]}
         problems += app_placement_problems(app, where, entry, screens, hosts, (known or {}).get("module"), (known or {}).get("rung"))
         problems += app_held_problems(where, entry)
+        problems += app_named_part_problems(where, (known or {}).get("page", ""), entry, screens)
+    native_cells = json.loads((SPEC / "Reference" / "native.json").read_text())["cells"]
     reached = Counter()
     for entry in app["cells"]:
         key = ("cell", entry["cell"]) if "cell" in entry else ("own", entry["own"])
@@ -2387,6 +2400,8 @@ def check_app():
         problems += [f"cell {key[1]} runs on {entry['screen']}, where the native reference's cells run on the bench"] if key[0] == "cell" and entry["screen"] != "bench" else []
         problems += app_placement_problems(app, f"{key[0]} {key[1]}", entry, screens, hosts, None, None)
         problems += app_held_problems(f"{key[0]} {key[1]}", entry)
+        page = native_cells.get(key[1], {}).get("promise", {}).get("page", "") if key[0] == "cell" else ""
+        problems += app_named_part_problems(f"{key[0]} {key[1]}", page, entry, screens)
     problems += [f"{feature} {defect} #{index} is placed {count} times" for (feature, defect, index), count in placed.items() if count > 1]
     problems += [f"{feature} {defect} #{index} runs on no screen" for (feature, defect, index) in tests if (feature, defect, index) not in placed]
     problems += [f"{kind} {name} runs on no screen" for kind, name in sorted(references - set(reached))]
@@ -2395,7 +2410,8 @@ def check_app():
     rewrite = sorted(f"{entry['feature']} {entry['for']} #{entry['index']}" for entry in app["placements"] if entry.get("rewrite"))
     problems += [f"{len(rewrite)} tests put the environment on a care screen, which the harness does: {', '.join(rewrite[:6])}"] if rewrite else []
     detail = (f"{len(placed)} feature tests and {len(reached)} cell tests on {len(screens)} screens under {len(hosts)} hosts; "
-              "no core test loads Syncfusion, and a placed test reaches every D17.3 vendor kind on a conformance declaration")
+              "no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, "
+              "and each Native or Fusion component a test's page names is held by a part it lists")
     return result(not problems, "; ".join(problems[:6]) or detail, screens=len(screens), hosts=len(hosts), placed=len(placed),
                   cells=len(reached), rewrite=len(rewrite), problems=len(problems))
 

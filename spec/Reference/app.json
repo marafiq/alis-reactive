@@ -578,7 +578,7 @@
         {
           "id": "fusionObjects",
           "kind": "fusion",
-          "role": "FusionToast and FusionConfirmDialog, in the layout of the fusionShell host"
+          "role": "FusionToast and FusionConfirm, in the layout of the fusionShell host"
         }
       ],
       "hosts": [
@@ -661,6 +661,18 @@
           "id": "benchValidator",
           "kind": "validator",
           "role": "the bench's validator, its rules bound to the conformance declarations by component ID"
+        },
+        {
+          "id": "benchInputs",
+          "kind": "nativeSlice",
+          "role": "the NativeTextBox inputs a cell reads as a second source: typed, note and code",
+          "module": "NativeComponents"
+        },
+        {
+          "id": "benchConfirm",
+          "kind": "nativeSlice",
+          "role": "NativeConfirm, the decision a lane cell waits on",
+          "module": "NativeAppLevelObjects"
         }
       ]
     },
@@ -685,6 +697,25 @@
           "kind": "nativeSlice",
           "role": "NativeDrawer on the refused pages that close one",
           "module": "NativeAppLevelObjects"
+        }
+      ]
+    },
+    {
+      "id": "fusion-refusals",
+      "area": "refusals",
+      "under": "refusals",
+      "title": "Refusal routes built with Syncfusion",
+      "user": "test infrastructure: one deliberately broken view per refusal of a Fusion slice or a Fusion template, apart from the core's refusal routes so no core test's page loads Syncfusion",
+      "parts": [
+        {
+          "id": "refusalFusion",
+          "kind": "fusion",
+          "role": "the Fusion components the refused Fusion pages render: FusionGrid with FusionGridValidation's rules or a template, and FusionSmartPasteButton"
+        },
+        {
+          "id": "fusionRefusalValidator",
+          "kind": "validator",
+          "role": "the validators the refused Fusion pages render under"
         }
       ]
     }
@@ -2848,12 +2879,13 @@
       "feature": "M21.F23",
       "for": "M21.X203",
       "index": 0,
-      "screen": "refusals",
+      "screen": "fusion-refusals",
       "hosts": [
         "net10"
       ],
       "parts": [
-        "refusalValidator"
+        "fusionRefusalValidator",
+        "refusalFusion"
       ],
       "harness": [
         "seed"
@@ -2863,12 +2895,13 @@
       "feature": "M21.F23",
       "for": "M21.X203",
       "index": 1,
-      "screen": "refusals",
+      "screen": "fusion-refusals",
       "hosts": [
         "net10"
       ],
       "parts": [
-        "refusalValidator"
+        "fusionRefusalValidator",
+        "refusalFusion"
       ],
       "harness": [
         "seed"
@@ -2878,12 +2911,13 @@
       "feature": "M21.F23",
       "for": "M21.X203",
       "index": 2,
-      "screen": "refusals",
+      "screen": "fusion-refusals",
       "hosts": [
         "net10"
       ],
       "parts": [
-        "refusalValidator"
+        "fusionRefusalValidator",
+        "refusalFusion"
       ],
       "harness": [
         "seed"
@@ -3201,11 +3235,13 @@
       "feature": "M21.F42",
       "for": "M21.X805",
       "index": 0,
-      "screen": "refusals",
+      "screen": "fusion-refusals",
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalFusion"
+      ],
       "harness": [
         "seed"
       ]
@@ -3304,11 +3340,13 @@
       "feature": "M22.F2",
       "for": "M22.X1",
       "index": 0,
-      "screen": "refusals",
+      "screen": "fusion-refusals",
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalFusion"
+      ],
       "harness": [
         "seed"
       ]
@@ -3317,11 +3355,13 @@
       "feature": "M22.F2",
       "for": "M22.X4",
       "index": 0,
-      "screen": "refusals",
+      "screen": "fusion-refusals",
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalFusion"
+      ],
       "harness": [
         "seed"
       ]
@@ -3795,13 +3835,14 @@
       "feature": "M25.F3",
       "for": "X17.38",
       "index": 0,
-      "screen": "shell",
+      "screen": "residents",
       "hosts": [
         "net10"
       ],
       "parts": [
-        "loader",
-        "shellEndpoint"
+        "rows",
+        "residentsBusy",
+        "residentsEndpoint"
       ],
       "harness": [
         "seed",
@@ -8830,7 +8871,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchInputs"
       ],
       "harness": [
         "seed"
@@ -8843,7 +8885,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchInputs"
       ],
       "harness": [
         "seed"
@@ -8856,7 +8899,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchInputs"
       ],
       "harness": [
         "seed"
@@ -9197,7 +9241,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchConfirm"
       ],
       "harness": [
         "seed"
