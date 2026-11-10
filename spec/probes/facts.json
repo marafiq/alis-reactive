@@ -2230,6 +2230,24 @@
       "oracle": "FluentValidation 12.1.1",
       "probe": "AspNetCoreBinding",
       "expect": "fv-date-comparisons: FluentValidation 12.1.1 over null members: GreaterThanOrEqualTo, LessThanOrEqualTo and InclusiveBetween pass True, Equal fails True, NotEqual passes True; a TimeOnly of 06:30 fails GreaterThanOrEqualTo 07:00 True, a TimeSpan of 1.02:00:00 fails LessThanOrEqualTo 23:00:00 True, 07:00 and 23:00:00 pass True; a DateTimeOffset one tick past the upper bound fails InclusiveBetween True, the bound written at -08:00 passes True; a DateTime one second before its peer fails GreaterThanOrEqualTo True, a Utc and a Local DateTime of one wall time pass it True"
+    },
+    {
+      "id": "core-frombody-naming-policy",
+      "statement": "A [FromBody] endpoint whose MVC JsonOptions name members in snake case binds a member from its snake-case name, given_name, and binds nothing from its camel-case or CLR name.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-naming-policy: under SnakeCaseLower {\"given_name\":\"Rose\"} binds GivenName=Rose Ward=Rehab Pharmacy=Central; {\"givenName\":\"Rose\"} binds GivenName=<null> Ward=Rehab Pharmacy=Central; {\"GivenName\":\"Rose\"} binds GivenName=<null> Ward=Rehab Pharmacy=Central",
+      "source": "spec/probes/AspNetCoreBinding/NamingProbes.cs"
+    },
+    {
+      "id": "core-frombody-left-out-member-starts",
+      "statement": "A [FromBody] member declared [JsonIgnore], and one the app's JsonOptions resolver removes from the contract, keeps its start when the body holds it.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-frombody-left-out-member-starts: {\"given_name\":\"Rose\",\"ward\":\"East\",\"pharmacy\":\"North\"} binds GivenName=Rose Ward=Rehab Pharmacy=Central",
+      "source": "spec/probes/AspNetCoreBinding/NamingProbes.cs"
     }
   ]
 }

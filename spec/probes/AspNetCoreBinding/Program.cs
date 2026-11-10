@@ -195,6 +195,7 @@ try
     await HttpProbes.Run(new Uri(app.Urls.First()));
     await DateProbes.Run(new Uri(app.Urls.First()));
     FluentDateProbes.Run();
+    await NamingProbes.Run();
 }
 finally
 {
