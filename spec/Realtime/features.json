@@ -265,6 +265,14 @@
           "id": "M10.X4",
           "rung": "behavior",
           "defect": "A stream a step closed runs its closed steps or shows the reconnect offer, as if the server had given up, or a message the endpoint writes after the close still runs a handler (M10.D4)."
+        },
+        {
+          "id": "X21.15",
+          "rung": "behavior"
+        },
+        {
+          "id": "X21.14",
+          "rung": "type"
         }
       ],
       "promises": [
@@ -374,6 +382,14 @@
           "opposite": "Load alone, with no item pushed, shows the indicator and hides it when list-status reads loaded.",
           "defect": "The message's request and the page's are counted apart, so the indicator never shows for the message's request, or hides when the page's request settles while the message's is still in flight (Realtime.tla's MessageRequestUncounted mutant, which breaks IndicatorNeverHidesEarly).",
           "observes": "Realtime.tla:DefaultFinally"
+        },
+        {
+          "for": "X21.15",
+          "page": "The medication round, whose view renders the trace on, on the host whose layout registers the OpenTelemetry adapter exporting to the harness's collector; its stream WardBoard's Bulletin handler adds one to a tally shown in bulletins. The harness pushes on WardBoard the messages the test names, their data as written.",
+          "gesture": "Open the round and wait until the harness reports WardBoard open. Push a Bulletin whose data is {} through the harness; wait until bulletins reads 1; open the harness's collector page.",
+          "outcome": "The collector lists under the page's trace id one run span whose parent is the plan's trace context, recording its transport as server-sent events and its event as bulletin.",
+          "opposite": "The same push on a round whose view renders the trace off: bulletins reads 1, and the collector lists no span.",
+          "defect": "A run a message starts as a root of its own lists under a new trace id, so the page's trace misses what the message did; one that records no transport or event lists a run span no one can tell from a click's."
         }
       ],
       "verdicts": [

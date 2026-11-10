@@ -411,6 +411,10 @@
         {
           "id": "X9.27",
           "rung": "behavior"
+        },
+        {
+          "id": "X9.28",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -598,6 +602,14 @@
           "outcome": "saved reads Ada Byron; consent.pdf 1024 Consent; Überweisung.pdf 2048 Referral.",
           "opposite": "With the two rows' files exchanged, saved reads Ada Byron; Überweisung.pdf 2048 Consent; consent.pdf 1024 Referral.",
           "defect": "The files sent as text or keyed by their input's id, so the endpoint binds no document; or the name past US-ASCII mangled, so the second document's name is not Überweisung.pdf; or a caption bound apart from its file, so the captions follow the order of the files and not their rows."
+        },
+        {
+          "for": "X9.28",
+          "page": "A notes page whose request defaults send X-Requested-With: XMLHttpRequest. Its Refresh notes button GETs the notes with no header of its own; its Refresh by fetch button sends the same GET with its own header x-requested-with holding Fetch. The endpoint writes the X-Requested-With values it received, as the request carried them, into notes-echo.",
+          "gesture": "Click Refresh by fetch and wait until notes-echo has text.",
+          "outcome": "notes-echo reads Fetch.",
+          "opposite": "Click Refresh notes: notes-echo reads XMLHttpRequest.",
+          "defect": "C# that writes the request's own header beside the configured one, or compares the two names by case, sends both, and fetch's Headers joins them, so notes-echo reads XMLHttpRequest, Fetch; C# that lets the configured header win sends XMLHttpRequest from both buttons."
         }
       ],
       "verdicts": [

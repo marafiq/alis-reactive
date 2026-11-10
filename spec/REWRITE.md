@@ -298,7 +298,7 @@ MSBuild never runs npm; an app whose bundle is missing refuses to start.
   the resolver in `Application_Start`, the namespaces in `Views/Web.config`, the links.
 - The delivery tests run on both fresh apps: each link's version equals the hash of the bytes served, the plan boots, a
   gesture shows its outcome, a validator refuses in the browser and the server saves a valid post, two time zones each
-  show their own day, and git lists no file the build wrote into the app.
+  show their own day, and git lists no file the build wrote into the app (M19.D2).
 - Native and Fusion depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U3's delivery job reads it
   back from each nuspec.
 

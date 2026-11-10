@@ -39,8 +39,9 @@ Terms used throughout:
   JavaScript reads `a[1]` and `a["1"]` alike. POC 4 planted the position of `LiveObjects<T>.At(1)` as the member
   `"1"`, and the test that writes through it passed. The index step has its meaning where a body is built: an
   input's body path writes the body a request sends, and a position there makes an array where a member makes an
-  object (`Alis.Reactive.Assets/runtime/plugins/model.ts:156-162`, `assignAt`). POC 10, inputs, proves it in the
-  browser. If POC 10 builds the body with no path, the index step leaves the grammar and a position is a member step.
+  object (`Alis.Reactive.Assets/runtime/plugins/model.ts:156-162`, `assignAt`). So the grammar keeps the index step:
+  an input's body path is a list of path steps (`spec/Core/schema.md` S5, `InputBinding`'s `path`), and a list item's
+  inputs reach a JSON body at their position (X14.10).
 - D1.6 The MVC binding name is one function of a CLR member path, `BindingName`: member names joined by
   `.`, and an index written `[n]` directly after the step before it, as MVC's own
   `CreateSubPropertyName` and `CreateSubIndexName` write them. It is computed only in C#.
@@ -117,7 +118,9 @@ Terms used throughout:
 - D2.7 A component's member is named by its JavaScript name in its declaration; that name is the vendor
   boundary and is not translated.
 - D2.8 D2.4 to D2.6 and D2.9 replace the root CLAUDE.md meaning "A member is named as System.Text.Json names it: its
-  JsonPropertyName, else camel case", which holds for a net10 JSON body only. Gate 1 carries the change.
+  JsonPropertyName, else camel case", which holds for a net10 JSON body only. Gate 1 approved the change
+  (2026-11-09), and that root line describes main and the redesign until the rewrite's root CLAUDE.md states D2.4 to
+  D2.6 and D2.9 in its place. A snake-case app's net10 body sends its members by that policy (X18.5).
 
 **Schema nodes.** `get`, `call` (Q1 paths, `members`); the request argument's members (Q9).
 
@@ -1548,6 +1551,8 @@ Terms used throughout:
   `spec/api/HttpSurface/refused/ReplyOutsideItsRoute.CS0103.cs.txt:13`.
 - `X8.25` analyzer (D11.10, D8.8): a step written on the pipeline of a block around its own, and a bound value
   carried out of its block through a variable declared outside it: new:N18.9.
+- `X8.28` type (D8.6): a pipeline condition written as a payload and a path lambda, `When(args, x => x.IsExpanded)`,
+  does not compile: `When` takes one `TypedSource<bool>`, and the payload's member is a source of its own: new:N8.2.
 
 ## Q9. The request
 
@@ -1971,6 +1976,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `X9.27` behavior (D9.8): a multipart body with two documents, each a file nested by C# path beside its caption, one
   file name past US-ASCII, and a text field binds on both hosts: the endpoint reads both files with their names, sizes
   and captions, and the field.
+- `X9.28` behavior (D9.12): with `X-Requested-With: XMLHttpRequest` among the configured headers, a request whose own
+  header `x-requested-with` holds `Fetch` reaches the endpoint with one `X-Requested-With`, `Fetch`, and a request
+  with no header of its own sends `XMLHttpRequest`.
 
 ## Q10. The request's flow and its response
 
@@ -4147,8 +4155,10 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   changed, so a vendor's drift fails the build at the upgrade.
 - D17.7 A vendor's name is checked by its characters, a letter and then letters, digits, `_` or `-`, with no regular
   expression (D16.10).
-- D17.8 Two reference components prove the vendor contract on paper in step 8, FusionMultiSelect and a native
-  reference, each declaration against the schema, and later in the browser.
+- D17.8 The conformance library's six declarations (`spec/Reference/native.json`) and FusionMultiSelect
+  (`spec/Reference/syncfusion.json`) prove the vendor contract: on paper, every cell of the matrix against the
+  declaration that runs it (`check:matrix`), and in the browser, each cell by its own test on the bench and each of
+  MultiSelect's own cells by its slice's test (the owner, 2026-11-10).
 - D17.9 The core's C# names no plugin and no component a consumer provides. At 65fdf118d it does: the `Confirm` doors
   write a call to `alis.confirm`, which only Fusion's browser code provides, so a page without Fusion cannot confirm.
   Those doors leave the core. A user's decision is a component's declared `MethodAsync<bool>`, read in a condition as
@@ -4507,6 +4517,11 @@ plans (Q19).
 - `X17.37` behavior (D17.15, D12.8): rows rendered in a slot; after the slot reloads, one click on a row's control
   sends one request.
 - `X17.38` behavior (D17.15, D10.21): a row's control shows busy while its request runs, and only that row's.
+- `X17.53` analyzer (D17.6): a declaration built again after an upgrade changed its vendor's TypeScript, with no C#
+  changed, is checked against the changed TypeScript: a member the upgrade removes fails that build with ALIS016, so
+  the analyzer's test builds one project twice with the TypeScript changed between the builds: new:N17.2.
+- `X17.54` type (D17.11): a vendor's method is handed an abort signal only at an argument its declaration declares of
+  N17.5's kind, so a call passes no argument its declaration does not name: new:N17.5.
 
 ## Q18. Type knowledge without reflection
 
@@ -4885,10 +4900,10 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   span (D20.3); with it off, the send mints one trace id for its retries, and the first attempt carries nothing, since
   no one knows it will fail. Both headers go to the page's own origin only; the services behind the endpoint receive
   them from the server's own propagation.
-- D20.10 Its proof is Playwright on the sandbox, whose endpoint echoes the `traceparent` it received into the page and
-  whose collector page lists the spans it received: with the trace off nothing is listed and no header is echoed; with
-  it on, the closed span names of a handler with a check, a retried GET and a chained request are listed under the
-  page's trace id.
+- D20.10 Its proof is Playwright on the conformance app's tracing hosts, whose endpoint echoes the `traceparent` it
+  received into the page and whose collector page lists the spans it received: with the trace off nothing is listed
+  and no header is echoed (X20.1); with it on, the closed span names of a retried GET (X20.2) and of a handler with a
+  check and a chained request (X20.8) are listed under the page's trace id.
 
 **Schema nodes.** `PlanDocument.trace`, the kinds `off` and `on`, and `Source` (Q19).
 
@@ -4929,6 +4944,13 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   neither.
 - `X20.6` analyzer: a request header named `traceparent` is refused where the view renders with "The traceparent header
   belongs to tracing: remove it from this request's headers." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
+- `X20.8` behavior (D20.5): with the trace on, a dose saved for Ruth on the ward North, whose check passes and whose
+  success chains a GET of the ward's census, lists under the page's trace id a run span holding the POST's send and
+  its attempt, by the route template `/Wards/{ward}/Doses`, and the chained GET's send and its attempt, and no span
+  or event holds Ruth or North.
+- `X20.9` behavior (D20.8): with the trace on, a save the endpoint's validation door refuses lists under the page's
+  trace id the plan's render activity and, under the save's attempt span, the endpoint's validation activity naming
+  its validator, its rule set and one failure.
 
 ## Q21. Realtime: server-sent events and SignalR
 
@@ -5086,3 +5108,7 @@ invoke and send.
   one error.
 - `X21.13` behavior (D21.13): a hub the server refuses from its first start tries again after 0, 2, 10 and 30 seconds of
   the page's clock, then runs its closed steps and shows the reconnect offer.
+- `X21.14` type (D21.7): a stream or a hub cannot be handed a bearer token: N21.8's members and N21.7's configuration
+  take none, so the page's cookies are a connection's only credential: new:N21.8.
+- `X21.15` behavior (D21.8): with the trace on, a message a stream pushes lists under the page's trace id a run span
+  whose parent is the plan's trace context, recording its transport, server-sent events, and its event's name.

@@ -384,6 +384,10 @@
           "id": "M3.X4",
           "rung": "analyzer",
           "defect": "A MinLength given a constant below zero compiles, where the redesign refuses it where the view renders: at build by ALIS033's pipeline-condition checks, new:N18.10, and where the view renders on code the analyzer does not follow (D18.6), with the redesign's message, \"Condition minimum text length must be zero or greater.\""
+        },
+        {
+          "id": "X8.28",
+          "rung": "type"
         }
       ],
       "promises": [

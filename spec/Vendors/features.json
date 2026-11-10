@@ -498,6 +498,14 @@
         {
           "id": "X12.18",
           "rung": "behavior"
+        },
+        {
+          "id": "X17.53",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.54",
+          "rung": "type"
         }
       ],
       "promises": [

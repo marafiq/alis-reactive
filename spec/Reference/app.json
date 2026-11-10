@@ -95,7 +95,7 @@
     },
     {
       "id": "tracing",
-      "what": "the OpenTelemetry adapter registered, exporting to the test app's collector, with a sampler the test steers per request; its process also listens on a second port, a second origin that allows the page's origin and the trace headers by CORS and lists each request it received",
+      "what": "the OpenTelemetry adapter registered and the server's OpenTelemetry SDK listening to the Alis.Reactive source, both exporting to the test app's collector, with a sampler the test steers per request; its process also listens on a second port, a second origin that allows the page's origin and the trace headers by CORS and lists each request it received",
       "framework": "net10"
     },
     {
@@ -4938,6 +4938,31 @@
       ]
     },
     {
+      "feature": "M10.F1",
+      "for": "X21.15",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "collector"
+      ],
+      "harness": [
+        "seed",
+        "push"
+      ],
+      "held": [
+        {
+          "verb": "push",
+          "action": "Realtime.tla:Message",
+          "on": "Bulletin on WardBoard"
+        }
+      ]
+    },
+    {
       "feature": "M10.F2",
       "for": "X12.5",
       "index": 0,
@@ -6105,6 +6130,24 @@
       ]
     },
     {
+      "feature": "M26.F1",
+      "for": "X20.9",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "collector",
+        "roundValidator"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M26.F2",
       "for": "X20.3",
       "index": 0,
@@ -6140,6 +6183,24 @@
       "parts": [
         "doses",
         "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M26.F2",
+      "for": "X20.8",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "collector",
+        "roundValidator"
       ],
       "harness": [
         "seed"
@@ -7682,6 +7743,22 @@
       "parts": [
         "intakeForm",
         "documents"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.28",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
       ],
       "harness": [
         "seed"

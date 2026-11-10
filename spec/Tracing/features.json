@@ -142,6 +142,10 @@
         {
           "id": "X20.1",
           "rung": "behavior"
+        },
+        {
+          "id": "X20.9",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -153,6 +157,14 @@
           "opposite": "The same round rendered by a request the sampler records, so the view writes the trace on: echo reads a traceparent whose trace id is the page's, and the collector lists a run span holding a send span holding one attempt span under that trace id.",
           "defect": "A port that records whatever its page says, or starts its spans before it reads the plan's trace, lists spans for a page whose render no one recorded, and sends a traceparent the server's parent-based sampler then records against the app's ratio (Tracing.tla's RecordsWhenOff mutant, which breaks NothingRecordedWhenOff). Main's level of trace on every plan (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:98 at 623dd4a27) is today's form of that mistake.",
           "observes": "Tracing.tla:Route"
+        },
+        {
+          "for": "X20.9",
+          "page": "The medication round, whose view renders the trace on, on the host whose layout registers the OpenTelemetry adapter and whose server's OpenTelemetry SDK listens to the Alis.Reactive source, both exporting to the harness's collector. Its order form's Save posts the order to an endpoint whose validation door checks it with the round's validator, whose Must allows a strength only up to the ward's limit, so the browser sends the order and the server answers 400 with the strength's message.",
+          "gesture": "Type 900 into the strength; click Save; wait until the strength shows its message; open the harness's collector page.",
+          "outcome": "The strength shows Strength is above the ward's limit., and the collector lists under the page's trace id the plan's render activity and, under the save's attempt span, the endpoint's validation activity naming RoundValidator, the default rule set and failure count 1.",
+          "opposite": "A strength of 90 saves, and the collector lists the validation activity under the save's attempt span with failure count 0.",
+          "defect": "A framework with no activity source of its own, or a validation door that starts no activity, lists only the browser's spans and nothing under the attempt; one whose source is named otherwise than Alis.Reactive is never heard by the app's SDK, so the same."
         }
       ],
       "verdicts": []
@@ -328,6 +340,10 @@
         {
           "id": "X20.5",
           "rung": "behavior"
+        },
+        {
+          "id": "X20.8",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -348,6 +364,14 @@
           "opposite": "The same page with an exporter that does not throw: status reads saved 1 and then saved 2, the console shows no error, and the collector lists the boot span and both runs.",
           "defect": "A port that lets a sink's error reach the run stops the handler where it starts, so status stays empty (Tracing.tla's SinkErrorStopsRun mutant, which breaks SinkFailureChangesNothing); one that logs each failure shows an error for every span.",
           "observes": "Tracing.tla:Trigger"
+        },
+        {
+          "for": "X20.8",
+          "page": "The medication round opened at /Wards/North/Round, whose view renders the trace on, on the host whose layout registers the OpenTelemetry adapter exporting to the harness's collector, whose page lists the spans of a trace as a tree with each span's attributes and events and searches them by text. Its dose form holds the resident's name, which the round's validator requires; its Save button posts the form to /Wards/{ward}/Doses, the ward read from the page's URL, and its success route chains a GET of /Wards/{ward}/Census whose count it sets as the text of census. The harness seeds the endpoints' answers.",
+          "gesture": "Type Ruth into the name; click Save; wait until census reads 12; open the harness's collector page and search it for Ruth, then for North.",
+          "outcome": "census reads 12; the collector lists under the page's trace id one run span holding a send span whose one attempt is POST, route template /Wards/{ward}/Doses, status 200, and a chained send span whose one attempt is GET, route template /Wards/{ward}/Census, status 200; each search lists no span.",
+          "opposite": "Click Save with the name empty: the name shows Name is required., and the collector lists one run span holding the refused check as an event and no send span.",
+          "defect": "A port that records values writes the attempt's URL as /Wards/North/Doses and the form's fields among the send's attributes, so the search for North or Ruth lists the send and the app's data reaches its telemetry; one that starts a send span before the request's check lists a send for the refused save."
         }
       ],
       "verdicts": []
