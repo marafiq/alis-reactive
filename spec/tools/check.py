@@ -2293,6 +2293,8 @@ def app_screen_problems(app, screens, hosts):
         problems += [f"screen {name} is under {screen['under']}, no screen"] if "under" in screen and screen["under"] not in screens else []
         problems += [f"screen {name} runs on {host}, no host" for host in screen.get("hosts", []) if host not in hosts]
         problems += [f"screen {name}'s {part['id']} is a {part['kind']}, no part kind" for part in screen["parts"] if part["kind"] not in app["partKinds"]]
+        problems += [f"screen {name}'s {part['id']} is a plain native part of InputsAndIds, and the core renders no input: a consumer's component does (M7.N2)"
+                     for part in screen["parts"] if part["kind"] == "native" and part.get("module") == "InputsAndIds"]
         fusion = [part["id"] for part in screen["parts"] if part["kind"] == "fusion"]
         problems += ([f"care screen {name} loads Syncfusion ({', '.join(fusion)}) on its own page; it belongs on a page under it"]
                      if fusion and screen.get("area") == "care" and "under" not in screen else [])

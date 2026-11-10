@@ -17,7 +17,7 @@
     "gc": "Playwright's Page.RequestGCAsync, confirmed by the page's own weak hold"
   },
   "partKinds": {
-    "native": "a plain-DOM input or element the core's doors render or reach",
+    "native": "a plain element or a hand-written control in the view's markup: the core reaches an element by id (M5.N1), markup raises an app event from it (M1.D3), and a native form sends its hand-written controls (D9.15); never a framework input, which a consumer renders (M7.N2)",
     "conformance": "a declaration of the conformance library, spec/Reference/native.json, named by the part's declares",
     "fusion": "a Syncfusion component through its Fusion slice; never a part of a core module's test",
     "nativeSlice": "a Native slice's component (NativeDrawer, NativeToast, NativeConfirm, NativeLoader, NativeActionLink, NativeCheckList and the rest)",
@@ -143,15 +143,15 @@
       "parts": [
         {
           "id": "search",
-          "kind": "native",
-          "role": "the search box that finds residents as you type",
-          "module": "InputsAndIds"
+          "kind": "nativeSlice",
+          "role": "the search box, a NativeTextBox whose typing finds residents",
+          "module": "NativeComponents"
         },
         {
           "id": "filters",
-          "kind": "native",
-          "role": "the wing select, status checkboxes and sort order",
-          "module": "InputsAndIds"
+          "kind": "nativeSlice",
+          "role": "the wing NativeDropDown, the status NativeCheckBox boxes and the sort order NativeDropDown",
+          "module": "NativeComponents"
         },
         {
           "id": "list",
@@ -226,15 +226,15 @@
         },
         {
           "id": "inputs",
-          "kind": "native",
-          "role": "the intake's inputs: name, dates and times, room, doses, contact and address fields",
-          "module": "InputsAndIds"
+          "kind": "nativeSlice",
+          "role": "the intake's NativeTextBox and NativeDropDown inputs: name, dates and times, room, doses, contact and address fields",
+          "module": "NativeComponents"
         },
         {
           "id": "nextOfKin",
-          "kind": "native",
-          "role": "the next-of-kin section rendered by PartialFor under its prefix",
-          "module": "InputsAndIds"
+          "kind": "nativeSlice",
+          "role": "the next-of-kin section's NativeTextBox inputs, rendered by PartialFor under its prefix",
+          "module": "NativeComponents"
         },
         {
           "id": "sectionSlot",
@@ -261,8 +261,8 @@
         {
           "id": "documents",
           "kind": "native",
-          "role": "the intake form's document rows, each a file and its caption",
-          "module": "InputsAndIds"
+          "role": "the intake form's document rows, each a hand-written file input and caption the form sends (D9.15)",
+          "module": "RequestsAndResponses"
         },
         {
           "id": "kinCards",
@@ -359,8 +359,14 @@
         {
           "id": "notes",
           "kind": "native",
-          "role": "the notes list, note box and the record's texts",
-          "module": "InputsAndIds"
+          "role": "the notes list, the record's texts and the buttons whose markup raises its app events",
+          "module": "Elements"
+        },
+        {
+          "id": "noteInputs",
+          "kind": "nativeSlice",
+          "role": "the record's NativeTextBox, NativeTextArea and NativeCheckBox inputs: the note box, the pain, balance, intake, target and name fields, the Starts and Allergies fields, and the room-free and include-note boxes",
+          "module": "NativeComponents"
         },
         {
           "id": "recordEndpoint",
@@ -444,8 +450,14 @@
         {
           "id": "doses",
           "kind": "native",
-          "role": "the due doses with Give buttons, order forms and the round's texts",
-          "module": "InputsAndIds"
+          "role": "the due doses, their Give buttons whose markup raises the round's app events, and the round's texts",
+          "module": "Elements"
+        },
+        {
+          "id": "doseInputs",
+          "kind": "nativeSlice",
+          "role": "the round's NativeTextBox and NativeCheckBox inputs: the dose form's Strength, Count, Code, Amount, Starts and Length fields, the Doses box and the test box",
+          "module": "NativeComponents"
         },
         {
           "id": "cardSlot",
@@ -665,7 +677,7 @@
         {
           "id": "benchInputs",
           "kind": "nativeSlice",
-          "role": "the NativeTextBox inputs a cell reads as a second source: typed, note and code",
+          "role": "the NativeTextBox inputs the bench reads as sources: typed, note, code and unit-name",
           "module": "NativeComponents"
         },
         {
@@ -697,6 +709,12 @@
           "kind": "nativeSlice",
           "role": "NativeDrawer on the refused pages that close one",
           "module": "NativeAppLevelObjects"
+        },
+        {
+          "id": "refusalInputs",
+          "kind": "nativeSlice",
+          "role": "the NativeDropDown a refused page reads as a source",
+          "module": "NativeComponents"
         }
       ]
     },
@@ -1449,7 +1467,8 @@
         "net10"
       ],
       "parts": [
-        "notes"
+        "notes",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -1464,7 +1483,8 @@
         "net10"
       ],
       "parts": [
-        "notes"
+        "notes",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -1481,7 +1501,8 @@
       "parts": [
         "tabForm",
         "notes",
-        "carePanel"
+        "carePanel",
+        "noteInputs"
       ],
       "harness": [
         "seed",
@@ -1505,7 +1526,8 @@
       ],
       "parts": [
         "notes",
-        "carePanel"
+        "carePanel",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -1522,7 +1544,8 @@
       "parts": [
         "notes",
         "recordEndpoint",
-        "carePanel"
+        "carePanel",
+        "noteInputs"
       ],
       "harness": [
         "seed",
@@ -3609,7 +3632,8 @@
       "parts": [
         "tabForm",
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -3642,7 +3666,8 @@
         "tabSlot",
         "tabForm",
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -4132,7 +4157,8 @@
       "parts": [
         "doses",
         "cardSlot",
-        "roundEndpoint"
+        "roundEndpoint",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -4398,7 +4424,8 @@
       "parts": [
         "doses",
         "roundEndpoint",
-        "roundValidator"
+        "roundValidator",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -4415,7 +4442,8 @@
       "parts": [
         "doses",
         "roundEndpoint",
-        "roundValidator"
+        "roundValidator",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -4499,7 +4527,8 @@
       ],
       "parts": [
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -5607,7 +5636,8 @@
       "parts": [
         "tabForm",
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -6164,7 +6194,8 @@
       "parts": [
         "doses",
         "roundEndpoint",
-        "collector"
+        "collector",
+        "doseInputs"
       ],
       "harness": [
         "seed",
@@ -6190,7 +6221,8 @@
         "doses",
         "roundEndpoint",
         "collector",
-        "roundValidator"
+        "roundValidator",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -6231,7 +6263,8 @@
       ],
       "parts": [
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -6249,7 +6282,8 @@
         "doses",
         "roundEndpoint",
         "collector",
-        "roundValidator"
+        "roundValidator",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -6489,7 +6523,8 @@
       "parts": [
         "innerSlot",
         "tabForm",
-        "notes"
+        "notes",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -6677,7 +6712,8 @@
       "parts": [
         "tabForm",
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -6693,7 +6729,8 @@
       ],
       "parts": [
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -6760,7 +6797,8 @@
       ],
       "parts": [
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -6846,7 +6884,8 @@
       "parts": [
         "doses",
         "cardSlot",
-        "roundEndpoint"
+        "roundEndpoint",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -6908,7 +6947,8 @@
         "tabSlot",
         "tabForm",
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -6976,7 +7016,8 @@
       ],
       "parts": [
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -7162,7 +7203,8 @@
       ],
       "parts": [
         "notes",
-        "carePanel"
+        "carePanel",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -7178,7 +7220,8 @@
       ],
       "parts": [
         "notes",
-        "carePanel"
+        "carePanel",
+        "noteInputs"
       ],
       "harness": [
         "seed"
@@ -7209,7 +7252,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalInputs"
+      ],
       "harness": [
         "seed"
       ]
@@ -7222,7 +7267,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalInputs"
+      ],
       "harness": [
         "seed"
       ]
@@ -7251,7 +7298,8 @@
         "net10"
       ],
       "parts": [
-        "doses"
+        "doses",
+        "doseInputs"
       ],
       "harness": [
         "seed"
@@ -7423,7 +7471,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchInputs"
       ],
       "harness": [
         "seed"
