@@ -955,7 +955,8 @@ def door_target_problems(feature, verdict, field, doors):
 
 TIP_MEMBER = re.compile(r"\.(\w+)(?:<[^>]*>)?\(")
 DELTA_ROOTS = ("Alis.Reactive/", "Alis.Reactive.Analyzers/", "Alis.Reactive.Assets/", "Alis.Reactive.Fusion/", "Alis.Reactive.FluentValidator/", "Alis.Reactive.Native/")
-DELTA_MEMBER = {".cs": re.compile(r"^\+\s*public static [^=;]*?\b(\w+)(?:<[^>(]*>)?\("), ".ts": re.compile(r"^\+export (?:async )?(?:function|const|class) (\w+)")}
+DELTA_MEMBER = {".cs": re.compile(r"^\+\s*public\s[^=;{(]*?\b(\w+)\s*(?:<[^>(]*>)?\s*(?:\(|\{|=>|=|;|:|$)"),
+                ".ts": re.compile(r"^\+export\s+(?:default\s+)?(?:declare\s+)?(?:abstract\s+)?(?:async\s+)?(?:function\*?|const|let|var|class|interface|type|enum)\s+(\w+)")}
 
 
 def tip_member(door):
@@ -994,7 +995,7 @@ def check_main_delta():
                 members.append(found.group(1))
                 if found.group(1) not in given:
                     problems.append(f"{path}: {found.group(1)}, added on main by {MAIN_TIP[:9]}, has no verdict at that SHA")
-    detail = f"each of {len(files)} shipped files main changed from {MAIN_SHA[:9]} to {MAIN_TIP[:9]} is cited there by a feature's sentence, and each of {len(members)} public members it added has a verdict"
+    detail = f"each of {len(files)} shipped files main changed from {MAIN_SHA[:9]} to {MAIN_TIP[:9]} is cited there by a feature's sentence, and each of {len(members)} public declarations or exports it added has a verdict"
     return result(not problems, "; ".join(problems[:4]) or detail, files=len(files), members=len(members), cited=len(cited))
 
 
