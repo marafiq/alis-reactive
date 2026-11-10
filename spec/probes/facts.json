@@ -4165,6 +4165,66 @@
         "gesture": "Click Call nurse; open the collector page.",
         "outcome": "The collector lists the click's run span under the page's trace id, and called reads none."
       }
+    },
+    {
+      "id": "ej2-daterangepicker-shown-range",
+      "statement": "A DateRangePicker given a start of 2026-07-14 and an end of 2026-07-20 under the format yyyy-MM-dd shows the two days joined by a dash with a space on each side.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0, rendering EJ2 33.1.47's components with ej2.min.js under the en-US locale",
+      "probe": "ej2-start-literals.mjs",
+      "expect": "ej2-daterangepicker-shown-range: a range of 2026-07-14 and 2026-07-20 under format yyyy-MM-dd shows \"2026-07-14 - 2026-07-20\"",
+      "source": "spec/probes/ej2-start-literals.mjs",
+      "proof": {
+        "feature": "M21.F16",
+        "page": "A respite stay, rendered by field.FusionDateRangePicker(build => build.Format(\"yyyy-MM-dd\")) for a model whose Stay holds 2026-07-14 and 2026-07-20.",
+        "gesture": "Open the page.",
+        "outcome": "The stay box shows 2026-07-14 - 2026-07-20."
+      }
+    },
+    {
+      "id": "ej2-timepicker-shown-time",
+      "statement": "A TimePicker given 14:30 under EJ2's default culture shows the time as 2:30 PM.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0, rendering EJ2 33.1.47's components with ej2.min.js under the en-US locale",
+      "probe": "ej2-start-literals.mjs",
+      "expect": "ej2-timepicker-shown-time: a value of 14:30 under the default culture shows \"2:30 PM\"",
+      "source": "spec/probes/ej2-start-literals.mjs",
+      "proof": {
+        "feature": "M21.F50",
+        "page": "A dose record page whose next dose FusionTimePicker is rendered by field.FusionTimePicker() for a model whose NextDoseAt is 2026-11-10 14:30.",
+        "gesture": "Open the page.",
+        "outcome": "The next dose box shows 2:30 PM."
+      }
+    },
+    {
+      "id": "ej2-numerictextbox-shown-value",
+      "statement": "A NumericTextBox given 12.5 under its default format, n2, shows 12.50.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0, rendering EJ2 33.1.47's components with ej2.min.js under the en-US locale",
+      "probe": "ej2-start-literals.mjs",
+      "expect": "ej2-numerictextbox-shown-value: a value of 12.5 under the default format shows \"12.50\"",
+      "source": "spec/probes/ej2-start-literals.mjs",
+      "proof": {
+        "feature": "M21.F32",
+        "page": "A dose record page whose dose given FusionNumericTextBox field.FusionNumericTextBox() renders for the model's DoseMg, posted by the browser's own submission to an action that renders the page again with DoseMg at the prescribed 12.5 when the dose fails its check.",
+        "gesture": "Type 99 in the dose box and click Save.",
+        "outcome": "The page shows again with 12.50 in the dose box, the value the action left."
+      }
+    },
+    {
+      "id": "ej2-colorpicker-held-value",
+      "statement": "A ColorPicker given #ff0000ff holds the same text as its value.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0, rendering EJ2 33.1.47's components with ej2.min.js under the en-US locale",
+      "probe": "ej2-start-literals.mjs",
+      "expect": "ej2-colorpicker-held-value: a value of #ff0000ff reads back \"#ff0000ff\"",
+      "source": "spec/probes/ej2-start-literals.mjs",
+      "proof": {
+        "feature": "M21.F12",
+        "page": "A resident's wristband color, rendered by field.FusionColorPicker() for a model whose BandColor is #ff0000ff, and a Show band button that sets the element band-shown's text to the picker's Value; band-shown starts as a dash.",
+        "gesture": "Click Show band.",
+        "outcome": "band-shown reads #ff0000ff."
+      }
     }
   ]
 }
