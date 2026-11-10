@@ -5125,3 +5125,6 @@ invoke and send.
   take none, so the page's cookies are a connection's only credential: new:N21.8.
 - `X21.15` behavior (D21.8): with the trace on, a message a stream pushes lists under the page's trace id a run span
   whose parent is the plan's trace context, recording its transport, server-sent events, and its event's name.
+- `X21.16` behavior (D21.8): with the trace on, a click that invokes a hub method lists its run span under the page's
+  trace id, and the hub's connection carries no trace header, so no invoke's server activity takes the page's trace as
+  its parent.

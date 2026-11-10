@@ -4115,10 +4115,10 @@
       "expect": "signalr-requests-carry-no-trace-context: @microsoft/signalr 10.0.11 sent negotiate, poll, send, close by long polling and negotiate, upgrade, message by WebSockets; 0 carrying a trace header; invoked 7 and invoked 7",
       "source": "spec/probes/signalr-trace-context.mjs",
       "proof": {
-        "feature": "M26.F3",
-        "page": "X21.15's round page under the tracing host: the trace on, the server's OpenTelemetry SDK also listening to ASP.NET Core's SignalR hub activities, and a Call nurse button whose pipeline invokes the nurse line hub's Call method, connected over WebSockets and, in a second fixture, over long polling.",
+        "feature": "M10.F1",
+        "page": "X21.16's medication round under the tracing host: the trace on, a Call nurse button whose pipeline invokes the nurse line hub's Call method, which replies with the traceparent of its connection's request, or none.",
         "gesture": "Click Call nurse; open the collector page.",
-        "outcome": "The collector lists the click's run span under the page's trace id and the hub's Call activity under a trace id of its own."
+        "outcome": "The collector lists the click's run span under the page's trace id, and called reads none."
       }
     },
     {
@@ -4130,10 +4130,10 @@
       "expect": "signalr-invocation-message-keys: @microsoft/signalr 10.0.11 invokes with arguments,invocationId,target,type by long polling and arguments,invocationId,target,type by WebSockets",
       "source": "spec/probes/signalr-trace-context.mjs",
       "proof": {
-        "feature": "M26.F3",
-        "page": "X21.15's round page under the tracing host: the trace on, the server's OpenTelemetry SDK also listening to ASP.NET Core's SignalR hub activities, and a Call nurse button whose pipeline invokes the nurse line hub's Call method, connected over WebSockets and, in a second fixture, over long polling.",
+        "feature": "M10.F1",
+        "page": "X21.16's medication round under the tracing host: the trace on, a Call nurse button whose pipeline invokes the nurse line hub's Call method, which replies with the traceparent of its connection's request, or none.",
         "gesture": "Click Call nurse; open the collector page.",
-        "outcome": "The collector lists the click's run span under the page's trace id and the hub's Call activity under a trace id of its own."
+        "outcome": "The collector lists the click's run span under the page's trace id, and called reads none."
       }
     },
     {

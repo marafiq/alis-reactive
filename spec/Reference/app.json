@@ -7822,6 +7822,23 @@
       "harness": [
         "seed"
       ]
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.16",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "nurseLine",
+        "doses",
+        "collector"
+      ],
+      "harness": [
+        "seed"
+      ]
     }
   ],
   "cells": [

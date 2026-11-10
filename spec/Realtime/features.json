@@ -273,6 +273,10 @@
         {
           "id": "X21.14",
           "rung": "type"
+        },
+        {
+          "id": "X21.16",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -390,6 +394,14 @@
           "outcome": "The collector lists under the page's trace id one run span whose parent is the plan's trace context, recording its transport as server-sent events and its event as bulletin.",
           "opposite": "The same push on a round whose view renders the trace off: bulletins reads 1, and the collector lists no span.",
           "defect": "A run a message starts as a root of its own lists under a new trace id, so the page's trace misses what the message did; one that records no transport or event lists a run span no one can tell from a click's."
+        },
+        {
+          "for": "X21.16",
+          "page": "The medication round, whose view renders the trace on, on the host whose layout registers the OpenTelemetry adapter exporting to the harness's collector; its Call nurse button's pipeline invokes the nurse line hub's Call method, which writes into its reply the traceparent of the connection's request as the hub reads it, or the word none, and the click shows the reply in called.",
+          "gesture": "Open the round and wait until the harness reports NurseLine open. Click Call nurse; wait until called reads its reply; open the harness's collector page.",
+          "outcome": "The collector lists under the page's trace id one run span for the click, and called reads none.",
+          "opposite": "The same click on a round whose view renders the trace off: called reads none, and the collector lists no span.",
+          "defect": "A framework that sets the plan's traceparent on the hub's connection makes called read the page's trace id, so every later invoke of that connection looks joined to a click it never came from; one that records no run span for the click lists nothing under the page's trace id."
         }
       ],
       "verdicts": [
