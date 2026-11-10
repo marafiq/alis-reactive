@@ -1268,25 +1268,25 @@
     },
     "defects": {
       "counts": {
-        "defects": 389,
+        "defects": 390,
         "doubled": 0,
         "features": 33,
-        "mapped": 1918,
+        "mapped": 1944,
         "rows": 8909,
-        "unmapped": 6991
+        "unmapped": 6965
       },
-      "detail": "every feature row valid; 6991 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6965 of 8909 spec doors in no feature",
       "pass": false
     },
     "doors_mapped": {
       "counts": {
         "doubled": 0,
         "features": 33,
-        "mapped": 1918,
+        "mapped": 1944,
         "rows": 8909,
-        "unmapped": 6991
+        "unmapped": 6965
       },
-      "detail": "every feature row valid; 6991 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6965 of 8909 spec doors in no feature",
       "pass": false
     },
     "evidence": {
@@ -1301,20 +1301,20 @@
       "counts": {
         "doubled": 0,
         "features": 33,
-        "mapped": 1918,
+        "mapped": 1944,
         "rows": 8909,
-        "unmapped": 6991
+        "unmapped": 6965
       },
-      "detail": "every feature row valid; 6991 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6965 of 8909 spec doors in no feature",
       "pass": false
     },
     "features_lost": {
       "counts": {
-        "lost": 564,
-        "types_in_no_feature": 564,
+        "lost": 562,
+        "types_in_no_feature": 562,
         "uncarried_doors": 0
       },
-      "detail": "564 declaring types in no feature",
+      "detail": "562 declaring types in no feature",
       "pass": false
     },
     "fluent": {
@@ -1417,12 +1417,12 @@
       "counts": {
         "doubled": 0,
         "features": 33,
-        "mapped": 1918,
-        "promises": 266,
+        "mapped": 1944,
+        "promises": 267,
         "rows": 8909,
-        "unmapped": 6991
+        "unmapped": 6965
       },
-      "detail": "every feature row valid; 6991 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6965 of 8909 spec doors in no feature",
       "pass": false
     },
     "questions": {
@@ -3363,16 +3363,16 @@
         "features": 33,
         "main_only": 4156,
         "main_only_in_features": 801,
-        "mapped": 1918,
+        "mapped": 1944,
         "rows": 8909,
-        "unmapped": 6991
+        "unmapped": 6965
       },
-      "detail": "every feature row valid; 6991 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6965 of 8909 spec doors in no feature",
       "pass": false
     }
   },
   "passed": 14,
-  "read_at_head": "1c9e9b7c3325571ab7bab43a4d45d6895f2a0cb3",
+  "read_at_head": "6f1f85065fc00d2e840d922f967ff3a877cac770",
   "step": {
     "failing": [
       "doors_mapped",
