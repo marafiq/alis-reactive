@@ -577,14 +577,6 @@
   "cells": {
     "refused": [
       {
-        "position": "ElementClass",
-        "source": "IfNull",
-        "reason": "D7.3",
-        "errors": [
-          "CS8620"
-        ]
-      },
-      {
         "position": "ConditionRight",
         "source": "IfNull",
         "reason": "D7.3",

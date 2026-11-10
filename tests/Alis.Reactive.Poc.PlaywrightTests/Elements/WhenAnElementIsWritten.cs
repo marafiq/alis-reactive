@@ -25,6 +25,16 @@ public sealed class WhenAnElementIsWritten : AppPageTest
     }
 
     [Test]
+    public async Task a_class_name_read_from_a_source_of_text_without_null_is_added()
+    {
+        await Open("/Pumps/PumpCard");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Mark the pump quiet when it has no alarm" }).ClickAsync();
+
+        await Expect(Page.Locator("#pump-card")).ToHaveAttributeAsync("class", "pump-card quiet");
+    }
+
+    [Test]
     public async Task a_class_name_is_removed()
     {
         await Open("/Pumps/PumpCard");

@@ -41,5 +41,11 @@ public sealed class Arg<T> : Arg
 
     public static implicit operator Arg<T>(TypedSource<T> source) => new(_ => source.Expression, _ => source.Form);
 
+    internal static Arg<T> Of(ITypedSource<T> source)
+    {
+        var read = Sources.Of(source);
+        return new(_ => read.Expression, _ => read.Form);
+    }
+
     internal override Expression ExpressionIn(PlanBuild build) => build.IntoLive<T>(_expression(build), _form(build));
 }

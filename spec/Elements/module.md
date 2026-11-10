@@ -24,8 +24,9 @@ Each name is gate 2's; each door is the capability it carries.
   `ClassList` its `classList` holds; `Hidden`, a `Property<bool>` over `hidden`; `Children`, the `ElementChildren` its
   `children` holds; and `Show()` and `Hide()`, which set `Hidden` to false and true, the names both lines carry. The
   POC's declaration holds `Text`, `Html` and `Classes` (`poc/Alis.Reactive.Poc/Elements/Element.cs`).
-- `M5.N2` new: `ClassList`, mirroring lib.dom's `DOMTokenList`: `Add`, `Remove` and `Toggle`, each taking an
-  `Arg<string?>` and changing no class when it reads nothing (D7.6), and its iterator, which yields `string` (N5.7).
+- `M5.N2` new: `ClassList`, mirroring lib.dom's `DOMTokenList`: `Add`, `Remove` and `Toggle`, each taking a literal
+  or, as a set does, an `ITypedSource<string?>` (D7.3), and changing no class when it reads nothing (D7.6), and its
+  iterator, which yields `string` (N5.7).
   It replaces main's `AddClass`, `RemoveClass` and `ToggleClass`, which take a literal only, and the redesign's
   `ElementClassList` with its `Items`.
 - `M5.N3` new: `ElementChildren`, mirroring lib.dom's `HTMLCollection`, whose iterator yields `ChildElement` (N5.7). It

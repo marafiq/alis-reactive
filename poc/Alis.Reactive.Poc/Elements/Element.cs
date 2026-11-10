@@ -20,11 +20,17 @@ public sealed class Element : Component
 
 public sealed class ClassList : JsObject
 {
-    public void Add(Arg<string?> name) => MethodWhenHeld(name, "add");
+    public void Add(string? name) => MethodWhenHeld((Arg<string?>)name, "add");
 
-    public void Remove(Arg<string?> name) => MethodWhenHeld(name, "remove");
+    public void Add(ITypedSource<string?> name) => MethodWhenHeld(Arg<string?>.Of(name), "add");
 
-    public void Toggle(Arg<string?> name) => MethodWhenHeld(name, "toggle");
+    public void Remove(string? name) => MethodWhenHeld((Arg<string?>)name, "remove");
+
+    public void Remove(ITypedSource<string?> name) => MethodWhenHeld(Arg<string?>.Of(name), "remove");
+
+    public void Toggle(string? name) => MethodWhenHeld((Arg<string?>)name, "toggle");
+
+    public void Toggle(ITypedSource<string?> name) => MethodWhenHeld(Arg<string?>.Of(name), "toggle");
 }
 
 public static class ElementSteps

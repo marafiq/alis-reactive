@@ -1197,7 +1197,8 @@ Terms used throughout:
   `Choose` (D6.14, `Sources.IfNull`, `Sources.Choose`).
 - D7.3 Every position takes a literal of its type and every source whose type is assignable to it:
   `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position. A set takes a source
-  as `ITypedSource<out T>`, so a narrower reference type and a text without null reach it as they are. C# converts a
+  as `ITypedSource<out T>`, and so does an element's class name, `ClassList`'s `Add`, `Remove` and `Toggle` (M5.N2,
+  gate 2's G9), so a narrower reference type and a text without null reach them as they are. C# converts a
   method's `Arg<T>` only from a `TypedSource<T>`: it refuses a conversion from the covariant interface (CS0552), warns
   where only nullability differs (CS8620), has no conversion from a struct's source to its nullable's (CS1503), takes no
   conversion operator in an extension block (CS9282), and a second operator on `TypedSource<T>` makes the plain case

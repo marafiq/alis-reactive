@@ -22,6 +22,10 @@
         pipeline.Element("alarm").Text.Set("marked");
     }))
 
+@(plan.Button("mark-quiet", "Mark the pump quiet when it has no alarm")
+    .Reactive(button => button.Click, pipeline =>
+        pipeline.Element("pump-card").Classes.Add(pipeline.Component<InfusionPump>("pump").LastAlarm().IfNull("quiet"))))
+
 @(plan.Button("clear", "Clear the mark")
     .Reactive(button => button.Click, pipeline => pipeline.Element("pump-card").Classes.Remove("alarmed")))
 
