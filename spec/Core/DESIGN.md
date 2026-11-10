@@ -1164,10 +1164,10 @@ Terms used throughout:
   to the card is counted in the next step; and an object that declares an iterator but holds a paged result stops the
   pipeline at the operation, and the step after it does not run.
 - `X6.57` refusal (D6.12): a date or a time the app's JSON options write by a converter of their own, compared or
-  ordered, in a list's lambda or a pipeline condition: "'{term}' compares a {type} the app's JSON options write by a
-  converter of their own, whose text the browser cannot read as the value .NET holds; compare it on the server." C#
-  tells the app's converter from System.Text.Json's own by the contract's converter, reference-equal to
-  `JsonMetadataServices`' instance when the app adds none (`probe:core-stj-own-date-converters`).
+  ordered, in a list's lambda, a pipeline condition or a validator's check (D16.16): "'{term}' compares a {type} the
+  app's JSON options write by a converter of their own, whose text the browser cannot read as the value .NET holds;
+  compare it on the server." C# tells the app's converter from System.Text.Json's own by the contract's converter,
+  reference-equal to `JsonMetadataServices`' instance when the app adds none (`probe:core-stj-own-date-converters`).
 - `X6.58` behavior (D6.12): a comparison of a date or a time stops its pipeline, logging the text, on a value a live
   object holds outside its key's forms: a vendor's `DateTime` member that holds the text "10/27/2026", and a
   `TimeOnly` payload member that holds "7:00 PM"; the step after it does not run, and the same pages with "2026-10-27"
@@ -1344,7 +1344,8 @@ Terms used throughout:
   - The operands. A pipeline condition reads any source. An array predicate reads the item and values the
     view supplies. A validator condition reads the members of the body its request sends (Q16).
   - A term the lambda door cannot translate. In an array predicate it is refused where the view renders.
-    In a validator condition it leaves the rule to the server, which decides it by what it is.
+    In a validator condition it is refused (X16.13) unless `WhenOnServer` or `UnlessOnServer` declares it the
+    server's, which then decides the rule by what it is (D16.8).
   - Order. A pipeline's `When`, `ElseIf` and `Else` run in authored order, and the first that holds wins.
     A validator condition gates its rules and has no branches.
 - D8.4 Template conditionals are not this core. Syncfusion's template engine evaluates them on its own
@@ -1444,8 +1445,8 @@ Terms used throughout:
   the source's type (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:16`).
 - `X8.2` analyzer: an array predicate with a term the lambda door cannot translate: "{term} has no browser form
   in an array predicate; use a member the framework translates, or move the test to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
-- `X8.3` behavior: a validator condition with a term the lambda door cannot translate gates its rules on the
-  server only; the browser sends the request and shows the server's message.
+- `X8.3` behavior: a validator condition `WhenOnServer` declares, with a term the lambda door cannot translate,
+  gates its rules on the server only; the browser sends the request and shows the server's message.
 - `X8.4` behavior: `When(a).ElseIf(b).Else()` runs the first branch whose condition holds and no other.
 - `X8.5` analyzer: a response body captured in a C# variable inside `OnSuccess` and read after the request is
   refused with "The response body of the request to {url} is read outside the block that binds it: read it
@@ -3002,7 +3003,10 @@ plans name.
   runs nothing.
 - `X12.2` behavior: after a slot loads three times, a click on its button runs its handler once.
 - `X12.3` behavior: a field a reloaded slot renders shows its message on blur.
-- `X12.4` behavior: after a slot with a required field unloads, the page's form saves.
+- `X12.4` behavior (D16.3, D16.5, D16.6): after a slot that rendered the input of a member the page's validator
+  requires unloads, the page's save reads that member's start, as the endpoint binds a body that lacks it, and the
+  page's rule holds the save with its message in the page container's summary; the slot's own validator's
+  registration leaves with the slot (D16.3), so its rules check nothing after it.
 - `X12.5` behavior: two slots listen to one hub; after one unloads, the other still shows the server's pushes.
 - `X12.6` behavior: unloading the slot whose hub the server hung up on hides the retry offer.
 - `X12.7` behavior: a slot whose component its host destroyed unloads with no console error, and the next load
@@ -3560,6 +3564,19 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   registered validator under the default rule set, the rule set the block names, or none (the form goes to gate 2).
   Typing clears an input's message, and blur and the input's commit check the input's member under the live check of
   each container that holds it, each over its own container's inputs; a message two of them give shows once.
+- D16.16 A check that compares a member with a fixed value or another member (`Equal`, `NotEqual`, `GreaterThan`,
+  `GreaterThanOrEqualTo`, `LessThan`, `LessThanOrEqualTo`, `InclusiveBetween`, `ExclusiveBetween`) compares a date or a
+  time (`DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly`, `TimeSpan`, each nullable too) as .NET does, to the tick,
+  through its key, as a condition does (D6.12, D8.10).
+  - C# writes each operand as its type's key over the checked body's value, picked by the member's source as
+    `spec/Core/conversions.md`'s Keys pick it, and a member the body lacks over its start (D16.6); a fixed value is
+    written in the member's form and keyed as the member (D7.7).
+  - A null member passes an ordering and a range, fails `Equal` and passes `NotEqual`, as FluentValidation's
+    comparison checks read it (`probe:fv-date-comparisons`), where a condition holds no ordering with null (D8.9).
+  - A text the member's type cannot hold fails first, with the binder's message (D16.7). A date or a time a converter
+    writes is refused, the app's options' (X6.57) and the member's own (X6.43).
+  - Both lines read a date in a check as a `Date`'s `getTime`, to the millisecond, and leave a `TimeOnly` and a
+    `TimeSpan` ordering to the server alone; the keys give each a browser rule that agrees with the server's.
 
 **Schema nodes.** `fn`, `get`, `as`, `op`, `if`, `record`, `list`, `lit`; the plugin data `form`, a registration with
 its starts as a typed contract (Q19), and `model`'s containers; `$form.validate` and `$form.showErrors` as plugin
@@ -3593,6 +3610,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `probe:js-regex-translated`
 - `probe:fv-flags-is-in-enum`
 - `probe:core-flags-split-agrees`
+- `probe:fv-date-comparisons`
+- `Schema.tla:DatesComparedByKey`
+- `Schema.tla:KeysOnlyCompared`
 - `Ownership.tla:RulesLeaveWithTheirOwner`
 - `Ownership.tla:FailureReachesSummary`
 - `Ownership.tla:InlineOnlyAtTheSentInput`
@@ -3684,6 +3704,11 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   (`Alis.Reactive/Validation/Checks.cs:432`).
 - G2: validation adds no grammar node; a check is `$form.validate` over plugin data, and the body it checks is a
   `fn` the plan writes (`Alis.Reactive/PlanModel/Validation/FormWriter.cs:19-30`).
+- A check orders a date by a `Date`'s `getTime` (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:194-196`; main's
+  `Alis.Reactive.Assets/runtime/shared/shape-convert.ts:167`), and orders only numbers, booleans and dates
+  (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:179-183`,
+  `Alis.Reactive/PlanModel/Validation/BrowserRules.cs:268`), so a `TimeOnly` and a `TimeSpan`, written as text
+  (`Alis.Reactive/Members/ClrShape.cs:75-80`), have no browser rule.
 
 **Defects.**
 - `X16.1` type: a request checked by a validator of another model does not compile: new:N16.2.
@@ -3753,6 +3778,10 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   fills over one:
   "'r => r.Care' sends CareDays, which [Flags] marks and the startup does not name, so a combination its source holds
   stops the request; name it with Flags<CareDays>() at startup." At build by ALIS038: new:N16.5.
+- `X16.27` behavior (D16.16): on net10, a shift whose `Starts`, a `TimeOnly` typed 06:30, fails
+  `GreaterThanOrEqualTo(new TimeOnly(7, 0))`, and whose `Length`, a `TimeSpan` typed 1.02:00:00, fails
+  `LessThanOrEqualTo(TimeSpan.FromHours(23))`, in the browser before sending, as the endpoint answers; with `Starts`
+  left empty the ordering passes on both sides.
 
 ## Q17. Vendors and inversion
 

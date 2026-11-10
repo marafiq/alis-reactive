@@ -91,12 +91,13 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 
 ## Keys
 
-A comparison or a sort of a date or a time reads each operand through its type's key (D6.12, D6.13): text of fixed
-width whose code units order as .NET orders the values, to the tick, so `eq`, `neq`, `lt`, `lte`, `gt`, `gte` and
-`compareOrdinal` compare two keys as texts (`probe:js-key-text-order`, `probe:js-span-key-order`). No key builds a
-JavaScript `Date`, so neither a wall time daylight saving skips or repeats nor a `Date`'s milliseconds move a
-comparison (`probe:js-date-wall-gap`, `probe:js-date-wall-overlap`, `probe:js-date-milliseconds`). C# writes a key
-only as an argument of those operators, the two arguments of one comparison keys of one type.
+A comparison, a sort or a check's comparison of a date or a time reads each operand through its type's key (D6.12,
+D6.13, D16.16): text of fixed width whose code units order as .NET orders the values, to the tick, so `eq`, `neq`, `lt`,
+`lte`, `gt`, `gte` and `compareOrdinal` compare two keys as texts (`probe:js-key-text-order`,
+`probe:js-span-key-order`). No key builds a JavaScript `Date`, so neither a wall time daylight saving skips or repeats
+nor a `Date`'s milliseconds move a comparison (`probe:js-date-wall-gap`, `probe:js-date-wall-overlap`,
+`probe:js-date-milliseconds`). C# writes a key only as an argument of those operators, the two arguments of one
+comparison keys of one type.
 
 The forms, each as System.Text.Json writes it (`probe:core-stj-date-time-forms`) and MVC 10's binding reads it as its
 fields, in a query and in form data under every culture whose calendar is Gregorian (`probe:core-query-date-forms`,
@@ -154,3 +155,4 @@ C# picks the key and its second argument by the source, a closed set:
 | a page URL member (D9.18), its query or path text as the invariant culture binds it | the type's key, `dateKey` for a `DateTime` | the member's start, as N10.7 reads text that does not convert |
 | an input (N3.3), the value its container sends (N13.1) | the type's key, `dateKey` for a `DateTime` | the member's start, for the text an input of a `DateOnly`, `TimeOnly` or `TimeSpan` hands; an input of a `DateTime` or `DateTimeOffset` hands the `Date` `as` converts its text to, or its start |
 | a value the view holds | its partner's key, over the value written in its partner's form (D7.7, D8.10), a `DateTime` with no offset (D3.9) | none |
+| a member a check's body lacks (D16.16) | the type's key, `dateKey` for a `DateTime`, over the start C# writes in the member's form with no offset (D16.6, D3.9) | none: C# wrote the start |

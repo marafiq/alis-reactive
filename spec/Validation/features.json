@@ -1,0 +1,2209 @@
+{
+  "module": "Validation",
+  "features": [
+    {
+      "id": "M8.F1",
+      "summary": "A validator: a rule written once on ReactiveValidator<T> in FluentValidation's grammar, which the server runs and from which C# derives the browser's rules where the view renders; its checks, its conditions over the one condition core, its options and its messages, and a date or a time compared through its key, to the tick. Main's client-only rules and guard vocabulary leave for the validator's own grammar.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:ReactiveValidator<T>",
+        "Alis.Reactive:ReactiveValidator",
+        "Alis.Reactive:IValidator<T>",
+        "Alis.Reactive:InlineValidator<T>",
+        "Alis.Reactive:IRuleBuilder<T, TProperty>",
+        "Alis.Reactive:IRuleBuilderOptions<T, TProperty>",
+        "Alis.Reactive:RuleBuilderExtensions",
+        "Alis.Reactive:CascadeMode",
+        "Alis.Reactive:CustomContext<T>",
+        "Alis.Reactive:ValidationResult",
+        "Alis.Reactive:ValidationFailure",
+        "Alis.Reactive:IConditionBuilder",
+        "Alis.Reactive.FluentValidator:ReactiveValidator<T>",
+        "Alis.Reactive.FluentValidator:FieldConditionBuilder<T>",
+        "Alis.Reactive.FluentValidator:FieldGuard<T>",
+        "Alis.Reactive.FluentValidator:FieldStart<T, TProp>",
+        "Alis.Reactive.FluentValidator:ReactiveClientRuleBuilder<TModel, TValue>",
+        "Alis.Reactive.FluentValidator:ReactiveClientCollectionRuleBuilder<TModel, TItem>",
+        "Alis.Reactive.FluentValidator:ReactiveClientRules"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "ClientRule(x => x.AdmissionDate)",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Validation/DateRules/DateValidationValidator.cs:9"
+        },
+        {
+          "line": "main",
+          "text": ".GreaterThanOrEqualTo(new DateTime(2020, 1, 1), \"Admission date must be on or after January 1, 2020.\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Validation/DateRules/DateValidationValidator.cs:12"
+        },
+        {
+          "line": "main",
+          "text": "protected ReactiveClientRuleBuilder<T, TValue> ClientRule<TValue>(",
+          "cite": "Alis.Reactive.FluentValidator/ReactiveValidator.cs:24"
+        },
+        {
+          "line": "main",
+          "text": "RuleFor(x => x.ResidentName).NotEmpty().WithMessage(\"'Resident Name' is required.\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/FileUpload/FileUploadValidator.cs:10"
+        },
+        {
+          "line": "main",
+          "text": "ClientRule(x => x.ResidentName).Required(\"'Resident Name' is required.\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/FileUpload/FileUploadValidator.cs:11"
+        },
+        {
+          "line": "main",
+          "text": "Add(rule, server => server.NotEmpty().WithMessage(message), client => client.Required(message));",
+          "cite": "Alis.Reactive.FluentValidator/ReactiveClientRuleBuilder.cs:87"
+        },
+        {
+          "line": "main",
+          "text": "WhenField(x => x.IsVeteran, () =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Conditions/AdmissionAssessment/AdmissionAssessmentValidator.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class CheckRules : ReactiveValidator<CheckedForm>",
+          "cite": "tests/Alis.Reactive.Framework.App/Validation/CheckedForm.cs:111"
+        },
+        {
+          "line": "redesign",
+          "text": "RuleFor(x => x.Wing).GreaterThanOrEqualTo(1).WithMessage(\"Wing one at least.\");",
+          "cite": "tests/Alis.Reactive.Framework.App/Validation/CheckedForm.cs:131"
+        },
+        {
+          "line": "redesign",
+          "text": "public IRuleBuilder<T, TProperty> RuleFor<TProperty>(Expression<Func<T, TProperty>> member)",
+          "cite": "Alis.Reactive/Validation/ReactiveValidator.cs:142"
+        },
+        {
+          "line": "proposed",
+          "text": "RuleFor(s => s.Starts).GreaterThanOrEqualTo(new TimeOnly(7, 0)).WithMessage(\"Shifts start at seven or later.\")",
+          "doors": [
+            "N16.2"
+          ]
+        }
+      ],
+      "nodes": [
+        "op",
+        "if",
+        "get",
+        "fn",
+        "lit",
+        "form"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Validation/ReactiveValidator.cs:118-366"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Validation/RuleBuilderExtensions.cs:1-336"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Validation/Rules.cs:1-580"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.FluentValidator/ReactiveValidator.cs:13-349"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Validation/Checks.cs:1-483"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:1-245"
+        }
+      ],
+      "core": [
+        "Q16",
+        "Q8",
+        "Q6"
+      ],
+      "meanings": [
+        {
+          "id": "M8.D1",
+          "meaning": "A check's message is its WithMessage text, else FluentValidation 12.1.1's English default for that check, template for template, a Url's being the framework's own since FluentValidation has none. C# fills {PropertyName} with the member's WithName, else its path split into words, and each comparison value, formatted under the view's culture (D3.11), the culture the endpoint binds the request under, where the view renders, so the browser shows the server's text. A member the body lacks reads its start (D16.6), which C# wrote, so C# fills {PropertyValue} with it (X16.22's '0'). A sentence that names what a member the body sends holds ({PropertyValue}, {TotalLength}, {Digits}, {ActualScale}) is left out of the browser's copy, and the server's 400 keeps it. IsInEnum's default is that sentence alone, and over a member the body sends it is not reached in the browser: a value no row of its enum lists stops the request before any check (D9.13), so the browser shows it only for a member the body lacks."
+        }
+      ],
+      "oracle": "FluentValidation 12.1.1's grammar, its comparison, range, pattern and enum checks and its default messages, settled by a run of the package (probe:fv-date-comparisons, probe:fv-flags-is-in-enum).",
+      "checker": [
+        "core:Q16",
+        "core:Q8",
+        "Validation.tla:ConditionAgrees",
+        "Schema.tla:DatesComparedByKey"
+      ],
+      "defects": [
+        {
+          "id": "X16.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.11",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X16.12",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X16.13",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X16.22",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.27",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X16.9",
+          "page": "A family contacts page whose form holds a Web page input under a validator whose rule is RuleFor(c => c.WebPage).Url().WithMessage(\"Give the family's web page.\"); Save posts the form and the page writes the web page the endpoint saved into saved.",
+          "gesture": "Type http://a.com/b c in Web page and click Save; then type http://a.com:99999 in Web page and click Save.",
+          "outcome": "After the first Save, saved reads http://a.com/b c and no message shows; after the second, \"Give the family's web page.\" shows beside Web page, saved still reads http://a.com/b c, and no request is sent.",
+          "opposite": "Typing http://a.com/b and clicking Save shows it in saved with no message.",
+          "defect": "The browser's pattern and the server's Uri disagree on a row, so the first Save shows the message the endpoint never gives, or the second is sent and the endpoint answers the message with a 400."
+        },
+        {
+          "for": "X16.10",
+          "page": "A room page whose form holds a Room number input under RuleFor(r => r.Number).Matches(@\"^[0-9]+$\").WithMessage(\"Write the room number in digits 0 to 9.\"); Save posts the form and the page writes the room number the endpoint saved into saved.",
+          "gesture": "Type ١٢ in Room number and click Save.",
+          "outcome": "\"Write the room number in digits 0 to 9.\" shows beside Room number, saved stays empty, and no request is sent.",
+          "opposite": "Typing 12 and clicking Save shows 12 in saved with no message.",
+          "defect": "One side reads Arabic-Indic digits as digits, so the browser sends ١٢ and the endpoint answers the message with a 400, or the browser holds 12."
+        },
+        {
+          "for": "X16.22",
+          "page": "A care plan page whose app names CareDays and RotaDays as flags enums at startup; RotaDays has no value for zero; the model starts Care at Mon | Tue and Rota at 0; Save care is checked by a rule set holding RuleFor(p => p.Care).IsInEnum() and Save rota by one holding RuleFor(p => p.Rota).IsInEnum(), each sending only the Name input; the page writes the endpoint's answer, the name and then each day of the saved enum, comma separated, into saved, and renders the container's summary above the buttons.",
+          "gesture": "Type Ada in Name and click Save care, then click Save rota.",
+          "outcome": "After Save care, saved reads Ada, Mon, Tue; after Save rota, \"'Rota' has a range of values which does not include '0'.\" shows in the summary, saved still reads Ada, Mon, Tue, and no request is sent.",
+          "opposite": "With the model starting Rota at Early, Save rota shows Ada, Early in saved and no message.",
+          "defect": "The browser reads a flags value as one value, so Mon | Tue fails and Save care sends nothing; or 0 passes, so Save rota is sent and the endpoint answers the message with a 400."
+        },
+        {
+          "for": "X16.27",
+          "page": "A net10 rota page whose shift form holds a Starts time input and a Length text box under a validator with RuleFor(s => s.Starts).GreaterThanOrEqualTo(new TimeOnly(7, 0)).WithMessage(\"Shifts start at seven or later.\") and RuleFor(s => s.Length).LessThanOrEqualTo(TimeSpan.FromHours(23)).WithMessage(\"A shift lasts 23 hours at most.\"); Save posts the form and the page writes the endpoint's answer, the start, or none when it has none, then the length, comma separated, into saved.",
+          "gesture": "Type 06:30 in Starts and 1.02:00:00 in Length and click Save; then clear Starts, type 23:00:00 in Length and click Save.",
+          "outcome": "After the first Save both messages show beside their inputs, saved stays empty and no request is sent; after the second no message shows and saved reads none, 23:00:00.",
+          "opposite": "Starts 07:00 and Length 23:00:00 show 07:00, 23:00:00 in saved with no message.",
+          "defect": "Neither member has a browser rule, as the redesign leaves a TimeOnly and a TimeSpan to the server, so the first Save is sent and the messages come back in a 400; or the length orders as text, 1.02:00:00 before 23:00:00, and its message never shows; or the empty Starts, a null, fails the ordering in the browser while the endpoint saves it."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "FieldConditionBuilder<T>",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldConditionBuilder<T>.Field<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field) -> FieldStart<T!, TProp>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldGuard<T>",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldGuard<T>.And(FieldGuard<T!>! other) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldGuard<T>.Not() -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldGuard<T>.Or(FieldGuard<T!>! other) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.ArrayContains(TProp value) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Between(TProp low, TProp high) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Contains(string! substring) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.EndsWith(string! suffix) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Eq(TProp value) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Falsy() -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Gt(TProp value) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Gte(TProp value) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.In(params TProp[]! values) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.IsEmpty() -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.IsNull() -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Lt(TProp value) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Lte(TProp value) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Matches(string! pattern) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.MinLength(int minLength) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Neq(TProp value) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.NotEmpty() -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.NotIn(params TProp[]! values) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.NotNull() -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.StartsWith(string! prefix) -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "FieldStart<T, TProp>.Truthy() -> FieldGuard<T!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveClientCollectionRuleBuilder<TModel, TItem>",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveClientCollectionRuleBuilder<TModel, TItem>.AtLeastOne(string! message) -> ReactiveClientCollectionRuleBuilder<TModel!, TItem!>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveClientCollectionRuleBuilder<TModel, TItem>.SetValidator(ReactiveValidator<TItem!>! validator) -> ReactiveClientCollectionRuleBuilder<TModel!, TItem!>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveClientRuleBuilder<TModel, TValue>",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveClientRules",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.ClientRule<TChild>(System.Linq.Expressions.Expression<System.Func<T!, TChild!>!>! field, ReactiveValidator<TChild!>! validator) -> void",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.ClientRule<TValue>(System.Linq.Expressions.Expression<System.Func<T!, TValue>!>! field) -> ReactiveClientRuleBuilder<T!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.ClientRuleEach<TItem>(System.Linq.Expressions.Expression<System.Func<T!, System.Collections.Generic.IEnumerable<TItem!>!>!>! field) -> ReactiveClientCollectionRuleBuilder<T!, TItem!>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.ClientRulesFrom(ReactiveValidator<T!>! validator) -> void",
+          "verdict": "refused",
+          "reason": "ClientRulesFrom copies another validator's browser rules into this one, with Include for the same model; the rewrite's Include, SetValidator and ChildRules hold the other validator on both sides, and the registration carries the browser's copy of every rule they reach (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.ClientRulesFrom<TSource>(ReactiveValidator<TSource!>! validator) -> void",
+          "verdict": "refused",
+          "reason": "ClientRulesFrom copies another validator's browser rules into this one, with Include for the same model; the rewrite's Include, SetValidator and ChildRules hold the other validator on both sides, and the registration carries the browser's copy of every rule they reach (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.Unless(System.Func<T!, FluentValidation.ValidationContext<T!>!, bool>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!",
+          "verdict": "refused",
+          "reason": "It takes FluentValidation's ValidationContext<T>, a type of the package, which the core implements without depending on it; a condition reads the model with When(m => ..), and the rule set the context carries is named by the check (N16.3) and by the endpoint's door (N16.1).",
+          "carriers": [
+            "N16.3",
+            "N16.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.Unless(System.Func<T!, bool>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!",
+          "verdict": "refused",
+          "reason": "Main's When and Unless over a delegate are conditions only the server decides, and a ClientRule inside one throws. The rewrite's When and Unless take an Expression<Func<T, bool>>, which the one translator writes for both sides (N8.1, D16.8), and a condition the server alone decides is declared by WhenOnServer or UnlessOnServer, which D16.9 leaves to the server by their door; a lambda written to main's When reads the same text in the rewrite's.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.UnlessAsync(System.Func<T!, FluentValidation.ValidationContext<T!>!, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!",
+          "verdict": "refused",
+          "reason": "It takes FluentValidation's ValidationContext<T>, a type of the package, which the core implements without depending on it; a condition reads the model with When(m => ..), and the rule set the context carries is named by the check (N16.3) and by the endpoint's door (N16.1).",
+          "carriers": [
+            "N16.3",
+            "N16.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.UnlessAsync(System.Func<T!, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!",
+          "verdict": "kept"
+        },
+        {
+          "door": "ReactiveValidator<T>.When(System.Func<T!, FluentValidation.ValidationContext<T!>!, bool>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!",
+          "verdict": "refused",
+          "reason": "It takes FluentValidation's ValidationContext<T>, a type of the package, which the core implements without depending on it; a condition reads the model with When(m => ..), and the rule set the context carries is named by the check (N16.3) and by the endpoint's door (N16.1).",
+          "carriers": [
+            "N16.3",
+            "N16.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.When(System.Func<T!, bool>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!",
+          "verdict": "refused",
+          "reason": "Main's When and Unless over a delegate are conditions only the server decides, and a ClientRule inside one throws. The rewrite's When and Unless take an Expression<Func<T, bool>>, which the one translator writes for both sides (N8.1, D16.8), and a condition the server alone decides is declared by WhenOnServer or UnlessOnServer, which D16.9 leaves to the server by their door; a lambda written to main's When reads the same text in the rewrite's.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenAsync(System.Func<T!, FluentValidation.ValidationContext<T!>!, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!",
+          "verdict": "refused",
+          "reason": "It takes FluentValidation's ValidationContext<T>, a type of the package, which the core implements without depending on it; a condition reads the model with When(m => ..), and the rule set the context carries is named by the check (N16.3) and by the endpoint's door (N16.1).",
+          "carriers": [
+            "N16.3",
+            "N16.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenAsync(System.Func<T!, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! action) -> FluentValidation.IConditionBuilder!",
+          "verdict": "kept"
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenField(System.Linq.Expressions.Expression<System.Func<T!, bool>!>! field, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenField<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldArrayContains<TProp>(System.Linq.Expressions.Expression<System.Func<T!, System.Collections.Generic.IEnumerable<TProp>?>!>! field, TProp value, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldBetween<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp low, TProp high, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldContains(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, string! substring, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldEmpty(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldEndsWith(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, string! suffix, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldGt<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldGte<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldIn<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp[]! values, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldLt<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldLte<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldMatches(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, string! pattern, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldMinLength(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, int minLength, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldNot(System.Linq.Expressions.Expression<System.Func<T!, bool>!>! field, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldNot<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp value, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldNotEmpty(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldNotIn<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, TProp[]! values, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldNotNull<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldNull<TProp>(System.Linq.Expressions.Expression<System.Func<T!, TProp>!>! field, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFieldStartsWith(System.Linq.Expressions.Expression<System.Func<T!, string?>!>! field, string! prefix, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "ReactiveValidator<T>.WhenFields(System.Func<FieldConditionBuilder<T!>!, FieldGuard<T!>!>! buildCondition, System.Action! defineRules) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains.",
+          "carriers": [
+            "N8.1"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.AtLeastOne<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.CreditCard<TModel>(this ReactiveClientRuleBuilder<TModel!, string?>! rule, string! message) -> ReactiveClientRuleBuilder<TModel!, string?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Email<TModel>(this ReactiveClientRuleBuilder<TModel!, string?>! rule, string! message) -> ReactiveClientRuleBuilder<TModel!, string?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Empty<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.EqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.EqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue expected, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.ExclusiveRange<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue lowerBound, TValue upperBound, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.ExclusiveRange<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue lowerBound, TValue upperBound, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.GreaterThan<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.GreaterThan<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue value, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.GreaterThan<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue?>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.GreaterThan<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue value, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.GreaterThanOrEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.GreaterThanOrEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue minimum, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.GreaterThanOrEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue?>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.GreaterThanOrEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue minimum, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.LessThan<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.LessThan<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue value, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.LessThan<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue?>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.LessThan<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue value, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.LessThanOrEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.LessThanOrEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue maximum, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.LessThanOrEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue?>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.LessThanOrEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue maximum, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Max<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue maximum, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Max<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue maximum, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.MaxLength<TModel>(this ReactiveClientRuleBuilder<TModel!, string?>! rule, int length, string! message) -> ReactiveClientRuleBuilder<TModel!, string?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Min<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue minimum, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Min<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue minimum, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.MinLength<TModel>(this ReactiveClientRuleBuilder<TModel!, string?>! rule, int length, string! message) -> ReactiveClientRuleBuilder<TModel!, string?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.NotEqual<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue forbidden, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.NotEqualTo<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Range<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, TValue lowerBound, TValue upperBound, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Range<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue?>! rule, TValue lowerBound, TValue upperBound, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Regex<TModel>(this ReactiveClientRuleBuilder<TModel!, string?>! rule, string! pattern, string! message) -> ReactiveClientRuleBuilder<TModel!, string?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Required<TModel, TValue>(this ReactiveClientRuleBuilder<TModel!, TValue>! rule, string! message) -> ReactiveClientRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientRules.Url<TModel>(this ReactiveClientRuleBuilder<TModel!, string?>! rule, string! message) -> ReactiveClientRuleBuilder<TModel!, string?>!",
+          "verdict": "refused",
+          "reason": "Main's ClientRule writes the browser's rule in a vocabulary of its own beside FluentValidation's (Required, Min, Max, Range, EqualTo, AtLeastOne, a Url the server checks by Must) and adds the server's rule from the same call, so a rule written with RuleFor alone reaches no browser and main's pages write one rule twice, once in each vocabulary. The rewrite reads the browser's rule from FluentValidation's grammar itself (D16.1): ClientRule(x => x.ResidentName).Required(message) is RuleFor(x => x.ResidentName).NotEmpty().WithMessage(message), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M8.F2",
+      "summary": "Registration through dependency injection: AddReactiveFluentValidation registers each validator once with Add<TValidator>(), no assembly scan; the registration marks each validated type as one MVC does not validate on net10; the flags enums are named once at startup. Main's registration of client-only rules leaves.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:ReactiveFluentValidationBuilder",
+        "Alis.Reactive:ReactiveFluentValidationServiceCollectionExtensions",
+        "Alis.Reactive:ReactiveClientValidationBuilder",
+        "Alis.Reactive:ReactiveClientValidationServiceCollectionExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "builder.Services.AddReactiveFluentValidation(validation =>",
+          "cite": "Alis.Reactive.SandboxApp/Program.cs:18"
+        },
+        {
+          "line": "main",
+          "text": "validation.AddFromAssemblyContaining<Program>());",
+          "cite": "Alis.Reactive.SandboxApp/Program.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "builder.Services.AddReactiveFluentValidation(validation =>",
+          "cite": "Alis.Reactive.SandboxApp/Program.cs:18"
+        },
+        {
+          "line": "redesign",
+          "text": "validation.Add<Alis.Reactive.SandboxApp.Areas.Sandbox.Models.ReservationsOfficeValidator>());",
+          "cite": "Alis.Reactive.SandboxApp/Program.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "public ReactiveFluentValidationBuilder Add<TValidator>()",
+          "cite": "Alis.Reactive/Validation/ReactiveFluentValidationServiceCollectionExtensions.cs:50"
+        }
+      ],
+      "nodes": [
+        "form",
+        "model",
+        "plugin"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Validation/ReactiveFluentValidationServiceCollectionExtensions.cs:1-131"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.FluentValidator/ReactiveFluentValidationServiceCollectionExtensions.cs:1-151"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Validation/FormWriter.cs:1-38"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:1-245"
+        }
+      ],
+      "core": [
+        "Q16",
+        "Q18"
+      ],
+      "meanings": [],
+      "oracle": "Microsoft.Extensions.DependencyInjection's service collection, and MVC's own validation, which on net10 adds the implicit required error for a non-nullable text (probe:core-form-implicit-required).",
+      "checker": [
+        "core:Q16",
+        "core:Q18"
+      ],
+      "defects": [
+        {
+          "id": "X16.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.23",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X16.24",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X16.25",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X16.26",
+          "rung": "analyzer"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X16.8",
+          "page": "A net10 visitor page whose form holds a Name input and a Ward input; the model's Name is a non-nullable string with no rule on it, under a registered validator holding RuleFor(v => v.Ward).NotEmpty(); Sign in posts the form as form data and the page writes the ward the endpoint saved into signed-in.",
+          "gesture": "Leave Name empty, type North in Ward and click Sign in.",
+          "outcome": "signed-in reads North, and no \"The Name field is required.\" shows anywhere.",
+          "opposite": "With Ward empty, Sign in shows \"'Ward' must not be empty.\" beside Ward and signed-in stays empty.",
+          "defect": "MVC's implicit required error for the non-nullable Name answers 400, so \"The Name field is required.\" shows in the summary and signed-in stays empty."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "ReactiveClientValidationBuilder",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveClientValidationBuilder.Add<TValidationSource, TModel>(System.Action<ClientValidationRulesBuilder<TModel!>!>! define) -> ReactiveClientValidationBuilder!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ReactiveClientValidationServiceCollectionExtensions",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ReactiveClientValidationServiceCollectionExtensions.AddReactiveClientValidation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<ReactiveClientValidationBuilder!>! configure) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M8.F3",
+      "summary": "The browser's rules: what C# derives from a validator where the view renders and the plan's registration carries, keyed by validator and rule set, with the starts the endpoint's binder leaves, so the browser's verdict over the body a request sends equals the endpoint's. The rule types are the plan writer's inside. Main's rules written per field at startup leave.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:BrowserRule",
+        "Alis.Reactive:BrowserRuleSet",
+        "Alis.Reactive:BrowserField",
+        "Alis.Reactive:IBrowserRuleSource",
+        "Alis.Reactive:AtLeastOneRule",
+        "Alis.Reactive:ComparisonRule",
+        "Alis.Reactive:CreditCardRule",
+        "Alis.Reactive:DefaultMemberRule",
+        "Alis.Reactive:EmptyRule",
+        "Alis.Reactive:FixedComparisonRule",
+        "Alis.Reactive:MaxLengthRule",
+        "Alis.Reactive:MemberComparisonRule",
+        "Alis.Reactive:MinLengthRule",
+        "Alis.Reactive:NoItemsRule",
+        "Alis.Reactive:NotDefaultMemberRule",
+        "Alis.Reactive:NotEmptyRule",
+        "Alis.Reactive:NotNullRule",
+        "Alis.Reactive:PatternRule",
+        "Alis.Reactive:RangeRule",
+        "Alis.Reactive:ClientValidationCondition<TModel>",
+        "Alis.Reactive:ClientValidationConditionBuilder<TModel>",
+        "Alis.Reactive:ClientValidationField",
+        "Alis.Reactive:ClientValidationFieldConditionStart<TModel, TValue>",
+        "Alis.Reactive:ClientValidationFieldRuleBuilder<TModel, TValue>",
+        "Alis.Reactive:ClientValidationFieldToken<TModel, TValue>",
+        "Alis.Reactive:ClientValidationRulesBuilder<TModel>",
+        "Alis.Reactive:IClientValidationRuleSource"
+      ],
+      "claims": [
+        "Alis.Reactive:ReactivePlan<TModel>.BrowserRules<TValidator>() -> System.Collections.Generic.IReadOnlyList<BrowserField!>!",
+        "Alis.Reactive:ReactivePlan<TModel>.BrowserRules<TValidator>(string! ruleSet) -> System.Collections.Generic.IReadOnlyList<BrowserField!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "if (value instanceof Date) return finiteNumber(value.getTime(), \"date\");",
+          "cite": "Alis.Reactive.Assets/runtime/shared/shape-convert.ts:167"
+        },
+        {
+          "line": "main",
+          "text": "public ClientValidationFieldRuleBuilder<TModel, TValue> Required(string message) =>",
+          "cite": "Alis.Reactive/Validation/ClientValidationFieldRuleBuilder.cs:27"
+        },
+        {
+          "line": "redesign",
+          "text": "return G.Call(G.Op(Operator.ToDate, value), PathMembers.Optional, \"getTime\");",
+          "cite": "Alis.Reactive/PlanModel/Validation/BrowserRule.cs:196"
+        },
+        {
+          "line": "redesign",
+          "text": "return Comparison.IsEquality || IsOrdered(Shape);",
+          "cite": "Alis.Reactive/PlanModel/Validation/BrowserRules.cs:268"
+        },
+        {
+          "line": "redesign",
+          "text": "return orderedShape is NumberShape or BooleanShape or DateShape or InstantShape;",
+          "cite": "Alis.Reactive/PlanModel/Validation/BrowserRule.cs:183"
+        }
+      ],
+      "nodes": [
+        "form",
+        "model",
+        "fn",
+        "get",
+        "op",
+        "record",
+        "list",
+        "lit"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Validation/BrowserRules.cs:1-372"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Validation/BrowserRule.cs:1-234"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Validation/BrowserField.cs:1-237"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:1-221"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Validation/ClientValidationFieldRuleBuilder.cs:1-27"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:1-245"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/validation/rule-engine.ts:1-296"
+        }
+      ],
+      "core": [
+        "Q16",
+        "Q19"
+      ],
+      "meanings": [],
+      "oracle": "The endpoint's binder on each host, probed for the starts it leaves and the texts it refuses (probe:core-form-nested-start, probe:core-json-nested-start, probe:mvc5-nested-fills-start, probe:core-form-value-messages), and FluentValidation 12.1.1 for the checks.",
+      "checker": [
+        "core:Q16",
+        "Validation.tla:Agreement",
+        "Validation.tla:ObjectStartAgrees",
+        "Validation.tla:NewHolderAgrees",
+        "Validation.tla:UnsentInputsUnread",
+        "Validation.tla:NoTypedValueLost"
+      ],
+      "defects": [
+        {
+          "id": "X16.2",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.14",
+          "rung": "analyzer"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X16.2",
+          "page": "A net10 home page whose model starts Lead with a lead named Ruth, and whose Lead type starts Name empty; the page renders a Lead name input and a Phone input, and the validator holds RuleFor(m => m.Lead.Name).NotEmpty().WithMessage(\"Lead name is required.\"); Save sends a JSON body holding the Phone input alone, Save all sends both inputs, and the page writes the endpoint's answer, the lead's name and phone, comma separated, into saved, and renders the container's summary above the buttons.",
+          "gesture": "Type 555-0100 in Phone and click Save.",
+          "outcome": "\"Lead name is required.\" shows in the summary, saved stays empty, and no request is sent.",
+          "opposite": "Typing Ruth in Lead name and 555-0100 in Phone and clicking Save all shows Ruth, 555-0100 in saved with no message.",
+          "defect": "The browser reads the lead the model starts with, named Ruth, so it sends, and the endpoint, which replaces the lead with a new one, answers \"Lead name is required.\" with a 400."
+        },
+        {
+          "for": "X16.3",
+          "page": "A deputy page whose model starts Deputy null, and whose Deputy type starts Name at Unnamed; the validator holds RuleFor(m => m.Deputy).SetValidator(new DeputyRules()), whose rule is RuleFor(d => d.Name).NotEmpty().WithMessage(\"Name the deputy.\"); the page renders a Phone input bound to Deputy.Phone; Save sends form data holding that input alone, and the page writes the endpoint's answer, the deputy's name and phone, comma separated, into saved.",
+          "gesture": "Type 555-0101 in Phone and click Save.",
+          "outcome": "saved reads Unnamed, 555-0101, and no message shows.",
+          "opposite": "With the Deputy type starting Name empty, Save shows \"Name the deputy.\" in the summary and saved stays empty.",
+          "defect": "The browser reads the null deputy's Name as null and runs the child rule on it, so \"Name the deputy.\" holds a save the endpoint takes, binding a new deputy named Unnamed."
+        },
+        {
+          "for": "X16.4",
+          "page": "A supplies page whose form holds a Count input bound to an int under RuleFor(s => s.Count).GreaterThan(0); Save posts the form and the page writes the count the endpoint saved into saved.",
+          "gesture": "Type 12a in Count and click Save.",
+          "outcome": "\"The value '12a' is not valid for Count.\" shows beside Count, saved stays empty, and no request is sent.",
+          "opposite": "Typing 12 and clicking Save shows 12 in saved with no message.",
+          "defect": "The text reads nothing and is left out of the body, so the browser checks the start, 0, and shows \"'Count' must be greater than '0'.\", or sends and the endpoint saves 0."
+        },
+        {
+          "for": "X16.6",
+          "page": "An intake page whose intake container holds a Name input, with Save intake sending the container and Mark arrived sending no container and setting Status to Arrived; the model starts Name at Unnamed; the validator holds RuleFor(i => i.Status).NotEmpty() and RuleFor(i => i.Name).NotEmpty().WithMessage(\"Name the resident.\"); the page writes the endpoint's answer, the name and the status, comma separated, into status.",
+          "gesture": "Clear Name and click Mark arrived.",
+          "outcome": "status reads Unnamed, Arrived, and no \"Name the resident.\" shows.",
+          "opposite": "Clicking Save intake with Name cleared shows \"Name the resident.\" beside Name, status stays as it was, and no request is sent.",
+          "defect": "The check reads the container's inputs although the request does not send them, so the cleared Name fails and Mark arrived sends nothing."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "ClientValidationCondition<TModel>",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationCondition<TModel>.And(ClientValidationCondition<TModel!>! other) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationCondition<TModel>.Not() -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationCondition<TModel>.Or(ClientValidationCondition<TModel!>! other) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationConditionBuilder<TModel>",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationConditionBuilder<TModel>.Field<TValue>(ClientValidationFieldToken<TModel!, TValue>! field) -> ClientValidationFieldConditionStart<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationConditionBuilder<TModel>.Field<TValue>(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! field) -> ClientValidationFieldConditionStart<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationField",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationField.FieldName.get -> string!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.ArrayContains<TItem>(TItem item) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Between(TValue lowerBound, TValue upperBound) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Contains(string! substring) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.EndsWith(string! suffix) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Eq(TValue value) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Falsy() -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Gt(TValue value) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Gte(TValue value) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.In(params TValue[]! values) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.IsEmpty() -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.IsNull() -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Lt(TValue value) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Lte(TValue value) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Matches(string! pattern) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.MinLength(int minLength) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Neq(TValue value) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.NotEmpty() -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.NotIn(params TValue[]! values) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.NotNull() -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.StartsWith(string! prefix) -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldConditionStart<TModel, TValue>.Truthy() -> ClientValidationCondition<TModel!>!",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.AtLeastOne(string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.CreditCard(string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.Email(string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.Empty(string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.EqualTo(ClientValidationFieldToken<TModel!, TValue>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.EqualTo(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.EqualTo(TValue expected, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.ExclusiveRange(TValue lowerBound, TValue upperBound, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.GreaterThan(ClientValidationFieldToken<TModel!, TValue>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.GreaterThan(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.GreaterThan(TValue value, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.GreaterThanOrEqualTo(ClientValidationFieldToken<TModel!, TValue>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.GreaterThanOrEqualTo(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.GreaterThanOrEqualTo(TValue minimum, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.LessThan(ClientValidationFieldToken<TModel!, TValue>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.LessThan(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.LessThan(TValue value, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.LessThanOrEqualTo(ClientValidationFieldToken<TModel!, TValue>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.LessThanOrEqualTo(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.LessThanOrEqualTo(TValue maximum, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.Max(TValue maximum, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.MaxLength(int length, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.Min(TValue minimum, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.MinLength(int length, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.NotEqual(TValue forbidden, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.NotEqualTo(ClientValidationFieldToken<TModel!, TValue>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.NotEqualTo(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! peerField, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.Range(TValue lowerBound, TValue upperBound, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.Regex(string! pattern, string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.Required(string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldRuleBuilder<TModel, TValue>.Url(string! message) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationFieldToken<TModel, TValue>",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationRulesBuilder<TModel>",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationRulesBuilder<TModel>.Field<TValue>(ClientValidationFieldToken<TModel!, TValue>! field) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationRulesBuilder<TModel>.Field<TValue>(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! field) -> ClientValidationFieldRuleBuilder<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "Main's AddReactiveClientValidation registers rules written for the browser alone, keyed by a validation source type, beside the validator the server runs: two texts of one rule, which drift apart. The rewrite writes a rule once on ReactiveValidator<T> (D16.1), and the registration carries the browser's copy C# derives from it (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "ClientValidationRulesBuilder<TModel>.When(System.Func<ClientValidationConditionBuilder<TModel!>!, ClientValidationCondition<TModel!>!>! condition, System.Action<ClientValidationRulesBuilder<TModel!>!>! define) -> void",
+          "verdict": "refused",
+          "reason": "Main's guard vocabulary writes a validator's condition through a builder of its own (WhenField, a field's Eq to Between, a guard's And, Or and Not) beside FluentValidation's When. The rewrite's When and Unless take the lambda itself, When(m => m.Age >= 65 && m.Ward == \"North\", ..), which the one translator (N8.1) writes into the condition core over the checked body (D16.8): Truthy and Falsy are == true and == false, In and NotIn are a list's Contains and its negation, Between is >= joined by && to <=, and ArrayContains is the member's Contains. A condition of rules written for the browser alone leaves with them: the registration carries the condition of each rule C# derives (N16.2).",
+          "carriers": [
+            "N8.1",
+            "N16.2"
+          ]
+        },
+        {
+          "door": "IClientValidationRuleSource",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2). It looks the rules up by a System.Type, which ALIS009 refuses on the public surface.",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "IClientValidationRuleSource.GetClientRules(System.Type! validationSourceType) -> System.Collections.Generic.IReadOnlyList<ClientValidationField!>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2). It looks the rules up by a System.Type, which ALIS009 refuses on the public surface.",
+          "carriers": [
+            "N16.2"
+          ]
+        },
+        {
+          "door": "static ClientValidationFieldToken<TModel, TValue>.For(System.Linq.Expressions.Expression<System.Func<TModel!, TValue>!>! field) -> ClientValidationFieldToken<TModel!, TValue>!",
+          "verdict": "refused",
+          "reason": "An implementation detail of main's plan writer, which no view, validator or component author writes; the registration carries the browser's rules of the validator a request names (N16.2).",
+          "carriers": [
+            "N16.2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M8.F4",
+      "summary": "A check and where its failures show: a request is checked by its model's registered validator over the body it sends, and Validate(container) checks with no request; every failure shows in the summary of the container the request sends, else the notice, and at the message element of the framework input it sent under the failure's binding name; a slot's own registration leaves with its slot.",
+      "status": "redesign-only",
+      "types": [],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Validate<TValidationSource>(string! formId) -> PipelineBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Validate<TValidationSource>(string! formId, string! ruleSet) -> PipelineBuilder<TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "redesign",
+          "text": "public PipelineBuilder<TModel> Validate<TValidationSource>(string formId)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:248"
+        },
+        {
+          "line": "redesign",
+          "text": ".Validate<RoundRules>(\"round-form\")",
+          "cite": "tests/Alis.Reactive.Framework.App/Bindings/Round.cshtml:50"
+        },
+        {
+          "line": "main",
+          "text": ".Validate<DrawerResidentValidator>(\"drawer-resident-form\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:39"
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Validate(admission)",
+          "doors": [
+            "N16.3"
+          ]
+        }
+      ],
+      "nodes": [
+        "form",
+        "model",
+        "plugin",
+        "request"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:240-275"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Validation/FormChecks.cs:1-127"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:1-245"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/display.ts:1-84"
+        }
+      ],
+      "core": [
+        "Q16",
+        "Q13",
+        "Q12"
+      ],
+      "meanings": [],
+      "oracle": "MVC's own pattern on both hosts: a validation summary that holds property errors and a message for each field, and D10.8's error body the endpoint's door answers (probe:core-validation-problem-shape).",
+      "checker": [
+        "core:Q16",
+        "Ownership.tla:RulesLeaveWithTheirOwner",
+        "Ownership.tla:FailureReachesSummary",
+        "Ownership.tla:InlineOnlyAtTheSentInput",
+        "Validation.tla:OnlyTheNamedValidator"
+      ],
+      "defects": [
+        {
+          "id": "X16.1",
+          "rung": "type"
+        },
+        {
+          "id": "X8.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X1.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X13.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X13.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.15",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.16",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.17",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.18",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.19",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.20",
+          "rung": "behavior"
+        },
+        {
+          "id": "X16.21",
+          "rung": "analyzer"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X8.3",
+          "page": "A visitor page whose form holds a Visitor input and a Relation input under a validator whose rule RuleFor(v => v.Visitor).NotEmpty().WithMessage(\"Name the visitor.\") sits under WhenOnServer(v => v.Relation.Normalize() == \"Son\"), a condition with no browser form; Sign in posts the form, the endpoint checks it, and the page writes the visitor it saved into signed-in.",
+          "gesture": "Type Son in Relation, leave Visitor empty and click Sign in.",
+          "outcome": "The request is sent, \"Name the visitor.\" shows beside Visitor from the endpoint's answer, and signed-in stays empty.",
+          "opposite": "Typing Ada in Visitor and clicking Sign in shows Ada in signed-in with no message.",
+          "defect": "The browser decides the server's condition, so it holds the save and sends no request; or it drops the rule with no place for the endpoint's message, which then shows nowhere."
+        },
+        {
+          "for": "X1.5",
+          "page": "A family page whose container holds a list of members, each with a Name input, the first holding Ada and the second Ben, and its summary above Save; Save posts the container, and the endpoint answers every save with a 400 keyed Members[1].Name, \"Name the second member.\"",
+          "gesture": "Click Save.",
+          "outcome": "\"Name the second member.\" shows beside the second member's Name and in the summary, and nothing beside the first.",
+          "opposite": "With the endpoint keying the error Members[0].Name, the message shows beside the first member's Name and in the summary.",
+          "defect": "The key's index is read as part of a member name, so the message shows in the summary only, or beside the first member's Name."
+        },
+        {
+          "for": "X12.4",
+          "page": "An admission page whose container holds a Resident input, the admission summary and the room-line slot; Choose a room loads into the slot a partial rendering the Room input of the page model's Room, and Clear the room unloads it; the page's validator holds RuleFor(a => a.Room).NotEmpty().WithMessage(\"Choose the resident's room.\"); Admit posts the container, and the page writes the endpoint's answer, \"{resident} admitted to room {room}\", into admitted.",
+          "gesture": "Type Ann in Resident, click Choose a room, type 12 in Room, click Clear the room, then click Admit.",
+          "outcome": "\"Choose the resident's room.\" shows in the admission summary, admitted stays empty, and no request is sent.",
+          "opposite": "Without Clear the room, Admit shows Ann admitted to room 12 in admitted.",
+          "defect": "The page's rule leaves with the slot that rendered the Room input, so Admit is sent and the endpoint answers the room's message with a 400; or the save reads the room from the unloaded input and admits Ann to room 12.",
+          "existing_test": "redesign WhenAPartialOfThePagesModelIsConditionalOrLoadedLater.once_the_partial_is_unloaded_the_pages_rule_holds_the_save_again"
+        },
+        {
+          "for": "X13.3",
+          "page": "A medication round page whose container holds two dose rows, each with an Amount input, and a slot; Add a dose loads into the slot a third row rendering Doses[2].Amount; the page's validator holds RuleForEach(r => r.Doses).ChildRules(d => d.RuleFor(x => x.Amount).GreaterThan(0).WithMessage(\"Give an amount.\")); Save round posts the container and the page shows the count of doses saved in saved.",
+          "gesture": "Type 5 in both rows' Amount, click Add a dose, type 0 in the new row's Amount and click Save round.",
+          "outcome": "\"Give an amount.\" shows beside the new row's Amount, saved stays empty, and no request is sent.",
+          "opposite": "Typing 5 in the new row and clicking Save round shows 3 in saved.",
+          "defect": "The page's item rule covers only the rows the page rendered, so the loaded row is not checked, Save round is sent and the endpoint answers \"Give an amount.\" with a 400."
+        },
+        {
+          "for": "X13.5",
+          "page": "A ward page with two containers, admission and discharge, each with its own summary; Open the line loads into a slot inside admission a line holding a Note input, and Close the line unloads it; Save admission posts admission and its endpoint answers a 400 for Bed, \"Choose a bed.\", which no input renders; Save discharge posts discharge and its endpoint answers a 400 for Reason, \"Give a reason.\", which no input renders.",
+          "gesture": "Click Open the line and Save admission, then Close the line, then click Save discharge.",
+          "outcome": "\"Choose a bed.\" shows in admission's summary and stays there after Close the line; \"Give a reason.\" shows in discharge's summary only.",
+          "opposite": "Clicking Save discharge alone shows \"Give a reason.\" in discharge's summary and admission's summary stays empty.",
+          "defect": "One summary serves the page, so both messages show in one; or the line takes admission's summary with it when it unloads, so \"Choose a bed.\" leaves.",
+          "existing_test": "redesign WhenALoadedLineJoinsTheFormAndLeaves.the_forms_summary_outlives_a_slot_that_joined_it_and_left"
+        },
+        {
+          "for": "X16.5",
+          "page": "A move-in page whose Texas and Massachusetts buttons load that state's partial into the state slot, each its own model, validator, container and Save: Texas requires License with \"Give the Texas license.\", Massachusetts requires Permit with \"Give the Massachusetts permit.\"; each Save writes the license or permit the endpoint saved into moved-in.",
+          "gesture": "Click Texas and its Save with License empty; then click Massachusetts and its Save with Permit empty.",
+          "outcome": "The first Save shows \"Give the Texas license.\" only; the second shows \"Give the Massachusetts permit.\" only; moved-in stays empty and no request is sent.",
+          "opposite": "With License typed TX-1, the Texas Save shows TX-1 in moved-in.",
+          "defect": "The Texas registration stays after its partial unloads, or the browser runs every registration on the page, so the Massachusetts Save also shows \"Give the Texas license.\"."
+        },
+        {
+          "for": "X16.7",
+          "page": "A care plan page whose container holds the tabs Personal and Medical, the Allergies input in Medical, and the container's summary above the tabs; the validator holds RuleFor(p => p.Allergies).NotEmpty().WithMessage(\"List allergies or none.\"); Save posts the container.",
+          "gesture": "With Personal open, click Save.",
+          "outcome": "\"List allergies or none.\" shows in the summary.",
+          "opposite": "Clicking Medical then shows the message beside Allergies as well.",
+          "defect": "Inline or summary is chosen by what the page shows, so the message goes only to the element inside the hidden Medical tab and the summary stays empty."
+        },
+        {
+          "for": "X16.15",
+          "page": "A ward page with no form whose Assign button posts a request setting Bed to 4 and nothing else; the validator holds RuleFor(a => a.Ward).NotEmpty().WithMessage(\"Ward is required.\"); the page holds the Native notice and writes the endpoint's answer, \"{ward}, bed {bed}\", into assigned.",
+          "gesture": "Click Assign.",
+          "outcome": "The notice shows \"Ward is required.\", assigned stays empty, and no request is sent.",
+          "opposite": "With the request also setting Ward to North, Assign shows North, bed 4 in assigned.",
+          "defect": "A request that sends no container is not checked, so Assign is sent and the endpoint answers \"Ward is required.\" with a 400; or the failure has no place and shows nowhere."
+        },
+        {
+          "for": "X16.16",
+          "page": "A ward page whose Ward input sits outside every container, and whose Assign posts a request sending it under r => r.Ward; the validator holds RuleFor(a => a.Ward).NotEmpty().WithMessage(\"Ward is required.\").ServerOnly(); the page holds the Native notice.",
+          "gesture": "Leave Ward empty and click Assign.",
+          "outcome": "\"Ward is required.\" shows beside Ward and in the notice.",
+          "opposite": "Typing North and clicking Assign shows no message.",
+          "defect": "An input outside every container has no message element the request knows, so the message shows in the notice only."
+        },
+        {
+          "for": "X16.17",
+          "page": "A family page whose container holds a Name input of the page's model, its summary and Save resident, which sends the container and whose endpoint answers a 400 for Name, \"Name the resident.\"; Open contact loads into a slot a partial whose own container holds a Name input of the contact's model, its own summary and Save contact, which sends the slot's container; the contact's endpoint answers a 400 for Name, \"Name the contact.\"",
+          "gesture": "Click Open contact, then Save contact.",
+          "outcome": "\"Name the contact.\" shows beside the slot's Name and in the slot's summary, and nothing shows beside the page's Name or in the page's summary.",
+          "opposite": "Clicking Save resident shows \"Name the resident.\" beside the page's Name and in the page's summary only.",
+          "defect": "Both inputs bind Name, so the message also shows beside the page's Name or in the page's summary."
+        },
+        {
+          "for": "X16.18",
+          "page": "A supplies page whose native form holds a hand-written <input name=\"Code\">, the form's summary and Submit, which posts the form; the endpoint answers a 400 for Code, \"Unknown code.\"",
+          "gesture": "Type ZZ9 in Code and click Submit.",
+          "outcome": "\"Unknown code.\" shows in the form's summary and nothing shows beside the input.",
+          "opposite": "A framework input of Code in the same form shows the message beside it and in the summary.",
+          "defect": "The message element is found by an id built from the name, so the message shows nowhere, or beside an element the page did not give it."
+        },
+        {
+          "for": "X16.19",
+          "page": "A room page whose container holds its summary and the room slot, which holds a Room input; Save posts the container, shows Saving… while it waits, and its endpoint answers after two seconds with a 400 for Room, \"Room 13 is closed.\"; Reload the room reloads the slot.",
+          "gesture": "Type 13 in Room, click Save, and while Saving… shows, click Reload the room.",
+          "outcome": "\"Room 13 is closed.\" shows in the summary and nothing shows beside the reloaded Room.",
+          "opposite": "Without Reload the room, the message shows beside Room and in the summary.",
+          "defect": "The message is placed by the input's id, so it shows beside the reloaded Room, which never sent 13."
+        },
+        {
+          "for": "X16.20",
+          "page": "An admission page whose live form container holds a live fieldset container, both checked live by the page's validator, which holds RuleFor(a => a.Name).NotEmpty().WithMessage(\"Name is required.\"); the Name input sits in the fieldset.",
+          "gesture": "Click into Name, leave it empty and press Tab.",
+          "outcome": "\"Name is required.\" shows once.",
+          "opposite": "Typing Ann and pressing Tab shows no message.",
+          "defect": "Each container checks the blur and both write the message, so it shows twice."
+        }
+      ],
+      "verdicts": []
+    }
+  ]
+}

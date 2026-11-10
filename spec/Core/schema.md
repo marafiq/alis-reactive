@@ -283,7 +283,7 @@ Keys read it, to the tick: nothing reads nothing, null is null, a value in the k
 other value stops the pipeline unless C# wrote a second argument, a `lit` of the member's start, which the key reads
 in its place; C# writes that argument for a page URL member and an input (N10.7, N3.3). C# writes a key only as an
 argument of `eq`, `neq`, `lt`, `lte`, `gt`, `gte` or `compareOrdinal` whose arguments are keys of one type (D6.12,
-D6.13), so no value position takes one.
+D6.13, D16.16), so no value position takes one.
 `toArray` is the array of the items its argument's `[Symbol.iterator]` yields, as `Array.from` reads them, where C#
 reads a list an object's iterator yields (D6.17): an argument that reads nothing or holds null reads nothing, and one
 with no iterator stops the pipeline; C# writes it over no other list.
