@@ -723,7 +723,7 @@ CORE_DEFECT = re.compile(r"^X\d+\.\d+$")
 DOOR_ID = re.compile(r"^(?:N\d+\.\d+|M\d+\.N\d+)$")
 VERDICT_KINDS = {"kept", "renamed", "refused"}
 SENTENCE_LINES = {"main": MAIN_SHA, "redesign": BASE_SHA, "proposed": None}
-FEATURE_STATUSES = {"both", "main-only", "redesign-only", "internal"}
+FEATURE_STATUSES = {"both", "main-only", "redesign-only", "internal", "new"}
 MAIN_SIDE = {"main-only", "both", "moved"}
 REDESIGN_SIDE = {"redesign-only", "both", "moved"}
 
@@ -746,7 +746,9 @@ def internal_modules():
 def expected_status(model, feature_id):
     owned = status_of(owned_rows(model, feature_id))
     match = FEATURE_ID.match(feature_id)
-    return owned or ("internal" if match and int(match.group(1)) in internal_modules() else None)
+    if owned or not match:
+        return owned
+    return "internal" if int(match.group(1)) in internal_modules() else "new"
 
 
 def module_doors():
@@ -1019,6 +1021,27 @@ def core_problems(model, doors):
                 problems.append(f"{name}: meaning {meaning.get('id')!r} is no M<module>.D<n> with its meaning")
         problems += checker_problems(feature)
         problems += sentence_problems(feature, doors)
+    return problems + new_feature_problems(model)
+
+
+NEW_DOOR_BULLET = re.compile(r"^- `(N\d+\.\d+|M\d+\.N\d+)` new\b", re.MULTILINE)
+DOOR_NAMED = re.compile(r"\b(?:N\d+\.\d+|M\d+\.N\d+)\b")
+
+
+def new_feature_problems(model):
+    texts = [(SPEC / "Core" / "DESIGN.md").read_text()] + [path.read_text() for path in SPEC.glob("*/module.md")]
+    marked_new = {door for text in texts for door in NEW_DOOR_BULLET.findall(text)}
+    folders = {number: name for name, number in module_names().items()}
+    problems = []
+    for feature in model["features"]:
+        match = FEATURE_ID.match(feature["id"])
+        if feature.get("status") != "new" or not match:
+            continue
+        module = SPEC / folders.get(int(match.group(1)), "") / "module.md"
+        named = set(DOOR_NAMED.findall(module.read_text())) if module.is_file() else set()
+        proposed = {door for sentence in feature.get("sentences", []) if isinstance(sentence, dict) for door in sentence.get("doors") or []}
+        if not proposed & marked_new & named:
+            problems.append(f"{feature['id']}: a new feature whose proposed sentences name no door its module.md names and marks new")
     return problems
 
 

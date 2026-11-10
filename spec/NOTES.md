@@ -878,3 +878,5 @@
   Evidence: M21.F5, F13, F20, F21, F27, F28, F29, F31 at HEAD; the sweep's report.
 - 2026-11-09 check_probes now refuses a browser fact whose proof lacks a page, a gesture or an outcome, or names no feature, the owner's decision that a browser fact names the proof the rewrite ships; all 47 at HEAD carry one
   Evidence: spec/tools/check.py browser_proof_problems; plants: a proof removed ("its proof lacks page, gesture, outcome"), a proof naming M21.F999 ("no feature").
+- 2026-11-09 a feature neither line has (module 26's tracing, module 25's NativeConfirm and NativeToast) takes status new: check.py gives it to a feature of a module that is not internal and owns no door, and refuses one whose proposed sentences name no door its module.md names and marks new (a "new:" or "new," bullet, 97 core doors marked so)
+  Evidence: spec/tools/check.py expected_status and new_feature_problems; plants on a scratch M5.F99: new naming M5.N1 -> "rows valid"; naming no new door -> refused; status both on a doorless feature -> "status 'both', its doors say 'new'".
