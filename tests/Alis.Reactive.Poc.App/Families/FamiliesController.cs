@@ -27,6 +27,8 @@ public sealed class FamiliesController : Controller
 
     public IActionResult FamilyBySlot() => View(Helen());
 
+    public IActionResult FamilyPrefixMovedInsidePlan() => View(Helen());
+
     public IActionResult NextOfKinWithPrefix()
     {
         ViewData.TemplateInfo.HtmlFieldPrefix = "NextOfKin";

@@ -56,6 +56,14 @@ internal sealed class InputNames
             $"The view's field prefix changed from {Described(Prefix)} to {Described(prefix)} after its plan started: MVC names input '{member}' under the new prefix and the plan under the one it started with. Render the view for its member with Html.PartialFor, which gives it its prefix before its plan starts.");
     }
 
+    internal void RefuseAPrefixMovedInsideThePlan()
+    {
+        var prefix = _view.TemplateInfo.HtmlFieldPrefix;
+        if (prefix == Prefix) return;
+        throw new InvalidOperationException(
+            $"The view's field prefix changed from {Described(Prefix)} to {Described(prefix)} inside its plan, so what the view renders after the change posts under names its plan does not send or check: render a member's view with Html.PartialFor, which leaves the view's prefix as it is.");
+    }
+
 #if NET48
     private static string ExpressionText(LambdaExpression member) => ExpressionHelper.GetExpressionText(member);
 

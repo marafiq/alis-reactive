@@ -136,6 +136,7 @@ public static class PlanHtml
     public static IHtmlString RenderPlan<TModel>(this HtmlHelper html, ReactivePlan<TModel> plan)
     {
         if (plan == null) throw new ArgumentNullException(nameof(plan));
+        plan.Build.Names.RefuseAPrefixMovedInsideThePlan();
         return new HtmlString(ScriptOpen + plan.Json() + ScriptClose);
     }
 #else
@@ -151,6 +152,7 @@ public static class PlanHtml
     public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper html, ReactivePlan<TModel> plan)
     {
         ArgumentNullException.ThrowIfNull(plan);
+        plan.Build.Names.RefuseAPrefixMovedInsideThePlan();
         return new HtmlString(ScriptOpen + plan.Json() + ScriptClose);
     }
 #endif
