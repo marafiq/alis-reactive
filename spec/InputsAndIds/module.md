@@ -50,6 +50,10 @@ Each name is gate 2's; each door is the capability it carries.
 - `M7.N3` kept: `IInputComponent.Input`, a `ComponentInput.Of(value, committedBy)` built from the declaration's typed
   value property and the event that commits it: the read an input's binding takes (N3.3) and the event its live check
   runs on (D16.15). It replaces main's `IInputComponent.ValueMember`, a string.
+- `M7.N4` kept: the redesign's `services.AddReactiveClassNames(names => ..)` and `ReactiveClassNames`, the class names
+  every field renders with, `Field`, `FieldLabel`, `FieldRequired`, `FieldMessage` and `InvalidInput`, chosen once at
+  startup, each unset name its default; C# writes `InvalidInput` into each input's binding as its `invalidClass`
+  (schema.md), so an app styles its fields with its own stylesheet (M7.X7). Its startup form is gate 2's.
 
 The meaning `M7.D1` is in `spec/InputsAndIds/features.json`, on the feature it gives.
 

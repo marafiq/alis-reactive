@@ -11,7 +11,9 @@
         "Alis.Reactive:InputBoundFieldBase<THelper, TModel, TProp>",
         "Alis.Reactive:InputBoundField<TModel, TProp>",
         "Alis.Reactive:IInputComponent",
-        "Alis.Reactive:ComponentInput"
+        "Alis.Reactive:ComponentInput",
+        "Alis.Reactive:ReactiveClassNames",
+        "Alis.Reactive:ReactiveClassNamesServiceCollectionExtensions"
       ],
       "claims": [],
       "sentences": [
@@ -109,6 +111,33 @@
           "doors": [
             "M7.N3"
           ]
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class ReactiveClassNames",
+          "cite": "Alis.Reactive/Inputs/ReactiveClassNames.cs:24"
+        },
+        {
+          "line": "redesign",
+          "text": "public static IServiceCollection AddReactiveClassNames(",
+          "cite": "Alis.Reactive/Inputs/ReactiveClassNamesServiceCollectionExtensions.cs:15"
+        },
+        {
+          "line": "redesign",
+          "text": "_writer.Write($\"<div class=\\\"{WebUtility.HtmlEncode(_classNames.Field)}\\\">\");",
+          "cite": "Alis.Reactive/InputField/InputFieldBuilder.cs:30"
+        },
+        {
+          "line": "redesign",
+          "text": "rendered.CommittedBy.Value, _classNames.InvalidInput));",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:259"
+        },
+        {
+          "line": "proposed",
+          "text": "services.AddReactiveClassNames(names => { names.FieldMessage = \"invalid-feedback\"; names.InvalidInput = \"is-invalid\"; });",
+          "doors": [
+            "M7.N4"
+          ]
         }
       ],
       "nodes": [
@@ -144,6 +173,22 @@
         {
           "line": "main",
           "cite": "Alis.Reactive/InputField/InputBoundFieldBase.cs:18-81"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Inputs/ReactiveClassNames.cs:24-91"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Inputs/ReactiveClassNamesServiceCollectionExtensions.cs:15-27"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:153-162"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/InputField/InputFieldBuilder.cs:28-43"
         }
       ],
       "executes": [
@@ -237,6 +282,11 @@
           "id": "M7.X3",
           "rung": "behavior",
           "defect": "An input is rechecked only on the element's change or blur, so a component that commits a value by its own event, which raises no DOM event, keeps a stale message: the live check runs on the event M7.N3 declares (D16.15)."
+        },
+        {
+          "id": "M7.X7",
+          "rung": "behavior",
+          "defect": "A field renders the framework's class names whatever the app chose, or an invalid input takes alis-has-error, so an app's stylesheet styles nothing: the field's wrapper, label, required marker and message slot render the names AddReactiveClassNames sets, each unset name its default, and C# writes InvalidInput into each input's binding as its invalidClass (M7.N4)."
         }
       ],
       "promises": [
@@ -300,6 +350,14 @@
           "opposite": "Picking None the same way after Residential shows \"Pick a care level.\" beside the choice again.",
           "defect": "The check listens to the element's change or blur, so the pick leaves \"Pick a care level.\" beside the choice until the person leaves it.",
           "existing_test": "redesign WhenAnInputHoldsAnEnumMember.picking_a_member_rechecks_the_input_by_the_choices_own_event"
+        },
+        {
+          "for": "M7.X7",
+          "page": "An app whose startup calls services.AddReactiveClassNames(names => { names.FieldMessage = \"invalid-feedback\"; names.InvalidInput = \"is-invalid\"; }) and whose stylesheet outlines .is-invalid in red; an intake view with Html.InputField for a required Name under RuleFor(i => i.Name).NotEmpty().WithMessage(\"Name the resident.\") and a Save button that posts the form.",
+          "gesture": "Click Save with Name empty, then type Ada into Name and click Save.",
+          "outcome": "After the first Save, Name's box carries is-invalid and not alis-has-error, and \"Name the resident.\" shows in an element of class invalid-feedback; after Ada and the second Save, the box carries neither class and no message shows.",
+          "opposite": "With no AddReactiveClassNames call, the same first Save gives Name's box alis-has-error and shows the message in an element of class alis-field__message.",
+          "defect": "The field writes the framework's names whatever the app chose, so the box takes alis-has-error and the message shows in alis-field__message, which the app's stylesheet does not style; or the box keeps is-invalid after Ada is saved."
         }
       ],
       "verdicts": [
