@@ -27,12 +27,13 @@ kinds and the payload's place, and the defects of Q17 are this module's. The bri
 `alis:unmount` and the page's plugin queue, through which a component's code provides a plugin, read at boot before
 `alis:mount` (D17.14). A plugin's declaration, its members and its lookup by name (D17.14, N17.11) are module 13's, with
 X17.24 to X17.27, X17.25's late push among them; a vendor's lookup is a plugin found as module 13 finds one. What an
-owner holds and releases is module 18's, X12.15 and X12.17 among it; the driver's side of a release, the check that the
-element still holds the object (X12.7, X12.13) and a listener marked released before its removal (X12.16), is this
-module's. NativeConfirm and NativeToast (N17.4, X17.6 to X17.9) and the row actions (D17.15, N17.12, X17.31 to X17.38)
-are module 25's; Syncfusion's vendor and the native components are modules 21 and 24. The analyzers' code (N17.2, N18.9,
-N18.12) is module 20's, and the rules they hold a vendor to are this module's defects. Boot's order is module 17's, the
-schema's `vendors` map module 14's with X19.4, and a render helper's starting state (D17.13, N17.10) module 7's.
+owner holds and releases is module 18's, and X12.15 and X12.17 are placed with a slot's load in M9.F2; the driver's side
+of a release, the check that the element still holds the object (X12.7, X12.13) and a listener marked released before
+its removal (X12.16), is this module's. NativeConfirm and NativeToast (N17.4, X17.6 to X17.9) and the row actions
+(D17.15, N17.12, X17.31 to X17.38) are module 25's; Syncfusion's vendor and the native components are modules 21 and 24.
+The analyzers' code (N17.2, N18.9, N18.12) is module 20's, and the rules they hold a vendor to are this module's
+defects. Boot's order is module 17's, the schema's `vendors` map module 14's with X19.4, and a render helper's starting
+state (D17.13, N17.10) module 7's.
 
 ## Doors
 

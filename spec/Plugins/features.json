@@ -1,0 +1,1318 @@
+{
+  "module": "Plugins",
+  "features": [
+    {
+      "id": "M13.F1",
+      "summary": "A plugin's declaration and the page's plugin: a JavaScript object the page's own code provides by name, with no element, for work the DSL does not express. Its declaration is a Plugin, named once with a vendor's characters and no dot, so the alis. names stay the framework's, and named with its listening, EventTarget unless an EventListening names a callback property, a method pair or a returned unsubscriber; its members are the whole declaration vocabulary, and CallItself calls a plugin that is a function. The page provides it by pushing a name and an instance onto window.__alisPlugins: boot reads the queue, and a later push registers at once. A name no script provides, or two provide, stops only the steps that reach it, and the page's other pipelines run. One plugin name is one object in a plan, with one listening (M13.D1). Main declares a plugin's members by strings, inline or on its Plugin, with argument shapes checked where the view renders, and registers it on the plan; the redesign declares it as a JsObject registered with RegisterPlugin<TPlugin>(), which raises no events; both stop the page's start for a name provided twice.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:Plugin",
+        "Alis.Reactive:PluginArgumentTypes",
+        "Alis.Reactive:PluginCommand",
+        "Alis.Reactive:PluginFunction<TReturn>",
+        "Alis.Reactive:PluginOperation",
+        "Alis.Reactive:PluginProperty<TValue>",
+        "Alis.Reactive:PluginTypeBuilder"
+      ],
+      "claims": [
+        "Alis.Reactive:ReactivePlan<TModel>.RegisterPlugin(Plugin! plugin) -> void",
+        "Alis.Reactive:ReactivePlan<TModel>.RegisterPlugin(string! pluginName, System.Action<PluginTypeBuilder!>! configure) -> void",
+        "Alis.Reactive:ReactivePlan<TModel>.RegisterPlugin<TPlugin>() -> TPlugin!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "/// Declares a Reactive Plan plugin: a named runtime object the DSL does not model,",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:9"
+        },
+        {
+          "line": "main",
+          "text": "/// with no return value. A plugin is the intentional escape hatch for runtime behavior",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:11"
+        },
+        {
+          "line": "main",
+          "text": "public abstract class Plugin",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:15"
+        },
+        {
+          "line": "main",
+          "text": "protected Plugin(string name)",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:22"
+        },
+        {
+          "line": "main",
+          "text": "protected PluginFunction<TReturn> Function<TReturn>(string member)",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:34"
+        },
+        {
+          "line": "main",
+          "text": "protected PluginFunction<TReturn> Function<TReturn>()",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:54"
+        },
+        {
+          "line": "main",
+          "text": "protected PluginProperty<TValue> Property<TValue>(string member)",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:72"
+        },
+        {
+          "line": "main",
+          "text": "protected PluginCommand Command(string member)",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:82"
+        },
+        {
+          "line": "main",
+          "text": "protected PluginCommand Command()",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:100"
+        },
+        {
+          "line": "main",
+          "text": "/// Declares the functions, properties, and commands a Reactive Plan may use on a named plugin.",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:7"
+        },
+        {
+          "line": "main",
+          "text": "/// For example, <c>plan.RegisterPlugin(\"auth\", p =&gt; p.Method&lt;string&gt;(\"getToken\"))</c>.",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:8"
+        },
+        {
+          "line": "main",
+          "text": "return AddMethod<T>(name, MethodArgumentContract.Open);",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:26"
+        },
+        {
+          "line": "main",
+          "text": "public PluginTypeBuilder Command(string name) =>",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:78"
+        },
+        {
+          "line": "main",
+          "text": "_shapes.Add(Shape.FromClrType(typeof(T)));",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:183"
+        },
+        {
+          "line": "main",
+          "text": "public void RegisterPlugin(string pluginName, Action<Builders.PluginTypeBuilder> configure)",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:55"
+        },
+        {
+          "line": "main",
+          "text": "public void RegisterPlugin(Plugin plugin)",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:68"
+        },
+        {
+          "line": "main",
+          "text": "public TPlugin RegisterPlugin<TPlugin>()",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:77"
+        },
+        {
+          "line": "main",
+          "text": "throw new InvalidOperationException($\"Plugin '{contract.Name.Value}' is already registered.\");",
+          "cite": "Alis.Reactive/PlanModel/BrowserObjects/BrowserObjectContracts.cs:45"
+        },
+        {
+          "line": "main",
+          "text": "throw new ArgumentException(\"Plugin name must not contain whitespace.\", nameof(value));",
+          "cite": "Alis.Reactive/PlanModel/WireTerms/PlanTerms.cs:176"
+        },
+        {
+          "line": "main",
+          "text": "if (this.plugins.has(name)) throw new Error(`[alis] plugin \"${name}\" already registered`);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/catalog.ts:14"
+        },
+        {
+          "line": "main",
+          "text": "if (!plugin) throw new Error(`[alis] plugin not found: \"${name}\"`);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/catalog.ts:21"
+        },
+        {
+          "line": "main",
+          "text": "throw new Error(`[alis] plugin \"${name}\" must be an object or function`);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/catalog.ts:64"
+        },
+        {
+          "line": "main",
+          "text": "const pendingPlugins = pluginQueue.__alisPlugins;",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:47"
+        },
+        {
+          "line": "main",
+          "text": "registerPlugin(entry.name, entry.instance);",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:51"
+        },
+        {
+          "line": "main",
+          "text": "delete pluginQueue.__alisPlugins;",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:53"
+        },
+        {
+          "line": "redesign",
+          "text": "/// A JavaScript object the page registers by name, for work the DSL does not model (URL, DOM and array",
+          "cite": "Alis.Reactive/Components/Plugin.cs:6"
+        },
+        {
+          "line": "redesign",
+          "text": "/// called and read: it raises no events a page subscribes to. A JavaScript object that raises events",
+          "cite": "Alis.Reactive/Components/Plugin.cs:8"
+        },
+        {
+          "line": "redesign",
+          "text": "/// is brought as a component.",
+          "cite": "Alis.Reactive/Components/Plugin.cs:9"
+        },
+        {
+          "line": "redesign",
+          "text": "public abstract class Plugin : JsObject",
+          "cite": "Alis.Reactive/Components/Plugin.cs:26"
+        },
+        {
+          "line": "redesign",
+          "text": "protected Plugin(string name)",
+          "cite": "Alis.Reactive/Components/Plugin.cs:32"
+        },
+        {
+          "line": "redesign",
+          "text": "public string Name => _name.Value;",
+          "cite": "Alis.Reactive/Components/Plugin.cs:38"
+        },
+        {
+          "line": "redesign",
+          "text": "public TPlugin RegisterPlugin<TPlugin>()",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:42"
+        },
+        {
+          "line": "redesign",
+          "text": "_context.RegisterPlugin(plugin.Name);",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:46"
+        },
+        {
+          "line": "redesign",
+          "text": "$\"Plugin '{name}' is registered twice on the plan of {View}: register it once, and use the plugin \" +",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:158"
+        },
+        {
+          "line": "redesign",
+          "text": "throw new ArgumentException(\"Plugin name must not contain whitespace.\", nameof(value));",
+          "cite": "Alis.Reactive/WireTerms/PlanTerms.cs:71"
+        },
+        {
+          "line": "redesign",
+          "text": "const plugins = new Map<string, Plugin>();",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plugins.ts:21"
+        },
+        {
+          "line": "redesign",
+          "text": "if (plugins.has(name)) throw new Error(`[alis] plugin \"${name}\" is already registered`);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plugins.ts:24"
+        },
+        {
+          "line": "redesign",
+          "text": "if (!canHaveMembers(instance)) throw new Error(`[alis] plugin \"${name}\" must be an object or function`);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plugins.ts:35"
+        },
+        {
+          "line": "redesign",
+          "text": "return { object: () => instance };",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plugins.ts:36"
+        },
+        {
+          "line": "redesign",
+          "text": "registerPlugin(\"alis.model\", modelPlugin);",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:29"
+        },
+        {
+          "line": "redesign",
+          "text": "registerPlugin(\"alis.form\", formPlugin);",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:30"
+        },
+        {
+          "line": "redesign",
+          "text": "for (const plugin of runtimeWindow.__alisPlugins ?? []) registerPlugin(plugin.name, pluginOf(plugin.name, plugin.instance));",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:44"
+        },
+        {
+          "line": "redesign",
+          "text": "delete runtimeWindow.__alisPlugins;",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:45"
+        },
+        {
+          "line": "proposed",
+          "text": "public NightClock() : base(\"nightclock\", EventListening.CallbackProperties) { }",
+          "doors": [
+            "N17.11"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public BedStore() : base(\"bedstore\", EventListening.ReturnedUnsubscriber(\"subscribe\")) { }",
+          "doors": [
+            "N17.11"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public MethodResult<string> Of(Arg<string> name) => CallItself<string>([name]);",
+          "doors": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public void Add(Arg<string> note) => Method([note]);",
+          "doors": [
+            "N5.3"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "none",
+        "obj",
+        "call",
+        "method",
+        "assignment",
+        "returned"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:15-127"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:11-186"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:55-82"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanModel/BrowserObjects/BrowserObjectContracts.cs:42-48"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanModel/WireTerms/PlanTerms.cs:171-190"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/Plugin.cs:26-39"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:42-49"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:153-161"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/WireTerms/PlanTerms.cs:66-85"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/catalog.ts:8-68"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:45-54"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plugins.ts:21-37"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:27-45"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q7",
+        "Q5",
+        "Q4",
+        "Q18"
+      ],
+      "meanings": [
+        {
+          "id": "M13.D1",
+          "meaning": "A plugin's name names one object in a plan, and the plan writes one locator for it, whatever reaches it: each declaration of that name, reached by a step or a handler, and a vendor's lookup by that name (N17.6). Two declarations of one name are two views of that object, each reaching the members it declares. Only a declaration that declares an event has its listening read (X17.45), so the locator carries the listening of the declarations of that name that declare one, and EventTarget when none does; a declaration that declares no event and a vendor's lookup add no listening. Two declarations of one name that each declare an event and whose listening differs are refused: at build by ALIS034 when both are constants of one compilation, and where the view renders when one plan reaches both, naming both declarations."
+        }
+      ],
+      "oracle": "ECMAScript's typeof, property read and call, by which a provided instance is any value and a member a number lacks reads undefined; the DOM Standard's EventTarget; C#'s new() constraint and a protected base constructor, by which the core makes a declaration with new T() (D5.12); and the page's queue, an array the page's code pushes onto before boot and a push the runtime takes after it (D17.14).",
+      "checker": [
+        "core:Q17",
+        "core:Q4",
+        "core:Q18",
+        "Absence.tla:RequiredAbsentStops",
+        "Absence.tla:LackingRequiredStops",
+        "Absence.tla:StopEndsOnlyItsHandler"
+      ],
+      "defects": [
+        {
+          "id": "X17.25",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.26",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.27",
+          "rung": "analyzer"
+        },
+        {
+          "id": "M13.X1",
+          "rung": "analyzer",
+          "defect": "Two declarations of one plugin name that each declare an event and whose listening differs both render, and the plan's one locator for the name carries the listening the last reach wrote, as the POC writes it (poc/Alis.Reactive.Poc/Writing/PlanBuild.cs:436-441), so the other declaration's handlers listen by a kind their object does not raise by and never run (M13.D1). ALIS034 (N18.12) reports two constant declarations of one name, each declaring an event, whose listening differs in one compilation; where the view renders, a plan that reaches both is refused, naming both declarations."
+        },
+        {
+          "id": "M13.X2",
+          "rung": "behavior",
+          "defect": "A declaration that declares no event, or a vendor's lookup, reached after a declaration of one name that declares one writes its EventTarget over that declaration's listening, so the event's handlers listen by a kind their object does not raise by (M13.D1)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.25",
+          "page": "A visitor desk page whose VisitorBook : Plugin(\"visitorbook\") declares Visits, a ReadOnly<int>, and Signed, an Event. The desk's script holds the book, an EventTarget whose visits is 3, and provides nothing at boot: its button Open the visitor book pushes {\"name\": \"visitorbook\", \"instance\": book} onto window.__alisPlugins and then writes book ready into book-state, and its button Sign the book dispatches signed on the book and writes signed into book-own. The view's buttons: Count the visits writes tried into count-tried, then the book's Visits into visits, then counted into count-done; Greet the visitor writes welcome into greeting. The book's Signed handler writes signed into book-signed.",
+          "gesture": "Click Count the visits and Greet the visitor; click Open the visitor book and wait until book-state reads book ready; click Count the visits; click Sign the book and wait until book-own reads signed.",
+          "outcome": "After the first Count the visits count-tried reads tried, and visits and count-done are empty; greeting reads welcome; after the second Count the visits visits reads 3 and count-done reads counted; after Sign the book book-own reads signed and book-signed is empty.",
+          "opposite": "The same desk whose script pushes the book as it loads, before the runtime boots: Count the visits writes 3 into visits and counted into count-done at the first click, and Sign the book writes signed into book-signed.",
+          "defect": "The redesign deletes the queue at boot (Alis.Reactive.Assets/runtime/root.ts:44-45 at 65fdf118d), so the push of Open the visitor book is dropped with no word and the second Count the visits stops again: visits and count-done stay empty. A runtime that subscribes a plan's handlers when their plugin arrives writes signed into book-signed.",
+          "existing_test": "redesign WhenThePageMeetsAPluginItCannotUse.a_step_reaching_a_plugin_no_script_registered_fails_only_its_own_pipeline"
+        },
+        {
+          "for": "X17.26",
+          "page": "A night ward page whose layout loads three scripts before the runtime: the ward's pushes {\"name\": \"shiftlog\"} with entries 2, the agency's pushes {\"name\": \"shiftlog\"} with entries 9, and the lantern's pushes {\"name\": \"lantern\", \"instance\": 42}. ShiftLog declares Entries, a ReadOnly<int>; Lantern : Plugin(\"lantern\") declares Colour, a ReadOnly<string>. The page's load writes the page started into started. Read the log writes tried into log-tried, then the log's Entries into entries, then read into log-done; Read the lantern writes tried into lantern-tried, then the lantern's Colour into colour, then read into lantern-done; Start the round writes started into round.",
+          "gesture": "Click Read the log, Read the lantern and Start the round, then Read the log again.",
+          "outcome": "started reads the page started; after each Read the log log-tried reads tried, and entries and log-done are empty; lantern-tried reads tried, and colour and lantern-done are empty; round reads started.",
+          "opposite": "The same page with the agency's script left out and the lantern provided as {\"colour\": \"amber\"}: Read the log writes 2 into entries and read into log-done, and Read the lantern writes amber into colour and read into lantern-done.",
+          "defect": "The redesign stops the whole page for a name provided twice and for a value that is no object (Alis.Reactive.Assets/runtime/objects/plugins.ts:24 and Alis.Reactive.Assets/runtime/objects/plugins.ts:35 at 65fdf118d), so started stays empty and no button runs, which its tests WhenThePageMeetsAPluginItCannotUse.a_plugin_name_a_second_bundle_registers_again_stops_the_page_from_starting and a_plugin_a_bundle_registers_as_something_that_holds_no_members_stops_the_page_from_starting assert and this promise flips. A registry that keeps the first provide writes 2 into entries, and one that keeps the last writes 9."
+        },
+        {
+          "for": "M13.X2",
+          "page": "A night desk page whose script provides nightclock before the runtime boots: a plain object with no addEventListener, holding hour \"12\", that calls its onStruck property when the clock's own button Strike midnight is clicked. NightClock : Plugin(\"nightclock\", EventListening.CallbackProperties) declares Struck, an Event heard through onStruck, and its handler writes midnight into clock-struck; NightClockFace : Plugin(\"nightclock\") declares Hour, a ReadOnly<string>, and no event. Rendered after the clock's handler, the button Read the hour writes the face's Hour into hour.",
+          "gesture": "Click Read the hour, then Strike midnight.",
+          "outcome": "hour reads 12 and clock-struck reads midnight.",
+          "opposite": "The same page with the button Read the hour rendered before the clock's handler: the same clicks write 12 into hour and midnight into clock-struck, so the order the view writes its reaches in does not decide the clock's listening.",
+          "defect": "The plan's one locator for nightclock carries the listening of the reach the view wrote last, as the POC writes it (poc/Alis.Reactive.Poc/Writing/PlanBuild.cs:439), so NightClockFace's EventTarget replaces NightClock's callback property; the handler looks for addEventListener on a clock that lacks it and does not start (D12.8), and clock-struck stays empty. A vendor's lookup by a plugin's name writes the same locator with EventTarget (poc/Alis.Reactive.Poc/Writing/PlanBuild.cs:419, poc/Alis.Reactive.Poc/Components/Component.cs:128), the same defect."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "Plugin.Command() -> PluginCommand!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a command, a call with no member under the target name root (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:100-105 at 623dd4a27), its argument shapes checked only where the view renders. The rewrite calls the object itself with CallItself, a call with no path applied with this undefined, its arguments typed by the declaring member's signature (D17.14, D5.9).",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "Plugin.Command(System.Action<PluginArgumentTypes!>! arguments) -> PluginCommand!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a command with listed argument types, a call with no member under the target name root (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:110-111 at 623dd4a27), its argument shapes checked only where the view renders. The rewrite calls the object itself with CallItself, a call with no path applied with this undefined, its arguments typed by the declaring member's signature (D17.14, D5.9).",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "Plugin.Command(string! member) -> PluginCommand!",
+          "verdict": "refused",
+          "reason": "Declares a member called for its effect, named by a string the plan writes as the call's target, its argument shapes read with typeof and checked only where the view renders (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:82-87 at 623dd4a27, Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). The rewrite declares it with Method over one list of Args, named by the declaring member's JavaScript name (D2.7), each argument typed by the member's own signature, which the compiler checks (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "Plugin.Command(string! member, System.Action<PluginArgumentTypes!>! arguments) -> PluginCommand!",
+          "verdict": "refused",
+          "reason": "Declares a member called for its effect with listed argument types, named by a string the plan writes as the call's target, its argument shapes read with typeof and checked only where the view renders (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:93-96 at 623dd4a27, Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). The rewrite declares it with Method over one list of Args, named by the declaring member's JavaScript name (D2.7), each argument typed by the member's own signature, which the compiler checks (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "Plugin.Function<TReturn>() -> PluginFunction<TReturn>!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a function that returns a value, a call with no member under the target name root (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:54-59 at 623dd4a27), its argument shapes checked only where the view renders. The rewrite calls the object itself with CallItself, a call with no path applied with this undefined, its arguments typed by the declaring member's signature (D17.14, D5.9).",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "Plugin.Function<TReturn>(System.Action<PluginArgumentTypes!>! arguments) -> PluginFunction<TReturn>!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a function that returns a value, with listed argument types, a call with no member under the target name root (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:65-66 at 623dd4a27), its argument shapes checked only where the view renders. The rewrite calls the object itself with CallItself, a call with no path applied with this undefined, its arguments typed by the declaring member's signature (D17.14, D5.9).",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "Plugin.Function<TReturn>(string! member) -> PluginFunction<TReturn>!",
+          "verdict": "refused",
+          "reason": "Declares a member that returns a value, named by a string the plan writes as the call's target, its argument shapes read with typeof and checked only where the view renders (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:34-39 at 623dd4a27, Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). The rewrite declares it with Method<T> over one list of Args, whose result is a source (M2.N1), named by the declaring member's JavaScript name (D2.7), each argument typed by the member's own signature, which the compiler checks (D5.9).",
+          "carriers": [
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "Plugin.Function<TReturn>(string! member, System.Action<PluginArgumentTypes!>! arguments) -> PluginFunction<TReturn>!",
+          "verdict": "refused",
+          "reason": "Declares a member that returns a value, with listed argument types, named by a string the plan writes as the call's target, its argument shapes read with typeof and checked only where the view renders (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:46-49 at 623dd4a27, Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). The rewrite declares it with Method<T> over one list of Args, whose result is a source (M2.N1), named by the declaring member's JavaScript name (D2.7), each argument typed by the member's own signature, which the compiler checks (D5.9).",
+          "carriers": [
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "Plugin.Property<TValue>(string! member) -> PluginProperty<TValue>!",
+          "verdict": "refused",
+          "reason": "Declares a readable property named by a string, with no presence mark and no write (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:72-77 at 623dd4a27). The rewrite declares it with Property<T>, ReadOnly<T> or WriteOnly<T>, named by the declaring member, marked optional where the vendor's typed API marks it (D5.3), and read with Read past it (N5.6).",
+          "carriers": [
+            "N17.11",
+            "N5.4",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "PluginArgumentTypes",
+          "verdict": "refused",
+          "reason": "An argument contract listed as types, each read with typeof into a shape (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:183 at 623dd4a27) and matched against the call's arguments where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:89 at 623dd4a27), so a call with a wrong or a missing argument compiles. The declaring member's own C# signature types each argument (D5.9), so the compiler refuses one.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginArgumentTypes.Arg<T>() -> PluginArgumentTypes!",
+          "verdict": "refused",
+          "reason": "An argument contract listed as types, each read with typeof into a shape (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:183 at 623dd4a27) and matched against the call's arguments where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:89 at 623dd4a27), so a call with a wrong or a missing argument compiles. The declaring member's own C# signature types each argument (D5.9), so the compiler refuses one.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginArgumentTypes.PluginArgumentTypes() -> void",
+          "verdict": "refused",
+          "reason": "An argument contract listed as types, each read with typeof into a shape (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:183 at 623dd4a27) and matched against the call's arguments where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:89 at 623dd4a27), so a call with a wrong or a missing argument compiles. The declaring member's own C# signature types each argument (D5.9), so the compiler refuses one.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCommand",
+          "verdict": "refused",
+          "reason": "A declared command held as a value, which a pipeline hands to p.Plugin(command) and completes with Fire (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:265-270 at 623dd4a27). The rewrite's command is the declaration's method, a C# method whose signature is its argument list (D5.9), called as a step at its line (D5.11).",
+          "carriers": [
+            "N5.3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginCommand.Arg<TArg>() -> PluginCommand!",
+          "verdict": "refused",
+          "reason": "An argument contract listed as types, each read with typeof into a shape (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:183 at 623dd4a27) and matched against the call's arguments where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:89 at 623dd4a27), so a call with a wrong or a missing argument compiles. The declaring member's own C# signature types each argument (D5.9), so the compiler refuses one.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCommand.Args(System.Action<PluginArgumentTypes!>! arguments) -> PluginCommand!",
+          "verdict": "refused",
+          "reason": "An argument contract listed as types, each read with typeof into a shape (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:183 at 623dd4a27) and matched against the call's arguments where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:89 at 623dd4a27), so a call with a wrong or a missing argument compiles. The declaring member's own C# signature types each argument (D5.9), so the compiler refuses one.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginFunction<TReturn>",
+          "verdict": "refused",
+          "reason": "A declared function held as a value, which a pipeline hands to p.Plugin<T>(function) for a builder whose conversion makes the source (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:214-219 at 623dd4a27). The rewrite's function is the declaration's Method<T>, whose result is a source itself (M2.N1), bound at its line (D5.11).",
+          "carriers": [
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PluginFunction<TReturn>.Arg<TArg>() -> PluginFunction<TReturn>!",
+          "verdict": "refused",
+          "reason": "An argument contract listed as types, each read with typeof into a shape (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:183 at 623dd4a27) and matched against the call's arguments where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:89 at 623dd4a27), so a call with a wrong or a missing argument compiles. The declaring member's own C# signature types each argument (D5.9), so the compiler refuses one.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginFunction<TReturn>.Args(System.Action<PluginArgumentTypes!>! arguments) -> PluginFunction<TReturn>!",
+          "verdict": "refused",
+          "reason": "An argument contract listed as types, each read with typeof into a shape (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:183 at 623dd4a27) and matched against the call's arguments where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:89 at 623dd4a27), so a call with a wrong or a missing argument compiles. The declaring member's own C# signature types each argument (D5.9), so the compiler refuses one.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginOperation",
+          "verdict": "refused",
+          "reason": "The base of a declared function and command, public so its two getters are (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:177-205 at 623dd4a27); an implementation detail no view, validator or component author needs. A plugin's member is a member of its declaration (D17.14).",
+          "carriers": [
+            "N5.3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginOperation.Member.get -> string!",
+          "verdict": "refused",
+          "reason": "Reports the member's name as text, root for the plugin itself (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:204-205 at 623dd4a27), an implementation detail no author reads. The plan writes the declaring member's JavaScript name (D2.7), and CallItself a call with no path.",
+          "carriers": [
+            "N5.3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginOperation.PluginName.get -> string!",
+          "verdict": "refused",
+          "reason": "Reports the plugin's name from a member's declaration (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:201-202 at 623dd4a27), a second door to what Plugin.Name, kept, gives; a member belongs to its declaration (D17.14).",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginProperty<TValue>",
+          "verdict": "refused",
+          "reason": "A declared readable property held as a value, which a pipeline hands to p.Plugin<T>(property) for a source (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:225-230 at 623dd4a27). The rewrite's property is the declaration's Property<T> or ReadOnly<T>, a source itself (M2.N1), written with Set when it is a Property<T> (D17.14).",
+          "carriers": [
+            "N17.11",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PluginProperty<TValue>.Member.get -> string!",
+          "verdict": "refused",
+          "reason": "Reports the property's name as text (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:255-256 at 623dd4a27), an implementation detail no author reads; the plan writes the declaring member's JavaScript name (D2.7).",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginProperty<TValue>.PluginName.get -> string!",
+          "verdict": "refused",
+          "reason": "Reports the plugin's name from a property's declaration (Alis.Reactive/PlanAuthoring/Plugins/Plugin.cs:252-253 at 623dd4a27), a second door to what Plugin.Name, kept, gives (D17.14).",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder",
+          "verdict": "refused",
+          "reason": "Declares a plugin's members by name inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), its methods, properties and the call of itself declared on a Plugin.",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Command() -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a command, an alias of Void() (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:104-105 at 623dd4a27), inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the call of itself declared with CallItself.",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Command(System.Action<PluginArgumentTypes!>! arguments) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a command with listed argument types, an alias of Void(arguments), inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the call of itself declared with CallItself over one list of Args.",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Command(string! name) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares a member command, an alias of Void(name) (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:78-79 at 623dd4a27), inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the member declared with Method over one list of Args.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Command(string! name, System.Action<PluginArgumentTypes!>! arguments) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares a member command with listed argument types, an alias of Void(name, arguments), inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the member declared with Method over one list of Args.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Function<T>() -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a function that returns a value inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the call of itself declared with CallItself<T>.",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Function<TReturn>(System.Action<PluginArgumentTypes!>! arguments) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a function that returns a value, with listed argument types inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the call of itself declared with CallItself<T> over one list of Args.",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Method<T>(string! name) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares a member that returns a value inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the member declared with Method<T> over one list of Args, whose result is a source (M2.N1).",
+          "carriers": [
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Method<TReturn>(string! name, System.Action<PluginArgumentTypes!>! arguments) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares a member that returns a value, with listed argument types inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the member declared with Method<T> over one list of Args, whose result is a source (M2.N1).",
+          "carriers": [
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Property<T>(string! name) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares a readable property inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the property declared with Property<T> or ReadOnly<T> and its presence mark.",
+          "carriers": [
+            "N17.11",
+            "N5.4"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Void() -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a command inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the call of itself declared with CallItself.",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Void(System.Action<PluginArgumentTypes!>! arguments) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares the plugin itself as a command with listed argument types inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the call of itself declared with CallItself over one list of Args.",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Void(string! name) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares a member command inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the member declared with Method over one list of Args.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginTypeBuilder.Void(string! name, System.Action<PluginArgumentTypes!>! arguments) -> PluginTypeBuilder!",
+          "verdict": "refused",
+          "reason": "Declares a member command with listed argument types inside a callback that runs where the view renders, named by a string with an open argument contract unless arguments are listed (Alis.Reactive/PlanAuthoring/Plugins/PluginTypeBuilder.cs:24-27 at 623dd4a27), so a call with any arguments passes. A plugin is a declaration whose members are typed (D17.14), the member declared with Method over one list of Args.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.RegisterPlugin(Plugin! plugin) -> void",
+          "verdict": "refused",
+          "reason": "Registers a plugin instance on the plan, and a second registration of one plugin is refused only where the view renders (Alis.Reactive/PlanModel/BrowserObjects/BrowserObjectContracts.cs:42-48 at 623dd4a27). A plugin is a declaration reached by its type, so a second registration on one plan is not representable (D17.14), and two declarations of one name are two views of one object (M13.D1).",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "ReactivePlan<TModel>.RegisterPlugin(string! pluginName, System.Action<PluginTypeBuilder!>! configure) -> void",
+          "verdict": "refused",
+          "reason": "The plugin's members are declared by name through PluginTypeBuilder when the view renders, so no type checks a member a pipeline calls. A plugin is a declaration whose members are typed, its name the one string at the plugin boundary (D17.14).",
+          "carriers": [
+            "N17.11"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M13.F2",
+      "summary": "A pipeline's reach to a plugin: p.Plugin<TPlugin>() reaches the plugin as its declaration, whose members a step reads, writes and calls in every block a component's member is used in, a handler, a condition's term and its branches and a callback's answer, each argument a literal or a source of its type; and plan.Plugin<TPlugin>().Reactive(..), a handler of a declared event, which subscribes when its plan starts and leaves at its owner's release. Main reaches a plugin by name strings, p.Plugin(name, member) and its kin, returning builders whose arguments are matched against declared shapes where the view renders and whose command is written only by Fire; the redesign calls the members of the plugin RegisterPlugin<TPlugin>() returned, and its runtime cannot subscribe to a page's plugin.",
+      "status": "main-only",
+      "types": [
+        "Alis.Reactive:PluginCallBuilder<TModel>",
+        "Alis.Reactive:PluginMemberBuilder<TReturn, TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Plugin(PluginCommand! command) -> PluginCallBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Plugin(string! pluginName) -> PluginCallBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Plugin(string! pluginName, string! member) -> PluginCallBuilder<TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Plugin<T>(PluginFunction<T>! function) -> PluginMemberBuilder<T, TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Plugin<T>(PluginProperty<T>! property) -> TypedPluginPropertySource<T>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Plugin<T>(string! pluginName) -> PluginMemberBuilder<T, TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Plugin<T>(string! pluginName, string! member) -> PluginMemberBuilder<T, TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.PluginProperty<T>(string! pluginName, string! member) -> TypedPluginPropertySource<T>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public PluginMemberBuilder<T, TModel> Plugin<T>(string pluginName, string member)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:166"
+        },
+        {
+          "line": "main",
+          "text": "var signature = Context.DeclarePluginMethod(PluginMethodRequirement.Function(",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:171"
+        },
+        {
+          "line": "main",
+          "text": "public Conditions.TypedPluginPropertySource<T> PluginProperty<T>(string pluginName, string member)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:200"
+        },
+        {
+          "line": "main",
+          "text": "public PluginCallBuilder<TModel> Plugin(string pluginName, string member)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:236"
+        },
+        {
+          "line": "main",
+          "text": "public PluginCallBuilder<TModel> Plugin(string pluginName)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:251"
+        },
+        {
+          "line": "main",
+          "text": "public PluginCallBuilder<TModel> Plugin(PluginCommand command)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:265"
+        },
+        {
+          "line": "main",
+          "text": "public sealed class PluginMemberBuilder<TReturn, TModel> where TModel : class",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:35"
+        },
+        {
+          "line": "main",
+          "text": "public static implicit operator TypedPluginSource<TReturn>(PluginMemberBuilder<TReturn, TModel> builder) =>",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:145"
+        },
+        {
+          "line": "main",
+          "text": "public sealed class PluginCallBuilder<TModel> where TModel : class",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:156"
+        },
+        {
+          "line": "main",
+          "text": "public void Fire()",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:269"
+        },
+        {
+          "line": "main",
+          "text": "var payloadPath = ExpressionPathHelper.ToEventPath(path);",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:41"
+        },
+        {
+          "line": "main",
+          "text": "_contract.AcceptInvocationArgument(_operation.Label, _values.Count, argument.Shape);",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83"
+        },
+        {
+          "line": "main",
+          "text": "_contract.AcceptInvocationComplete(_operation.Label, _values.Count);",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:89"
+        },
+        {
+          "line": "main",
+          "text": "object(pluginName: string, typeKey: string): RuntimeObject {",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/runtime-plan.ts:180"
+        },
+        {
+          "line": "main",
+          "text": "this.instances.resolve(pluginName),",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/runtime-plan.ts:184"
+        },
+        {
+          "line": "redesign",
+          "text": "///     public TypedSource&lt;string&gt; Slug(Arg&lt;string&gt; text) =&gt; Method&lt;string&gt;(text, name: \"\");   // the plugin is itself a function",
+          "cite": "Alis.Reactive/Components/Plugin.cs:16"
+        },
+        {
+          "line": "redesign",
+          "text": "///     public TypedSource&lt;int&gt; Count(Arg&lt;string[]&gt; items) =&gt; Method&lt;int&gt;(items);              // a member function",
+          "cite": "Alis.Reactive/Components/Plugin.cs:17"
+        },
+        {
+          "line": "redesign",
+          "text": "///     public void Mark(Arg&lt;string&gt; step) =&gt; Method(step);                                         // a member called for its effect",
+          "cite": "Alis.Reactive/Components/Plugin.cs:18"
+        },
+        {
+          "line": "redesign",
+          "text": "///     public ReadOnly&lt;string&gt; Version =&gt; ReadOnly&lt;string&gt;();                                     // a member read",
+          "cite": "Alis.Reactive/Components/Plugin.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "/// p.Element(\"board-code\").Text.Set(slugify.Slug(planner.Wing));",
+          "cite": "Alis.Reactive/Components/Plugin.cs:23"
+        },
+        {
+          "line": "redesign",
+          "text": ".Reactive(button => button.Click, p => tally.Add(4)))",
+          "cite": "tests/Alis.Reactive.Framework.App/Plugins/Tally.cshtml:16"
+        },
+        {
+          "line": "redesign",
+          "text": ".Reactive(button => button.Click, p => p.Element(\"total\").Text.Set(tally.Total)))",
+          "cite": "tests/Alis.Reactive.Framework.App/Plugins/Tally.cshtml:27"
+        },
+        {
+          "line": "redesign",
+          "text": ".Reactive(button => button.Click, p => tally.Mark.Set(3)))",
+          "cite": "tests/Alis.Reactive.Framework.App/Plugins/Tally.cshtml:29"
+        },
+        {
+          "line": "redesign",
+          "text": ".Reactive(button => button.Click, p => p.When(tally.HasPassedTheMark()).Truthy()",
+          "cite": "tests/Alis.Reactive.Framework.App/Plugins/Tally.cshtml:31"
+        },
+        {
+          "line": "redesign",
+          "text": "case \"plugin\":  return subscribePlugin(locator, event, listener, owner);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:28"
+        },
+        {
+          "line": "redesign",
+          "text": "pluginNamed(locator.name).subscribe!(locator.key, event, listener, owner);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:61"
+        },
+        {
+          "line": "redesign",
+          "text": "if (!plugin) throw new Error(`[alis] plugin not found: \"${name}\"`);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plugins.ts:30"
+        },
+        {
+          "line": "proposed",
+          "text": "var log = p.Plugin<ShiftLog>();",
+          "doors": [
+            "N17.11"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "log.Add(\"fed\");",
+          "doors": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "chart.TickLabel.Set(tick => log.Label(tick.Resident));",
+          "doors": [
+            "N17.9",
+            "N17.11"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "plan.Plugin<ShiftLog>().Reactive(log => log.Signed, p => p.Element(\"log-signed\").Text.Set(\"signed\"));",
+          "doors": [
+            "N17.11"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "plan.Plugin<BedStore>().Reactive(store => store.Freed, (freed, p) => p.Element(\"bed-freed\").Text.Set(freed.Bed));",
+          "doors": [
+            "N17.11"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "get",
+        "set",
+        "call",
+        "do",
+        "let",
+        "if",
+        "answer"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:166-270"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:35-275"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:9-92"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:42-49"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/runtime-plan.ts:170-188"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:25-62"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plugins.ts:28-37"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q7",
+        "Q5",
+        "Q4",
+        "Q12",
+        "Q2"
+      ],
+      "meanings": [],
+      "oracle": "ECMAScript's property read, assignment and call, with a function called with this undefined for CallItself; the DOM Standard's EventTarget, addEventListener and removeEventListener, by which the shift log is heard; and C#'s overload resolution and Arg<T>'s conversions, by which an argument of the wrong type does not compile (D7.3).",
+      "checker": [
+        "core:Q17",
+        "core:Q7",
+        "core:Q5",
+        "core:Q12",
+        "Absence.tla:ConditionTermsLazy",
+        "Absence.tla:StopEndsOnlyItsHandler",
+        "Ownership.tla:ListenOncePerObject",
+        "Ownership.tla:ListenLeavesWithItsOwner",
+        "CallbackProperty.tla:EveryHearerHearsOnceInOrder"
+      ],
+      "defects": [
+        {
+          "id": "X17.24",
+          "rung": "behavior"
+        },
+        {
+          "id": "X2.2",
+          "rung": "type"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.24",
+          "page": "A shift log page whose script provides four plugins on window.__alisPlugins before the runtime boots. shiftlog is an EventTarget holding entries, a number that starts at 0, add(note), which adds 1 to entries, and label(resident), which answers the resident followed by \": \" and the entries; its declaration ShiftLog : Plugin(\"shiftlog\") declares Entries, a Property<int>; Add(Arg<string> note), a Method; Label(Arg<string> resident), a Method<string>; and Signed, an Event. nightclock is declared Plugin(\"nightclock\", EventListening.CallbackProperties) with Struck, an Event heard through its onStruck property. bedstore is declared Plugin(\"bedstore\", EventListening.ReturnedUnsubscriber(\"subscribe\")) with Freed, an Event<BedFreed> with a string Bed, its subscribe returning its unsubscribe. initials is a function that answers a name's initials, declared Plugin(\"initials\") with Of(Arg<string> name) => CallItself<string>([name]). The script wires three buttons of its own: Sign the log dispatches signed on the shift log, Strike midnight calls the clock's onStruck, and Free bed 4 calls each freed subscriber with {\"bed\": \"4\"}. The view's buttons: Add a note calls Add(\"fed\") and writes Entries into entries; Set the entries to 5 writes 5 into Entries and Entries into entries; Check the log, when Entries is greater than 5, calls Add(\"checked\") and writes Entries into entries and busy into log-state, and otherwise writes quiet into log-state; Draw the dose chart draws a dose chart the app brings, with the ticks Ada and Bea, whose TickLabel, a Callback<TickArgs, string>, answers tick => shiftlog.Label(tick.Resident); Read the initials writes initials.Of(\"Ada Lovelace\") into initials-read. The handlers: the shift log's Signed writes signed into log-signed, the clock's Struck writes midnight into clock-struck, and the bed store's Freed writes the payload's Bed into bed-freed.",
+          "gesture": "Click Add a note and Check the log; click Set the entries to 5, Add a note, Check the log and Draw the dose chart; click Read the initials; click Sign the log, Strike midnight and Free bed 4.",
+          "outcome": "After the first Check the log entries reads 1 and log-state reads quiet; after the second entries reads 7 and log-state reads busy; the dose chart's ticks read Ada: 7 and Bea: 7; initials-read reads AL; log-signed reads signed, clock-struck reads midnight and bed-freed reads 4.",
+          "opposite": "Reload the page and click Check the log first: log-state reads quiet and entries stays empty, since the term read 0 and no branch called Add.",
+          "defect": "A page's plugin is an object with no subscribe (Alis.Reactive.Assets/runtime/objects/plugins.ts:36 at 65fdf118d) whose handler the redesign subscribes through that member (Alis.Reactive.Assets/runtime/objects/plan-objects.ts:61 at 65fdf118d), so no handler of a plugin starts and log-signed, clock-struck and bed-freed stay empty. A runtime that listens to a plugin by EventTarget whatever its declaration names leaves clock-struck and bed-freed empty while log-signed reads signed.",
+          "existing_test": "redesign WhenAPageUsesAPlugin.a_plugin_method_changes_what_its_property_reads"
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "PipelineBuilder<TModel>.Plugin(PluginCommand! command) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Takes a member declaration held as a value and returns a builder whose arguments end with Fire (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:265-270 at 623dd4a27). p.Plugin<TPlugin>() reaches the declaration itself, whose member is a method called as a step at its line (D5.11) with typed arguments (D5.9) (D17.14).",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Plugin(string! pluginName) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Calls a plugin itself as a command by its name and no member, the requirement written into the plan from the call itself where the view renders (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:251-260 at 623dd4a27), so no type checks the plugin, its member or its arguments. p.Plugin<TPlugin>() reaches the plugin as its declaration, whose members a step reads, writes and calls typed (D17.14).",
+          "carriers": [
+            "N17.11"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Plugin(string! pluginName, string! member) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "Calls a plugin's member as a command by its name and the member's name, the requirement written into the plan from the call itself where the view renders (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:236-246 at 623dd4a27), so no type checks the plugin, its member or its arguments. p.Plugin<TPlugin>() reaches the plugin as its declaration, whose members a step reads, writes and calls typed (D17.14).",
+          "carriers": [
+            "N17.11",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Plugin<T>(PluginFunction<T>! function) -> PluginMemberBuilder<T, TModel!>!",
+          "verdict": "refused",
+          "reason": "Takes a member declaration held as a value and returns a builder that converts to a source (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:214-219 at 623dd4a27). p.Plugin<TPlugin>() reaches the declaration itself, whose member is a Method<T> whose result is a source itself (M2.N1), bound at its line (D5.11) (D17.14).",
+          "carriers": [
+            "N17.11",
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Plugin<T>(PluginProperty<T>! property) -> TypedPluginPropertySource<T>!",
+          "verdict": "refused",
+          "reason": "Takes a member declaration held as a value and returns a source of a kind of its own (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:225-230 at 623dd4a27). p.Plugin<TPlugin>() reaches the declaration itself, whose member is a Property<T> or ReadOnly<T>, a source itself (M2.N1) (D17.14).",
+          "carriers": [
+            "N17.11",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Plugin<T>(string! pluginName) -> PluginMemberBuilder<T, TModel!>!",
+          "verdict": "refused",
+          "reason": "Calls a plugin itself for a value by its name and no member, the requirement written into the plan from the call itself where the view renders (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:183-193 at 623dd4a27), so no type checks the plugin, its member or its arguments. p.Plugin<TPlugin>() reaches the plugin as its declaration, whose members a step reads, writes and calls typed (D17.14).",
+          "carriers": [
+            "N17.11",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Plugin<T>(string! pluginName, string! member) -> PluginMemberBuilder<T, TModel!>!",
+          "verdict": "refused",
+          "reason": "Calls a plugin's member for a value by its name and the member's name, the requirement written into the plan from the call itself where the view renders (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:166-177 at 623dd4a27), so no type checks the plugin, its member or its arguments. p.Plugin<TPlugin>() reaches the plugin as its declaration, whose members a step reads, writes and calls typed (D17.14).",
+          "carriers": [
+            "N17.11",
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.PluginProperty<T>(string! pluginName, string! member) -> TypedPluginPropertySource<T>!",
+          "verdict": "refused",
+          "reason": "Reads a plugin's property by its name and the property's name, the requirement written into the plan from the call itself where the view renders (Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:200-208 at 623dd4a27), so no type checks the plugin, its member or its arguments. p.Plugin<TPlugin>() reaches the plugin as its declaration, whose members a step reads, writes and calls typed (D17.14).",
+          "carriers": [
+            "N17.11",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>",
+          "verdict": "refused",
+          "reason": "A command's arguments collected one call at a time and written into the pipeline only by Fire (Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:156-275 at 623dd4a27), so a call whose Fire is left off writes nothing and compiles. A declared method is called as a step where it is written (D5.11), its arguments one list of typed Args (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Fire() -> void",
+          "verdict": "refused",
+          "reason": "Appends the collected call to the pipeline (Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:269-274 at 623dd4a27), a terminal call a view can leave off. A declared method's call is the step itself, written at its line (D5.11).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>",
+          "verdict": "refused",
+          "reason": "A function's arguments collected one call at a time and turned into a source by an implicit conversion (Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:35-149 at 623dd4a27). A declared Method<T>'s result is a source itself (M2.N1), its arguments one list of typed Args (D5.9).",
+          "carriers": [
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "static PluginMemberBuilder<TReturn, TModel>.implicit operator TypedPluginSource<TReturn>!(PluginMemberBuilder<TReturn, TModel!>! builder) -> TypedPluginSource<TReturn>!",
+          "verdict": "refused",
+          "reason": "Makes the source of kind TypedPluginSource from the collected call (Alis.Reactive/PlanAuthoring/Plugins/PluginMemberBuilder.cs:145-148 at 623dd4a27), a source kind of its own. M2.N1's one source type replaces TypedPluginSource, and a Method<T>'s result is that source (N5.3).",
+          "carriers": [
+            "M2.N1",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg(System.DateTime value) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A DateTime literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg(bool value) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A bool literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg(decimal value) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A decimal literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg(double value) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A double literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg(int value) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A int literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg(long value) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A long literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg(string! value) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A string literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg<TArg>(TypedSource<TArg>! source) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A source as an argument, its shape matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:46-50 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a TypedSource<T> (D7.3), which the compiler checks.",
+          "carriers": [
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg<TPayload, TProp>(TPayload args, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "An event payload's member as an argument, named by a lambda over a placeholder argument and read by the member path the lambda gives (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:36-44 at 623dd4a27), main's second syntax for a source. The payload's member is a source read with Read (N5.6), which a declared method's Arg<T> takes (D7.3).",
+          "carriers": [
+            "N5.6",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.Arg<TResponse, TProp>(ResponseBody<TResponse!>! body, System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! path) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A response body's member as an argument, read by the member path a lambda gives (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:23-34 at 623dd4a27), main's second syntax for a source. The body's member is a source read with Read on the route's reply (N10.7, N5.6), which a declared method's Arg<T> takes (D7.3).",
+          "carriers": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "PluginCallBuilder<TModel>.ArgValue<TValue>(TValue value) -> PluginCallBuilder<TModel!>!",
+          "verdict": "refused",
+          "reason": "A literal of any type, its shape read with typeof where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 at 623dd4a27), a second door beside the typed literals. A declared method's Arg<T> takes a literal of its type (D7.3), and the plan's literal writer refuses what a plan cannot carry where the view renders.",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg(System.DateTime value) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A DateTime literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg(bool value) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A bool literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg(decimal value) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A decimal literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg(double value) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A double literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg(int value) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A int literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg(long value) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A long literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg(string! value) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A string literal argument, its shape read from its CLR type and matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a literal of its type (D7.3), and the compiler checks it against the member's signature (D5.9).",
+          "carriers": [
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg<TArg>(TypedSource<TArg>! source) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A source as an argument, its shape matched against the declared shapes where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:46-50 and Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:83 at 623dd4a27). A declared method's Arg<T> takes a TypedSource<T> (D7.3), which the compiler checks.",
+          "carriers": [
+            "N5.3",
+            "M2.N1"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg<TPayload, TProp>(TPayload args, System.Linq.Expressions.Expression<System.Func<TPayload, TProp>!>! path) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "An event payload's member as an argument, named by a lambda over a placeholder argument and read by the member path the lambda gives (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:36-44 at 623dd4a27), main's second syntax for a source. The payload's member is a source read with Read (N5.6), which a declared method's Arg<T> takes (D7.3).",
+          "carriers": [
+            "N5.6",
+            "N5.3"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.Arg<TResponse, TProp>(ResponseBody<TResponse!>! body, System.Linq.Expressions.Expression<System.Func<TResponse!, TProp>!>! path) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A response body's member as an argument, read by the member path a lambda gives (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:23-34 at 623dd4a27), main's second syntax for a source. The body's member is a source read with Read on the route's reply (N10.7, N5.6), which a declared method's Arg<T> takes (D7.3).",
+          "carriers": [
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "PluginMemberBuilder<TReturn, TModel>.ArgValue<TValue>(TValue value) -> PluginMemberBuilder<TReturn, TModel!>!",
+          "verdict": "refused",
+          "reason": "A literal of any type, its shape read with typeof where the view renders (Alis.Reactive/PlanAuthoring/Plugins/PluginArguments.cs:52-56 at 623dd4a27), a second door beside the typed literals. A declared method's Arg<T> takes a literal of its type (D7.3), and the plan's literal writer refuses what a plan cannot carry where the view renders.",
+          "carriers": [
+            "N5.3"
+          ]
+        }
+      ]
+    }
+  ]
+}

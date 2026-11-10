@@ -27,11 +27,10 @@ unload release. Module 9 of `spec/CLAUDE.md`.
 ## Boundaries
 
 `Into` is the request's door, claimed by module 6 (M6.F2); this module carries its slot meaning (D10.11). The plan's
-own types, `ReactivePlan<TModel>` and `PlanExtensions`, are this module's, and they also hold doors other modules own:
-`RegisterPlugin<TPlugin>()` and main's two `RegisterPlugin` overloads, module 13's, carried by N17.11; `BrowserRules`,
-module 8's; `Component<TComponent>()` and `Render<TComponent>`, module 12's, as `spec/InputsAndIds/module.md` names
-them; and `FormSummary`, refused and carried by the container's block (N14.3). A module that claims one of them moves
-its verdict out of M9.F1 in the same commit, or the verdicts check fails.
+own types, `ReactivePlan<TModel>` and `PlanExtensions`, are this module's, and they also hold doors other modules own,
+each claimed there: `RegisterPlugin<TPlugin>()` and main's two `RegisterPlugin` overloads in M13.F1, carried by N17.11;
+`BrowserRules` in M8.F3; `Render<TComponent>` in M12.F2. `Component<TComponent>()`, an app-level object's door, stays
+in M9.F1 until module 25 claims it, and `FormSummary` stays, refused and carried by the container's block (N14.3).
 
 What a release removes from a component and its vendor (D12.5: X12.7, X12.13, X12.16) is module 18's and module 12's; a
 hub or a stream a slot holds (X12.5, X12.6) is module 10's; a `listen` on an object a payload or a method hands over

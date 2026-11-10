@@ -4616,7 +4616,8 @@ shapes, starts and the payload's path of each event.
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4), two constant definitions of one vendor name whose data differ in one compilation
-  (M12.D1, M12.X1), and a constant object path or element path with an empty step (M12.X3).
+  (M12.D1, M12.X1), a constant object path or element path with an empty step (M12.X3), and two constant declarations
+  of one plugin name, each declaring an event, whose listening differs in one compilation (M13.D1, M13.X1).
 
 **Evidence.**
 - Three item-type finders (`Alis.Reactive/Inputs/FieldReference.cs:50-58`, `Alis.Reactive/Members/ClrShape.cs:82-90`,

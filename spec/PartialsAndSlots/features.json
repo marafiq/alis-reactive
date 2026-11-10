@@ -3,7 +3,7 @@
   "features": [
     {
       "id": "M9.F1",
-      "summary": "A view's plan: started in the view with the view's model, in a page, a partial, an editor template or a slot's content, and rendered at the view's end as a script of plan data; each view's plan is its own, nothing carries plan state between views on the server, and the plans of a page compose in the browser without merging, each with the owner whose container holds its script. The plan's types also hold doors of other modules until they claim them: plugin registration, a validator's browser rules, a component joined to the plan and a form's summary.",
+      "summary": "A view's plan: started in the view with the view's model, in a page, a partial, an editor template or a slot's content, and rendered at the view's end as a script of plan data; each view's plan is its own, nothing carries plan state between views on the server, and the plans of a page compose in the browser without merging, each with the owner whose container holds its script. The plan's types also hold a form's summary, refused for the container's block (N14.3), and an app-level object's door until module 25 claims it; their plugin registration, a validator's browser rules and a component joined to the plan are claimed by modules 13, 8 and 12.",
       "status": "both",
       "types": [
         "Alis.Reactive:PlanExtensions",
@@ -226,22 +226,6 @@
           "reason": "Indented plan JSON for a view that prints its own plan, which only the framework's sandbox pages do, each in a pre element (AIAssistView/Index.cshtml:125 at 623dd4a27). No view author needs the plan as text: the block's end writes the plan's script into the page, where the browser's developer tools show it. No door hands a view its plan indented; the sandbox's plan panel goes.",
           "carriers": [
             "N14.2"
-          ]
-        },
-        {
-          "door": "ReactivePlan<TModel>.RegisterPlugin(Plugin! plugin) -> void",
-          "verdict": "refused",
-          "reason": "Registers a plugin instance on the plan, and a second registration of one plugin is refused only where the view renders (Alis.Reactive/PlanModel/BrowserObjects/BrowserObjectContracts.cs:42-48 at 623dd4a27). A plugin is a declaration reached by its type, so a second registration on one plan is not representable (D17.14).",
-          "carriers": [
-            "N17.11"
-          ]
-        },
-        {
-          "door": "ReactivePlan<TModel>.RegisterPlugin(string! pluginName, System.Action<PluginTypeBuilder!>! configure) -> void",
-          "verdict": "refused",
-          "reason": "The plugin's members are declared by name through PluginTypeBuilder when the view renders, so no type checks a member a pipeline calls. A plugin is a declaration whose members are typed, its name the one string at the plugin boundary (D17.14).",
-          "carriers": [
-            "N17.11"
           ]
         }
       ]
