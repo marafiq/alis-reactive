@@ -85,6 +85,16 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionBreadcrumb/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts:144`, `:223`).
+- `M21.N8` kept: `FusionButton`: `Content`, `IconCss` and `CssClass` as `Property<string>`, `Disabled`, `IsPrimary` and
+  `IsToggle` as `Property<bool>`, `IconPosition` as `Property<FusionButtonIconPosition>`, `DataBind`, `Click` and
+  `FocusIn`; the enum `FusionButtonIconPosition`, EJ2's `IconPosition` under the redesign's name beside the class, as a
+  nested type would share the property's name (CS0102), written by its names through a string enum converter (M21.X801);
+  and the render helper `Html.FusionButton(plan, elementId, build => ..)`, which returns the rendered component in place
+  of main's `FusionButtonBuilder<TModel>`. It replaces main's five files
+  (`Alis.Reactive.Fusion/Components/FusionButton/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-buttons/src/button/button.d.ts:86`, `:58`, `:79`, `:64`, `:70`, `:92`, `:51`, `:8`, `:176`, `:184`,
+  `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N10` kept: `FusionCheckBox`: `Checked`, `Indeterminate` and `Disabled` as `Property<bool>`, `DataBind`, `Click`,
   `FocusIn` and `Change`, with `IInputComponent.Input` committed by `Change` (M7.N3); the payload
   `FusionCheckBox.ChangeEventArgs` (`Checked`, `probe:ej2-payload-checkbox-change`); and the render helpers
@@ -161,6 +171,28 @@ Each name is gate 2's; each door is the capability it carries.
   their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:93`, `:511`, `:517`,
   `@syncfusion/ej2-calendars/src/calendar/calendar.d.ts:551`, `:698`, `:710`).
+- `M21.N18` kept: `FusionDialog`: `Show`, `Hide` and `RefreshPosition`; `BeforeOpen` and `BeforeClose` and their
+  payloads `FusionDialog.BeforeOpenEventArgs` (`Cancel`) and `FusionDialog.BeforeCloseEventArgs` (`Cancel`,
+  `IsInteracted`); `Open`, `Close` and `OverlayClick`, each an `Event` with no payload (D17.4), as EJ2 types them
+  `Object`; its templates and buttons, the vendor builder's through `build` in 1.0, a footer button's click a gate 2
+  item; and the render helper `Html.FusionDialog(plan, elementId, build => ..)`, which returns the rendered component in
+  place of main's `FusionDialogBuilder<TModel>`. It replaces main's eleven files
+  (`Alis.Reactive.Fusion/Components/FusionDialog/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-popups/src/dialog/dialog.d.ts:813`, `:820`, `:798`, `:588`, `:605`, `:572`, `:596`, `:636`, `:134`,
+  `:159`, `:163`).
+- `M21.N19` kept: `FusionDropDownButton`: `Content` and `CssClass` as `Property<string>`, `Disabled` as
+  `Property<bool>`, `DataBind`, `Toggle`, `FocusIn`, `RemoveItems(items, isUniqueId)` and `Select`; the payload
+  `FusionDropDownButton.MenuEventArgs` (`Item`) and its item `FusionDropDownButton.ItemModel` (`Id`, `Text`, `IconCss`,
+  `Url`, `Separator`, `Disabled`), each named by `[JsonPropertyName]` (M21.X807); and the render helper
+  `Html.FusionDropDownButton(plan, elementId, build => ..)`, which returns the rendered component in place of main's
+  `FusionDropDownButtonBuilder<TModel>`. It replaces main's seven files
+  (`Alis.Reactive.Fusion/Components/FusionDropDownButton/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-splitbuttons/src/drop-down-button/drop-down-button.d.ts:68`, `:75`, `:81`, `:215`, `:308`, `:239`,
+  `:188`, `@syncfusion/ej2-splitbuttons/src/common/common.d.ts:72`,
+  `@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:21`, `:35`, `:14`, `:42`, `:28`, `:49`,
+  `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N20` kept: `FusionDropDownList<TValue>`, TValue the type of the member it binds, as EJ2 marks DropDownList's
   value a generic type (`@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:306`): `Value`, a
   `Property<TValue>` whose type argument admits null, `Text` as `Property<string?>` (M21.X506), `DataSource<TItem>()`,
@@ -321,6 +353,16 @@ Each name is gate 2's; each door is the capability it carries.
   => ..)`. It replaces main's eight files (`Alis.Reactive.Fusion/Components/FusionPivotView/` at 623dd4a27), whose doors
   carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1447`, `:1476`, `:2244`, `:2460`, `:2467`, `:2816`).
+- `M21.N35` kept: `FusionProgressButton`: `Content` and `CssClass` as `Property<string>`, `Disabled` and
+  `EnableProgress` as `Property<bool>`, `DataBind`, `Start()` and `Start(percent)`, `Stop`, `ProgressComplete`,
+  `FocusIn`, `Begin`, `Progress` and `End`; the payload `FusionProgressButton.ProgressEventArgs`, `Percent` and `Step`
+  as `Property<double>` (M21.X802) and `CurrentDuration` as `ReadOnly<double>`; and the render helper
+  `Html.FusionProgressButton(plan, elementId, build => ..)`, which returns the rendered component in place of main's
+  `FusionProgressButtonBuilder<TModel>`. It replaces main's seven files
+  (`Alis.Reactive.Fusion/Components/FusionProgressButton/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts:140`, `:134`, `:121`, `:90`, `:218`, `:224`,
+  `:230`, `:279`, `:175`, `:182`, `:189`, `:312`, `:316`, `:322`, `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N36` kept: `FusionRadioButton`: `Checked` and `Disabled` as `Property<bool>`, `DataBind`, `GetSelectedValue`,
   `Click`, `FocusIn` and `Change`; the payload `FusionRadioButton.ChangeArgs` (`Value`,
   `probe:ej2-payload-radiobutton-change`); and the render helper `Html.FusionRadioButton(plan, elementId, build => ..)`,
@@ -364,6 +406,16 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inputs/src/slider/slider.d.ts:366`, `:514`, `:521`, `:70`, `:76`, `:80`, `:84`, `:88`,
   `@syncfusion/ej2-base/src/component.d.ts:129`).
+- `M21.N42` kept: `FusionSmartPasteButton`: `Disabled` as `Property<bool>`, `Click` and `FocusIn`; the render helper
+  `Html.FusionSmartPasteButton(elementId, options => ..)` with `FusionSmartPasteButtonOptions` (`Content`,
+  `AiAssistEndpoint`, `CssClass`, `IsPrimary`), which writes the construction options and the page's antiforgery request
+  token into the button with no script and refuses an empty endpoint (M21.X805); and the framework's component code
+  (`Alis.Reactive.Assets/components/fusion/smart-paste-button.ts` at 65fdf118d), which builds the SmartPasteButton when
+  the element mounts and carries the AI boundary of M21.D801 (M21.X803, M21.X804). It replaces main's four files
+  (`Alis.Reactive.Fusion/Components/FusionSmartPasteButton/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-buttons/src/button/button.d.ts:64`, `:176`, `:184`,
+  `@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.d.ts:16`, `:23`).
 - `M21.N43` kept: `FusionSmartTextArea`: `Value` as `Property<string?>` (M21.X604), `FocusIn`, `Change`,
   `BeforeSuggestionInsert` and `AfterSuggestionInsert`, with `IInputComponent.Input` committed by `Change` (M7.N3); the
   payloads `FusionSmartTextArea.ChangedEventArgs` (`Value`, `PreviousValue`, `IsInteracted`),
@@ -379,6 +431,18 @@ Each name is gate 2's; each door is the capability it carries.
   `@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:39`, `:186`, `:281`,
   `@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:11`, `:23`, `:27`), and `insertedText` the member its JavaScript
   hands (`@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.js:420`, `:508`).
+- `M21.N44` kept: `FusionSplitButton`: `Content` and `CssClass` as `Property<string>`, `Disabled` as `Property<bool>`,
+  `DataBind`, `Toggle`, `FocusIn`, `RemoveItems(items, isUniqueId)`, `Click`, an `Event` with no payload (D17.4), and
+  `Select`; the payload `FusionSplitButton.MenuEventArgs` (`Item`) and its item `FusionSplitButton.ItemModel` (`Id`,
+  `Text`, `IconCss`, `Url`, `Separator`, `Disabled`), each named by `[JsonPropertyName]` (M21.X808); and the render
+  helper `Html.FusionSplitButton(plan, elementId, build => ..)`, which returns the rendered component in place of main's
+  `FusionSplitButtonBuilder<TModel>`. It replaces main's eight files
+  (`Alis.Reactive.Fusion/Components/FusionSplitButton/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts:32`, `:39`, `:45`, `:183`, `:204`, `:166`, `:102`,
+  `:120`, `@syncfusion/ej2-splitbuttons/src/common/common.d.ts:72`,
+  `@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:21`, `:35`, `:14`, `:42`, `:28`, `:49`,
+  `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N46` kept: `FusionSwitch`: `Checked` as `Property<bool>` and `Change`, with `IInputComponent.Input` committed by
   `Change` (M7.N3); the payload `FusionSwitch.ChangeEventArgs` (`Checked`), with no `IsInteracted`, which the browser
   does not hand (M21.X711, `probe:ej2-payload-switch-change`); and the render helpers `field.FusionSwitch()` and
@@ -419,6 +483,14 @@ Each name is gate 2's; each door is the capability it carries.
   main's seven files (`Alis.Reactive.Fusion/Components/FusionToolbar/` at 623dd4a27), whose doors carry their verdicts
   in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts:344`, `:414`).
+- `M21.N52` kept: `FusionTooltip`, the Tooltip of `@syncfusion/ej2-popups`: `Open`, `Close` and `Refresh`;
+  `BeforeRender`, `BeforeOpen`, `AfterOpen`, `BeforeClose` and `AfterClose`, named as EJ2 raises them (M21.X806), and
+  their payload `FusionTooltip.TooltipEventArgs` (`Cancel`, `IsInteracted`); and the render helper
+  `Html.FusionTooltip(plan, elementId, build => ..)`, which returns the rendered component in place of main's
+  `FusionTooltipBuilder<TModel>`. It replaces main's eleven files (`Alis.Reactive.Fusion/Components/FusionTooltip/` at
+  623dd4a27), whose doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2
+  33.1.47's public member (`@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:541`, `:548`, `:555`, `:350`, `:361`,
+  `:369`, `:377`, `:385`, `:76`, `:96`).
 
 The meaning `M21.D1` and the defects `M21.X1` to `M21.X3` are in `spec/FusionComponents/features.json`, on the
 features they give.
@@ -602,3 +674,24 @@ features they give.
   and its component code; the rewrite calls the public `getFilesData()`
   (`@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:1177`), sends the files the user chose alone, and takes EJ2's
   class name, `FusionUploader`.
+- A button's icon position reaches EJ2 by name (M21.X801). The redesign writes `FusionButtonIconPosition` as its number,
+  since the enum carries no converter (`Alis.Reactive.Fusion/Components/FusionButton/FusionButtonIconPosition.cs:6` at
+  65fdf118d), and EJ2 calls `toLowerCase` on the value to place the icon
+  (`@syncfusion/ej2-buttons/src/button/button.js:124`), so on a button with text and an icon the write throws and the
+  button loses its icon. ALIS037 refuses that declaration; the rewrite's enum carries a string enum converter, written
+  Left, Right, Top or Bottom, and refuses a value outside the four where the view renders, as main's own map does.
+- An event is heard where its vendor raises it, with the payload it declares (M21.X806). Main's Tooltip `Opened` and
+  `Closed` listen to `open` and `close`, two of its methods (`@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:541`), so
+  they never fire; ALIS018 refuses such a declaration, and the rewrite's `AfterOpen` and `AfterClose` name EJ2's events.
+  Dialog's open, close and overlayClick, which EJ2 types `Object`, and SplitButton's click, whose payload holds the
+  element alone, are events with no payload (D17.4), so no member ships without a probe.
+- A progress handler steers its progress (M21.X802). The redesign declares the progress payload's `Percent` and `Step`
+  read-only, where EJ2 reads both back from the listener
+  (`@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.js:277`, `:280`); the rewrite declares them
+  `Property<double>`, and adds `Stop`, EJ2's public stop, which neither line declares.
+- A Smart Paste works against a protected endpoint and in a partial view, and a button with no endpoint is refused where
+  the view renders (M21.X803, M21.X804, M21.X805, M21.D801). Both lines post the AI request with no antiforgery token
+  (`Alis.Reactive.Assets/components/fusion/smart-paste-button.ts:18` at 65fdf118d), main builds the button in a script
+  that waits for DOMContentLoaded, and both read the text of any status as an answer. The rewrite sends EJ2's
+  ChatOptions as JSON with the page's request token in the header `RequestVerificationToken`, hands EJ2 the whole text
+  of a 200 to 299 response and nothing otherwise, never a stream, and builds the button when it mounts.

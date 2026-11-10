@@ -1411,6 +1411,332 @@
    ]
   },
   {
+   "id": "M21.F8",
+   "summary": "FusionButton: one declaration of the Syncfusion Button by its JavaScript names, content, iconCss, iconPosition, cssClass, disabled, isPrimary, isToggle, dataBind, click and focusIn, each EJ2 33.1.47's public member; the icon position EJ2's enum holds, written by its names; and the render helper that renders it under the developer's id. Main spreads the slice over five files whose writes and reads name members by strings over ComponentRef, each write followed by dataBind, and a builder class of its own; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component, with an icon position the live form writes as a number EJ2 cannot read, which the rewrite writes by name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionButton",
+    "Alis.Reactive.Fusion:FusionButtonBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionButtonExtensions",
+    "Alis.Reactive.Fusion:FusionButtonHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionButtonIconPosition"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(\"iconPosition\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonExtensions.cs:21"
+    },
+    {
+     "line": "main",
+     "text": ".EmitSet(IconPositionProperty, ValueExpression.Literal(ToSyncfusion(position)))",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonExtensions.cs:67"
+    },
+    {
+     "line": "main",
+     "text": "_ => throw new System.ArgumentOutOfRangeException(nameof(position), position, null)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonExtensions.cs:146"
+    },
+    {
+     "line": "main",
+     "text": "return new FusionButtonBuilder<TModel>(plan, elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonHtmlExtensions.cs:38"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<FusionButtonIconPosition> IconPosition => Property<FusionButtonIconPosition>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:37"
+    },
+    {
+     "line": "redesign",
+     "text": "public enum FusionButtonIconPosition",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonIconPosition.cs:6"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Click() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:52"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionButton>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:86"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionButton declares the EJ2 Button by its JavaScript names: content, iconCss and cssClass as Content, IconCss and CssClass, each a Property<string>; disabled, isPrimary and isToggle as Disabled, IsPrimary and IsToggle, each a Property<bool>; iconPosition as IconPosition, a Property<FusionButtonIconPosition>; and dataBind, click and focusIn as DataBind, Click and FocusIn; each EJ2 33.1.47's public member (@syncfusion/ej2-buttons/src/button/button.d.ts:86, :58, :79, :64, :70, :92, :51, :176, :184; @syncfusion/ej2-base/src/component.d.ts:129). EJ2's Button raises created alone (@syncfusion/ej2-buttons/src/button/button.d.ts:111), so the slice declares no event, and a click on the button is the element's own, heard through the DOM's EventTarget vendor (D17.3).",
+     "doors": [
+      "M21.N8",
+      "N5.4"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionButtonIconPosition is EJ2's IconPosition (@syncfusion/ej2-buttons/src/button/button.d.ts:8-25), Left, Right, Top and Bottom, under the redesign's name beside the class, since a type nested in FusionButton under EJ2's name would share its name with the IconPosition property, which C# refuses (CS0102). It carries a string enum converter, System.Text.Json's JsonStringEnumConverter<FusionButtonIconPosition> with integer values refused, so the live form writes each value by its name as EJ2's enum holds it (D7.7, M21.X801), and a value cast from a number outside the four throws where the view renders, as main's ToSyncfusion refuses it; X17.46 names JsonStringEnumConverter<FusionButtonIconPosition> alone, so the type check's reading of a converter by the names it writes is a gate 2 item.",
+     "doors": [
+      "M21.N8",
+      "N17.2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Main's SetContent, SetCssClass, SetDisabled, SetPrimary and SetToggle each write one member and call dataBind; the rewrite writes it with Set on the member's Property and calls DataBind() where the view wants the change at once, and main's SetIcon(iconCss, position) is IconCss.Set then IconPosition.Set.",
+     "doors": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionButton(plan, elementId, build => ..) renders the button under the id the developer chose on EJ2's ButtonBuilder, as both lines do, and returns the rendered component in place of main's FusionButtonBuilder<TModel>; pipeline.Component<FusionButton>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N8",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:6-8"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonBuilder.cs:14-52"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonExtensions.cs:9-148"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonHtmlExtensions.cs:15-40"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonIconPosition.cs:6-19"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:25-88"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionButton/FusionButtonIconPosition.cs:6-19"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Button as its TypeScript declares it (@syncfusion/ej2-buttons/src/button/button.d.ts, IconPosition there), and as its source places the icon (@syncfusion/ej2-buttons/src/button/button.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X801",
+     "rung": "analyzer",
+     "defect": "The redesign declares IconPosition as Property<FusionButtonIconPosition> (Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:37 at 65fdf118d) over an enum that carries no converter (Alis.Reactive.Fusion/Components/FusionButton/FusionButtonIconPosition.cs:6 at 65fdf118d), so the live form writes Right as the number 1 (spec/Core/DESIGN.md:1221), where EJ2's iconPosition holds the names of its IconPosition (@syncfusion/ej2-buttons/src/button/button.d.ts:51) and calls toLowerCase on it to place the icon (@syncfusion/ej2-buttons/src/button/button.js:124); on a change it removes the icon and places it again (@syncfusion/ej2-buttons/src/button/button.js:262-268), so on a button with text and an icon the write throws and leaves it with no icon. Main writes the name by its own map (Alis.Reactive.Fusion/Components/FusionButton/FusionButtonExtensions.cs:139 at 623dd4a27). The type check refuses an enum written as its number against the vendor's enum by ALIS037 (X17.46); the rewrite's FusionButtonIconPosition in M21.N8 carries a string enum converter, and the declaration passes when the type check reads that converter by the names it writes, a gate 2 item beside X17.46."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionButtonBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionButtonBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionButtonBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionButtonExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.Click<TModel>(this ComponentRef<FusionButton!, TModel!>! self) -> ComponentRef<FusionButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.Content<TModel>(this ComponentRef<FusionButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.CssClass<TModel>(this ComponentRef<FusionButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.Disabled<TModel>(this ComponentRef<FusionButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.FocusIn<TModel>(this ComponentRef<FusionButton!, TModel!>! self) -> ComponentRef<FusionButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.IsPrimary<TModel>(this ComponentRef<FusionButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.IsToggle<TModel>(this ComponentRef<FusionButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.SetContent<TModel>(this ComponentRef<FusionButton!, TModel!>! self, string! content) -> ComponentRef<FusionButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.SetCssClass<TModel>(this ComponentRef<FusionButton!, TModel!>! self, string! cssClass) -> ComponentRef<FusionButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.SetDisabled<TModel>(this ComponentRef<FusionButton!, TModel!>! self, bool disabled) -> ComponentRef<FusionButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.SetIcon<TModel>(this ComponentRef<FusionButton!, TModel!>! self, string! iconCss, FusionButtonIconPosition position) -> ComponentRef<FusionButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.SetPrimary<TModel>(this ComponentRef<FusionButton!, TModel!>! self, bool isPrimary) -> ComponentRef<FusionButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonExtensions.SetToggle<TModel>(this ComponentRef<FusionButton!, TModel!>! self, bool isToggle) -> ComponentRef<FusionButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionButtonHtmlExtensions.FusionButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.ButtonBuilder!>! build) -> FusionButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionButtonHtmlExtensions.FusionButton<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.ButtonBuilder!>! build) -> FusionButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N8",
+      "M12.N3"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F10",
    "summary": "FusionCheckBox: one declaration of the Syncfusion CheckBox by its JavaScript names, checked, indeterminate, disabled, dataBind, click, focusIn and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it; the input it is, its checked state committed by change; and the render helpers that render it bound to a member of bool. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name.",
    "status": "both",
@@ -4483,6 +4809,790 @@
      "verdict": "renamed",
      "to": [
       "M21.N17"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F18",
+   "summary": "FusionDialog: one declaration of the Syncfusion Dialog by its JavaScript names, show, hide, refreshPosition and its five events, each EJ2 33.1.47's public member; the payloads of beforeOpen and beforeClose, nested under EJ2's interface names, Cancel read back where EJ2 reads it; open, close and overlayClick, which EJ2 types Object, as events with no payload; its own templates and buttons, the vendor builder's in 1.0; and the render helper that renders it under the developer's id. Main spreads the slice over eleven files whose events and calls name members by strings over ComponentRef, payload classes with setters, and a builder class of its own whose Reactive extension wires the events; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionDialog",
+    "Alis.Reactive.Fusion:FusionDialogBeforeCloseArgs",
+    "Alis.Reactive.Fusion:FusionDialogBeforeOpenArgs",
+    "Alis.Reactive.Fusion:FusionDialogBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionDialogCloseArgs",
+    "Alis.Reactive.Fusion:FusionDialogClosedArgs",
+    "Alis.Reactive.Fusion:FusionDialogEvents",
+    "Alis.Reactive.Fusion:FusionDialogExtensions",
+    "Alis.Reactive.Fusion:FusionDialogHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionDialogOpenArgs",
+    "Alis.Reactive.Fusion:FusionDialogOpenedArgs",
+    "Alis.Reactive.Fusion:FusionDialogOverlayClickArgs",
+    "Alis.Reactive.Fusion:FusionDialogReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "\"open\", new FusionDialogOpenedArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogEvents.cs:25"
+    },
+    {
+     "line": "main",
+     "text": "\"close\", new FusionDialogClosedArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogEvents.cs:30"
+    },
+    {
+     "line": "main",
+     "text": "public bool IsInteracted { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnBeforeClose.cs:13"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Dialog(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Show() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs:26"
+    },
+    {
+     "line": "redesign",
+     "text": "public Event<FusionDialogOpenArgs> Open",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<bool> IsInteracted => ReadOnly<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs:69"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionDialog>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs:114"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDialog declares the EJ2 Dialog by its JavaScript names: show, hide and refreshPosition as Show, Hide and RefreshPosition; beforeOpen and beforeClose as BeforeOpen and BeforeClose, whose payloads are FusionDialog.BeforeOpenEventArgs and FusionDialog.BeforeCloseEventArgs; and open, close and overlayClick as Open, Close and OverlayClick; each EJ2 33.1.47's public member (@syncfusion/ej2-popups/src/dialog/dialog.d.ts:813, :820, :798, :588, :605, :572, :596, :636).",
+     "doors": [
+      "M21.N18",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDialog.BeforeOpenEventArgs reads Cancel, a Property<bool> EJ2 reads back to keep the dialog closed (@syncfusion/ej2-popups/src/dialog/dialog.d.ts:134; @syncfusion/ej2-popups/src/dialog/dialog.js:1622), and FusionDialog.BeforeCloseEventArgs reads Cancel, read back to keep it open (@syncfusion/ej2-popups/src/dialog/dialog.js:1739), and IsInteracted, a ReadOnly<bool> (@syncfusion/ej2-popups/src/dialog/dialog.d.ts:159, :163); each payload is nested under EJ2's interface name, where the redesign names them FusionDialogBeforeOpenArgs and FusionDialogBeforeCloseArgs, and declares no member for container, element, target and event, which hold the DOM's objects; maxHeight, closedBy and preventFocus, which neither line declares, are not added.",
+     "doors": [
+      "M21.N18",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Open, Close and OverlayClick are each an Event with no payload (D17.4), since EJ2 types all three Object (@syncfusion/ej2-popups/src/dialog/dialog.d.ts:572, :596, :636), so no member ships without a probe, and overlayClick hands its listener the DOM's own click event (@syncfusion/ej2-popups/src/dialog/dialog.js:183); they replace the redesign's empty FusionDialogOpenArgs, FusionDialogCloseArgs and FusionDialogOverlayClickArgs and main's FusionDialogOpenedArgs and FusionDialogClosedArgs.",
+     "doors": [
+      "M21.N18",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A Dialog's own templates and buttons are the slice's, and in 1.0 they are the vendor builder's, reached through build: Header, Content and FooterTemplate take markup the view writes as text, which is no data template of the Fusion templates (D15.2), and Buttons takes Syncfusion's DialogDialogButton, whose Click names a global JavaScript function, which a view never writes. FusionDialog declares no door for a footer button's click, a callback EJ2 types Object (@syncfusion/ej2-popups/src/dialog/dialog.d.ts:72), nor for getButtons, which returns Button[] | Button (@syncfusion/ej2-popups/src/dialog/dialog.d.ts:836), a union no probe pins. A footer button's click is a gate 2 item, its designed default none in 1.0: a dialog's actions are buttons of the view's own markup in its content, each under the id the view chose, found by pipeline.Element(id) and heard as the element's own click (D17.3).",
+     "doors": [
+      "M21.N18",
+      "M5.N5"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionDialog(plan, elementId, build => ..) renders the dialog under the id the developer chose on EJ2's DialogBuilder, as both lines do, and returns the rendered component in place of main's FusionDialogBuilder<TModel> and its Reactive extension; its Reactive(d => d.BeforeClose, pipeline) handles its events from the plan's start, and pipeline.Component<FusionDialog>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N18",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnBeforeClose.cs:7-14"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnBeforeOpen.cs:7-11"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnClosed.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnOpened.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/Events/FusionDialogOnOverlayClick.cs:8-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogBuilder.cs:14-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogEvents.cs:6-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogExtensions.cs:11-45"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogReactiveExtensions.cs:9-25"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs:23-116"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Dialog as its TypeScript declares it (@syncfusion/ej2-popups/src/dialog/dialog.d.ts, BeforeOpenEventArgs and BeforeCloseEventArgs there), and as its source raises its events (@syncfusion/ej2-popups/src/dialog/dialog.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionDialogBeforeCloseArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogBeforeCloseArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N18",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDialogBeforeCloseArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogBeforeCloseArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N18",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDialogBeforeOpenArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogBeforeOpenArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N18",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDialogBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionDialogBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionDialogBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionDialogClosedArgs",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogClosedArgs.FusionDialogClosedArgs() -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogEvents.BeforeClose.get -> TypedEvent<FusionDialogBeforeCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogEvents.BeforeOpen.get -> TypedEvent<FusionDialogBeforeOpenArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogEvents.Closed.get -> TypedEvent<FusionDialogClosedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogEvents.Opened.get -> TypedEvent<FusionDialogOpenedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogEvents.OverlayClick.get -> TypedEvent<FusionDialogOverlayClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionDialogOpenedArgs",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogOpenedArgs.FusionDialogOpenedArgs() -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "FusionDialogReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "static FusionDialogExtensions.Hide<TModel>(this ComponentRef<FusionDialog!, TModel!>! self) -> ComponentRef<FusionDialog!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDialogExtensions.RefreshPosition<TModel>(this ComponentRef<FusionDialog!, TModel!>! self) -> ComponentRef<FusionDialog!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDialogExtensions.Show<TModel>(this ComponentRef<FusionDialog!, TModel!>! self) -> ComponentRef<FusionDialog!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDialogHtmlExtensions.FusionDialog<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Popups.DialogBuilder!>! build) -> FusionDialogBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionDialogHtmlExtensions.FusionDialog<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Popups.DialogBuilder!>! build) -> FusionDialogBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionDialogReactiveExtensions.Reactive<TModel, TArgs>(this FusionDialogBuilder<TModel!>! builder, System.Func<FusionDialogEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionDialogBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N18"
+     ]
+    },
+    {
+     "door": "static readonly FusionDialogEvents.Instance -> FusionDialogEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N18"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F19",
+   "summary": "FusionDropDownButton: one declaration of the Syncfusion DropDownButton by its JavaScript names, content, cssClass, disabled, dataBind, toggle, focusIn, removeItems and select, each EJ2 33.1.47's public member; select's payload and its item, nested under EJ2's interface names; and the render helper that renders it under the developer's id. Main spreads the slice over seven files whose writes, calls and reads name members by strings over ComponentRef, two C# names for one removeItems, a payload class with a setter and a builder class of its own whose Reactive extension wires select; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionDropDownButton",
+    "Alis.Reactive.Fusion:FusionDropDownButtonBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionDropDownButtonEvents",
+    "Alis.Reactive.Fusion:FusionDropDownButtonExtensions",
+    "Alis.Reactive.Fusion:FusionDropDownButtonHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionDropDownButtonItem",
+    "Alis.Reactive.Fusion:FusionDropDownButtonReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionDropDownButtonSelectArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"removeItems\").WithArgs<string[], bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonExtensions.cs:33"
+    },
+    {
+     "line": "main",
+     "text": "if (items == null) throw new ArgumentNullException(nameof(items));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonExtensions.cs:108"
+    },
+    {
+     "line": "main",
+     "text": "public FusionDropDownButtonItem Item { get; set; } = new FusionDropDownButtonItem();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/Events/FusionDropDownButtonOnSelected.cs:9"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().DropDownButton(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonHtmlExtensions.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "public void RemoveItems(Arg<string[]> items, Arg<bool> isUniqueId) => Method(items, isUniqueId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:48"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<FusionDropDownButtonItem> Item => ReadOnly<FusionDropDownButtonItem>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:59"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionDropDownButton>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:102"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDropDownButton declares the EJ2 DropDownButton by its JavaScript names: content and cssClass as Content and CssClass, each a Property<string>; disabled as Disabled, a Property<bool>; dataBind, toggle and focusIn as DataBind, Toggle and FocusIn; removeItems as RemoveItems(items, isUniqueId); and select as Select, whose payload is FusionDropDownButton.MenuEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-splitbuttons/src/drop-down-button/drop-down-button.d.ts:68, :75, :81, :215, :308, :239, :188; @syncfusion/ej2-base/src/component.d.ts:129).",
+     "doors": [
+      "M21.N19",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDropDownButton.MenuEventArgs, EJ2's MenuEventArgs nested under its name (@syncfusion/ej2-splitbuttons/src/common/common.d.ts:70-74), reads Item, a FusionDropDownButton.ItemModel, EJ2's ItemModel nested under its name (@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:6-51): data whose Id, Text, IconCss and Url are text and Separator and Disabled booleans, each named by [JsonPropertyName] as ItemModel names it (X17.48) and optional as EJ2 marks it, so a member the item lacks reads nothing; select hands the item the user chose (@syncfusion/ej2-splitbuttons/src/drop-down-button/drop-down-button.js:649). It declares no member for element and event, the DOM's objects. The redesign's FusionDropDownButtonSelectArgs and FusionDropDownButtonItem, with Id, Text and Disabled, carry the same reads under the redesign's names, with no [JsonPropertyName].",
+     "doors": [
+      "M21.N19",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "RemoveItems(items, false) removes the items whose text the list names and RemoveItems(items, true) those whose id it names (@syncfusion/ej2-splitbuttons/src/drop-down-button/drop-down-button.d.ts:239), carrying main's RemoveItemsByText and RemoveItemsById, two C# names main gave one vendor method; main's ArgumentNullException on a null list is carried by the type of items, an Arg<string[]>, which admits no null, so a null literal draws C#'s nullable warning (CS8625) at build in place of a throw where the view renders (D7.3).",
+     "doors": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Main's SetContent, SetCssClass and SetDisabled each write one member and call dataBind; the rewrite writes it with Set on the member's Property and calls DataBind() where the view wants the change at once.",
+     "doors": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionDropDownButton(plan, elementId, build => ..) renders the button and its items under the id the developer chose on EJ2's DropDownButtonBuilder, as both lines do, and returns the rendered component in place of main's FusionDropDownButtonBuilder<TModel> and its Reactive extension; its Reactive(d => d.Select, pipeline) handles a choice from the plan's start, and pipeline.Component<FusionDropDownButton>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N19",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/Events/FusionDropDownButtonOnSelected.cs:6-25"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonBuilder.cs:14-54"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonExtensions.cs:12-120"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonHtmlExtensions.cs:15-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonReactiveExtensions.cs:9-26"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:25-104"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's DropDownButton as its TypeScript declares it (@syncfusion/ej2-splitbuttons/src/drop-down-button/drop-down-button.d.ts, MenuEventArgs in @syncfusion/ej2-splitbuttons/src/common/common.d.ts and ItemModel in @syncfusion/ej2-splitbuttons/src/common/common-model.d.ts), and as its source raises select (@syncfusion/ej2-splitbuttons/src/drop-down-button/drop-down-button.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X807",
+     "rung": "analyzer",
+     "defect": "FusionDropDownButtonItem carries no [JsonPropertyName] on either line (Alis.Reactive.Fusion/Components/FusionDropDownButton/Events/FusionDropDownButtonOnSelected.cs:15-25 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:63-73 at 65fdf118d), while select's item is EJ2's ItemModel (@syncfusion/ej2-splitbuttons/src/common/common.d.ts:72), which names id, text and disabled (@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:21, :35, :49): the vendor contract analyzer's type check (N17.2) refuses each member by ALIS037 (X17.48), and the rewrite's FusionDropDownButton.ItemModel in M21.N19 names each by [JsonPropertyName]."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionDropDownButtonBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionDropDownButtonBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionDropDownButtonBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionDropDownButtonEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19"
+     ]
+    },
+    {
+     "door": "FusionDropDownButtonEvents.Selected.get -> TypedEvent<FusionDropDownButtonSelectArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19"
+     ]
+    },
+    {
+     "door": "FusionDropDownButtonExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionDropDownButtonReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N19"
+     ]
+    },
+    {
+     "door": "FusionDropDownButtonSelectArgs.Item.get -> FusionDropDownButtonItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19"
+     ]
+    },
+    {
+     "door": "FusionDropDownButtonSelectArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N19",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.Content<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.CssClass<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.Disabled<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.FocusIn<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self) -> ComponentRef<FusionDropDownButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.RemoveItemsById<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self, params string![]! itemIds) -> ComponentRef<FusionDropDownButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.RemoveItemsByText<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self, params string![]! itemTexts) -> ComponentRef<FusionDropDownButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.SetContent<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self, string! content) -> ComponentRef<FusionDropDownButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.SetCssClass<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self, string! cssClass) -> ComponentRef<FusionDropDownButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.SetDisabled<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self, bool disabled) -> ComponentRef<FusionDropDownButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonExtensions.Toggle<TModel>(this ComponentRef<FusionDropDownButton!, TModel!>! self) -> ComponentRef<FusionDropDownButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonHtmlExtensions.FusionDropDownButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.DropDownButtonBuilder!>! build) -> FusionDropDownButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonHtmlExtensions.FusionDropDownButton<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.DropDownButtonBuilder!>! build) -> FusionDropDownButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionDropDownButtonReactiveExtensions.Reactive<TModel, TArgs>(this FusionDropDownButtonBuilder<TModel!>! builder, System.Func<FusionDropDownButtonEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionDropDownButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N19"
+     ]
+    },
+    {
+     "door": "static readonly FusionDropDownButtonEvents.Instance -> FusionDropDownButtonEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N19"
      ]
     }
    ]
@@ -12925,6 +14035,426 @@
    ]
   },
   {
+   "id": "M21.F35",
+   "summary": "FusionProgressButton: one declaration of the Syncfusion ProgressButton by its JavaScript names, content, cssClass, disabled, enableProgress, dataBind, start, stop, progressComplete, focusIn, begin, progress and end, each EJ2 33.1.47's public member; the progress payload nested under EJ2's interface name, its percent and step writable as EJ2 reads them back; and the render helper that renders it under the developer's id. Main spreads the slice over seven files whose writes, calls and reads name members by strings over ComponentRef, start mapped from a second C# name, a payload class with setters no browser runs and a builder class of its own whose Reactive extension wires the events; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component, with start's overload under a second name and a payload it cannot write.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionProgressButton",
+    "Alis.Reactive.Fusion:FusionProgressButtonBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionProgressButtonEvents",
+    "Alis.Reactive.Fusion:FusionProgressButtonExtensions",
+    "Alis.Reactive.Fusion:FusionProgressButtonHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionProgressButtonProgressArgs",
+    "Alis.Reactive.Fusion:FusionProgressButtonReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentMethod.Mapped(\"startAt\", \"start\").WithArgs<double>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonExtensions.cs:31"
+    },
+    {
+     "line": "main",
+     "text": "public double Step { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/Events/FusionProgressButtonOnProgress.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().ProgressButton(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonHtmlExtensions.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Start() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:39"
+    },
+    {
+     "line": "redesign",
+     "text": "public void StartAt(Arg<double> percent)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<double> Step => ReadOnly<double>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:74"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionProgressButton>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:104"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionProgressButton declares the EJ2 ProgressButton by its JavaScript names: content and cssClass as Content and CssClass, each a Property<string>; disabled and enableProgress as Disabled and EnableProgress, each a Property<bool>; dataBind, progressComplete, stop and focusIn as DataBind, ProgressComplete, Stop and FocusIn; start as Start() and Start(percent), C# overloads of EJ2's one start(percent?), which carry main's Start and StartAt and the redesign's Start and StartAt; and begin, progress and end as Begin, Progress and End, whose payload is FusionProgressButton.ProgressEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts:140, :134, :121, :90, :230, :224, :279, :218, :175, :182, :189; @syncfusion/ej2-base/src/component.d.ts:129). Stop, which neither line declares, stops a running progress.",
+     "doors": [
+      "M21.N35",
+      "N5.4",
+      "N5.3",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionProgressButton.ProgressEventArgs, EJ2's ProgressEventArgs nested under its name (@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts:308-323), reads Percent and Step, each a Property<double>, since EJ2 hands them to the listener and runs the progress on from what the listener leaves (@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.js:244, :277, :280), so a handler of Begin or Progress sets the interval or the percent the bar moves on from (M21.X802); and CurrentDuration, a ReadOnly<double>, which EJ2 does not read back.",
+     "doors": [
+      "M21.N35",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Main's SetContent, SetCssClass, SetDisabled and SetProgressEnabled each write one member and call dataBind; the rewrite writes it with Set on the member's Property and calls DataBind() where the view wants the change at once.",
+     "doors": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionProgressButton(plan, elementId, build => ..) renders the button under the id the developer chose on EJ2's ProgressButtonBuilder, as both lines do, and returns the rendered component in place of main's FusionProgressButtonBuilder<TModel> and its Reactive extension; its Reactive(b => b.End, pipeline) handles its progress from the plan's start, and pipeline.Component<FusionProgressButton>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N35",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/Events/FusionProgressButtonOnProgress.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonBuilder.cs:14-54"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonEvents.cs:6-26"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonExtensions.cs:10-125"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonHtmlExtensions.cs:15-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonReactiveExtensions.cs:9-26"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:21-106"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's ProgressButton as its TypeScript declares it (@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts, ProgressEventArgs there), and as its source raises begin, progress and end and reads their payload back (@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X802",
+     "rung": "type",
+     "defect": "The redesign declares the progress payload's Percent and Step read-only (Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:68, :74 at 65fdf118d), and main's setters run in no browser (Alis.Reactive.Fusion/Components/FusionProgressButton/Events/FusionProgressButtonOnProgress.cs:9 at 623dd4a27), where EJ2 reads both back from the listener and runs the progress on from them (@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.js:277, :280), so no view can set the interval or the percent a progress moves on from. The rewrite's FusionProgressButton.ProgressEventArgs in M21.N35 declares both as Property<double>, so the write compiles and EJ2 reads it."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionProgressButtonBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonEvents.Began.get -> TypedEvent<FusionProgressButtonProgressArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonEvents.Ended.get -> TypedEvent<FusionProgressButtonProgressArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonEvents.Progressed.get -> TypedEvent<FusionProgressButtonProgressArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonProgressArgs.CurrentDuration.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonProgressArgs.CurrentDuration.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N35",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonProgressArgs.Percent.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonProgressArgs.Percent.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N35",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonProgressArgs.Step.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonProgressArgs.Step.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N35",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionProgressButtonReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.Content<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.CssClass<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.Disabled<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.FocusIn<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self) -> ComponentRef<FusionProgressButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.ProgressComplete<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self) -> ComponentRef<FusionProgressButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.ProgressEnabled<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.SetContent<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self, string! content) -> ComponentRef<FusionProgressButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.SetCssClass<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self, string! cssClass) -> ComponentRef<FusionProgressButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.SetDisabled<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self, bool disabled) -> ComponentRef<FusionProgressButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.SetProgressEnabled<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self, bool enabled) -> ComponentRef<FusionProgressButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.Start<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self) -> ComponentRef<FusionProgressButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonExtensions.StartAt<TModel>(this ComponentRef<FusionProgressButton!, TModel!>! self, double percent) -> ComponentRef<FusionProgressButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonHtmlExtensions.FusionProgressButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.ProgressButtonBuilder!>! build) -> FusionProgressButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonHtmlExtensions.FusionProgressButton<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.ProgressButtonBuilder!>! build) -> FusionProgressButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionProgressButtonReactiveExtensions.Reactive<TModel, TArgs>(this FusionProgressButtonBuilder<TModel!>! builder, System.Func<FusionProgressButtonEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionProgressButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N35"
+     ]
+    },
+    {
+     "door": "static readonly FusionProgressButtonEvents.Instance -> FusionProgressButtonEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N35"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F36",
    "summary": "FusionRadioButton: one declaration of the Syncfusion RadioButton by its JavaScript names, checked, disabled, dataBind, getSelectedValue, click, focusIn and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it; and the render helper that renders one button under the developer's id. Main spreads the slice over seven files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter, and a builder class of its own whose Reactive extension wires the change; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component and its payload nested under EJ2's interface name.",
    "status": "both",
@@ -15427,6 +16957,278 @@
    ]
   },
   {
+   "id": "M21.F42",
+   "summary": "FusionSmartPasteButton: one declaration of the Syncfusion SmartPasteButton by its JavaScript names, disabled, click and focusIn, each EJ2 33.1.47's public member; the AI boundary it crosses, EJ2's ChatOptions sent as JSON to the app's endpoint with the page's antiforgery token and one text received whole, never a stream (M21.D801); and the render helper that writes its options with no script, refusing a button with no endpoint, for the framework's component code to build it when it mounts. Main writes the component's construction and its request as a script in the view, which waits for DOMContentLoaded; the redesign moves both into its component code, the shape the rewrite keeps, and both lines send the request with no antiforgery token and read the text of any status.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionSmartPasteButton",
+    "Alis.Reactive.Fusion:FusionSmartPasteButtonExtensions",
+    "Alis.Reactive.Fusion:FusionSmartPasteButtonHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionSmartPasteButtonOptions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "return new HtmlString(RenderButton(elementId, options) + RenderInitializer(elementId, options));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:31"
+    },
+    {
+     "line": "main",
+     "text": "return \"<script>(function(){document.addEventListener('DOMContentLoaded',function(){\"",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:76"
+    },
+    {
+     "line": "main",
+     "text": "+ \"var response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});\"",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:80"
+    },
+    {
+     "line": "main",
+     "text": "public string AiAssistEndpoint { get; set; } = \"\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonOptions.cs:6"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Disabled => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButton.cs:14"
+    },
+    {
+     "line": "redesign",
+     "text": "attributes[\"data-alis-smart-paste-button\"] = ConstructionOptions(options);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:53"
+    },
+    {
+     "line": "redesign",
+     "text": "const response = await fetch(endpoint, {",
+     "cite": "Alis.Reactive.Assets/components/fusion/smart-paste-button.ts:18"
+    },
+    {
+     "line": "redesign",
+     "text": "onMount(\"[data-alis-smart-paste-button]\", element => {",
+     "cite": "Alis.Reactive.Assets/components/fusion/smart-paste-button.ts:26"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSmartPasteButton declares the EJ2 SmartPasteButton by its JavaScript names: disabled as Disabled, a Property<bool>, and click and focusIn as Click and FocusIn, each EJ2 33.1.47's public member, which the SmartPasteButton takes from its Button (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.d.ts:16; @syncfusion/ej2-buttons/src/button/button.d.ts:64, :176, :184).",
+     "doors": [
+      "M21.N42",
+      "N5.4"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "What crosses the AI boundary is EJ2's, and the framework's component code carries it whole (M21.D801): on a click, EJ2 reads the clipboard's text and the fields of the button's form and asks its aiAssistHandler with EJ2's ChatOptions (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.d.ts:4-15; @syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.js:112-123, :125); the component code sends that object as the JSON body of a POST to the endpoint the view names, and hands EJ2 the response's whole text, read once the body has arrived, never a stream (streaming is out of 1.0, an owner decision); EJ2 fills each field a line FIELD name^^^value names and leaves one answered NO_DATA (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.js:128, :161, :182). The app's endpoint, not the framework, calls the model.",
+     "doors": [
+      "M21.N42"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionSmartPasteButton(elementId, options => ..) renders the button with its construction options in a data attribute and no script, as the redesign does, and the framework's component code builds the SmartPasteButton when the element mounts, so a button in a partial view loaded into a slot works as one in the page (M21.X804); main writes a script into the view, which views never carry. pipeline.Component<FusionSmartPasteButton>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N42",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The AI request is an unsafe request to the page's origin, so it carries the app's antiforgery token (D9.22, M21.X803): the render helper writes the request token into the construction options from the host's own antiforgery, IAntiforgery.GetAndStoreTokens on net10 and AntiForgery.GetTokens on net48, as D9.22 writes the plan's, and the component code sends it in the header RequestVerificationToken, the one place a JSON body carries it, on a POST to the page's origin alone; net10's antiforgery reads that header, and on net48 the endpoint takes the framework's [ValidateAntiForgeryHeader].",
+     "doors": [
+      "M21.N42"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A response whose status is outside 200 to 299, or a request the network refuses, hands EJ2 no text, so no field changes and no error page is read as an answer; both lines hand EJ2 the text of any status. An empty AiAssistEndpoint is refused where the view renders (M21.X805), since a button that asks no endpoint fills nothing.",
+     "doors": [
+      "M21.N42"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButton.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonExtensions.cs:6-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:15-85"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonOptions.cs:3-9"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButton.cs:11-21"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:16-83"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonOptions.cs:4-20"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/components/fusion/smart-paste-button.ts:17-30"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7",
+    "Q9",
+    "Q10",
+    "Q12"
+   ],
+   "meanings": [
+    {
+     "id": "M21.D801",
+     "meaning": "A Smart Paste's AI boundary is a POST the framework's component code sends and one text it receives. It sends EJ2's ChatOptions (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.d.ts:4-15), built by EJ2 from the form's fields and the clipboard's text (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.js:112-123), as the request's JSON body, with Content-Type application/json and the page's antiforgery request token in the header RequestVerificationToken when the endpoint is on the page's origin (D9.22). It receives the response's whole text, awaited once the body has arrived, when the status is 200 to 299, and hands EJ2 an empty text otherwise, which EJ2 reads as no answer (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.js:128); EJ2 alone parses the text into fields (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.js:161). The endpoint is the app's own and calls the model the app chose; nothing streams in 1.0 (an owner decision), and no plan step runs inside the answer, since an answer the vendor awaits is no expression D17.12 takes."
+    }
+   ],
+   "oracle": "Syncfusion EJ2 33.1.47's SmartPasteButton as its TypeScript declares it (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.d.ts, ChatOptions there, and the Button it extends (@syncfusion/ej2-buttons/src/button/button.d.ts)), as its source builds ChatOptions, asks aiAssistHandler and fills the form from the text it answers (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.js); and the antiforgery of D9.22, each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X803",
+     "rung": "behavior",
+     "defect": "Both lines send the AI request with no antiforgery token: main's script (Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:80 at 623dd4a27) and the redesign's component code (Alis.Reactive.Assets/components/fusion/smart-paste-button.ts:18-22 at 65fdf118d) POST to the app's endpoint with Content-Type alone, where every unsafe request to the page's origin carries the app's token (D9.22). An app that validates it refuses the request, the refusal's text holds no FIELD line, and no field fills, with nothing shown. The rewrite's helper in M21.N42 writes the request token and its component code sends it in the header RequestVerificationToken (M21.D801)."
+    },
+    {
+     "id": "M21.X804",
+     "rung": "behavior",
+     "defect": "Main makes the button a SmartPasteButton only in a script its helper writes into the view, from a DOMContentLoaded listener (Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:76 at 623dd4a27), an event the page raises once, before a partial view loaded into a slot arrives, so in such a partial the button stays a plain button and a click fills no field; the script also breaks the rule that views carry no JavaScript. The redesign's component code builds it when the element mounts (Alis.Reactive.Assets/components/fusion/smart-paste-button.ts:26-29 at 65fdf118d), and the slot plugin announces the mount when a partial view loads into a slot (Alis.Reactive.Assets/runtime/plugins/slot.ts:36 at 65fdf118d), the shape M21.N42 keeps."
+    },
+    {
+     "id": "M21.X805",
+     "rung": "refusal",
+     "defect": "Both lines render a Smart Paste button whose AiAssistEndpoint is empty, its default (Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonOptions.cs:6 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonOptions.cs:13 at 65fdf118d), and then set no aiAssistHandler (Alis.Reactive.Fusion/Components/FusionSmartPasteButton/FusionSmartPasteButtonHtmlExtensions.cs:79 at 623dd4a27; Alis.Reactive.Assets/components/fusion/smart-paste-button.ts:28 at 65fdf118d), so EJ2 asks nothing (@syncfusion/ej2-buttons/src/smart-paste-button/smart-paste-button.js:124) and a click fills no field and says nothing. The rewrite's helper in M21.N42 refuses it where the view renders: \"FusionSmartPasteButton 'intake-paste' names no AiAssistEndpoint: a Smart Paste button asks the endpoint for its answer\"."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X803",
+     "page": "A net10 intake page in an app that calls Antiforgery(AntiforgeryIn.Header) at startup, with a resident form whose GivenName field sits beside a FusionSmartPasteButton whose AiAssistEndpoint is /intake/smart-paste, an action under [ValidateAntiForgeryToken] that answers FIELD GivenName^^^Rose.",
+     "gesture": "Copy the text \"Resident Rose Alvarez, room 12\", then click Smart Paste.",
+     "outcome": "The GivenName field shows Rose.",
+     "opposite": "Before the click, the GivenName field is empty.",
+     "defect": "The request carries no RequestVerificationToken, the action answers 400, and the GivenName field stays empty."
+    },
+    {
+     "for": "M21.X803",
+     "page": "The same intake page on net48, its /intake/smart-paste action under the framework's [ValidateAntiForgeryHeader].",
+     "gesture": "Copy the text \"Resident Rose Alvarez, room 12\", then click Smart Paste.",
+     "outcome": "The GivenName field shows Rose.",
+     "opposite": "Before the click, the GivenName field is empty.",
+     "defect": "The request carries no RequestVerificationToken, the filter refuses it, and the GivenName field stays empty."
+    },
+    {
+     "for": "M21.X804",
+     "page": "An intake page whose Load intake button loads a partial view into a slot that holds the resident form and its FusionSmartPasteButton, whose endpoint answers FIELD GivenName^^^Rose.",
+     "gesture": "Click Load intake, copy the text \"Resident Rose Alvarez, room 12\", then click Smart Paste.",
+     "outcome": "The GivenName field shows Rose.",
+     "opposite": "Before Smart Paste is clicked, the GivenName field is empty.",
+     "defect": "Main's button waits for DOMContentLoaded, which the page raised before the partial arrived, so it stays a plain button and the GivenName field stays empty."
+    },
+    {
+     "for": "M21.X805",
+     "page": "An intake page that renders Html.FusionSmartPasteButton(\"intake-paste\", options => ..) with no AiAssistEndpoint.",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders, naming intake-paste and AiAssistEndpoint.",
+     "opposite": "With AiAssistEndpoint /intake/smart-paste, the page shows the Smart Paste button.",
+     "defect": "Both lines render the button, and a click on it fills no field and shows nothing."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionSmartPasteButtonExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N42",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSmartPasteButtonExtensions.Click<TModel>(this ComponentRef<FusionSmartPasteButton!, TModel!>! self) -> ComponentRef<FusionSmartPasteButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N42",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSmartPasteButtonExtensions.Disabled<TModel>(this ComponentRef<FusionSmartPasteButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N42",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSmartPasteButtonExtensions.FocusIn<TModel>(this ComponentRef<FusionSmartPasteButton!, TModel!>! self) -> ComponentRef<FusionSmartPasteButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N42",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSmartPasteButtonExtensions.SetDisabled<TModel>(this ComponentRef<FusionSmartPasteButton!, TModel!>! self, bool disabled) -> ComponentRef<FusionSmartPasteButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N42",
+      "M12.N2"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F43",
    "summary": "FusionSmartTextArea: one declaration of the Syncfusion SmartTextArea by its JavaScript names, value, focusIn, change, beforeSuggestionInsert and afterSuggestionInsert, each EJ2 33.1.47's public member or, for the inserted text, the member its JavaScript hands; the payloads of its three events; the input it is, its value committed by change; and the render helpers that render it bound to a model member with its suggestion options. Main spreads the slice over eight files whose writes and calls name members by strings over ComponentRef, payload classes with setters, Reactive extensions on the plan and a render helper that writes a script into the view; the redesign declares it in one file and builds the component in the framework's own component code, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and the area started at the member's value.",
    "status": "both",
@@ -15805,6 +17607,384 @@
      "verdict": "renamed",
      "to": [
       "M21.N43"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F44",
+   "summary": "FusionSplitButton: one declaration of the Syncfusion SplitButton by its JavaScript names, content, cssClass, disabled, dataBind, toggle, focusIn, removeItems, click and select, each EJ2 33.1.47's public member; click as an event with no payload and select's payload and its item nested under EJ2's interface names; and the render helper that renders it under the developer's id. Main spreads the slice over eight files whose writes, calls and reads name members by strings over ComponentRef, two C# names for one removeItems, payload classes with a setter and a builder class of its own whose Reactive extension wires the events; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionSplitButton",
+    "Alis.Reactive.Fusion:FusionSplitButtonBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionSplitButtonClickArgs",
+    "Alis.Reactive.Fusion:FusionSplitButtonEvents",
+    "Alis.Reactive.Fusion:FusionSplitButtonExtensions",
+    "Alis.Reactive.Fusion:FusionSplitButtonHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionSplitButtonItem",
+    "Alis.Reactive.Fusion:FusionSplitButtonReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionSplitButtonSelectArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "\"click\", new FusionSplitButtonClickArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonEvents.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "if (items == null) throw new ArgumentNullException(nameof(items));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonExtensions.cs:108"
+    },
+    {
+     "line": "main",
+     "text": "public FusionSplitButtonItem Item { get; set; } = new FusionSplitButtonItem();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/Events/FusionSplitButtonOnSelected.cs:9"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().SplitButton(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonHtmlExtensions.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "public void RemoveItems(Arg<string[]> items, Arg<bool> isUniqueId) => Method(items, isUniqueId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:44"
+    },
+    {
+     "line": "redesign",
+     "text": "public Event<FusionSplitButtonClickArgs> Click",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:47"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionSplitButton>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:107"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSplitButton declares the EJ2 SplitButton by its JavaScript names: content and cssClass as Content and CssClass, each a Property<string>; disabled as Disabled, a Property<bool>; dataBind, toggle and focusIn as DataBind, Toggle and FocusIn; removeItems as RemoveItems(items, isUniqueId); click as Click, an Event with no payload (D17.4), since EJ2's ClickEventArgs holds the element alone (@syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts:209, :210; @syncfusion/ej2-splitbuttons/src/split-button/split-button.js:303), in place of the redesign's empty FusionSplitButtonClickArgs; and select as Select, whose payload is FusionSplitButton.MenuEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts:32, :39, :45, :183, :204, :166, :102, :120; @syncfusion/ej2-base/src/component.d.ts:129).",
+     "doors": [
+      "M21.N44",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSplitButton.MenuEventArgs, EJ2's MenuEventArgs nested under its name (@syncfusion/ej2-splitbuttons/src/common/common.d.ts:70-74), reads Item, a FusionSplitButton.ItemModel, EJ2's ItemModel nested under its name (@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:6-51): data whose Id, Text, IconCss and Url are text and Separator and Disabled booleans, each named by [JsonPropertyName] as ItemModel names it (X17.48) and optional as EJ2 marks it, so a member the item lacks reads nothing; select hands the item the user chose (@syncfusion/ej2-splitbuttons/src/split-button/split-button.js:183). It declares no member for element and event, the DOM's objects. The redesign's FusionSplitButtonSelectArgs and FusionSplitButtonItem, with Id, Text and Disabled, carry the same reads under the redesign's names, with no [JsonPropertyName].",
+     "doors": [
+      "M21.N44",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "RemoveItems(items, false) removes the items whose text the list names and RemoveItems(items, true) those whose id it names (@syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts:166), carrying main's RemoveItemsByText and RemoveItemsById, two C# names main gave one vendor method; main's ArgumentNullException on a null list is carried by the type of items, an Arg<string[]>, which admits no null, so a null literal draws C#'s nullable warning (CS8625) at build in place of a throw where the view renders (D7.3).",
+     "doors": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Main's SetContent, SetCssClass and SetDisabled each write one member and call dataBind; the rewrite writes it with Set on the member's Property and calls DataBind() where the view wants the change at once.",
+     "doors": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionSplitButton(plan, elementId, build => ..) renders the button and its items under the id the developer chose on EJ2's SplitButtonBuilder, as both lines do, and returns the rendered component in place of main's FusionSplitButtonBuilder<TModel> and its Reactive extension; its Reactive(b => b.Click, pipeline) and Reactive(b => b.Select, pipeline) handle its primary click and a choice from the plan's start, and pipeline.Component<FusionSplitButton>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N44",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/Events/FusionSplitButtonOnClicked.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/Events/FusionSplitButtonOnSelected.cs:6-25"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonBuilder.cs:14-54"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonEvents.cs:6-21"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonExtensions.cs:12-120"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonHtmlExtensions.cs:15-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonReactiveExtensions.cs:9-26"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:21-109"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's SplitButton as its TypeScript declares it (@syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts, ClickEventArgs there, MenuEventArgs in @syncfusion/ej2-splitbuttons/src/common/common.d.ts and ItemModel in @syncfusion/ej2-splitbuttons/src/common/common-model.d.ts), and as its source raises click and select (@syncfusion/ej2-splitbuttons/src/split-button/split-button.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X808",
+     "rung": "analyzer",
+     "defect": "FusionSplitButtonItem carries no [JsonPropertyName] on either line (Alis.Reactive.Fusion/Components/FusionSplitButton/Events/FusionSplitButtonOnSelected.cs:15-25 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:68-78 at 65fdf118d), while select's item is EJ2's ItemModel (@syncfusion/ej2-splitbuttons/src/common/common.d.ts:72), which names id, text and disabled (@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:21, :35, :49): the vendor contract analyzer's type check (N17.2) refuses each member by ALIS037 (X17.48), and the rewrite's FusionSplitButton.ItemModel in M21.N44 names each by [JsonPropertyName]."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionSplitButtonBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonEvents.Clicked.get -> TypedEvent<FusionSplitButtonClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonEvents.Selected.get -> TypedEvent<FusionSplitButtonSelectArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N44"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonSelectArgs.Item.get -> FusionSplitButtonItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44"
+     ]
+    },
+    {
+     "door": "FusionSplitButtonSelectArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N44",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.Content<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.CssClass<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.Disabled<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.FocusIn<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self) -> ComponentRef<FusionSplitButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.RemoveItemsById<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self, params string![]! itemIds) -> ComponentRef<FusionSplitButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.RemoveItemsByText<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self, params string![]! itemTexts) -> ComponentRef<FusionSplitButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.SetContent<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self, string! content) -> ComponentRef<FusionSplitButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.SetCssClass<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self, string! cssClass) -> ComponentRef<FusionSplitButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.SetDisabled<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self, bool disabled) -> ComponentRef<FusionSplitButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonExtensions.Toggle<TModel>(this ComponentRef<FusionSplitButton!, TModel!>! self) -> ComponentRef<FusionSplitButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonHtmlExtensions.FusionSplitButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.SplitButtonBuilder!>! build) -> FusionSplitButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonHtmlExtensions.FusionSplitButton<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.SplitButtonBuilder!>! build) -> FusionSplitButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionSplitButtonReactiveExtensions.Reactive<TModel, TArgs>(this FusionSplitButtonBuilder<TModel!>! builder, System.Func<FusionSplitButtonEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionSplitButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N44"
+     ]
+    },
+    {
+     "door": "static readonly FusionSplitButtonEvents.Instance -> FusionSplitButtonEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N44"
      ]
     }
    ]
@@ -17507,6 +19687,415 @@
      "verdict": "renamed",
      "to": [
       "M21.N51"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F52",
+   "summary": "FusionTooltip: one declaration of the Syncfusion Tooltip of @syncfusion/ej2-popups by its JavaScript names, open, close, refresh and its five events, each EJ2 33.1.47's public member; their one payload, nested under EJ2's interface name, Cancel read back where EJ2 reads it; and the render helper that renders it under the developer's id. Main spreads the slice over eleven files whose events and calls name members by strings over ComponentRef, two of its events named for methods, so they never fire, payload classes with setters and a builder class of its own whose Reactive extension wires the events; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component and its events named as EJ2 raises them.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionTooltip",
+    "Alis.Reactive.Fusion:FusionTooltipAfterCloseArgs",
+    "Alis.Reactive.Fusion:FusionTooltipAfterOpenArgs",
+    "Alis.Reactive.Fusion:FusionTooltipBeforeCloseArgs",
+    "Alis.Reactive.Fusion:FusionTooltipBeforeOpenArgs",
+    "Alis.Reactive.Fusion:FusionTooltipBeforeRenderArgs",
+    "Alis.Reactive.Fusion:FusionTooltipBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionTooltipClosedArgs",
+    "Alis.Reactive.Fusion:FusionTooltipEvents",
+    "Alis.Reactive.Fusion:FusionTooltipExtensions",
+    "Alis.Reactive.Fusion:FusionTooltipHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionTooltipOpenedArgs",
+    "Alis.Reactive.Fusion:FusionTooltipReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "\"open\", new FusionTooltipOpenedArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipEvents.cs:25"
+    },
+    {
+     "line": "main",
+     "text": "\"close\", new FusionTooltipClosedArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipEvents.cs:30"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"open\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipExtensions.cs:14"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Tooltip(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Open() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "public Event<FusionTooltipAfterOpenArgs> AfterOpen",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:40"
+    },
+    {
+     "line": "redesign",
+     "text": "public Event<FusionTooltipBeforeOpenArgs> BeforeOpen",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:32"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionTooltip>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:110"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTooltip declares the EJ2 Tooltip of @syncfusion/ej2-popups by its JavaScript names: open, close and refresh as Open, Close and Refresh; and beforeRender, beforeOpen, afterOpen, beforeClose and afterClose as BeforeRender, BeforeOpen, AfterOpen, BeforeClose and AfterClose, each with the payload FusionTooltip.TooltipEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:541, :548, :555, :350, :361, :369, :377, :385). AfterOpen and AfterClose carry main's Opened and Closed, which listen to open and close, the names of methods (M21.X806).",
+     "doors": [
+      "M21.N52",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTooltip.TooltipEventArgs, EJ2's TooltipEventArgs nested under its name (@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:68-97), reads Cancel, a Property<bool> EJ2 reads back on beforeRender, beforeOpen and beforeClose to keep the tooltip from showing or hiding (@syncfusion/ej2-popups/src/tooltip/tooltip.js:555, :660, :834), and IsInteracted, an optional ReadOnly<bool> (@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:96), true when a DOM event raised it and false when a method did (@syncfusion/ej2-popups/src/tooltip/tooltip.js:547). It declares no member for target, element and event, which hold the DOM's objects, nor for type, the DOM event's type, which EJ2 writes null when a method opens the tooltip (@syncfusion/ej2-popups/src/tooltip/tooltip.js:546). It replaces the redesign's five classes, FusionTooltipBeforeRenderArgs, FusionTooltipBeforeOpenArgs, FusionTooltipAfterOpenArgs, FusionTooltipBeforeCloseArgs and FusionTooltipAfterCloseArgs, and main's five.",
+     "doors": [
+      "M21.N52",
+      "N5.6",
+      "N5.4"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionTooltip(plan, elementId, build => ..) renders the tooltip under the id the developer chose on EJ2's TooltipBuilder, as both lines do, and returns the rendered component in place of main's FusionTooltipBuilder<TModel> and its Reactive extension; its Reactive(t => t.BeforeOpen, pipeline) handles its events from the plan's start, and pipeline.Component<FusionTooltip>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N52",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnBeforeClose.cs:6-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnBeforeOpen.cs:6-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnBeforeRender.cs:6-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnClosed.cs:6-8"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/Events/FusionTooltipOnOpened.cs:6-8"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipBuilder.cs:14-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipEvents.cs:6-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipExtensions.cs:11-45"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipReactiveExtensions.cs:9-31"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:20-112"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Tooltip as its TypeScript declares it (@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts, TooltipEventArgs there, the Tooltip of @syncfusion/ej2-popups and no other package's class of that name), and as its source raises its events and reads cancel back (@syncfusion/ej2-popups/src/tooltip/tooltip.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X806",
+     "rung": "analyzer",
+     "defect": "Main's Opened and Closed listen to open and close (Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipEvents.cs:25, :30 at 623dd4a27), which EJ2's Tooltip declares as methods (@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:541, :548) and never raises: it raises afterOpen and afterClose (@syncfusion/ej2-popups/src/tooltip/tooltip.js:196, :210), so a pipeline on Opened or Closed never runs. The vendor contract analyzer (N17.2) refuses an event declared over a member of another kind by ALIS018 (D17.5); the rewrite's AfterOpen and AfterClose in M21.N52 name EJ2's events, as the redesign's do."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionTooltipBeforeCloseArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipBeforeCloseArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N52",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTooltipBeforeOpenArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipBeforeOpenArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N52",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTooltipBeforeRenderArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipBeforeRenderArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N52",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTooltipBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionTooltipBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionTooltipBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionTooltipClosedArgs",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipClosedArgs.FusionTooltipClosedArgs() -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipEvents.BeforeClose.get -> TypedEvent<FusionTooltipBeforeCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipEvents.BeforeOpen.get -> TypedEvent<FusionTooltipBeforeOpenArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipEvents.BeforeRender.get -> TypedEvent<FusionTooltipBeforeRenderArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipEvents.Closed.get -> TypedEvent<FusionTooltipClosedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipEvents.Opened.get -> TypedEvent<FusionTooltipOpenedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionTooltipOpenedArgs",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipOpenedArgs.FusionTooltipOpenedArgs() -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "FusionTooltipReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "static FusionTooltipExtensions.Close<TModel>(this ComponentRef<FusionTooltip!, TModel!>! self) -> ComponentRef<FusionTooltip!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTooltipExtensions.Open<TModel>(this ComponentRef<FusionTooltip!, TModel!>! self) -> ComponentRef<FusionTooltip!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTooltipExtensions.Refresh<TModel>(this ComponentRef<FusionTooltip!, TModel!>! self) -> ComponentRef<FusionTooltip!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTooltipHtmlExtensions.FusionTooltip<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Popups.TooltipBuilder!>! build) -> FusionTooltipBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionTooltipHtmlExtensions.FusionTooltip<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Popups.TooltipBuilder!>! build) -> FusionTooltipBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionTooltipReactiveExtensions.Reactive<TModel, TArgs>(this FusionTooltipBuilder<TModel!>! builder, System.Func<FusionTooltipEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionTooltipBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N52"
+     ]
+    },
+    {
+     "door": "static readonly FusionTooltipEvents.Instance -> FusionTooltipEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N52"
      ]
     }
    ]
