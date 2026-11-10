@@ -1,0 +1,325 @@
+{
+  "module": "TypeKnowledge",
+  "features": [
+    {
+      "id": "M16.F1",
+      "summary": "Type knowledge: what the framework knows of a model, a request, a literal and a payload with no reflection of its own. A member's JSON name, the members a type writes, the members the app's options ignore, a collection's item type and a type's start come from the app's System.Text.Json contract under the app's options; the member a lambda names, its declaring class and its static type from the expression tree; the types a door is written over from its generics. One item-type finder serves every caller, and an override reads by the JSON name its declaration's contract gives it. The module's public rows are the three doors D18.5 types: a button's type, a text box's type and an action link's attribute, each a string on both lines and a typed closed set in the rewrite (N18.4). Main names every member in camel case by a rule of its own and finds a collection's item type and a dictionary by walking interfaces. The redesign reads the JsonPropertyName and JsonIgnore attributes, lists properties, finds item types in three places, builds starts with Activator and constructors, reads literals and payloads member by member, finds a request member by name ignoring case and scans a declaration's members at run time.",
+      "status": "both",
+      "types": [],
+      "claims": [
+        "Alis.Reactive.Native:NativeButtonBuilder<TModel>.Type(string! type) -> NativeButtonBuilder<TModel!>!",
+        "Alis.Reactive.Native:NativeTextBoxBuilder<TModel, TProp>.Type(string! type) -> NativeTextBoxBuilder<TModel, TProp>!",
+        "Alis.Reactive.Native:NativeActionLinkBuilder<TModel>.Attr(string! name, string! value) -> NativeActionLinkBuilder<TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "internal static string Of(string memberName) => JsonNamingPolicy.CamelCase.ConvertName(memberName);",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9"
+        },
+        {
+          "line": "main",
+          "text": "segments.Insert(0, JsonMemberName.Of(member.Member.Name));",
+          "cite": "Alis.Reactive/PlanAuthoring/Arrays/ElementExpressionCompiler.cs:194"
+        },
+        {
+          "line": "main",
+          "text": "var candidates = type.GetInterfaces()",
+          "cite": "Alis.Reactive/PlanModel/Values/Shape.cs:145"
+        },
+        {
+          "line": "main",
+          "text": "|| new[] { collectionType }.Concat(collectionType.GetInterfaces()).Any(IsGenericDictionaryContract);",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/ExpressionPathHelper.cs:113"
+        },
+        {
+          "line": "main",
+          "text": "public NativeButtonBuilder<TModel> Type(string type)",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonBuilder.cs:42"
+        },
+        {
+          "line": "main",
+          "text": "public NativeTextBoxBuilder<TModel, TProp> Type(string type)",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxBuilder.cs:73"
+        },
+        {
+          "line": "main",
+          "text": "public NativeActionLinkBuilder<TModel> Attr(string name, string value)",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkBuilder.cs:63"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static string Of(string memberName) => JsonNamingPolicy.CamelCase.ConvertName(memberName);",
+          "cite": "Alis.Reactive/Members/JsonMemberName.cs:9"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static string Of(MemberInfo member) => member.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? Of(member.Name);",
+          "cite": "Alis.Reactive/Members/JsonMemberName.cs:11"
+        },
+        {
+          "line": "redesign",
+          "text": "=> type.GetProperties(BindingFlags.Public | BindingFlags.Instance)",
+          "cite": "Alis.Reactive/Members/ClrShape.cs:40"
+        },
+        {
+          "line": "redesign",
+          "text": "&& property.GetCustomAttribute<JsonIgnoreAttribute>() == null);",
+          "cite": "Alis.Reactive/Members/ClrShape.cs:43"
+        },
+        {
+          "line": "redesign",
+          "text": "var itemTypes = (IsSupportedGenericCollection(type) ? new[] { type } : type.GetInterfaces())",
+          "cite": "Alis.Reactive/Members/ClrShape.cs:93"
+        },
+        {
+          "line": "redesign",
+          "text": "foreach (var candidate in new[] { type }.Concat(type.GetInterfaces()))",
+          "cite": "Alis.Reactive/Inputs/FieldReference.cs:53"
+        },
+        {
+          "line": "redesign",
+          "text": "var property = current.GetProperty(name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/RequestMembers.cs:34"
+        },
+        {
+          "line": "redesign",
+          "text": "=> new[] { type }.Concat(type.GetInterfaces()).FirstOrDefault(candidate =>",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/RequestMembers.cs:76"
+        },
+        {
+          "line": "redesign",
+          "text": "if (type.IsValueType) return Activator.CreateInstance(type)!;",
+          "cite": "Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:126"
+        },
+        {
+          "line": "redesign",
+          "text": "return bindable.Invoke(bindable.GetParameters().Select(DefaultOf).ToArray());",
+          "cite": "Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:142"
+        },
+        {
+          "line": "redesign",
+          "text": ".Select(member => (JsonMemberName.Of(member), LiteralFor(member.GetValue(value), ClrShape.Of(member.PropertyType), depth + 1)))",
+          "cite": "Alis.Reactive/PlanModel/Values/ValueExpression.cs:76"
+        },
+        {
+          "line": "redesign",
+          "text": "var value = Carried<TPayload>(member).GetValue(payload);",
+          "cite": "Alis.Reactive/Razor/MarkupRaise.cs:27"
+        },
+        {
+          "line": "redesign",
+          "text": ".GetMembers(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)",
+          "cite": "Alis.Reactive/Components/JsObject.cs:368"
+        },
+        {
+          "line": "redesign",
+          "text": "public NativeButtonBuilder<TModel> Type(string type)",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonBuilder.cs:59"
+        },
+        {
+          "line": "redesign",
+          "text": "public NativeTextBoxBuilder<TModel, TProp> Type(string type)",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxBuilder.cs:65"
+        },
+        {
+          "line": "redesign",
+          "text": "public NativeActionLinkBuilder<TModel> Attr(string name, string value)",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkBuilder.cs:81"
+        },
+        {
+          "line": "proposed",
+          "text": "A member's JSON name, the members a type writes, the members the app's options ignore, a collection's item type and a type's start are read from the app's System.Text.Json contract, and a call that lists, reads, writes or invokes a member by reflection outside the owner's list fails the build.",
+          "doors": [
+            "N18.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A button's type, a text box's type and an action link's attribute are typed closed sets, never text.",
+          "doors": [
+            "N18.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A request sends a container typed by its model, and its Form and Inputs take only a container of the request's model, so the compiler matches what it sends to the request's members.",
+          "doors": [
+            "N18.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "An override in an app's model carries the JSON name and the JsonIgnore of the member it overrides, checked at build.",
+          "doors": [
+            "N18.5"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A Method, MethodAsync or property declaration is the body of the member it declares, checked at build, with no run-time member scan.",
+          "doors": [
+            "N18.2"
+          ]
+        }
+      ],
+      "nodes": [
+        "data",
+        "as",
+        "lit",
+        "record",
+        "start",
+        "nothing",
+        "unbound",
+        "string",
+        "number",
+        "boolean",
+        "date",
+        "instant",
+        "file",
+        "array",
+        "nullable",
+        "object",
+        "model",
+        "form"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:7-10"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanModel/Values/Shape.cs:120-159"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonBuilder.cs:42-46"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Members/JsonMemberName.cs:7-12"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Members/ClrShape.cs:16-43"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Inputs/FieldReference.cs:50-60"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:115-155"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonBuilder.cs:59-63"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/runtime-path.ts:17-24"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:251-263"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/paths.ts:13-28"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/model.ts:106-109"
+        }
+      ],
+      "core": [
+        "Q18",
+        "Q2",
+        "Q16"
+      ],
+      "meanings": [],
+      "oracle": "System.Text.Json's contract under the app's options: the members, JSON names, ignore conditions and element types JsonSerializerOptions.GetTypeInfo gives, and the object it reads from {}, pinned by probe:core-stj-empty-object-start, probe:core-json-result-names, probe:core-frombody-binds-json-name, probe:core-frombody-ignores-clr-name, probe:core-form-binds-clr-name and probe:core-json-null-member; MVC 5's JSON body bound by CLR names ignoring case (probe:mvc5-json-value-provider-case); C#'s expression trees, which carry the member a lambda names; and the HTML Living Standard's type attribute of a button and of an input, each a closed set of keywords.",
+      "checker": [
+        "core:Q18",
+        "core:Q2",
+        "core:Q16"
+      ],
+      "defects": [
+        {
+          "id": "X18.1",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X18.2",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X18.3",
+          "rung": "type"
+        },
+        {
+          "id": "X18.4",
+          "rung": "type"
+        },
+        {
+          "id": "X18.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X18.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X18.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X18.8",
+          "rung": "refusal"
+        },
+        {
+          "id": "X18.9",
+          "rung": "analyzer"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X18.5",
+          "page": "A net10 admission page in an app whose JSON options name members in snake case. Its Admission form holds a Given name input bound to GivenName; Admit posts the form as a JSON body to an endpoint that binds Admission from it and answers the member names the body held and the bound GivenName, which the success route writes into sent-names and admitted-name.",
+          "gesture": "Type Rose in Given name and click Admit.",
+          "outcome": "sent-names reads given_name and admitted-name reads Rose.",
+          "opposite": "The same page on net48, whose JSON body names each member by its CLR name (D2.4): the same typing and click write GivenName into sent-names and Rose into admitted-name.",
+          "defect": "The framework names the member by a camel case of its own, as both lines do (Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9 at 623dd4a27, Alis.Reactive/Members/JsonMemberName.cs:9 at 65fdf118d), so sent-names reads givenName, from which the endpoint binds nothing (probe:core-frombody-naming-policy), and admitted-name stays empty."
+        },
+        {
+          "for": "X18.6",
+          "page": "A net10 admission page whose app's JSON options remove Admission's Pharmacy from its contract through their resolver, and whose Admission declares Ward with [JsonIgnore]; Ward starts \"Rehab\" and Pharmacy \"Central\". Its form holds a Given name input, a Ward input and a Pharmacy input under a validator with RuleFor(a => a.Ward).Equal(\"Rehab\").WithMessage(\"New admissions go to Rehab.\") and RuleFor(a => a.Pharmacy).Equal(\"Central\").WithMessage(\"New admissions use the central pharmacy.\"); Admit posts the form as a JSON body, and its success route writes admitted into admit-status.",
+          "gesture": "Type Rose in Given name, East in Ward and North in Pharmacy, and click Admit.",
+          "outcome": "Neither message shows, the request is sent and admit-status reads admitted.",
+          "opposite": "The same page with Ward's [JsonIgnore] removed and Pharmacy left in the contract: the same typing and click show both messages beside Ward and Pharmacy, no request is sent and admit-status stays empty.",
+          "defect": "The body sends a member the contract leaves out and the check reads what was typed, so a message shows and no request is sent, where the endpoint binds the starts (probe:core-frombody-left-out-member-starts). The redesign lists members by the JsonIgnore attribute alone (Alis.Reactive/Members/ClrShape.cs:43 at 65fdf118d), so Pharmacy's message shows; a reader that lists every property shows both."
+        },
+        {
+          "for": "X18.7",
+          "page": "A night roster page whose OnCallStaff declares an abstract Role with [JsonPropertyName(\"duty_role\")], which OnCallNurse overrides with the same name, as ALIS025 requires, starting empty. The roster holds its night on-call nurse as data the app's options wrote, {\"name\": \"Ada\", \"duty_role\": \"Charge nurse\"}, read as an OnCallNurse; the button Show night on-call role writes nurse => nurse.Role into night-role.",
+          "gesture": "Click Show night on-call role.",
+          "outcome": "night-role reads Charge nurse.",
+          "opposite": "With the nurse's duty_role holding Staff nurse, the same click writes Staff nurse into night-role.",
+          "defect": "The read names the member in a camel case of the framework's own, role, as main does (Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9 at 623dd4a27), which the data lacks, so night-role shows the override's empty start; a read by the CLR name, Role, shows the same."
+        },
+        {
+          "for": "X18.8",
+          "page": "A rosters index whose link Night station opens a night station page. There OnCallStaff declares an abstract Station, and OnCallNurse overrides it with [JsonIgnore], the drift ALIS025 refuses, suppressed on that member for this page; the roster holds its night on-call nurse as data the app's options wrote, and the button Show night station writes nurse => nurse.Station into night-station.",
+          "gesture": "Click Night station on the rosters index.",
+          "outcome": "The night station page is refused where the view renders with X18.8's message, naming 'nurse => nurse.Station' and OnCallNurse.",
+          "opposite": "With the override's [JsonIgnore] removed, the roster's nurse holds station Ward 4, the page renders, and Show night station writes Ward 4 into night-station.",
+          "defect": "The read is written by the declaration's JSON name, station, which the browser never holds, so the page renders and night-station shows the override's start with no word; or the refusal names OnCallStaff, the declaration, where the read starts from OnCallNurse."
+        }
+      ],
+      "verdicts": []
+    }
+  ]
+}

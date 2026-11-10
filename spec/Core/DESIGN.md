@@ -4644,10 +4644,10 @@ shapes, starts and the payload's path of each event.
 - `X18.2` analyzer: `Method()` called from a member other than the one it declares: new:N18.2 (POC 13e).
 - `X18.3` type: a request that sends a container of another model does not compile: new:N18.3.
 - `X18.4` type: a button's type written as text does not compile: new:N18.4.
-- `X18.5` behavior: with the app's JSON options naming members in snake case, a request's JSON body sends
-  `given_name`, and the endpoint binds it.
+- `X18.5` behavior: on net10, with the app's JSON options naming members in snake case, a request's JSON body sends
+  `given_name`, and the endpoint binds it (`probe:core-frombody-naming-policy`).
 - `X18.6` behavior: a member the app's JSON options ignore is not in a JSON body, and the check reads its
-  start.
+  start, as the endpoint binds it (`probe:core-frombody-left-out-member-starts`).
 - `X18.7` behavior: a read of a member an override implements reads it by its declaration's JSON name
   (`WhenARosterIsHandedOver`, POC 3).
 - `X18.8` refusal: a read of an override the app's JSON options ignore is refused with "'{lambda}' reads a member
