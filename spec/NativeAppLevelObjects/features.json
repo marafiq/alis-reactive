@@ -474,10 +474,10 @@
       "promises": [
         {
           "for": "M25.X3",
-          "page": "A ward board whose app takes ShowBusy() and whose layout renders Html.NativeLoader(\"Loading\"), whose stylesheet shows .alis-loader--target as a 20 pixel square, with two panels, north and south, and Refresh north and Refresh south, each a GET whose route writes its panel's text; the test's endpoint holds each response until the test releases it.",
-          "gesture": "Click Refresh north and Refresh south, then release south's response.",
+          "page": "The app shell, whose app takes ShowBusy() and whose layout renders Html.NativeLoader(\"Loading\"), whose stylesheet shows .alis-loader--target as a 20 pixel square, with two panels, north and south, and Refresh north and Refresh south, each a GET whose route writes its panel's text. The harness gates each GET (Composition.tla's Answer).",
+          "gesture": "Click Refresh north and Refresh south; once the harness reports both GETs held, check both panels, then release south's GET.",
           "outcome": "While both are held each panel shows the loader's overlay; after south's response south shows its new text and no overlay, and north still shows its overlay.",
-          "opposite": "Release north's response too: neither panel shows an overlay, and each shows its new text.",
+          "opposite": "Release north's GET too: neither panel shows an overlay, and each shows its new text.",
           "defect": "Both lines move one loader element into the target set last (Alis.Reactive.Assets/components/native/loader.ts:58 at 65fdf118d), so north shows no overlay once Refresh south starts, while north's request still runs."
         }
       ],
@@ -826,8 +826,8 @@
         },
         {
           "for": "X17.36",
-          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\"), each with a NativeActionLink under replace whose block GETs /Residents/{residentId} into resident-detail; the test's endpoint holds Ada's response until the test releases it.",
-          "gesture": "Click Ada's link, click Bea's link, then release Ada's response.",
+          "page": "The residents list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\"), each with a NativeActionLink under replace whose block GETs /Residents/{residentId} into resident-detail. The harness gates Ada's GET (Lanes.tla's Respond).",
+          "gesture": "Click Ada's link; once the harness reports Ada's GET held, click Bea's link; then release Ada's GET.",
           "outcome": "resident-detail shows Bea's panel.",
           "opposite": "The same list under overlap, the default: after the same clicks and the release resident-detail shows Ada's panel, the later answer.",
           "defect": "A policy held per control and not across the action's rows (D11.7) lets row A's late answer overwrite row B's panel."
@@ -842,10 +842,10 @@
         },
         {
           "for": "X17.38",
-          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\") in an app that takes ShowBusy() and renders Html.NativeLoader(\"Loading\"), whose stylesheet shows .alis-loader--target as a 20 pixel square, each row with a Discharge control from one NativeActionButton whose block posts the row's id and on success sets the control's text to Discharged; the test's endpoint holds Bea's response until the test releases it.",
-          "gesture": "Click Bea's Discharge, then release its response.",
+          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\") in an app that takes ShowBusy() and renders Html.NativeLoader(\"Loading\"), whose stylesheet shows .alis-loader--target as a 20 pixel square, each row with a Discharge control from one NativeActionButton whose block posts the row's id and on success sets the control's text to Discharged. The harness gates Bea's POST (Lanes.tla's Respond).",
+          "gesture": "Click Bea's Discharge; once the harness reports Bea's POST held, check the controls, then release it.",
           "outcome": "While it is held Bea's control shows the loader's overlay and Ada's and Cy's show none; after the release no control shows one and Bea's reads Discharged.",
-          "opposite": "Click Ada's Discharge instead: while held only Ada's control shows the overlay.",
+          "opposite": "Click Ada's Discharge instead: while the harness holds its POST only Ada's control shows the overlay.",
           "defect": "A busy target that names the action's first control, or the page, shows the wrong row or every row busy; the target is the control the block's success route writes, read when the request starts (D10.21).",
           "observes": "Lanes.tla:Respond"
         },
@@ -1056,10 +1056,10 @@
         },
         {
           "for": "X17.8",
-          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with an intake page's declared app event IntakeSaveRequested, whose payload is a resident's name, handled under replace: the handler asks NativeConfirm Save the intake for the payload? and on yes posts it, the test's endpoint counting the saves and the route setting saved's text to the count and the name it saved. Save dispatches IntakeSaveRequested with Ada; the page's on-load GET of the amended name, Ada Lovelace, is held by the test's endpoint until the test releases it, and its route dispatches IntakeSaveRequested with that name.",
-          "gesture": "Click Save; while the dialog asks Save the intake for Ada?, release the held load; then click Yes.",
+          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with an intake page's declared app event IntakeSaveRequested, whose payload is a resident's name, handled under replace: the handler asks NativeConfirm Save the intake for the payload? and on yes posts it, the endpoint counting the saves and the route setting saved's text to the count and the name it saved. Save dispatches IntakeSaveRequested with Ada; the page's on-load GET of the amended name, Ada Lovelace, has a route that dispatches IntakeSaveRequested with that name. The harness gates the on-load GET (Composition.tla's Answer).",
+          "gesture": "Once the harness reports the on-load GET held, click Save; while the dialog asks Save the intake for Ada?, release the GET; then click Yes.",
           "outcome": "The dialog then asks Save the intake for Ada Lovelace?, no other dialog follows the Yes, and saved reads 1 Ada Lovelace.",
-          "opposite": "Click Save and Yes before releasing the load: saved reads 1 Ada.",
+          "opposite": "Click Save and Yes before releasing the GET: saved reads 1 Ada.",
           "defect": "An ask that ignores the replaced run's abort (D17.11) keeps Save the intake for Ada? open with the second ask waiting behind it, so a second dialog follows the first Yes, or that Yes saves Ada for the aborted run (Lanes.tla:ReplacedRunRunsNothingAfter)."
         },
         {
@@ -1193,10 +1193,10 @@
       "promises": [
         {
           "for": "X17.9",
-          "page": "A shift page whose app takes the request defaults and whose layout renders Html.NativeToast(TimeSpan.FromSeconds(5), dismiss: \"Dismiss\"), with Record a dose, whose click shows Notice().Info(\"Dose recorded\"), and Report a fall, whose click shows Notice().Error(\"Fall reported: call the nurse\"); the test runs the page's clock with Playwright's Page.Clock.",
-          "gesture": "Click Record a dose and Report a fall, hover the information toast, advance the clock 6 seconds, move the pointer to the page, advance the clock 6 seconds, press Escape and click the page, then click the error toast's Dismiss.",
+          "page": "A shift page whose app takes the request defaults and whose layout renders Html.NativeToast(TimeSpan.FromSeconds(5), dismiss: \"Dismiss\"), with Record a dose, whose click shows Notice().Info(\"Dose recorded\"), and Report a fall, whose click shows Notice().Error(\"Fall reported: call the nurse\"). The harness runs the page's timers on the clock.",
+          "gesture": "Click Record a dose and Report a fall, hover the information toast, advance the clock 6 seconds through the harness, move the pointer to the page, advance the clock 6 seconds, press Escape and click the page, then click the error toast's Dismiss.",
           "outcome": "After the first advance both toasts show; after the second the information toast is gone and the error toast shows, and it still shows after Escape and the click; after Dismiss no toast shows.",
-          "opposite": "Click Record a dose and advance the clock 6 seconds without hovering: the information toast is gone.",
+          "opposite": "Click Record a dose and advance the clock 6 seconds through the harness without hovering: the information toast is gone.",
           "defect": "A toast whose time runs while it is hovered, or an error toast that leaves after its time or on Escape or a click elsewhere, fails it; a manual popover stays on Escape and on a click elsewhere (probe:dom-popover-manual-escape-and-click-elsewhere), so only the time and Dismiss end a toast."
         },
         {

@@ -405,11 +405,11 @@
         },
         {
           "for": "X8.11",
-          "page": "A booking test component whose async Reserve sets its text from Open to Reserved when the test releases it; a button's When, the room free, holds an awaited call to Reserve, and the step after the branch copies the booking's text into the summary.",
-          "gesture": "Mark the room free and click Book, then release the reservation.",
-          "outcome": "Before the release the summary is empty; after it the summary reads Reserved.",
-          "opposite": "With the room taken, the summary reads Open at once, with nothing to release.",
-          "defect": "The step after the branch runs before Reserve settles, so the summary reads Open, or it waits on a branch not taken, so the summary stays empty."
+          "page": "The resident record's care panel, a ConformanceComponent whose text reads Open and whose Settle() awaits the test app's settle endpoint. A Book button's When, the room free, holds an awaited call to the care panel's Settle() followed by a step that sets the care panel's Text to Reserved, and the step after the branch copies the care panel's text into the summary. The harness gates the settle endpoint (Run.tla's Settle).",
+          "gesture": "Mark the room free and click Book; once the harness reports the settle held, check the summary, then release it.",
+          "outcome": "While the settle is held the summary is empty; after the release the summary reads Reserved.",
+          "opposite": "With the room taken, the summary reads Open at once, with nothing held.",
+          "defect": "The step after the branch runs before the care panel's Settle() settles, so the summary reads Open, or it waits on a branch not taken, so the summary stays empty."
         },
         {
           "for": "X8.13",
@@ -421,11 +421,11 @@
         },
         {
           "for": "X8.14",
-          "page": "A pain meter and two test components that count their calls in texts on the page, a nurse whose IsFree answers at once and a doctor whose async IsFree the test releases: When the pain is at least 8 the plan reads Ambulance, ElseIf the nurse IsFree it reads Nurse, ElseIf the doctor IsFree it reads Doctor, Else Wait.",
-          "gesture": "Set the pain to 9 and click Assess; set it to 5 with the nurse free and click; set it to 5 with the nurse busy, click, and release the doctor's answer yes.",
-          "outcome": "At 9 the plan reads Ambulance and both counts read 0; with the nurse free it reads Nurse, the nurse's count 1 and the doctor's 0; with the nurse busy it reads Doctor only after the release, and the doctor's count reads 1.",
-          "opposite": "Released with no, the plan reads Wait.",
-          "defect": "An ElseIf's method runs though a branch before it held, so a count rises at pain 9, or the doctor's answer is not awaited, so the plan reads Wait or Doctor before the release."
+          "page": "The resident record with a pain meter and the care panel's two ConformanceComponents, nurse and doctor, each showing its calls, the count of its method calls: the nurse's Total() answers its count at once, its Free and Busy buttons setting the count to 1 and 0, and the doctor's SettleCheck() awaits the test app's check endpoint and answers what that endpoint answers. When the pain is at least 8 the plan reads Ambulance, ElseIf the nurse's Total() is above 0 it reads Nurse, ElseIf the doctor's SettleCheck() it reads Doctor, Else Wait. The harness seeds the check endpoint's answer and gates it (Run.tla's Settle).",
+          "gesture": "Set the pain to 9 and click Assess; set it to 5, click the nurse's Free and Assess; set it to 5, click the nurse's Busy and Assess, and once the harness reports the check endpoint held, check the plan, then release it with the seeded answer yes.",
+          "outcome": "At 9 the plan reads Ambulance and both calls read 0; with the nurse free it reads Nurse, the nurse's calls 1 and the doctor's 0; with the nurse busy it reads Doctor only after the release, and the doctor's calls read 1.",
+          "opposite": "With the check endpoint seeded to answer no, the plan reads Wait after the release.",
+          "defect": "An ElseIf's method runs though a branch before it held, so a calls count rises at pain 9, or the doctor's answer is not awaited, so the plan reads Wait or Doctor before the release."
         },
         {
           "for": "X8.15",

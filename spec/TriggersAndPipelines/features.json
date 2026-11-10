@@ -177,10 +177,10 @@
         },
         {
           "for": "X11.7",
-          "page": "A save button whose handler, under skip, posts the chart; the server holds the answer until the test releases it, and counts the posts it received.",
-          "gesture": "Click save twice before the answer, then release it.",
-          "outcome": "The server received one post, and the status reads Saved once.",
-          "opposite": "A click after the answer sends a second post.",
+          "page": "The admission screen's chart save button, whose handler, under skip, posts the chart. The harness gates the POST (Lanes.tla's Respond) and counts the posts the endpoint received.",
+          "gesture": "Click save; once the harness reports the POST held, click save again, then release it.",
+          "outcome": "The harness counts one post, and the status reads Saved once.",
+          "opposite": "A click after the release sends a second post.",
           "defect": "The second click starts a run while the first is in flight, so the server receives two posts.",
           "observes": "Lanes.tla:FireSecond"
         },

@@ -2190,8 +2190,8 @@
         },
         {
           "for": "X16.19",
-          "page": "A room page whose container holds its summary and the room slot, which holds a Room input; Save posts the container and shows Saving… while it waits, and the endpoint holds its answer, a 400 for Room, \"Room 13 is closed.\", until the test releases it; Reload the room reloads the slot.",
-          "gesture": "Type 13 in Room, click Save, and while Saving… shows, click Reload the room; then release Save's answer.",
+          "page": "The admission screen's room form, a container holding its summary and the room slot, which holds a Room input; Save posts the container and shows Saving… while it waits, and Reload the room reloads the slot. The harness seeds Save's answer, a 400 for Room, \"Room 13 is closed.\", and gates it (Ownership.tla's ShowsFailures).",
+          "gesture": "Type 13 in Room and click Save; once the harness reports Save's POST held and Saving… shows, click Reload the room; then release it.",
           "outcome": "\"Room 13 is closed.\" shows in the summary and nothing shows beside the reloaded Room.",
           "opposite": "Without Reload the room, the message shows beside Room and in the summary.",
           "defect": "The message is placed by the input's id, so it shows beside the reloaded Room, which never sent 13.",

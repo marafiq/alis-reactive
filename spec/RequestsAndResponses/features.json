@@ -1424,10 +1424,10 @@
         },
         {
           "for": "X10.16",
-          "page": "Two Parallel GETs whose success routes set one summary card, the endpoint holding each answer until the test releases it; a second page whose two GETs set two cards, held the same way.",
-          "gesture": "Click Load on the first page, release the first GET's answer, then the second's; do the same on the second page.",
+          "page": "The residents screen's summary: on its first page, Load sends two Parallel GETs whose success routes set one summary card; on its second page, Load sends two Parallel GETs that set two cards. The harness gates each GET (Composition.tla's Answer).",
+          "gesture": "Click Load on the first page; once the harness reports both GETs held, release the first, then the second; do the same on the second page.",
           "outcome": "On the first page the card's indicator and aria-busy stay after the first release and leave at the second; on the second page the first card's leave at the first release and the second card's stay until the second.",
-          "opposite": "With both answers released together, every indicator hides together.",
+          "opposite": "With both GETs released together, every indicator hides together.",
           "defect": "The indicator hidden at the first answer, so the shared card shows no indicator after the first release; or one target held for both, so the first card stays busy until the second release.",
           "observes": "Composition.tla:DefaultFinally"
         },
@@ -1442,9 +1442,9 @@
         },
         {
           "for": "X10.19",
-          "page": "Two Parallel GETs with no Busy, each success route setting one component's value from its JSON body, the endpoint holding each answer until the test releases it; a third GET, held the same way, whose route sets a text only inside a When.",
-          "gesture": "Click Load both, release the first answer, then the second; then click Load third and release its answer.",
-          "outcome": "Each component's element shows the indicator until its own answer is released and the page's indicator never shows; while the third's answer is held the page's indicator shows.",
+          "page": "The residents screen with two census panels, each a ConformanceComponent: Load both sends two Parallel GETs with no Busy, each success route setting one census panel's Value from its JSON body; Load third sends a third GET whose route sets a text only inside a When. The harness gates each GET (Composition.tla's Answer).",
+          "gesture": "Click Load both; once the harness reports both GETs held, release the first, then the second; then click Load third and, once the harness reports it held, release it.",
+          "outcome": "Each census panel's element shows the indicator until its own GET is released and the page's indicator never shows; while the third GET is held the page's indicator shows.",
           "opposite": "With Busy(\"panel\") on both, only the panel shows the indicator.",
           "defect": "The page's indicator shown for the two components, or the third holding the element its When writes.",
           "observes": "Composition.tla:Begin"

@@ -423,8 +423,8 @@
         },
         {
           "for": "X11.5",
-          "page": "A ward page whose resident slot holds the resident card partial. The card's Refresh sends GET /residents/7, whose answer the test releases, with the busy indicator ward-busy outside the slot and a success route that writes Refreshed into ward-status, also outside the slot; the page's Close card button unloads the slot.",
-          "gesture": "Click Refresh, click Close card, then release the answer.",
+          "page": "The resident record whose tab slot holds the resident card partial. The card's Refresh sends GET /residents/7, with the busy indicator ward-busy outside the slot and a success route that writes Refreshed into ward-status, also outside the slot; the record's Close card button unloads the slot. The harness gates GET /residents/7 (Composition.tla's Answer).",
+          "gesture": "Click Refresh; once the harness reports GET /residents/7 held, click Close card, then release it.",
           "outcome": "ward-busy hides when the card closes, and ward-status stays empty after the release.",
           "opposite": "Without Close card, the release writes Refreshed into ward-status and hides ward-busy.",
           "defect": "Dispose ends no run in flight, as the redesign's owner only runs its disposers (Alis.Reactive.Assets/runtime/objects/owner.ts:32-40 at 65fdf118d), so Refreshed shows after the release; or the busy target is held past the dispose, so ward-busy stays shown.",
@@ -474,17 +474,17 @@
         },
         {
           "for": "X11.14",
-          "page": "An admissions page whose Admit button sends POST /admissions, taking no defaults. Its success route appends Admitted to the log, sends POST /beds, whose answer the test releases, and then appends Bed assigned; the admission's Finally appends Finally, its Chained appends Chained, and the step after the request appends After.",
-          "gesture": "Click Admit, then release the beds answer.",
+          "page": "The admission screen whose Admit button sends POST /admissions, taking no defaults. Its success route appends Admitted to the log, sends POST /beds and then appends Bed assigned; the admission's Finally appends Finally, its Chained appends Chained, and the step after the request appends After. The harness gates POST /beds (Lanes.tla's SettleTheTail).",
+          "gesture": "Click Admit; once the harness reports POST /beds held, check the log, then release it.",
           "outcome": "Before the release the log reads Admitted; after it the log reads Admitted, Bed assigned, Finally, Chained, After.",
-          "opposite": "With the route sending no second request, the log reads Admitted, Bed assigned, Finally, Chained, After once the admission answers, with no release.",
+          "opposite": "With the route sending no second request, the log reads Admitted, Bed assigned, Finally, Chained, After once the admission answers, with nothing held.",
           "defect": "Finally, Chained and the step after run once the route reaches its first awaited step, as a join over the route's first promise alone would, so the log reads Admitted, Finally, Chained, After before the release and Bed assigned after it.",
           "observes": "Lanes.tla:SettleTheTail"
         },
         {
           "for": "X11.15",
-          "page": "A roster page whose Refresh button, under replace, sends GET /roster; its success route sends GET /shifts and writes shifts shown into roster-status. The endpoint holds the first run's shifts answer until the test releases it. The shifts request's Finally appends inner finally to the log, the roster request's Finally appends outer finally, and the app's request defaults' Finally appends defaults finally for each request.",
-          "gesture": "Click Refresh, and once the roster answers click Refresh again, then release the first run's shifts answer.",
+          "page": "The residents screen whose Refresh button, under replace, sends GET /roster; its success route sends GET /shifts and writes shifts shown into roster-status. The shifts request's Finally appends inner finally to the log, the roster request's Finally appends outer finally, and the app's request defaults' Finally appends defaults finally for each request. The harness gates the first run's GET /shifts (Lanes.tla's Respond).",
+          "gesture": "Click Refresh; once the harness reports the first run's GET /shifts held, click Refresh again; then release it.",
           "outcome": "After the second click the log reads inner finally, defaults finally, outer finally, defaults finally, each once, and after the release the first run writes no shifts shown.",
           "opposite": "Under overlap, the second click starts a second run beside the first, and after the release the first run writes shifts shown before its Finally layers run.",
           "defect": "The abort runs the outer Finally before the inner one, or the defaults' layer once for both requests, so the log reads another order; or the aborted run's route goes on and writes shifts shown after the release.",
@@ -492,10 +492,10 @@
         },
         {
           "for": "X11.16",
-          "page": "A ward board whose Load board button runs Parallel: one branch sends GET /residents, whose success route sends GET /allergies, whose answer the test releases; the other branch sends GET /staff. The step after Parallel writes Board ready into board-status.",
-          "gesture": "Click Load board, then release the allergies answer.",
+          "page": "The residents screen whose Load board button runs Parallel: one branch sends GET /residents, whose success route sends GET /allergies; the other branch sends GET /staff. The step after Parallel writes Board ready into board-status. The harness gates GET /allergies (Lanes.tla's Settle).",
+          "gesture": "Click Load board; once the harness reports GET /allergies held, check board-status, then release it.",
           "outcome": "board-status stays empty while the allergies request is in flight, and reads Board ready after the release.",
-          "opposite": "With the residents route sending no request, Board ready shows once both branches answer, with no release.",
+          "opposite": "With the residents route sending no request, Board ready shows once both branches answer, with nothing held.",
           "defect": "The join waits for each branch's request and not for its route's own request, so Board ready shows before the release.",
           "observes": "Lanes.tla:Settle"
         },

@@ -1997,6 +1997,26 @@ def app_placement_problems(app, where, entry, screens, hosts, module, rung):
     return problems
 
 
+APP_ACTION_VERBS = {"gate", "push", "drop", "refuse", "reopen", "restart"}
+
+
+def app_held_problems(where, entry):
+    harness = set(entry["harness"])
+    held = entry.get("held", [])
+    named = {step["verb"] for step in held}
+    problems = [f"{where} uses {verb} and holds no step of it" for verb in sorted(harness - named - {"seed"})]
+    problems += [f"{where} holds a {verb} step, and its harness lacks {verb}" for verb in sorted(named - harness)]
+    for step in held:
+        action = step.get("action")
+        if action is None:
+            problems += [f"{where}'s {step['verb']} step on {step.get('on')} names no action"] if step["verb"] in APP_ACTION_VERBS else []
+            continue
+        spec, _, name = action.partition(".tla:")
+        known = spec in ACTION_SPECS and name in spec_actions(spec)
+        problems += [f"{where} holds {action}, no action of {spec}.tla's Next"] if not known else []
+    return problems
+
+
 def app_vendor_problems(screens, used):
     native = json.loads((SPEC / "Reference" / "native.json").read_text())
     components = {declared["name"]: declared for declared in native["types"] if declared["kind"] == "component"}
@@ -2036,6 +2056,7 @@ def check_app():
         placed[key] += 1
         used |= {(entry["screen"], part) for part in entry["parts"]}
         problems += app_placement_problems(app, where, entry, screens, hosts, (known or {}).get("module"), (known or {}).get("rung"))
+        problems += app_held_problems(where, entry)
     reached = Counter()
     for entry in app["cells"]:
         key = ("cell", entry["cell"]) if "cell" in entry else ("own", entry["own"])
@@ -2044,6 +2065,7 @@ def check_app():
         problems += [f"{key[0]} {key[1]} is placed, and the references promise no such cell"] if key not in references else []
         problems += [f"cell {key[1]} runs on {entry['screen']}, where the native reference's cells run on the bench"] if key[0] == "cell" and entry["screen"] != "bench" else []
         problems += app_placement_problems(app, f"{key[0]} {key[1]}", entry, screens, hosts, None, None)
+        problems += app_held_problems(f"{key[0]} {key[1]}", entry)
     problems += [f"{feature} {defect} #{index} is placed {count} times" for (feature, defect, index), count in placed.items() if count > 1]
     problems += [f"{feature} {defect} #{index} runs on no screen" for (feature, defect, index) in tests if (feature, defect, index) not in placed]
     problems += [f"{kind} {name} runs on no screen" for kind, name in sorted(references - set(reached))]

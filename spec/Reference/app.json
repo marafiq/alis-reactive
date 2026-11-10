@@ -1318,6 +1318,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the care panel's Settle()"
+        }
       ]
     },
     {
@@ -1352,6 +1359,18 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the check endpoint's answer, yes or no"
+        },
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the doctor's SettleCheck()"
+        }
       ]
     },
     {
@@ -2107,6 +2126,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "GET /residents/7"
+        }
       ]
     },
     {
@@ -2121,8 +2147,7 @@
         "conformance"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -2154,8 +2179,7 @@
         "carePanel"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -2205,6 +2229,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:SettleTheTail",
+          "on": "POST /beds"
+        }
       ]
     },
     {
@@ -2223,6 +2254,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the first run's GET /shifts"
+        }
       ]
     },
     {
@@ -2241,6 +2279,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Settle",
+          "on": "GET /allergies"
+        }
       ]
     },
     {
@@ -2321,8 +2366,7 @@
         "recordEndpoint"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -3395,6 +3439,18 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "north's GET"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "south's GET"
+        }
       ]
     },
     {
@@ -3456,6 +3512,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "Ada's GET"
+        }
       ]
     },
     {
@@ -3488,6 +3551,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "Bea's POST"
+        }
       ]
     },
     {
@@ -3549,6 +3619,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the on-load GET of the amended name"
+        }
       ]
     },
     {
@@ -3610,6 +3687,13 @@
       "harness": [
         "seed",
         "clock"
+      ],
+      "held": [
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the toasts' 5-second time"
+        }
       ]
     },
     {
@@ -3882,8 +3966,7 @@
         "radio"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -3917,8 +4000,7 @@
         "notes"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -3950,8 +4032,7 @@
         "notes"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -4082,8 +4163,7 @@
         "recordEndpoint"
       ],
       "harness": [
-        "seed",
-        "clock"
+        "seed"
       ]
     },
     {
@@ -4161,8 +4241,7 @@
         "roundEndpoint"
       ],
       "harness": [
-        "seed",
-        "clock"
+        "seed"
       ]
     },
     {
@@ -4194,8 +4273,7 @@
         "plugins"
       ],
       "harness": [
-        "seed",
-        "push"
+        "seed"
       ]
     },
     {
@@ -4211,8 +4289,7 @@
         "plugins"
       ],
       "harness": [
-        "seed",
-        "push"
+        "seed"
       ]
     },
     {
@@ -4228,8 +4305,7 @@
         "plugins"
       ],
       "harness": [
-        "seed",
-        "clock"
+        "seed"
       ]
     },
     {
@@ -4245,8 +4321,7 @@
         "plugins"
       ],
       "harness": [
-        "seed",
-        "clock"
+        "seed"
       ]
     },
     {
@@ -4939,8 +5014,7 @@
         "residentsEndpoint"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -5518,6 +5592,18 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "each Parallel GET of the first page"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "each Parallel GET of the second page"
+        }
       ]
     },
     {
@@ -5554,6 +5640,18 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "each of the two Parallel GETs"
+        },
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the third GET"
+        }
       ]
     },
     {
@@ -5664,7 +5762,6 @@
       ],
       "parts": [],
       "harness": [
-        "gate",
         "seed"
       ]
     },
@@ -5761,8 +5858,7 @@
         "roundEndpoint"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -5867,6 +5963,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the desk's async acknowledge"
+        }
       ]
     },
     {
@@ -5900,6 +6003,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "East's rooms GET"
+        }
       ]
     },
     {
@@ -5917,6 +6027,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the chart's POST"
+        }
       ]
     },
     {
@@ -6433,8 +6550,7 @@
         "intakeEndpoint"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -6452,8 +6568,7 @@
         "intakeEndpoint"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -6489,6 +6604,18 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "Save's answer, a 400 for Room"
+        },
+        {
+          "verb": "gate",
+          "action": "Ownership.tla:ShowsFailures",
+          "on": "Save's POST"
+        }
       ]
     },
     {
@@ -6902,8 +7029,7 @@
         "conformance"
       ],
       "harness": [
-        "seed",
-        "clock"
+        "seed"
       ]
     },
     {
@@ -7010,6 +7136,13 @@
       "harness": [
         "seed",
         "restart"
+      ],
+      "held": [
+        {
+          "verb": "restart",
+          "action": "CallbackProperty.tla:Restart",
+          "on": "the ConformanceCallbacks object at conformanceCallbacks"
+        }
       ]
     },
     {
@@ -7025,8 +7158,7 @@
         "peer"
       ],
       "harness": [
-        "seed",
-        "gate"
+        "seed"
       ]
     },
     {
@@ -7059,8 +7191,7 @@
         "plugins"
       ],
       "harness": [
-        "seed",
-        "clock"
+        "seed"
       ]
     },
     {
@@ -7122,8 +7253,14 @@
       ],
       "harness": [
         "seed",
-        "gc",
-        "gate"
+        "gc"
+      ],
+      "held": [
+        {
+          "verb": "gc",
+          "action": null,
+          "on": "the dropped peer, confirmed by the page's WeakRef"
+        }
       ]
     },
     {
@@ -7226,6 +7363,13 @@
       "harness": [
         "seed",
         "restart"
+      ],
+      "held": [
+        {
+          "verb": "restart",
+          "action": "Ownership.tla:HostDestroysListened",
+          "on": "the ConformanceComponent at conformance"
+        }
       ]
     },
     {
@@ -7463,6 +7607,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the settle endpoint conformance.Settle() awaits"
+        }
       ]
     },
     {
@@ -7477,6 +7628,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7595,6 +7753,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the item endpoint args.Held.Item.Settle() awaits"
+        }
       ]
     },
     {
@@ -7635,6 +7800,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7662,6 +7834,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7689,6 +7868,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7716,6 +7902,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7743,6 +7936,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7757,6 +7957,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the text endpoint args.Settle() awaits"
+        }
       ]
     },
     {
@@ -7771,6 +7978,18 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        },
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the text endpoint args.Settle() awaits"
+        }
       ]
     },
     {
@@ -7785,6 +8004,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the held endpoint args.Held.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7799,6 +8025,18 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        },
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the held endpoint args.Held.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7826,6 +8064,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7853,6 +8098,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7880,6 +8132,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7907,6 +8166,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7947,6 +8213,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -7974,6 +8247,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -8001,6 +8281,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the count endpoint conformance.SettleCount() awaits"
+        }
       ]
     },
     {
@@ -8379,6 +8666,13 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Request.tla:Route",
+          "on": "the items endpoint's GET"
+        }
       ]
     },
     {
@@ -8432,6 +8726,18 @@
       "harness": [
         "seed",
         "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the code endpoint's GET, released first"
+        },
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "the items endpoint's GET"
+        }
       ]
     },
     {
@@ -8472,6 +8778,13 @@
       "harness": [
         "seed",
         "push"
+      ],
+      "held": [
+        {
+          "verb": "push",
+          "action": "Realtime.tla:Message",
+          "on": "Renamed with Beta on the test stream"
+        }
       ]
     },
     {
@@ -8512,6 +8825,13 @@
       "harness": [
         "seed",
         "restart"
+      ],
+      "held": [
+        {
+          "verb": "restart",
+          "action": "Ownership.tla:HostDestroys",
+          "on": "the card's ConformanceComponent"
+        }
       ]
     },
     {
