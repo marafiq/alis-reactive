@@ -41,8 +41,8 @@ the action link's `NativeActionLinkRequest<TModel>` are modules 24 and 25's, whi
 Module 6 adds no door of its own: Q9 and Q10 give every capability its door, N10.7 the surface. Beside N10.7 it keeps
 `HttpSend` and its parts (N9.1) with the wire forms `enum` and `flags` (N9.8), `HttpResponse` (N10.2), `Query<TQuery>`
 on POST, PUT and DELETE (N9.7), a condition on a part, a chained request and a parallel branch (N10.4), and the
-condensed request (N10.5); ALIS029 (N9.4) and `RequestKeysSuppressor` (N9.5) are its analyzers, whose code is module
-20's.
+condensed request (N10.5); ALIS029 (N9.4), `RequestKeysSuppressor` (N9.5) and ALIS008's corrected message (N9.9) are its
+analyzers, whose code is module 20's.
 
 - The verbs: main's `Get`, `Post`, `Put` and `Delete` on `PipelineBuilder<TModel>` and on `HttpRequestBuilder<TModel>`
   inside `Chained` and `Parallel`, and the redesign's `RequestExtensions` and `RequestStart<TModel>`, go to N10.7's

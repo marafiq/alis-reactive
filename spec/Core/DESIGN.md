@@ -1694,7 +1694,7 @@ Terms used throughout:
 - D9.17 A block holds one request at its own level. A request in a block inside it (a branch, a route, `Finally`,
   a `Parallel` branch) is that block's, and requests in nested blocks run one after another, each after the one
   before it settles (D11.5). ALIS008 keeps refusing a second request in one block, retargeted to the verbs of
-  `Pipeline<TModel>` in every stage, both lambda forms and every file (N9.5), with its reason corrected: `Chained`
+  `Pipeline<TModel>` in every stage, both lambda forms and every file (N9.9), with its reason corrected: `Chained`
   runs a request after another succeeds, `Parallel` sends them at once, and a request in `Finally` runs after every
   outcome.
 - D9.18 `pipeline.PageUrl<TPage>()` (N10.7) reads the page's own URL. It is a source (Q7), not a part of the request.
@@ -1865,17 +1865,17 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   run (D9.4), on a read of the lambda's own parameter. The doors are matched by the method's definition. The warning
   stays on `Path`, whose member is the request's own, on a value the view holds, inside the key or beside it, and on
   every other lambda; an input's member path keeps it for MVC's helpers (N6.3).
-- `N9.5` new: ALIS008's corrected message
-  (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`), retargeted from
-  `PipelineBuilder` and `RequestExtensions` (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:37-40`)
-  in the block lambdas of Razor files only (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:59`)
-  to the verbs of `Pipeline<TModel>` in every block, expression and `{}` lambdas both, in every file, since the
-  defaults live in a startup file.
 - `N9.6` new: the request defaults of D9.12 and D10.12, configured once in C#; their door's form goes to gate 2.
 - `N9.7` new: `Query<TQuery>(q => q.Set(x => x.Member, value or source))` on POST, PUT and DELETE.
 - `N9.8` new: the wire forms `enum` and `flags` of `HttpSend`, written by `EnumNames.cs`, the file the rewrite's request
   unit adds to the Types module; no public door. `flags` serves a source whose enum the app names with N16.4; a literal
   enum is `Enum.ToString`'s text (D9.13).
+- `N9.9` new: ALIS008's corrected message
+  (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:17`), retargeted from
+  `PipelineBuilder` and `RequestExtensions` (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:37-40`)
+  in the block lambdas of Razor files only (`Alis.Reactive.Analyzers/HttpPipeline/MultipleHttpRequestsInPipelineAnalyzer.cs:59`)
+  to the verbs of `Pipeline<TModel>` in every block, expression and `{}` lambdas both, in every file, since the
+  defaults live in a startup file.
 
 **Evidence.**
 - B6: the request is a record of string-named fields (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:101`) typed by
@@ -2479,7 +2479,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `X10.25` analyzer (D10.21, D10.13): a second `Busy` or `NoBusy`, a status outside 300 to 599, a second route for
   one status and a second catch-all: new:N18.7.
 - `X10.26` analyzer (D9.17): a second request in one block, at its own level, in every stage and file: ALIS008,
-  new:N9.5.
+  new:N9.9.
 - `X10.27` analyzer (N10.7): a request's parts object written by two statements, and a request held in a variable and
   written twice (a second `Chained` among them), each of which compiles: new:N18.7.
 - `X10.28` refusal (N10.7): a request rendered in an app that never called `AddReactiveRequests` is refused where the
@@ -4559,7 +4559,7 @@ plans (Q19).
     developer sees where each rule runs. ALIS006, main's warning on a condition with no browser form: kept, an error
     (N18.11). ALIS007, a second `Chained`: the chain does not compile, since `Chained` ends the request's sentence
     (`SecondChained` in `spec/api/refused.sh`), and a request held and written twice is ALIS030's single use, which
-    carries it (N18.7). ALIS008: kept, retargeted (D9.17, N9.5). ALIS009: kept (D18.5).
+    carries it (N18.7). ALIS008: kept, retargeted (D9.17, N9.9). ALIS009: kept (D18.5).
     ALIS010 to ALIS013, the slice tree (a use of a slice above, a namespace other than the folder's, a public type
     left unsealed, a table that disagrees with its package): kept for each package built on the core, since a module
     is a namespace and a folder (the owner, 2026-11-06). ALIS014 to ALIS029 are the POC's, each at its own line.
