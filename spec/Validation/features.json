@@ -2168,7 +2168,8 @@
           "gesture": "Leave Ward empty and click Assign.",
           "outcome": "\"Ward is required.\" shows beside Ward and in the notice.",
           "opposite": "Typing North and clicking Assign shows no message.",
-          "defect": "An input outside every container has no message element the request knows, so the message shows in the notice only."
+          "defect": "An input outside every container has no message element the request knows, so the message shows in the notice only.",
+          "observes": "Composition.tla:Route"
         },
         {
           "for": "X16.17",
@@ -2176,7 +2177,8 @@
           "gesture": "Click Open contact, then Save contact.",
           "outcome": "\"Name the contact.\" shows beside the slot's Name and in the slot's summary, and nothing shows beside the page's Name or in the page's summary.",
           "opposite": "Clicking Save resident shows \"Name the resident.\" beside the page's Name and in the page's summary only.",
-          "defect": "Both inputs bind Name, so the message also shows beside the page's Name or in the page's summary."
+          "defect": "Both inputs bind Name, so the message also shows beside the page's Name or in the page's summary.",
+          "observes": "Ownership.tla:SendsSlotInput"
         },
         {
           "for": "X16.18",
@@ -2188,11 +2190,12 @@
         },
         {
           "for": "X16.19",
-          "page": "A room page whose container holds its summary and the room slot, which holds a Room input; Save posts the container, shows Saving… while it waits, and its endpoint answers after two seconds with a 400 for Room, \"Room 13 is closed.\"; Reload the room reloads the slot.",
-          "gesture": "Type 13 in Room, click Save, and while Saving… shows, click Reload the room.",
+          "page": "A room page whose container holds its summary and the room slot, which holds a Room input; Save posts the container and shows Saving… while it waits, and the endpoint holds its answer, a 400 for Room, \"Room 13 is closed.\", until the test releases it; Reload the room reloads the slot.",
+          "gesture": "Type 13 in Room, click Save, and while Saving… shows, click Reload the room; then release Save's answer.",
           "outcome": "\"Room 13 is closed.\" shows in the summary and nothing shows beside the reloaded Room.",
           "opposite": "Without Reload the room, the message shows beside Room and in the summary.",
-          "defect": "The message is placed by the input's id, so it shows beside the reloaded Room, which never sent 13."
+          "defect": "The message is placed by the input's id, so it shows beside the reloaded Room, which never sent 13.",
+          "observes": "Ownership.tla:ShowsFailures"
         },
         {
           "for": "X16.20",

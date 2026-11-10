@@ -154,7 +154,8 @@
           "gesture": "Click the call button, then release the desk's acknowledgement.",
           "outcome": "Before the release the pager reads Heard and the desk reads Waiting; after it the desk reads Acknowledged.",
           "opposite": "With the second handler subscribed first, the pager copies Idle.",
-          "defect": "The second handler waits for the first one's await, so the pager stays empty before the release, or the first never goes on and the desk keeps Waiting."
+          "defect": "The second handler waits for the first one's await, so the pager stays empty before the release, or the first never goes on and the desk keeps Waiting.",
+          "observes": "Run.tla:FirstReturns"
         },
         {
           "for": "X11.19",
@@ -162,7 +163,8 @@
           "gesture": "Click the chime's button.",
           "outcome": "The chime shows both values, the first handler's and the second's.",
           "opposite": "With an awaited step before the second handler's write, the chime shows the first value alone.",
-          "defect": "A handler continues in a microtask, so the chime reads before either write and shows neither value, or the second handler starts after the chime's turn and its value is missing."
+          "defect": "A handler continues in a microtask, so the chime reads before either write and shows neither value, or the second handler starts after the chime's turn and its value is missing.",
+          "observes": "Run.tla:SecondReturns"
         },
         {
           "for": "X11.6",
@@ -170,7 +172,8 @@
           "gesture": "Pick ward East, then ward West before East answers, then release East's answer.",
           "outcome": "The room list shows West's rooms after both answers.",
           "opposite": "Under overlap, the room list shows East's rooms after its late answer.",
-          "defect": "The first run is not cut, so East's late answer overwrites West's rooms."
+          "defect": "The first run is not cut, so East's late answer overwrites West's rooms.",
+          "observes": "Lanes.tla:Route"
         },
         {
           "for": "X11.7",
@@ -178,7 +181,8 @@
           "gesture": "Click save twice before the answer, then release it.",
           "outcome": "The server received one post, and the status reads Saved once.",
           "opposite": "A click after the answer sends a second post.",
-          "defect": "The second click starts a run while the first is in flight, so the server receives two posts."
+          "defect": "The second click starts a run while the first is in flight, so the server receives two posts.",
+          "observes": "Lanes.tla:FireSecond"
         },
         {
           "for": "X11.24",
@@ -186,7 +190,8 @@
           "gesture": "Click the bell once.",
           "outcome": "The log reads rang 1 finally 1 rang 2 finally 2 after 2.",
           "opposite": "Under overlap the log holds after 1 as well.",
-          "defect": "The new run starts before the old Finally, so the log reads rang 1 rang 2 finally 1, or the old run's after-step runs."
+          "defect": "The new run starts before the old Finally, so the log reads rang 1 rang 2 finally 1, or the old run's after-step runs.",
+          "observes": "Run.tla:CutInItsStep"
         },
         {
           "for": "M1.X1",

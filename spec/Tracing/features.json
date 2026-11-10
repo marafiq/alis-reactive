@@ -151,7 +151,8 @@
           "gesture": "Click Save; on the gate page click Release; wait until echo has text; open the collector page.",
           "outcome": "echo reads traceparent none, baggage none, and the collector page lists no span.",
           "opposite": "The same page rendered by a request the sampler records, so the view writes the trace on: echo reads a traceparent whose trace id is the page's, and the collector lists a run span holding a send span holding one attempt span under that trace id.",
-          "defect": "A port that records whatever its page says, or starts its spans before it reads the plan's trace, lists spans for a page whose render no one recorded, and sends a traceparent the server's parent-based sampler then records against the app's ratio (Tracing.tla's RecordsWhenOff mutant, which breaks NothingRecordedWhenOff). Main's level of trace on every plan (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:98 at 623dd4a27) is today's form of that mistake."
+          "defect": "A port that records whatever its page says, or starts its spans before it reads the plan's trace, lists spans for a page whose render no one recorded, and sends a traceparent the server's parent-based sampler then records against the app's ratio (Tracing.tla's RecordsWhenOff mutant, which breaks NothingRecordedWhenOff). Main's level of trace on every plan (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:98 at 623dd4a27) is today's form of that mistake.",
+          "observes": "Tracing.tla:Route"
         }
       ],
       "verdicts": []
@@ -336,7 +337,8 @@
           "gesture": "Click Find beds; click Find beds again; on the gate page click Release; wait until beds reads 4; open the collector page.",
           "outcome": "beds reads 4, and the collector lists under the page's trace id two run spans: the first ended with outcome replaced, holding its send span and that send's attempt span, both ended; the second ended with outcome completed, holding its send and attempt spans.",
           "opposite": "One click of Find beds and Release: beds reads 4, and the collector lists one run span, ended with outcome completed.",
-          "defect": "A port that ends a run's span only when its pipeline routes leaves the replaced run's span open, so the collector never receives it and lists only the second run (Tracing.tla's ReplacedRunLeftOpen mutant, which breaks EveryStartedSpanEnds)."
+          "defect": "A port that ends a run's span only when its pipeline routes leaves the replaced run's span open, so the collector never receives it and lists only the second run (Tracing.tla's ReplacedRunLeftOpen mutant, which breaks EveryStartedSpanEnds).",
+          "observes": "Tracing.tla:Abort"
         },
         {
           "for": "X20.5",
@@ -344,7 +346,8 @@
           "gesture": "Open the page; click Save; wait until status reads saved 1; click Save; wait until status reads saved 2.",
           "outcome": "status reads saved 1 and then saved 2, and the console shows one error, logged as the page started, naming the trace sink, and no other error.",
           "opposite": "The same page with an exporter that does not throw: status reads saved 1 and then saved 2, the console shows no error, and the collector lists the boot span and both runs.",
-          "defect": "A port that lets a sink's error reach the run stops the handler where it starts, so status stays empty (Tracing.tla's SinkErrorStopsRun mutant, which breaks SinkFailureChangesNothing); one that logs each failure shows an error for every span."
+          "defect": "A port that lets a sink's error reach the run stops the handler where it starts, so status stays empty (Tracing.tla's SinkErrorStopsRun mutant, which breaks SinkFailureChangesNothing); one that logs each failure shows an error for every span.",
+          "observes": "Tracing.tla:Trigger"
         }
       ],
       "verdicts": []
@@ -503,7 +506,8 @@
           "gesture": "Install Playwright's clock; click Load census; on the gate page click Release; run the clock forward by the standard first wait; wait until census reads 12; open the collector page and the echo page.",
           "outcome": "census reads 12; the collector lists under the page's trace id one run span holding one send span holding two attempt spans, GET with status 503, and GET with status 200 and resend count 1; the echo page lists two traceparents, each naming one of those attempt spans.",
           "opposite": "An endpoint that answers 200 at once: census reads 12, and the send span holds one attempt span, GET with status 200 and no resend count.",
-          "defect": "A port that makes one span per send and none per attempt lists one span with the last status, and one that names the run's span in every attempt's traceparent echoes one parent for both attempts (Tracing.tla's AttemptHeaderFromRun mutant, which breaks AttemptsJoinTheTrace)."
+          "defect": "A port that makes one span per send and none per attempt lists one span with the last status, and one that names the run's span in every attempt's traceparent echoes one parent for both attempts (Tracing.tla's AttemptHeaderFromRun mutant, which breaks AttemptsJoinTheTrace).",
+          "observes": "Tracing.tla:Respond"
         },
         {
           "for": "X20.4",
@@ -511,7 +515,8 @@
           "gesture": "Click Check pharmacy; on the gate page click Release; wait until pharmacy-echo has text; open the second host's log page.",
           "outcome": "pharmacy-echo reads traceparent none, and the second host's log lists one GET and no OPTIONS.",
           "opposite": "Click Check ward: ward-echo reads a traceparent naming the attempt's span under the page's trace id (probe:browser-same-origin-trace-headers-sent).",
-          "defect": "A runtime that adds the trace headers to every request (Tracing.tla's HeaderToEveryOrigin mutant, which breaks TraceHeadersStayHome) hands the page's trace id to another party and turns each cross-origin GET into a preflighted one: Chromium sends OPTIONS asking traceparent first, and where the other origin does not allow the header the GET is never sent and fetch rejects with a TypeError (probe:browser-cross-origin-traceparent-preflight). Here pharmacy-echo shows the traceparent and the log lists an OPTIONS."
+          "defect": "A runtime that adds the trace headers to every request (Tracing.tla's HeaderToEveryOrigin mutant, which breaks TraceHeadersStayHome) hands the page's trace id to another party and turns each cross-origin GET into a preflighted one: Chromium sends OPTIONS asking traceparent first, and where the other origin does not allow the header the GET is never sent and fetch rejects with a TypeError (probe:browser-cross-origin-traceparent-preflight). Here pharmacy-echo shows the traceparent and the log lists an OPTIONS.",
+          "observes": "Tracing.tla:Attempt"
         },
         {
           "for": "X20.7",

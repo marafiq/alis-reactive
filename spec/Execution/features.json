@@ -427,7 +427,8 @@
           "gesture": "Click Refresh, click Close card, then release the answer.",
           "outcome": "ward-busy hides when the card closes, and ward-status stays empty after the release.",
           "opposite": "Without Close card, the release writes Refreshed into ward-status and hides ward-busy.",
-          "defect": "Dispose ends no run in flight, as the redesign's owner only runs its disposers (Alis.Reactive.Assets/runtime/objects/owner.ts:32-40 at 65fdf118d), so Refreshed shows after the release; or the busy target is held past the dispose, so ward-busy stays shown."
+          "defect": "Dispose ends no run in flight, as the redesign's owner only runs its disposers (Alis.Reactive.Assets/runtime/objects/owner.ts:32-40 at 65fdf118d), so Refreshed shows after the release; or the busy target is held past the dispose, so ward-busy stays shown.",
+          "observes": "Composition.tla:Unload"
         },
         {
           "for": "X11.8",
@@ -451,7 +452,8 @@
           "gesture": "Click Raise a noted alarm on each monitor, then Confirm the acknowledgement on the first.",
           "outcome": "The first monitor shows cancelled and ack-status reads Acknowledging; after the confirmation its patient reads acknowledged, it shows silenced, ack-bed reads 6 and ack-status reads Acknowledged; the second monitor shows cancelled and the third sounding.",
           "opposite": "Before the confirmation, the first monitor's patient reads resting, it shows not silenced and ack-bed stays empty.",
-          "defect": "The handler continues after a microtask, so the first monitor reads no cancel and shows sounding; or the second handler waits for the first one's await, so its Cancel misses the second monitor's turn and it shows sounding; or a read after the await reads a snapshot of the payload, so ack-bed reads 4."
+          "defect": "The handler continues after a microtask, so the first monitor reads no cancel and shows sounding; or the second handler waits for the first one's await, so its Cancel misses the second monitor's turn and it shows sounding; or a read after the await reads a snapshot of the payload, so ack-bed reads 4.",
+          "observes": "Run.tla:VendorReads"
         },
         {
           "for": "X11.12",
@@ -459,7 +461,8 @@
           "gesture": "Click Raise an unnoted alarm, then Raise a noted alarm, then click Late cancel on the monitors index.",
           "outcome": "After the unnoted alarm the monitor shows cancelled and after the noted one sounding, and the Late cancel page is refused where the view renders with \"A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.\"",
           "opposite": "With the late Cancel moved before the When, the Late cancel page renders and its unnoted alarm shows cancelled.",
-          "defect": "The C# counts any await in the handler as before every write, so the first page is refused; or the Else runs after the monitor's turn, so the unnoted alarm sounds; or the late write passes the render and reaches no vendor."
+          "defect": "The C# counts any await in the handler as before every write, so the first page is refused; or the Else runs after the monitor's turn, so the unnoted alarm sounds; or the late write passes the render and reaches no vendor.",
+          "observes": "Run.tla:Fire"
         },
         {
           "for": "X11.13",
@@ -475,7 +478,8 @@
           "gesture": "Click Admit, then release the beds answer.",
           "outcome": "Before the release the log reads Admitted; after it the log reads Admitted, Bed assigned, Finally, Chained, After.",
           "opposite": "With the route sending no second request, the log reads Admitted, Bed assigned, Finally, Chained, After once the admission answers, with no release.",
-          "defect": "Finally, Chained and the step after run once the route reaches its first awaited step, as a join over the route's first promise alone would, so the log reads Admitted, Finally, Chained, After before the release and Bed assigned after it."
+          "defect": "Finally, Chained and the step after run once the route reaches its first awaited step, as a join over the route's first promise alone would, so the log reads Admitted, Finally, Chained, After before the release and Bed assigned after it.",
+          "observes": "Lanes.tla:SettleTheTail"
         },
         {
           "for": "X11.15",
@@ -483,7 +487,8 @@
           "gesture": "Click Refresh, and once the roster answers click Refresh again, then release the first run's shifts answer.",
           "outcome": "After the second click the log reads inner finally, defaults finally, outer finally, defaults finally, each once, and after the release the first run writes no shifts shown.",
           "opposite": "Under overlap, the second click starts a second run beside the first, and after the release the first run writes shifts shown before its Finally layers run.",
-          "defect": "The abort runs the outer Finally before the inner one, or the defaults' layer once for both requests, so the log reads another order; or the aborted run's route goes on and writes shifts shown after the release."
+          "defect": "The abort runs the outer Finally before the inner one, or the defaults' layer once for both requests, so the log reads another order; or the aborted run's route goes on and writes shifts shown after the release.",
+          "observes": "Run.tla:Abort"
         },
         {
           "for": "X11.16",
@@ -491,7 +496,8 @@
           "gesture": "Click Load board, then release the allergies answer.",
           "outcome": "board-status stays empty while the allergies request is in flight, and reads Board ready after the release.",
           "opposite": "With the residents route sending no request, Board ready shows once both branches answer, with no release.",
-          "defect": "The join waits for each branch's request and not for its route's own request, so Board ready shows before the release."
+          "defect": "The join waits for each branch's request and not for its route's own request, so Board ready shows before the release.",
+          "observes": "Lanes.tla:Settle"
         },
         {
           "for": "X11.18",
@@ -507,7 +513,8 @@
           "gesture": "Click Admit.",
           "outcome": "The log reads inner finally, defaults finally, outer finally, defaults finally, and neither after beds nor after admission.",
           "opposite": "With the bed board holding Capacity, the log reads inner finally, defaults finally, after beds, outer finally, defaults finally, after admission.",
-          "defect": "A stop unwinds past a request frame without its Finally layers, so the log lacks inner finally; or the stop ends the inner route alone, so after beds appears."
+          "defect": "A stop unwinds past a request frame without its Finally layers, so the log lacks inner finally; or the stop ends the inner route alone, so after beds appears.",
+          "observes": "Run.tla:Step"
         },
         {
           "for": "X11.21",
@@ -515,7 +522,8 @@
           "gesture": "Click Refresh, click Refresh again before Finish priming, then click Finish priming.",
           "outcome": "After the second click the log reads defaults finally 1 and roster-busy stays hidden; after Finish priming the log reads defaults finally 1, route 2, finally 2, defaults finally 2.",
           "opposite": "Under overlap, the second click leaves round 1 running, and after Finish priming the log holds route 1, finally 1 and defaults finally 1 as well.",
-          "defect": "The aborted request runs its own Finally although its WhileLoading never completed, so finally 1 appears; or the defaults' Finally is skipped with it, so defaults finally 1 is missing; or round 1's WhileLoading goes on after its await, so roster-busy shows before round 2 sends and route 1 appears."
+          "defect": "The aborted request runs its own Finally although its WhileLoading never completed, so finally 1 appears; or the defaults' Finally is skipped with it, so defaults finally 1 is missing; or round 1's WhileLoading goes on after its await, so roster-busy shows before round 2 sends and route 1 appears.",
+          "observes": "Lanes.tla:Finally"
         },
         {
           "for": "X11.22",
@@ -523,7 +531,8 @@
           "gesture": "Click Refresh, and once finally start 1 shows click Refresh again, then click Finish flushing each time the pump asks.",
           "outcome": "finally end 1 shows once, after the first Finish flushing, followed by defaults finally 1, and after 1 never shows.",
           "opposite": "Under overlap, the second click leaves round 1 running, and after Finish flushing the log holds after 1.",
-          "defect": "The replace ends the old Finally at its await, so finally end 1 never shows; or the old Finally runs again for the new run, so finally end 1 shows twice; or the step after the old request runs, so after 1 shows."
+          "defect": "The replace ends the old Finally at its await, so finally end 1 never shows; or the old Finally runs again for the new run, so finally end 1 shows twice; or the step after the old request runs, so after 1 shows.",
+          "observes": "Lanes.tla:After"
         },
         {
           "for": "X11.23",
@@ -531,7 +540,8 @@
           "gesture": "Click Refresh, once the answer arrives click Close card, then click Finish flushing.",
           "outcome": "ward-busy hides when the card closes, and the log holds no flushed after Finish flushing.",
           "opposite": "Without Close card, Finish flushing appends flushed and hides ward-busy.",
-          "defect": "A disposed run waits again, so flushed appears after Finish flushing; or the busy target is held until the defaults' Finally ends, so ward-busy stays shown after the card closes."
+          "defect": "A disposed run waits again, so flushed appears after Finish flushing; or the busy target is held until the defaults' Finally ends, so ward-busy stays shown after the card closes.",
+          "observes": "Lanes.tla:Dispose"
         }
       ],
       "verdicts": []

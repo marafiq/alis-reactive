@@ -276,23 +276,26 @@
           "gesture": "Click Open the bed card, then Show the board's state, then Close the bed card.",
           "outcome": "board-state reads open and board-lines reads 1 while the card is loaded, and board-lines reads 0 after Close the bed card.",
           "opposite": "Before Open the bed card, board-lines reads 0.",
-          "defect": "The stream is held only through its subscriptions, so a plan that only reads its state holds nothing: board-state reads closed and board-lines stays 0 (Alis.Reactive.Assets/runtime/realtime/stream.ts:75 at 65fdf118d)."
+          "defect": "The stream is held only through its subscriptions, so a plan that only reads its state holds nothing: board-state reads closed and board-lines stays 0 (Alis.Reactive.Assets/runtime/realtime/stream.ts:75 at 65fdf118d).",
+          "observes": "Realtime.tla:Unload"
         },
         {
           "for": "X21.3",
-          "page": "A nurses' station page whose stream WardBoard writes each News message's text into news, whose reconnecting steps write dropped into board-dropped and whose reconnected steps write back into board-back; Drop the board makes the endpoint end the stream's response after a retry field of 100 milliseconds and accept the browser's next connection; Post news makes the endpoint write a News message with the text typed beside it.",
-          "gesture": "Click Drop the board, then type Fall in room 4 and click Post news.",
-          "outcome": "board-dropped reads dropped, board-back reads back, and news reads Fall in room 4.",
+          "page": "A nurses' station page whose stream WardBoard writes each News message's text into news, whose reconnecting steps write dropped into board-dropped and whose reconnected steps write back into board-back; Drop the board makes the endpoint end the stream's response and hold the browser's next connection until Reopen the board lets it in; Post news makes the endpoint write a News message with the text typed beside it.",
+          "gesture": "Click Drop the board and wait until board-dropped reads dropped; click Reopen the board and wait until board-back reads back; then type Fall in room 4 and click Post news.",
+          "outcome": "board-dropped reads dropped while board-back stays empty until Reopen the board; then board-back reads back, and news reads Fall in room 4.",
           "opposite": "Before Drop the board, board-dropped and board-back are empty, and Post news with Ada is up shows Ada is up in news.",
-          "defect": "A stream raises no lifecycle trigger, so board-dropped and board-back stay empty while the browser reconnects (Alis.Reactive.Assets/runtime/realtime/hub.ts:116 at 65fdf118d lists a hub's alone), or the message after the reconnection runs no handler and news stays empty."
+          "defect": "A stream raises no lifecycle trigger, so board-dropped and board-back stay empty while the browser reconnects (Alis.Reactive.Assets/runtime/realtime/hub.ts:116 at 65fdf118d lists a hub's alone), or the message after the reconnection runs no handler and news stays empty.",
+          "observes": "Realtime.tla:Reconnected"
         },
         {
           "for": "X21.8",
-          "page": "A medication round page whose stream RoundNews's Dose handler posts the dose to /doses under the request defaults, whose busy indicator is the page's; Drop the round makes the endpoint end the stream's response after a retry field of 2000 milliseconds, the stream's reconnecting steps write dropped into round-dropped and its reconnected steps write back into round-back; Post a dose makes the endpoint write a Dose message, and /doses answers after one second.",
-          "gesture": "Click Drop the round, then, once round-back reads back, click Post a dose.",
-          "outcome": "The busy indicator stays hidden while round-dropped reads dropped and round-back is empty, shows once the dose's request is sent, and hides when that request settles.",
+          "page": "A medication round page whose stream RoundNews's Dose handler posts the dose to /doses under the request defaults, whose busy indicator is the page's; Drop the round makes the endpoint end the stream's response and hold the browser's next connection until Reopen the round lets it in, the stream's reconnecting steps write dropped into round-dropped and its reconnected steps write back into round-back; Post a dose makes the endpoint write a Dose message, and the endpoint holds the /doses answer until the test releases it.",
+          "gesture": "Click Drop the round and wait until round-dropped reads dropped; click Reopen the round and wait until round-back reads back; click Post a dose and, once the busy indicator shows, release the /doses answer.",
+          "outcome": "The busy indicator stays hidden while round-dropped reads dropped and round-back is empty, shows once the dose's request is sent, and hides when its answer is released.",
           "opposite": "With the stream open and no dose posted, the busy indicator stays hidden.",
-          "defect": "The reconnection holds the busy indicator, so it shows for the whole outage; or the request a message's run sends is left out of the page's count, so the indicator never shows for it or hides before it settles."
+          "defect": "The reconnection holds the busy indicator, so it shows for the whole outage; or the request a message's run sends is left out of the page's count, so the indicator never shows for it or hides before it settles.",
+          "observes": "Realtime.tla:Drop"
         },
         {
           "for": "X21.9",
@@ -300,7 +303,8 @@
           "gesture": "Click Open the bed card and Close both boards, then Close the bed card, then Reopen the ward board and click Retry.",
           "outcome": "One reconnect offer shows after Close both boards; it stays shown after Close the bed card; it hides once WardBoard opens after Retry.",
           "opposite": "With the bed card open and only BedBoard given up, Close the bed card hides the offer.",
-          "defect": "The offer is a flag per connection, not a count, so it shows twice, or unloading the card hides it while WardBoard is still given up, or it stays shown after WardBoard opens."
+          "defect": "The offer is a flag per connection, not a count, so it shows twice, or unloading the card hides it while WardBoard is still given up, or it stays shown after WardBoard opens.",
+          "observes": "Realtime.tla:GiveUp"
         },
         {
           "for": "X21.10",
@@ -309,7 +313,8 @@
           "outcome": "The offer stays shown after the first Retry, which the endpoint refuses, and hides after the second once board-call reads 2.",
           "opposite": "Without Close the board, the offer never shows and board-call reads 1.",
           "defect": "A click on Retry hides the offer before the stream opens, so it is hidden while the retry fails (Alis.Reactive.Assets/runtime/realtime/retry-indicator.ts:47-53 at 65fdf118d), or a failed retry leaves it hidden.",
-          "existing_test": "main WhenLiveConnectionDrops.clicking_retry_while_the_outage_continues_keeps_the_indicator_visible"
+          "existing_test": "main WhenLiveConnectionDrops.clicking_retry_while_the_outage_continues_keeps_the_indicator_visible",
+          "observes": "Realtime.tla:Retry"
         },
         {
           "for": "X21.11",
@@ -335,6 +340,33 @@
           "opposite": "Without Stop live alerts, Sound the all clear shows All clear in alert.",
           "defect": "The close is taken as the server giving up, so alerts-closed reads closed or the offer shows; or the All clear still runs the handler and alert reads All clear.",
           "existing_test": "redesign WhenNurseStopsLiveAlerts.stopping_live_alerts_says_so_and_raises_no_reconnect_banner"
+        },
+        {
+          "for": "X21.8",
+          "page": "A page whose stream Feed's reconnecting steps write dropped into feed-dropped and whose reconnected steps write back into feed-back; Drop the feed makes the endpoint end the stream's response and hold the browser's next connection until Reopen the feed lets it in; Load sends GET /items under the request defaults, whose busy indicator is the page's, and the endpoint holds that answer until the test releases it.",
+          "gesture": "Click Drop the feed and wait until feed-dropped reads dropped; click Load, then release its answer; then click Reopen the feed.",
+          "outcome": "The busy indicator stays hidden while feed-dropped reads dropped, shows once Load's request is sent and hides when its answer is released, with feed-back still empty; feed-back reads back after Reopen the feed.",
+          "opposite": "With the stream open, Load and its release show and hide the indicator the same way.",
+          "defect": "The reconnection counts as a request in flight, so the indicator shows at the drop and stays shown after Load's answer settles, until the stream reconnects (Realtime.tla's StreamHoldsBusy mutant, which breaks IndicatorNeverStaysShown).",
+          "observes": "Realtime.tla:BeginPage"
+        },
+        {
+          "for": "X21.8",
+          "page": "A page whose stream Feed's Item handler posts the item to /items under the request defaults, whose busy indicator is the page's; the post's success route writes saved into item-status, and its Finally awaits the ConformanceComponent's async method, which the page's Settle button resolves; Push an item makes the endpoint write an Item message, and the endpoint holds the /items answer until the test releases it.",
+          "gesture": "Click Push an item; once the busy indicator shows, release the /items answer and wait until item-status reads saved; then click Settle.",
+          "outcome": "After the release item-status reads saved and the busy indicator still shows; after Settle it hides.",
+          "opposite": "With no item pushed, the busy indicator stays hidden and item-status stays empty.",
+          "defect": "The answer releases the hold, so the indicator hides when item-status reads saved while the request's Finally still awaits, before the defaults' Finally runs (X10.3's busy targets hide after the defaults' Finally; Realtime.tla's IndicatorNeverHidesEarly over Holding).",
+          "observes": "Realtime.tla:Answer"
+        },
+        {
+          "for": "X21.8",
+          "page": "A page whose stream Feed's Item handler posts the item to /items under the request defaults, whose busy indicator is the page's; Push an item makes the endpoint write an Item message, and the endpoint holds the /items answer until the test releases it; Load sends GET /list under the same defaults, answered at once, and its success route writes loaded into list-status.",
+          "gesture": "Click Push an item; once the busy indicator shows, click Load and wait until list-status reads loaded; then release the /items answer.",
+          "outcome": "The busy indicator stays shown after list-status reads loaded, and hides once the /items answer is released.",
+          "opposite": "Load alone, with no item pushed, shows the indicator and hides it when list-status reads loaded.",
+          "defect": "The message's request and the page's are counted apart, so the indicator never shows for the message's request, or hides when the page's request settles while the message's is still in flight (Realtime.tla's MessageRequestUncounted mutant, which breaks IndicatorNeverHidesEarly).",
+          "observes": "Realtime.tla:DefaultFinally"
         }
       ],
       "verdicts": [
@@ -637,7 +669,8 @@
           "outcome": "The reconnect offer shows after Hang up the bed line and hides after Close the bed card.",
           "opposite": "With the page's own plan also naming BedLine, Close the bed card keeps the offer shown.",
           "defect": "The offer outlives the connection's last holder, so it stays shown with nothing left to retry, as main releases the hub without withdrawing it (Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts:134-141 at 623dd4a27).",
-          "existing_test": "redesign WhenASlotListensToALiveConnection.unloading_the_slot_whose_hub_the_server_hung_up_on_withdraws_its_retry_offer"
+          "existing_test": "redesign WhenASlotListensToALiveConnection.unloading_the_slot_whose_hub_the_server_hung_up_on_withdraws_its_retry_offer",
+          "observes": "Ownership.tla:ServerHangsUp"
         },
         {
           "for": "X21.4",
@@ -663,7 +696,8 @@
           "outcome": "line-closed reads closed, line-dropped stays empty, and the reconnect offer shows.",
           "opposite": "With the line answered, the page shows line-call at 1, line-closed stays empty, and the offer stays hidden.",
           "defect": "A start that fails its last try shows the offer and runs no closed steps, so line-closed stays empty; or it runs the reconnecting steps and line-dropped reads dropped.",
-          "existing_test": "redesign WhenTheServerDropsAHub.a_hub_the_server_refuses_on_every_try_is_offered_for_retry"
+          "existing_test": "redesign WhenTheServerDropsAHub.a_hub_the_server_refuses_on_every_try_is_offered_for_retry",
+          "observes": "Realtime.tla:Connect"
         },
         {
           "for": "M10.X2",
@@ -680,6 +714,15 @@
           "outcome": "roster reads Ada, Ben once the page opens, with no error in the console then; after Ask for the roster, roster-again stays empty and the console holds one error naming the hub and Roster.",
           "opposite": "After Answer the line again and once line-back reads back, Ask for the roster shows Ada, Ben in roster-again with no new error.",
           "defect": "The on-load invoke runs before the first start completes and is rejected, so roster stays empty and the console holds an error at every load; or the invoke during the reconnection waits for it and logs nothing."
+        },
+        {
+          "for": "X12.6",
+          "page": "A page under ShowReconnect() with the Native reconnect offer, whose Open the card loads into card-slot a card whose plan names the hub Line, which no other plan of the page names, and writes the call's number into line-call when the hub welcomes it; Hang up makes the hub's server close the connection and refuse every connection until Answer again lets the next one in.",
+          "gesture": "Click Open the card and Hang up, wait for the reconnect offer, then click Answer again and Retry.",
+          "outcome": "The reconnect offer shows after Hang up and hides after Retry, line-call reads 2, and the card stays open.",
+          "opposite": "Without Hang up, the offer never shows and line-call reads 1.",
+          "defect": "A retry that starts only the page's hubs skips the hub the card's slot holds, so line-call keeps 1 and the offer stays shown (Ownership.tla's HubKeptWhileHeld and OfferOnlyWhileHeld).",
+          "observes": "Ownership.tla:Retry"
         }
       ],
       "verdicts": [

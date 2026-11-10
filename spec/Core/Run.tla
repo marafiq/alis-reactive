@@ -348,15 +348,6 @@ VendorReads ==
     /\ UNCHANGED <<stack, status, active>>
     /\ UNCHANGED quiet
 
-ChainedSecond ==
-    /\ Mutant = "ChainHandlers"
-    /\ turn = "done"
-    /\ status[1] = "ended"
-    /\ status[2] = "idle"
-    /\ active = 0
-    /\ Begin(2, "done")
-    /\ UNCHANGED quiet
-
 Settle(h) ==
     /\ turn = "done"
     /\ active = 0
@@ -411,7 +402,7 @@ CutInItsStep(cause) ==
                    keptInBranch, cutInBranch, attemptCut, finallysRequestRouted>>
 
 Next ==
-    \/ Fire \/ FirstReturns \/ SecondReturns \/ VendorReads \/ ChainedSecond
+    \/ Fire \/ FirstReturns \/ SecondReturns \/ VendorReads
     \/ \E h \in Handlers : Step(h) \/ Settle(h)
     \/ \E cause \in {"replace", "dispose"} : Abort(cause) \/ CutInItsStep(cause)
 

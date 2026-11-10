@@ -2941,8 +2941,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   The object's declaration carries its listening, a vendor's listening kind (D17.3), as a plugin's does: an
   `EventedObject` declares its `EventListening`, and a component, an `EventedObject` too, has its vendor's.
   Ownership.tla carries the step (`ListenA`) and a collection (`Collect`) under three invariants, each with its
-  mutant: one listener per object, gone at its owner's release, and nothing called on a collected object. The
-  first two are X12.9 and X12.10; the third is a garbage collector's timing, which no browser test arranges.
+  mutant: one listener per object, gone at its owner's release, and nothing called on a collected object. They are
+  X12.9, X12.10 and X12.18, whose test forces the collection with Playwright's `Page.RequestGCAsync` and confirms it
+  by the page's own weak hold before the release, as a timer runs on Playwright's clock.
 - D12.9 A slot's content is what its loads put there. A step that sets the text or the HTML of an element a plan
   loads into or unloads would leave what the slot loaded running under content it no longer shows, and D14.6's
   split refuses it: within one plan where the view renders (R14.4), and across plans the step stops in the browser
@@ -3076,6 +3077,9 @@ plans name.
   plugin's unsubscribe throws: the request's `Finally`, which writes a note in the card and then the page's status,
   writes the status once, so it ran while the card was on the page; the card empties, and opening it again loads it
   (`Run.tla:NothingRunsAfterAnAbort`, `Lanes.tla:FinallyRunsBeforeRelease`).
+- `X12.18` behavior (D12.8): a payload's object a slot's `listen` step listened to, dropped by its host and collected,
+  is let go: the page's own weak hold of it reads collected, and the slot's unload calls nothing on it
+  (`Ownership.tla:NoRemoveOnCollected`).
 
 ## Q13. Where state lives
 
@@ -4848,7 +4852,9 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   `Confirm`, a hub invoke, each block of an `all`, and a slot's load and unload. A synchronous statement is no span: a
   `stop` with its reason, a required member a holder lacks, a refused check and a boundary error are events on the span
   that holds them. An attempt follows OpenTelemetry's HTTP client conventions: the method, the status, the resend count
-  and the URL as its route template.
+  and the URL as its route template. A send starts with its first attempt, after the request's `WhileLoading` and its
+  guard (`Request.tla`'s `loading` and `guard`), so a request stopped or cut before it sends records no send, and a
+  `MethodAsync` its `WhileLoading` awaits is a child of the handler run's span (`Tracing.tla`'s `Attempt`).
 - D20.5 No value is recorded. A span records ids, kinds, member wire names, event names, the route template, the status,
   the attempt and the outcome, never an input's text, a body, a payload, a query value or a path value, so the app's
   data stays out of its telemetry.

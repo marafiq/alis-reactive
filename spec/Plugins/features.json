@@ -400,7 +400,8 @@
           "gesture": "Click Read the hour, then Strike midnight.",
           "outcome": "hour reads 12 and clock-struck reads midnight.",
           "opposite": "The same page with the button Read the hour rendered before the clock's handler: the same clicks write 12 into hour and midnight into clock-struck, so the order the view writes its reaches in does not decide the clock's listening.",
-          "defect": "The plan's one locator for nightclock carries the listening of the reach the view wrote last, as the POC writes it (poc/Alis.Reactive.Poc/Writing/PlanBuild.cs:439), so NightClockFace's EventTarget replaces NightClock's callback property; the handler looks for addEventListener on a clock that lacks it and does not start (D12.8), and clock-struck stays empty. A vendor's lookup by a plugin's name writes the same locator with EventTarget (poc/Alis.Reactive.Poc/Writing/PlanBuild.cs:419, poc/Alis.Reactive.Poc/Components/Component.cs:128), the same defect."
+          "defect": "The plan's one locator for nightclock carries the listening of the reach the view wrote last, as the POC writes it (poc/Alis.Reactive.Poc/Writing/PlanBuild.cs:439), so NightClockFace's EventTarget replaces NightClock's callback property; the handler looks for addEventListener on a clock that lacks it and does not start (D12.8), and clock-struck stays empty. A vendor's lookup by a plugin's name writes the same locator with EventTarget (poc/Alis.Reactive.Poc/Writing/PlanBuild.cs:419, poc/Alis.Reactive.Poc/Components/Component.cs:128), the same defect.",
+          "observes": "CallbackProperty.tla:Step"
         }
       ],
       "verdicts": [

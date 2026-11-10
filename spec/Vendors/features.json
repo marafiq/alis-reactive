@@ -329,7 +329,8 @@
         "Ownership.tla:ListenOncePerObject",
         "Ownership.tla:ListenLeavesWithItsOwner",
         "Ownership.tla:ThrownListenerRunsNothing",
-        "Run.tla:WritesAfterTheTurnAreRefused"
+        "Run.tla:WritesAfterTheTurnAreRefused",
+        "Ownership.tla:NoRemoveOnCollected"
       ],
       "defects": [
         {
@@ -493,6 +494,10 @@
           "id": "M12.X3",
           "rung": "analyzer",
           "defect": "A vendor's object path with an empty step, as \"slate.\", writes a path whose step names nothing, so every step that reaches the object stops in the browser. ALIS034 (N18.12) reports a constant object path or element path with an empty step; where the view renders on code it does not follow, the path is refused with \"Path '{text}' contains an empty segment at index {index}. Use dot-separated property names without consecutive, leading, or trailing dots.\" (Alis.Reactive/WireTerms/Path.cs:124-125 at 65fdf118d)."
+        },
+        {
+          "id": "X12.18",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -550,7 +555,8 @@
           "gesture": "Click Ring room 7, then Post an update.",
           "outcome": "rang-room reads 7, posted-message reads Bed 4 needs water, and the ring log's line reads bell.",
           "opposite": "Before either click, rang-room and posted-message are empty; Ring room 7 alone leaves posted-message empty.",
-          "defect": "A listening outside the method pair reaches no handler: the bell's property is never assigned or the feed's subscribe is never called, so rang-room or posted-message stays empty; the redesign has no returned unsubscriber (Alis.Reactive/Vendors/ComponentVendor.cs:78-121 at 65fdf118d)."
+          "defect": "A listening outside the method pair reaches no handler: the bell's property is never assigned or the feed's subscribe is never called, so rang-room or posted-message stays empty; the redesign has no returned unsubscriber (Alis.Reactive/Vendors/ComponentVendor.cs:78-121 at 65fdf118d).",
+          "observes": "CallbackProperty.tla:Raise"
         },
         {
           "for": "X17.20",
@@ -590,7 +596,8 @@
           "gesture": "Click Open the card, Open the inner card, Open the notes and Ring room 7; Close the inner card and Ring room 7; Close the notes and Ring room 7; Open the inner card and Ring room 7; Make it throw and Ring room 7.",
           "outcome": "The ring log's lines read, in order: bell page-1 page-2 card inner notes; bell page-1 page-2 card notes; bell page-1 page-2 card; bell page-1 page-2 card inner; bell page-1 page-2 card inner, with bell-error showing the bell's throw.",
           "opposite": "Before any slot opens, Ring room 7 writes the line bell page-1 page-2.",
-          "defect": "A listener runs twice or out of the order it subscribed, a release removes a listener other than its own, or the bell's throw skips the listeners after it, so a line differs; the redesign calls the replaced value before its listener, unguarded (Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:59 at 65fdf118d), so the last line reads bell."
+          "defect": "A listener runs twice or out of the order it subscribed, a release removes a listener other than its own, or the bell's throw skips the listeners after it, so a line differs; the redesign calls the replaced value before its listener, unguarded (Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:59 at 65fdf118d), so the last line reads bell.",
+          "observes": "CallbackProperty.tla:UnloadB"
         },
         {
           "for": "X17.50",
@@ -598,7 +605,8 @@
           "gesture": "Click Open the card, Check the bell and Ring room 7; Close the card, Check the bell and Ring room 7; Open the card, Replace the callback and Ring room 7; Close the card, Open the card and Ring room 7; Close the card, Check the bell and Ring room 7.",
           "outcome": "bell-holds reads other, then own, then script; the ring log's lines read, in order: bell card; bell; script; script card; script.",
           "opposite": "Before any slot opens, Check the bell reads own and Ring room 7 writes the line bell.",
-          "defect": "The framework writes the property again at a later listener or puts back a value over one a script assigned, so the script's function is lost at Close the card and the last line reads bell; or the script's assignment leaves the card's handler running, so the third line reads script card."
+          "defect": "The framework writes the property again at a later listener or puts back a value over one a script assigned, so the script's function is lost at Close the card and the last line reads bell; or the script's assignment leaves the card's handler running, so the third line reads script card.",
+          "observes": "CallbackProperty.tla:Script"
         },
         {
           "for": "X17.51",
@@ -606,7 +614,8 @@
           "gesture": "Click Freeze A, Open card A and Ring A; click Open the notes and Listen to bell A; click Open card B, Freeze B, Ring B, Close card B and Ring B.",
           "outcome": "The ring log's lines read bell-a, then bell-b card-b, then bell-b; Open card A shows one console error naming bell-a and onRang, and Close card B one naming bell-b and onRang; listen-tried reads listening and listen-done is empty.",
           "opposite": "Without Freeze A, Open card A and Ring A write the line bell-a card-a, and Listen to bell A writes listened into listen-done.",
-          "defect": "The refused assignment passes unnoticed, so card-a counts as listening and the notes' listen goes on, listen-done reading listened; or the refused put-back leaves the framework's function calling card-b's listener, so the last line reads bell-b card-b."
+          "defect": "The refused assignment passes unnoticed, so card-a counts as listening and the notes' listen goes on, listen-done reading listened; or the refused put-back leaves the framework's function calling card-b's listener, so the last line reads bell-b card-b.",
+          "observes": "CallbackProperty.tla:Freeze"
         },
         {
           "for": "X17.52",
@@ -614,7 +623,8 @@
           "gesture": "Click Open the card, Restart the bell, Close the card and Ring room 7; then Open the card and Ring room 7.",
           "outcome": "The ring log's lines read bell 2, then bell 2 card, and the console shows no error.",
           "opposite": "Without Restart the bell, Open the card and Ring room 7 writes bell 1 card, and Close the card then Ring room 7 writes bell 1.",
-          "defect": "The release puts the old bell's function onto the new bell, so the first line reads bell 1; or the card's listener stays tied to the old object and the new bell is not assigned when the card opens again, so the second line reads bell 2."
+          "defect": "The release puts the old bell's function onto the new bell, so the first line reads bell 1; or the card's listener stays tied to the old object and the new bell is not assigned when the card opens again, so the second line reads bell 2.",
+          "observes": "CallbackProperty.tla:Restart"
         },
         {
           "for": "X12.9",
@@ -622,7 +632,8 @@
           "gesture": "Click Open bed 4 and Mark as cleaned; click Open bed 4 again and Mark as cleaned.",
           "outcome": "After the first Mark as cleaned, cleaned-count reads 1; after the second, 2.",
           "opposite": "Click Open bed 5 and Mark bed 5 as cleaned: cleaned-count reads 3.",
-          "defect": "The same card reached again adds a second listener, so the second Mark as cleaned writes 3."
+          "defect": "The same card reached again adds a second listener, so the second Mark as cleaned writes 3.",
+          "observes": "Ownership.tla:ListenA"
         },
         {
           "for": "X12.10",
@@ -638,7 +649,44 @@
           "gesture": "Click Break off, Open the card, Close the card, Open the card, then Tick.",
           "outcome": "ticks-heard reads 1.",
           "opposite": "Without Break off, Open the card, Close the card and Tick leave ticks-heard empty.",
-          "defect": "A listener whose removal threw still runs, since it was not marked released before its removal, so ticks-heard reads 2."
+          "defect": "A listener whose removal threw still runs, since it was not marked released before its removal, so ticks-heard reads 2.",
+          "observes": "Ownership.tla:UnsubscribeThrows"
+        },
+        {
+          "for": "X17.49",
+          "page": "A page that renders the ConformanceComponent, whose declaration names its listening with ComponentVendor.DefineCallbackProperties and declares Raised, an Event heard through its onRaised property; its own code assigns onRaised a function that appends own to the log, and its button Raise raises, each raise writing a new line into the log. The page's plan has two Raised handlers, which append page-1 and page-2. Open the slot loads the slot holder, whose plan, when it loads, listens to the ConformanceComponent's Raised, reached by its element's id, appending outer; the holder's content holds the slot inner, loaded by Open the inner slot, whose plan listens the same way, appending inner.",
+          "gesture": "Click Open the slot, Open the inner slot and Raise; click Open the slot again and Raise.",
+          "outcome": "The log's lines read own page-1 page-2 outer inner, then own page-1 page-2 outer.",
+          "opposite": "Before any slot opens, Raise writes the line own page-1 page-2.",
+          "defect": "A load over the holder starts its new listener before it releases the old ones, or keeps the inner slot's, so the second line holds outer twice or still holds inner (CallbackProperty.tla's EveryHearerHearsOnceInOrder).",
+          "observes": "CallbackProperty.tla:LoadA"
+        },
+        {
+          "for": "X17.49",
+          "page": "A page that renders the ConformanceComponent, whose declaration names its listening with ComponentVendor.DefineCallbackProperties and declares Raised, an Event heard through its onRaised property; its own code assigns onRaised a function that appends own to the log, and its button Raise raises, each raise writing a new line into the log. The page's plan has two Raised handlers, which append page-1 and page-2. Open the slot loads the slot holder, whose plan, when it loads, listens to the ConformanceComponent's Raised, reached by its element's id, appending outer; the holder's content holds the slot inner, loaded by Open the inner slot, whose plan listens the same way, appending inner.",
+          "gesture": "Click Open the slot, Open the inner slot and Raise; click Open the inner slot again and Raise.",
+          "outcome": "The log's lines read own page-1 page-2 outer inner, twice.",
+          "opposite": "With the holder open and the inner slot never opened, Raise writes the line own page-1 page-2 outer.",
+          "defect": "A load over the inner slot keeps the old listener beside the new one, so the second line reads inner twice, or drops it, so the line ends at outer (CallbackProperty.tla's EveryHearerHearsOnceInOrder).",
+          "observes": "CallbackProperty.tla:LoadB"
+        },
+        {
+          "for": "X17.50",
+          "page": "A page that renders the ConformanceComponent, whose declaration names its listening with ComponentVendor.DefineCallbackProperties and declares Raised, an Event heard through its onRaised property; its own code assigns onRaised a function that appends own to the log, and its button Raise raises, each raise writing a new line into the log. Its button Check shows, in holds, whether onRaised holds its own function (own) or another (other). The page's plan has two Raised handlers, which append page-1 and page-2. Open the slot loads the slot holder, whose plan, when it loads, listens to the ConformanceComponent's Raised, reached by its element's id, appending outer; the holder's content holds the slot inner, loaded by Open the inner slot, whose plan listens the same way, appending inner; Close the slot unloads the holder.",
+          "gesture": "Click Open the slot, Open the inner slot and Raise; click Close the slot, Check and Raise.",
+          "outcome": "The log's lines read own page-1 page-2 outer inner, then own page-1 page-2, and holds reads other.",
+          "opposite": "Before any slot opens, Raise writes the line own page-1 page-2.",
+          "defect": "The close puts back the component's own function at its first release while the page's handlers still listen, so the second line reads own and holds reads own (CallbackProperty.tla's PutBackAtFirst mutant, which breaks ALiveHandlerKeepsTheFrameworksFunction).",
+          "observes": "CallbackProperty.tla:UnloadA"
+        },
+        {
+          "for": "X12.18",
+          "page": "A page that renders the ConformanceComponent at the id conformance, whose button Raise raises its Raised event with a payload holding its peer, a ConformancePeer on an element of its own, and whose button Drop the peer removes that element and lets go of that peer; the page holds the first peer only by a WeakRef, and its button Check the first peer writes collected or alive into peer-state. Open the slot loads the slot holder, whose plan's Raised handler listens to the payload's peer's change, adding one to the page's tally and writing it into heard, an element outside the slot; Close the slot unloads it, after which the page writes closed into slot-state and any error the unload threw into slot-error.",
+          "gesture": "Click Open the slot, Raise and Drop the peer; force a garbage collection with Playwright's Page.RequestGCAsync; click Check the first peer; click Close the slot.",
+          "outcome": "peer-state reads collected before Close the slot; after it slot-state reads closed and slot-error stays empty.",
+          "opposite": "Without Drop the peer, peer-state reads alive after the collection, and after Close the slot a change of the peer leaves heard unchanged.",
+          "defect": "The listen step holds the peer strongly, so peer-state reads alive after the collection; or the unload calls the collected peer's removeEventListener, so slot-error shows the TypeError and slot-state stays empty.",
+          "observes": "Ownership.tla:Collect"
         }
       ],
       "verdicts": []
@@ -917,6 +965,15 @@
           "opposite": "On the same page with the timer built on alis:mount, Let it elapse writes elapsed into elapsed-heard.",
           "defect": "The missing object stops every handler of the plan from subscribing, so greeting stays empty; or the handler subscribes at a later step, so elapsed-heard reads elapsed; or no error names the handler.",
           "existing_test": "redesign WhenAComponentIsNotBuiltYet.a_handler_of_a_component_not_built_yet_stops_no_other_handler_from_listening"
+        },
+        {
+          "for": "X12.13",
+          "page": "A page that renders the ConformanceComponent at the id conformance, whose button Raise raises its Raised event and whose button Restart, its host, destroys the object and puts a new ConformanceComponent object on the same element; every object's unsubscribe adds one to the page's count in off-calls, and a destroy calls no unsubscribe. Open the slot loads the slot holder, whose plan, when it loads, listens to the ConformanceComponent's Raised, reached by its element's id, adding one to the page's tally and writing it into heard, an element outside the slot; Close the slot unloads it.",
+          "gesture": "Click Open the slot, Raise, Restart, Raise, then Close the slot.",
+          "outcome": "heard reads 1, off-calls reads 0 after Close the slot, and the console shows no error.",
+          "opposite": "Without Restart, Close the slot writes 1 into off-calls.",
+          "defect": "The release removes the listen from the object the element holds now, which never subscribed, or calls the destroyed object's unsubscribe, so off-calls reads 1 or the console shows an error; or the listen follows the element to the new object, so heard reads 2 (Ownership.tla's RemoveOnDestroyed mutant, which breaks NoRemoveOnDestroyedListened).",
+          "observes": "Ownership.tla:HostDestroysListened"
         }
       ],
       "verdicts": [

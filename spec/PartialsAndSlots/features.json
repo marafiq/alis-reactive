@@ -495,7 +495,8 @@
           "gesture": "Click Open Ada's card, Open Ben's card and Open Ada's card, then Note a fall.",
           "outcome": "The call list reads \"The ward heard the note\" and \"Ada Byron heard the note\", once each.",
           "opposite": "Clicking Close the card and Note a fall again adds \"The ward heard the note\" alone.",
-          "defect": "Each load subscribes the new card's handler beside those the loads before it left, so one note adds \"Ada Byron heard the note\" twice and \"Ben Okafor heard the note\" once."
+          "defect": "Each load subscribes the new card's handler beside those the loads before it left, so one note adds \"Ada Byron heard the note\" twice and \"Ben Okafor heard the note\" once.",
+          "observes": "Ownership.tla:Raise"
         },
         {
           "for": "X12.3",
@@ -528,7 +529,8 @@
           "gesture": "Click Open the card, take a reading of 72, click Close the card, then take a reading of 75.",
           "outcome": "After the first reading page-pulse and card-pulse read 72; after the second page-pulse reads 75 and card-pulse still reads 72.",
           "opposite": "With the card left open, the second reading shows 75 in both.",
-          "defect": "The card's listen is not released with the card, so the second reading writes 75 into card-pulse; or the release removes the page's own handler as well, and page-pulse stays at 72."
+          "defect": "The card's listen is not released with the card, so the second reading writes 75 into card-pulse; or the release removes the page's own handler as well, and page-pulse stays at 72.",
+          "observes": "Lanes.tla:FireFirst"
         },
         {
           "for": "X12.15",
@@ -544,7 +546,8 @@
           "gesture": "Click Open the card and Save, then Open the card again.",
           "outcome": "status reads 1, the card slot empties after Save, and the second Open the card shows the card.",
           "opposite": "With a radio whose unsubscribe returns normally, the same clicks show status 1 and no console error.",
-          "defect": "The release runs before the Finally, so its write into the card's note finds no element, the Finally stops and status stays empty; or the release's throw stops the unload and the card stays on the page."
+          "defect": "The release runs before the Finally, so its write into the card's note finds no element, the Finally stops and status stays empty; or the release's throw stops the unload and the card stays on the page.",
+          "observes": "Lanes.tla:Release"
         },
         {
           "for": "M9.X2",
@@ -561,7 +564,8 @@
           "gesture": "Click Open the board and Ring the bell, then Take the note down and Ring the bell again.",
           "outcome": "After the second ring page-heard reads 2 and note-heard reads 1.",
           "opposite": "Without Take the note down, the second ring shows note-heard at 2.",
-          "defect": "The note's plan belongs to the board's slot, so unloading the note slot releases nothing and the second ring writes 2 into note-heard."
+          "defect": "The note's plan belongs to the board's slot, so unloading the note slot releases nothing and the second ring writes 2 into note-heard.",
+          "observes": "Ownership.tla:UnloadB"
         },
         {
           "for": "M9.X4",
@@ -579,7 +583,8 @@
           "outcome": "pin-tried reads 2, pin-after reads 1, and page-heard reads 1.",
           "opposite": "With the board left open, the second pin shows pin-tried and pin-after at 2.",
           "defect": "The load of a slot no longer on the page goes on, so pin-after reads 2; or its stop ends more than its own pipeline, and the bell's handler leaves page-heard empty.",
-          "existing_test": "redesign WhenASlotLoadsAnAnswer.loading_into_a_slot_no_longer_on_the_page_fails_only_its_own_pipeline"
+          "existing_test": "redesign WhenASlotLoadsAnAnswer.loading_into_a_slot_no_longer_on_the_page_fails_only_its_own_pipeline",
+          "observes": "Ownership.tla:LoadB"
         }
       ],
       "verdicts": []

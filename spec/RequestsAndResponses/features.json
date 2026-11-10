@@ -424,7 +424,8 @@
           "gesture": "Click Show chart with the resident whose room holds null.",
           "outcome": "The status reads Done, the log keeps its dash, and the network log holds no request to /Residents.",
           "opposite": "With a resident whose Id is 42, the network log holds GET /Residents/42 and the log reads After.",
-          "defect": "The request sent to /Residents/ or /Residents/undefined, so the network log holds it; or Finally skipped, so the status keeps Loading; or the step after run, so the log reads After."
+          "defect": "The request sent to /Residents/ or /Residents/undefined, so the network log holds it; or Finally skipped, so the status keeps Loading; or the step after run, so the log reads After.",
+          "observes": "Request.tla:Guard"
         },
         {
           "for": "X9.10",
@@ -1313,7 +1314,8 @@
           "gesture": "Click Load summary.",
           "outcome": "The error text reads Offline, the status reads Done, and the card's busy indicator and aria-busy are gone.",
           "opposite": "With the server answering 200, the card shows the name and no Offline.",
-          "defect": "The catch-all not run, so Offline never shows; Finally not run, so Done never shows; or the indicator left on the card."
+          "defect": "The catch-all not run, so Offline never shows; Finally not run, so Done never shows; or the indicator left on the card.",
+          "observes": "Request.tla:DefaultFinally"
         },
         {
           "for": "X10.4",
@@ -1353,7 +1355,8 @@
           "gesture": "Click Load census.",
           "outcome": "The census shows, the log reads loading, done once, and the busy count reads 1.",
           "opposite": "With NoRetry(), the 503 runs the error route and the census keeps its dash.",
-          "defect": "Each attempt runs WhileLoading and Finally, so the log reads loading, loading, done, done; the busy indicator shown per attempt, so the count reads 2; or the 503 routed at once, so the census never shows."
+          "defect": "Each attempt runs WhileLoading and Finally, so the log reads loading, loading, done, done; the busy indicator shown per attempt, so the count reads 2; or the 503 routed at once, so the census never shows.",
+          "observes": "Composition.tla:Answer"
         },
         {
           "for": "X10.11",
@@ -1361,7 +1364,8 @@
           "gesture": "Leave Print badge unchecked and click Admit.",
           "outcome": "The status reads Admitted, the log reads After, and the network log holds no badge request.",
           "opposite": "With Print badge checked, the badge loads.",
-          "defect": "The chained request sent despite its condition, so the network log holds it; or its failed condition stopping the pipeline, so the log keeps its dash."
+          "defect": "The chained request sent despite its condition, so the network log holds it; or its failed condition stopping the pipeline, so the log keeps its dash.",
+          "observes": "Request.tla:After"
         },
         {
           "for": "X10.12",
@@ -1393,15 +1397,17 @@
           "gesture": "Click Load on the first, then Load on the second.",
           "outcome": "The first logs error once and the app counted 1 attempt; the second shows its success text.",
           "opposite": "With NoRetry() on the second, its 503 route runs.",
-          "defect": "A 500 retried, so the app counts 2 attempts; or a 503 not retried, so the second runs its error route."
+          "defect": "A 500 retried, so the app counts 2 attempts; or a 503 not retried, so the second runs its error route.",
+          "observes": "Request.tla:Attempt"
         },
         {
           "for": "X10.16",
-          "page": "Two Parallel GETs whose success routes set one summary card, answered after 1 and 5 seconds; a second page whose two GETs set two cards.",
-          "gesture": "Click Load on the first page, then on the second.",
-          "outcome": "On the first page the card's indicator and aria-busy stay until 5 seconds; on the second the first card's hide at 1 second and the second card's stay to 5.",
-          "opposite": "With both answered at once, every indicator hides together.",
-          "defect": "The indicator hidden at the first answer, so the shared card shows no indicator from 1 second; or one target held for both, so the first card stays busy to 5 seconds."
+          "page": "Two Parallel GETs whose success routes set one summary card, the endpoint holding each answer until the test releases it; a second page whose two GETs set two cards, held the same way.",
+          "gesture": "Click Load on the first page, release the first GET's answer, then the second's; do the same on the second page.",
+          "outcome": "On the first page the card's indicator and aria-busy stay after the first release and leave at the second; on the second page the first card's leave at the first release and the second card's stay until the second.",
+          "opposite": "With both answers released together, every indicator hides together.",
+          "defect": "The indicator hidden at the first answer, so the shared card shows no indicator after the first release; or one target held for both, so the first card stays busy until the second release.",
+          "observes": "Composition.tla:DefaultFinally"
         },
         {
           "for": "X10.17",
@@ -1409,15 +1415,17 @@
           "gesture": "Click Load summary before loading the partial.",
           "outcome": "The network log holds no request and the status keeps Waiting.",
           "opposite": "After the partial loads, the GET is sent and the panel shows the indicator.",
-          "defect": "The request sent with no target, so the network log holds it; or WhileLoading run, so the status reads Loading."
+          "defect": "The request sent with no target, so the network log holds it; or WhileLoading run, so the status reads Loading.",
+          "observes": "Composition.tla:Stop"
         },
         {
           "for": "X10.19",
-          "page": "Two Parallel GETs with no Busy, each success route setting one component's value from its JSON body, answered after 1 and 3 seconds; a third GET whose route sets a text only inside a When.",
-          "gesture": "Click Load both, then Load third.",
-          "outcome": "Each component's element shows the indicator until its own answer and the page's indicator never shows; the third shows the page's indicator.",
+          "page": "Two Parallel GETs with no Busy, each success route setting one component's value from its JSON body, the endpoint holding each answer until the test releases it; a third GET, held the same way, whose route sets a text only inside a When.",
+          "gesture": "Click Load both, release the first answer, then the second; then click Load third and release its answer.",
+          "outcome": "Each component's element shows the indicator until its own answer is released and the page's indicator never shows; while the third's answer is held the page's indicator shows.",
           "opposite": "With Busy(\"panel\") on both, only the panel shows the indicator.",
-          "defect": "The page's indicator shown for the two components, or the third holding the element its When writes."
+          "defect": "The page's indicator shown for the two components, or the third holding the element its When writes.",
+          "observes": "Composition.tla:Begin"
         },
         {
           "for": "X10.20",
@@ -1425,7 +1433,8 @@
           "gesture": "Click Load.",
           "outcome": "The network log holds no request, the status keeps Waiting, and the console holds one error naming busy.",
           "opposite": "With NativeLoader's script loaded, the GET is sent.",
-          "defect": "The request sent with no indicator, so the network log holds it; or the missing contract found only at the first failure."
+          "defect": "The request sent with no indicator, so the network log holds it; or the missing contract found only at the first failure.",
+          "observes": "Request.tla:DefaultLoading"
         },
         {
           "for": "M6.X1",

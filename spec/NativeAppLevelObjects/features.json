@@ -846,7 +846,8 @@
           "gesture": "Click Bea's Discharge, then release its response.",
           "outcome": "While it is held Bea's control shows the loader's overlay and Ada's and Cy's show none; after the release no control shows one and Bea's reads Discharged.",
           "opposite": "Click Ada's Discharge instead: while held only Ada's control shows the overlay.",
-          "defect": "A busy target that names the action's first control, or the page, shows the wrong row or every row busy; the target is the control the block's success route writes, read when the request starts (D10.21)."
+          "defect": "A busy target that names the action's first control, or the page, shows the wrong row or every row busy; the target is the control the block's success route writes, read when the request starts (D10.21).",
+          "observes": "Lanes.tla:Respond"
         },
         {
           "for": "M25.X4",

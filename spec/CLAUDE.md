@@ -512,6 +512,40 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   FusionMultiSelect, exercising the same kinds of features on its own members and what it brings of its own. The
   custom component's name says it covers the framework's features, never a domain word such as a ward: the owner took
   ConformanceComponent, the component the conformance matrix runs on, the same day.
+- The owner, 2026-11-10, on the conformance app (verbatim in `spec/NOTES.md`): ConformanceComponent tests the surface of
+  invoking a JavaScript object in all its variations, and the HTTP and partials lifecycles need more, so the browser
+  tests run on one conformance app built from several components, some of them Syncfusion's, that covers 100% of the
+  framework's features. It is a common-sense app, whose screens, hierarchy and behavior read as a real app's, its
+  feedback loop fast and in a real browser, and the TLA+ specs' actions list the variations it exercises.
+- The owner, 2026-11-10, yes to the care home app (verbatim in `spec/NOTES.md`), with the quality bar held on its test
+  data: no test is false confidence, brittle or slow, since those breed one-off hacks and the quality falls, as on main.
+  Before the rewrite, a plan for test quality, repeatability and shards, and the exact solution structure, its tools,
+  the TLA+ specs and the folder hierarchy as vertical slices, with the 10,000-foot view, so the rewrite starts equipped.
+- The owner, 2026-11-10: no relying on Syncfusion to cover the framework, the trap main fell into. A core module's
+  browser test runs on ConformanceComponent, native inputs and the app-level objects, never through a Syncfusion
+  component; a Syncfusion component on a care home screen is tested only by its own slice's tests, which prove what its
+  declaration adds. The app's check refuses a core module's test whose screen part is a Fusion slice.
+- The owner, 2026-11-10: two custom components show the framework onboards any vendor that follows its rules: a second
+  joins ConformanceComponent with vendor data different in every part (where its object lives, how it subscribes and
+  unsubscribes, what a listener receives), beside FusionMultiSelect, Syncfusion's real vendor. The tests are vertical
+  slices too, each in its module's folder and named for its behavior, so the test tree never becomes the next fight.
+- The owner, 2026-11-10: the TLA+ specs and every tool the spec built carry over to the rewrite, so a feature asked for a
+  month later starts from what the repo holds, never from rediscovery. The spec is the repo's feature workflow: its
+  living checks run in CI, its test specs are bound to the tests and its TLA+ actions to the harness's gates by name.
+- The owner, 2026-11-10: publishing the NuGet packages, and how a developer uses them in an app (the framework's
+  browser assets reaching both hosts), is part of the plan before the rewrite, at the same bar. The package ids stay the
+  same; Alis.Reactive.NativeTagHelpers ships as an empty package until it is written, after the rewrite, and so does
+  Alis.Reactive.DesignSystem, since the key principle is the inverted dependency: nothing depends on a design system.
+  Both were scope creep and need a redesign later, or leave: the structure reserves nothing for them, and their future is
+  the owner's decision.
+- The owner, 2026-11-10: the Native components are great consumers and are written for real, with the dependency
+  inverted: NativeToast, NativeDrawer (main's panel) and the common components (text box, check box, drop-down, radio
+  group, check list, text area, button, hidden field, action link) are production components on the core's public
+  surface only.
+  The app-level components serve a legacy app's layout, where a drawer, toast or confirm appears in a target the layout
+  holds, as main designed them; the rewrite keeps that meaning and decides its form from the facts. The Native
+  components are written to the highest bar: a component-writing expert's review, and the strictest TypeScript lint
+  the repo can hold, so the code is held to it.
 - The owner, 2026-11-09: "TLA+ ... help design this out because main badly failed at slow tests and broken ones
   that can not be fully relied". The lead's design within it: the TLC specs carry every ordering of the async lanes,
   so no browser test provokes a race by timing. A promise on an async lane names the one action of a spec's `Next`
@@ -520,8 +554,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   test's gesture releases it, and every action is named by one promise: the browser proves the code refines each
   action once, and the browser test count is the actions plus the cells plus each slice's own surface. A timer the
   plan carries (a toast's time, a debounce, a retry's wait) runs on Playwright's clock (`Page.Clock`), never real
-  time. Step 9 writes the actions into the promises; step 10's check.py refuses an action no promise names and a
-  promise naming an action its spec lacks.
+  time, and a collection the design's weak holds depend on is forced by Playwright's Page.RequestGCAsync, confirmed
+  by the page's own weak hold before the test goes on (X12.18). An action that fires under no mutant-free run leaves its
+  spec's `Next` (Tracing.tla's Finish and Send, Run.tla's ChainedSecond, 2026-11-10). Step 9 writes the actions
+  into the promises; step 10's check.py refuses an action no promise names and a promise naming an action its spec lacks.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

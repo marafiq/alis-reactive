@@ -35,6 +35,8 @@ Records == traceOn \/ Mutant = "RecordsWhenOff"
 
 Started(s) == IF Records THEN [spans EXCEPT ![s] = "open"] ELSE spans
 
+StartedAll(names) == IF Records THEN [s \in SpanNames |-> IF s \in names THEN "open" ELSE spans[s]] ELSE spans
+
 Ended(s) == IF spans[s] = "open" THEN [spans EXCEPT ![s] = "ended"] ELSE spans
 
 EndAll == [s \in SpanNames |-> IF spans[s] = "open" THEN "ended" ELSE spans[s]]
@@ -54,23 +56,17 @@ Trigger ==
        ELSE status' = "running" /\ pc' = "check" /\ spans' = Started("run") /\ UNCHANGED outcome
     /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent>>
 
-Send ==
-    /\ status = "running"
-    /\ pc = "check"
-    /\ pc' = "attempt"
-    /\ spans' = Started("send")
-    /\ UNCHANGED <<traceOn, origin, sinkFails, status, attempts, sent, outcome>>
-
 Attempt ==
     /\ status = "running"
-    /\ pc = "attempt"
+    /\ pc \in {"check", "attempt"}
     /\ attempts < 2
     /\ LET n == attempts + 1 IN
         /\ attempts' = n
-        /\ spans' = Started(AttemptName(n))
+        /\ spans' = StartedAll(IF n = 1 THEN {"send", AttemptName(n)} ELSE {AttemptName(n)})
         /\ sent' = sent \cup {[n |-> n, to |-> origin, parent |-> Header(n, sinkFails), resend |-> Resend(n)]}
+    /\ pc' = "attempt"
     /\ status' = "waiting"
-    /\ UNCHANGED <<traceOn, origin, sinkFails, pc, outcome>>
+    /\ UNCHANGED <<traceOn, origin, sinkFails, outcome>>
 
 Respond ==
     /\ status = "waiting"
@@ -106,7 +102,7 @@ Abort ==
            ELSE spans' = EndAll /\ status' = "ended"
     /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent>>
 
-Next == Trigger \/ Send \/ Attempt \/ Respond \/ Route \/ Abort
+Next == Trigger \/ Attempt \/ Respond \/ Route \/ Abort
 
 Spec == Init /\ [][Next]_vars
 
