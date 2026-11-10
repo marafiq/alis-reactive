@@ -470,6 +470,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   imports Syncfusion's own C# types (its MaskedTextBox in Syncfusion.EJ2.Inputs) meets no ambiguous name, and Syncfusion's
   documentation names the same component: FusionInputMask becomes FusionMaskedTextBox, and FusionFileUpload becomes
   FusionUploader; the other 48 slices already follow it.
+- The owner, 2026-11-09: "html browser proof will actually be part of rewrite with high confidence where public
+  members are not clear enough". Each browser fact a declaration rests on names the proof the rewrite ships with it:
+  a sandbox page that shows the pinned member through the framework's own read (a payload member set as an
+  element's text), and a Playwright test that makes the real gesture and reads that text. It reruns on every
+  Syncfusion upgrade, so a vendor that changes a shape fails the upgrade before an app meets it. The probe's own
+  listener (`spec/probes/ej2-payloads.mjs`) is the spec's oracle, never the rewrite's proof.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
