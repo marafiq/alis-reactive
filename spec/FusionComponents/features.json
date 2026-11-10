@@ -647,7 +647,7 @@
   },
   {
    "id": "M21.F5",
-   "summary": "FusionAutoComplete: one declaration of the Syncfusion AutoComplete by its JavaScript names, value, dataSource, enabled, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change and filtering, each EJ2 33.1.47's public member; the payloads of change and filtering; the input it is, its value committed by change; and the render helper that renders it bound to a model member and names its fields. Main spreads the slice over seven files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as the vendor holds it, the @private text left out (gate 2), and its data named as every framework read names it (M21.D1).",
+   "summary": "FusionAutoComplete: one declaration of the Syncfusion AutoComplete by its JavaScript names, value, dataSource, enabled, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change and filtering, each EJ2 33.1.47's public member; the payloads of change and filtering; the input it is, generic over the member it binds, its value that member's own type and committed by change; and the render helper that renders it bound to a model member and names its fields. Main spreads the slice over seven files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed by the bound member, which admits null as the vendor's value holds null until a choice (M21.X501), the @private text left out (gate 2), and its data named as every framework read names it (M21.D1).",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionAutoComplete",
@@ -733,7 +733,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionAutoComplete declares Value, typed by the items' value member as M21.N1's items overload types MultiSelect's (gate 2) and admitting null, since EJ2's value holds null until a choice (M21.X501); DataSource<TItem>(); Enabled as Property<bool>; DataBind, FocusIn, FocusOut, ShowPopup, HidePopup and Clear as methods; and Change and Filtering as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionAutoComplete<TValue> declares the EJ2 AutoComplete by its JavaScript names, TValue the type of the member it binds, since EJ2 marks the value AutoComplete inherits from ComboBox a generic type (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:228-231): value as Value, a Property<TValue> that holds null until a choice, so the bound member's type admits null (string?, int?) and Value.Set(null) clears the box as main's SetValue(null) does (M21.X501); DataSource<TItem>(); Enabled as Property<bool>; DataBind, FocusIn, FocusOut, ShowPopup, HidePopup and Clear as methods; and Change and Filtering as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N5",
       "N5.4",
@@ -749,7 +749,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionAutoComplete.ChangeEventArgs reads Value, typed as the component's, and IsInteracted; FusionAutoComplete.FilteringEventArgs reads Text, writes PreventDefaultAction, and calls UpdateData with any source of a list, a response body's among them.",
+     "text": "FusionAutoComplete<TValue>.ChangeEventArgs reads Value, a TValue, since EJ2 marks the change payload's value a generic type (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:9-15), and IsInteracted; FusionAutoComplete<TValue>.FilteringEventArgs reads Text, writes PreventDefaultAction, and calls UpdateData with any source of a list, a response body's among them.",
      "doors": [
       "M21.N5",
       "N5.6",
@@ -758,7 +758,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionAutoComplete bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionAutoComplete<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
      "doors": [
       "M21.N5",
       "M7.N3"
@@ -766,7 +766,7 @@
     },
     {
      "line": "proposed",
-     "text": "field.FusionAutoComplete(build => ..) renders the element under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionAutoComplete(items, build => ..) hands EJ2 the items the same way; and Fields<TItem>(text, value) and Fields<TItem>(text, value, groupBy) name each field as every framework read names it (M21.X503).",
+     "text": "field.FusionAutoComplete(build => ..) renders FusionAutoComplete<TProp>, TProp the bound member's type, under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionAutoComplete(items, build => ..) hands EJ2 the items the same way; and Fields<TItem>(text, value) and Fields<TItem>(text, value, groupBy) name each field as every framework read names it (M21.X503).",
      "doors": [
       "M21.N5",
       "M7.N2",
@@ -776,7 +776,7 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionAutoComplete's Reactive(a => a.Change, pipeline) and Reactive(a => a.Filtering, pipeline) handle its events from the plan's start; p.Component<FusionAutoComplete>(m => m.Medication) reaches it in any block.",
+     "text": "The rendered FusionAutoComplete<TProp>'s Reactive(a => a.Change, pipeline) and Reactive(a => a.Filtering, pipeline) handle its events from the plan's start, their payloads typed by the bound member; pipeline.Input(m => m.Medication).Component<FusionAutoComplete<string?>>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
@@ -861,7 +861,7 @@
     {
      "id": "M21.X501",
      "rung": "analyzer",
-     "defect": "The redesign declares Value as Property<string> (Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoComplete.cs:24 at 65fdf118d) where EJ2's value is number | string | boolean | object | null, null by default (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:227-231), which AutoComplete inherits from ComboBox (@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts:21), so an untouched box types as text and main's clear, SetValue(null) (Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoCompleteExtensions.cs:44-47 at 623dd4a27), is a nullable warning: the vendor contract analyzer (N17.2) refuses the nullability by ALIS019, and the rewrite's Value admits null, typed by the items' value member as M21.N1's items overload types MultiSelect's."
+     "defect": "The redesign declares Value as Property<string> (Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoComplete.cs:24 at 65fdf118d) where EJ2's value is number | string | boolean | object | null, null by default (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:227-231), which AutoComplete inherits from ComboBox (@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts:21), so an untouched box types as text and main's clear, SetValue(null) (Alis.Reactive.Fusion/Components/FusionAutoComplete/FusionAutoCompleteExtensions.cs:44-47 at 623dd4a27), is a nullable warning. The rewrite's FusionAutoComplete<TValue> types Value by the member it binds, the app's own data, and the vendor contract analyzer (N17.2) checks each type argument the views give: one kind the union holds (ALIS037) whose read admits null (ALIS019), so a string? or int? member binds it and a string member is refused."
     },
     {
      "id": "M21.X502",
@@ -2207,7 +2207,7 @@
   },
   {
    "id": "M21.F13",
-   "summary": "FusionComboBox: one declaration of the Syncfusion ComboBox by its JavaScript names, value, text, index, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, its value committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder, and names no field; the redesign declares it in one file, the shape the rewrite keeps, with its value and text typed nullable as main and the vendor hold them, and items handed by the plan's writer so its fields name each member as every framework read names it (M21.D1).",
+   "summary": "FusionComboBox: one declaration of the Syncfusion ComboBox by its JavaScript names, value, text, index, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, generic over the member it binds, its value that member's own type and committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder, and names no field; the redesign declares it in one file, the shape the rewrite keeps, with its value typed by the bound member and its text Property<string?>, each admitting null as main and the vendor hold them (M21.X504), and items handed by the plan's writer so its fields name each member as every framework read names it (M21.D1).",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionComboBox",
@@ -2278,7 +2278,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionComboBox declares Value, typed by the items' value member as M21.N1's items overload types MultiSelect's (gate 2) and admitting null, and Text as Property<string?>, since EJ2 holds each null until a choice (M21.X504), and Index as Property<int?>; DataBind, FocusIn, FocusOut, ShowPopup, HidePopup and Clear as methods; and Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionComboBox<TValue> declares the EJ2 ComboBox by its JavaScript names, TValue the type of the member it binds, since EJ2 marks ComboBox's value a generic type (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:228-231): value as Value, a Property<TValue> that holds null until a choice, so the bound member's type admits null (string?, int?), text as Text, a Property<string?>, EJ2 holding each null until a choice (M21.X504), and index as Index, a Property<int?>; DataBind, FocusIn, FocusOut, ShowPopup, HidePopup and Clear as methods; and Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N13",
       "N5.4",
@@ -2287,7 +2287,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionComboBox.ChangeEventArgs reads Value, typed as the component's, and IsInteracted; Focus and Blur hand a payload EJ2 types as Object, of which the declaration reads no member.",
+     "text": "FusionComboBox<TValue>.ChangeEventArgs reads Value, a TValue, since EJ2 marks the change payload's value a generic type (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:9-15), and IsInteracted; Focus and Blur hand a payload EJ2 types as Object, of which the declaration reads no member.",
      "doors": [
       "M21.N13",
       "N5.6"
@@ -2295,7 +2295,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionComboBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionComboBox<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
      "doors": [
       "M21.N13",
       "M7.N3"
@@ -2303,7 +2303,7 @@
     },
     {
      "line": "proposed",
-     "text": "field.FusionComboBox() and field.FusionComboBox(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionComboBox(items, build => ..) hands EJ2 the items the same way, the door neither line has; and Fields<TItem>(text, value) names each field as every framework read names it (M21.X505).",
+     "text": "field.FusionComboBox() and field.FusionComboBox(build => ..) render FusionComboBox<TProp>, TProp the bound member's type, under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionComboBox(items, build => ..) hands EJ2 the items the same way, the door neither line has; and Fields<TItem>(text, value) names each field as every framework read names it (M21.X505).",
      "doors": [
       "M21.N13",
       "M7.N2",
@@ -2313,7 +2313,7 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionComboBox's Reactive(c => c.Change, pipeline), Reactive(c => c.Focus, pipeline) and Reactive(c => c.Blur, pipeline) handle its events from the plan's start; p.Component<FusionComboBox>(m => m.PreferredLanguage) reaches it in any block.",
+     "text": "The rendered FusionComboBox<TProp>'s Reactive(c => c.Change, pipeline), Reactive(c => c.Focus, pipeline) and Reactive(c => c.Blur, pipeline) handle its events from the plan's start, the change payload typed by the bound member; pipeline.Input(m => m.PreferredLanguage).Component<FusionComboBox<string?>>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
@@ -2394,7 +2394,7 @@
     {
      "id": "M21.X504",
      "rung": "analyzer",
-     "defect": "The redesign declares Value and Text as Property<string> (Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBox.cs:24, :27 at 65fdf118d) where EJ2's value is number | string | boolean | object | null and its text string | null, each null by default (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:219-223, :227-231), so an untouched box types as text and main's clears, SetValue(null) and SetText(null) over properties it declares string? (Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBoxExtensions.cs:17-21, :46-56 at 623dd4a27), are nullable warnings: the vendor contract analyzer (N17.2) refuses the nullability by ALIS019, and the rewrite's Value admits null, typed by the items' value member as M21.N1's items overload types MultiSelect's, and its Text is Property<string?>."
+     "defect": "The redesign declares Value and Text as Property<string> (Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBox.cs:24, :27 at 65fdf118d) where EJ2's value is number | string | boolean | object | null and its text string | null, each null by default (@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:219-223, :227-231), so an untouched box types as text and main's clears, SetValue(null) and SetText(null) over properties it declares string? (Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBoxExtensions.cs:17-21, :46-56 at 623dd4a27), are nullable warnings. The rewrite's FusionComboBox<TValue> types Value by the member it binds, the app's own data, and the vendor contract analyzer (N17.2) checks each type argument the views give: one kind the union holds (ALIS037) whose read admits null (ALIS019), so a string? or int? member binds it and a string member is refused; its Text is Property<string?>, which ALIS019 accepts."
     },
     {
      "id": "M21.X505",
@@ -3192,7 +3192,7 @@
   },
   {
    "id": "M21.F20",
-   "summary": "FusionDropDownList: one declaration of the Syncfusion DropDownList by its JavaScript names, value, text, dataSource, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, its value committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and text typed nullable as the vendor holds them and its data named as every framework read names it (M21.D1).",
+   "summary": "FusionDropDownList: one declaration of the Syncfusion DropDownList by its JavaScript names, value, text, dataSource, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, generic over the member it binds, its value that member's own type and committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed by the bound member and its text Property<string?>, each admitting null as the vendor holds them (M21.X506), and its data named as every framework read names it (M21.D1).",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionDropDownList",
@@ -3263,7 +3263,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionDropDownList declares Value, typed by the items' value member as M21.N1's items overload types MultiSelect's (gate 2) and admitting null, and Text as Property<string?>, since EJ2 holds each null until a choice (M21.X506); DataSource<TItem>(); DataBind, FocusIn, FocusOut, ShowPopup, HidePopup and Clear as methods; and Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionDropDownList<TValue> declares the EJ2 DropDownList by its JavaScript names, TValue the type of the member it binds, since EJ2 marks DropDownList's value a generic type (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:303-308): value as Value, a Property<TValue> that holds null until a choice, so the bound member's type admits null (string?, int?), and text as Text, a Property<string?>, EJ2 holding each null until a choice (M21.X506); DataSource<TItem>(); DataBind, FocusIn, FocusOut, ShowPopup, HidePopup and Clear as methods; and Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N20",
       "N5.4",
@@ -3272,7 +3272,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionDropDownList.ChangeEventArgs reads Value, typed as the component's, and IsInteracted; Focus and Blur hand a payload EJ2 types as Object, of which the declaration reads no member; DataSource<TItem>().Set(source) replaces the list's items from any source, a response body's among them, as main's three SetDataSource did.",
+     "text": "FusionDropDownList<TValue>.ChangeEventArgs reads Value, a TValue, since EJ2 marks the change payload's value a generic type (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:9-15), and IsInteracted; Focus and Blur hand a payload EJ2 types as Object, of which the declaration reads no member; DataSource<TItem>().Set(source) replaces the list's items from any source, a response body's among them, as main's three SetDataSource did.",
      "doors": [
       "M21.N20",
       "N5.6",
@@ -3282,7 +3282,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionDropDownList bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionDropDownList<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
      "doors": [
       "M21.N20",
       "M7.N3"
@@ -3290,7 +3290,7 @@
     },
     {
      "line": "proposed",
-     "text": "field.FusionDropDownList() and field.FusionDropDownList(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionDropDownList(items, build => ..) hands EJ2 the items the same way; and Fields<TItem>(text, value) and Fields<TItem>(text, value, groupBy) name each field as every framework read names it (M21.X507).",
+     "text": "field.FusionDropDownList() and field.FusionDropDownList(build => ..) render FusionDropDownList<TProp>, TProp the bound member's type, under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionDropDownList(items, build => ..) hands EJ2 the items the same way; and Fields<TItem>(text, value) and Fields<TItem>(text, value, groupBy) name each field as every framework read names it (M21.X507).",
      "doors": [
       "M21.N20",
       "M7.N2",
@@ -3300,7 +3300,7 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionDropDownList's Reactive(d => d.Change, pipeline), Reactive(d => d.Focus, pipeline) and Reactive(d => d.Blur, pipeline) handle its events from the plan's start; p.Component<FusionDropDownList>(m => m.Ward) reaches it in any block.",
+     "text": "The rendered FusionDropDownList<TProp>'s Reactive(d => d.Change, pipeline), Reactive(d => d.Focus, pipeline) and Reactive(d => d.Blur, pipeline) handle its events from the plan's start, the change payload typed by the bound member; pipeline.Input(m => m.Ward).Component<FusionDropDownList<string?>>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
@@ -3381,7 +3381,7 @@
     {
      "id": "M21.X506",
      "rung": "analyzer",
-     "defect": "Both lines declare value and text as non-null text: the redesign's Value and Text are Property<string> (Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownList.cs:24, :27 at 65fdf118d) and main's are ComponentProperty<string> (Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListExtensions.cs:15-19 at 623dd4a27), where EJ2's value is number | string | boolean | object | null and its text string | null, each null by default (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:296-301, :303-308), so an untouched list types as text and main's clear, SetValue(null) (Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListExtensions.cs:41-44 at 623dd4a27), is a nullable warning: the vendor contract analyzer (N17.2) refuses the nullability by ALIS019, and the rewrite's Value admits null, typed by the items' value member as M21.N1's items overload types MultiSelect's, and its Text is Property<string?>."
+     "defect": "Both lines declare value and text as non-null text: the redesign's Value and Text are Property<string> (Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownList.cs:24, :27 at 65fdf118d) and main's are ComponentProperty<string> (Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListExtensions.cs:15-19 at 623dd4a27), where EJ2's value is number | string | boolean | object | null and its text string | null, each null by default (@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:296-301, :303-308), so an untouched list types as text and main's clear, SetValue(null) (Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownListExtensions.cs:41-44 at 623dd4a27), is a nullable warning. The rewrite's FusionDropDownList<TValue> types Value by the member it binds, the app's own data, and the vendor contract analyzer (N17.2) checks each type argument the views give: one kind the union holds (ALIS037) whose read admits null (ALIS019), so a string? or int? member binds it and a string member is refused; its Text is Property<string?>, which ALIS019 accepts."
     },
     {
      "id": "M21.X507",
@@ -3672,7 +3672,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionDropDownTree declares Value as Property<string[]?> and Text as Property<string?>, since EJ2 documents each null until a choice (M21.X508); DataBind, ShowPopup, HidePopup and Clear as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionDropDownTree declares value as Value, a Property<string[]?>, the list of text EJ2 declares with no generic mark (@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts:641-646), and text as Text, a Property<string?>, since EJ2 documents each null until a choice (M21.X508); DataBind, ShowPopup, HidePopup and Clear as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N21",
       "N5.4",
@@ -3707,7 +3707,7 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionDropDownTree's Reactive(t => t.Change, pipeline) handles its change from the plan's start; p.Component<FusionDropDownTree>(m => m.CareUnits) reaches it in any block.",
+     "text": "The rendered FusionDropDownTree's Reactive(t => t.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.CareUnits).Component<FusionDropDownTree>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
@@ -7930,7 +7930,7 @@
   },
   {
    "id": "M21.F27",
-   "summary": "FusionListBox: one declaration of the Syncfusion ListBox by its JavaScript names, value, dataBind, selectItems, selectAll, enableItems and change, each EJ2 33.1.47's public member; the payload of change; and the render helpers that render it with an element id the view gives and a plan, its items handed by the plan's writer. Main spreads the slice over seven files whose calls name members by strings over ComponentRef, give the three vendor methods six C# names with fixed arguments, a payload class with a setter, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, each method taking every argument EJ2 takes.",
+   "summary": "FusionListBox: one declaration of the Syncfusion ListBox by its JavaScript names, value, dataBind, selectItems, selectAll, enableItems and change, each EJ2 33.1.47's public member; the payload of change, generic over the list its items' values make; and the render helpers that render it with an element id the view gives and a plan, its items handed by the plan's writer. Main spreads the slice over seven files whose calls name members by strings over ComponentRef, give the three vendor methods six C# names with fixed arguments, a payload class with a setter, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, each method taking every argument EJ2 takes.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionListBox",
@@ -8000,7 +8000,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionListBox declares Value, a list typed by the items' value member through Html.FusionListBox(plan, id, items, build => ..) as M21.N1's items overload types MultiSelect's (gate 2), EJ2's empty list by default; DataBind; SelectItems, SelectAll and EnableItems with every argument EJ2 takes, the items, the state and whether the items are values, each argument any source; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionListBox<TValue> declares the EJ2 ListBox by its JavaScript names, TValue the list its items' values make (string[], int[]), since EJ2 marks the list box's value a generic type (@syncfusion/ej2-dropdowns/src/list-box/list-box.d.ts:150-156): value as Value, a Property<TValue>, EJ2's empty list by default; DataBind; SelectItems, SelectAll and EnableItems with every argument EJ2 takes, the items, the state and whether the items are values, each argument any source; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N27",
       "N5.3",
@@ -8009,7 +8009,7 @@
     },
     {
      "line": "proposed",
-     "text": "SelectItems(values, true, true), SelectItems(values, false, true), SelectAll(true), SelectAll(false), EnableItems(values, true, true) and EnableItems(values, false, true) carry main's SelectValues, UnselectValues, SelectAll, UnselectAll, EnableValues and DisableValues, six C# names main gave three vendor methods; FusionListBox.ListBoxChangeEventArgs reads Value, typed as the component's.",
+     "text": "SelectItems(values, true, true), SelectItems(values, false, true), SelectAll(true), SelectAll(false), EnableItems(values, true, true) and EnableItems(values, false, true) carry main's SelectValues, UnselectValues, SelectAll, UnselectAll, EnableValues and DisableValues, six C# names main gave three vendor methods; FusionListBox<TValue>.ListBoxChangeEventArgs reads Value, a TValue.",
      "doors": [
       "M21.N27",
       "M12.N2",
@@ -8018,7 +8018,7 @@
     },
     {
      "line": "proposed",
-     "text": "Html.FusionListBox(plan, id, build => ..) renders the list box, and Html.FusionListBox(plan, id, items, build => ..), a door neither line has, hands EJ2 the items by M21.D1; its Reactive(b => b.Change, pipeline) handles its change from the plan's start, and pipeline.Component<FusionListBox>(id) reaches it from any block.",
+     "text": "Html.FusionListBox<TValue>(plan, id, build => ..) renders FusionListBox<TValue>, TValue the list the view names, and Html.FusionListBox(plan, id, items, build => ..), a door neither line has, renders it with TValue the list of the items' value member and hands EJ2 the items by M21.D1; its Reactive(b => b.Change, pipeline) handles its change from the plan's start, and pipeline.Component<FusionListBox<string[]>>(id) reaches it from any block.",
      "doors": [
       "M12.N3",
       "M12.N2",
@@ -8681,7 +8681,7 @@
   },
   {
    "id": "M21.F29",
-   "summary": "FusionMention: one declaration of the Syncfusion Mention by its JavaScript names, search, showPopup, hidePopup, change, opened and closed, each EJ2 33.1.47's public member; the payload of change; and the render helper that renders it with an element id the view gives and a plan, its fields named. Main spreads the slice over eight files whose calls name members by strings over ComponentRef, payload classes with setters, a builder of its own with a Reactive extension on it, and a render helper that writes a script into the view to hand the Mention's instance to the view's id; the redesign declares it in one file and hands the instance over in the framework's own component code, the shape the rewrite keeps, with items handed by the plan's writer so its fields name each member as every framework read names it (M21.D1).",
+   "summary": "FusionMention: one declaration of the Syncfusion Mention by its JavaScript names, search, showPopup, hidePopup, change, opened and closed, each EJ2 33.1.47's public member; the payload of change, its value typed by the items' value member; and the render helper that renders it with an element id the view gives and a plan, its fields named. Main spreads the slice over eight files whose calls name members by strings over ComponentRef, payload classes with setters, a builder of its own with a Reactive extension on it, and a render helper that writes a script into the view to hand the Mention's instance to the view's id; the redesign declares it in one file and hands the instance over in the framework's own component code, the shape the rewrite keeps, with items handed by the plan's writer so its fields name each member as every framework read names it (M21.D1).",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionMention",
@@ -8748,7 +8748,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionMention declares Search, ShowPopup and HidePopup as methods, each argument any source; and Change, Opened and Closed as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionMention<TValue> declares the EJ2 Mention by its JavaScript names, TValue the type of its items' value member, which its change payload reads: Search, ShowPopup and HidePopup as methods, each argument any source; and Change, Opened and Closed as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N29",
       "N5.3",
@@ -8757,7 +8757,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionMention.MentionChangeEventArgs reads Value, typed by the items' value member as M21.N1's items overload types MultiSelect's (gate 2), and IsInteracted; Opened and Closed hand FusionMention.PopupEventArgs, of which the declaration reads no member.",
+     "text": "FusionMention<TValue>.MentionChangeEventArgs reads Value, a TValue, since EJ2 marks the mention's changed value a generic type (@syncfusion/ej2-dropdowns/src/mention/mention.d.ts:9-15), and IsInteracted; Opened and Closed hand FusionMention<TValue>.PopupEventArgs, of which the declaration reads no member.",
      "doors": [
       "M21.N29",
       "N5.6"
@@ -8765,7 +8765,7 @@
     },
     {
      "line": "proposed",
-     "text": "Html.FusionMention(plan, id, build => ..) renders the Mention on a host element beside a hidden element of the view's id, which the framework's own component code gives the Mention's instance when it mounts, so the view carries no script; Html.FusionMention(plan, id, items, build => ..) hands EJ2 the items by M21.D1; and Fields<TItem>(text, value) names each field as every framework read names it (M21.X510).",
+     "text": "Html.FusionMention<TValue>(plan, id, build => ..) renders FusionMention<TValue>, TValue the type the view names, on a host element beside a hidden element of the view's id, which the framework's own component code gives the Mention's instance when it mounts, so the view carries no script; Html.FusionMention(plan, id, items, build => ..) renders it with TValue the type of the items' value member and hands EJ2 the items by M21.D1; and Fields<TItem>(text, value) names each field as every framework read names it (M21.X510).",
      "doors": [
       "M21.N29",
       "M12.N3",
@@ -8775,7 +8775,7 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionMention's Reactive(m => m.Change, pipeline), Reactive(m => m.Opened, pipeline) and Reactive(m => m.Closed, pipeline) handle its events from the plan's start, and pipeline.Component<FusionMention>(id) reaches it from any block.",
+     "text": "The rendered FusionMention<TValue>'s Reactive(m => m.Change, pipeline), Reactive(m => m.Opened, pipeline) and Reactive(m => m.Closed, pipeline) handle its events from the plan's start, and pipeline.Component<FusionMention<string>>(id) reaches it from any block.",
      "doors": [
       "M12.N3",
       "M12.N2",
@@ -9618,7 +9618,7 @@
   },
   {
    "id": "M21.F31",
-   "summary": "FusionMultiColumnComboBox: one declaration of the Syncfusion MultiColumnComboBox by its JavaScript names, value, text, dataSource, dataBind, focusIn, focusOut, showPopup, hidePopup and change, each EJ2 33.1.47's public member; the payload of change; the input it is, its value committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and text typed nullable as the vendor documents them and its rows named as every framework read names them (M21.D1).",
+   "summary": "FusionMultiColumnComboBox: one declaration of the Syncfusion MultiColumnComboBox by its JavaScript names, value, text, dataSource, dataBind, focusIn, focusOut, showPopup, hidePopup and change, each EJ2 33.1.47's public member; the payload of change, its value typed by the rows' value member; the input it is, its value committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and text typed nullable as the vendor documents them and its rows named as every framework read names them (M21.D1).",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionMultiColumnComboBox",
@@ -9682,7 +9682,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionMultiColumnComboBox declares Value and Text as Property<string?>, since EJ2 documents each null until a choice (M21.X511); DataSource<TRow>(); DataBind, FocusIn, FocusOut, ShowPopup and HidePopup as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionMultiColumnComboBox<TValue> declares the EJ2 MultiColumnComboBox by its JavaScript names, TValue the type of the rows' value member, which its change payload reads: value as Value and text as Text, each a Property<string?>, the text EJ2 declares for the component's value with no generic mark (@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts:445-451), since EJ2 documents each null until a choice (M21.X511); DataSource<TRow>(); DataBind, FocusIn, FocusOut, ShowPopup and HidePopup as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N31",
       "N5.4",
@@ -9691,7 +9691,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionMultiColumnComboBox.ChangeEventArgs reads Value, typed by the rows' value member as M21.N1's items overload types MultiSelect's (gate 2), and IsInteracted; DataSource<TRow>().Set(source) replaces the rows from any source, a response body's among them, as main's three SetDataSource did.",
+     "text": "FusionMultiColumnComboBox<TValue>.ChangeEventArgs reads Value, a TValue, one kind of the number | string EJ2 declares for it and marks a generic type (@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts:385-389), which the vendor contract analyzer checks (ALIS037), and IsInteracted; DataSource<TRow>().Set(source) replaces the rows from any source, a response body's among them, as main's three SetDataSource did.",
      "doors": [
       "M21.N31",
       "N5.6",
@@ -9701,7 +9701,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionMultiColumnComboBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionMultiColumnComboBox<TValue> bound to a member is an input: its Value, a string? as EJ2 declares it, committed by Change, is what a form sends and a check reads.",
      "doors": [
       "M21.N31",
       "M7.N3"
@@ -9709,7 +9709,7 @@
     },
     {
      "line": "proposed",
-     "text": "field.FusionMultiColumnComboBox() and field.FusionMultiColumnComboBox(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionMultiColumnComboBox(rows, build => ..) hands EJ2 the rows the same way; and Fields<TItem>(text, value) and Fields<TItem>(text, value, groupBy) name each field as every framework read names it (M21.X512).",
+     "text": "field.FusionMultiColumnComboBox<TValue>() and field.FusionMultiColumnComboBox<TValue>(build => ..) render FusionMultiColumnComboBox<TValue>, TValue the type the view names, under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionMultiColumnComboBox(rows, build => ..) renders it with TValue the type of the rows' value member and hands EJ2 the rows the same way; and Fields<TItem>(text, value) and Fields<TItem>(text, value, groupBy) name each field as every framework read names it (M21.X512).",
      "doors": [
       "M21.N31",
       "M7.N2",
@@ -9719,7 +9719,7 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionMultiColumnComboBox's Reactive(c => c.Change, pipeline) handles its change from the plan's start; p.Component<FusionMultiColumnComboBox>(m => m.Bed) reaches it in any block.",
+     "text": "The rendered FusionMultiColumnComboBox<TValue>'s Reactive(c => c.Change, pipeline) handles its change from the plan's start, its payload's value typed by the rows' value member; pipeline.Input(m => m.Bed).Component<FusionMultiColumnComboBox<string>>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",

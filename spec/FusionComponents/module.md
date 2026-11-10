@@ -63,14 +63,16 @@ Each name is gate 2's; each door is the capability it carries.
   each data member of it named by `[JsonPropertyName]` with EJ2's name (X17.48); and types a value of the app's own data
   that EJ2 types as a union by a type parameter, the bound member's for an input, which the vendor contract analyzer
   checks at each type argument against one type of the union (ALIS037, gate 2).
-- `M21.N5` kept: `FusionAutoComplete`: `Value`, typed by the items' value member as M21.N1's items overload types
-  MultiSelect's (gate 2) and admitting null (M21.X501), `DataSource<TItem>()`, `Enabled`, `DataBind`, `FocusIn`,
-  `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change` and `Filtering`, with `IInputComponent.Input` committed by
-  `Change` (M7.N3); the payloads `FusionAutoComplete.ChangeEventArgs` (`Value`, `IsInteracted`) and
-  `FusionAutoComplete.FilteringEventArgs` (`Text`, `PreventDefaultAction`, `UpdateData`); and the render helpers
-  `field.FusionAutoComplete(build => ..)` and `field.FusionAutoComplete(items, build => ..)`, which hands EJ2 the items
-  by M21.D1, with `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X503). `Text` leaves: EJ2
-  marks AutoComplete's `text` `@private` (M21.X502, gate 2). It replaces main's seven files
+- `M21.N5` kept: `FusionAutoComplete<TValue>`, TValue the type of the member it binds, as EJ2 marks the value
+  AutoComplete inherits from ComboBox a generic type (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:228`):
+  `Value`, a `Property<TValue>` whose type argument admits null (M21.X501), `DataSource<TItem>()`, `Enabled`,
+  `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change` and `Filtering`, with
+  `IInputComponent.Input` committed by `Change` (M7.N3); the payloads `FusionAutoComplete<TValue>.ChangeEventArgs`
+  (`Value`, `IsInteracted`) and `FusionAutoComplete<TValue>.FilteringEventArgs` (`Text`, `PreventDefaultAction`,
+  `UpdateData`); and the render helpers `field.FusionAutoComplete(build => ..)` and `field.FusionAutoComplete(items,
+  build => ..)`, which render it with the bound member's type and hand EJ2 the items by M21.D1, with
+  `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X503). `Text` leaves: EJ2 marks
+  AutoComplete's `text` `@private` (M21.X502, gate 2). It replaces main's seven files
   (`Alis.Reactive.Fusion/Components/FusionAutoComplete/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:231`, `:373`, `:380`, `:387`,
@@ -100,13 +102,14 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionColorPicker/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts:46`, `:59`, `:146`, `:268`, `:368`).
-- `M21.N13` kept: `FusionComboBox`: `Value`, typed by the items' value member as M21.N1's items overload types
-  MultiSelect's (gate 2) and admitting null, `Text` as `Property<string?>` (M21.X504), `Index` as `Property<int?>`,
-  `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change`, `Focus` and `Blur`, with
-  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionComboBox.ChangeEventArgs` (`Value`,
-  `IsInteracted`), and the focus and blur payloads, which EJ2 types as `Object`, declaring no member (their class name a
-  gate 2 gap); and the render helpers `field.FusionComboBox()`, `field.FusionComboBox(build => ..)` and
-  `field.FusionComboBox(items, build => ..)`, which hands EJ2 the items by M21.D1, a door neither line has, with
+- `M21.N13` kept: `FusionComboBox<TValue>`, TValue the type of the member it binds, as EJ2 marks ComboBox's value a
+  generic type (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:228`): `Value`, a `Property<TValue>` whose type
+  argument admits null, `Text` as `Property<string?>` (M21.X504), `Index` as `Property<int?>`, `DataBind`, `FocusIn`,
+  `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by
+  `Change` (M7.N3); the payload `FusionComboBox<TValue>.ChangeEventArgs` (`Value`, `IsInteracted`), and the focus and
+  blur payloads, which EJ2 types as `Object`, declaring no member (their class name a gate 2 gap); and the render
+  helpers `field.FusionComboBox()`, `field.FusionComboBox(build => ..)` and `field.FusionComboBox(items, build => ..)`,
+  which render it with the bound member's type and hand EJ2 the items by M21.D1, a door neither line has, with
   `Fields<TItem>(text, value)` (M21.X505). It replaces main's eight files
   (`Alis.Reactive.Fusion/Components/FusionComboBox/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
@@ -120,16 +123,17 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/context-menu/context-menu.d.ts:77`, `:84`;
   `@syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242`, `:552`).
-- `M21.N20` kept: `FusionDropDownList`: `Value`, typed by the items' value member as M21.N1's items overload types
-  MultiSelect's (gate 2) and admitting null, `Text` as `Property<string?>` (M21.X506), `DataSource<TItem>()`,
+- `M21.N20` kept: `FusionDropDownList<TValue>`, TValue the type of the member it binds, as EJ2 marks DropDownList's
+  value a generic type (`@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:306`): `Value`, a
+  `Property<TValue>` whose type argument admits null, `Text` as `Property<string?>` (M21.X506), `DataSource<TItem>()`,
   `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change`, `Focus` and `Blur`, with
-  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionDropDownList.ChangeEventArgs` (`Value`,
-  `IsInteracted`), and the focus and blur payloads, which EJ2 types as `Object`, declaring no member (their class name a
-  gate 2 gap); and the render helpers `field.FusionDropDownList()`, `field.FusionDropDownList(build => ..)` and
-  `field.FusionDropDownList(items, build => ..)`, which hands EJ2 the items by M21.D1, with `Fields<TItem>(text, value)`
-  and `Fields<TItem>(text, value, groupBy)` (M21.X507). It replaces main's eight files
-  (`Alis.Reactive.Fusion/Components/FusionDropDownList/` at 623dd4a27), whose doors carry their verdicts in
-  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionDropDownList<TValue>.ChangeEventArgs`
+  (`Value`, `IsInteracted`), and the focus and blur payloads, which EJ2 types as `Object`, declaring no member (their
+  class name a gate 2 gap); and the render helpers `field.FusionDropDownList()`, `field.FusionDropDownList(build => ..)`
+  and `field.FusionDropDownList(items, build => ..)`, which render it with the bound member's type and hand EJ2 the
+  items by M21.D1, with `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X507). It replaces
+  main's eight files (`Alis.Reactive.Fusion/Components/FusionDropDownList/` at 623dd4a27), whose doors carry their
+  verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:301`, `:308`, `:365`, `:389`, `:395`, `:685`,
   `:694`, `:700`, `:706`, `:742`, `@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:390`).
 - `M21.N21` kept: `FusionDropDownTree`: `Value` as `Property<string[]?>` and `Text` as `Property<string?>` (M21.X508),
@@ -184,11 +188,12 @@ Each name is gate 2's; each door is the capability it carries.
   replaces main's seven files (`Alis.Reactive.Fusion/Components/FusionKanban/` at 623dd4a27), whose doors carry their
   verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:112`, `:234`, `:429`, `:468`, `:484`, `:502`, `:511`, `:527`).
-- `M21.N27` kept: `FusionListBox`: `Value`, a list typed by the items' value member as M21.N1's items overload types
-  MultiSelect's (gate 2), `DataBind`, `SelectItems`, `SelectAll` and `EnableItems`, each taking every argument EJ2
-  takes, and `Change`; the payload `FusionListBox.ListBoxChangeEventArgs` (`Value`); and the render helpers
-  `Html.FusionListBox(plan, id, build => ..)` and `Html.FusionListBox(plan, id, items, build => ..)`, which hands EJ2
-  the items by M21.D1, a door neither line has. It replaces main's seven files
+- `M21.N27` kept: `FusionListBox<TValue>`, TValue the list its items' values make, as EJ2 marks the list box's value a
+  generic type (`@syncfusion/ej2-dropdowns/src/list-box/list-box.d.ts:154`): `Value`, a `Property<TValue>`, `DataBind`,
+  `SelectItems`, `SelectAll` and `EnableItems`, each taking every argument EJ2 takes, and `Change`; the payload
+  `FusionListBox<TValue>.ListBoxChangeEventArgs` (`Value`); and the render helpers `Html.FusionListBox<TValue>(plan, id,
+  build => ..)`, TValue the view's, and `Html.FusionListBox(plan, id, items, build => ..)`, TValue the list of the
+  items' value member, which hands EJ2 the items by M21.D1, a door neither line has. It replaces main's seven files
   (`Alis.Reactive.Fusion/Components/FusionListBox/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-dropdowns/src/list-box/list-box.d.ts:156`, `:274`, `:409`, `:418`, `:425`, `:724`).
@@ -200,14 +205,16 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-lists/src/list-view/list-view.d.ts:392`, `:462`, `:466`, `:532`, `:538`, `:706`, `:818`, `:826`,
   `:830`, `:834`).
-- `M21.N29` kept: `FusionMention`: `Search`, `ShowPopup`, `HidePopup`, `Change`, `Opened` and `Closed`; the payloads
-  `FusionMention.MentionChangeEventArgs` (`Value`, typed by the items' value member as M21.N1's items overload types
-  MultiSelect's (gate 2), `IsInteracted`) and `FusionMention.PopupEventArgs`; and the render helpers
-  `Html.FusionMention(plan, id, build => ..)` and `Html.FusionMention(plan, id, items, build => ..)`, which hands EJ2
-  the items by M21.D1, with `Fields<TItem>(text, value)` (M21.X510), the Mention's instance handed to the view's id by
-  the framework's own component code (`Alis.Reactive.Assets/components/fusion/mention.ts:7-11` at 65fdf118d). It
-  replaces main's eight files (`Alis.Reactive.Fusion/Components/FusionMention/` at 623dd4a27), whose doors carry their
-  verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+- `M21.N29` kept: `FusionMention<TValue>`, TValue the type of its items' value member, as EJ2 marks the mention's
+  changed value a generic type (`@syncfusion/ej2-dropdowns/src/mention/mention.d.ts:13`): `Search`, `ShowPopup`,
+  `HidePopup`, `Change`, `Opened` and `Closed`; the payloads `FusionMention<TValue>.MentionChangeEventArgs` (`Value`, a
+  TValue, `IsInteracted`) and `FusionMention<TValue>.PopupEventArgs`; and the render helpers
+  `Html.FusionMention<TValue>(plan, id, build => ..)`, TValue the view's, and `Html.FusionMention(plan, id, items, build
+  => ..)`, TValue the type of the items' value member, which hands EJ2 the items by M21.D1, with `Fields<TItem>(text,
+  value)` (M21.X510), the Mention's instance handed to the view's id by the framework's own component code
+  (`Alis.Reactive.Assets/components/fusion/mention.ts:7-11` at 65fdf118d). It replaces main's eight files
+  (`Alis.Reactive.Fusion/Components/FusionMention/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-dropdowns/src/mention/mention.d.ts:15`, `:282`, `:294`, `:300`, `:407`, `:413`, `:469`).
 - `M21.N30` kept: `FusionMenu`: `Open` and `Close`; `BeforeItemRender`, `BeforeOpen`, `OnOpen`, `BeforeClose`, `OnClose`
   and `Select` and their payloads, `FusionMenu.BeforeOpenCloseMenuEventArgs` with `IsFocused` (optional, `isFocused`),
@@ -216,12 +223,15 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/menu/menu.d.ts:119`, `:126`;
   `@syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242`, `:552`).
-- `M21.N31` kept: `FusionMultiColumnComboBox`: `Value` and `Text` as `Property<string?>` (M21.X511),
-  `DataSource<TRow>()`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup` and `Change`, with
-  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionMultiColumnComboBox.ChangeEventArgs`
-  (`Value`, typed by the rows' value member as M21.N1's items overload types MultiSelect's (gate 2), `IsInteracted`);
-  and the render helpers `field.FusionMultiColumnComboBox()`, `field.FusionMultiColumnComboBox(build => ..)` and
-  `field.FusionMultiColumnComboBox(rows, build => ..)`, which hands EJ2 the rows by M21.D1, with
+- `M21.N31` kept: `FusionMultiColumnComboBox<TValue>`, TValue the type of the rows' value member, as EJ2 marks the
+  change payload's value a generic type
+  (`@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts:387`): `Value` and `Text`
+  as `Property<string?>`, the text EJ2 declares for the component's value (M21.X511), `DataSource<TRow>()`, `DataBind`,
+  `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup` and `Change`, with `IInputComponent.Input` committed by `Change`
+  (M7.N3); the payload `FusionMultiColumnComboBox<TValue>.ChangeEventArgs` (`Value`, a TValue, one kind of EJ2's `number
+  | string`, `IsInteracted`); and the render helpers `field.FusionMultiColumnComboBox<TValue>()` and
+  `field.FusionMultiColumnComboBox<TValue>(build => ..)`, TValue the view's, and `field.FusionMultiColumnComboBox(rows,
+  build => ..)`, TValue the type of the rows' value member, which hands EJ2 the rows by M21.D1, with
   `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X512). It replaces main's six files
   (`Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
@@ -431,7 +441,9 @@ features they give.
   declares the value and text of AutoComplete, ComboBox, DropDownList, DropDownTree and MultiColumnComboBox non-null
   (`Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownList.cs:24` at 65fdf118d) where EJ2 documents each
   null until a choice (`@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:305-308`); ALIS019 refuses the
-  declarations, and a value that admits null keeps main's clears.
+  declarations. Each box's value is typed on its own terms: by the member it binds where EJ2 marks the value a generic
+  type (AutoComplete, ComboBox, DropDownList), as the list of text EJ2 declares for DropDownTree's, and as the text EJ2
+  declares for MultiColumnComboBox's; each admits null, so main's clears keep working.
 - AutoComplete names no private member (M21.X502). Both lines write `text`, which EJ2 marks `@private` on AutoComplete
   (`@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts:197-200`); the designed default, gate 2's, sets what
   the box shows through `Value`.
