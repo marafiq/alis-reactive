@@ -534,10 +534,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   living checks run in CI, its test specs are bound to the tests and its TLA+ actions to the harness's gates by name.
 - The owner, 2026-11-10: publishing the NuGet packages, and how a developer uses them in an app (the framework's
   browser assets reaching both hosts), is part of the plan before the rewrite, at the same bar. The package ids stay the
-  same; Alis.Reactive.NativeTagHelpers ships as an empty package until it is written, after the rewrite, and so does
+  same, but for AlisReactive.FluentValidator's (below); Alis.Reactive.NativeTagHelpers ships as an empty package until it is written, after the rewrite, and so does
   Alis.Reactive.DesignSystem, since the key principle is the inverted dependency: nothing depends on a design system.
   Both were scope creep and need a redesign later, or leave: the structure reserves nothing for them, and their future is
   the owner's decision.
+- The owner, 2026-11-10, asked what AlisReactive.FluentValidator ships, since the core implements the validation grammar
+  without the FluentValidation library: "if not needed remove it that is better". The rewrite packs five ids, not main's
+  six: main's FluentValidator doors moved into AlisReactive (`spec/inventory/doors.tsv`), so an app on main's release
+  candidates drops the reference and keeps its validators.
 - The owner, 2026-11-10: the Native components are great consumers and are written for real, with the dependency
   inverted: NativeToast, NativeDrawer (main's panel) and the common components (text box, check box, drop-down, radio
   group, check list, text area, button, hidden field, action link) are production components on the core's public
