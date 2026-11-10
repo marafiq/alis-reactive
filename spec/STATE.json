@@ -1268,27 +1268,27 @@
     },
     "defects": {
       "counts": {
-        "core_defects_unplaced": 19,
-        "defects": 518,
+        "core_defects_unplaced": 7,
+        "defects": 540,
         "doubled": 0,
-        "features": 102,
-        "mapped": 8754,
+        "features": 109,
+        "mapped": 8909,
         "rows": 8909,
-        "unmapped": 155
+        "unmapped": 0
       },
-      "detail": "every feature row valid; 155 of 8909 spec doors in no feature; core defects no feature places: X17.6, X17.7, X17.8, X17.9, X17.31, X17.32, X17.33, X17.34, X17.35, X17.36, X17.37, X17.38, X20.1, X20.2, X20.3, X20.4, X20.5, X20.6, X20.7",
+      "detail": "every feature row valid; 0 of 8909 spec doors in no feature; core defects no feature places: X20.1, X20.2, X20.3, X20.4, X20.5, X20.6, X20.7",
       "pass": false
     },
     "doors_mapped": {
       "counts": {
         "core_doors_homeless": 3,
         "doubled": 0,
-        "features": 102,
-        "mapped": 8754,
+        "features": 109,
+        "mapped": 8909,
         "rows": 8909,
-        "unmapped": 155
+        "unmapped": 0
       },
-      "detail": "every feature row valid; 155 of 8909 spec doors in no feature; core doors no module names: N20.1, N20.2, N20.3",
+      "detail": "every feature row valid; 0 of 8909 spec doors in no feature; core doors no module names: N20.1, N20.2, N20.3",
       "pass": false
     },
     "evidence": {
@@ -1302,22 +1302,22 @@
     "features_core": {
       "counts": {
         "doubled": 0,
-        "features": 102,
-        "mapped": 8754,
+        "features": 109,
+        "mapped": 8909,
         "rows": 8909,
-        "unmapped": 155
+        "unmapped": 0
       },
-      "detail": "every feature row valid; 155 of 8909 spec doors in no feature",
-      "pass": false
+      "detail": "every feature rests on answered questions, schema nodes and checked invariants",
+      "pass": true
     },
     "features_lost": {
       "counts": {
-        "lost": 17,
-        "types_in_no_feature": 17,
+        "lost": 0,
+        "types_in_no_feature": 0,
         "uncarried_doors": 0
       },
-      "detail": "17 declaring types in no feature",
-      "pass": false
+      "detail": "features lost 0",
+      "pass": true
     },
     "fluent": {
       "counts": {},
@@ -1336,7 +1336,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 52,
+        "files": 54,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1400,7 +1400,7 @@
     },
     "module_cites": {
       "counts": {
-        "cites": 982,
+        "cites": 1009,
         "unresolved": 0
       },
       "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
@@ -1415,8 +1415,8 @@
     },
     "probes": {
       "counts": {
-        "browser": 99,
-        "facts": 356,
+        "browser": 108,
+        "facts": 365,
         "net10": 118,
         "net48": 77,
         "node": 62
@@ -1427,14 +1427,14 @@
     "promises": {
       "counts": {
         "doubled": 0,
-        "features": 102,
-        "mapped": 8754,
-        "promises": 366,
+        "features": 109,
+        "mapped": 8909,
+        "promises": 385,
         "rows": 8909,
-        "unmapped": 155
+        "unmapped": 0
       },
-      "detail": "every feature row valid; 155 of 8909 spec doors in no feature",
-      "pass": false
+      "detail": "every refusal and behavior defect has a promise",
+      "pass": true
     },
     "questions": {
       "counts": {
@@ -3371,25 +3371,22 @@
     "verdicts": {
       "counts": {
         "doubled": 0,
-        "features": 102,
+        "features": 109,
         "main_only": 4156,
-        "main_only_in_features": 4128,
-        "mapped": 8754,
+        "main_only_in_features": 4156,
+        "mapped": 8909,
         "rows": 8909,
-        "unmapped": 155
+        "unmapped": 0
       },
-      "detail": "every feature row valid; 155 of 8909 spec doors in no feature",
-      "pass": false
+      "detail": "every main-only door has a verdict, and every refusal names its carriers",
+      "pass": true
     }
   },
-  "passed": 15,
-  "read_at_head": "cafad6b169eb16274b3978dabf76ce097b21bf9d",
+  "passed": 19,
+  "read_at_head": "86ae2d41b68ddcf915f39945e1d61f2dffb6a684",
   "step": {
     "failing": [
-      "doors_mapped",
-      "verdicts",
-      "features_core",
-      "features_lost"
+      "doors_mapped"
     ],
     "name": "Feature rows",
     "next": "Write spec/<Module>/features.json and module.md for each module.",
