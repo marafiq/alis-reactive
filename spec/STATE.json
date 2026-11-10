@@ -1485,14 +1485,14 @@
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
-        "matrix_promised": 0,
+        "matrix_promised": 159,
         "matrix_runs": 159,
         "promises": 392,
         "rows": 8909,
         "unmapped": 0
       },
-      "detail": "not started: none of the 159 cells the reference components run has a promise",
-      "pass": false
+      "detail": "every refusal and behavior defect, and every cell each reference component runs, has a promise",
+      "pass": true
     },
     "questions": {
       "counts": {
@@ -3564,16 +3564,16 @@
       "pass": true
     }
   },
-  "passed": 23,
-  "read_at_head": "5e4732f47c9296799c4c78770ed3ceecde579308",
+  "passed": 24,
+  "read_at_head": "be84927c0b9ea00091bdb18a474f02a62c3b2713",
   "step": {
     "failing": [
-      "promises"
+      "rewrite_units"
     ],
-    "name": "The promises",
-    "next": "Give every refusal and behavior defect and every matrix cell its promise.",
-    "number": 9,
-    "phase": "D"
+    "name": "REWRITE.md",
+    "next": "Write spec/REWRITE.md in SliceTree order.",
+    "number": 11,
+    "phase": "E"
   },
   "total": 26
 }
