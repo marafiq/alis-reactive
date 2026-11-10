@@ -550,7 +550,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   no other consumer, since they differ (plain-DOM native elements against shadow-DOM web components). The line between
   coverage and consumers: the test consumers, ConformanceComponent and ConformanceElement, carry the framework's
   coverage in the conformance app and never ship; a shipped consumer's tests prove only what its declaration adds. A
-  web components package is a sixth package id, the owner's decision after the rewrite.
+  web components package is one more package id, the owner's decision after the rewrite.
 - The lead, 2026-11-10, on the owner's "I let you decide now": `spec/REWRITE.md` holds the repository the rewrite
   builds (tree, slices, SliceTree, naming, harness, TLA+ owners, tools, shards, CI, packages, what retires) and its 26
   units. Two independent designs fed it; where they differed: vitest and PlanTests stay as feedback (BRIEF.md
