@@ -201,6 +201,7 @@ for line in grep:
     file, number, text = line.split(":", 2)
     if file != "spec/BRIEF.md":
         flags.append({"file": file, "line": int(number), "text": text.strip()[:600]})
+flag_files = collections.Counter("the module.md files" if flag["file"].endswith("/module.md") else flag["file"] for flag in flags).most_common()
 
 decisions = [
     {"n": "G0", "group": "Dates",
@@ -217,7 +218,7 @@ decisions = [
      "refs": ["F4"]},
     {"n": "G3", "group": "Names",
      "question": f"F3 compares a name's overloads across receivers exactly: {counts['F3_differ']} of {counts['F3_names']} names on several receivers differ, most only where a receiver continues its sentence through a stage type, offers fewer overloads, holds an operand, or is a live list.",
-     "recommendation": f"F3 reads four things as the same shape. A door that continues (void, its receiver, or its next stage, a type that carries the receiver's type arguments, as `BodyParts<TRequest>` goes to `BodiedParts<TRequest>`) is one result. Each receiver's overloads are the fullest receiver's, less what its type cannot take (HEAD has no success body; one file is a whole body, several are multipart parts) or the operand it holds (a bound input holds its element, a request its container and its reply). A live list's queries read as a data list's: an item lambda is an expression on data and a callback on live objects. Under these {len(same_under_rules)} more names agree, and {len(remaining)} still differ (G4).",
+     "recommendation": f"F3 reads four things as the same shape. A door that continues (void, its receiver, or its next stage, a type that carries the receiver's type arguments, as `BodyParts<TRequest>` goes to `BodiedParts<TRequest>`) is one result. Each receiver's overload is one of the fullest receiver's with the same result, or one with parameters left out in order, as a type that takes less (HEAD has no success body; one file is a whole body, several are multipart parts) or holds the operand (a bound input holds its element, a request its container and its reply). A live list's queries read as a data list's: an item lambda is an expression on data and a callback on live objects. Under these {len(same_under_rules)} more names agree, and {len(remaining)} still differ (G4).",
      "refs": ["F3", "D6.2", "N5.5"]},
     {"n": "G4", "group": "Names",
      "question": f"Under G3, {len(remaining)} names still take two shapes: " + ", ".join(f"`{name}`" for name in remaining) + ".",
@@ -251,11 +252,17 @@ decisions = [
      "question": f"BRIEF step 7 says sentences.json holds every sentence. The {lines['main'] + lines['redesign'] + lines['proposed']} sentences of {features} features ({lines['main']} from main, {lines['redesign']} from the redesign, {lines['proposed']} proposed) live in the features' rows, beside {verdict_counts['renamed']} renamed, {verdict_counts['refused']} refused and {verdict_counts['kept']} kept doors.",
      "recommendation": "Keep them in the features' rows. A copy in sentences.json would be a second carrier of the same text, and sentences.json holds only what the compiler cannot know.",
      "refs": ["BRIEF step 7"]},
+    {"n": "G13", "group": "Forms the spec defers",
+     "question": f"{len(flags)} lines of the spec name gate 2 (listed at the end: " + ", ".join(f"{count} in {file}" for file, count in flag_files) + "). Most defer a door's form or a name to this gate, and G0 to G12 decide none of them.",
+     "recommendation": "Approve each item at what its line writes: the form or default it states, else the door as the POC or spec/api compiles it. An item with neither comes back to you with a form before the unit that builds it, so no form is taken without your yes.",
+     "refs": ["BRIEF step 7"]},
     {"n": "G12", "group": "Since gate 1",
      "question": "Core text and models that changed after your gate 1 yes.",
      "recommendation": "D5.13, D6.17, D17.5's iterator bullet and D15.3's two amendments are new meanings, named in this list. Three changes carry no new meaning: D11.9 now states, as D10.21 does, that a loader has no timeout; Tracing.tla keeps the trace headers when a sink fails, as D20.6 and D20.9 state; D7.1 and D7.2 name the Cells methods.",
      "refs": ["D5.13", "D6.17", "D17.5", "D15.3", "D11.9", "D20.6", "D7.1"]},
 ]
+
+decisions.sort(key=lambda decision: int(decision["n"][1:]))
 
 checks = [
     {"id": "F1", "title": "One concept, one name", "status": "pass" if not f1 else "fail",
@@ -274,8 +281,8 @@ checks = [
 gate2 = {
     "head": head,
     "branch": "feature/spec-first",
-    "decision": "Gate 2 asks for a yes or no on each of G0 to G12 below: the fluent API as the compiler reads it today. spec/probes/FluentSurface compiles the POC and spec/api, and check_fluent decides the five checks of BRIEF step 7 from that output. F1 passes. F2 to F5 fail only on what these decisions settle and on the doors the rewrite adds, and a yes to each leaves no name or rule for me to choose. Each decision comes with my recommendation. spec/tools/gate2_page.py computes every count on this tab from check_fluent's output; the date facts cite their probes.",
-    "changed": "Changed since the first version of this tab: its G2 gave counts for OnSuccess, OnError and Chained that came from an architect's report, not from check_fluent, and named only three doors; G1 and G2 now name every slot by one rule. Its G3 renamed the header read; G4 now keeps it, since it is the Fetch API's own `get`. The names G3 left without a recommendation now each have one (G3, G4), and so does each synonym group (G5).",
+    "decision": "Gate 2 asks for a yes or no on each of G0 to G13 below: the fluent API as the compiler reads it today. spec/probes/FluentSurface compiles the POC and spec/api, and check_fluent decides the five checks of BRIEF step 7 from that output. F1 passes. F2 to F5 fail only on what G1 to G10 settle and on the doors the rewrite adds; G0 is the date line, G11 and G12 the spec's own record, and G13 every form the spec defers to this gate. Each decision comes with my recommendation, and a yes to each leaves no name, rule or form for me to choose. spec/tools/gate2_page.py computes every count on this tab from check_fluent's output; the date facts cite their probes.",
+    "changed": "Changed since the first version of this tab: its G2 gave counts for OnSuccess, OnError and Chained that came from an architect's report, not from check_fluent, and named only three doors; G1 and G2 now name every slot by one rule. Its G3 renamed the header read; G4 now keeps it, since it is the Fetch API's own `get`. The names G3 left without a recommendation now each have one (G3, G4), and so does each synonym group (G5). G13 is new: the forms other lines of the spec defer to this gate.",
     "checks": checks,
     "decisions": decisions,
     "positions": [{"name": item["name"], "gap": item["gap"]} for item in surface["cells"]["positions"]],
@@ -285,7 +292,7 @@ gate2 = {
     "shapes": [{"name": name, "verdict": verdict} for name, verdict in sorted(shapes.items())],
     "synonyms": synonyms,
     "work": [
-        "After your yes: the table's new rows in .claude/rules/csharp.md, F4 reading them by type with G2's nesting rule, and the spec/api lambdas renamed to them, in one commit; F3's rules and the kept rows (G3, G4); one show-errors name (G5); PartialFor's typed door (G6); the D7 lines (G7, G9); the CS8620 refusals (G8); the date line (G0).",
+        "After your yes: the table's new rows in .claude/rules/csharp.md, F4 reading them by type with G2's nesting rule, and the spec/api lambdas renamed to them, in one commit; F3's rules and the kept rows (G3, G4); one show-errors name (G5); PartialFor's typed door (G6); the D7 lines (G7, G9); the CS8620 refusals (G8); the date line (G0); each deferred form G13 approves, recorded beside its line.",
         "Step 8: spec/Reference, a custom TypeScript component and the real MultiSelect, carrying every conformance cell (BRIEF section 8).",
         "Steps 9 to 12: the promises, check.py complete, spec/REWRITE.md in SliceTree order, the root CLAUDE.md.",
     ],
