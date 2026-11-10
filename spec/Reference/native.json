@@ -558,6 +558,13 @@
           "door": "LiveObject<TrolleyDrawer>",
           "csharp": "Drawer",
           "type": "TrolleyDrawer"
+        },
+        {
+          "js": "sign",
+          "kind": "method",
+          "ts": "sign(): void",
+          "door": "Method",
+          "csharp": "Sign()"
         }
       ]
     },
@@ -634,153 +641,331 @@
       "members": [
         "WardRound.title"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.Title.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads North round.",
+        "opposite": "On a round titled South round the same click shows South round.",
+        "defect": "The read names the member Title, its C# name, so the component's title reads nothing and shown stays empty."
+      }
     },
     "prop.scalar.write": {
       "members": [
         "WardRound.title"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Rename button whose click sets round.Title to \"North round, late shift\".",
+        "gesture": "Click Rename.",
+        "outcome": "The round's heading reads North round, late shift.",
+        "opposite": "Before the click the heading reads North round.",
+        "defect": "The set writes title on the host element instead of the component the vendor's objectPath finds, so the heading keeps North round."
+      }
     },
     "prop.dotted.read": {
       "members": [
         "WardRound.settings.pageSize"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown listing 8 beds a page (settings.pageSize 8), and a Show button whose click sets shown's text to round.Settings.PageSize.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads 8.",
+        "opposite": "On a round listing 12 beds a page the same click shows 12.",
+        "defect": "The read takes settings.pageSize as one member name, so it reads nothing and shown stays empty."
+      }
     },
     "prop.dotted.write": {
       "members": [
         "WardRound.settings.pageSize"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown of 10 beds listing 8 a page, and a Page by 4 button whose click sets round.Settings.PageSize to 4.",
+        "gesture": "Click Page by 4.",
+        "outcome": "The round's pager reads Beds 1 to 4 of 10.",
+        "opposite": "Before the click the pager reads Beds 1 to 8 of 10.",
+        "defect": "The write sets a member named settings.pageSize on the component, so its settings keep 8 and the pager reads Beds 1 to 8 of 10."
+      }
     },
     "prop.object.memberRead": {
       "members": [
         "WardRound.ward.name"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.Ward.Name.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads North.",
+        "opposite": "On the South ward's round the same click shows South.",
+        "defect": "The read stops at ward and sets the object as text, so shown reads [object Object]."
+      }
     },
     "prop.object.memberWrite": {
       "members": [
         "WardRound.ward.name"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Rename ward button whose click sets round.Ward.Name to \"North East\".",
+        "gesture": "Click Rename ward.",
+        "outcome": "The round's ward line reads Ward: North East.",
+        "opposite": "Before the click it reads Ward: North.",
+        "defect": "The write lands on round.name instead of round.ward.name, so the ward line keeps Ward: North."
+      }
     },
     "prop.list.lambda": {
       "members": [
         "WardRound.beds.occupied"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown of 4 beds, 3 occupied, and a Count button whose click sets shown's text to round.Beds.Count(b => b.Occupied).",
+        "gesture": "Click Count.",
+        "outcome": "shown reads 3.",
+        "opposite": "On a round of 4 beds with 1 occupied the same click shows 1.",
+        "defect": "The lambda reads each bed's member by its C# name Occupied, so no bed counts and shown reads 0."
+      }
     },
     "prop.readOnly": {
       "members": [
         "WardRound.roundId"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown whose round id is NR-2026-11-10, and a Show button whose click sets shown's text to round.RoundId.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads NR-2026-11-10.",
+        "opposite": "On the next day's round the same click shows NR-2026-11-11.",
+        "defect": "The read of a ReadOnly member is written as a call of roundId, which is no function, so the pipeline stops and shown stays empty."
+      }
     },
     "prop.writeOnly": {
       "members": [
         "WardRound.signature"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Sign button whose click sets round.Signature to \"Nurse Okafor\".",
+        "gesture": "Click Sign.",
+        "outcome": "The round's signature line reads Signed by Nurse Okafor.",
+        "opposite": "Before the click it reads Unsigned.",
+        "defect": "The set reads the member before writing it, and a write-only member has no getter, so the step stops and the line reads Unsigned."
+      }
     },
     "method.void": {
       "members": [
         "WardRound.refresh()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Refresh button whose click calls round.Refresh().",
+        "gesture": "Click Refresh.",
+        "outcome": "The round's refresh line reads Refreshed 1 time.",
+        "opposite": "Before the click it reads Refreshed 0 times.",
+        "defect": "The call is written as a read of refresh, so the method never runs and the line keeps Refreshed 0 times."
+      }
     },
     "method.value": {
       "members": [
         "WardRound.dueCount()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown with 3 doses due, and a Show button whose click sets shown's text to round.DueCount().",
+        "gesture": "Click Show.",
+        "outcome": "shown reads 3.",
+        "opposite": "On a round with 1 dose due the same click shows 1.",
+        "defect": "The result is read from the method's function object instead of its call, so shown stays empty."
+      }
     },
     "method.object.memberRead": {
       "members": [
         "WardRound.current().resident"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.Current().Resident.",
+        "gesture": "Click Show.",
+        "outcome": "shown reads Helen Martinez.",
+        "opposite": "On a round standing at bed 2 the same click shows Arthur Lee.",
+        "defect": "The member is read from the method instead of the object it returned, so shown stays empty."
+      }
     },
     "method.object.methodCall": {
       "members": [
         "WardRound.current().markSeen()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Seen button whose click calls round.Current().MarkSeen().",
+        "gesture": "Click Seen.",
+        "outcome": "Bed 1's line reads Helen Martinez, seen, and bed 2's still reads Arthur Lee, not seen.",
+        "opposite": "Before the click bed 1's line reads Helen Martinez, not seen.",
+        "defect": "The call goes to round.markSeen, which WardRound lacks, so the pipeline stops and bed 1 stays not seen."
+      }
     },
     "method.async.void": {
       "members": [
         "WardRound.save()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Save button whose click sets shown's text to Saving, awaits round.Save(), which the test app's save endpoint answers when the test releases it, then sets shown's text to Saved.",
+        "gesture": "Click Save.",
+        "outcome": "While the save endpoint is held shown reads Saving, and once it answers shown reads Saved.",
+        "opposite": "A save the endpoint refuses rejects the promise and stops the pipeline, so shown keeps Saving.",
+        "defect": "The step after the call runs before the promise settles, so shown reads Saved while the endpoint is held.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "method.async.value": {
       "members": [
         "WardRound.fetchDue()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it.",
+        "gesture": "Click Show.",
+        "outcome": "While the endpoint is held shown stays empty, and once it answers shown reads 3.",
+        "opposite": "A due count the endpoint refuses stops the pipeline, so shown stays empty.",
+        "defect": "The value set is the promise itself, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
     },
     "method.arg.scalar": {
       "members": [
         "WardRound.note()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Note button whose click calls round.Note(\"Fluids checked at 14:00\").",
+        "gesture": "Click Note.",
+        "outcome": "The round's note line reads Fluids checked at 14:00.",
+        "opposite": "Before the click the note line is empty.",
+        "defect": "The argument is passed as a one-item list, so the note line reads [\"Fluids checked at 14:00\"]."
+      }
     },
     "method.arg.object": {
       "members": [
         "WardRound.admit()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and an Admit button whose click calls round.Admit with an admission of Mary Chen to bed B7.",
+        "gesture": "Click Admit.",
+        "outcome": "The round's admissions read Mary Chen in B7.",
+        "opposite": "Before the click the admissions read None.",
+        "defect": "The admission's members are written by their C# names Resident and Bed, so the round shows undefined in undefined."
+      }
     },
     "method.arg.list": {
       "members": [
         "WardRound.admitAll()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and an Admit both button whose click calls round.AdmitAll with Mary Chen to B7 and Tom Price to B8.",
+        "gesture": "Click Admit both.",
+        "outcome": "The round's admissions read Mary Chen in B7; Tom Price in B8.",
+        "opposite": "Before the click the admissions read None.",
+        "defect": "The list is spread into two arguments, so only Mary Chen is admitted."
+      }
     },
     "event.scalar": {
       "members": [
         "WardRound.doseDue.isUrgent"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to Urgent when args.IsUrgent holds, else Routine; bed 1's dose is urgent.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads Urgent.",
+        "opposite": "At bed 2, whose dose is routine, the same handler shows Routine.",
+        "defect": "The payload is read from the listener's second argument, so isUrgent reads nothing and bed 1 shows Routine."
+      }
     },
     "event.object": {
       "members": [
         "WardRound.doseDue.resident.room.number"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Resident.Room.Number; Helen Martinez is in room 12B.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 12B.",
+        "opposite": "At bed 2, Arthur Lee in room 14A, the same handler shows 14A.",
+        "defect": "The read takes resident.room.number as one member name, so shown stays empty."
+      }
     },
     "event.list": {
       "members": [
         "WardRound.doseDue.doses.drug"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Doses.Count(d => !d.Given); bed 1 has Digoxin and Furosemide not given and Paracetamol given.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 2.",
+        "opposite": "At bed 2, whose doses are all given, the same handler shows 0.",
+        "defect": "The lambda reads given by the C# name Given, so every dose counts as not given and shown reads 3."
+      }
     },
     "event.method": {
       "members": [
         "WardRound.doseDue.snooze()"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that calls args.Snooze().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Bed 1's dose line reads Snoozed.",
+        "opposite": "At bed 2, whose handler is the same, the line also reads Snoozed, and before any click both read Due.",
+        "defect": "The call is taken from the component instead of the payload, which WardRound lacks, so the pipeline stops and the line reads Due."
+      }
     },
     "event.promise": {
       "members": [
         "WardRound.doseDue.stock"
       ],
-      "version": "promised"
+      "version": "promised",
+      "promise": {
+        "page": "The promised version of the ward round page: its WardRound hands a promise in doseDue's stock, declared ReadOnly<int>, and the DoseDue handler sets shown's text to args.Stock, then sets done's text to after.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown and done stay empty: the read of a promise stops the pipeline.",
+        "opposite": "On the current version, whose stock is 14, the same click shows 14 and done reads after.",
+        "defect": "The read hands the promise to the set and runs on, so shown reads [object Promise] and done reads after."
+      }
     },
     "event.deepAsync": {
       "members": [
         "WardRound.doseDue.trolley.drawer.unlock()",
         "WardRound.doseDue.isUrgent"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that awaits args.Trolley.Drawer.Unlock(), which the test app's drawer endpoint answers with Drawer 3 open when the test releases it, sets shown's text to the result, then sets urgent's text to Urgent when args.IsUrgent holds.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "While the drawer endpoint is held shown and urgent stay empty; once it answers shown reads Drawer 3 open and urgent reads Urgent.",
+        "opposite": "A drawer the endpoint refuses rejects the promise and stops the handler, so shown and urgent stay empty.",
+        "defect": "The step after the call runs before the promise settles, so shown reads [object Promise] while the endpoint is held.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.writeOnly.payload.before": {
       "members": [
         "WardRound.doseDue.note"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.note"
+      "door": "WardRound.doseDue.note",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets args.Note to \"Given late\".",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Bed 1's note reads Given late, which the round reads when the handler returns.",
+        "opposite": "A handler that writes no note leaves Note: none.",
+        "defect": "The write goes to a copy of the payload, so the round reads no note and shows Note: none."
+      }
     },
     "event.poc15.writeOnly.payload.after": {
       "members": [
@@ -794,161 +979,335 @@
         "WardRound.doseDue.trolley.label"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.label"
+      "door": "WardRound.doseDue.trolley.label",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets args.Trolley.Label to \"Cart A\".",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "The round's trolley line reads Trolley: Cart A.",
+        "opposite": "Before the click it reads Trolley: none.",
+        "defect": "The write lands on args.label instead of the trolley, so the line keeps Trolley: none."
+      }
     },
     "event.poc15.writeOnly.held.after": {
       "members": [
         "WardRound.doseDue.trolley.label"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.label"
+      "door": "WardRound.doseDue.trolley.label",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets args.Trolley.Label to \"Cart A\".",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "While the due endpoint is held the trolley line reads Trolley: none; once it answers it reads Trolley: Cart A.",
+        "opposite": "Before the click it reads Trolley: none.",
+        "defect": "The run drops a write to an object the payload holds after the await as it drops a payload write, so the line keeps Trolley: none.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.liveObjects.payload.before": {
       "members": [
         "WardRound.doseDue.alarms"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.alarms"
+      "door": "WardRound.doseDue.alarms",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Alarms.Count(a => a.Reason == \"Missed dose\").",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 2.",
+        "opposite": "At bed 2, with no missed dose, it reads 0.",
+        "defect": "The lambda reads reason by its C# name Reason, so no alarm counts and shown reads 0."
+      }
     },
     "event.poc15.liveObjects.payload.after": {
       "members": [
         "WardRound.doseDue.alarms"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.alarms"
+      "door": "WardRound.doseDue.alarms",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Alarms.Count(a => a.Reason == \"Missed dose\").",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers shown reads 1: the round acknowledged one missed dose when the handler returned.",
+        "opposite": "Without the await the same count reads 2.",
+        "defect": "The read uses the list as the handler started, so shown reads 2.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.liveObjects.held.before": {
       "members": [
         "WardRound.doseDue.trolley.drawers"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.drawers"
+      "door": "WardRound.doseDue.trolley.drawers",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.Drawers.Count(d => d.Label != \"\").",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 4.",
+        "opposite": "On a trolley of 3 labelled drawers it reads 3.",
+        "defect": "The lambda reads label by its C# name Label, so no drawer counts and shown reads 0."
+      }
     },
     "event.poc15.liveObjects.held.after": {
       "members": [
         "WardRound.doseDue.trolley.drawers"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.drawers"
+      "door": "WardRound.doseDue.trolley.drawers",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.Drawers.Count(d => d.Label != \"\").",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers shown reads 4.",
+        "opposite": "While the endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.methodValue.payload.before": {
       "members": [
         "WardRound.doseDue.remaining()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.remaining()"
+      "door": "WardRound.doseDue.remaining()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Remaining().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 3.",
+        "opposite": "At bed 2, with 1 dose left, it reads 1.",
+        "defect": "The result is read from the method's function object, so shown stays empty."
+      }
     },
     "event.poc15.methodValue.payload.after": {
       "members": [
         "WardRound.doseDue.remaining()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.remaining()"
+      "door": "WardRound.doseDue.remaining()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Remaining().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers shown reads 2: the round recorded one dose when the handler returned.",
+        "opposite": "Without the await it reads 3.",
+        "defect": "The call runs at the handler's start instead of after the await, so shown reads 3.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.methodValue.held.before": {
       "members": [
         "WardRound.doseDue.trolley.stockCount()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.stockCount()"
+      "door": "WardRound.doseDue.trolley.stockCount()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.StockCount().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 14.",
+        "opposite": "On a trolley stocked with 9 it reads 9.",
+        "defect": "The call goes to args.stockCount, which the payload lacks, so the pipeline stops and shown stays empty."
+      }
     },
     "event.poc15.methodValue.held.after": {
       "members": [
         "WardRound.doseDue.trolley.stockCount()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.stockCount()"
+      "door": "WardRound.doseDue.trolley.stockCount()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.StockCount().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers shown reads 14.",
+        "opposite": "While the endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.methodAsyncValue.payload.before": {
       "members": [
         "WardRound.doseDue.lookup()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.lookup()"
+      "door": "WardRound.doseDue.lookup()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Lookup(), which the test app's allergy endpoint answers with Penicillin allergy when the test releases it.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "While the allergy endpoint is held shown stays empty; once it answers shown reads Penicillin allergy.",
+        "opposite": "An allergy lookup the endpoint refuses stops the handler, so shown stays empty.",
+        "defect": "The value set is the promise itself, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.methodAsyncValue.payload.after": {
       "members": [
         "WardRound.doseDue.lookup()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.lookup()"
+      "door": "WardRound.doseDue.lookup()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Lookup(), which the test app's allergy endpoint answers with Penicillin allergy when the test releases it.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once both endpoints answer shown reads Penicillin allergy.",
+        "opposite": "While the allergy endpoint is held shown stays empty.",
+        "defect": "The second await is not waited for, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.methodAsyncValue.held.before": {
       "members": [
         "WardRound.doseDue.trolley.weigh()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.weigh()"
+      "door": "WardRound.doseDue.trolley.weigh()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.Weigh(), which the test app's scale endpoint answers with 42 when the test releases it.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "While the scale endpoint is held shown stays empty; once it answers shown reads 42.",
+        "opposite": "A weighing the endpoint refuses stops the handler, so shown stays empty.",
+        "defect": "The value set is the promise itself, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.methodAsyncValue.held.after": {
       "members": [
         "WardRound.doseDue.trolley.weigh()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.weigh()"
+      "door": "WardRound.doseDue.trolley.weigh()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.Weigh(), which the test app's scale endpoint answers with 42 when the test releases it.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once both endpoints answer shown reads 42.",
+        "opposite": "While the scale endpoint is held shown stays empty.",
+        "defect": "The second await is not waited for, so shown reads [object Promise].",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.returnedObject.payload.before": {
       "members": [
         "WardRound.doseDue.nextDose()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.nextDose()"
+      "door": "WardRound.doseDue.nextDose()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.NextDose().Drug.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads Digoxin.",
+        "opposite": "At bed 2, whose next dose is Paracetamol, it reads Paracetamol.",
+        "defect": "The member is read from the method instead of the dose it returned, so shown stays empty."
+      }
     },
     "event.poc15.returnedObject.payload.after": {
       "members": [
         "WardRound.doseDue.nextDose()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.nextDose()"
+      "door": "WardRound.doseDue.nextDose()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.NextDose().Drug.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers shown reads Furosemide: the round recorded Digoxin when the handler returned.",
+        "opposite": "Without the await it reads Digoxin.",
+        "defect": "The returned dose is the one bound before the await, so shown reads Digoxin.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.returnedObject.held.before": {
       "members": [
         "WardRound.doseDue.trolley.drawerAt()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.drawerAt()"
+      "door": "WardRound.doseDue.trolley.drawerAt()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.DrawerAt(1).Label.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads Drawer 1.",
+        "opposite": "DrawerAt(2) on the same page reads Drawer 2.",
+        "defect": "The argument is dropped, so the call returns no drawer and the pipeline stops with shown empty."
+      }
     },
     "event.poc15.returnedObject.held.after": {
       "members": [
         "WardRound.doseDue.trolley.drawerAt()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.drawerAt()"
+      "door": "WardRound.doseDue.trolley.drawerAt()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.DrawerAt(1).Label.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers shown reads Drawer 1.",
+        "opposite": "While the endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.returnedObjects.payload.before": {
       "members": [
         "WardRound.doseDue.missed()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.missed()"
+      "door": "WardRound.doseDue.missed()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Missed().Count().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 2.",
+        "opposite": "At bed 2, with no missed dose, it reads 0.",
+        "defect": "The returned list is read as one object, so shown reads 1."
+      }
     },
     "event.poc15.returnedObjects.payload.after": {
       "members": [
         "WardRound.doseDue.missed()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.missed()"
+      "door": "WardRound.doseDue.missed()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Missed().Count().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers shown reads 2.",
+        "opposite": "While the endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.returnedObjects.held.before": {
       "members": [
         "WardRound.doseDue.trolley.emptyDrawers()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.emptyDrawers()"
+      "door": "WardRound.doseDue.trolley.emptyDrawers()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.EmptyDrawers().Count().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 1.",
+        "opposite": "On a full trolley it reads 0.",
+        "defect": "The returned list is read as one object, so shown reads 1 on a full trolley too."
+      }
     },
     "event.poc15.returnedObjects.held.after": {
       "members": [
         "WardRound.doseDue.trolley.emptyDrawers()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.emptyDrawers()"
+      "door": "WardRound.doseDue.trolley.emptyDrawers()",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.EmptyDrawers().Count().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers shown reads 1.",
+        "opposite": "While the endpoint is held shown stays empty.",
+        "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.callback.payload.before": {
       "members": [
         "WardRound.doseDue.signature"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.signature"
+      "door": "WardRound.doseDue.signature",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets args.Signature to the answer dose => dose.Drug + \" signed by Nurse Okafor\".",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Bed 1's dose line reads Digoxin signed by Nurse Okafor, which the round asks for when the handler returns.",
+        "opposite": "A handler that sets no signature leaves Digoxin unsigned.",
+        "defect": "The callback is set on a copy of the payload, so the round asks nothing and the line reads Digoxin unsigned."
+      }
     },
     "event.poc15.callback.payload.after": {
       "members": [
@@ -959,274 +1318,610 @@
     },
     "event.poc15.callback.held.before": {
       "members": [
-        "WardRound.doseDue.trolley.signature"
+        "WardRound.doseDue.trolley.signature",
+        "WardRound.doseDue.trolley.sign()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.signature"
+      "door": "WardRound.doseDue.trolley.signature",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets args.Trolley.Signature to the answer dose => dose.Drug + \" by Nurse Okafor\", then calls args.Trolley.Sign().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "The trolley line reads Trolley signed for Digoxin by Nurse Okafor.",
+        "opposite": "Before the click it reads Trolley unsigned.",
+        "defect": "The callback is set on the payload instead of the trolley, so the trolley signs with no answer and reads Trolley unsigned."
+      }
     },
     "event.poc15.callback.held.after": {
       "members": [
-        "WardRound.doseDue.trolley.signature"
+        "WardRound.doseDue.trolley.signature",
+        "WardRound.doseDue.trolley.sign()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.signature"
+      "door": "WardRound.doseDue.trolley.signature",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets args.Trolley.Signature to the answer dose => dose.Drug + \" by Nurse Okafor\", then calls args.Trolley.Sign().",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "Once the due endpoint answers the trolley line reads Trolley signed for Digoxin by Nurse Okafor.",
+        "opposite": "While the endpoint is held it reads Trolley unsigned.",
+        "defect": "The run drops a callback set on an object the payload holds after the await as it drops a payload write, so the line keeps Trolley unsigned.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.component.payload.before": {
       "members": [
         "WardRound.pumpAttached.rate"
       ],
       "version": "current",
-      "door": "WardRound.pumpAttached"
+      "door": "WardRound.pumpAttached",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, a BedsidePump at bed 1 running at 25 mL/h, and a PumpAttached handler that sets shown's text to args.Rate, then sets args.Rate to 50.",
+        "gesture": "Click the round's Attach pump button at bed 1.",
+        "outcome": "shown reads 25 and the pump reads Rate 50 mL/h.",
+        "opposite": "Before the click the pump reads Rate 25 mL/h.",
+        "defect": "The payload is taken as plain data, so the write changes a copy and the pump keeps Rate 25 mL/h."
+      }
     },
     "event.poc15.component.payload.after": {
       "members": [
         "WardRound.pumpAttached.rate"
       ],
       "version": "current",
-      "door": "WardRound.pumpAttached"
+      "door": "WardRound.pumpAttached",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, a BedsidePump at bed 1 running at 25 mL/h, and a PumpAttached handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets args.Rate to 50.",
+        "gesture": "Click the round's Attach pump button at bed 1.",
+        "outcome": "While the due endpoint is held the pump reads Rate 25 mL/h; once it answers it reads Rate 50 mL/h.",
+        "opposite": "Before the click the pump reads Rate 25 mL/h.",
+        "defect": "The run drops a write to a payload that is a component after the await as it drops a plain payload write, so the pump keeps Rate 25 mL/h.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "event.poc15.component.held.before": {
       "members": [
         "WardRound.doseDue.pump.rate"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.pump"
+      "door": "WardRound.doseDue.pump",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Pump.Rate, then sets args.Pump.Rate to 50; bed 1's BedsidePump runs at 25 mL/h.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "shown reads 25 and the pump reads Rate 50 mL/h.",
+        "opposite": "Before the click the pump reads Rate 25 mL/h.",
+        "defect": "The pump is read through the round's own element instead of the payload's pump, so shown reads nothing and the pump keeps Rate 25 mL/h."
+      }
     },
     "event.poc15.component.held.after": {
       "members": [
         "WardRound.doseDue.pump.rate"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.pump"
+      "door": "WardRound.doseDue.pump",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets args.Pump.Rate to 50; bed 1's BedsidePump runs at 25 mL/h.",
+        "gesture": "Click the round's Dose due button at bed 1.",
+        "outcome": "While the due endpoint is held the pump reads Rate 25 mL/h; once it answers it reads Rate 50 mL/h.",
+        "opposite": "Before the click the pump reads Rate 25 mL/h.",
+        "defect": "The run drops a write to a component the payload holds after the await as it drops a payload write, so the pump keeps Rate 25 mL/h.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "absence.member": {
       "members": [
         "WardRound.roundId"
       ],
-      "version": "older"
+      "version": "older",
+      "promise": {
+        "page": "The older version of the ward round page: its WardRound lacks roundId, and a Show button whose click sets shown's text to round.RoundId, then sets done's text to after.",
+        "gesture": "Click Show.",
+        "outcome": "shown and done stay empty: the read of a member the round lacks stops the pipeline.",
+        "opposite": "On the current version the same click shows NR-2026-11-10 and done reads after.",
+        "defect": "A member the object lacks reads undefined and the pipeline runs on, so done reads after."
+      }
     },
     "absence.past": {
       "members": [
         "WardRound.chart.allergy.severity"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, whose chart for Helen Martinez holds no allergy, ChartAllergy's Severity starting as none, and a Show button whose click sets shown's text to round.Chart.Read(c => c.Allergy.Severity).",
+        "gesture": "Click Show.",
+        "outcome": "shown reads none, the start of a ChartAllergy.",
+        "opposite": "On a chart whose allergy is severe the same click shows severe.",
+        "defect": "The read past the missing allergy stops the pipeline, so shown stays empty."
+      }
     },
     "absence.promise": {
       "members": [
         "WardRound.dueCount()"
       ],
-      "version": "promised"
+      "version": "promised",
+      "promise": {
+        "page": "The promised version of the ward round page: its WardRound's dueCount returns a promise of 3, declared Method<int>, and a Show button whose click sets shown's text to round.DueCount(), then sets done's text to after.",
+        "gesture": "Click Show.",
+        "outcome": "shown and done stay empty: a promise where a value was declared stops the pipeline at the call.",
+        "opposite": "On the current version the same click shows 3 and done reads after.",
+        "defect": "The promise is set as text and the pipeline runs on, so shown reads [object Promise] and done reads after."
+      }
     },
     "source.PropertySet": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Copy button whose click sets round.Title to round.Value.",
+        "gesture": "Click the page's button.",
+        "outcome": "The round's heading reads r-104.",
+        "opposite": "Before the click it reads North round.",
+        "defect": "The component's member read at Positions.PropertySet reads its name instead of its value, so the heading empties."
+      }
     },
     "source.WriteOnlySet": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Sign button whose click sets round.Signature to round.Value.",
+        "gesture": "Click the page's button.",
+        "outcome": "The signature line reads Signed by r-104.",
+        "opposite": "Before the click it reads Unsigned.",
+        "defect": "The component's member read at Positions.WriteOnlySet reads its name instead of its value, so the line reads Signed by."
+      }
     },
     "source.ElementText": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.Value.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads r-104.",
+        "opposite": "At bed 2 the same click shows r-105.",
+        "defect": "The component's member read at Positions.ElementText reads its name instead of its value, so shown stays empty."
+      }
     },
     "source.ElementHtml": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's HTML to round.Value.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads r-104.",
+        "opposite": "At bed 2 the same click shows r-105.",
+        "defect": "The component's member read at Positions.ElementHtml reads its name instead of its value, so shown stays empty."
+      }
     },
     "source.ElementClass": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Mark button whose click adds the class named by round.Value to the element bedside.",
+        "gesture": "Click the page's button.",
+        "outcome": "bedside carries the class r-104.",
+        "opposite": "At bed 2 the same click adds r-105.",
+        "defect": "The component's member read at Positions.ElementClass reads its name instead of its value, so no class is added."
+      }
     },
     "source.ConditionLeft": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Check button whose click sets shown's text to At Helen's bed when round.Value equals \"r-104\", else Elsewhere.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads At Helen's bed.",
+        "opposite": "At bed 2 the same click shows Elsewhere.",
+        "defect": "The component's member read at Positions.ConditionLeft reads its name instead of its value, so every click shows Elsewhere."
+      }
     },
     "source.ConditionRight": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a NativeTextBox resident holding r-104 and a Check button whose click sets shown's text to Same bed when the box's value equals round.Value, else Other bed.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Same bed.",
+        "opposite": "With r-105 typed in the box the same click shows Other bed.",
+        "defect": "The component's member read at Positions.ConditionRight reads its name instead of its value, so every click shows Other bed."
+      }
     },
     "source.TextTestOperand": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a NativeTextBox note holding \"r-104: fluids\" and a Check button whose click sets shown's text to Note matches when the note's value starts with round.Value, else No match, through M3.N1's text test.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Note matches.",
+        "opposite": "With \"r-105: fluids\" in the box the same click shows No match.",
+        "defect": "The component's member read at Positions.TextTestOperand reads its name instead of its value, so every click shows No match."
+      }
     },
     "source.MatchesPattern": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a round titled ^r-1[0-9]{2}$, a NativeTextBox code holding r-104, and a Check button whose click sets shown's text to Valid when the code matches round.Title, through M3.N1's Matches.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Valid.",
+        "opposite": "With x-104 in the box the same click shows Invalid.",
+        "defect": "The component's member read at Positions.MatchesPattern reads its name instead of its value, so every click shows Invalid."
+      }
     },
     "source.RequestMember": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Send button whose click posts round.Value as the request's Resident to the test app's notes endpoint, which answers Received and the resident, set as shown's text.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Received r-104.",
+        "opposite": "At bed 2 the same click shows Received r-105.",
+        "defect": "The component's member read at Positions.RequestMember reads its name instead of its value, so the endpoint receives no Resident and shown reads Received.",
+        "observes": "Request.tla:Route"
+      }
     },
     "source.Header": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Send button whose click posts to the test app's notes endpoint with the header X-Resident set to round.Value, which the endpoint answers back as shown's text.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads X-Resident r-104.",
+        "opposite": "At bed 2 the same click shows X-Resident r-105.",
+        "defect": "The component's member read at Positions.Header reads its name instead of its value, so the header is not sent and shown reads X-Resident.",
+        "observes": "Request.tla:Route"
+      }
     },
     "source.DispatchPayloadMember": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Tell button whose click dispatches the app event BedReached with Resident set to round.Value through M1.N4's dispatch, and a BedReached handler that sets shown's text to the payload's Resident.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads r-104.",
+        "opposite": "At bed 2 the same click shows r-105.",
+        "defect": "The component's member read at Positions.DispatchPayloadMember reads its name instead of its value, so shown stays empty."
+      }
     },
     "source.MethodArgument": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Note button whose click calls round.Note(round.Value).",
+        "gesture": "Click the page's button.",
+        "outcome": "The round's note line reads r-104.",
+        "opposite": "Before the click the note line is empty.",
+        "defect": "The component's member read at Positions.MethodArgument reads its name instead of its value, so the note line reads nothing."
+      }
     },
     "source.PluginArgument": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and the page plugin shiftLog and a Log button whose click calls shiftLog.Log(round.Value).",
+        "gesture": "Click the page's button.",
+        "outcome": "The shift log's last line reads r-104.",
+        "opposite": "Before the click the shift log is empty.",
+        "defect": "The component's member read at Positions.PluginArgument reads its name instead of its value, so the log line is empty."
+      }
     },
     "source.HubArgument": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and on net10, a Tell button whose click invokes the ward hub's Announce with round.Value through N21.1's hub door, and the hub's Announced message set as shown's text.",
+        "gesture": "Click the page's button.",
+        "outcome": "shown reads Announced r-104.",
+        "opposite": "At bed 2 the same click shows Announced r-105.",
+        "defect": "The component's member read at Positions.HubArgument reads its name instead of its value, so the hub receives no resident and shown reads Announced.",
+        "observes": "Realtime.tla:Message"
+      }
     },
     "http.get": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a GET to the test app's doses endpoint with round.Value as its query's resident, its success setting shown's text to the body's summary.",
+        "gesture": "Click Load.",
+        "outcome": "The request is GET /rounds/doses?resident=r-104 and shown reads 3 doses for r-104.",
+        "opposite": "At bed 2 the same click sends r-105 and shows its summary for r-105.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty resident.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.post": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the test app's doses endpoint with round.Value as the JSON body's resident, its success setting shown's text to the body's summary.",
+        "gesture": "Click Load.",
+        "outcome": "The body sent is {\"resident\":\"r-104\"} and shown reads Recorded r-104.",
+        "opposite": "At bed 2 the same click sends r-105 and shows its summary for r-105.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty resident.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.put": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a PUT to the test app's bed endpoint with round.Value as the form data's Resident, its success setting shown's text to the body's summary.",
+        "gesture": "Click Load.",
+        "outcome": "The form data sent holds Resident=r-104 and shown reads Moved r-104.",
+        "opposite": "At bed 2 the same click sends r-105 and shows its summary for r-105.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty resident.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.delete": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a DELETE to the test app's round endpoint with round.Value as the JSON body's resident, its success setting shown's text to the body's summary.",
+        "gesture": "Click Load.",
+        "outcome": "The body sent is {\"resident\":\"r-104\"} and shown reads Closed r-104.",
+        "opposite": "At bed 2 the same click sends r-105 and shows its summary for r-105.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty resident.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.route": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to /wards/{ward}/notes with Ward set to North and round.Value as Resident, the endpoint answering the ward and resident as shown's text.",
+        "gesture": "Click Load.",
+        "outcome": "The request is POST /wards/North/notes, its body holds Resident r-104, and shown reads North: r-104.",
+        "opposite": "With Ward set to South the same click posts to /wards/South/notes.",
+        "defect": "The placeholder is filled from the component's value instead of Ward, so the request goes to /wards/r-104/notes.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.query": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a GET to the doses endpoint with round.Value as resident and the literal 2026-11-10 as day.",
+        "gesture": "Click Load.",
+        "outcome": "The request is GET /rounds/doses?resident=r-104&day=2026-11-10.",
+        "opposite": "Without the day the request is GET /rounds/doses?resident=r-104.",
+        "defect": "The query keeps only the last member, so the request is GET /rounds/doses?day=2026-11-10.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.header": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the notes endpoint with round.Value as Resident and the header X-Shift set to Late, the endpoint answering the header as shown's text.",
+        "gesture": "Click Load.",
+        "outcome": "The body holds Resident r-104 and shown reads X-Shift Late.",
+        "opposite": "Without the header shown reads X-Shift none.",
+        "defect": "The header is sent as a body member, so shown reads X-Shift none.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.static": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the notes endpoint with round.Value as Resident and the literal member Source set to ward-round.",
+        "gesture": "Click Load.",
+        "outcome": "The body sent is {\"resident\":\"r-104\",\"source\":\"ward-round\"}.",
+        "opposite": "Without the literal the body is {\"resident\":\"r-104\"}.",
+        "defect": "The literal is written by its C# name Source, so the endpoint binds no source.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.hidden": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends the form's inputs, a hidden RoundId of NR-2026-11-10 and the round bound to Resident, to the notes endpoint as form data.",
+        "gesture": "Click Load.",
+        "outcome": "The form data sent holds RoundId=NR-2026-11-10 and Resident=r-104.",
+        "opposite": "At bed 2 the same click sends Resident=r-105 beside the same RoundId.",
+        "defect": "The hidden input is skipped as a non-component input, so the form data holds Resident=r-104 alone.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.into": {
       "members": [
         "WardRound.change"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward page with an empty card element and an Open bed card button whose click GETs the test app's card endpoint into card; the card's partial renders a WardRound titled Bed 1 round and a Change handler that sets the card's picked text to the round's Value.",
+        "gesture": "Click Open bed card, then bed 2 in the loaded round.",
+        "outcome": "The card shows the heading Bed 1 round and picked reads r-105.",
+        "opposite": "Before the click the card is empty.",
+        "defect": "The loaded partial's plan is not started, so bed 2's click runs no handler and picked stays empty.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.whileLoading": {
       "members": [
         "WardRound.title"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a GET to the doses endpoint whose WhileLoading sets round.Title to Loading doses and whose success sets it to North round, 3 due.",
+        "gesture": "Click Load.",
+        "outcome": "While the doses endpoint is held the heading reads Loading doses; once it answers it reads North round, 3 due.",
+        "opposite": "A request that stops in its guard sends nothing and the heading keeps North round.",
+        "defect": "WhileLoading runs after the response, so the heading never reads Loading doses.",
+        "observes": "Request.tla:Loading"
+      }
     },
     "http.response.success": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the move endpoint, which answers {\"resident\":\"r-105\"}, its success setting round.Value to the body's Resident.",
+        "gesture": "Click Load.",
+        "outcome": "The round's resident line reads r-105.",
+        "opposite": "When the endpoint answers 409 the success route does not run and the line keeps r-104.",
+        "defect": "The body is read before it is decoded, so round.Value is set to nothing and the line empties.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.response.error": {
       "members": [
         "WardRound.title"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the move endpoint, which answers 422 with {\"message\":\"Bed 2 is closed\"}, its error route setting round.Title to the error body's Message.",
+        "gesture": "Click Load.",
+        "outcome": "The round's heading reads Bed 2 is closed.",
+        "opposite": "When the endpoint answers 200 the error route does not run and the heading keeps North round.",
+        "defect": "The error route reads the success body's shape, so the heading empties.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.chained": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the move endpoint whose success sets round.Value to r-105, then Chained a GET to the doses endpoint with round.Value as resident.",
+        "gesture": "Click Load.",
+        "outcome": "The chained request is GET /rounds/doses?resident=r-105.",
+        "opposite": "When the move answers 409 no chained request is sent.",
+        "defect": "The chained request reads round.Value before the first success route ran, so it sends resident=r-104.",
+        "observes": "Request.tla:Chained"
+      }
     },
     "http.parallel": {
       "members": [
         "WardRound.title",
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends Parallel GETs to the doses endpoint, setting round.Title to its summary, and to the bed endpoint, setting round.Value to its resident; the test releases the bed endpoint first.",
+        "gesture": "Click Load.",
+        "outcome": "Once the bed endpoint answers the resident line reads r-105 while the heading keeps North round; once the doses endpoint answers the heading reads 3 due.",
+        "opposite": "A refused bed request leaves r-104 while the doses branch still sets 3 due.",
+        "defect": "The branches' routes run only after both answer, so r-105 shows only with 3 due.",
+        "observes": "Lanes.tla:AllSettled"
+      }
     },
     "http.finally": {
       "members": [
         "WardRound.title"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the move endpoint whose Finally sets round.Title to Doses checked.",
+        "gesture": "Click Load.",
+        "outcome": "Once the endpoint answers 200 the heading reads Doses checked.",
+        "opposite": "When the endpoint answers 500 the heading also reads Doses checked.",
+        "defect": "Finally runs only on success, so a 500 leaves North round.",
+        "observes": "Request.tla:Finally"
+      }
     },
     "lane.confirm": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Move button whose click asks NativeConfirm Move Helen to bed 2? and sets round.Value to r-105 when the answer is yes.",
+        "gesture": "Click Move and answer OK.",
+        "outcome": "The round's resident line reads r-105.",
+        "opposite": "Answering Cancel leaves r-104.",
+        "defect": "The write runs before the answer settles, so Cancel still moves Helen to r-105.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "lane.push": {
       "members": [
         "WardRound.title"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "On net10, a ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, subscribed to the ward stream whose BedMoved message sets round.Value to the message's Resident, and an Announce move button that posts to the test app's move endpoint, which pushes BedMoved with r-105.",
+        "gesture": "Click Announce move.",
+        "outcome": "The round's resident line reads r-105.",
+        "opposite": "Before the push it reads r-104.",
+        "defect": "The message's member is read by its C# name Resident, so round.Value is set to nothing and the line empties.",
+        "observes": "Realtime.tla:Message"
+      }
     },
     "lane.slot.load": {
       "members": [
         "WardRound.change"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward page whose card slot is loaded on start by a GET to the test app's card endpoint; the card's partial renders a WardRound and a Change handler that sets the card's picked text to the round's Value.",
+        "gesture": "Click bed 2 in the card's round.",
+        "outcome": "picked reads r-105.",
+        "opposite": "Before the click picked is empty.",
+        "defect": "The slot's plan subscribes before the round mounts, so bed 2's click runs no handler.",
+        "observes": "Ownership.tla:LoadA"
+      }
     },
     "lane.slot.unloadListener": {
       "members": [
         "WardRound.change"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward page with the page's WardRound and a card slot whose plan listens to the page's round by its element id, setting the page's log text to the round's Value on Change, and a Close card button that unloads the slot.",
+        "gesture": "Click Close card, then bed 2 on the page's round.",
+        "outcome": "log keeps empty: the unloaded slot's listener is gone.",
+        "opposite": "With the card still loaded the same click on bed 2 sets log to r-105.",
+        "defect": "The unload removes the card's content and leaves its listener on the page's round, so log reads r-105.",
+        "observes": "Ownership.tla:UnloadA"
+      }
     },
     "lane.slot.hostDestroyed": {
       "members": [
@@ -1234,7 +1929,15 @@
         "WardRound.isDestroyed",
         "WardRound.change"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A ward page whose card slot holds a WardRound, a Restart round button whose click lets the round's host destroy it and mount a new one, and Close card and Open card buttons.",
+        "gesture": "Click Restart round, Close card, then Open card.",
+        "outcome": "The page's error line stays empty and the reopened card shows its round at bed 1.",
+        "opposite": "Closing without a restart also leaves the error line empty.",
+        "defect": "The unload removes the listener from the destroyed round, whose element no longer holds it, so removeEventListener throws and the error line reads it.",
+        "observes": "Ownership.tla:HostDestroys"
+      }
     },
     "template.render": {
       "carriedBy": "FusionMultiSelect",
@@ -1249,38 +1952,84 @@
         "WardRound.value",
         "WardRound.change"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A round form for the resident at the bedside, its WardRound bound to RoundForm.Resident, whose ReactiveValidator writes NotEmpty with the message Choose the resident at the bedside., and a Save button that posts the form to the test app's round endpoint.",
+        "gesture": "Click Save.",
+        "outcome": "The message Choose the resident at the bedside. shows beside the round and nothing is sent.",
+        "opposite": "After choosing bed 1, Save sends Resident=r-104 and shows the server's Saved r-104.",
+        "defect": "The rule is bound to the round's element by a name its input does not carry, so Save sends the empty form.",
+        "observes": "Request.tla:Check"
+      }
     },
     "validation.condition": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A round form for the resident at the bedside, its WardRound bound to RoundForm.Resident, whose ReactiveValidator writes NotEmpty with the message Choose the resident at the bedside., and a Save button that posts the form to the test app's round endpoint, the rule written When(m => m.IsNightRound), and a night round box.",
+        "gesture": "Tick night round, then click Save.",
+        "outcome": "The message Choose the resident at the bedside. shows beside the round.",
+        "opposite": "With night round unticked Save sends the form and shows Saved.",
+        "defect": "The condition reads IsNightRound by its C# name, so it never holds and Save sends the empty form.",
+        "observes": "Request.tla:Check"
+      }
     },
     "validation.live": {
       "members": [
         "WardRound.change"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A round form for the resident at the bedside, its WardRound bound to RoundForm.Resident, whose ReactiveValidator writes NotEmpty with the message Choose the resident at the bedside., and a Save button that posts the form to the test app's round endpoint, after a Save that showed its message.",
+        "gesture": "Choose bed 1 in the round.",
+        "outcome": "The message clears without another Save.",
+        "opposite": "Choosing no bed leaves the message.",
+        "defect": "Live validation listens for the input event, which the round never raises, so the message stays."
+      }
     },
     "validation.summary": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A round form for the resident at the bedside, its WardRound bound to RoundForm.Resident, whose ReactiveValidator writes NotEmpty with the message Choose the resident at the bedside., and a Save button that posts the form to the test app's round endpoint and a validation summary.",
+        "gesture": "Click Save.",
+        "outcome": "The summary lists Choose the resident at the bedside.",
+        "opposite": "After choosing bed 1 the summary is empty.",
+        "defect": "The message's place is read from the page instead of the plan, so the summary stays empty."
+      }
     },
     "validation.listItem": {
       "members": [
         "WardRound.value",
         "WardRound.change"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A morning handover of two rounds, each a WardRound bound to Rounds[i].Resident, whose ReactiveValidator writes NotEmpty on each round's Resident, and a Save button.",
+        "gesture": "Choose bed 1 in the first round, then click Save.",
+        "outcome": "The message shows beside the second round only, and nothing is sent.",
+        "opposite": "With both rounds chosen Save sends Rounds[0].Resident=r-104 and Rounds[1].Resident=r-105.",
+        "defect": "The rule is bound to Rounds.Resident without the index, so the message shows beside the first round.",
+        "observes": "Request.tla:Check"
+      }
     },
     "validation.prefix": {
       "members": [
         "WardRound.value"
       ],
-      "version": "current"
+      "version": "current",
+      "promise": {
+        "page": "A day form whose morning round is rendered by Html.PartialFor(m => m.Morning), its WardRound bound to Resident under the prefix Morning, with NotEmpty on Morning.Resident.",
+        "gesture": "Choose bed 1 in the morning round, then click Save.",
+        "outcome": "The form sends Morning.Resident=r-104 and the server binds it, showing Saved r-104.",
+        "opposite": "Saving with no bed chosen shows the message beside the morning round.",
+        "defect": "The round's name drops the prefix, so the form sends Resident=r-104 and the server binds no morning resident.",
+        "observes": "Request.tla:Check"
+      }
     }
   }
 }

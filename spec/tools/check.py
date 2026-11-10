@@ -1221,14 +1221,30 @@ def check_promises():
                           "every refusal and behavior defect, and every cell each reference component runs, has a promise")
 
 
+MATRIX_ASYNC_KINDS = {"request", "hub"}
+
+
+def matrix_action_exists(observed):
+    spec, _, action = observed.partition(".tla:")
+    path = SPEC / "Core" / f"{spec}.tla"
+    if not action or not path.exists():
+        return False
+    text = path.read_text()
+    start = text.find("\nNext ==")
+    end = text.find("\nSpec ==", start)
+    return start >= 0 and re.search(rf"\b{re.escape(action)}\b", text[start:end]) is not None
+
+
 def matrix_promise_problems():
     problems, unpromised, runs = [], [], 0
     matrix = SPEC / "Reference" / "matrix.json"
     if not matrix.exists():
         return ["not started: spec/Reference/matrix.json absent"], 0, 0
     rungs = core_defect_rungs()
-    compiled = {cell["id"] for cell in json.loads(matrix.read_text())["cells"]
+    cells = {cell["id"]: cell for cell in json.loads(matrix.read_text())["cells"]}
+    compiled = {name for name, cell in cells.items()
                 if cell["outcome"] == "refused" and any(rungs.get(meaning) in MATRIX_COMPILER_RUNGS for meaning in cell["meaning"])}
+    tests = {f"{row['line']} {row['fixture']}.{row['test']}" for row in table("tests.tsv")}
     for name, field in [("syncfusion.json", "member"), ("native.json", "members")]:
         path = SPEC / "Reference" / name
         if not path.exists():
@@ -1241,8 +1257,13 @@ def matrix_promise_problems():
             missing = [part for part in ("page", "gesture", "outcome", "opposite", "defect") if not is_prose((promise or {}).get(part))]
             if promise is None:
                 unpromised.append(f"spec/Reference/{name} {cell} has no promise")
-            elif missing:
+                continue
+            if missing:
                 problems.append(f"spec/Reference/{name} {cell}: its promise lacks {', '.join(missing)}")
+            problems += [f"spec/Reference/{name} {cell} observes {promise['observes']!r}, no action of its spec's Next"] if "observes" in promise and not matrix_action_exists(promise["observes"]) else []
+            lane = set(cells[cell]["kinds"]) & MATRIX_ASYNC_KINDS
+            problems += [f"spec/Reference/{name} {cell} sends on the {', '.join(sorted(lane))} lane and observes no action"] if lane and "observes" not in promise else []
+            problems += [f"spec/Reference/{name} {cell} names {promise['existing_test']!r}, no test of tests.tsv"] if "existing_test" in promise and promise["existing_test"] not in tests else []
     promised = runs - len(unpromised) - len(problems)
     if promised == 0 and not problems:
         return [f"not started: none of the {runs} cells the reference components run has a promise"], runs, promised

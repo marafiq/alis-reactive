@@ -62,7 +62,15 @@
       "cite": "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277",
       "cells": [
         "prop.scalar.read",
-        "prop.scalar.write"
+        "prop.scalar.write",
+        "source.ConditionLeft",
+        "source.ConditionRight",
+        "source.ElementClass",
+        "source.ElementHtml",
+        "source.ElementText",
+        "source.Header",
+        "source.MatchesPattern",
+        "source.TextTestOperand"
       ]
     },
     {
@@ -127,14 +135,28 @@
       "door": "Property<string?>",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"Choose Helen's allergies\", and a Show hint button whose click sets the element hint's text to the box's Placeholder; hint starts as No hint.",
+        "gesture": "Click Show hint.",
+        "outcome": "hint reads Choose Helen's allergies.",
+        "opposite": "On the same page with the box rendered without Placeholder, which EJ2 holds as null, the click leaves hint empty.",
+        "defect": "The read takes placeholder from the input element's placeholder attribute instead of EJ2's placeholder property, so it reads the attribute EJ2 rewrote and the null case shows text."
+      }
     },
     "prop.scalar.write": {
       "member": "placeholder",
       "door": "Property<string?>",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered empty with Placeholder \"Choose allergies\", and a Penicillin only button whose click sets the box's Placeholder to \"Helen: penicillin only\".",
+        "gesture": "Click Penicillin only.",
+        "outcome": "The empty box shows the placeholder Helen: penicillin only.",
+        "opposite": "A Clear hint button whose click sets Placeholder from the note box, which holds no text, writes null, and the empty box shows no placeholder.",
+        "defect": "The write sets the input element's placeholder attribute instead of EJ2's placeholder property, so EJ2 keeps Choose allergies and shows it again when it next renders the input."
+      }
     },
     "prop.dotted.read": {
       "member": "fields.text",
@@ -142,7 +164,14 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
         "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:15"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and a Show field button whose click sets the element field's text to the box's Fields.Text.",
+        "gesture": "Click Show field.",
+        "outcome": "field reads name, the JSON name Fields gave the allergy's Name under the app's camel-case options.",
+        "opposite": "In an app whose JSON options keep Pascal case, the same click reads Name.",
+        "defect": "The read names fields.text as one JavaScript name on the component, so it reads nothing and field shows empty."
+      }
     },
     "prop.dotted.write": {
       "member": "fields.text",
@@ -150,7 +179,14 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
         "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:15"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and a Use labels button whose click sets the box's Fields.Text to \"label\" and then sets the element field's text to the box's Fields.Text.",
+        "gesture": "Click Use labels.",
+        "outcome": "field reads label.",
+        "opposite": "Before the click a Show field button sets field to name, the text field the render helper gave.",
+        "defect": "The write sends fields.text as one JavaScript name and creates a member of that name on the component, so EJ2's fields still name the text field name and field reads name."
+      }
     },
     "prop.object.memberRead": {
       "member": "fields.groupBy",
@@ -158,7 +194,14 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
         "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:36"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Fields(a => a.Name, a => a.Code, a => a.Kind), and a Show grouping button whose click sets the element grouping's text to the box's Fields.GroupBy.",
+        "gesture": "Click Show grouping.",
+        "outcome": "grouping reads kind.",
+        "opposite": "With the box rendered with Fields(a => a.Name, a => a.Code), whose groupBy EJ2 holds as null, the click leaves grouping empty.",
+        "defect": "The declaration reads fields as data copied when the page started instead of the live object EJ2 holds, so a groupBy the page later set is not read; here the read of the copy names group and finds nothing."
+      }
     },
     "prop.object.memberWrite": {
       "member": "fields.groupBy",
@@ -166,7 +209,14 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:102",
         "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:36"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Fields(a => a.Name, a => a.Code), and a Group by kind button whose click sets the box's Fields.GroupBy to \"kind\" and then sets the element grouping's text to the box's Fields.GroupBy.",
+        "gesture": "Click Group by kind.",
+        "outcome": "grouping reads kind.",
+        "opposite": "A Show grouping button clicked before Group by kind leaves grouping empty, since EJ2 holds groupBy as null.",
+        "defect": "The write lands on a copy of fields the declaration made instead of the live object EJ2 holds, so the read after it shows nothing."
+      }
     },
     "prop.list.lambda": {
       "lacks": "the one property that holds a list of objects, dataSource, is a union that carries DataManager and lists of four kinds with no probe fact, and a read fits every type the API holds (D17.5), so no read of its items is high-confidence",
@@ -185,7 +235,14 @@
       "door": "Method (M21.N1 ShowPopup)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:952"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and a Show allergies button whose click calls the box's ShowPopup().",
+        "gesture": "Click Show allergies.",
+        "outcome": "The box's list is open and shows Penicillin, Latex and Peanut.",
+        "opposite": "The Show allergies button of a page whose When(ward's Name equals \"South\") holds the call, on the North ward, leaves the list closed.",
+        "defect": "The call writes showPopup as a property instead of calling it, so the list stays closed."
+      }
     },
     "method.value": {
       "lacks": "no documented-public method of the chain returns text, a number, a boolean, a date or a data object: getItems and getRootElement return DOM elements, getDataByValue returns an index-signature object or a scalar union, and requiredModules carries no JSDoc",
@@ -212,7 +269,14 @@
       "door": "Method with one Arg<bool>",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:962"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered empty, and a Select every allergy button whose click calls the box's SelectAll(true).",
+        "gesture": "Click Select every allergy.",
+        "outcome": "The box holds the chips Penicillin, Latex and Peanut.",
+        "opposite": "A Select none button whose click calls SelectAll(false) on a box holding Latex leaves it with no chip.",
+        "defect": "The argument is written as the text \"true\", which EJ2 reads as truthy, so Select none selects every allergy."
+      }
     },
     "method.arg.object": {
       "lacks": "every method of the chain that takes an object takes it as an index-signature object or a union that carries DataManager, with no probe fact: addItem, filter and disableItem",
@@ -228,7 +292,14 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1061"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) and changeOnBlur left on, and a Change handler that sets the element source's text to \"user\" when the payload's IsInteracted holds and to \"system\" otherwise.",
+        "gesture": "Choose Latex in the box's list and press Tab to leave the box.",
+        "outcome": "source reads user.",
+        "opposite": "A Load from discharge button whose click sets the box's Value to [7] raises change with isInteracted false, and source reads system.",
+        "defect": "The handler reads the payload's members from the event's second argument, where EJ2 hands nothing, so source reads system for both."
+      }
     },
     "event.object": {
       "member": "tagging -> itemData.text",
@@ -237,7 +308,14 @@
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:622",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1040",
         "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:15"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and a Tagging handler that sets the element tagged's text to the payload's ItemData read with Read(d => d.Name).",
+        "gesture": "Choose Latex in the box's list.",
+        "outcome": "tagged reads Latex.",
+        "opposite": "Choosing Peanut instead reads Peanut, the item of that tagging.",
+        "defect": "The read names itemData's member by its C# name Name instead of its JSON name name, so tagged shows empty."
+      }
     },
     "event.list": {
       "member": "change -> value",
@@ -245,7 +323,14 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1073"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin, and a Change handler that sets the element peanut's text to \"Peanut on file\" when the payload's Value holds 12 (Value.Any(code => code == 12)) and to \"No peanut\" otherwise.",
+        "gesture": "Choose Peanut in the box's list and press Tab to leave the box.",
+        "outcome": "peanut reads Peanut on file.",
+        "opposite": "Choosing Latex instead and leaving the box sets peanut to No peanut.",
+        "defect": "The lambda reads the payload's value as text, \"7,12\", so no item equals 12 and peanut reads No peanut."
+      }
     },
     "event.method": {
       "member": "filtering -> updateData",
@@ -256,7 +341,15 @@
       ],
       "facts": [
         "ej2-filtering-args-members"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), AllowFiltering on, and a Filtering handler that writes PreventDefaultAction, sends GET /allergies?text= with the payload's Text and on success calls the payload's UpdateData with the reply's body; the endpoint answers [Latex] for lat.",
+        "gesture": "Type lat into the box.",
+        "outcome": "Once the endpoint answers, the list shows Latex alone.",
+        "opposite": "Typing xyz, which the endpoint answers with no allergy, shows No records found.",
+        "defect": "The call of updateData after the awaited request is dropped as a write to the payload is, so the list keeps all three allergies.",
+        "observes": "Request.tla:Route"
+      }
     },
     "event.promise": {
       "lacks": "no payload of MultiSelect's events declares a member that holds a Promise",
@@ -393,7 +486,14 @@
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:565",
         "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:857",
         "@syncfusion/ej2-popups/src/popup/popup.d.ts:125"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and an Open handler that sets the payload's Popup's OffsetY to 8 and then sets the element offset's text to Popup's OffsetY.",
+        "gesture": "Click the box to open its list.",
+        "outcome": "offset reads 8.",
+        "opposite": "An Open handler that only reads Popup's OffsetY sets offset to 0, EJ2's default.",
+        "defect": "The write lands on the payload object instead of the Popup component it holds, so the read shows 0."
+      }
     },
     "event.poc15.component.held.after": {
       "member": "open -> popup.offsetY",
@@ -402,7 +502,15 @@
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:565",
         "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:857",
         "@syncfusion/ej2-popups/src/popup/popup.d.ts:125"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), and an Open handler that sets the element before's text to the payload's Popup's OffsetY, sends GET /wards/north/layout, and on success sets Popup's OffsetY to 8 and sets the element after's text to Popup's OffsetY.",
+        "gesture": "Click the box to open its list.",
+        "outcome": "Once the endpoint answers, after reads 8.",
+        "opposite": "before reads 0, the offset before the await.",
+        "defect": "A write to a component the payload holds after an awaited step is refused as a write to the payload itself is, so the page is refused where the view renders.",
+        "observes": "Request.tla:Route"
+      }
     },
     "absence.member": {
       "member": "index, which DropDownList declares and the MultiSelect chain does not",
@@ -410,7 +518,14 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:325"
       ],
-      "scan": "grep -c -E '^\\s+index\\??:' over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-base/src/component.d.ts and @syncfusion/ej2-base/src/base.d.ts: 0 in each"
+      "scan": "grep -c -E '^\\s+index\\??:' over @syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, @syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts, @syncfusion/ej2-base/src/component.d.ts and @syncfusion/ej2-base/src/base.d.ts: 0 in each",
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box, and a test declaration over the same element, OlderAllergyBox, declares Index as Property<int?>, which DropDownList declares and MultiSelect lacks, its drift suppressed naming this test; the element index reading No index and the element after reading Waiting, and a Show index button whose click sets index's text to Index and then sets after's text to Done.",
+        "gesture": "Click Show index.",
+        "outcome": "after keeps Waiting, and index keeps No index: the read stopped the pipeline.",
+        "opposite": "A Show placeholder button whose click reads Placeholder, which the box holds, and then sets after sets after to Done.",
+        "defect": "The read of a member the object lacks reads nothing and runs on, so after reads Done and index shows empty."
+      }
     },
     "absence.past": {
       "member": "tagging -> itemData.groupBy, which the item's data lacks",
@@ -419,7 +534,14 @@
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:622",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:1040",
         "@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model.d.ts:36"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), over items written by the app's JSON options where Penicillin's item has no kind and Latex's kind is Material, the Allergy class starting Kind as \"Unclassified\"; a Tagging handler sets the element kind's text to the payload's ItemData read with Read(d => d.Kind).",
+        "gesture": "Choose Penicillin in the box's list.",
+        "outcome": "kind reads Unclassified.",
+        "opposite": "Choosing Latex instead reads Material.",
+        "defect": "The read of a member the present item lacks reads nothing instead of its start, so kind shows empty."
+      }
     },
     "absence.promise": {
       "lacks": "no method of the chain returns a Promise, so no declaration of a value meets one",
@@ -430,231 +552,483 @@
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, a tray ticket FusionMultiSelect bound to TicketCodes over the same allergies, and a Copy to ticket button whose click sets the ticket box's Value to the allergy box's Value.",
+        "gesture": "Click Copy to ticket.",
+        "outcome": "The ticket box holds the chips Penicillin and Latex.",
+        "opposite": "With the allergy box emptied first, the click leaves the ticket box with no chip.",
+        "defect": "The source reads the allergy box's chip texts instead of its value, so the ticket box holds no chip."
+      }
     },
     "source.WriteOnlySet": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, the test app's TrayTicket component that declares Allergies as WriteOnly<List<int>> and prints the codes it is given, and a Print button whose click sets TrayTicket's Allergies to the box's Value.",
+        "gesture": "Click Print.",
+        "outcome": "The tray ticket reads Allergies: 7, 9.",
+        "opposite": "With the box emptied first, the click prints Allergies: none.",
+        "defect": "The write-only set reads the box's value through the element's value attribute, which EJ2 leaves empty, so the ticket prints Allergies: none."
+      }
     },
     "source.ElementText": {
-      "member": "value",
-      "door": "Property<TValue> (M21.N1)",
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
       "cites": [
-        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"Penicillin only\", and a Show hint button whose click sets the element hint's text to the box's Placeholder.",
+        "gesture": "Click Show hint.",
+        "outcome": "hint reads Penicillin only.",
+        "opposite": "With the box rendered without Placeholder, the click leaves hint empty.",
+        "defect": "The text set writes the source's plan form instead of its value, so hint shows nothing readable."
+      }
     },
     "source.ElementHtml": {
-      "member": "value",
-      "door": "Property<TValue> (M21.N1)",
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
       "cites": [
-        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"<b>Penicillin</b> only\", and a Show hint button whose click sets the element hint's HTML to the box's Placeholder.",
+        "gesture": "Click Show hint.",
+        "outcome": "hint shows Penicillin in bold followed by only.",
+        "opposite": "The Show hint as text button, which sets hint's text instead, shows <b>Penicillin</b> only as text.",
+        "defect": "The HTML set writes the source as text, so the bold element never appears."
+      }
     },
     "source.ElementClass": {
-      "member": "value",
-      "door": "Property<TValue> (M21.N1)",
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
       "cites": [
-        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"allergy-alert\", and a Flag button whose click adds to the element banner the class the box's Placeholder names.",
+        "gesture": "Click Flag.",
+        "outcome": "banner carries the class allergy-alert and shows its red border.",
+        "opposite": "With the box rendered without Placeholder, the click changes no class of banner.",
+        "defect": "The class set adds the member's name placeholder instead of its value, so banner carries the class placeholder."
+      }
     },
     "source.ConditionLeft": {
-      "member": "value",
-      "door": "Property<TValue> (M21.N1)",
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
       "cites": [
-        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"Penicillin only\", and a Check button whose click sets the element verdict's text to Penicillin plan when When(the box's Placeholder equals \"Penicillin only\") holds and to Other plan otherwise.",
+        "gesture": "Click Check.",
+        "outcome": "verdict reads Penicillin plan.",
+        "opposite": "With the box rendered with Placeholder \"Latex only\", the click sets verdict to Other plan.",
+        "defect": "The comparison reads the left operand as the member's name, so it never equals and verdict reads Other plan."
+      }
     },
     "source.ConditionRight": {
-      "member": "value",
-      "door": "Property<TValue> (M21.N1)",
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
       "cites": [
-        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"Penicillin only\", a note box holding Penicillin only, and a Check button whose click sets verdict to Matches when When(the note box's Value equals the allergy box's Placeholder) holds and to Differs otherwise.",
+        "gesture": "Click Check.",
+        "outcome": "verdict reads Matches.",
+        "opposite": "With the note box holding Latex only, the click sets verdict to Differs.",
+        "defect": "The comparison takes the right operand as a literal of the member's name, so verdict reads Differs."
+      }
     },
     "source.TextTestOperand": {
-      "member": "value",
-      "door": "Property<TValue> (M21.N1)",
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
       "cites": [
-        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"Penicillin only\", a note box holding Penicillin only, twice a day, and a Check button whose click sets verdict to Starts with the plan when the note box's Value StartsWith the allergy box's Placeholder (M3.N1, N7.3) and to Other otherwise.",
+        "gesture": "Click Check.",
+        "outcome": "verdict reads Starts with the plan.",
+        "opposite": "With the note box holding Latex only, the click sets verdict to Other.",
+        "defect": "The text test reads its operand as nothing and every text starts with nothing, so verdict reads Starts with the plan for Latex only too."
+      }
     },
     "source.MatchesPattern": {
-      "member": "value",
-      "door": "Property<TValue> (M21.N1)",
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
       "cites": [
-        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"^[A-Z][a-z]+ only$\", a note box holding Penicillin only, and a Check button whose click sets verdict to Well formed when the note box's Value Matches the allergy box's Placeholder (M3.N1) and to Malformed otherwise.",
+        "gesture": "Click Check.",
+        "outcome": "verdict reads Well formed.",
+        "opposite": "With the note box holding penicillin only, starting lower case, the click sets verdict to Malformed.",
+        "defect": "The pattern is read as the member's name, which matches neither text, so verdict reads Malformed for both."
+      }
     },
     "source.RequestMember": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Save button whose click sends POST /residents/helen/allergies with r.AllergyCodes set from the box's Value, its success route setting the element saved's text to the reply's Message; the endpoint answers Saved 7, 9.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, saved reads Saved 7, 9.",
+        "opposite": "With the box emptied first, the endpoint answers Saved none.",
+        "defect": "The member is sent as the chips' texts, which the endpoint cannot bind as codes, so it answers Saved none.",
+        "observes": "Request.tla:Route"
+      }
     },
     "source.Header": {
-      "member": "value",
-      "door": "Property<TValue> (M21.N1)",
+      "member": "placeholder",
+      "door": "Property<string?>, as the text the position takes; value is a list of the bound member's type",
       "cites": [
-        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+        "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277"
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \"Penicillin only\", and a Save button whose click sends POST /residents/helen/allergies with the header X-Allergy-Plan from the box's Placeholder; the endpoint answers with the header it read, shown in saved by the success route.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, saved reads Plan: Penicillin only.",
+        "opposite": "With the box rendered without Placeholder, the header reads nothing, is not sent, and saved reads Plan: none.",
+        "defect": "The header is sent as the text null when the source reads nothing, so the endpoint answers Plan: null.",
+        "observes": "Request.tla:Route"
+      }
     },
     "source.DispatchPayloadMember": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, a Share button whose click dispatches the page's AllergiesShared event with the payload member Codes from the box's Value (M1.N4), and a handler of AllergiesShared that sets the element shared's text to the payload's Codes joined with commas.",
+        "gesture": "Click Share.",
+        "outcome": "shared reads 7,9.",
+        "opposite": "With the box emptied first, shared reads empty.",
+        "defect": "The payload member is the source's plan form instead of its value, so the handler reads no codes."
+      }
     },
     "source.MethodArgument": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, the test app's TrayTicket component declaring Print(Arg<List<int>> codes), which prints the codes it is called with, and a Print button whose click calls TrayTicket's Print with the box's Value.",
+        "gesture": "Click Print.",
+        "outcome": "The tray ticket reads Allergies: 7, 9.",
+        "opposite": "With the box emptied first, the ticket reads Allergies: none.",
+        "defect": "The argument passes the chips' texts, so the ticket reads Allergies: Penicillin, Latex."
+      }
     },
     "source.PluginArgument": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, the page's shiftLog plugin declaring Note(Arg<List<int>> codes), which appends a line for the codes it is given, and a Log button whose click calls shiftLog's Note with the box's Value.",
+        "gesture": "Click Log.",
+        "outcome": "The shift log's last line reads Allergies noted: 7, 9.",
+        "opposite": "With the box emptied first, the line reads Allergies noted: none.",
+        "defect": "The plugin receives the member's name instead of its value, so the line reads Allergies noted: value."
+      }
     },
     "source.HubArgument": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "On net10, Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, the page holds the ward hub, and an Announce button whose click invokes the hub's Announce with the box's Value (N21.1, N21.8); the hub answers every page of the ward with a message the page shows in announced.",
+        "gesture": "Click Announce.",
+        "outcome": "announced reads Helen: 7, 9 on file.",
+        "opposite": "With the box emptied first, announced reads Helen: none on file.",
+        "defect": "The hub argument is sent as the chips' texts, which the hub cannot bind as codes, so announced reads Helen: none on file.",
+        "observes": "Realtime.tla:Message"
+      }
     },
     "http.get": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Find menus button whose click sends GET /menus with r.AllergyCodes set from the box's Value, its success route setting the element menus's text to the reply's Message; the endpoint answers with the codes its query bound.",
+        "gesture": "Click Find menus.",
+        "outcome": "Once the endpoint answers, menus reads Menus without 7, 9.",
+        "opposite": "With the box emptied first, the query sends no code and menus reads Menus without none.",
+        "defect": "The query sends the list as one key holding 7,9, which the endpoint binds as no code.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.post": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Save button whose click sends POST /residents/helen/allergies with r.AllergyCodes set from the box's Value, its success route setting saved's text to the reply's Message.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, saved reads Saved 7, 9.",
+        "opposite": "With the box emptied first, saved reads Saved none.",
+        "defect": "The body sends the chips' texts instead of the codes, so the endpoint binds none.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.put": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and an Update button whose click sends PUT /residents/helen/allergies with r.AllergyCodes set from the box's Value, its success route setting saved's text to the reply's Message.",
+        "gesture": "Click Update.",
+        "outcome": "Once the endpoint answers, saved reads Replaced with 7, 9.",
+        "opposite": "With the box emptied first, saved reads Replaced with none.",
+        "defect": "The PUT sends no body, as a GET does, so the endpoint binds none.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.delete": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Remove button whose click sends DELETE /residents/helen/allergies with r.AllergyCodes set from the box's Value in its body, its success route setting saved's text to the reply's Message.",
+        "gesture": "Click Remove.",
+        "outcome": "Once the endpoint answers, saved reads Removed 7, 9.",
+        "opposite": "With the box emptied first, saved reads Removed none.",
+        "defect": "The DELETE drops its body, so the endpoint binds no code and answers Removed none.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.route": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Save button whose click sends POST /residents/{residentId}/allergies with r.ResidentId set to the page's resident id 42 and r.AllergyCodes from the box's Value, its success route setting saved's text to the reply's Message.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, saved reads Resident 42: 7, 9.",
+        "opposite": "With the resident id reading empty text, the request stops before it is sent and saved keeps Not saved.",
+        "defect": "The placeholder is left in the path as {residentId}, so the endpoint answers 404 and saved keeps Not saved.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.query": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Find menus button whose click sends GET /menus with r.Ward set to North and r.AllergyCodes from the box's Value, its success route setting menus's text to the reply's Message.",
+        "gesture": "Click Find menus.",
+        "outcome": "Once the endpoint answers, menus reads North menus without 7, 9.",
+        "opposite": "With the box emptied first, menus reads North menus without none.",
+        "defect": "The ward is sent and the codes are dropped when a list sits beside a scalar in the query, so menus reads North menus without none.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.header": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Save button whose click sends POST /residents/helen/allergies with the header X-Ward from the ward box holding North and r.AllergyCodes from the allergy box's Value, its success route setting saved's text to the reply's Message.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, saved reads North: 7, 9.",
+        "opposite": "With the ward box emptied first, the header is not sent and saved reads No ward: 7, 9.",
+        "defect": "The header is sent as empty text when the ward box is empty, so the endpoint answers Ward : 7, 9.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.static": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Save button whose click sends POST /residents/helen/allergies with Set(r => r.Source, \"intake\") and r.AllergyCodes from the box's Value, its success route setting saved's text to the reply's Message.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, saved reads Saved from intake: 7, 9.",
+        "opposite": "The discharge page's Save, whose literal is \"discharge\", reads Saved from discharge: 7, 9.",
+        "defect": "The literal is written under its C# name Source where the endpoint binds source, so saved reads Saved from unknown: 7, 9.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.beside.hidden": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex inside the intake form, which also holds the hidden input ResidentId with 42, and a Save button whose click sends POST /residents/allergies with the form's inputs, its success route setting saved's text to the reply's Message.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, saved reads Resident 42: 7, 9.",
+        "opposite": "With the hidden input outside the form, the request does not send it and saved reads Resident 0: 7, 9.",
+        "defect": "The hidden input is skipped when a component's input sits beside it, so saved reads Resident 0: 7, 9.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.into": {
       "member": "value",
       "door": "Property<TValue> (M21.N1), the component rendered by field.FusionMultiSelect() in the loaded partial",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's page holds an empty card element and an Open allergies button whose click sends GET /residents/helen/allergy-card Into(card); the partial renders field.FusionMultiSelect(m => m.AllergyCodes) holding Penicillin, over Penicillin, Latex and Peanut.",
+        "gesture": "Click Open allergies.",
+        "outcome": "Once the endpoint answers, the card shows the allergy box with the chip Penicillin.",
+        "opposite": "Before the endpoint answers, the card is empty.",
+        "defect": "The loaded HTML is inserted without starting its plan, so the box shows a bare input with no chip.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.whileLoading": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Reload button whose click sends GET /residents/helen/allergies, its WhileLoading setting the box's Value to an empty list and its success route setting the box's Value from the reply's Codes, [9, 12].",
+        "gesture": "Click Reload.",
+        "outcome": "While the endpoint holds its answer, the box shows no chip.",
+        "opposite": "Once the endpoint answers, the box holds Latex and Peanut.",
+        "defect": "WhileLoading runs after the response, so the box keeps Penicillin and Latex while the request is in flight.",
+        "observes": "Request.tla:Loading"
+      }
     },
     "http.response.success": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered empty, and a Load button whose click sends GET /residents/helen/allergies, its success route setting the box's Value from the reply's Codes; the endpoint answers {\"codes\": [9, 12]}.",
+        "gesture": "Click Load.",
+        "outcome": "Once the endpoint answers, the box holds Latex and Peanut.",
+        "opposite": "When the endpoint answers {\"codes\": []}, the box holds no chip.",
+        "defect": "The route sets the box from the reply's whole body instead of its codes, so EJ2 holds no chip.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.response.error": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Latex, and a Save button whose click sends POST /residents/helen/allergies with r.AllergyCodes from the box's Value, its OnError<AllergyConflict>(409, ..) route setting the box's Value from the error body's OnFile; the endpoint answers 409 with {\"onFile\": [7]}.",
+        "gesture": "Click Save.",
+        "outcome": "Once the endpoint answers, the box holds Penicillin.",
+        "opposite": "When the endpoint answers 200, the success route runs instead and the box keeps Latex.",
+        "defect": "The error route reads the body as the success body's type, so OnFile reads nothing and the box holds no chip.",
+        "observes": "Request.tla:Route"
+      }
     },
     "http.chained": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Save button whose click sends POST /residents/helen/allergies, then Chained sends GET /menus with r.AllergyCodes from the box's Value, its success route setting menus's text to the reply's Message.",
+        "gesture": "Click Save.",
+        "outcome": "Once both endpoints answer, menus reads Menus without 7, 9.",
+        "opposite": "When the first endpoint answers 500, the chained request is not sent and menus keeps No menus.",
+        "defect": "The chained request reads the box when Save was clicked, before the first route set it, so a value the first route wrote is not sent; here the first route empties the box and menus reads Menus without 7, 9 instead of Menus without none.",
+        "observes": "Request.tla:Chained"
+      }
     },
     "http.parallel": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered empty, and a Load both button whose click runs Parallel: GET /pharmacy/helen setting the box's Value from its Codes, [7], and GET /dietitian/helen setting the box's Placeholder from its Note, \"No nuts\"; status reads Both loaded after Parallel.",
+        "gesture": "Click Load both.",
+        "outcome": "While the dietitian's endpoint holds its answer, the box already holds Penicillin; once it answers, status reads Both loaded.",
+        "opposite": "When the pharmacy endpoint answers 500, the dietitian's answer still sets the placeholder and status reads Both loaded.",
+        "defect": "Parallel runs each route only when every response has arrived, so the box holds no chip while the dietitian's answer is held.",
+        "observes": "Lanes.tla:AllSettled"
+      }
     },
     "http.finally": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Save button whose click empties the box, sends POST /residents/helen/allergies, and in Finally sets the box's Value back to [7, 9].",
+        "gesture": "Click Save.",
+        "outcome": "When the endpoint answers 500, the box holds Penicillin and Latex again.",
+        "opposite": "When the endpoint answers 200, the box holds Penicillin and Latex again too.",
+        "defect": "Finally runs only after the success route, so after a 500 the box stays empty.",
+        "observes": "Request.tla:Finally"
+      }
     },
     "lane.confirm": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) holding Penicillin and Latex, and a Clear allergies button whose click asks FusionConfirm \"Clear Helen's allergies?\" and, When the answer holds, sets the box's Value to an empty list; the dialog is open after Clear allergies was clicked.",
+        "gesture": "Click OK in the dialog.",
+        "outcome": "The box holds no chip.",
+        "opposite": "Clicking Cancel instead leaves the box holding Penicillin and Latex.",
+        "defect": "The write runs before the answer settles, so Cancel empties the box too.",
+        "observes": "Run.tla:Settle"
+      }
     },
     "lane.push": {
       "member": "value",
       "door": "Property<TValue> (M21.N1)",
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416"
-      ]
+      ],
+      "promise": {
+        "page": "On net10, Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered empty, the page listens to the ward stream's AllergyRecorded message, whose handler sets the box's Value from the message's Codes, and a Record peanut button on the same page asks the test app's endpoint to push AllergyRecorded with {\"codes\": [12]}.",
+        "gesture": "Click Record peanut.",
+        "outcome": "Once the server pushes the message, the box holds Peanut.",
+        "opposite": "When the endpoint pushes a message with no codes, the codes read nothing, null is written, and the box holds no chip.",
+        "defect": "The handler reads the message's Codes under its C# name, so the box holds no chip.",
+        "observes": "Realtime.tla:Message"
+      }
     },
     "lane.slot.load": {
       "member": "change, subscribed by addEventListener",
@@ -662,7 +1036,15 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528",
         "@syncfusion/ej2-base/src/base.d.ts:86"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's page holds an empty card element and an Open allergies button whose click loads GET /residents/helen/allergy-card Into(card); the partial renders field.FusionMultiSelect(m => m.AllergyCodes) over Penicillin, Latex and Peanut and its own plan's Change handler sets the card's status text to Allergies changed.",
+        "gesture": "With the card loaded, choose Latex in its allergy box's list and press Tab to leave the box.",
+        "outcome": "The card's status reads Allergies changed.",
+        "opposite": "Before the change, the card's status reads Unchanged.",
+        "defect": "The partial's plan subscribes before EJ2 creates the component on the loaded element, so the handler never runs and status keeps Unchanged.",
+        "observes": "Ownership.tla:LoadA"
+      }
     },
     "lane.slot.unloadListener": {
       "member": "change, removed by removeEventListener",
@@ -670,7 +1052,15 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528",
         "@syncfusion/ej2-base/src/base.d.ts:94"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code) on the page, a card element, and an Open card button that loads a partial whose plan listens to the page's allergy box, reached by its element id, with a Change handler that appends Card saw a change to the page's log; a Close card button unloads the card.",
+        "gesture": "With the card closed, choose Latex in the page's allergy box and press Tab to leave the box.",
+        "outcome": "The log stays empty.",
+        "opposite": "With the card open, the same gesture appends Card saw a change to the log.",
+        "defect": "Unload leaves the card's listener on the page's box, so the log reads Card saw a change after the card closed.",
+        "observes": "Ownership.tla:UnloadA"
+      }
     },
     "lane.slot.hostDestroyed": {
       "member": "destroy() and isDestroyed",
@@ -682,7 +1072,15 @@
       "facts": [
         "ej2-destroy-sets-is-destroyed",
         "ej2-destroy-removes-instance"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's page loads a card whose partial renders the allergy box with field.FusionMultiSelect(m => m.AllergyCodes) and listens to its Change; the page's Remove box button calls the box's Destroy(), as its host does, and a Close card button unloads the card.",
+        "gesture": "With the box destroyed, click Close card.",
+        "outcome": "The card closes and the page shows no error, and the console holds no error.",
+        "opposite": "Opening the card again shows the allergy box holding Penicillin, and its Change handler runs.",
+        "defect": "Release calls removeEventListener on the destroyed component, which throws, so the card stays open and the console names the error.",
+        "observes": "Ownership.tla:HostDestroys"
+      }
     },
     "template.render": {
       "member": "itemTemplate",
@@ -692,7 +1090,14 @@
       ],
       "facts": [
         "ej2-multiselect-item-template-text"
-      ]
+      ],
+      "promise": {
+        "page": "An intake page whose allergy FusionMultiSelect renders its items with the item template FusionTemplate.Create<Allergy>().Span(m => m.Name).Render(plan), over Penicillin and an allergy named <i>Latex</i>.",
+        "gesture": "Click the allergy box to open its list.",
+        "outcome": "The list reads Penicillin and <i>Latex</i> as text, and holds no italic element.",
+        "opposite": "With the item template written as a raw read of name, the list renders Latex in italics, the engine writing data unencoded (ej2-template-unencoded).",
+        "defect": "The builder writes the read raw instead of through the text helper, so <i>Latex</i> renders as an italic element."
+      }
     },
     "template.conditional": {
       "member": "itemTemplate",
@@ -702,7 +1107,14 @@
       ],
       "facts": [
         "ej2-multiselect-item-template-condition"
-      ]
+      ],
+      "promise": {
+        "page": "An intake page whose allergy FusionMultiSelect renders its items with an item template holding When(m => m.Severity == \"severe\", then: t => t.Badge(\"Severe\"), @else: e => e.Span(\"Mild\")), over Penicillin, severe, and Latex, mild.",
+        "gesture": "Click the allergy box to open its list.",
+        "outcome": "Penicillin's item shows the badge Severe and Latex's shows Mild.",
+        "opposite": "An allergy whose severity is moderate shows Mild.",
+        "defect": "The conditional compares severity with the text between double quotes the engine reads as another word, so every item shows Mild."
+      }
     },
     "validation.rule": {
       "member": "value, committed by change",
@@ -710,7 +1122,15 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake form renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes) over Penicillin, Latex and Peanut, an IntakeValidator : ReactiveValidator<IntakeForm> registered through DI with RuleFor(m => m.AllergyCodes).NotEmpty().WithMessage(\"Record at least one allergy\"), and a Save button whose click posts the form.",
+        "gesture": "With the box empty, click Save.",
+        "outcome": "The box's message reads Record at least one allergy, and the form is not sent.",
+        "opposite": "With Latex chosen, Save posts and saved reads Saved 9.",
+        "defect": "The browser's rule reads the box's text input, which EJ2 empties after each chip, so an empty box passes and the server answers 400.",
+        "observes": "Request.tla:Check"
+      }
     },
     "validation.condition": {
       "member": "value, committed by change",
@@ -718,7 +1138,15 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake form renders a Has allergies check box and her allergy box with field.FusionMultiSelect(m => m.AllergyCodes), an IntakeValidator with When(m => m.HasAllergies, () => RuleFor(m => m.AllergyCodes).NotEmpty().WithMessage(\"Record at least one allergy\")), and a Save button.",
+        "gesture": "With Has allergies checked and the box empty, click Save.",
+        "outcome": "The box's message reads Record at least one allergy, and the form is not sent.",
+        "opposite": "With Has allergies unchecked and the box empty, Save posts and saved reads Saved none.",
+        "defect": "The condition is read from the model as the page rendered it, where HasAllergies was false, so the empty box passes.",
+        "observes": "Request.tla:Check"
+      }
     },
     "validation.live": {
       "member": "value, committed by change",
@@ -726,7 +1154,14 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake form renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes) over Penicillin, Latex and Peanut, an IntakeValidator : ReactiveValidator<IntakeForm> registered through DI with RuleFor(m => m.AllergyCodes).NotEmpty().WithMessage(\"Record at least one allergy\"), a Save button, and the box's message showing Record at least one allergy after a failed Save.",
+        "gesture": "Choose Latex in the box's list and press Tab to leave the box.",
+        "outcome": "The box's message is gone without another Save.",
+        "opposite": "Removing Latex's chip and leaving the box shows Record at least one allergy again.",
+        "defect": "Live checking listens to the native input's blur instead of the component's commit event, so the message stays until the next Save."
+      }
     },
     "validation.summary": {
       "member": "value, committed by change",
@@ -734,7 +1169,15 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's intake form renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes) over Penicillin, Latex and Peanut, an IntakeValidator : ReactiveValidator<IntakeForm> registered through DI with RuleFor(m => m.AllergyCodes).NotEmpty().WithMessage(\"Record at least one allergy\"), a validation summary above the form, and a Save button.",
+        "gesture": "With the box empty, click Save.",
+        "outcome": "The summary reads Record at least one allergy.",
+        "opposite": "With Penicillin chosen, Save leaves the summary empty and posts.",
+        "defect": "The summary reads the place of the message from the page's visible elements instead of the plan, and the hidden select EJ2 renders takes it, so the summary stays empty.",
+        "observes": "Request.tla:Check"
+      }
     },
     "validation.listItem": {
       "member": "value, committed by change",
@@ -742,7 +1185,15 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
-      ]
+      ],
+      "promise": {
+        "page": "A ward intake form for two residents renders, in a for loop, field.FusionMultiSelect(m => m.Residents[i].AllergyCodes) for Helen and for Arthur, and a WardValidator with RuleForEach(m => m.Residents).ChildRules(r => r.RuleFor(x => x.AllergyCodes).NotEmpty().WithMessage(\"Record at least one allergy\")).",
+        "gesture": "With Helen's box holding Penicillin and Arthur's empty, click Save.",
+        "outcome": "Arthur's box shows Record at least one allergy and Helen's shows none, and the form is not sent.",
+        "opposite": "With both boxes holding an allergy, Save posts and saved reads Saved 2 residents.",
+        "defect": "Both boxes share the id of the item's member, so the message lands under Helen's box.",
+        "observes": "Request.tla:Check"
+      }
     },
     "validation.prefix": {
       "member": "value, committed by change, rendered under the partial's prefix by field.FusionMultiSelect()",
@@ -750,7 +1201,15 @@
       "cites": [
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416",
         "@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:528"
-      ]
+      ],
+      "promise": {
+        "page": "Helen Martinez's family form renders Html.PartialFor(m => m.Guardian), whose partial renders field.FusionMultiSelect(m => m.AllergyCodes) for the guardian, and a FamilyValidator with RuleFor(m => m.Guardian.AllergyCodes).NotEmpty().WithMessage(\"Record the guardian's allergies\").",
+        "gesture": "With Latex chosen in the guardian's box, click Save.",
+        "outcome": "The endpoint binds Guardian.AllergyCodes and saved reads Guardian allergies 9.",
+        "opposite": "With the guardian's box empty, the box shows Record the guardian's allergies and the form is not sent.",
+        "defect": "The box posts under AllergyCodes without the partial's prefix, so the endpoint binds Family.AllergyCodes and saved reads Guardian allergies none.",
+        "observes": "Request.tla:Check"
+      }
     }
   }
 }
