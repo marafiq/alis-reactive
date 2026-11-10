@@ -1,0 +1,951 @@
+{
+  "module": "Vendors",
+  "features": [
+    {
+      "id": "M12.F1",
+      "summary": "A vendor: the data a component's declaration carries, in closed sets the one driver follows. Where the object lives, a path from the element or a lookup the vendor's code provides as a plugin; how a listener subscribes, a method pair, a callback property whose listeners chain on one framework function per object and property, or a subscribe method that returns its unsubscriber; where the object holds its element; what a listener receives, its arguments, with the payload at the place its event declares and the vendor's continuation called at its position; a callback the vendor calls for an answer, written as an expression; the vendor contract, which checks every declaration against the vendor's typed API at build; and the bridge to a component's own code: alis:mount and alis:unmount, announced over the content a boot, a slot's load or its unload covers, and the page's plugin queue, through which a vendor's code provides its lookup, read at boot before alis:mount, each later push registering at once. Main has no vendor data: its runtime holds a driver per vendor name, native and fusion, and reads Syncfusion's object by name. The redesign writes a vendor's path, listening and payload kind into the plan, with two listening kinds and a path alone; its payload kind, VendorEventPayload, leaves for the handler's payload place (D17.4).",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:ComponentVendor",
+        "Alis.Reactive:VendorEventPayload"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "redesign",
+          "text": "public static ComponentVendor Native { get; } = new ComponentVendor(",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:59"
+        },
+        {
+          "line": "redesign",
+          "text": "new MethodVendorListening(\"addEventListener\", \"removeEventListener\"),",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:62"
+        },
+        {
+          "line": "redesign",
+          "text": "public static ComponentVendor Define(",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:78"
+        },
+        {
+          "line": "redesign",
+          "text": "VendorEventPayload payload)",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:83"
+        },
+        {
+          "line": "redesign",
+          "text": "public static ComponentVendor DefineCallbackProperties(",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:109"
+        },
+        {
+          "line": "redesign",
+          "text": "internal Vendor ToGrammar() => new Vendor(_objectPath.TargetText, _listening, _payload);",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:123"
+        },
+        {
+          "line": "redesign",
+          "text": "public override string ToString() => Name;",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:126"
+        },
+        {
+          "line": "redesign",
+          "text": "\"Vendor name '\" + name + \"' must start with a letter and contain only ASCII letters, digits, underscore, or hyphen.\",",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:134"
+        },
+        {
+          "line": "redesign",
+          "text": "public enum VendorEventPayload",
+          "cite": "Alis.Reactive/Grammar/VendorEventPayload.cs:8"
+        },
+        {
+          "line": "redesign",
+          "text": "Argument,",
+          "cite": "Alis.Reactive/Grammar/VendorEventPayload.cs:11"
+        },
+        {
+          "line": "redesign",
+          "text": "Element,",
+          "cite": "Alis.Reactive/Grammar/VendorEventPayload.cs:14"
+        },
+        {
+          "line": "redesign",
+          "text": "throw new Error(`[alis] #${element.id} has no ${vendorName} object yet (${vendor.objectPath.join(\".\")})`);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:13"
+        },
+        {
+          "line": "redesign",
+          "text": "return read(element, vendor.objectPath, \"optional\", `#${element.id}`) === object;",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:17"
+        },
+        {
+          "line": "redesign",
+          "text": "case \"method\":     return subscribeByMethod(root, vendorName, listen, event, vendorListener);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:30"
+        },
+        {
+          "line": "redesign",
+          "text": "case \"assignment\": return assignListener(root, vendorName, event, vendorListener);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:31"
+        },
+        {
+          "line": "redesign",
+          "text": "if (typeof previous === \"function\") previous.apply(this, args);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:59"
+        },
+        {
+          "line": "redesign",
+          "text": "if (first instanceof CustomEvent) return isMissing(first.detail) ? first : first.detail;",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:90"
+        },
+        {
+          "line": "redesign",
+          "text": "if (first instanceof Event) return first.currentTarget ?? first;",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:91"
+        },
+        {
+          "line": "redesign",
+          "text": "if (stillHolds(element, vendor, root)) unsubscribe();",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:41"
+        },
+        {
+          "line": "redesign",
+          "text": "}",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:51"
+        },
+        {
+          "line": "redesign",
+          "text": "export const MOUNT_EVENT = \"alis:mount\";",
+          "cite": "Alis.Reactive.Assets/runtime/plans/mount-events.ts:5"
+        },
+        {
+          "line": "redesign",
+          "text": "export const UNMOUNT_EVENT = \"alis:unmount\";",
+          "cite": "Alis.Reactive.Assets/runtime/plans/mount-events.ts:6"
+        },
+        {
+          "line": "redesign",
+          "text": "document.addEventListener(\"alis:mount\", event => forEachWithin(event, selector, construct));",
+          "cite": "Alis.Reactive.Assets/components/hooks.ts:15"
+        },
+        {
+          "line": "redesign",
+          "text": "document.addEventListener(\"alis:unmount\", event => forEachWithin(event, selector, destroy));",
+          "cite": "Alis.Reactive.Assets/components/hooks.ts:19"
+        },
+        {
+          "line": "redesign",
+          "text": "(host.__alisPlugins ??= []).push({ name, instance });",
+          "cite": "Alis.Reactive.Assets/components/hooks.ts:34"
+        },
+        {
+          "line": "redesign",
+          "text": "for (const plugin of runtimeWindow.__alisPlugins ?? []) registerPlugin(plugin.name, pluginOf(plugin.name, plugin.instance));",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:44"
+        },
+        {
+          "line": "redesign",
+          "text": "delete runtimeWindow.__alisPlugins;",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:45"
+        },
+        {
+          "line": "redesign",
+          "text": "announceMount(document.body);",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:47"
+        },
+        {
+          "line": "redesign",
+          "text": "announceUnmount(target);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:32"
+        },
+        {
+          "line": "redesign",
+          "text": "announceMount(target);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:36"
+        },
+        {
+          "line": "redesign",
+          "text": "throw new InvalidOperationException($\"Two different vendors are named '{name}'. Give each vendor its own name.\");",
+          "cite": "Alis.Reactive/PlanModel/Writing/Scope.cs:270"
+        },
+        {
+          "line": "main",
+          "text": "const root = (element as FusionElement).ej2_instances?.[0];",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:81"
+        },
+        {
+          "line": "main",
+          "text": "registerComponentDriver(\"native\", nativeComponentDriver);",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89"
+        },
+        {
+          "line": "main",
+          "text": "registerComponentDriver(\"fusion\", fusionComponentDriver);",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:90"
+        },
+        {
+          "line": "main",
+          "text": "const listenersDroppedOnDestroy = source.isDestroyed;",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:34"
+        },
+        {
+          "line": "proposed",
+          "text": "public override ComponentVendor Vendor => ComponentVendor.Define(\"oxygengauge\", VendorLookup.ByPlugin(\"oxygen-gauges\"), subscribe: \"on\", unsubscribe: \"off\");",
+          "doors": [
+            "N17.6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public override ComponentVendor Vendor => ComponentVendor.DefineReturnedUnsubscriber(\"wardfeed\", objectPath: \"feed\", subscribe: \"subscribe\");",
+          "doors": [
+            "N17.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public ReadOnly<DoseRow> Row => Argument<DoseRow>(1);",
+          "doors": [
+            "N17.8"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "public void Show(Arg<string[]> items) => MethodAt(1, [items]);",
+          "doors": [
+            "N17.8",
+            "N5.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "chart.TickLabel.Set(tick => tick.Label);",
+          "doors": [
+            "N17.9"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "chart.SortTicks(tick => tick.Doses);",
+          "doors": [
+            "N17.9"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "p.Listen(opened.Read(o => o.Card), card => card.Cleaned, (cleaned, inner) => inner.Element(\"cleaned-by\").Text.Set(cleaned.Read(c => c.Nurse)));",
+          "doors": [
+            "N12.1",
+            "N5.6"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "plugin",
+        "fn",
+        "get",
+        "call",
+        "listen",
+        "method",
+        "assignment",
+        "returned",
+        "answer"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:59-136"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Grammar/VendorEventPayload.cs:8-15"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Writing/Scope.cs:265-275"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Components/Contracts/IComponent.cs:9"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plans/mount-events.ts:5-20"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/hooks.ts:14-35"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:44-52"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:32-39"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q12",
+        "Q4",
+        "Q5",
+        "Q18"
+      ],
+      "meanings": [
+        {
+          "id": "M12.D1",
+          "meaning": "A vendor name names one vendor: one place of the object (its path or its lookup), one listening and one element path. Two definitions of one name whose data differ are refused: at build by ALIS034 when both are constants of one compilation, and where the view renders when one plan names both, as the redesign refuses them."
+        }
+      ],
+      "oracle": "The DOM Standard's EventTarget, addEventListener and removeEventListener, and CustomEvent's detail; ECMAScript's property assignment, call and Object.freeze, by which a vendor's object adds, assigns, refuses and removes a listener; and each vendor's typed API as TypeScript 5.9.3 types it (D17.5).",
+      "checker": [
+        "core:Q17",
+        "core:Q12",
+        "CallbackProperty.tla:EveryHearerHearsOnceInOrder",
+        "CallbackProperty.tla:AThrowSkipsNoHandler",
+        "CallbackProperty.tla:ALiveHandlerKeepsTheFrameworksFunction",
+        "CallbackProperty.tla:TheLastReleasePutsBackItsValue",
+        "CallbackProperty.tla:ARefusedAssignmentStartsNoHandler",
+        "CallbackProperty.tla:AReplacedObjectIsNotWritten",
+        "Ownership.tla:ListenOncePerObject",
+        "Ownership.tla:ListenLeavesWithItsOwner",
+        "Ownership.tla:ThrownListenerRunsNothing",
+        "Run.tla:WritesAfterTheTurnAreRefused"
+      ],
+      "defects": [
+        {
+          "id": "X17.1",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.2",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.5",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.13",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.16",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.18",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.19",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.28",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.29",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.30",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.39",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.40",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.41",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.42",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.43",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.44",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.45",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.46",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.47",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.48",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.11",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.12",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.14",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.15",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.17",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.20",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.21",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.22",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.23",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.49",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.50",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.51",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.52",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.16",
+          "rung": "behavior"
+        },
+        {
+          "id": "M12.X1",
+          "rung": "analyzer",
+          "defect": "Two definitions of one vendor name with different data both render, so one plan's handlers find the object by another definition's path or listening, or the view throws only where both meet in one plan (M12.D1). ALIS034 (N18.12) reports two constant definitions of one name whose path, lookup, listening or element path differ in one compilation; where the view renders, a plan that names both is refused with \"Two different vendors are named '{name}'. Give each vendor its own name.\" (Alis.Reactive/PlanModel/Writing/Scope.cs:270 at 65fdf118d)."
+        },
+        {
+          "id": "M12.X3",
+          "rung": "analyzer",
+          "defect": "A vendor's object path with an empty step, as \"slate.\", writes a path whose step names nothing, so every step that reaches the object stops in the browser. ALIS034 (N18.12) reports a constant object path or element path with an empty step; where the view renders on code it does not follow, the path is refused with \"Path '{text}' contains an empty segment at index {index}. Use dot-separated property names without consecutive, leading, or trailing dots.\" (Alis.Reactive/WireTerms/Path.cs:124-125 at 65fdf118d)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.3",
+          "page": "A ward door page whose door sensor is an element that is its own component (ComponentVendor.Native) and declares Opened, an Event<DoorSignal> whose payload is the event the sensor raises: DoorSignal declares Type, a ReadOnly<string>, and Detail, a ReadOnly<DoorOpened> of the app's class DoorOpened with a string Room. The sensor's button Open with room raises a CustomEvent named opened with the detail {\"room\": \"12\"}, and its button Open with no room raises opened with no detail. The Opened handler writes the payload's Type into opened-type and its Detail's Room into opened-room.",
+          "gesture": "Click Open with room, then Open with no room.",
+          "outcome": "After each click opened-type reads opened; after the first opened-room reads 12, and after the second it is empty.",
+          "opposite": "Click Open with room once more: opened-type reads opened and opened-room reads 12.",
+          "defect": "The payload follows the dispatch, not the declaration: the redesign hands the handler a CustomEvent's detail when it carries one and the event when it carries none (Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:89-92 at 65fdf118d), so opened-type is empty after Open with room."
+        },
+        {
+          "for": "X17.10",
+          "page": "A ward monitor page with oxygen gauges whose library keeps its gauges in a registry of its own, off their elements, found by the lookup the gauge's code provides as the plugin oxygen-gauges, named by VendorLookup.ByPlugin(\"oxygen-gauges\") in the gauge's vendor. The gauge declares Reading, a ReadOnly<int>; Threshold, a Property<int> it shows; Lower() and Raise(), which show Alarm lowered and Alarm raised beside it; and Alarmed, an Event its button Sound the alarm raises. gauge-bed-1 is a gauge the library made with the reading 97; gauge-bed-2 is an element the library has made no gauge for, until the page's button Make the bed 2 gauge makes one with the reading 88. Read bed 1 writes gauge-bed-1's Reading into reading-1; Set the threshold to 92 writes 92 into gauge-bed-1's Threshold; Raise the alarm and Lower the alarm call gauge-bed-1's Raise() and Lower(); gauge-bed-1's Alarmed handler writes alarmed into alarm-heard; Read bed 2 writes reading into bed-2-tried, then gauge-bed-2's Reading into reading-2 and read into bed-2-done.",
+          "gesture": "Click Read bed 1, Set the threshold to 92, Raise the alarm, Lower the alarm and Sound the alarm; then click Read bed 2 and Raise the alarm.",
+          "outcome": "reading-1 reads 97, gauge bed 1 shows the threshold 92, alarm-heard reads alarmed, and gauge bed 1 shows Alarm lowered after Lower the alarm and Alarm raised after the last click; bed-2-tried reads reading, and reading-2 and bed-2-done are empty.",
+          "opposite": "Click Make the bed 2 gauge, then Read bed 2: reading-2 reads 88 and bed-2-done reads read, so the lookup runs when a step reaches the gauge.",
+          "defect": "The lookup is skipped or read once: a gauge kept off its element reads nothing and its alarm never moves, so reading-1 is empty; or a gauge the library never made reads nothing and the pipeline goes on, so bed-2-done reads read (D17.3, D4.1)."
+        },
+        {
+          "for": "X17.11",
+          "page": "A nurses' station page with a ward feed the app brings, whose declaration names its listening with ComponentVendor.DefineReturnedUnsubscriber(\"wardfeed\", objectPath: \"feed\", subscribe: \"subscribe\") and declares Posted, an Event<FeedUpdate> with a string Message. The feed's button Post an update posts the message Bed 4 needs water, and the feed shows the count of listeners it holds as subscribers: n. The page's Posted handler writes the payload's Message into last-update. Open the feed card loads the slot feed-card with a partial whose plan, when it loads, listens to the feed's Posted, reached by its element's id, with a pipeline that adds one to the page's tally and writes it into card-heard, an element outside the slot; Close the feed card unloads it.",
+          "gesture": "Click Open the feed card, Post an update, Close the feed card, then Post an update.",
+          "outcome": "After the first Post an update, card-heard reads 1 and the feed shows subscribers: 2; after Close the feed card the feed shows subscribers: 1; after the second Post an update, card-heard still reads 1 and last-update reads Bed 4 needs water.",
+          "opposite": "Click Open the feed card and Post an update again: card-heard reads 2 and the feed shows subscribers: 2.",
+          "defect": "The release calls nothing, or a method named as the subscribe's pair, where the feed removes a listener only by the function its subscribe returned, so the feed keeps subscribers: 2 and the second Post an update writes 2 into card-heard."
+        },
+        {
+          "for": "X17.12",
+          "page": "An admission page with a resident search box the app brings, whose Search event its vendor raises with two arguments, the typed query and the vendor's continuation, which shows each item it is handed as an option under the box. The payload's declaration declares Query, the first argument's text, and Show, the continuation, MethodAt(1, [items]). The Search handler writes Query into searched-for and calls Show with the page's list of residents, Ada Byrne and Adam Cole.",
+          "gesture": "Type Ad into the resident search box, and wait until searched-for reads Ad.",
+          "outcome": "searched-for reads Ad, and the box shows the options Ada Byrne and Adam Cole.",
+          "opposite": "Before any typing, the box shows no option and searched-for is empty.",
+          "defect": "The continuation at position 1 is not called, or is called with nothing, so the box shows no option; or Query reads an argument other than the first, so searched-for is empty (D17.4)."
+        },
+        {
+          "for": "X17.14",
+          "page": "A dose chart page with two charts the app brings, each of whose declaration declares TickLabel, a Callback<TickArgs, string> its vendor calls for each tick with the tick's Resident and draws the answer as the tick's label; a chart with no TickLabel draws each tick's position, 1, 2 and 3. Both charts hold the ticks Ada, Bea and Cy. The view sets chart-labeled's TickLabel to tick => tick.Resident and leaves chart-plain's unset; the page's button Draw the charts draws both.",
+          "gesture": "Click Draw the charts.",
+          "outcome": "chart-labeled's ticks read Ada, Bea and Cy.",
+          "opposite": "chart-plain's ticks read 1, 2 and 3.",
+          "defect": "The answer is not the function the vendor calls, or answers nothing, so chart-labeled's ticks read 1, 2 and 3, or are empty (D17.12)."
+        },
+        {
+          "for": "X17.15",
+          "page": "A call bell page whose bell the app brings declares Rang, an Event<RingArgs> with a string Room, and Chimed, an Event with no payload. The bell's button Ring with no room raises rang with no argument, its button Ring room 7 raises rang with {\"room\": \"7\"}, and its button Chime raises chimed with no argument; after each raise the bell's own code writes its count of raises into raised. The Rang handler writes ringing into ring-tried as its first step, then the payload's Room into ring-room; the Chimed handler writes chimed into chime-heard.",
+          "gesture": "Click Ring with no room, then Chime.",
+          "outcome": "After Ring with no room, raised reads 1 and ring-tried and ring-room are empty; after Chime, chime-heard reads chimed and raised reads 2.",
+          "opposite": "Click Ring room 7: ring-tried reads ringing, ring-room reads 7 and raised reads 3.",
+          "defect": "The missing payload reads as nothing and the handler runs, so ring-tried reads ringing after Ring with no room, as the redesign reads a payload's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d); or the stop reaches the vendor, so raised stays empty; or Chimed's empty payload stops it, so chime-heard is empty."
+        },
+        {
+          "for": "X17.17",
+          "page": "A nurses' station page with a call bell the app brings, whose declaration names its listening with ComponentVendor.DefineCallbackProperties(\"callbell\", objectPath: \"bell\") and declares Rang, an Event<RingArgs> with a string Room, heard through the bell's onRang property; the bell's own code assigns onRang a function that appends bell to the ring log, and its button Ring room 7 rings with the room 7, each ring writing a new line into the ring log; and a ward feed declared with ComponentVendor.DefineReturnedUnsubscriber(\"wardfeed\", objectPath: \"feed\", subscribe: \"subscribe\"), whose Posted is an Event<FeedUpdate> with a string Message and whose button Post an update posts Bed 4 needs water. The Rang handler writes the payload's Room into rang-room; the Posted handler writes its Message into posted-message.",
+          "gesture": "Click Ring room 7, then Post an update.",
+          "outcome": "rang-room reads 7, posted-message reads Bed 4 needs water, and the ring log's line reads bell.",
+          "opposite": "Before either click, rang-room and posted-message are empty; Ring room 7 alone leaves posted-message empty.",
+          "defect": "A listening outside the method pair reaches no handler: the bell's property is never assigned or the feed's subscribe is never called, so rang-room or posted-message stays empty; the redesign has no returned unsubscriber (Alis.Reactive/Vendors/ComponentVendor.cs:78-121 at 65fdf118d)."
+        },
+        {
+          "for": "X17.20",
+          "page": "A dose chart page with a text box unit-name, a shift clock the app brings whose Shift(), a Method<string>, answers Day until its button Next shift turns it to Night, and a chart the app brings that declares Caption and Footer, each a Callback<CaptionArgs, string> it calls at each draw and shows above and below its ticks, and SortTicks(Answer(key)), a Method that orders and redraws its ticks by the key its answer gives for each. The view sets Caption to unit-name's value and Footer to the clock's Shift(); the chart's ticks are Ada with 2 doses, Bea with 4 and Cy with 1, drawn in that order; its button Redraw draws it; the page's button Sort by doses calls chart.SortTicks(tick => tick.Doses).",
+          "gesture": "Type East into unit-name and click Redraw; type West over it, click Next shift and click Redraw; click Sort by doses.",
+          "outcome": "After the first Redraw the caption reads East and the footer Day; after the second the caption reads West and the footer Night; after Sort by doses the ticks read Cy, Ada and Bea, in that order.",
+          "opposite": "Before any typing, Redraw shows an empty caption and the footer Day, and the ticks read Ada, Bea and Cy.",
+          "defect": "The answer reads the page once, when it is assigned, so the second Redraw still shows East or Day; or the sort's argument is passed as a value, not as the function the vendor calls for each tick, so the ticks keep Ada, Bea and Cy (D17.12)."
+        },
+        {
+          "for": "X17.21",
+          "page": "A dose chart page with a unit tracker the app brings, whose Unit, a ReadOnly<string>, holds Ward 3 until its button Retire the unit deletes that member, and a chart the app brings that declares Ward, a Property<string>, and Caption, a Callback<CaptionArgs, string> it calls when a write changes Ward, before it draws the answer as its caption, so a throw from Caption leaves the caption it drew. The view sets Caption to the tracker's Unit. Set ward North writes North into the chart's Ward, then set into north-done; Set ward South writes trying into south-tried, writes South into the chart's Ward, then set into south-done.",
+          "gesture": "Click Set ward North, Retire the unit, then Set ward South.",
+          "outcome": "After Set ward North the caption reads Ward 3 and north-done reads set; after Set ward South, south-tried reads trying, south-done is empty, and the caption still reads Ward 3.",
+          "opposite": "Without Retire the unit, Set ward South leaves the caption Ward 3 and writes set into south-done.",
+          "defect": "The stopped answer gives its vendor nothing or a default and the pipeline goes on, so south-done reads set or the caption is empty (D17.12)."
+        },
+        {
+          "for": "X17.22",
+          "page": "A dose chart page with a unit tracker the app brings, whose Unit, a ReadOnly<string>, holds Ward 3 until its button Retire the unit deletes that member, and a chart the app brings that declares Caption, a Callback<CaptionArgs, string> it calls before it draws the answer as its caption; the chart's own button Redraw draws it in the chart's own turn, and the button's code shows the message of an error the draw throws in chart-error, so a throw leaves the caption it drew. The view sets Caption to the tracker's Unit.",
+          "gesture": "Click Redraw, Retire the unit, then Redraw.",
+          "outcome": "After the first Redraw the caption reads Ward 3 and chart-error is empty; after the second, chart-error shows a message and the caption still reads Ward 3.",
+          "opposite": "Without Retire the unit, the second Redraw leaves chart-error empty and the caption Ward 3.",
+          "defect": "The stopped answer returns nothing to the vendor's call in place of the throw, so the chart draws an empty caption and chart-error stays empty (D17.12)."
+        },
+        {
+          "for": "X17.23",
+          "page": "A dose chart page with two charts the app brings, each of whose declaration declares ValueOf, a Callback<AccessorArgs, string> its vendor calls with a field name first and a row second, as a value accessor is called, and draws each row's answer as that row's value. AccessorArgs declares Field, the first argument's text, and Row, Argument<DoseRow>(1), a DoseRow with a string Label and an int Doses. Both charts hold the rows Ada with 2 doses, Bea with 4 and Cy with 1, and are called with the field name doses. The view sets chart-rows' ValueOf to args => args.Row.Label and chart-fields' to args => args.Field; the page's button Draw draws both.",
+          "gesture": "Click Draw.",
+          "outcome": "chart-rows' values read Ada, Bea and Cy.",
+          "opposite": "chart-fields' values read doses, doses and doses.",
+          "defect": "The answer reads Row from the first argument, the field name, so chart-rows' values are empty (D17.4)."
+        },
+        {
+          "for": "X17.49",
+          "page": "A nurses' station page with a call bell the app brings, whose declaration names its listening with ComponentVendor.DefineCallbackProperties(\"callbell\", objectPath: \"bell\") and declares Rang, an Event<RingArgs> with a string Room, heard through the bell's onRang property; the bell's own code assigns onRang a function that appends bell to the ring log, and its button Ring room 7 rings with the room 7, each ring writing a new line into the ring log. Its button Make it throw makes its own function throw after it appends, and the bell shows the error it meets in bell-error. The page's plan has two Rang handlers, which append page-1 and page-2. Open the card loads the slot card, whose plan, when it loads, listens to the bell's Rang, reached by its element's id, appending card; the card's content holds the slot inner, loaded by Open the inner card, whose plan listens the same way, appending inner; Open the notes loads the page's slot notes, whose plan listens the same way, appending notes; Close the inner card and Close the notes unload theirs.",
+          "gesture": "Click Open the card, Open the inner card, Open the notes and Ring room 7; Close the inner card and Ring room 7; Close the notes and Ring room 7; Open the inner card and Ring room 7; Make it throw and Ring room 7.",
+          "outcome": "The ring log's lines read, in order: bell page-1 page-2 card inner notes; bell page-1 page-2 card notes; bell page-1 page-2 card; bell page-1 page-2 card inner; bell page-1 page-2 card inner, with bell-error showing the bell's throw.",
+          "opposite": "Before any slot opens, Ring room 7 writes the line bell page-1 page-2.",
+          "defect": "A listener runs twice or out of the order it subscribed, a release removes a listener other than its own, or the bell's throw skips the listeners after it, so a line differs; the redesign calls the replaced value before its listener, unguarded (Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:59 at 65fdf118d), so the last line reads bell."
+        },
+        {
+          "for": "X17.50",
+          "page": "A nurses' station page with a call bell the app brings, whose declaration names its listening with ComponentVendor.DefineCallbackProperties(\"callbell\", objectPath: \"bell\") and declares Rang, an Event<RingArgs> with a string Room, heard through the bell's onRang property; the bell's own code assigns onRang a function that appends bell to the ring log, and its button Ring room 7 rings with the room 7, each ring writing a new line into the ring log. The bell's button Check the bell shows, in bell-holds, whether onRang holds its own function (own), the page script's (script) or another (other); the page's script button Replace the callback assigns onRang a function that appends script. No page handler listens to the bell. Open the card loads the slot card, whose plan, when it loads, listens to the bell's Rang, reached by its element's id, appending card; Close the card unloads it.",
+          "gesture": "Click Open the card, Check the bell and Ring room 7; Close the card, Check the bell and Ring room 7; Open the card, Replace the callback and Ring room 7; Close the card, Open the card and Ring room 7; Close the card, Check the bell and Ring room 7.",
+          "outcome": "bell-holds reads other, then own, then script; the ring log's lines read, in order: bell card; bell; script; script card; script.",
+          "opposite": "Before any slot opens, Check the bell reads own and Ring room 7 writes the line bell.",
+          "defect": "The framework writes the property again at a later listener or puts back a value over one a script assigned, so the script's function is lost at Close the card and the last line reads bell; or the script's assignment leaves the card's handler running, so the third line reads script card."
+        },
+        {
+          "for": "X17.51",
+          "page": "A nurses' station page with two call bells the app brings, bell-a and bell-b, whose declaration names its listening with ComponentVendor.DefineCallbackProperties(\"callbell\", objectPath: \"bell\") and declares Rang, an Event<RingArgs> with a string Room, heard through the bell's onRang property. Each bell's own code assigns onRang a function that appends its name, bell-a or bell-b, to the ring log, each ring writing a new line; bell-a's buttons are Ring A and Freeze A, and bell-b's Ring B and Freeze B, each Freeze freezing its bell's object. Open card A loads the slot card-a, whose plan, when it loads, listens to bell-a's Rang, reached by its element's id, appending card-a; Open card B and Close card B load and unload card-b, which listens to bell-b the same way, appending card-b. Open the notes loads the slot notes, whose button Listen to bell A runs a pipeline that writes listening into listen-tried, listens to bell-a's Rang with a pipeline that appends notes, then writes listened into listen-done.",
+          "gesture": "Click Freeze A, Open card A and Ring A; click Open the notes and Listen to bell A; click Open card B, Freeze B, Ring B, Close card B and Ring B.",
+          "outcome": "The ring log's lines read bell-a, then bell-b card-b, then bell-b; Open card A shows one console error naming bell-a and onRang, and Close card B one naming bell-b and onRang; listen-tried reads listening and listen-done is empty.",
+          "opposite": "Without Freeze A, Open card A and Ring A write the line bell-a card-a, and Listen to bell A writes listened into listen-done.",
+          "defect": "The refused assignment passes unnoticed, so card-a counts as listening and the notes' listen goes on, listen-done reading listened; or the refused put-back leaves the framework's function calling card-b's listener, so the last line reads bell-b card-b."
+        },
+        {
+          "for": "X17.52",
+          "page": "A nurses' station page with a call bell the app brings, whose declaration names its listening with ComponentVendor.DefineCallbackProperties(\"callbell\", objectPath: \"bell\") and declares Rang, an Event<RingArgs> with a string Room, heard through the bell's onRang property; the bell's own code assigns onRang a function that appends bell to the ring log, and its button Ring room 7 rings with the room 7, each ring writing a new line into the ring log, where each bell object's own function appends bell with its generation, bell 1 for the first. The page's button Restart the bell, the bell's host, destroys the bell object and puts a new one, bell 2, at bell on the same element. Open the card loads the slot card, whose plan, when it loads, listens to the bell's Rang, reached by its element's id, appending card; Close the card unloads it.",
+          "gesture": "Click Open the card, Restart the bell, Close the card and Ring room 7; then Open the card and Ring room 7.",
+          "outcome": "The ring log's lines read bell 2, then bell 2 card, and the console shows no error.",
+          "opposite": "Without Restart the bell, Open the card and Ring room 7 writes bell 1 card, and Close the card then Ring room 7 writes bell 1.",
+          "defect": "The release puts the old bell's function onto the new bell, so the first line reads bell 1; or the card's listener stays tied to the old object and the new bell is not assigned when the card opens again, so the second line reads bell 2."
+        },
+        {
+          "for": "X12.9",
+          "page": "A ward page with a bed board the app brings that raises Opened with a payload holding the bed card it opened, a component whose vendor names its element path; each card's button Mark as cleaned raises its Cleaned event. The board's button Open bed 4 opens bed 4's card and raises Opened with it, the same card at each click, and Open bed 5 does so with bed 5's card, whose button is Mark bed 5 as cleaned. The Opened handler's listen step listens to the payload's card's Cleaned with a pipeline that adds one to the page's tally and writes it into cleaned-count.",
+          "gesture": "Click Open bed 4 and Mark as cleaned; click Open bed 4 again and Mark as cleaned.",
+          "outcome": "After the first Mark as cleaned, cleaned-count reads 1; after the second, 2.",
+          "opposite": "Click Open bed 5 and Mark bed 5 as cleaned: cleaned-count reads 3.",
+          "defect": "The same card reached again adds a second listener, so the second Mark as cleaned writes 3."
+        },
+        {
+          "for": "X12.10",
+          "page": "A ward page with a bed board the app brings that stays on the page and raises Opened with the bed card it opened, whose button Mark as cleaned raises Cleaned; the board's button Open bed 4 opens bed 4's card. Open the board card loads the slot board-card, whose plan listens to the board's Opened, reached by its element's id, and in that pipeline listens to the payload's card's Cleaned with a pipeline that adds one to the page's tally and writes it into cleaned-count, an element outside the slot; Close the board card unloads it.",
+          "gesture": "Click Open the board card, Open bed 4 and Mark as cleaned; click Close the board card and Mark as cleaned.",
+          "outcome": "After the first Mark as cleaned, cleaned-count reads 1, and after the second it still reads 1.",
+          "opposite": "Without Close the board card, the second Mark as cleaned writes 2.",
+          "defect": "The listen's listener stays on the card past its owner's release, so the second Mark as cleaned writes 2."
+        },
+        {
+          "for": "X12.16",
+          "page": "A nurses' station page whose own code provides the plugin ward-clock, whose events subscribe with on and off; its button Break off makes off throw, and its button Tick raises tick. Open the card loads the slot card, whose plan's Tick handler adds one to the page's tally and writes it into ticks-heard, an element outside the slot; Close the card unloads it.",
+          "gesture": "Click Break off, Open the card, Close the card, Open the card, then Tick.",
+          "outcome": "ticks-heard reads 1.",
+          "opposite": "Without Break off, Open the card, Close the card and Tick leave ticks-heard empty.",
+          "defect": "A listener whose removal threw still runs, since it was not marked released before its removal, so ticks-heard reads 2."
+        }
+      ],
+      "verdicts": []
+    },
+    {
+      "id": "M12.F2",
+      "summary": "A component on the page: Component, the base of a component's declaration, a live object whose listening is its vendor's; IComponent, carrying the ComponentVendor a declaration names; plan.Render<TComponent>(id, markup), which writes the markup a render helper gives, and RenderedComponent's Reactive, a handler of a declared event from the plan's start, which names the element as that declaration's component in the plan; and pipeline.Component<TComponent>(id), the component on the element of that id, typed by its declaration. An element holds one component in a plan, and a handler whose element holds no object when its plan starts does not start and stops no other. Main's IComponent names its vendor by a string its runtime picks a driver by, and main reaches a component through ComponentRef, whose writes and calls are internal; the redesign carries the vendor as data and reaches a component as its declaration.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:Component",
+        "Alis.Reactive:IComponent",
+        "Alis.Reactive:RenderedComponent<TComponent, TModel>",
+        "Alis.Reactive:ComponentRef<TComponent, TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent>(string! refId) -> ComponentRef<TComponent, TModel!>!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent>(string! refId) -> TComponent!",
+        "Alis.Reactive:ReactivePlan<TModel>.Render<TComponent>(string! elementId, Microsoft.AspNetCore.Html.IHtmlContent! markup) -> RenderedComponent<TComponent, TModel!>!",
+        "Alis.Reactive:ReactivePlan<TModel>.Render<TComponent>(string! elementId, System.Web.IHtmlString! markup) -> RenderedComponent<TComponent, TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "redesign",
+          "text": "ComponentVendor Vendor { get; }",
+          "cite": "Alis.Reactive/Components/IComponent.cs:9"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class RenderedComponent<TComponent, TModel>",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:36"
+        },
+        {
+          "line": "redesign",
+          "text": "public RenderedComponent<TComponent, TModel> Reactive<TArgs>(",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:79"
+        },
+        {
+          "line": "redesign",
+          "text": "context.DeclareComponent(_componentId, Declaration.Vendor);",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:94"
+        },
+        {
+          "line": "redesign",
+          "text": "context.On(objects => objects.Element(_componentId), declaredEvent.ObjectPath, declaredEvent.Name, body);",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:95"
+        },
+        {
+          "line": "redesign",
+          "text": "public RenderedComponent<TComponent, TModel> Reactive(",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:103"
+        },
+        {
+          "line": "redesign",
+          "text": "public RenderedComponent<TComponent, TModel> Render<TComponent>(",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:68"
+        },
+        {
+          "line": "redesign",
+          "text": "return new RenderedComponent<TComponent, TModel>(this, elementId, markup);",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:80"
+        },
+        {
+          "line": "redesign",
+          "text": "public TComponent Component<TComponent>(string refId)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:168"
+        },
+        {
+          "line": "redesign",
+          "text": "=> Live<TComponent>(refId);",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:170"
+        },
+        {
+          "line": "redesign",
+          "text": "$\"'{vendor.Name}', but an element holds one component: name it by the declaration of the component its view renders.\");",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:129"
+        },
+        {
+          "line": "redesign",
+          "text": "if (!element) throw new Error(`[alis] #${locator.id} is not on the page`);",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:55"
+        },
+        {
+          "line": "main",
+          "text": "string Vendor { get; }",
+          "cite": "Alis.Reactive/Components/Contracts/IComponent.cs:9"
+        },
+        {
+          "line": "main",
+          "text": "public class ComponentRef<TComponent, TModel>",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:11"
+        },
+        {
+          "line": "main",
+          "text": "Pipeline.AddStep(ReactionGraph.Set(",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:39"
+        },
+        {
+          "line": "main",
+          "text": "ComponentSource.Of(componentKey), property.Member, value));",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:40"
+        },
+        {
+          "line": "main",
+          "text": "public ComponentRef<TComponent, TModel> Component<TComponent>(string refId)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:127"
+        },
+        {
+          "line": "main",
+          "text": "return new ComponentRef<TComponent, TModel>(refId, this);",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:130"
+        },
+        {
+          "line": "proposed",
+          "text": "public sealed class DoseTimer : Component { public override ComponentVendor Vendor => ComponentVendor.Define(\"dosetimer\", \"timer\", \"on\", \"off\"); }",
+          "doors": [
+            "M12.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "p.Component<DoseTimer>(\"dose-timer\").Restart();",
+          "doors": [
+            "M12.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "plan.Render<DoseTimer>(\"dose-timer\", Html.Partial(\"_DoseTimer\")).Reactive(t => t.Elapsed, (elapsed, p) => p.Element(\"elapsed-for\").Text.Set(elapsed.Read(e => e.Resident)));",
+          "doors": [
+            "M12.N3",
+            "N5.6"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "listen"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/Component.cs:21-24"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/IComponent.cs:9"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/RenderedComponent.cs:36-117"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:68-80"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:168-170"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:120-136"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Components/Contracts/ComponentRef.cs:11-65"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:127-130"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-55"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:44-52"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q12",
+        "Q4",
+        "Q14"
+      ],
+      "meanings": [
+        {
+          "id": "M12.D2",
+          "meaning": "A handler of a component's event subscribes when its plan's owner starts, after alis:mount has announced the content that owner covers, at boot and at a slot's load alike. A handler whose element the page lacks, or whose element holds no object at its vendor's place, does not start and never starts later: the console shows one error naming the element and its vendor, and the plan's other handlers subscribe. A step that reaches that element when it runs finds the object then, and stops only its own pipeline when it is still missing (D4.1)."
+        }
+      ],
+      "oracle": "ASP.NET Core's IHtmlContent and MVC 5's IHtmlString, through which a view writes a component's markup, and the DOM Standard's getElementById, by which the runtime finds a component's element.",
+      "checker": [
+        "core:Q17",
+        "core:Q12",
+        "Ownership.tla:NoUnsubscribeOnDestroyed",
+        "Ownership.tla:NoRemoveOnDestroyedListened",
+        "Ownership.tla:ListenersDoNotAccumulate",
+        "Absence.tla:RequiredAbsentStops",
+        "Absence.tla:StopEndsOnlyItsHandler"
+      ],
+      "defects": [
+        {
+          "id": "X17.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X12.13",
+          "rung": "behavior"
+        },
+        {
+          "id": "M12.X2",
+          "rung": "refusal",
+          "defect": "An element a plan names as the component of two vendors renders, so the plan finds one element's object by two vendors' places and listenings. Where the view renders it is refused with \"Element '{id}' is named as a component of vendor '{first}' and as one of vendor '{second}', but an element holds one component: name it by the declaration of the component its view renders.\" (Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:128-129 at 65fdf118d)."
+        },
+        {
+          "id": "M12.X4",
+          "rung": "behavior",
+          "defect": "A handler whose element holds no object when its plan starts stops the plan's other handlers from subscribing, subscribes later to an object built after the start, or fails with no error naming it (M12.D2)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.4",
+          "page": "A medication room page with a dose timer the app brings: its declaration, its render helper and its browser code are the app's own, and its code builds the timer on alis:mount. The timer shows its minutes and declares Minutes, a Property<int> that starts at 30; Restart(), a Method that sets the minutes back to 30; and Elapsed, an Event<TimerElapsed> with a string Resident, which the timer's button Let it elapse raises for the resident Ada. Read the minutes writes Minutes into minutes-read; Set 15 minutes writes 15 into Minutes; Restart calls Restart(); the Elapsed handler writes the payload's Resident into elapsed-for.",
+          "gesture": "Click Set 15 minutes and Read the minutes; click Restart and Read the minutes; click Let it elapse.",
+          "outcome": "After the first Read the minutes, minutes-read reads 15 and the timer shows 15; after the second, minutes-read reads 30 and the timer shows 30; after Let it elapse, elapsed-for reads Ada.",
+          "opposite": "Before any click, the timer shows 30, and minutes-read and elapsed-for are empty.",
+          "defect": "A step reaches only a component the framework's packages onboard, as main's runtime holds drivers for native and fusion alone (Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89-90 at 623dd4a27), so minutes-read, the timer's minutes or elapsed-for stays as it was."
+        },
+        {
+          "for": "X12.7",
+          "page": "A ward page whose slot bed-panel, loaded by Open the panel and unloaded by Close the panel, renders a bed monitor the app brings, which its code builds on alis:mount, and a text alarm-heard inside the panel; the panel's plan has the monitor's Alarmed handler, which writes alarm into alarm-heard. The monitor's button Sound the alarm raises Alarmed, and its button Shut down destroys it and takes it off its element.",
+          "gesture": "Click Open the panel, Shut down, Close the panel, Open the panel, then Sound the alarm.",
+          "outcome": "alarm-heard reads alarm, and the console shows no error.",
+          "opposite": "In the first panel, before Shut down, Sound the alarm writes alarm into alarm-heard as well.",
+          "defect": "The release calls the destroyed monitor's unsubscribe, which throws, so the console shows an error, or the error stops the next load, so the new panel's alarm-heard stays empty."
+        },
+        {
+          "for": "X12.13",
+          "page": "A ward page whose slot bed-card, loaded by Open the card and unloaded by Close the card, renders a bed monitor the app brings; the card's plan has the monitor's Alarmed handler, which adds one to the page's tally and writes it into alarms-heard, an element outside the slot. The monitor's button Sound the alarm raises Alarmed, and its button Restart, the monitor's host, destroys it and puts a new monitor on the same element; every monitor's unsubscribe adds one to the page's count of calls in off-calls, and a monitor's destroy, by Restart or on alis:unmount, calls no unsubscribe.",
+          "gesture": "Click Open the card, Sound the alarm, Restart, Sound the alarm, then Close the card.",
+          "outcome": "alarms-heard reads 1, and off-calls reads 0 after Close the card.",
+          "opposite": "Without Restart, Close the card writes 1 into off-calls.",
+          "defect": "The handler follows the element to the new object, so alarms-heard reads 2; or the release calls the unsubscribe of the object the element holds now, so off-calls reads 1."
+        },
+        {
+          "for": "M12.X2",
+          "page": "A ward page that renders the bed monitor bed-4, whose plan's button Quiet the bed runs a pipeline that calls Silence() on bed-4 reached through the bed monitor's declaration, of the vendor monitor, then writes 1 into the Level of bed-4 reached through the oxygen gauge's declaration, of the vendor oxygengauge.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"Element 'bed-4' is named as a component of vendor 'monitor' and as one of vendor 'oxygengauge', but an element holds one component: name it by the declaration of the component its view renders.\"",
+          "opposite": "With both steps reaching bed-4 through the monitor's declaration, the page renders and Quiet the bed silences the monitor.",
+          "defect": "Both vendors are written, so the page renders and each step finds bed-4 by its own declaration's vendor, one of them reading what the monitor is not.",
+          "existing_test": "redesign WhenAVendorIsDeclaredWrongly.an_element_named_as_the_components_of_two_vendors_is_refused"
+        },
+        {
+          "for": "M12.X4",
+          "page": "A medication room page with a dose timer the app brings, whose code builds it only when the page's button Build the timer is clicked; the page's plan has the timer's Elapsed handler, which writes elapsed into elapsed-heard, and the button Say hello, which writes hello into greeting. A built timer's button Let it elapse raises Elapsed.",
+          "gesture": "Click Say hello; then click Build the timer and Let it elapse.",
+          "outcome": "greeting reads hello and the console shows one error naming the timer's element and its vendor; after Let it elapse, elapsed-heard is empty.",
+          "opposite": "On the same page with the timer built on alis:mount, Let it elapse writes elapsed into elapsed-heard.",
+          "defect": "The missing object stops every handler of the plan from subscribing, so greeting stays empty; or the handler subscribes at a later step, so elapsed-heard reads elapsed; or no error names the handler.",
+          "existing_test": "redesign WhenAComponentIsNotBuiltYet.a_handler_of_a_component_not_built_yet_stops_no_other_handler_from_listening"
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "ComponentRef<TComponent, TModel>",
+          "verdict": "refused",
+          "reason": "A reach whose writes and calls are internal, EmitSet and EmitCall over a member named as a string (Alis.Reactive/Components/Contracts/ComponentRef.cs:31-65 at 623dd4a27), so only the framework's packages declare what a step does on a component, and a component an app brings has no door. The rewrite reaches a component as its declaration (M12.N2), whose members a step reads with Read (N5.6) and calls with any number of arguments (N5.3).",
+          "carriers": [
+            "M12.N2",
+            "N5.3",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "IComponent.Vendor.get -> string!",
+          "verdict": "refused",
+          "reason": "A vendor named by a string the runtime picks a driver by, native or fusion (Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89-90 at 623dd4a27), so the runtime names each vendor it serves. The rewrite carries the vendor as data the one driver follows (D17.3): IComponent.Vendor is the ComponentVendor a declaration names (M12.N1).",
+          "carriers": [
+            "M12.N1"
+          ]
+        },
+        {
+          "door": "PipelineBuilder<TModel>.Component<TComponent>(string! refId) -> ComponentRef<TComponent, TModel!>!",
+          "verdict": "kept",
+          "as": [
+            "M12.N2"
+          ]
+        }
+      ]
+    }
+  ]
+}

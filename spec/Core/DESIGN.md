@@ -27,9 +27,9 @@ Terms used throughout:
 - D1.2 In plan JSON a member is a JSON string, an index is a non-negative JSON integer, and each is the object
   `{"kind":"each"}`. A string is a member name whatever its text: `"[]"`, `"[*]"`, `"*"` and `"0"` are member
   names, never markers.
-- D1.3 Every path the plan carries uses this step: `get`, `call` and `set` paths, a handler's path, a
-  vendor's object path, an input binding's body path, a registration field's path, and the member paths of a
-  request.
+- D1.3 Every path the plan carries uses this step: `get`, `call` and `set` paths, a handler's path, the path a vendor's
+  `locate` reads from its element (D17.3), an input binding's body path, a registration field's path, and the member
+  paths of a request.
 - D1.4 A dictionary entry is a member step whose name is the key's text as System.Text.Json writes the key
   as a property name. A dictionary whose key type System.Text.Json writes no property name for is refused
   where the view renders.
@@ -50,7 +50,7 @@ Terms used throughout:
 - D1.8 The member names in a path are the wire names of Q2 for the host the view renders on.
 
 **Schema nodes.** `PathStep` (a string, an integer, or `each`) in `get`, `call`, `set`, `Handler.path`,
-`Vendor.objectPath`, `InputBinding.path`, `FormField.path` and the request argument's member paths (Q9).
+`Vendor.locate`, `InputBinding.path`, `RuleField.path` and the request argument's member paths (Q9).
 
 **Checker.**
 - `probe:mvc5-sub-index-name`
@@ -2846,19 +2846,19 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   (`EveryOwnerReleasedPastAThrow`), a raise running no listener whose removal threw (`ThrownListenerRunsNothing`),
   and the content replaced (`StepReplacesTheContent`). That the step stops after a release that met a throw, and that
   its `Finally` runs once, are browser promises (X12.15, X12.17), since no spec models a release inside a run.
-- D12.5 Release removes exactly what the owner holds, and nothing another owner holds. A listener is removed
-  only while its element still holds, at the vendor's object path, the object the listener was added to. A
-  component its host destroyed took its listeners with it, and the owner calls nothing on it. EJ2's destroy
-  takes the component off its element (`probe:ej2-destroy-removes-instance`), so the rule names no vendor.
-  Main's check of Syncfusion's `isDestroyed` in the runtime is refused for that reason. A handler holds the object
-  it subscribed to when its plan started (D12.4), so after a restart (its host destroys the component and puts a
-  new object at the vendor's object path on the same element) the new object hears none of the plan's handlers,
-  and the release calls nothing on it. A `listen` step that reaches the new object adds its own listener, as for
-  any other object (D12.8). An element that no longer holds the object a handler subscribed to is read as one whose
-  host destroyed that object, listeners and all. A listener is marked released before its removal runs, so one whose
-  removal threw, which its vendor still holds, runs nothing when its object raises, and a callback property whose
-  put-back threw keeps the framework's function, which calls the value it replaced and no listener (D17.3). A check that throws is that listener's error, and its removal
-  is not called.
+- D12.5 Release removes exactly what the owner holds, and nothing another owner holds. A listener is removed only while
+  its element still holds, where the vendor's `locate` finds it (D17.3), the object the listener was added to. A
+  component its host destroyed took its listeners with it, and the owner calls nothing on it. EJ2's destroy takes the
+  component off its element (`probe:ej2-destroy-removes-instance`), so the rule names no vendor. Main's check of
+  Syncfusion's `isDestroyed` in the runtime is refused for that reason. A handler holds the object it subscribed to when
+  its plan started (D12.4), so after a restart (its host destroys the component and puts a new object where the vendor's
+  `locate` finds it on the same element) the new object hears none of the plan's handlers, and the release calls nothing
+  on it. A `listen` step that reaches the new object adds its own listener, as for any other object (D12.8). An element
+  that no longer holds the object a handler subscribed to is read as one whose host destroyed that object, listeners and
+  all. A listener is marked released before its removal runs, so one whose removal threw, which its vendor still holds,
+  runs nothing when its object raises, and a callback property whose put-back threw keeps the framework's function,
+  which calls the value it replaced and no listener (D17.3). A check that throws is that listener's error, and its
+  removal is not called.
 - D12.6 A hub or a stream is held by every owner whose plans name it. The connection opens at the first hold
   and closes at the last release, and its retry offer goes with it. A step reaches only a held connection.
 - D12.7 Live validation is one capture-phase listener per page. An input an event reaches is checked by the
@@ -2884,16 +2884,16 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     whatever the pipeline around it awaited;
   - is refused where the view renders on an object declared optional or nullable: a listen needs its object when
     the step runs;
-  - on a component an event's payload is or holds, is removed at release only while the element the component held
-    when the step listened still holds it at the vendor's object path, D12.5's rule: the vendor names where its object
-    holds its element (D17.3), the step reads that element when it listens and holds it weakly beside the object and
-    the listener, and a host that destroyed or restarted the component took the listener with it. A vendor whose
+  - on a component an event's payload is or holds, is removed at release only while the element the component held when
+    the step listened still holds it where the vendor's `locate` finds it, D12.5's rule: the vendor names where its
+    object holds its element (D17.3), the step reads that element when it listens and holds it weakly beside the object
+    and the listener, and a host that destroyed or restarted the component took the listener with it. A vendor whose
     destroy clears the element (Chart.js nulls its canvas) changes nothing, since the release never reads it again;
-  - on a component reached by its element's id is the door a slot's plan has to a component the page rendered (gate
-    1's P5): the step holds that element weakly beside the object and the listener, and the release removes the
-    listener only while the element still holds the object at the vendor's object path, D12.5's rule, so its vendor
-    needs no element path. A plan hears a component it renders with `.Reactive` from the plan's start; a `listen`
-    on it starts when its step runs and leaves at its owner's release, the page's included (X12.14);
+  - on a component reached by its element's id is the door a slot's plan has to a component the page rendered (gate 1's
+    P5): the step holds that element weakly beside the object and the listener, and the release removes the listener
+    only while the element still holds the object where the vendor's `locate` finds it, D12.5's rule, so its vendor
+    needs no element path. A plan hears a component it renders with `.Reactive` from the plan's start; a `listen` on it
+    starts when its step runs and leaves at its owner's release, the page's included (X12.14);
   - is refused where the view renders on a component a payload or a returned object hands over whose vendor names no
     element path, since its release could not tell a destroyed component from a living one;
   - stops the pipeline the step is in when its object lacks a listening member (a subscribe or an unsubscribe, a
@@ -4168,8 +4168,8 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     writes (D12) and an entry's element is the row's control, not its row; the use case is a row re-rendered from the
     response's partial. Until it has a door, a view reloads the list with a chained GET `Into` its container.
 
-**Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its object path and its listening kind;
-`Handler`, which names its event and carries its payload kind, since the vendors map is shared by name across
+**Schema nodes.** The plan's `vendors` map, one `Vendor` per name, holding its `locate` and its listening kind;
+`Handler`, which names its event and carries its payload's path, since the vendors map is shared by name across
 plans (Q19).
 
 **Checker.**
@@ -4193,8 +4193,8 @@ plans (Q19).
 
 **Doors.**
 - kept: `ComponentVendor.Define`, `ComponentVendor.DefineCallbackProperties`, `ComponentVendor.Native`,
-  `ComponentVendor.Name`, `VendorEventPayload`, and the declaration vocabulary of `JsObject` (`Method`,
-  `MethodAsync`, properties, events).
+  `ComponentVendor.Name`, and the declaration vocabulary of `JsObject` (`Method`, `MethodAsync`, properties,
+  events); `VendorEventPayload` leaves for N17.1's path (D17.4).
 - `N17.1` new: the payload's place in its listener's arguments, declared with the event (D17.4); its form goes to
   gate 2.
 - `N17.6` new: a vendor's lookup, a plugin called with the element, beside the path from the element (D17.3):
@@ -4255,7 +4255,7 @@ plans (Q19).
   public methods declare one (`probe:ej2-methods-returning-promise`).
 - B16: only the meta-package is exact (`Alis.Reactive.SandboxApp/package.json:25`); its sub-packages follow tilde
   ranges (`package-lock.json:1717-1726`), so `ej2-base` resolves to 33.1.45 under 33.1.47.
-- A regular expression checks a vendor's name (`Alis.Reactive/Vendors/ComponentVendor.cs:10-11`).
+- A regular expression checks a vendor's name (`Alis.Reactive/Vendors/ComponentVendor.cs:33-34`).
 - Both lines write a whole plan for each action link: main serializes the plan into each anchor's payload
   (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:45`), and the redesign renders a plan per
   link (`Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:108`). Main refuses validation, Parallel,
@@ -4560,7 +4560,7 @@ plans (Q19).
     is a namespace and a folder (the owner, 2026-11-06). ALIS014 to ALIS029 are the POC's, each at its own line.
 
 **Schema nodes.** None: type knowledge lives in C#, and the plan carries only what it decides: JSON names,
-shapes, starts and the payload kind of each event.
+shapes, starts and the payload's path of each event.
 
 **Checker.**
 - `probe:core-stj-empty-object-start`
@@ -4614,8 +4614,9 @@ shapes, starts and the payload kind of each event.
   GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
   `Inputs`, `Input` or a header (D17.15).
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
-  dot (D17.3, D17.14), and an argument at a position on a declaration that is neither an event's payload nor a
-  callback's arguments (D17.4).
+  dot (D17.3, D17.14), an argument at a position on a declaration that is neither an event's payload nor a
+  callback's arguments (D17.4), two constant definitions of one vendor name whose data differ in one compilation
+  (M12.D1, M12.X1), and a constant object path or element path with an empty step (M12.X3).
 
 **Evidence.**
 - Three item-type finders (`Alis.Reactive/Inputs/FieldReference.cs:50-58`, `Alis.Reactive/Members/ClrShape.cs:82-90`,
@@ -4668,12 +4669,12 @@ shapes, starts and the payload kind of each event.
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).
 - D19.4 C# declares no enum (schema.md S8). A closed choice with no data is a sealed class with a private constructor
-  and one static instance per case, written as its text; a choice whose cases carry data is a kind. `Operator`,
-  `PathMembers` and the public `VendorEventPayload` become such classes.
+  and one static instance per case, written as its text; a choice whose cases carry data is a kind. `Operator`
+  and `PathMembers` become such classes; the public `VendorEventPayload` leaves for N17.1's path (D17.4).
 - D19.5 Every kind has exactly one handler. The switch that picks a default by shape leaves, since C# writes each
   input's blank (D3.6, N3.3), and the object locator's two switches become one switch that returns the locator's
   driver (G1).
-- D19.6 A handler carries its payload kind (D17.4), and the vendor does not: the vendors map is shared by name across
+- D19.6 A handler carries its payload's path (D17.4), and the vendor does not: the vendors map is shared by name across
   plans, so two plans that listen to different events of one component, read differently, agree on the vendor.
 - D19.7 The form plugin's data is one registration, one validator under one rule set and keyed by both, holding the
   model's start, the bound scalars, objects and lists of D16.6 and D16.7, and a rule tree whose groups follow the
@@ -4706,8 +4707,8 @@ shapes, starts and the payload kind of each event.
 Each Schema.tla invariant is the browser's need, and each mutant drops the one refusal of the C# writer that serves it.
 
 **Doors.**
-- `N19.1` new: the sealed choice classes of D19.4 in `Alis.Reactive/Grammar`, replacing `Operator`, `PathMembers` and
-  `VendorEventPayload`; the public payload class has the cases `Argument`, `Event` and `Detail` of D17.4.
+- `N19.1` new: the sealed choice classes of D19.4 in `Alis.Reactive/Grammar`, replacing `Operator` and
+  `PathMembers`; `VendorEventPayload` leaves for N17.1's path (D17.4).
 - `N19.2` new: `Registration`, `BoundScalar`, `BoundObject`, `BoundList`, `RuleGroup`, `RuleField`, `RuleTest` and
   `Container` in `Alis.Reactive/Grammar/PlanDocument.cs`, replacing `FormField` and `FormTest`; they carry N16.2.
 - `N19.3` new: `Culture`, `NumberText`, the time zone kinds and the trace kinds, as `PlanDocument`'s fields.
@@ -4725,7 +4726,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   `Alis.Reactive/Grammar/PlanDocument.cs:184-187`.
 
 **Defects.**
-- `X19.1` type: an operator, a path's members or a payload kind made from an integer does not compile: new:N19.1.
+- `X19.1` type: an operator or a path's members made from an integer does not compile: new:N19.1.
 - `X19.2` type: a grammar node built with a field left out does not compile, since each constructor takes every field
   and none is nullable: new:N19.3.
 - `X19.3` refusal: a plan of version 6 is refused at boot with "This plan was written for plan version 6; this page
