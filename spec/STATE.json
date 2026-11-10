@@ -1400,7 +1400,7 @@
     },
     "module_cites": {
       "counts": {
-        "cites": 691,
+        "cites": 692,
         "unresolved": 0
       },
       "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
@@ -3383,7 +3383,7 @@
     }
   },
   "passed": 15,
-  "read_at_head": "b39db70fa4d27375b4f4fdbe80958e48f44f2aaa",
+  "read_at_head": "6524474f5b3d541f517b6f662f995afd406bb2f4",
   "step": {
     "failing": [
       "doors_mapped",
