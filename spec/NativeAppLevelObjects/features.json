@@ -1,0 +1,1465 @@
+{
+  "module": "NativeAppLevelObjects",
+  "features": [
+    {
+      "id": "M25.F1",
+      "summary": "The page's drawer: NativeDrawer, one per page, rendered once in the layout and reached with no id, with Open(), Close(), Size and the BeforeClose event, whose payload's ClosedBy says what is closing it and whose Cancel keeps it open, so the view decides each close, Escape in a form included; its heading and its content load by their fixed ids. Main sizes, opens and closes it by extension methods that write classes and attributes onto the element and keeps it open on Escape by a class a pipeline adds; the redesign declares the members its drawer code writes on the element and raises BeforeClose before each close. On both lines the drawer resets its content, heading and size only on transitionend, which a page whose CSS runs no transition never fires, and the redesign's size then reads text no DrawerSize names.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:DrawerClosedBy",
+        "Alis.Reactive.Native:DrawerSize",
+        "Alis.Reactive.Native:NativeDrawer",
+        "Alis.Reactive.Native:NativeDrawerBeforeCloseArgs",
+        "Alis.Reactive.Native:NativeDrawerExtensions",
+        "Alis.Reactive.Native:NativeDrawerHtmlExtensions"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public sealed class NativeDrawer : NativeComponent, IAppLevelComponent",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawer.cs:12"
+        },
+        {
+          "line": "main",
+          "text": "public const string ElementId = \"alis-drawer\";",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawer.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "public static ComponentRef<NativeDrawer, TModel> SetSize<TModel>(",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawerExtensions.cs:33"
+        },
+        {
+          "line": "main",
+          "text": "public static ComponentRef<NativeDrawer, TModel> KeepOpenOnEscape<TModel>(",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawerExtensions.cs:62"
+        },
+        {
+          "line": "main",
+          "text": "p.Component<NativeDrawer>().SetSize(DrawerSize.Md).KeepOpenOnEscape();",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/StaffTraining.cshtml:38"
+        },
+        {
+          "line": "main",
+          "text": "document.addEventListener(\"keydown\", (e: KeyboardEvent) => closeOnEscape(container, e));",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/drawer.ts:40"
+        },
+        {
+          "line": "main",
+          "text": "container.addEventListener(\"transitionend\", () => resetOnceClosed(container));",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/drawer.ts:41"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<DrawerSize> Size => Property<DrawerSize>();",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawer.cs:41"
+        },
+        {
+          "line": "redesign",
+          "text": "public Event<NativeDrawerBeforeCloseArgs> BeforeClose => Event<NativeDrawerBeforeCloseArgs>();",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawer.cs:51"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<bool> Cancel => Property<bool>();",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawer.cs:61"
+        },
+        {
+          "line": "redesign",
+          "text": "plan.Component<NativeDrawer>().Reactive(evt => evt.BeforeClose, (args, p) =>",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_StaffTrainingPartial.cshtml:8"
+        },
+        {
+          "line": "redesign",
+          "text": "p.When(args.ClosedBy).Eq(DrawerClosedBy.Escape).Then(_ => args.Cancel.Set(true))",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_StaffTrainingPartial.cshtml:9"
+        },
+        {
+          "line": "redesign",
+          "text": "p.Component<NativeDrawer>().Size.Set(DrawerSize.Md);",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/IncidentReport.cshtml:25"
+        },
+        {
+          "line": "redesign",
+          "text": "return SIZES.find(size => container.classList.contains(sizeClass(size))) ?? \"\";",
+          "cite": "Alis.Reactive.Assets/components/native/drawer.ts:33"
+        },
+        {
+          "line": "redesign",
+          "text": "if (event.key === \"Escape\") close(container, \"escape\");",
+          "cite": "Alis.Reactive.Assets/components/native/drawer.ts:74"
+        },
+        {
+          "line": "redesign",
+          "text": "container.addEventListener(\"transitionend\", () => {",
+          "cite": "Alis.Reactive.Assets/components/native/drawer.ts:77"
+        },
+        {
+          "line": "proposed",
+          "text": "var drawer = pipeline.Component<NativeDrawer>(); drawer.Size.Set(DrawerSize.Lg); drawer.Open();",
+          "doors": [
+            "M25.N1",
+            "M25.N6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "plan.Component<NativeDrawer>().Reactive(drawer => drawer.BeforeClose, (closing, pipeline) => pipeline.When(closing.ClosedBy).Eq(DrawerClosedBy.Escape).Then(kept => closing.Cancel.Set(true)));",
+          "doors": [
+            "M25.N1",
+            "M25.N6",
+            "M12.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Element(NativeDrawer.TitleId).Text.Set(\"Care notes\"); pipeline.Get<NotesQuery>(\"/Residents/{residentId}/Notes\", query => query.Set(q => q.ResidentId, 7)).Into(NativeDrawer.ContentId);",
+          "doors": [
+            "M25.N1",
+            "M5.N1",
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "plan.Component<NativeDrawer>().Reactive(drawer => drawer.Closed, pipeline => pipeline.Unload(NativeDrawer.ContentId));",
+          "doors": [
+            "M25.N1",
+            "M25.N6",
+            "M12.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "@Html.NativeDrawer(closeText: \"Close\") renders the drawer once in the layout, its close button holding the app's text.",
+          "doors": [
+            "M25.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Main's SetSize, Open and Close are Size, Open() and Close() on the declaration the reach with no id returns, and its KeepOpenOnEscape is a BeforeClose handler that writes Cancel when ClosedBy is Escape, in the partial that holds the form, so it lasts while that partial is in the drawer.",
+          "doors": [
+            "M25.N1",
+            "M25.N6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A handler that asks before the drawer closes writes Cancel first, then asks, then calls Close() on yes, since a write to the payload after an await reaches no drawer (D11.4).",
+          "doors": [
+            "M25.N1",
+            "M25.N4",
+            "N17.3",
+            "N11.2"
+          ]
+        }
+      ],
+      "nodes": [
+        "call",
+        "set",
+        "get",
+        "on",
+        "if",
+        "let",
+        "element",
+        "lit",
+        "string",
+        "boolean"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawer.cs:12-21"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawerExtensions.cs:15-127"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/DrawerSize.cs:6-16"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeDrawer/NativeDrawer.cs:32-121"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/drawer.ts:10-44"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/native/drawer.ts:19-82"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-16"
+        }
+      ],
+      "core": [
+        "Q11",
+        "Q17",
+        "Q12",
+        "Q5",
+        "Q4",
+        "Q3"
+      ],
+      "meanings": [
+        {
+          "id": "M25.D1",
+          "meaning": "NativeDrawer is the page's one drawer, the page's object and no slot's (D13.1). Html.NativeDrawer(closeText) renders an aside with the id alis-drawer, the class alis-drawer, aria-labelledby alis-drawer-title and aria-hidden true, holding an h2 with the id alis-drawer-title, a button of type button with the id alis-drawer-close and the app's close text, and a div with the id alis-drawer-content, with no style, no icon and the size class alis-drawer--md. The drawer code, on alis:mount, writes open(), close() and size on the element and raises beforeClose as a CustomEvent whose detail is the payload {closedBy, cancel}, as the redesign's does (Alis.Reactive.Assets/components/native/drawer.ts:24-51 at 65fdf118d). Open adds alis-drawer--visible and removes aria-hidden. Escape pressed on the page, the close button and close() on an open drawer each raise BeforeClose with ClosedBy escape, closeButton or close and Cancel false; a handler that writes Cancel true before its first await keeps it open (D11.4). A close that no handler cancels removes alis-drawer--visible and resets the drawer's own state in the same turn, whatever the app's CSS animates (M25.X1): aria-hidden returns to true, the size to md and the heading's text to nothing, and the drawer raises Closed. Its content is a slot, which only a load or an unload releases (D12.4), so the drawer code empties no content: the view that loads a partial into the drawer unloads it with Unload(NativeDrawer.ContentId) in a handler of Closed, or its next Into replaces it, releasing the partial's handlers either way. Size reads md from the render and after each reset, so a read of Size always names a DrawerSize (M25.X2), each written as its JSON name sm, md or lg. An Escape that a confirm keeps at its dialog never reaches the drawer (X17.7). NativeDrawer.TitleId and NativeDrawer.ContentId name the heading's and the content's ids, so a view writes no id of the drawer as text."
+        }
+      ],
+      "oracle": "The DOM, as lib.dom types it in TypeScript 5.9.3: HTMLElement's classList, setAttribute, removeAttribute and textContent, EventTarget.dispatchEvent with a CustomEvent whose detail is the payload, and KeyboardEvent.key; and Chromium's transitionend, which fires only where a CSS transition runs (probe:dom-transitionend-needs-a-transition, spec/probes/dom-native-m25.mjs, Playwright 1.63.0).",
+      "checker": [
+        "core:Q11",
+        "core:Q17",
+        "core:Q12",
+        "Run.tla:WritesAfterTheTurnAreRefused",
+        "Ownership.tla:ListenLeavesWithItsOwner"
+      ],
+      "defects": [
+        {
+          "id": "M25.X1",
+          "rung": "behavior",
+          "defect": "Both lines reset the drawer's content, heading, size and aria-hidden only on transitionend (Alis.Reactive.Assets/runtime/components/native/drawer.ts:41 at 623dd4a27, Alis.Reactive.Assets/components/native/drawer.ts:77-81 at 65fdf118d), which fires only where a CSS transition runs (probe:dom-transitionend-needs-a-transition). The rewrite ships no style (D17.10), so on a page whose CSS runs no transition on the drawer a closed drawer keeps its heading and size, and the redesign keeps its partial, whose handlers stay live, and reopens showing it; the rewrite resets the drawer's own state and raises Closed in the close's own turn (M25.D1, M25.N1)."
+        },
+        {
+          "id": "M25.X2",
+          "rung": "behavior",
+          "defect": "The redesign's reset removes every size class (Alis.Reactive.Assets/components/native/drawer.ts:55 at 65fdf118d) and its size then reads \"\" (Alis.Reactive.Assets/components/native/drawer.ts:33 at 65fdf118d), text no DrawerSize names, so a read of Size after a close converts to nothing and an element set from it shows nothing (D3's failed conversion). The rewrite's drawer holds md from the render and after each reset (M25.D1, M25.N1)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M25.X1",
+          "page": "A notes page whose stylesheet gives the drawer no transition, rendering Html.NativeDrawer(\"Close\"). Open notes sets the drawer's heading to Care notes, loads a partial into its content that shows Ada's notes, and opens the drawer; the page's plan unloads the drawer's content on Closed; Open empty opens the drawer and loads nothing.",
+          "gesture": "Click Open notes, click the drawer's Close button, then click Open empty.",
+          "outcome": "The drawer shows with an empty heading and an empty content, no note of Ada's in it.",
+          "opposite": "The same page whose stylesheet gives the drawer's panel a 50 ms transform transition: after the same clicks the drawer shows an empty heading and an empty content too.",
+          "defect": "Both lines reset only on transitionend (Alis.Reactive.Assets/components/native/drawer.ts:77-81 at 65fdf118d), so with no transition the drawer reopens with Care notes and Ada's notes; a drawer that raised Closed only on transitionend would leave the page's Unload unrun."
+        },
+        {
+          "for": "M25.X2",
+          "page": "A drawer page with Open wide, which sets the drawer's Size to Lg and opens it, and Read size, which sets size-read's text to the drawer's Size.",
+          "gesture": "Click Open wide, click the drawer's Close button, then click Read size.",
+          "outcome": "size-read reads md.",
+          "opposite": "Click Open wide and then Read size, with the drawer open: size-read reads lg.",
+          "defect": "The redesign's size reads \"\" once its reset removed the size classes (Alis.Reactive.Assets/components/native/drawer.ts:33 at 65fdf118d), which no DrawerSize names, so size-read stays empty."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "NativeDrawerExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M25.N1"
+          ]
+        },
+        {
+          "door": "static NativeDrawerExtensions.Close<TModel>(this ComponentRef<NativeDrawer!, TModel!>! self) -> ComponentRef<NativeDrawer!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N1",
+            "M25.N6"
+          ]
+        },
+        {
+          "door": "static NativeDrawerExtensions.KeepOpenOnEscape<TModel>(this ComponentRef<NativeDrawer!, TModel!>! self) -> ComponentRef<NativeDrawer!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N1",
+            "M25.N6"
+          ]
+        },
+        {
+          "door": "static NativeDrawerExtensions.NativeDrawer(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html) -> Microsoft.AspNetCore.Html.IHtmlContent!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N1"
+          ]
+        },
+        {
+          "door": "static NativeDrawerExtensions.NativeDrawer(this System.Web.Mvc.HtmlHelper! html) -> System.Web.IHtmlString!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N1"
+          ]
+        },
+        {
+          "door": "static NativeDrawerExtensions.Open<TModel>(this ComponentRef<NativeDrawer!, TModel!>! self) -> ComponentRef<NativeDrawer!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N1",
+            "M25.N6"
+          ]
+        },
+        {
+          "door": "static NativeDrawerExtensions.SetSize<TModel>(this ComponentRef<NativeDrawer!, TModel!>! self, DrawerSize size) -> ComponentRef<NativeDrawer!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N1",
+            "M25.N6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M25.F2",
+      "summary": "The page's busy indicator: NativeLoader fulfils the core's busy contract, the plugin busy with show(target) and hide(target), which the core alone calls as it counts each target a request holds and sets aria-busy on it (D10.21); its render helper renders the page's indicator, show(target) gives each target an overlay of its own, and a view writes no step to it. Both lines make it an app-level object a pipeline targets, shows, hides and times out: one element that moves into the one target it covers, leaves position relative on that target's inline style and hides itself after its timeout.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeLoader",
+        "Alis.Reactive.Native:NativeLoaderExtensions",
+        "Alis.Reactive.Native:NativeLoaderHtmlExtensions"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public static ComponentRef<NativeLoader, TModel> SetTarget<TModel>(",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoaderExtensions.cs:39"
+        },
+        {
+          "line": "main",
+          "text": "public static ComponentRef<NativeLoader, TModel> SetTimeout<TModel>(",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoaderExtensions.cs:49"
+        },
+        {
+          "line": "main",
+          "text": ".WhileLoading(l => l.Component<NativeLoader>().SetTimeout(3000).Show())",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Loader/Index.cshtml:28"
+        },
+        {
+          "line": "main",
+          "text": "target.style.position = \"relative\";",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/loader.ts:47"
+        },
+        {
+          "line": "main",
+          "text": "target.appendChild(this);",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/loader.ts:48"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> Target => Property<string>();",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoader.cs:37"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<int> Timeout => Property<int>();",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoader.cs:40"
+        },
+        {
+          "line": "redesign",
+          "text": "loader.Target.Set(\"drawer-resident-form\");",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/_AddResidentFormPartial.cshtml:41"
+        },
+        {
+          "line": "redesign",
+          "text": "target.style.position = \"relative\";",
+          "cite": "Alis.Reactive.Assets/components/native/loader.ts:57"
+        },
+        {
+          "line": "redesign",
+          "text": "this.pendingAutoHide = setTimeout(() => this.hide(), ms);",
+          "cite": "Alis.Reactive.Assets/components/native/loader.ts:68"
+        },
+        {
+          "line": "proposed",
+          "text": "services.AddReactiveRequests(requests => requests.ShowBusy());",
+          "doors": [
+            "N10.7",
+            "M25.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "@Html.NativeLoader(\"Loading\") renders the page's indicator once in the layout with the app's text.",
+          "doors": [
+            "M25.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<IntakeView, DischargeRequest>(\"/Residents/{residentId}/Discharge\", request => request.Set(r => r.ResidentId, 7)).Busy(\"resident-panel\");",
+          "doors": [
+            "N10.7",
+            "M25.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<IntakeView, ResidentForm>(\"/Residents\", request => request.Form(\"drawer-resident-form\")).WhileLoading(loading => loading.Element(\"resident-form-status\").Text.Set(\"Saving resident...\")).Finally(done => done.Element(\"resident-form-status\").Text.Set(\"\"));",
+          "doors": [
+            "N10.7",
+            "M5.N1",
+            "M25.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Both lines' Show, Hide, SetTarget, Target, SetTimeout and Timeout leave: the core holds and releases each target by its count, NativeLoader shows each target the core holds, and nothing hides the indicator while a request holds it.",
+          "doors": [
+            "M25.N2",
+            "N10.7"
+          ]
+        }
+      ],
+      "nodes": [
+        "request",
+        "plugin",
+        "call",
+        "lit",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoader.cs:12-21"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoaderExtensions.cs:15-104"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoader.cs:24-67"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/loader.ts:8-79"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/native/loader.ts:3-86"
+        }
+      ],
+      "core": [
+        "Q10",
+        "Q11",
+        "Q12",
+        "Q17",
+        "Q4"
+      ],
+      "meanings": [
+        {
+          "id": "M25.D2",
+          "meaning": "NativeLoader's code provides the plugin busy on window.__alisPlugins when its indicator mounts (D17.14). Html.NativeLoader(text) renders the page's indicator, a div with the id alis-loader, the class alis-loader, role status and hidden, holding a p with the id alis-loader-message and the class alis-loader__message whose text is the app's, written where the layout renders it. show() and hide() with no target show and hide that indicator. show(target) appends one overlay, a span with the class alis-loader alis-loader--target and aria-hidden true, as the last child of the element of that id, found by getElementById, and keeps it under the id; hide(target) removes the overlay it keeps for that id, and removes nothing when the target's element left with its slot or its content was replaced. It writes no inline style, moves no element and hides nothing by itself: the core calls show when a target's count leaves 0 and hide when it returns to 0 and sets aria-busy on the target (D10.21), so two targets each show their own overlay and each hides when its own request settles. An input, a void element, holds no child, so its busy state shows by the aria-busy the core sets. A request's own message, Saving resident... where both lines write alis-loader-message, is the view's own element, set in the request's WhileLoading and emptied in its Finally (N10.7, M5.N1), so it shows beside the target that request holds and never in the hidden page indicator."
+        }
+      ],
+      "oracle": "The DOM, as lib.dom types it in TypeScript 5.9.3: Document.getElementById, Node.appendChild and ChildNode.remove, HTMLElement.hidden and the status role of WAI-ARIA 1.2; and the core's busy contract, Composition.tla's count per target.",
+      "checker": [
+        "core:Q10",
+        "core:Q17",
+        "Composition.tla:IndicatorNeverHidesEarly",
+        "Composition.tla:IndicatorNeverStaysShown",
+        "Composition.tla:HoldOncePerRequest"
+      ],
+      "defects": [
+        {
+          "id": "M25.X3",
+          "rung": "behavior",
+          "defect": "Both lines move one loader element into the one target set last (Alis.Reactive.Assets/runtime/components/native/loader.ts:48 at 623dd4a27, Alis.Reactive.Assets/components/native/loader.ts:58 at 65fdf118d), so of two requests on two targets in flight only the later target shows the indicator, and each target keeps position relative on its inline style after the loader leaves (Alis.Reactive.Assets/components/native/loader.ts:57 at 65fdf118d). The rewrite gives each target its own overlay and writes no style (M25.D2, M25.N2)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M25.X3",
+          "page": "A ward board whose app takes ShowBusy() and whose layout renders Html.NativeLoader(\"Loading\"), whose stylesheet shows .alis-loader--target as a 20 pixel square, with two panels, north and south, and Refresh north and Refresh south, each a GET whose route writes its panel's text; the test's endpoint holds each response until the test releases it.",
+          "gesture": "Click Refresh north and Refresh south, then release south's response.",
+          "outcome": "While both are held each panel shows the loader's overlay; after south's response south shows its new text and no overlay, and north still shows its overlay.",
+          "opposite": "Release north's response too: neither panel shows an overlay, and each shows its new text.",
+          "defect": "Both lines move one loader element into the target set last (Alis.Reactive.Assets/components/native/loader.ts:58 at 65fdf118d), so north shows no overlay once Refresh south starts, while north's request still runs."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "NativeLoaderExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M25.N2"
+          ]
+        },
+        {
+          "door": "static NativeLoaderExtensions.Hide<TModel>(this ComponentRef<NativeLoader!, TModel!>! self) -> ComponentRef<NativeLoader!, TModel!>!",
+          "verdict": "refused",
+          "reason": "Shows or hides the page's one loader from a step, by its classes and aria-hidden (Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoaderExtensions.cs:72-81 at 623dd4a27). The core holds the busy indicator on each target a request derives or names and calls the busy contract's show and hide by each target's count, from the request's guards to its defaults' Finally, on every outcome; a step's hide while a request holds the indicator is the early hide Composition.tla:IndicatorNeverHidesEarly forbids, so NativeLoader's declaration gives a pipeline no door to it (D10.21).",
+          "carriers": [
+            "N10.7",
+            "M25.N2"
+          ]
+        },
+        {
+          "door": "static NativeLoaderExtensions.Show<TModel>(this ComponentRef<NativeLoader!, TModel!>! self) -> ComponentRef<NativeLoader!, TModel!>!",
+          "verdict": "refused",
+          "reason": "Shows or hides the page's one loader from a step, by its classes and aria-hidden (Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoaderExtensions.cs:58-67 at 623dd4a27). The core holds the busy indicator on each target a request derives or names and calls the busy contract's show and hide by each target's count, from the request's guards to its defaults' Finally, on every outcome; a step's hide while a request holds the indicator is the early hide Composition.tla:IndicatorNeverHidesEarly forbids, so NativeLoader's declaration gives a pipeline no door to it (D10.21).",
+          "carriers": [
+            "N10.7",
+            "M25.N2"
+          ]
+        },
+        {
+          "door": "static NativeLoaderExtensions.SetTarget<TModel>(this ComponentRef<NativeLoader!, TModel!>! self, string! targetId) -> ComponentRef<NativeLoader!, TModel!>!",
+          "verdict": "refused",
+          "reason": "Names by a string the one element the page's one loader moves into on its next show (Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoaderExtensions.cs:39-43 at 623dd4a27). A request holds the indicator on the targets the C# derives from what its success route writes, its Into's element and the container it sends, or on those Busy(elementId, ..) names, each counted on its own, so two targets show at once (D10.21).",
+          "carriers": [
+            "N10.7",
+            "M25.N2"
+          ]
+        },
+        {
+          "door": "static NativeLoaderExtensions.SetTimeout<TModel>(this ComponentRef<NativeLoader!, TModel!>! self, int ms) -> ComponentRef<NativeLoader!, TModel!>!",
+          "verdict": "refused",
+          "reason": "Hides the loader by itself a time after its show (Alis.Reactive.Native/AppLevel/NativeLoader/NativeLoaderExtensions.cs:49-53 at 623dd4a27), while the request it covers can still run: the indicator never hides by itself (D10.21, Composition.tla:IndicatorNeverHidesEarly). The core hides each target when its request ends on every outcome (Composition.tla:IndicatorNeverStaysShown), and a request's attempts end within the standard retry policy's bound (D10.14).",
+          "carriers": [
+            "N10.7",
+            "N10.3"
+          ]
+        },
+        {
+          "door": "static NativeLoaderExtensions.NativeLoader(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html) -> Microsoft.AspNetCore.Html.IHtmlContent!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N2"
+          ]
+        },
+        {
+          "door": "static NativeLoaderExtensions.NativeLoader(this System.Web.Mvc.HtmlHelper! html) -> System.Web.IHtmlString!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M25.F3",
+      "summary": "A row's action, for any grid-like list: declared once outside its rows as a block whose payload is RowActivated<TRow>, the Row it was rendered with and the Element the user activated, and rendered per row by Render(row, text) as NativeActionButton's button, for any block, or NativeActionLink's anchor, for a block whose one request is a GET, its href that GET's URL; Native's plugin native-row-actions finds each control by id and raises activated for an unmodified primary click, prevents a link's navigation then, and leaves a modified or middle click to the browser (D17.15). Main writes a whole plan into each link's data attribute and its runtime finds a link by a document click and closest; the redesign writes a plan per link with a click handler that reads the click's button, modifiers and defaultPrevented; both send any verb from a link.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeActionLink",
+        "Alis.Reactive.Native:NativeActionLinkBuilder<TModel>",
+        "Alis.Reactive.Native:NativeActionLinkClickArgs",
+        "Alis.Reactive.Native:NativeActionLinkConfirm<TModel>",
+        "Alis.Reactive.Native:NativeActionLinkHtmlExtensions",
+        "Alis.Reactive.Native:NativeActionLinkRequest<TModel>"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public static NativeActionLinkBuilder<TModel> NativeActionLink<TModel>(",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkHtmlExtensions.cs:35"
+        },
+        {
+          "line": "main",
+          "text": "var contract = NativeActionLinkSerializer.CreateContract(url, pipeline);",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkHtmlExtensions.cs:49"
+        },
+        {
+          "line": "main",
+          "text": "new NativeActionLinkPayload(context.BuildPlan(), actionLinkReaction),",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:45"
+        },
+        {
+          "line": "main",
+          "text": "if (event.defaultPrevented || event.button !== 0) return;",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/native-action-link.ts:33"
+        },
+        {
+          "line": "main",
+          "text": "const anchor = target?.closest<HTMLAnchorElement>(SELECTOR);",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/native-action-link.ts:37"
+        },
+        {
+          "line": "main",
+          "text": ".Confirm($\"Discharge {row.ResidentName} from the active census?\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/_CareOpsActionRows.cshtml:27"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class NativeActionLink : Component",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:20"
+        },
+        {
+          "line": "redesign",
+          "text": "public ReadOnly<bool> DefaultPrevented => ReadOnly<bool>();",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:47"
+        },
+        {
+          "line": "redesign",
+          "text": ".And(click.DefaultPrevented).Falsy()",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:114"
+        },
+        {
+          "line": "redesign",
+          "text": "public HttpRequestBuilder<TModel> Post() { _sent.One(_href); return _pipeline.Post(_href); }",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkRequest.cs:32"
+        },
+        {
+          "line": "redesign",
+          "text": "public NativeActionLinkConfirm<TModel> Confirm(string message)",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkRequest.cs:49"
+        },
+        {
+          "line": "redesign",
+          "text": "_html.RenderPlan(_plan).WriteTo(writer, encoder);",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkBuilder.cs:145"
+        },
+        {
+          "line": "redesign",
+          "text": ".Confirm($\"Discharge {row.ResidentName} from the active census?\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/_CareOpsActionRows.cshtml:23"
+        },
+        {
+          "line": "proposed",
+          "text": "var rows = plan.Rows<ResidentRow>(\"residents\");",
+          "doors": [
+            "N17.12"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "var open = rows.NativeActionLink((activated, pipeline) => pipeline.Get<ResidentQuery>(\"/Residents/{residentId}\", query => query.Set(q => q.ResidentId, activated.Row.Read(r => r.Id))).OnSuccess(Content.Html, (loaded, done) => done.Into(\"resident-detail\", loaded.Body)));",
+          "doors": [
+            "N17.12",
+            "M25.N3",
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "var discharge = rows.NativeActionButton((activated, pipeline) => pipeline.When(pipeline.Component<NativeConfirm>().Ask(activated.Row.Read(r => r.Name))).Truthy().Then(yes => yes.Post<IntakeView, DischargeRequest>(\"/Residents/{residentId}/Discharge\", request => request.Set(r => r.ResidentId, activated.Row.Read(r => r.Id))).OnSuccess<CensusCount>((census, done) => activated.Element.Text.Set(\"Discharged\"))));",
+          "doors": [
+            "N17.12",
+            "M25.N3",
+            "M25.N4",
+            "M25.N6",
+            "N17.3",
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "foreach (var resident in residents) { @open.Render(resident, resident.Name).CssClass(\"resident-link\") @discharge.Render(resident, \"Discharge\") }",
+          "doors": [
+            "N17.12",
+            "M25.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A link whose block posts, puts or deletes is a NativeActionButton: both lines' POST links, a Confirm before the request included, are buttons whose block asks NativeConfirm or FusionConfirm in a condition and sends the request on yes.",
+          "doors": [
+            "N17.12",
+            "M25.N3",
+            "M25.N4",
+            "N17.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A control outside any list is a row action rendered for its one row, or a button the view writes that raises a declared app event.",
+          "doors": [
+            "N17.12",
+            "M1.N5",
+            "M1.N3"
+          ]
+        }
+      ],
+      "nodes": [
+        "call",
+        "let",
+        "listen",
+        "on",
+        "if",
+        "get",
+        "set",
+        "request",
+        "plugin",
+        "element",
+        "lit",
+        "string",
+        "list",
+        "record"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkHtmlExtensions.cs:35-52"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkSerializer.cs:17-124"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkBuilder.cs:92-124"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkIdGenerator.cs:13-34"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:91-126"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkRequest.cs:15-100"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeActionLink/NativeActionLinkBuilder.cs:112-147"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/native-action-link.ts:20-107"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:20-35"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:35-48"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q9",
+        "Q10",
+        "Q11",
+        "Q12",
+        "Q14",
+        "Q4"
+      ],
+      "meanings": [
+        {
+          "id": "M25.D3",
+          "meaning": "Native's row action helpers are built on plan.Rows<TRow>(rowsId) as an app's would be (D17.15, N17.12). NativeActionButton(action) renders, for each Render(row, text), a button of type button with the id {rowsId}-{position}-{n} and the text as text; NativeActionLink(action) renders an a with that id, the text and an href that is its block's one GET's URL, filled from the row's and the view's values by the encoding the request sends (D9.4). Render returns the control, whose CssClass(css) writes its class attribute and whose attribute doors are N18.4's; id and href are the helper's. The plugin native-row-actions, called once per action by the action's on-load handler with that action's entries, finds each control by getElementById, listens to its click and returns one EventTarget that raises activated with the entry's row and the control's element. A click with button 0 and none of ctrlKey, metaKey, shiftKey and altKey raises activated, and on a link prevents the navigation first; any other click on a link raises nothing and is the browser's, and a middle click raises no click at all (probe:dom-link-middle-click, probe:dom-link-modified-click). The plugin reads no data attribute, walks no DOM and does not read defaultPrevented. Its listeners are released with the plan's owner, so rows a slot reloads are heard once (D12.8)."
+        }
+      ],
+      "oracle": "The DOM, as lib.dom types it in TypeScript 5.9.3: MouseEvent's button, ctrlKey, metaKey, shiftKey and altKey, Event.preventDefault, the auxclick event and Document.getElementById; and Chromium, where a middle click on a link raises auxclick and no click and opens the link in a new page, and a Control or Meta click whose listener prevents nothing opens the link in a new page while the page stays (probe:dom-link-middle-click, probe:dom-link-modified-click, spec/probes/dom-native-m25.mjs, Playwright 1.63.0); the request's encoding of a key into a path (D9.4).",
+      "checker": [
+        "core:Q17",
+        "core:Q10",
+        "core:Q11",
+        "core:Q12",
+        "Lanes.tla:ReplacedRunRunsNoRoute",
+        "Ownership.tla:ListenersDoNotAccumulate",
+        "Composition.tla:IndicatorNeverHidesEarly"
+      ],
+      "defects": [
+        {
+          "id": "X17.31",
+          "rung": "type"
+        },
+        {
+          "id": "X17.32",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X17.33",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.34",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.35",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.36",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.37",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.38",
+          "rung": "behavior"
+        },
+        {
+          "id": "M25.X4",
+          "rung": "behavior",
+          "defect": "Both lines skip a click whose default another listener already prevented (Alis.Reactive.Assets/runtime/components/native/native-action-link.ts:33 at 623dd4a27, Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:114 at 65fdf118d), so a page script that prevents every click's default, a tooltip or analytics library's, silently stops every link's action. The plugin infers no intent from what another script did (D17.15, M25.D3, M25.N3)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.33",
+          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\"), each with a Discharge control from one NativeActionButton whose block posts the row's id to /Residents/{residentId}/Discharge, sets status's text to the name the endpoint answers for that id and sets the control's text to Discharged.",
+          "gesture": "Click Bea's Discharge.",
+          "outcome": "status reads Bea discharged, Bea's control reads Discharged, and Ada's and Cy's read Discharge.",
+          "opposite": "Click Ada's Discharge instead: status reads Ada discharged and only Ada's control reads Discharged.",
+          "defect": "An action whose entries carry one row's values for every control, or whose Element is the first control rendered, discharges the wrong resident or relabels the wrong row."
+        },
+        {
+          "for": "X17.34",
+          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\"), each with a NativeActionLink whose block GETs /Residents/{residentId} and loads its HTML into resident-detail.",
+          "gesture": "Click Ada's link.",
+          "outcome": "resident-detail shows Ada's panel and the address bar stays on the ward list.",
+          "opposite": "Click Bea's link with Control (Meta on macOS) and Cy's with the middle button: each opens its href, /Residents/2 and /Residents/3, in a new page, the ward list stays and resident-detail stays empty.",
+          "defect": "A plugin that raises the action for a modified click loads Bea's panel as well as opening the page, and one that prevents a middle click's default keeps the page from opening; a middle click raises no click (probe:dom-link-middle-click) and a modified click whose listener prevents nothing opens the link (probe:dom-link-modified-click)."
+        },
+        {
+          "for": "X17.35",
+          "page": "A residents list whose rows' keys are Ada Lovelace, a+b, O'Neil, Unit (2), ~north and Zoé, each with a NativeActionLink whose block GETs /Residents/{key} and sets received's text to the key the endpoint bound.",
+          "gesture": "Click each link, and click each again with Control (Meta on macOS).",
+          "outcome": "received reads each key as written, and each new page's address is the URL its plain click requested.",
+          "opposite": "A key of letters only, Ada: received reads Ada and the new page's address is /Residents/Ada.",
+          "defect": "An href filled by another encoding than the request's (D9.4) opens a page for another key than the click loads: a + left raw reads as a space, and an é written in a second form binds no resident."
+        },
+        {
+          "for": "X17.36",
+          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\"), each with a NativeActionLink under replace whose block GETs /Residents/{residentId} into resident-detail; the test's endpoint holds Ada's response until the test releases it.",
+          "gesture": "Click Ada's link, click Bea's link, then release Ada's response.",
+          "outcome": "resident-detail shows Bea's panel.",
+          "opposite": "The same list under overlap, the default: after the same clicks and the release resident-detail shows Ada's panel, the later answer.",
+          "defect": "A policy held per control and not across the action's rows (D11.7) lets row A's late answer overwrite row B's panel."
+        },
+        {
+          "for": "X17.37",
+          "page": "A ward page whose Load residents loads into the slot residents-slot a partial rendering Ada, Bea and Cy, each with a Discharge control from one NativeActionButton whose block posts the row's id; the test's endpoint counts the discharges it receives and the block sets count's text to the count it answers.",
+          "gesture": "Click Load residents twice, then click Bea's Discharge.",
+          "outcome": "count reads 1.",
+          "opposite": "Click Load residents once and then Bea's Discharge: count reads 1.",
+          "defect": "A listen the first load's owner never released, or a plugin that listens on the document, hears the click twice after the reload, so count reads 2 (D12.8, Ownership.tla:ListenersDoNotAccumulate)."
+        },
+        {
+          "for": "X17.38",
+          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\") in an app that takes ShowBusy() and renders Html.NativeLoader(\"Loading\"), whose stylesheet shows .alis-loader--target as a 20 pixel square, each row with a Discharge control from one NativeActionButton whose block posts the row's id and on success sets the control's text to Discharged; the test's endpoint holds Bea's response until the test releases it.",
+          "gesture": "Click Bea's Discharge, then release its response.",
+          "outcome": "While it is held Bea's control shows the loader's overlay and Ada's and Cy's show none; after the release no control shows one and Bea's reads Discharged.",
+          "opposite": "Click Ada's Discharge instead: while held only Ada's control shows the overlay.",
+          "defect": "A busy target that names the action's first control, or the page, shows the wrong row or every row busy; the target is the control the block's success route writes, read when the request starts (D10.21)."
+        },
+        {
+          "for": "M25.X4",
+          "page": "A ward list rendering three rows, Ada (1), Bea (2) and Cy (3), from plan.Rows<ResidentRow>(\"residents\"), each with a NativeActionLink whose block GETs /Residents/{residentId} into resident-detail, on a test page whose own script prevents the default of every click on the document in the capture phase.",
+          "gesture": "Click Ada's link.",
+          "outcome": "resident-detail shows Ada's panel and the address bar stays on the ward list.",
+          "opposite": "The same page without that script: the same click shows Ada's panel too.",
+          "defect": "Both lines read defaultPrevented and skip the click (Alis.Reactive.Native/Components/NativeActionLink/NativeActionLink.cs:114 at 65fdf118d), so resident-detail stays empty."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "static NativeActionLinkHtmlExtensions.NativeActionLink<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, string! linkText, string! url, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> NativeActionLinkBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N17.12",
+            "M25.N3"
+          ]
+        },
+        {
+          "door": "static NativeActionLinkHtmlExtensions.NativeActionLink<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, string! linkText, string! url, System.Action<PipelineBuilder<TModel!>!>! pipeline) -> NativeActionLinkBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N17.12",
+            "M25.N3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M25.F4",
+      "summary": "The framework's own confirm, new on both lines: NativeConfirm, the platform's modal dialog opened by showModal, one per page, rendered once in the layout with the app's title and button texts and reached with no id, whose Ask(message) is a MethodAsync<bool> read in a condition: OK answers true, Cancel and Escape answer false, an Escape stays in the dialog so a drawer behind stays open, the page behind is inert, asks take their turn in order, and an ask whose run ends closes. Today a confirm is Fusion's only: main's runtime and the redesign's plan call a confirm that only Fusion's browser code provides, so a page without Fusion cannot ask.",
+      "status": "new",
+      "types": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public GuardBuilder<TModel> Confirm(string message)",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Conditions.cs:52"
+        },
+        {
+          "line": "main",
+          "text": "const confirmFn = (window as WindowWithConfirm).alis?.confirm;",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/conditions.ts:120"
+        },
+        {
+          "line": "main",
+          "text": "throw new Error(\"[alis] confirm condition requires @Html.FusionConfirmDialog() in layout\");",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/conditions.ts:123"
+        },
+        {
+          "line": "redesign",
+          "text": "internal sealed class ConfirmCondition : Condition",
+          "cite": "Alis.Reactive/PlanModel/Conditions/Condition.cs:485"
+        },
+        {
+          "line": "redesign",
+          "text": "G.Let(accepted, G.Call(G.Obj(scope.Objects.Confirm()), PathMembers.Required, \"ask\", G.Lit(_message)), awaits: true),",
+          "cite": "Alis.Reactive/PlanModel/Conditions/Condition.cs:504"
+        },
+        {
+          "line": "redesign",
+          "text": "if (event.key === \"Escape\") event.stopPropagation();",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:68"
+        },
+        {
+          "line": "redesign",
+          "text": "queue = queue.then(() => showConfirmDialog(dialog, message, outerResolve));",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:88"
+        },
+        {
+          "line": "redesign",
+          "text": "providePlugin(\"alis.confirm\", {",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:94"
+        },
+        {
+          "line": "proposed",
+          "text": "var confirm = pipeline.Component<NativeConfirm>();",
+          "doors": [
+            "M25.N4",
+            "M25.N6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.When(confirm.Ask(\"Discharge Ada from the ward?\")).Truthy().Then(yes => yes.Post<IntakeView, DischargeRequest>(\"/Residents/{residentId}/Discharge\", request => request.Set(r => r.ResidentId, 7))).Else(no => no.Element(\"decision\").Text.Set(\"Kept\"));",
+          "doors": [
+            "M25.N4",
+            "N17.3",
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "@Html.NativeConfirm(\"Please confirm\", ok: \"Discharge\", cancel: \"Keep\") renders the dialog once in the layout with the app's title and button texts.",
+          "doors": [
+            "M25.N4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "NativeConfirm declares Ask(message) as a MethodAsync<bool> whose message is any source, with the block's abort signal as its second argument, so the dialog code's ask(message, signal) receives a signal the view does not write.",
+          "doors": [
+            "M25.N4",
+            "N17.5"
+          ]
+        }
+      ],
+      "nodes": [
+        "call",
+        "let",
+        "if",
+        "signal",
+        "element",
+        "lit",
+        "string",
+        "boolean"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.Conditions.cs:50-56"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Conditions/Condition.cs:485-508"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/conditions.ts:119-128"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:67-99"
+        }
+      ],
+      "core": [
+        "Q11",
+        "Q17",
+        "Q8",
+        "Q5",
+        "Q4",
+        "Q12"
+      ],
+      "meanings": [
+        {
+          "id": "M25.D4",
+          "meaning": "NativeConfirm is declared as a native component whose object is its dialog element (ComponentVendor.Native), IAppLevelComponent with ElementId alis-confirm and DefaultId. Html.NativeConfirm(title, ok, cancel) renders a dialog with the id alis-confirm, the class alis-confirm, aria-labelledby alis-confirm-title and aria-describedby alis-confirm-message, holding an h2 with the id alis-confirm-title and the app's title, an empty p with the id alis-confirm-message, a button of type button with the class alis-confirm__cancel, the app's cancel text and autofocus, and a button of type button with the class alis-confirm__ok and the app's OK text, each text HTML-encoded, with no style. The confirm code, on alis:mount, writes ask(message, signal) on the element and a keydown listener on the dialog that stops an Escape's propagation, so the page's own Escape listeners hear none while the dialog still cancels (probe:dom-dialog-escape-stopped-at-dialog). ask returns a promise and waits behind the asks before it. At its turn, an ask whose signal is aborted answers false unshown; otherwise it sets the message's textContent, a message that reads nothing showing no text (D4.5), and calls showModal, so the page behind is inert (probe:dom-dialog-modal-click-behind) and focus starts on the cancel button. OK closes the dialog and answers true; the cancel button closes it and answers false; Escape cancels and closes it (probe:dom-dialog-escape) and answers false. An abort of the signal while its ask is open, when the run that asked ends (D17.11), closes the dialog and answers false, and an abort while it waits takes it out of the queue unshown; the answer runs nothing for an ended run (D11.8). On alis:unmount the code answers each open and waiting ask false."
+        }
+      ],
+      "oracle": "The DOM, as lib.dom types it in TypeScript 5.9.3: HTMLDialogElement's showModal, close(returnValue) and open (typescript/lib/lib.dom.d.ts:13615, :13597, :13585), the cancel event (:12644), Node.textContent (:21742), Event.stopPropagation and AbortSignal; and Chromium's modal dialog: a click on the page behind it reaches no handler, Escape cancels and closes it, an Escape keydown reaches a keydown listener on the document unless the dialog stops its propagation, and a stopped Escape still cancels and closes it (probe:dom-dialog-modal-click-behind, probe:dom-dialog-escape, probe:dom-dialog-escape-stopped-at-dialog, spec/probes/dom-native-m25.mjs, Playwright 1.63.0).",
+      "checker": [
+        "core:Q11",
+        "core:Q17",
+        "core:Q8",
+        "Run.tla:NothingRunsAfterAnAbort",
+        "Lanes.tla:ReplacedRunRunsNothingAfter"
+      ],
+      "defects": [
+        {
+          "id": "X17.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X17.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "M25.X5",
+          "rung": "behavior",
+          "defect": "A second ask that the confirm code shows while the first is open writes its question over the first one's, so the first question is answered as the second and both asks take one answer; the asks take their turn in order, as the redesign's Fusion confirm queues them (Alis.Reactive.Assets/components/fusion/confirm.ts:88 at 65fdf118d, M25.D4, M25.N4)."
+        },
+        {
+          "id": "M25.X6",
+          "rung": "behavior",
+          "defect": "A confirm code that writes the message as HTML shows markup a message holds as elements, so a resident's name or a typed note changes the question; the message is set by textContent (D17.10, M25.D4, M25.N4)."
+        },
+        {
+          "id": "M25.X7",
+          "rung": "behavior",
+          "defect": "A dialog shown by show() and not showModal() leaves the page live behind it, so a click behind the open question runs its handler before the user answered (probe:dom-dialog-modal-click-behind, D17.10, M25.N4)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.6",
+          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\") and loads no Fusion asset, with a Discharge Ada button whose click asks NativeConfirm Discharge Ada from the ward? in a When and on a true answer sets decision's text to Discharged, and otherwise to Kept.",
+          "gesture": "Click Discharge Ada, then click Yes.",
+          "outcome": "The dialog reads Please confirm and Discharge Ada from the ward?, and after Yes decision reads Discharged.",
+          "opposite": "Click Discharge Ada, then No: decision reads Kept.",
+          "defect": "Both lines call a confirm that only Fusion's confirm code provides (Alis.Reactive/PlanModel/Conditions/Condition.cs:504 and Alis.Reactive.Assets/components/fusion/confirm.ts:94 at 65fdf118d), so on a page with no Fusion asset the ask stops its pipeline and decision stays empty."
+        },
+        {
+          "for": "X17.7",
+          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\") and Html.NativeDrawer(\"Close\"), whose Open notes opens the drawer and loads a partial with a Discharge button that asks NativeConfirm Discharge Ada? and sets decision's text to Discharged on yes and Kept on no.",
+          "gesture": "Click Open notes, click Discharge, then press Escape.",
+          "outcome": "The dialog closes, decision reads Kept, and the drawer still shows the partial's Discharge button.",
+          "opposite": "Press Escape again, with no dialog open: the drawer closes.",
+          "defect": "An Escape pressed in a modal dialog reaches a keydown listener on the document (probe:dom-dialog-escape), where the drawer closes on Escape (Alis.Reactive.Assets/components/native/drawer.ts:73-75 at 65fdf118d), so a confirm code that does not stop the Escape at its dialog (probe:dom-dialog-escape-stopped-at-dialog) closes the drawer and its partial behind the answer."
+        },
+        {
+          "for": "X17.8",
+          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with an intake page's declared app event IntakeSaveRequested, whose payload is a resident's name, handled under replace: the handler asks NativeConfirm Save the intake for the payload? and on yes posts it, the test's endpoint counting the saves and the route setting saved's text to the count and the name it saved. Save dispatches IntakeSaveRequested with Ada; the page's on-load GET of the amended name, Ada Lovelace, is held by the test's endpoint until the test releases it, and its route dispatches IntakeSaveRequested with that name.",
+          "gesture": "Click Save; while the dialog asks Save the intake for Ada?, release the held load; then click Yes.",
+          "outcome": "The dialog then asks Save the intake for Ada Lovelace?, no other dialog follows the Yes, and saved reads 1 Ada Lovelace.",
+          "opposite": "Click Save and Yes before releasing the load: saved reads 1 Ada.",
+          "defect": "An ask that ignores the replaced run's abort (D17.11) keeps Save the intake for Ada? open with the second ask waiting behind it, so a second dialog follows the first Yes, or that Yes saves Ada for the aborted run (Lanes.tla:ReplacedRunRunsNothingAfter)."
+        },
+        {
+          "for": "M25.X5",
+          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), whose Discharge click has two handlers, the first asking Discharge Ada? and setting discharge's text to its answer, the second asking Notify the family? and setting notify's text to its answer.",
+          "gesture": "Click Discharge, click Yes, then click No.",
+          "outcome": "The dialog first reads Discharge Ada?, then Notify the family?; discharge reads true and notify reads false.",
+          "opposite": "Click Discharge, No, then Yes: discharge reads false and notify reads true.",
+          "defect": "A confirm code that shows the second ask in the open dialog reads Notify the family? before Discharge Ada? is answered, and gives both handlers the first answer."
+        },
+        {
+          "for": "M25.X6",
+          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with a note input and a Discharge button that asks NativeConfirm the note's value.",
+          "gesture": "Type <b>Discharge Ada?</b> into the note and click Discharge.",
+          "outcome": "The dialog reads <b>Discharge Ada?</b> as typed, with no bold element.",
+          "opposite": "Type Discharge Bo? and click Discharge: the dialog reads Discharge Bo?.",
+          "defect": "A confirm code that writes the message as HTML shows Discharge Ada? in bold with the tags gone."
+        },
+        {
+          "for": "M25.X7",
+          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with a Discharge button that asks NativeConfirm Discharge Ada? and an Add note button that sets notes's text to added.",
+          "gesture": "Click Discharge, then click where Add note is while the dialog asks.",
+          "outcome": "notes stays empty and the dialog still asks Discharge Ada?.",
+          "opposite": "Click No, then Add note: notes reads added.",
+          "defect": "A dialog shown by show() leaves the page live behind it, so the click sets notes to added while the question is open (probe:dom-dialog-modal-click-behind)."
+        }
+      ],
+      "verdicts": []
+    },
+    {
+      "id": "M25.F5",
+      "summary": "The framework's own toast, new on both lines: NativeToast fulfils the core's notice contract, the plugin notice with show(text, kind) the core calls for Notice() and for a default route's notice (D10.21): one region per page in the top layer, popover manual, a status region for success and information and an alert region for warnings and errors, each toast's text set by textContent beside a dismiss button with the app's text, leaving after the app's time unless hovered or focused, an error staying until dismissed. Today the only toast is Fusion's, an app-level component a view shows by setting its members.",
+      "status": "new",
+      "types": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public sealed class FusionToast : FusionComponent, IAppLevelComponent",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:10"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class FusionToast : FusionComponent, IAppLevelComponent",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:27"
+        },
+        {
+          "line": "proposed",
+          "text": "done.Notice().Success(\"Resident admitted\");",
+          "doors": [
+            "N10.7",
+            "M25.N5"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "@Html.NativeToast(TimeSpan.FromSeconds(5), dismiss: \"Dismiss\") renders the toast region once in the layout with the app's time and dismiss text.",
+          "doors": [
+            "M25.N5"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A failed request whose route is a default shows one error notice after its last attempt, through the same contract, and NativeToast shows it until it is dismissed.",
+          "doors": [
+            "N10.7",
+            "M25.N5"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "call",
+        "lit",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:10-19"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:27-97"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:79-87"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:35-48"
+        }
+      ],
+      "core": [
+        "Q10",
+        "Q11",
+        "Q17",
+        "Q4"
+      ],
+      "meanings": [
+        {
+          "id": "M25.D5",
+          "meaning": "NativeToast's code provides the plugin notice on window.__alisPlugins when its region mounts (D17.14). Html.NativeToast(shownFor, dismiss) renders a section with the id alis-toasts, the class alis-toasts and popover manual, holding a div with the class alis-toasts__status and role status and a div with the class alis-toasts__alert and role alert, with the app's time and dismiss text, and no style; the code shows the region with showPopover on mount, and it stays shown, since a manual popover neither Escape nor a click elsewhere hides (probe:dom-popover-manual-escape-and-click-elsewhere). show(text, kind) appends a toast, a div with the classes alis-toast and alis-toast--{kind} holding a p whose textContent is the text and a button of type button with the dismiss text, to the status region for success and info and to the alert region for warning and error; a text that reads nothing shows no text (D4.5). The dismiss button removes its toast. A success, info or warning toast leaves when the app's time has run while neither hovered nor focused: mouseenter and focusin pause its time and mouseleave and focusout resume it; an error toast leaves only by its dismiss button. A toast that arrives while a modal dialog is open shows under it, inert, and is dismissed once the dialog closes, as a region shown again over the dialog stays inert too (probe:dom-popover-reshown-over-modal-dismiss-click, probe:dom-popover-dismiss-click-after-modal-closed). No step waits for its time (D11.9)."
+        }
+      ],
+      "oracle": "The DOM, as lib.dom types it in TypeScript 5.9.3: HTMLElement's popover, showPopover and hidePopover (typescript/lib/lib.dom.d.ts:13784, :13832, :13826), Node.textContent (:21742) and the mouseenter, mouseleave, focusin and focusout events; WAI-ARIA 1.2's status and alert roles; and Chromium, where a manual popover stays shown on Escape and on a click elsewhere, and a popover shown over a modal dialog takes no click until the dialog closes (probe:dom-popover-manual-escape-and-click-elsewhere, probe:dom-popover-reshown-over-modal-dismiss-click, probe:dom-popover-dismiss-click-after-modal-closed, spec/probes/dom-native-m25.mjs, Playwright 1.63.0).",
+      "checker": [
+        "core:Q10",
+        "core:Q11",
+        "core:Q17",
+        "Composition.tla:NoticeOncePerFailure"
+      ],
+      "defects": [
+        {
+          "id": "X17.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "M25.X8",
+          "rung": "behavior",
+          "defect": "A toast code that writes the text as HTML shows markup a notice holds as elements, so a server's message or a typed note changes what the toast says; the text is set by textContent (D17.10, M25.D5, M25.N5)."
+        },
+        {
+          "id": "M25.X9",
+          "rung": "behavior",
+          "defect": "A toast region that announces every kind as an alert, or none, gives a screen reader the wrong urgency: an error read politely is missed, and a success read as an alert interrupts. Success and information go to the status region and warnings and errors to the alert region (D17.10, M25.D5, M25.N5)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X17.9",
+          "page": "A shift page whose app takes the request defaults and whose layout renders Html.NativeToast(TimeSpan.FromSeconds(5), dismiss: \"Dismiss\"), with Record a dose, whose click shows Notice().Info(\"Dose recorded\"), and Report a fall, whose click shows Notice().Error(\"Fall reported: call the nurse\"); the test runs the page's clock with Playwright's Page.Clock.",
+          "gesture": "Click Record a dose and Report a fall, hover the information toast, advance the clock 6 seconds, move the pointer to the page, advance the clock 6 seconds, press Escape and click the page, then click the error toast's Dismiss.",
+          "outcome": "After the first advance both toasts show; after the second the information toast is gone and the error toast shows, and it still shows after Escape and the click; after Dismiss no toast shows.",
+          "opposite": "Click Record a dose and advance the clock 6 seconds without hovering: the information toast is gone.",
+          "defect": "A toast whose time runs while it is hovered, or an error toast that leaves after its time or on Escape or a click elsewhere, fails it; a manual popover stays on Escape and on a click elsewhere (probe:dom-popover-manual-escape-and-click-elsewhere), so only the time and Dismiss end a toast."
+        },
+        {
+          "for": "M25.X8",
+          "page": "A shift page whose app takes the request defaults and whose layout renders Html.NativeToast(TimeSpan.FromSeconds(5), dismiss: \"Dismiss\"), with a note input and a Report button that shows Notice().Warning with the note's value.",
+          "gesture": "Type <b>Bed 4</b> wet into the note and click Report.",
+          "outcome": "The toast reads <b>Bed 4</b> wet as typed, with no bold element.",
+          "opposite": "Type Bed 4 wet and click Report: the toast reads Bed 4 wet.",
+          "defect": "A toast code that writes the text as HTML shows Bed 4 in bold with the tags gone."
+        },
+        {
+          "for": "M25.X9",
+          "page": "A shift page whose app takes the request defaults and whose layout renders Html.NativeToast(TimeSpan.FromSeconds(5), dismiss: \"Dismiss\"), with Record a dose, whose click shows Notice().Success(\"Dose recorded\"), and Report a fall, whose click shows Notice().Error(\"Fall reported\").",
+          "gesture": "Click Record a dose and Report a fall.",
+          "outcome": "The page's status role holds Dose recorded and its alert role holds Fall reported, as getByRole finds them.",
+          "opposite": "Click only Record a dose: the alert role holds no text.",
+          "defect": "A region that puts every kind under one role announces Dose recorded as an alert or Fall reported politely."
+        }
+      ],
+      "verdicts": []
+    },
+    {
+      "id": "M25.F6",
+      "summary": "An app-level object reached with no id: IAppLevelComponent, whose DefaultId names the fixed id its declaration renders at, pipeline.Component<TComponent>(), the declaration bound to that id, and plan.Component<TComponent>(), the same object for the plan's handlers, open to any app's declaration on the core's public surface (D17.10). NativeDrawer, NativeConfirm, FusionConfirm and FusionToast implement it; NativeLoader and NativeToast, found by their contracts' plugin names, do not. Main returns a ComponentRef written through internal members and marks the object a layout object in the plan; the redesign returns the declaration.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive:IAppLevelComponent"
+      ],
+      "claims": [
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent>() -> TComponent!",
+        "Alis.Reactive:PipelineBuilder<TModel>.Component<TComponent>() -> ComponentRef<TComponent, TModel!>!",
+        "Alis.Reactive:ReactivePlan<TModel>.Component<TComponent>() -> RenderedComponent<TComponent, TModel!>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public interface IAppLevelComponent : IComponent",
+          "cite": "Alis.Reactive/Components/Contracts/IComponent.cs:26"
+        },
+        {
+          "line": "main",
+          "text": "string DefaultId { get; }",
+          "cite": "Alis.Reactive/Components/Contracts/IComponent.cs:29"
+        },
+        {
+          "line": "main",
+          "text": "public ComponentRef<TComponent, TModel> Component<TComponent>()",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:136"
+        },
+        {
+          "line": "main",
+          "text": "where TComponent : IAppLevelComponent, new()",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:137"
+        },
+        {
+          "line": "main",
+          "text": "return new LayoutObjectTarget(",
+          "cite": "Alis.Reactive/Components/Onboarding/ComponentObjectTarget.cs:42"
+        },
+        {
+          "line": "main",
+          "text": "p.Component<NativeDrawer>().Open();",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/AppLevel/Drawer/Index.cshtml:34"
+        },
+        {
+          "line": "redesign",
+          "text": "public interface IAppLevelComponent : IComponent",
+          "cite": "Alis.Reactive/Components/IComponent.cs:28"
+        },
+        {
+          "line": "redesign",
+          "text": "public TComponent Component<TComponent>()",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:175"
+        },
+        {
+          "line": "redesign",
+          "text": "component.BindTo(new ComponentBinding(component.DefaultId, component.Vendor, Context));",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:179"
+        },
+        {
+          "line": "redesign",
+          "text": "public RenderedComponent<TComponent, TModel> Component<TComponent>()",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:96"
+        },
+        {
+          "line": "redesign",
+          "text": "=> new RenderedComponent<TComponent, TModel>(this, new TComponent().DefaultId);",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:98"
+        },
+        {
+          "line": "proposed",
+          "text": "public sealed class NightRound : Component, IAppLevelComponent { public const string ElementId = \"night-round\"; public override ComponentVendor Vendor => ComponentVendor.Native; public string DefaultId => ElementId; public void Start() => Method(); }",
+          "doors": [
+            "M25.N6",
+            "M12.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Component<NightRound>().Start();",
+          "doors": [
+            "M25.N6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "plan.Component<NativeDrawer>().Reactive(drawer => drawer.BeforeClose, (closing, pipeline) => pipeline.Element(\"drawer-state\").Text.Set(\"closing\"));",
+          "doors": [
+            "M25.N6",
+            "M12.N3"
+          ]
+        }
+      ],
+      "nodes": [
+        "call",
+        "get",
+        "set",
+        "on",
+        "element",
+        "lit",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:133-142"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Components/Onboarding/ComponentObjectTarget.cs:38-45"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:172-181"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:83-98"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/component-merge.ts:45-63"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-16"
+        }
+      ],
+      "core": [
+        "Q5",
+        "Q12",
+        "Q13",
+        "Q17",
+        "Q4"
+      ],
+      "meanings": [
+        {
+          "id": "M25.D6",
+          "meaning": "pipeline.Component<TComponent>() makes the declaration with new TComponent() (D5.12), reads its DefaultId and binds it to that id, as pipeline.Component<TComponent>(id) binds one (M12.N2): an element the page lacks, or a member its object lacks, stops the pipeline that reaches it (D4.1). plan.Component<TComponent>() names the same object for the plan's handlers, whose listen is released with the plan's owner, so a partial's BeforeClose handler leaves when the partial leaves (Ownership.tla:ListenLeavesWithItsOwner) while the drawer stays the page's. An app-level object is the page's and no slot's (D13.1): no unload removes it, so main's layout-object role in the plan carries nothing the page's ownership does not. DefaultId stays an instance member: a const cannot be read through a type parameter, and an interface's static abstract member needs a runtime net48 lacks."
+        }
+      ],
+      "oracle": "C#'s generic constraints, by which a reach with no id compiles only for a declaration that implements IAppLevelComponent and has a constructor with no parameters, and the core's ownership of a page's objects (D13.1, Ownership.tla).",
+      "checker": [
+        "core:Q5",
+        "core:Q12",
+        "core:Q17",
+        "Ownership.tla:ListenLeavesWithItsOwner"
+      ],
+      "defects": [
+        {
+          "id": "M25.X10",
+          "rung": "type",
+          "defect": "A view that reaches NativeLoader or NativeToast with no id does not compile: neither implements IAppLevelComponent (M25.N6), so no pipeline holds a door to the busy or the notice contract, whose members the core alone calls (D10.21, M25.N2, M25.N5)."
+        }
+      ],
+      "promises": [],
+      "verdicts": [
+        {
+          "door": "PipelineBuilder<TModel>.Component<TComponent>() -> ComponentRef<TComponent, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M25.N6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M25.F7",
+      "summary": "The framework's own reconnect offer, new as a component: NativeReconnectOffer fulfils the core's reconnect contract, the plugin reconnect with show(retry) and hide() the core calls as it counts the page's connections that gave up (D21.11): one region with the app's text and a retry button that calls retry. Main shows a layout element the developer writes, which its runtime finds by a fixed id and whose click retries every dropped connection.",
+      "status": "new",
+      "types": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "const RETRY_ELEMENT_ID = \"alis-realtime-connection-retry-container\";",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/retry-indicator.ts:12"
+        },
+        {
+          "line": "main",
+          "text": "element.hidden = false;",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/retry-indicator.ts:35"
+        },
+        {
+          "line": "main",
+          "text": "<div id=\"alis-realtime-connection-retry-container\" hidden",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/RealTime/Index.cshtml:43"
+        },
+        {
+          "line": "proposed",
+          "text": "services.AddReactiveRealtime(live => live.ShowReconnect());",
+          "doors": [
+            "N21.7",
+            "M25.N7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "@Html.NativeReconnectOffer(\"Live updates stopped.\", retry: \"Reconnect\") renders the offer once in the layout with the app's texts.",
+          "doors": [
+            "M25.N7"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "call",
+        "lit",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/HttpPipeline/RealTime/Index.cshtml:43-46"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/realtime/retry-indicator.ts:16-58"
+        }
+      ],
+      "core": [
+        "Q21",
+        "Q12",
+        "Q17"
+      ],
+      "meanings": [
+        {
+          "id": "M25.D7",
+          "meaning": "NativeReconnectOffer's code provides the plugin reconnect on window.__alisPlugins when its region mounts (D17.14). Html.NativeReconnectOffer(text, retry) renders a div with the id alis-reconnect, the class alis-reconnect, role alert and hidden, holding a p with the app's text and a button of type button with the class alis-reconnect__retry and the app's retry text, with no style. show(retry) keeps the function it is handed and removes hidden; the button calls the function it keeps; hide() sets hidden. The core calls show when the count of connections that gave up leaves 0 and hide when it returns to 0 (D21.11), so the offer neither hides early nor stays shown."
+        }
+      ],
+      "oracle": "The DOM, as lib.dom types it in TypeScript 5.9.3: HTMLElement.hidden and the click event, and WAI-ARIA 1.2's alert role; and the core's reconnect contract, Realtime.tla's count.",
+      "checker": [
+        "core:Q21",
+        "core:Q17",
+        "Realtime.tla:OfferNeverHidesEarly",
+        "Realtime.tla:OfferNeverStaysShown"
+      ],
+      "defects": [],
+      "promises": [],
+      "verdicts": []
+    }
+  ]
+}

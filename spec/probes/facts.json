@@ -3796,6 +3796,141 @@
         "gesture": "Check Mon and Wed and click Save.",
         "outcome": "The page reads 2 days: Mon, Wed."
       }
+    },
+    {
+      "id": "dom-dialog-modal-click-behind",
+      "statement": "A click at a page button's place while a dialog opened by showModal is open reaches no handler of that button, and the dialog stays open.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-dialog-modal-click-behind: behind:0 open:true",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F4",
+        "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with a Discharge button that asks NativeConfirm Discharge Ada? and an Add note button that sets notes's text to added.",
+        "gesture": "Click Discharge, then click where Add note is while the dialog asks.",
+        "outcome": "notes stays empty and the dialog still reads Discharge Ada?."
+      }
+    },
+    {
+      "id": "dom-dialog-escape",
+      "statement": "Escape pressed in a dialog opened by showModal fires its cancel event and closes it, and a keydown listener on the document hears that Escape.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-dialog-escape: cancel open:false document:1",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F4",
+        "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with a Discharge button that asks NativeConfirm Discharge Ada? and sets decision's text to Discharged on yes and Kept on no.",
+        "gesture": "Click Discharge, then press Escape.",
+        "outcome": "The dialog closes and decision reads Kept."
+      }
+    },
+    {
+      "id": "dom-dialog-escape-stopped-at-dialog",
+      "statement": "Escape pressed in a dialog opened by showModal whose own keydown listener stops the Escape's propagation reaches no keydown listener on the document, and the dialog still fires cancel and closes.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-dialog-escape-stopped-at-dialog: cancel open:false document:0",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F4",
+        "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\") and Html.NativeDrawer(\"Close\"), whose Open notes opens the drawer and loads a partial with a Discharge button that asks NativeConfirm Discharge Ada? and sets decision's text to Discharged on yes and Kept on no.",
+        "gesture": "Click Open notes, click Discharge, then press Escape.",
+        "outcome": "The dialog closes, decision reads Kept, and the drawer still shows the partial's Discharge button."
+      }
+    },
+    {
+      "id": "dom-popover-manual-escape-and-click-elsewhere",
+      "statement": "A popover manual element shown by showPopover stays shown when Escape is pressed and when the page is clicked elsewhere, and the click reaches the page.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-popover-manual-escape-and-click-elsewhere: open:true behind:1",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F5",
+        "page": "A shift page whose layout renders Html.NativeToast(TimeSpan.FromSeconds(5), dismiss: \"Dismiss\"), with Report a fall, whose click shows Notice().Error(\"Fall reported\"), and Add note, which sets notes's text to added.",
+        "gesture": "Click Report a fall, press Escape, then click Add note.",
+        "outcome": "The toast still reads Fall reported, and notes reads added."
+      }
+    },
+    {
+      "id": "dom-popover-reshown-over-modal-dismiss-click",
+      "statement": "A popover shown again by hidePopover and showPopover while a dialog opened by showModal is open takes no click on its button, and the dialog stays open.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-popover-reshown-over-modal-dismiss-click: dismiss:0 open:true",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F5",
+        "page": "A shift page whose layout renders Html.NativeToast(TimeSpan.FromSeconds(5), dismiss: \"Dismiss\") and Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with a Discharge button whose click shows Notice().Error(\"Bed 4 is not ready\") and then asks NativeConfirm Discharge Ada?.",
+        "gesture": "Click Discharge, then click where the toast's Dismiss is while the dialog asks.",
+        "outcome": "The toast still reads Bed 4 is not ready and the dialog still asks Discharge Ada?."
+      }
+    },
+    {
+      "id": "dom-popover-dismiss-click-after-modal-closed",
+      "statement": "Once the dialog opened by showModal closes, a click on the popover's button reaches its handler.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-popover-dismiss-click-after-modal-closed: dismiss:1",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F5",
+        "page": "The same shift page, with a Discharge button whose click shows Notice().Error(\"Bed 4 is not ready\") and then asks NativeConfirm Discharge Ada?.",
+        "gesture": "Click Discharge, click No, then click the toast's Dismiss.",
+        "outcome": "No toast shows."
+      }
+    },
+    {
+      "id": "dom-link-middle-click",
+      "statement": "A middle click on a link raises auxclick and no click on it, opens its href in a new page, and the page stays.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-link-middle-click: click:0 auxclick:1 new-page:http://probe.test/residents/7 stays:http://probe.test/",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F3",
+        "page": "A ward list rendering Ada (1), Bea (2) and Cy (3) from plan.Rows<ResidentRow>(\"residents\"), each with a NativeActionLink whose block GETs /Residents/{residentId} and loads its HTML into resident-detail.",
+        "gesture": "Click Cy's link with the middle button.",
+        "outcome": "A new page opens at /Residents/3, the ward list stays, and resident-detail stays empty."
+      }
+    },
+    {
+      "id": "dom-link-modified-click",
+      "statement": "A Control click, Meta on macOS, on a link raises click with button 0 and the modifier set, and when its listener prevents nothing it opens the href in a new page while the page stays.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-link-modified-click: button:0 modifier:true new-page:http://probe.test/residents/7 stays:http://probe.test/",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F3",
+        "page": "The same ward list, each row with a NativeActionLink whose block GETs /Residents/{residentId} into resident-detail.",
+        "gesture": "Click Bea's link with Control (Meta on macOS).",
+        "outcome": "A new page opens at /Residents/2, the ward list stays, and resident-detail stays empty."
+      }
+    },
+    {
+      "id": "dom-transitionend-needs-a-transition",
+      "statement": "A class change that starts a CSS transition fires transitionend, and one on an element no transition applies to fires none.",
+      "host": "browser",
+      "oracle": "The DOM in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m25.mjs",
+      "expect": "dom-transitionend-needs-a-transition: without:0 with:1",
+      "source": "spec/probes/dom-native-m25.mjs",
+      "proof": {
+        "feature": "M25.F1",
+        "page": "A notes page whose stylesheet gives the drawer no transition, rendering Html.NativeDrawer(\"Close\"), with Open notes, which sets the drawer's heading to Care notes, loads Ada's notes into its content and opens it, and Open empty, which opens it and loads nothing.",
+        "gesture": "Click Open notes, click the drawer's Close button, then click Open empty.",
+        "outcome": "The drawer shows with an empty heading and an empty content."
+      }
     }
   ]
 }

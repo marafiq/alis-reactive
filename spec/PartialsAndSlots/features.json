@@ -3,7 +3,7 @@
   "features": [
     {
       "id": "M9.F1",
-      "summary": "A view's plan: started in the view with the view's model, in a page, a partial, an editor template or a slot's content, and rendered at the view's end as a script of plan data; each view's plan is its own, nothing carries plan state between views on the server, and the plans of a page compose in the browser without merging, each with the owner whose container holds its script. The plan's types also hold a form's summary, refused for the container's block (N14.3), and an app-level object's door until module 25 claims it; their plugin registration, a validator's browser rules and a component joined to the plan are claimed by modules 13, 8 and 12.",
+      "summary": "A view's plan: started in the view with the view's model, in a page, a partial, an editor template or a slot's content, and rendered at the view's end as a script of plan data; each view's plan is its own, nothing carries plan state between views on the server, and the plans of a page compose in the browser without merging, each with the owner whose container holds its script. The plan's types also hold a form's summary, refused for the container's block (N14.3); their plugin registration, a validator's browser rules, a component joined to the plan and an app-level object's door are claimed by modules 13, 8, 12 and 25.",
       "status": "both",
       "types": [
         "Alis.Reactive:PlanExtensions",
