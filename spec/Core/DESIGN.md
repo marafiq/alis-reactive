@@ -2584,7 +2584,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     disposed owner, so the run never waits again (`Run.tla:DisposedRunNeverWaits`). A request a disposed run's
     `Finally` reaches sends nothing, and its own `Finally` runs.
 - D11.9 No step waits for time. The only waits the core owns are a retry's delay and a `Retry-After`
-  (D10.14). A component's own timers, such as a toast's or a loader's timeout, are its properties.
+  (D10.14). A component's own timers, such as a toast's time shown, are the component's; the busy indicator has none
+  and hides only when its count returns to 0 (D10.21).
 - D11.10 Every stage is a block, as D8.7 and D8.8 state, on every view kind, MVC 5 and ASP.NET Core MVC (the owner,
   2026-11-08). The stages are closed: a handler of any trigger (on load, an element's or a component's event, a
   declared app event, a dispatch, a server push, a hub message), each branch (`Then`, an `ElseIf`'s, `Else`), each
