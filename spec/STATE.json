@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 360,
+        "defects": 362,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1269,7 +1269,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 549,
+        "defects": 551,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1325,12 +1325,13 @@
         "F1_names": 140,
         "F1_rows": 140,
         "F1_synonym_groups": 25,
-        "F2": "fail",
+        "F2": "pass",
         "F2_cells": 240,
-        "F2_compiling": 116,
-        "F2_failing": 1,
+        "F2_compiling": 117,
+        "F2_failing": 0,
         "F2_forms": 33,
         "F2_forms_as_named": 33,
+        "F2_gap_doors": 9,
         "F2_gaps": 119,
         "F2_position_gaps": 4,
         "F2_positions": 15,
@@ -1358,10 +1359,10 @@
         "F5_stale_rows": 0,
         "F5_untyped": 0,
         "lambda_parameters": 463,
-        "members": 539
+        "members": 542
       },
-      "detail": "F2 ConditionLeft x Literal: fails CS1929 and is no refused cell; F2 PropertySet x HubInvokeResult: no door (N21.1, N21.8: no hub door)",
-      "pass": false
+      "detail": "one concept per name, every Q7 cell compiles, is refused as named or waits on a door the spec marks new, one shape per name, callbacks named as the locked table names them, every string parameter of a closed kind",
+      "pass": true
     },
     "gate1": {
       "counts": {},
@@ -1478,7 +1479,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 383,
+        "defects": 385,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -3430,15 +3431,15 @@
       "pass": true
     }
   },
-  "passed": 22,
-  "read_at_head": "dbadb1dcf0e12ce14d01af92cd43d759221b8a1d",
+  "passed": 23,
+  "read_at_head": "6f968fba6d20b779765d1b507780470522a77e38",
   "step": {
     "failing": [
-      "fluent"
+      "matrix"
     ],
-    "name": "The fluent API, gate 2",
-    "next": "Write spec/Fluent/sentences.json; present gate 2.",
-    "number": 7,
+    "name": "The reference components",
+    "next": "Write spec/Reference/matrix.json, syncfusion.json, native.json.",
+    "number": 8,
     "phase": "D"
   },
   "total": 26
