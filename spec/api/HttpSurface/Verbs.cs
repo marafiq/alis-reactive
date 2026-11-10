@@ -41,7 +41,7 @@ public static class RequestVerbs
 
     public static void Validate<TModel, TContainer>(this Pipeline<TModel> pipeline, RequestContainer<TContainer> container) => throw new NotSupportedException();
 
-    public static void ShowErrors<TModel>(this Pipeline<TModel> pipeline, ITypedSource<ValidationProblem> problem) => throw new NotSupportedException();
+    public static void ShowValidationErrors<TModel>(this Pipeline<TModel> pipeline, ITypedSource<ValidationProblem> problem) => throw new NotSupportedException();
 
     public static void Into<TModel>(this Pipeline<TModel> pipeline, string elementId, ITypedSource<Markup> html) => throw new NotSupportedException();
 }

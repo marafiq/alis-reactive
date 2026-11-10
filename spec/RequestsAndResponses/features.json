@@ -1002,7 +1002,7 @@
         },
         {
           "line": "proposed",
-          "text": ".OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowErrors(refused.Body))",
+          "text": ".OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))",
           "doors": [
             "N10.7"
           ]

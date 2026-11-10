@@ -30,7 +30,7 @@ public static class RowActionsUsage
                     .Set(r => r.Ward, activated.Row.Read(r => r.Ward)))
                 .OnError<ValidationProblem>(400, (refused, pipeline) =>
                 {
-                    pipeline.ShowErrors(refused.Body);
+                    pipeline.ShowValidationErrors(refused.Body);
                     activated.Element.Classes.Add("refused");
                 })
                 .OnSuccess<CensusCount>((census, pipeline) =>

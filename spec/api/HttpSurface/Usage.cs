@@ -47,7 +47,7 @@ public static class Usage
                     .Set(r => r.Ward, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))))
             .Validate<IntakeValidator>()
             .OnSuccess(Content.Json<IntakeCreated>(), (created, pipeline) => pipeline.Notice().Success("Resident admitted"))
-            .OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowErrors(refused.Body))
+            .OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
             .Chained((created, pipeline) => pipeline
                 .Get<SummaryQuery>("/Residents/{residentId}/Summary", request => request
                     .Path(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
@@ -151,7 +151,7 @@ public static class Usage
                 .Set(q => q.Wing, ward)
                 .Set(q => q.Bed, 4))
             .OnSuccess<Census>((counted, pipeline) => pipeline.Element("beds").Text.Set(counted.Request.Read(q => q.Ward)))
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body));
         pipeline.Get<BedQuery>("/Wards/{ward}/Beds", request => request
                 .Path(q => q.Ward, "north")
                 .Form(bedSearch))
@@ -189,13 +189,13 @@ public static class Usage
                 .Query(r => r.Reason, "held")
                 .Query(r => r.Floor, floor))
             .OnSuccess(Content.Text, (held, pipeline) => pipeline.Notice().Success(held.Body))
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Set(r => r.Ward, "north")
                 .Set(r => r.Floor, floor)
                 .Set(r => r.Note, note)
                 .Set(r => r.Bed, 4))
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
             .OnSuccess(pipeline => pipeline.Notice().Success("Bed held"));
         pipeline.Put<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Path(r => r.Ward, "north")
@@ -227,8 +227,8 @@ public static class Usage
                 .Form(bedForm)
                 .Input(r => r.Note, pipeline.Input(v => v.Resident))
                 .Set(r => r.Bed, 4))
-            .OnError<ValidationProblem>(422, (refused, pipeline) => pipeline.ShowErrors(refused.Body))
-            .OnSuccess<ValidationProblem>((answered, pipeline) => pipeline.ShowErrors(answered.Body));
+            .OnError<ValidationProblem>(422, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
+            .OnSuccess<ValidationProblem>((answered, pipeline) => pipeline.ShowValidationErrors(answered.Body));
         pipeline.Post<IntakeView, BedRequest>("/Wards/{ward}/Beds", request => request
                 .Inputs(bedForm)
                 .Input(r => r.Floor, pipeline.Input(v => v.Floor)))

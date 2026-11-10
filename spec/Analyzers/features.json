@@ -96,7 +96,7 @@
         },
         {
           "line": "proposed",
-          "text": "A request's constant URL, headers, statuses, busy targets and staged values are refused at build by ALIS030, and ShowErrors outside a route by ALIS031.",
+          "text": "A request's constant URL, headers, statuses, busy targets and staged values are refused at build by ALIS030, and ShowValidationErrors outside a route by ALIS031.",
           "doors": [
             "N18.7",
             "N18.8"

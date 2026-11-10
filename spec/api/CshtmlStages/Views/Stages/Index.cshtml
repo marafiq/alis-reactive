@@ -38,7 +38,7 @@
             })
             .OnError<ValidationProblem>(400, (refused, pipeline) =>
             {
-                pipeline.ShowErrors(refused.Body);
+                pipeline.ShowValidationErrors(refused.Body);
                 pipeline.Element("status").Text.Set(refused.Headers.Get("X-Reason"));
             })
             .OnSuccess<IntakeCreated>((created, pipeline) =>

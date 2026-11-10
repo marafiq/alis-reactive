@@ -110,7 +110,7 @@ public static class EveryStage
                 })
                 .OnError<ValidationProblem>(400, (refused, pipeline) =>
                 {
-                    pipeline.ShowErrors(refused.Body);
+                    pipeline.ShowValidationErrors(refused.Body);
                     pipeline.Element("status").Text.Set(refused.Headers.Get("X-Reason"));
                     pipeline.Element("save").Classes.Add("refused");
                 })
@@ -215,7 +215,7 @@ public static class EveryStage
 
     private static void EveryRouteModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, ITypedSource<ValidationProblem> problem, RequestForm<IntakeRequest> intake)
     {
-        pipeline.ShowErrors(problem);
+        pipeline.ShowValidationErrors(problem);
         EveryModule(pipeline, text, intake);
     }
 }

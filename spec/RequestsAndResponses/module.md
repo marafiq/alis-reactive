@@ -68,7 +68,7 @@ analyzers, whose code is module 20's.
   each branch a pipeline and the steps after it the all-settled block (D10.10).
 - Kept: `WhileLoading`, `Finally` and `Into(elementId)` (D10.3, D10.11). Both lines'
   `Validate<TValidationSource>(formId)` goes to `Validate<TValidator>()` over the body the request sends (D16.1,
-  D16.2), and both lines' `ValidationErrors(formId)` to `ShowErrors(problem)` (D16.13).
+  D16.2), and both lines' `ValidationErrors(formId)` to `ShowValidationErrors(problem)` (D16.13).
 - Added on the evidence of both lines: `ValidationResult.ToErrorResponse()` on each host (N10.1), the net48 JSON
   result door (N10.6), the defaults (N9.6, N10.3), `Busy`, `NoBusy`, `NoDefaults`, `Download` and `Notice` (N10.7), and
   net48's `[ValidateAntiForgeryHeader]` (D9.22).

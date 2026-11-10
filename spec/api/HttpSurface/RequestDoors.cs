@@ -20,7 +20,7 @@ public static class RequestDoors
             .Busy()
             .NoBusy()
             .NoRetry()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, pipeline) => pipeline.Element("status").Text.Set(answered.Headers.Get("X-Status")))
             .Chained((answered, pipeline) => pipeline.Element("asked").Text.Set(answered.Request.Read(r => r.Ward)));
         sent.OnSuccess(Content.Json<Census>(), (counted, pipeline) => pipeline.Notice().Info("Counted"))
@@ -35,7 +35,7 @@ public static class RequestDoors
             .Busy()
             .NoBusy()
             .NoRetry()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
             .Chained((reply, pipeline) => pipeline.Notice().Info("Chained"));
         sent.OnSuccess(pipeline => pipeline.Notice().Info("Answered"));
         sent.OnSuccess<Census>((counted, pipeline) => pipeline.Notice().Info("Counted"));
@@ -88,7 +88,7 @@ public static class RequestDoors
             .Busy()
             .NoBusy()
             .NoRetry()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, pipeline) => pipeline.Element("status").Text.Set(answered.Headers.Get("X-Status")))
             .Chained((answered, pipeline) => pipeline.Element("asked").Text.Set(answered.Request.Read(r => r.Ward)));
         sent.OnSuccess(Content.Json<Census>(), (counted, pipeline) => pipeline.Notice().Info("Counted"))
@@ -103,7 +103,7 @@ public static class RequestDoors
             .Busy()
             .NoBusy()
             .NoRetry()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
             .Chained((reply, pipeline) => pipeline.Notice().Info("Chained"));
         sent.OnSuccess(pipeline => pipeline.Notice().Info("Answered"));
         sent.OnSuccess<Census>((counted, pipeline) => pipeline.Notice().Info("Counted"));
@@ -124,7 +124,7 @@ public static class RequestDoors
             .Busy("beds", "bed-count")
             .Busy()
             .NoBusy()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, pipeline) => pipeline.Element("status").Text.Set(answered.Headers.Get("X-Status")))
             .Chained((answered, pipeline) => pipeline.Element("asked").Text.Set(answered.Request.Read(r => r.Ward)));
         sent.OnSuccess(Content.Json<Census>(), (counted, pipeline) => pipeline.Notice().Info("Counted"))
@@ -138,7 +138,7 @@ public static class RequestDoors
             .Busy("beds", "bed-count")
             .Busy()
             .NoBusy()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
             .Chained((reply, pipeline) => pipeline.Notice().Info("Chained"));
         sent.OnSuccess(pipeline => pipeline.Notice().Info("Answered"));
         sent.OnSuccess<Census>((counted, pipeline) => pipeline.Notice().Info("Counted"));
@@ -160,7 +160,7 @@ public static class RequestDoors
             .Busy()
             .NoBusy()
             .NoRetry()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, pipeline) => pipeline.Element("status").Text.Set(answered.Headers.Get("X-Status")))
             .Chained((answered, pipeline) => pipeline.Element("asked").Text.Set(answered.Request.Read(r => r.Ward)));
         sent.OnSuccess(Content.Json<Census>(), (counted, pipeline) => pipeline.Notice().Info("Counted"))
@@ -175,7 +175,7 @@ public static class RequestDoors
             .Busy()
             .NoBusy()
             .NoRetry()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
             .Chained((reply, pipeline) => pipeline.Notice().Info("Chained"));
         sent.OnSuccess(pipeline => pipeline.Notice().Info("Answered"));
         sent.OnSuccess<Census>((counted, pipeline) => pipeline.Notice().Info("Counted"));
@@ -197,7 +197,7 @@ public static class RequestDoors
             .Busy()
             .NoBusy()
             .NoRetry()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body));
         sent.OnSuccess(Content.None, (answered, pipeline) => pipeline.Element("status").Text.Set(answered.Headers.Get("X-Status")))
             .Chained((answered, pipeline) => pipeline.Element("asked").Text.Set(answered.Request.Read(r => r.Ward)));
         sent.OnSuccess(Content.Json<Census>(), (counted, pipeline) => pipeline.Notice().Info("Counted"))
@@ -212,7 +212,7 @@ public static class RequestDoors
             .Busy()
             .NoBusy()
             .NoRetry()
-            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowErrors(refused.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
             .Chained((reply, pipeline) => pipeline.Notice().Info("Chained"));
         sent.OnSuccess(pipeline => pipeline.Notice().Info("Answered"));
         sent.OnSuccess<Census>((counted, pipeline) => pipeline.Notice().Info("Counted"));

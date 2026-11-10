@@ -2258,7 +2258,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - kept: `OnSuccess`, `OnSuccess<T>`, `OnError` and `OnError(status)` with its typed form, as routes on the request
   (N10.7), `Chained`, `Parallel`, `WhileLoading`, `Finally`, `Into` and `Validate`, which checks the body its request
   sends (D16.2); `Response(..)`'s builder goes to those routes, and `OnAllSettled` to the steps after `Parallel` (D10.10). `ValidationErrors(formId)` (`Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:291`) becomes
-  `ShowErrors(problem)`, a step of a request's route that shows the problem as that request's failures (D16.13); a
+  `ShowValidationErrors(problem)`, a step of a request's route that shows the problem as that request's failures (D16.13); a
   route shows no other container's failures, since a message maps only to the inputs its own request sent (D13.3).
 - `N10.1` new: the error door on each host, `ValidationResult.ToErrorResponse()`: net10 a `ValidationProblemDetails`
   result, net48 a JSON result with status 400 and `TrySkipIisCustomErrors`, replacing the body each app builds by hand.
@@ -2291,7 +2291,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     argument is an instance member of the type it is called on: the verbs, `PageUrl<TPage>()` and
     `Container<TContainer>(containerId)` on `Pipeline<TModel>`, `OnSuccess<T>` and `OnError<T>` on the request types. A
     door with no type argument to name (`Set`, `Form`, `Inputs`, `Input`, `OnSuccess(pipeline => ..)`, `Into`,
-    `Download`, `Notice`, `ShowErrors`, `Validate(container)`) is an extension method over them. The modules: the verbs,
+    `Download`, `Notice`, `ShowValidationErrors`, `Validate(container)`) is an extension method over them. The modules: the verbs,
     the request types, `RequestDefaults` and `NoModel` are `Pipelines`', as the POC's `Pipelines/Requests.cs` is, since
     each takes a pipeline; the objects a request reads (`Response`, `Failure`, `Content`, `Markup`, `ResponseFile`,
     `BrowserFile`, `PageUrl`, `ValidationProblem`, `RequestContainer`, `RequestForm`) are `Requests`', which names no
@@ -2332,7 +2332,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     carries `T`, so its `Chained((reply, pipeline) => ..)` receives the typed reply by construction. `Validate<TValidator>()`,
     `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the body the request sends (Q16); `Busy(elementId, ..)`,
     `Busy()` and `NoBusy()` say where its busy indicator shows (D10.21); `WhileLoading`, `Finally`, `NoDefaults()` and
-    `NoValidation()` complete it. `ShowErrors(problem)` is a step of a route's pipeline that shows any
+    `NoValidation()` complete it. `ShowValidationErrors(problem)` is a step of a route's pipeline that shows any
     `ValidationProblem` source, a 400's body or another route's, as the request's failures (D16.13), refused by ALIS031
     in a block no route encloses (N18.8).
   - the objects, each a JS object whose members are sources: `Response<TRequest>` (`Status`, `Headers.Get(name)` and
@@ -2409,7 +2409,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
               .Form(intake)))
       .Validate<IntakeValidator>()
       .OnSuccess(Content.Json<IntakeCreated>(), (created, pipeline) => pipeline.Notice().Success("Resident admitted"))
-      .OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowErrors(refused.Body))
+      .OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))
       .Chained((created, next) => next
           .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
               .Path(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
@@ -2604,7 +2604,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   (`WhileLoading`, `Finally`, each error route). Each is a `Pipeline<TModel>`, the defaults' a `Pipeline<NoModel>`.
   - A block holds any number of steps of every module: a set, a call, an element's text, HTML and classes, a
     condition, a request, `Parallel`, `Confirm`, `Into`, `Unload`, `Validate`, a dispatch, a notice, and in a route
-    `ShowErrors`. They are written as a chain or as statements in a `{}` body and run in authored order (D11.1,
+    `ShowValidationErrors`. They are written as a chain or as statements in a `{}` body and run in authored order (D11.1,
     D11.5), and each reads every value the blocks around it bind (D8.8).
   - A block's C# runs once, where the view renders: a statement writes a step, and a loop over the view's data
     writes a step for each item. C#'s own branching (`if`, `switch`, `?:`, a switch expression, `try`, `throw`,
@@ -3117,7 +3117,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - refused: `Form()`, carried by `Form(form)` and `Inputs(container)`, which name what they send (D9.2); `Form(fields)`,
   carried by `Input(r => r.Member, input)` (N9.3); `Validate<TValidator>(formId)`, carried by a request's own check
   (D16.2) and the check with no request, `Validate(container)` (N16.3); `ValidationErrors(formId)`, carried by
-  `ShowErrors(problem)` (N10.7); `PageForm`, which no door returns, since a request's failures show at its own summary
+  `ShowValidationErrors(problem)` (N10.7); `PageForm`, which no door returns, since a request's failures show at its own summary
   place (D16.13); `Html.FormSummary(formId)` (`Alis.Reactive/Razor/PlanExtensions.cs:98`), carried by the container's
   block (N14.3).
 - `N13.1` new: a container's typed read of a member as the container sends it, the one read by binding name (D13.3); its
@@ -3571,7 +3571,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - Both are MVC's own pattern: a validation summary that holds property errors, and a message for each field.
   - No DOM visibility is read, so a message inside a hidden panel is still in the summary. The form of the
     summary goes to gate 2.
-  - `ShowErrors(problem)` places a `ValidationProblem` from any source the same way, a response's body included
+  - `ShowValidationErrors(problem)` places a `ValidationProblem` from any source the same way, a response's body included
     (N10.7).
 - D16.14 `FormField` is designed once (P5):
   - its path as Q1's steps, every item as `each` (D13.5);
@@ -3772,7 +3772,7 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   shows in the page container's summary and not at the reloaded input.
 - `X16.20` behavior: a live fieldset container inside a live form container: blurring the empty name both hold
   shows "Name is required." once.
-- `X16.21` analyzer: `ShowErrors` on a pipeline that is no request's route: "ShowErrors shows a request's failures,
+- `X16.21` analyzer: `ShowValidationErrors` on a pipeline that is no request's route: "ShowValidationErrors shows a request's failures,
   and this pipeline is no request's route; call it inside OnError or OnSuccess." At build by ALIS031, and where the view renders on code it does not follow (D18.6): new:N18.8.
 - `X16.22` behavior: a save that leaves out `Care`, an enum the app names as flags whose model starts it at
   `Mon | Tue`, passes `IsInEnum` in the browser, and the endpoint saves Mon, Tue; a save that leaves out `Rota`, an enum
@@ -4551,7 +4551,7 @@ plans (Q19).
   check, with the same message, that the render keeps for code the analyzer does not follow (a helper method a block
   calls); a line of this design that says a rule the build sees is refused where the view renders means both.
   - Moved to an analyzer, by family: ALIS030, the request (X9.5, X9.6, X9.7, X9.12, X10.18, X10.25, X14.6, X20.6;
-    N18.7); ALIS031, `ShowErrors` outside a route (X16.21; N18.8); ALIS032, blocks (X5.13, X5.14, X6.8, X8.5, X8.9,
+    N18.7); ALIS031, `ShowValidationErrors` outside a route (X16.21; N18.8); ALIS032, blocks (X5.13, X5.14, X6.8, X8.5, X8.9,
     X8.16, X8.17, X8.18, X8.25, X11.1, X17.13, X17.19; N18.9); ALIS033, lambdas, member lambdas and literals (X2.5,
     X3.11, X4.12, X6.2, X6.6, X6.10, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.30,
     X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3, X14.13, X14.14; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
@@ -4616,7 +4616,7 @@ shapes, starts and the payload's path of each event.
   request held in a variable and written twice or after another step, so a door a stage removes cannot come back
   through a second use and a route stays in the sentence of its request, which carries ALIS007's second `Chained`
   (N10.7).
-- `N18.8` new: ALIS031, `ShowErrors` in a block that no route encloses (D16.13).
+- `N18.8` new: ALIS031, `ShowValidationErrors` in a block that no route encloses (D16.13).
 - `N18.9` new: ALIS032, the block analyzer: a step written on the pipeline of a block around its own (D11.10); a
   bound value carried out of its block through a variable declared outside it (D8.8, D5.11); an `ElseIf` or `Else`
   after another step, a second `Else` (D8.7); a result called in an `ElseIf`'s condition read after its `When`, and an

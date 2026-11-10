@@ -38,7 +38,7 @@ Kept from the core, each the analyzer that holds its rule:
   (`Alis.Reactive.Analyzers/ControlFlow/ControlFlowInReactiveCallbackAnalyzer.cs:98` at 65fdf118d) to every block of
   `Pipeline<TModel>` in every file.
 - `N18.7` ALIS030, the request analyzer, which carries ALIS007's second `Chained` as a request written twice.
-- `N18.8` ALIS031, `ShowErrors` in a block no route encloses.
+- `N18.8` ALIS031, `ShowValidationErrors` in a block no route encloses.
 - `N18.9` ALIS032, the block analyzer; `N18.10` ALIS033, the lambda analyzer; `N18.12` ALIS034, the declaration
   names analyzer.
 - `N18.11` ALIS006, kept as an error, the validator analyzer; main reports it as a warning
@@ -81,7 +81,7 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS025 | an override's JSON name and ignore | new (N18.5) |
 | ALIS026, ALIS027, ALIS036 | the suppressors | new (N6.3, N9.5) |
 | ALIS028, ALIS029 | a typed source; a file member | new (N6.4, N9.4) |
-| ALIS030 to ALIS035 | the request, `ShowErrors`, blocks, lambdas, declarations, a row's link | new (N18.7 to N18.13) |
+| ALIS030 to ALIS035 | the request, `ShowValidationErrors`, blocks, lambdas, declarations, a row's link | new (N18.7 to N18.13) |
 | ALIS038, ALIS039 | the flags door; two app events of one name | new (N16.5, M1.N6) |
 
 ## Improvements

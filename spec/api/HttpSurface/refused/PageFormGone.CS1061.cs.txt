@@ -8,5 +8,5 @@ public static class PageFormGone
 {
     public static void Refused(Pipeline<IntakeView> pipeline)
         => pipeline.Post("/Wards/Census/Refresh")
-            .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("intake").ShowErrors(refused.Body));
+            .OnError<ValidationProblem>(400, (refused, shown) => shown.Form("intake").ShowValidationErrors(refused.Body));
 }
