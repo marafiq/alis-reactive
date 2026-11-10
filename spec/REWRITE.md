@@ -390,7 +390,7 @@ is never the reason.
 - The sources of DesignSystem and NativeTagHelpers, their workspaces and asset lines; `examples/net48-mvc-smoke`, which
   becomes `tests/Alis.Reactive.Consumer.Net48`; `build/AlisReactiveBrowserAssets.targets`; `Alis.Reactive.Assets/components/`,
   whose code moves into its package; jsdom and Tailwind.
-- `.claude/rules/docs.md`'s worked example: the cut removes the sandbox's, and U11 writes the conformance app's.
+- `.claude/rules/docs.md`'s worked example: the cut removes the sandbox's, and U12 writes the conformance app's.
 
 ## 4. Units
 
@@ -447,28 +447,32 @@ Features: M2.F1, M2.F2
 ### U6. Elements
 Features: M5.F1
 
-### U7. Inputs and ids
-Features: M7.F1, M7.F2, M7.F3
-
-### U8. Conditions
-Features: M3.F1, M3.F2
-
-### U9. Declarations and vendors
+### U7. Declarations and vendors
 Features: M11.F1, M11.F2, M11.F3, M12.F1, M12.F2
 
 The conformance library's six declarations land here with the doors that reach them; the bench's cells run from here on.
 
-### U10. Plugins
-Features: M13.F1, M13.F2
+### U8. Inputs and ids
+Features: M7.F1, M7.F2, M7.F3
 
-### U11. Requests and responses
-Features: M6.F1, M6.F2
+The core renders no input: `Html.InputField` builds on a component's render helper (M7.N2), so no test of this unit's
+features lands before U9, whose Native inputs render the fields those tests type into, and most land with the requests,
+partials or validation their pages also use. U8 ends on its analyzer cases; its module owns no spec.
 
-### U12. Native components
+### U9. Native components
 Features: M24.F1, M24.F2, M24.F3, M24.F4, M24.F5, M24.F6, M24.F7, M24.F8, M24.F9
 
 Written to the highest bar: a component-writing expert's review of each slice before its commit, and the strictest
 lint and TypeScript options of section 2.7 with no exemption.
+
+### U10. Conditions
+Features: M3.F1, M3.F2
+
+### U11. Plugins
+Features: M13.F1, M13.F2
+
+### U12. Requests and responses
+Features: M6.F1, M6.F2
 
 ### U13. Partials and slots
 Features: M9.F1, M9.F2
@@ -477,7 +481,7 @@ Features: M9.F1, M9.F2
 Features: M25.F1, M25.F2, M25.F3, M25.F4, M25.F5, M25.F6, M25.F7
 
 NativeDrawer, NativeToast, NativeConfirm, NativeLoader, the reconnect offer and the action link, each rendered into
-the target a legacy layout holds by the helper the layout calls once; the same review and lint as U12.
+the target a legacy layout holds by the helper the layout calls once; the same review and lint as U9.
 
 ### U15. Array lambdas
 Features: M4.F1, M4.F2
