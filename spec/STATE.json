@@ -1340,13 +1340,15 @@
         "F3": "fail",
         "F3_differ": 21,
         "F3_names": 35,
-        "F4": "fail",
+        "F4": "pass",
+        "F4_data": 143,
         "F4_hides": 0,
-        "F4_no_row": 455,
+        "F4_no_row": 0,
         "F4_other_name": 0,
         "F4_parameters": 455,
+        "F4_rows": 10,
+        "F4_rows_unused": 0,
         "F4_slots": 92,
-        "F4_stale_rows": 6,
         "F5": "fail",
         "F5_parameters": 110,
         "F5_rows": 45,
@@ -1355,7 +1357,7 @@
         "lambda_parameters": 463,
         "members": 539
       },
-      "detail": "F2 ConditionLeft x Literal: fails CS1929 and is no refused cell; F2 PropertySet x HubInvokeResult: no door (N21.1, N21.8: no hub door); F3 All: (callback1)>source on LiveObjects<TItem>; (path)>source on ITypedSource<T>; F3 Any: ()>source | (callback1)>source on LiveObjects<TItem>; ()>source | (path)>source on ITypedSource<T>; F4 spec/api/HttpSurface/EveryStage.cs:19 'handled': Rendered.Reactive(pipeline)#1:Pipeline has no row; F4 spec/api/HttpSurface/EveryStage.cs:25 'north': Guard.Then(branch)#0:Pipeline has no row; F5 IHtmlHelper.PartialFor(viewName): no string kind; F5 RequestDefaults.Header(value): no string kind",
+      "detail": "F2 ConditionLeft x Literal: fails CS1929 and is no refused cell; F2 PropertySet x HubInvokeResult: no door (N21.1, N21.8: no hub door); F3 All: (callback1)>source on LiveObjects<TItem>; (path)>source on ITypedSource<T>; F3 Any: ()>source | (callback1)>source on LiveObjects<TItem>; ()>source | (path)>source on ITypedSource<T>; F5 IHtmlHelper.PartialFor(viewName): no string kind; F5 RequestDefaults.Header(value): no string kind",
       "pass": false
     },
     "gate1": {
@@ -1365,8 +1367,8 @@
     },
     "gate2": {
       "counts": {},
-      "detail": "gate 2 not answered",
-      "pass": false
+      "detail": "gate 2 answered yes",
+      "pass": true
     },
     "hedges": {
       "counts": {
@@ -3425,12 +3427,11 @@
       "pass": true
     }
   },
-  "passed": 21,
-  "read_at_head": "7f11dac54e013f91970be7efb31356592c76f30f",
+  "passed": 22,
+  "read_at_head": "10cab373367ee1b3c68b06cd791e5676fa3073cd",
   "step": {
     "failing": [
-      "fluent",
-      "gate2"
+      "fluent"
     ],
     "name": "The fluent API, gate 2",
     "next": "Write spec/Fluent/sentences.json; present gate 2.",
