@@ -5007,9 +5007,20 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   element's text, a component's member and a dispatch. Server push is in 1.0; a response body read as a stream (a
   fetch `ReadableStream`, an AI or chat stream) stays out by the owner's 2026-06-10 decision, so D10.6's closed set of
   response kinds holds no stream kind, and the two decisions do not overlap.
+- D21.13 A connection's waits are stated in C# and carried, never a default nobody wrote:
+  - A stream's reconnection waits the `retry:` the typed event writer (N21.2) sends with the stream's first event, as
+    `SseItem<T>.ReconnectionInterval`: the app's `ReconnectionInterval(TimeSpan)` on `AddReactiveRealtime` (N21.9), and
+    3 seconds when the app states none, written so every browser waits the same, since the HTML standard leaves the
+    default to the browser. The browser waits it on its own timer, which Playwright's clock does not drive, so the test
+    app states 100 milliseconds.
+  - A hub's plugin data carries its waits, 0, 2, 10 and 30 seconds, the SignalR client's own default
+    (`node_modules/@microsoft/signalr/dist/esm/DefaultReconnectPolicy.js:4`, 10.0.11), written by the C#. The browser
+    hands them to `withAutomaticReconnect` and tries a first start again on the same waits (M10.D1); after the last the
+    hub gives up and runs its closed steps. The client waits each on a page timer
+    (`node_modules/@microsoft/signalr/dist/esm/HubConnection.js:717`), so a test runs them on Playwright's clock (X21.13).
 
 **Schema nodes.** The plugins `alis.stream` and `alis.hub`, their plugin data `stream` (new) and `hub`, each carrying
-`offer` (D21.11), the contract plugin `reconnect`, `Handler` for message and lifecycle triggers, and `call` for a hub's
+`offer` (D21.11), a hub's `waits` (D21.13), the contract plugin `reconnect`, `Handler` for message and lifecycle triggers, and `call` for a hub's
 invoke and send.
 
 **Checker.**
@@ -5036,6 +5047,8 @@ invoke and send.
   live.ShowReconnect())` or `NoReconnectOffer()`, a `Hosting` door beside `AddReactiveRequests` (D21.11).
 - `N21.8` new: a stream's and a hub's members as a JS object's, its state, its lifecycle and message events and a hub's
   methods, each a source (D21.12); their form goes to gate 2.
+- `N21.9` new: `ReconnectionInterval(TimeSpan)` on net10's realtime configuration, the wait a stream's writer sends as
+  its first event's `retry:`, 3 seconds when the app states none (D21.13).
 
 **Evidence.**
 - The core's browser code imports the SignalR client: `Alis.Reactive.Assets/runtime/realtime/hub.ts:1`, pinned at
@@ -5071,3 +5084,5 @@ invoke and send.
   or a hub needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime."
 - `X21.12` behavior: under `ShowReconnect()`, a page that provides no `reconnect` opens no stream, and the console holds
   one error.
+- `X21.13` behavior (D21.13): a hub the server refuses from its first start tries again after 0, 2, 10 and 30 seconds of
+  the page's clock, then runs its closed steps and shows the reconnect offer.

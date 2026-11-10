@@ -7244,6 +7244,41 @@
       "harness": [
         "seed"
       ]
+    },
+    {
+      "feature": "M10.F2",
+      "for": "X21.13",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nurseLine"
+      ],
+      "harness": [
+        "seed",
+        "refuse",
+        "reopen",
+        "clock"
+      ],
+      "held": [
+        {
+          "verb": "refuse",
+          "action": "Realtime.tla:GiveUp",
+          "on": "NurseLine from its first start"
+        },
+        {
+          "verb": "clock",
+          "action": null,
+          "on": "the hub client's start waits"
+        },
+        {
+          "verb": "reopen",
+          "action": "Realtime.tla:Connect",
+          "on": "NurseLine after the third refusal, in the opposite"
+        }
+      ]
     }
   ],
   "cells": [

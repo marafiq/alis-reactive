@@ -137,6 +137,13 @@
           "doors": [
             "N21.7"
           ]
+        },
+        {
+          "line": "proposed",
+          "text": "services.AddReactiveRealtime(live => live.ShowReconnect().ReconnectionInterval(TimeSpan.FromSeconds(3)))",
+          "doors": [
+            "N21.9"
+          ]
         }
       ],
       "nodes": [
@@ -651,6 +658,10 @@
           "id": "M10.X3",
           "rung": "behavior",
           "defect": "An invoke an on-load handler calls runs before the hub's first start completes and is rejected, so the answer never shows; or an invoke during a reconnection waits for it instead of stopping its pipeline (M10.D3)."
+        },
+        {
+          "id": "X21.13",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -725,6 +736,15 @@
           "opposite": "Without the refusal, the offer never shows and line-call reads 1.",
           "defect": "A retry that starts only the page's hubs skips the hub the card's slot holds, so line-call keeps 1 and the offer stays shown (Ownership.tla's HubKeptWhileHeld and OfferOnlyWhileHeld).",
           "observes": "Ownership.tla:Retry"
+        },
+        {
+          "for": "X21.13",
+          "page": "The medication round under ShowReconnect() with the Native reconnect offer, whose plan names the hub NurseLine, writes open into line-state when the hub welcomes it, and whose closed steps write closed into line-state. The harness refuses NurseLine from the page's first connection and reports each connection it refuses, and runs the clock through the hub client's waits.",
+          "gesture": "Pause the clock and open the round; wait until the harness reports one refusal. Run the clock forward 41 seconds and wait until the harness reports four refusals; then run it 2 seconds more.",
+          "outcome": "After 41 seconds the harness reports four refusals, line-state is empty and the reconnect offer is hidden; after 2 seconds more it reports five, line-state reads closed and the offer shows.",
+          "opposite": "With the harness reopening NurseLine after the third refusal, the try at 12 seconds connects and line-state reads open, and no closed step runs.",
+          "defect": "The first start is tried once or on waits the plan does not carry, so line-state reads closed at the first refusal, or the fifth try never comes and line-state never reads closed (M10.D1); or the reconnect offer shows before the hub gives up.",
+          "observes": "Realtime.tla:GiveUp"
         }
       ],
       "verdicts": [

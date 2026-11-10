@@ -21,7 +21,8 @@ of its own. Module 10 of `spec/CLAUDE.md`.
   event and per hub method (D21.3, N21.1, N21.2); what the framework did not produce is logged once and runs nothing
   (D21.4); the lifecycle triggers `reconnecting`, `reconnected` and `closed` on both transports (D21.5, N21.4); the
   reconnect contract and the app's startup choice (D21.11, N21.7); the hub's client linked only when a plan names a
-  hub (D21.1, N21.5).
+  hub (D21.1, N21.5); each connection's waits stated in C# and carried: a stream's `retry:`, a hub's start and
+  reconnection waits (D21.13, N21.9).
 
 ## Boundaries
 
@@ -39,6 +40,7 @@ This module adds no door. Its doors are the core's: the message triggers typed `
 and a hub's methods declared once (N21.1); the endpoint's typed event writer (N21.2); the plugin data `stream`
 (N21.3); the lifecycle triggers (N21.4); the hub's own asset (N21.5); every realtime door on net10's surface alone
 (N21.6); the reconnect contract and `AddReactiveRealtime`'s choice (N21.7); a stream's and a hub's members (N21.8);
+a stream's reconnection wait (N21.9);
 and the hub's `invoke` and `send`, kept (Q11).
 
 The meanings `M10.D1` to `M10.D4` are in `spec/Realtime/features.json`, on the feature they give.
