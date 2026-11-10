@@ -564,11 +564,19 @@
         },
         {
           "for": "X10.28",
-          "page": "An app that never calls AddReactiveRequests, and a view whose Load button gets the rounds from /Rounds.",
+          "page": "A net10 app that never calls AddReactiveRequests, and a view whose Load button gets the rounds from /Rounds.",
           "gesture": "Open the page.",
           "outcome": "The page is refused where it renders with \"'GET /Rounds' is rendered in an app that never called AddReactiveRequests; call services.AddReactiveRequests(requests => ..) once at startup.\"",
           "opposite": "With AddReactiveRequests called at startup, the page renders and Load shows the rounds.",
           "defect": "The page renders and Load runs with no defaults, so a 500 from /Rounds shows nothing and no busy indicator shows while it waits."
+        },
+        {
+          "for": "X10.28",
+          "page": "A net48 MVC 5 app that calls services.AddReactiveRequests(requests => ..) in Application_Start and sets no MVC resolver, served from IIS by the verify-net48 run, and a view whose Load button gets the rounds from /Rounds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where it renders with \"'GET /Rounds' is rendered in an app that never called AddReactiveRequests or set MVC's resolver; call services.AddReactiveRequests(requests => ..) once at startup and set the resolver over the container with DependencyResolver.SetResolver in Application_Start.\"",
+          "opposite": "With DependencyResolver.SetResolver set over the app's container in Application_Start, the page renders and Load shows the rounds.",
+          "defect": "The refusal names AddReactiveRequests alone, which the app called, so the developer looks for a call that is there; or the view reads only an IServiceProvider, which MVC 5 hands it none of, so the page is refused even with the resolver set (M19.X4)."
         }
       ],
       "verdicts": [

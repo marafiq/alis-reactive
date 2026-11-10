@@ -1,0 +1,265 @@
+{
+  "module": "RenderingAndDelivery",
+  "features": [
+    {
+      "id": "M19.F1",
+      "summary": "Rendering and delivery: how a view's plan and the framework's browser files reach the page on each host. A view's plan renders at its block's end as one application/json script marked data-reactive-plan, its text escaped so no text it carries ends the element. Every file a framework package ships is linked by a URL that carries the file's content hash, by ASP.NET Core's asp-append-version over the package's static web asset on net10 and by Url.AppendVersion over the copy under Content\\{PackageId}\\ on net48. A package writes into an app's project only on net48, into its own folder beside a .gitignore holding *, so the app's git lists nothing. A view reads the app's startup registrations through the request's services on net10 and MVC 5's DependencyResolver on net48. The one door of either line here is the redesign's UrlVersionExtensions, kept as M19.N1. Main copies each file under a name holding the package's version, which every view links, writes no ignore file, and names each plan script by its plan id.",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:UrlVersionExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "<script src=\"@Url.Content(\"~/Content/alisreactive/alis-reactive.1.0.0-rc.1.js\")\"></script>",
+          "cite": "examples/net48-mvc-smoke/Views/Shared/_Layout.cshtml:18"
+        },
+        {
+          "line": "main",
+          "text": "PropertyNamingPolicy = JsonNamingPolicy.CamelCase",
+          "cite": "Alis.Reactive/PlanModel/Serialization/PlanSerializer.cs:13"
+        },
+        {
+          "line": "main",
+          "text": "var planScript = $\"<script type=\\\"application/json\\\" id=\\\"alis-plan-{elementId}\\\" data-reactive-plan data-trace=\\\"trace\\\">{planJson}</script>\";",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:98"
+        },
+        {
+          "line": "main",
+          "text": "source ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(IClientValidationRuleSource))",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:155"
+        },
+        {
+          "line": "redesign",
+          "text": "public static class UrlVersionExtensions",
+          "cite": "Alis.Reactive/Razor/UrlVersionExtensions.cs:15"
+        },
+        {
+          "line": "redesign",
+          "text": "public static string AppendVersion(this UrlHelper url, string contentPath)",
+          "cite": "Alis.Reactive/Razor/UrlVersionExtensions.cs:35"
+        },
+        {
+          "line": "redesign",
+          "text": "return url.Content(contentPath) + \"?v=\" + version;",
+          "cite": "Alis.Reactive/Razor/UrlVersionExtensions.cs:50"
+        },
+        {
+          "line": "redesign",
+          "text": "return Convert.ToBase64String(sha.ComputeHash(file)).TrimEnd('=').Replace('+', '-').Replace('/', '_');",
+          "cite": "Alis.Reactive/Razor/UrlVersionExtensions.cs:57"
+        },
+        {
+          "line": "redesign",
+          "text": "<script src=\"@Url.AppendVersion(\"~/Content/AlisReactive/js/alis-reactive.js\")\"></script>",
+          "cite": "examples/net48-mvc-smoke/Views/Shared/_Layout.cshtml:15"
+        },
+        {
+          "line": "redesign",
+          "text": "<link rel=\"stylesheet\" href=\"~/_content/AlisReactive/css/alis-reactive.css\" asp-append-version=\"true\"/>",
+          "cite": "Alis.Reactive.SandboxApp/Views/Shared/_Layout.cshtml:7"
+        },
+        {
+          "line": "redesign",
+          "text": "<AlisReactiveStaticWebAsset Include=\"$(AlisAssetsDist)\\scripts\\alis-reactive.dev.js\" RelativePath=\"js/alis-reactive.js\" />",
+          "cite": "Alis.Reactive/Alis.Reactive.csproj:28"
+        },
+        {
+          "line": "redesign",
+          "text": "if ($listed) { $listed; throw \"the packages' delivery left files git lists in the smoke app\" }",
+          "cite": ".github/workflows/verify-net48.yml:103"
+        },
+        {
+          "line": "redesign",
+          "text": "var markup = new System.Text.StringBuilder($\"<script type=\\\"application/json\\\" data-reactive-plan>{json}</script>\");",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:125"
+        },
+        {
+          "line": "redesign",
+          "text": "Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default,",
+          "cite": "Alis.Reactive/Grammar/GrammarSerializer.cs:12"
+        },
+        {
+          "line": "redesign",
+          "text": "=> new ReactivePlan<TModel>(html.ViewContext.HttpContext.RequestServices, FieldPrefixOf(html), RenderedPage.ViewPathOf(html.ViewContext));",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:48"
+        },
+        {
+          "line": "redesign",
+          "text": "names ??= System.Web.Mvc.DependencyResolver.Current?.GetService(typeof(ReactiveClassNames)) as ReactiveClassNames;",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:158"
+        },
+        {
+          "line": "proposed",
+          "text": "A layout links each framework file by Url.AppendVersion on net48 and by asp-append-version on net10, whose v is the file's SHA-256 in URL-safe base64.",
+          "doors": [
+            "M19.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A view's plan block writes the plan at its end as one application/json script marked data-reactive-plan, with no text that ends it.",
+          "doors": [
+            "N14.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A view reads the registrations services.AddReactiveRequests(requests => ..) writes through the request's services on net10 and MVC 5's DependencyResolver on net48.",
+          "doors": [
+            "N10.7"
+          ]
+        }
+      ],
+      "nodes": [
+        "lit",
+        "set",
+        "element",
+        "request"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:90-125"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanModel/Serialization/PlanSerializer.cs:11-23"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:150-170"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/UrlVersionExtensions.cs:15-59"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:38-49"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:121-129"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Grammar/GrammarSerializer.cs:9-15"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:153-162"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Alis.Reactive.csproj:27-32"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:56-70"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plans/discover.ts:10-24"
+        },
+        {
+          "line": "redesign",
+          "cite": "examples/net48-mvc-smoke/ci/verify.mjs:14-26"
+        }
+      ],
+      "core": [
+        "Q14"
+      ],
+      "meanings": [
+        {
+          "id": "M19.D1",
+          "meaning": "Every browser file a framework package ships reaches the page by a URL whose query v is the file's SHA-256 in URL-safe base64 with no padding (RFC 4648, section 5), so the URL changes exactly when the file's bytes do (probe:core-append-version-hash), and a view's link stays the same across upgrades. On net10 a view links the package's static web asset at ~/_content/{PackageId}/{path} with ASP.NET Core's asp-append-version; on net48 it links the copy under ~/Content/{PackageId}/{path} with Url.AppendVersion (M19.N1), which reads the hash again only when the file's last write time changes. A path at which no file is is refused where the view renders, naming the path and the build that copies the package's files (M19.X2)."
+        },
+        {
+          "id": "M19.D2",
+          "meaning": "A package writes into an app's project only on net48, and only into the folder it owns, Content\\{PackageId}\\, which IIS serves, beside a .gitignore holding *. Each file is copied, and the .gitignore written, only when its content changes, so the app's git status lists nothing after a build or an upgrade. On net10 a package writes nothing into the project: its files are static web assets the host serves from the package. The app adds no ignore entry on either host."
+        },
+        {
+          "id": "M19.D3",
+          "meaning": "A view's plan renders at its block's end (N14.2) as one script element of type application/json marked data-reactive-plan. Its text is the plan's JSON with <, > and & written as the JSON escapes \\u003C, \\u003E and \\u0026, so no text a plan carries, a literal or a value the view holds with </script> in it, ends the element or starts markup, and the browser's JSON.parse reads each text back unchanged (probe:core-stj-default-encoder-html, probe:html-script-text-ends-at-close-tag). The element carries no other attribute: a plan id keys nothing (D13.2), and the plan carries its own trace context (N19.3)."
+        },
+        {
+          "id": "M19.D4",
+          "meaning": "A view reads the registrations an app's startup calls write, once on each host, through one read per host: the request's services on net10 (HttpContext.RequestServices), and on net48 MVC 5's DependencyResolver.Current, which the app sets over its container in Application_Start. A registration a view needs and does not find is refused by its door's own refusal, X10.28 for AddReactiveRequests, whose net48 text names DependencyResolver.SetResolver beside the startup call."
+        }
+      ],
+      "oracle": "The WHATWG HTML standard's script data state for the text of a script element, and JSON's \\u escapes (RFC 8259), which the browser's JSON.parse reads; SHA-256 (FIPS 180-4) and base64url (RFC 4648, section 5); ASP.NET Core 10's asp-append-version and static web assets; MVC 5's DependencyResolver, read from the aspnetwebstack source; System.Text.Json 10's default encoder; and the verify-net48 run, which builds the net48 smoke app from the packages, serves it from IIS and lists the app's git status.",
+      "checker": [
+        "core:Q14"
+      ],
+      "defects": [
+        {
+          "id": "M19.X1",
+          "rung": "behavior",
+          "defect": "A framework file linked by a URL that does not change with its bytes, so after an upgrade the browser runs the runtime it cached and refuses the new version's plans at boot (D19.10); or a URL whose v changes on every build of an unchanged file, so every page after a deploy fetches each file again. Main links a file name holding the package's version (examples/net48-mvc-smoke/Views/Shared/_Layout.cshtml:18 at 623dd4a27), so each upgrade edits every layout that links one."
+        },
+        {
+          "id": "M19.X2",
+          "rung": "refusal",
+          "defect": "Url.AppendVersion over a path at which no file is writes a URL with no version and no word of the path, so the page renders and its runtime never loads. The redesign refuses it with \"No file is at {contentPath} ({physicalPath}). A package's build copies its browser files into Content\\{PackageId}\\; build the app before it serves a page.\" (Alis.Reactive/Razor/UrlVersionExtensions.cs:40 at 65fdf118d), the message this module keeps."
+        },
+        {
+          "id": "M19.X3",
+          "rung": "behavior",
+          "defect": "A plan's JSON written with < and > as themselves, so a text that holds </script> ends the plan's element where the page parses it, the rest of the plan shows on the page as markup, and the plan does not boot. Both lines leave it to System.Text.Json's default encoder (Alis.Reactive/Grammar/GrammarSerializer.cs:12 at 65fdf118d), which no spec line names."
+        },
+        {
+          "id": "M19.X4",
+          "rung": "behavior",
+          "defect": "A view that reads only an IServiceProvider, which an MVC 5 view is handed none of (the redesign passes none on net48: Alis.Reactive/Razor/PlanExtensions.cs:41 at 65fdf118d), so a net48 page whose app registered its requests and set MVC's resolver is refused as an app that never called AddReactiveRequests (X10.28)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M19.X1",
+          "page": "A net10 rounds index with the link Open the rounds, to a rounds page whose layout links the framework's runtime as ~/_content/AlisReactive/js/alis-reactive.js with asp-append-version, served with a cache lifetime of one year, and whose Show the round button writes the round's ward, North, into round-ward. Between two visits the test host replaces the package's runtime, and the plans the app writes, with a later version's, as an upgrade does.",
+          "gesture": "On the rounds index, click Open the rounds and click Show the round; after the upgrade, go back to the rounds index, click Open the rounds and click Show the round.",
+          "outcome": "Each visit writes North into round-ward, and the runtime's URL on the second visit carries a v that differs from the first visit's.",
+          "opposite": "With the runtime left as it was between the visits, the second visit's runtime URL carries the first visit's v, and round-ward shows North.",
+          "defect": "The runtime's URL carries no hash of its bytes, so the second visit runs the runtime the browser cached, which refuses the later version's plan at boot (D19.10), and round-ward stays empty; or the v changes with a file that did not, so the opposite's two URLs differ."
+        },
+        {
+          "for": "M19.X1",
+          "page": "The net48 smoke app's home page, built from the packages and served from IIS by the verify-net48 run: its layout links the runtime as ~/Content/AlisReactive/js/alis-reactive.js with Url.AppendVersion, and its Show the proof check box shows reactive-proof.",
+          "gesture": "Check Show the proof.",
+          "outcome": "reactive-proof shows, and the runtime's URL ends with ?v= and the SHA-256 of the bytes IIS serves at it, in URL-safe base64.",
+          "opposite": "With the runtime's file changed and the app built again, the runtime's URL carries the new bytes' hash, and Show the proof still shows reactive-proof.",
+          "defect": "The layout links the file with Url.Content, as main's does (examples/net48-mvc-smoke/Views/Shared/_Layout.cshtml:18 at 623dd4a27), so the URL carries no v; or its v is the hash of bytes IIS does not serve at it."
+        },
+        {
+          "for": "M19.X2",
+          "page": "A net48 wards index with the link Open the ward, to a ward page whose layout links ~/Content/AlisReactive/js/alis-reactive.jss with Url.AppendVersion, a path at which no file is, and whose Show the ward button writes North into ward-name.",
+          "gesture": "On the wards index, click Open the ward.",
+          "outcome": "The ward page is refused where the view renders with the message that begins \"No file is at ~/Content/AlisReactive/js/alis-reactive.jss\" and names Content\\{PackageId}\\ and the build.",
+          "opposite": "With the layout linking ~/Content/AlisReactive/js/alis-reactive.js, the ward page renders, and Show the ward writes North into ward-name.",
+          "defect": "The URL is written with no check, so the ward page renders, its runtime never loads, and Show the ward writes nothing, with no word of the path."
+        },
+        {
+          "for": "M19.X3",
+          "page": "A resident card whose view holds the resident's name, </script><b>Ada</b>, as the literal its Show name button writes as the text of resident-name, and whose Show room button writes 4B into resident-room.",
+          "gesture": "Click Show name, then click Show room.",
+          "outcome": "resident-name shows the text </script><b>Ada</b>, no bold text shows on the page, and resident-room shows 4B.",
+          "opposite": "With the resident's name Ada Lee, Show name writes Ada Lee into resident-name, and Show room writes 4B into resident-room.",
+          "defect": "The plan's JSON carries </script> as itself, so the plan's element ends at it: Ada shows in bold below the card, the plan's text does not parse at boot, and neither button writes anything."
+        },
+        {
+          "for": "M19.X4",
+          "page": "A net48 MVC 5 intake page, in an app that calls services.AddReactiveRequests(requests => ..) in Application_Start and sets MVC's resolver over its container with DependencyResolver.SetResolver; its Name text box and Save button post the resident's name to an endpoint that answers Saved and the name into intake-status, which reads Not saved until then. The verify-net48 run serves it from IIS.",
+          "gesture": "Type Ada Lee into Name and click Save.",
+          "outcome": "intake-status shows Saved Ada Lee.",
+          "opposite": "With the app's resolver left unset, the intake page is refused where the view renders with X10.28's message, which on net48 names DependencyResolver.SetResolver beside AddReactiveRequests.",
+          "defect": "The view reads only an IServiceProvider, which an MVC 5 view is handed none of, so the intake page is refused as an app that never called AddReactiveRequests, though it did; or the refusal of the opposite names AddReactiveRequests alone, which the app called."
+        }
+      ],
+      "verdicts": []
+    }
+  ]
+}

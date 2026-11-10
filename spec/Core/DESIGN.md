@@ -2484,7 +2484,10 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   written twice (a second `Chained` among them), each of which compiles: new:N18.7.
 - `X10.28` refusal (N10.7): a request rendered in an app that never called `AddReactiveRequests` is refused where the
   view renders with "'{method} {url}' is rendered in an app that never called AddReactiveRequests; call
-  services.AddReactiveRequests(requests => ..) once at startup."
+  services.AddReactiveRequests(requests => ..) once at startup." On net48, where an MVC 5 view reaches the app's
+  registrations only through MVC's resolver (M19.D4), the text is "'{method} {url}' is rendered in an app that never
+  called AddReactiveRequests or set MVC's resolver; call services.AddReactiveRequests(requests => ..) once at startup
+  and set the resolver over the container with DependencyResolver.SetResolver in Application_Start."
 - `X10.29` behavior (N10.7): a typed catch-all, `OnError<TError>((failed, pipeline) => ..)`, reads the JSON body of a
   status no route names through `failed.Body`, and `Body` reads nothing after a network failure, while `Outcome` reads
   `network`.
