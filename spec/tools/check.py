@@ -210,7 +210,7 @@ def check_inventory():
 RUNGS = {"type", "analyzer", "refusal", "behavior"}
 CITE_EXTENSIONS = "cs|ts|tla|cfg|json|md|txt|mjs|csproj|props|targets|cshtml|js|sh|yml"
 CITE = re.compile(rf"([A-Za-z0-9_.\-/]+\.(?:{CITE_EXTENSIONS})):(\d+)(?:-(\d+))?")
-PROSE_CITE_TOKEN = re.compile(rf"(?P<path>[A-Za-z0-9_.\-/]+\.(?:{CITE_EXTENSIONS}))?:(?P<first>\d+)(?:-(?P<last>\d+))?|\bat\s+(?P<sha>[0-9a-f]{{7,40}})\b|(?P<stop>[.;]\s|\n\n)")
+PROSE_CITE_TOKEN = re.compile(rf"(?P<path>@?[A-Za-z0-9_.\-/]+\.(?:{CITE_EXTENSIONS}))?:(?P<first>\d+)(?:-(?P<last>\d+))?|\bat\s+(?P<sha>[0-9a-f]{{7,40}})\b|(?P<stop>[.;]\s|\n\n)")
 CHECKER = re.compile(r"`(?:([A-Za-z]+)\.tla:(\w+)|probe:([\w.\-]+)|check:(\w+))`")
 DEFECT = re.compile(r"^- `?(X\d+\.\d+)`? (type|analyzer|refusal|behavior)(?: \([^)]*\))?: (.+)$")
 NEW_DOOR = re.compile(r"`?(N\d+\.\d+)`?")
@@ -1055,8 +1055,9 @@ def check_module_cites():
         for cite, sha, line in prose_cites(path.read_text()):
             cites += 1
             if not prose_cite_resolves(cite, sha):
-                problems.append(f"{path.relative_to(REPO)}:{line}: {written_cite(cite)} resolves at none of {sha or 'HEAD, the redesign and main'}")
-    return result(not problems, "; ".join(problems[:8]) or "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main", cites=cites, unresolved=len(problems))
+                where = "the installed node_modules" if cite[0].startswith("@") else sha or "HEAD, the redesign and main"
+                problems.append(f"{path.relative_to(REPO)}:{line}: {written_cite(cite)} resolves in none of {where}")
+    return result(not problems, "; ".join(problems[:8]) or "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules", cites=cites, unresolved=len(problems))
 
 
 def prose_cites(text):
@@ -1078,6 +1079,14 @@ def prose_cites(text):
     return found + [(cite, None, line) for cite, line in pending]
 
 
+def installed_package_lines(path):
+    for folder in [REPO, *REPO.parents]:
+        candidate = folder / "node_modules" / path
+        if candidate.is_file():
+            return len(candidate.read_text().splitlines())
+    return -1
+
+
 def written_cite(cite):
     path, first, last = cite
     return f"{path}:{first}-{last}" if last else f"{path}:{first}"
@@ -1086,6 +1095,8 @@ def written_cite(cite):
 def prose_cite_resolves(cite, sha):
     path, first, last = cite
     needed = max(first, last or first)
+    if path.startswith("@"):
+        return installed_package_lines(path) >= needed
     return any(line_count(source, path) >= needed for source in ([sha] if sha else [None, BASE_SHA, MAIN_SHA]))
 
 
