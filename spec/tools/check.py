@@ -1218,7 +1218,8 @@ FLUENT_STRING_KINDS = {"text", "url", "element-id", "header-name", "css-class", 
 FLUENT_UNTYPED_KINDS = {"object", "type", "object[]", "type[]"}
 FLUENT_SLOT_ROW = re.compile(r"^[\w-]+\.\w+\(\w+\)#\d+:\w+$")
 FLUENT_TABLE_TITLE = "Callback parameter naming convention (locked):"
-FLUENT_LATER = ["F1", "F2"]
+FLUENT_LATER = ["F2"]
+FLUENT_CONCEPT_ID = re.compile(r"^(?:D\d+\.\d+|N\d+\.\d+|M\d+\.[DN]\d+)$")
 
 
 def check_fluent(plant=None):
@@ -1228,16 +1229,19 @@ def check_fluent(plant=None):
     surface, refused = fluent_surface(plant)
     if refused:
         return result(False, refused)
-    rows = json.loads(path.read_text()).get("strings", {})
+    sentences = json.loads(path.read_text())
+    rows = sentences.get("strings", {})
+    concepts, concept_counts = fluent_concept_problems(surface, sentences.get("concepts", {}))
     shapes, shape_counts = fluent_shape_problems(surface, rows)
     callbacks, callback_counts = fluent_callback_problems(surface, fluent_callback_table())
     strings, string_counts = fluent_string_problems(surface, rows)
-    judged = {"F3": shapes, "F4": callbacks, "F5": strings}
-    counts = {"members": len(surface["members"]), "lambda_parameters": len(surface["lambdas"]), **shape_counts, **callback_counts, **string_counts}
+    judged = {"F1": concepts, "F3": shapes, "F4": callbacks, "F5": strings}
+    counts = {"members": len(surface["members"]), "lambda_parameters": len(surface["lambdas"]), **concept_counts, **shape_counts,
+              **callback_counts, **string_counts}
     counts.update({check: "pass" if not found else "fail" for check, found in judged.items()})
     counts.update({check: "not built" for check in FLUENT_LATER})
     first = [problem for found in judged.values() for problem in found[:2]]
-    detail = "; ".join(first) or "F3, F4 and F5 pass"
+    detail = "; ".join(first) or "F1, F3, F4 and F5 pass"
     return result(False, detail + "; " + ", ".join(FLUENT_LATER) + " not built", **counts)
 
 
@@ -1254,6 +1258,31 @@ def fluent_surface(plant):
         if completed.returncode != 0:
             return None, "the fluent console refused: " + next(iter(completed.stderr.strip().splitlines()), "exit " + str(completed.returncode))
         return json.loads(written.read_text()), None
+
+
+def fluent_known_ids():
+    design = (SPEC / "Core" / "DESIGN.md").read_text()
+    decisions = set(re.findall(r"^- (D\d+\.\d+) ", design, re.MULTILINE))
+    return decisions | all_new_doors(design_sections() or {}) | module_statements()
+
+
+def fluent_synonym_groups(concepts):
+    groups = {}
+    for name, ids in sorted(concepts.items()):
+        groups.setdefault(tuple(sorted(ids)), []).append(name)
+    return [names for names in groups.values() if len(names) > 1]
+
+
+def fluent_concept_problems(surface, concepts):
+    names = sorted({member["member"] for member in surface["members"]})
+    known = fluent_known_ids()
+    problems = [f"F1 {name}: no concept row" for name in names if name not in concepts]
+    problems += [f"F1 {name}: a row names no surface member" for name in sorted(set(concepts) - set(names))]
+    for name, ids in sorted(concepts.items()):
+        if not ids:
+            problems.append(f"F1 {name}: a row names no meaning")
+        problems += [f"F1 {name}: {ident} resolves nowhere" for ident in ids if not (FLUENT_CONCEPT_ID.match(ident) and ident in known)]
+    return problems, {"F1_names": len(names), "F1_rows": len(concepts), "F1_synonym_groups": len(fluent_synonym_groups(concepts))}
 
 
 def fluent_type_name(receiver):

@@ -1,0 +1,8 @@
+using System;
+
+namespace Alis.Reactive.Plants;
+
+public sealed class LiteralAlonePlant
+{
+    public void Classes(string text) => throw new NotSupportedException();
+}

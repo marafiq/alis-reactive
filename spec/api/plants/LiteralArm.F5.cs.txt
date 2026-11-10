@@ -1,0 +1,11 @@
+using System;
+using Alis.Reactive.Values;
+
+namespace Alis.Reactive.Plants;
+
+public sealed class LiteralArmPlant
+{
+    public void Classes(string text) => throw new NotSupportedException();
+
+    public void Classes<TValue>(ITypedSource<TValue> text) => throw new NotSupportedException();
+}

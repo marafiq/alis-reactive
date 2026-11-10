@@ -33,7 +33,26 @@ static class Surface
                 foreach (var member in type.GetMembers().Where(IsExposed))
                     if (Describe(assembly, type, member) is { } described)
                         members.Add(described);
-        return members;
+        return LiteralArms(members);
+    }
+
+    static IReadOnlyList<SurfaceMember> LiteralArms(IReadOnlyList<SurfaceMember> members)
+    {
+        var sourced = members
+            .SelectMany(member => member.Parameters.Select((parameter, index) => (member, parameter, index)))
+            .Where(entry => entry.parameter.Kind.TrimEnd('?') == "source")
+            .Select(entry => (entry.member.Receiver, entry.member.Member, entry.index))
+            .ToHashSet();
+        return members
+            .Select(member => member with
+            {
+                Parameters = member.Parameters
+                    .Select((parameter, index) => parameter.Kind == "string" && sourced.Contains((member.Receiver, member.Member, index))
+                        ? parameter with { Kind = "literal" }
+                        : parameter)
+                    .ToList(),
+            })
+            .ToList();
     }
 
     public static string Receiver(ITypeSymbol type)
