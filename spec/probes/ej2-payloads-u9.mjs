@@ -28,7 +28,7 @@ const describe = () => {
   }));
 };
 
-const withoutTrialBanner = page => page.evaluate(() => [...document.body.children].filter(child => !child.id && child.tagName === "DIV").forEach(child => child.remove()));
+const withoutTrialBanner = page => page.evaluate(() => [...document.body.children].filter(child => child.tagName === "DIV" && (child.style.zIndex === "999999999" || child.attributes.length === 0 && child.firstElementChild?.style.zIndex === "99999")).forEach(child => child.remove()));
 
 const heard = (page, name) => page.evaluate(key => window.heard[key] ?? "not raised", name);
 

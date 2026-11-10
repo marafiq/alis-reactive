@@ -33,14 +33,13 @@ const describe = () => {
   }));
 };
 
-const withoutBanner = page => page.evaluate(() => [...document.body.children].filter(child => !child.id && !child.className && child.tagName === "DIV").forEach(child => child.remove()));
 
 const press = async (page, selector, options) => {
-  await withoutBanner(page);
+  await withoutTrialBanner(page);
   await page.click(selector, options);
 };
 
-const withoutTrialBanner = page => page.evaluate(() => [...document.body.children].filter(child => !child.id && child.tagName === "DIV").forEach(child => child.remove()));
+const withoutTrialBanner = page => page.evaluate(() => [...document.body.children].filter(child => child.tagName === "DIV" && (child.style.zIndex === "999999999" || child.attributes.length === 0 && child.firstElementChild?.style.zIndex === "99999")).forEach(child => child.remove()));
 
 const click = async (page, selector) => {
   await withoutTrialBanner(page);
@@ -205,7 +204,7 @@ const batch = async page => {
     window.batchGrid = shown;
   });
   await page.waitForFunction(() => window.heard["batch:dataBound"], null, { timeout: 10000 });
-  await withoutBanner(page);
+  await withoutTrialBanner(page);
   await page.dblclick("#batch .e-row >> nth=0 >> td >> nth=1");
   await page.fill("#batch td.e-editedbatchcell input", "Ada Byron");
   await page.keyboard.press("Enter");
