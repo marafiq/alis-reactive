@@ -1268,28 +1268,28 @@
     },
     "defects": {
       "counts": {
-        "core_defects_unplaced": 7,
-        "defects": 540,
+        "core_defects_unplaced": 0,
+        "defects": 549,
         "doubled": 0,
-        "features": 109,
+        "features": 112,
         "mapped": 8909,
         "rows": 8909,
         "unmapped": 0
       },
-      "detail": "every feature row valid; 0 of 8909 spec doors in no feature; core defects no feature places: X20.1, X20.2, X20.3, X20.4, X20.5, X20.6, X20.7",
-      "pass": false
+      "detail": "every defect on its rung, every core defect in a feature; no promise for a type or analyzer defect",
+      "pass": true
     },
     "doors_mapped": {
       "counts": {
-        "core_doors_homeless": 3,
+        "core_doors_homeless": 0,
         "doubled": 0,
-        "features": 109,
+        "features": 112,
         "mapped": 8909,
         "rows": 8909,
         "unmapped": 0
       },
-      "detail": "every feature row valid; 0 of 8909 spec doors in no feature; core doors no module names: N20.1, N20.2, N20.3",
-      "pass": false
+      "detail": "every spec door in exactly one feature, every core door named by a module",
+      "pass": true
     },
     "evidence": {
       "counts": {
@@ -1302,7 +1302,7 @@
     "features_core": {
       "counts": {
         "doubled": 0,
-        "features": 109,
+        "features": 112,
         "mapped": 8909,
         "rows": 8909,
         "unmapped": 0
@@ -1336,7 +1336,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 54,
+        "files": 56,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1400,7 +1400,7 @@
     },
     "module_cites": {
       "counts": {
-        "cites": 1009,
+        "cites": 1026,
         "unresolved": 0
       },
       "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
@@ -1415,8 +1415,8 @@
     },
     "probes": {
       "counts": {
-        "browser": 108,
-        "facts": 365,
+        "browser": 111,
+        "facts": 368,
         "net10": 118,
         "net48": 77,
         "node": 62
@@ -1427,9 +1427,9 @@
     "promises": {
       "counts": {
         "doubled": 0,
-        "features": 109,
+        "features": 112,
         "mapped": 8909,
-        "promises": 385,
+        "promises": 391,
         "rows": 8909,
         "unmapped": 0
       },
@@ -3106,106 +3106,115 @@
         "Tracing": {
           "Tracing.cfg": {
             "green": true,
-            "hash": "2b783b02e134d964a3f5281f1d7c00a8138d753eb866b3849b20e935f4144b65",
+            "hash": "8bbe99e02cad970a46ae96126a4e9588ecf387d7f68426c25187e6db8529c5cc",
             "line": "Model checking completed. No error has been found.",
-            "states": "208 states generated, 148 distinct states found, 0 states left on queue.",
+            "states": "208 states generated, 152 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Tracing.violates.AttemptsJoinTheTrace.cfg": {
             "green": false,
-            "hash": "70f216c886d3cd60c7414bb2a7fbc47d41f90c748b62d12873ad4aca6057202a",
+            "hash": "d40a25992c8efb6d343ef92d957180a0ad6a9e8877ea6cb4d1a4aaea8d5e5a17",
             "line": "violated: AttemptsJoinTheTrace",
-            "states": "188 states generated, 134 distinct states found, 0 states left on queue.",
+            "states": "188 states generated, 138 distinct states found, 5 states left on queue.",
             "violated": [
               "AttemptsJoinTheTrace"
             ]
           },
           "Tracing.violates.ChildEndsBeforeParent.cfg": {
             "green": false,
-            "hash": "fae3c619f9a79df5d13303e0efe3924acd4674a8a58ea0a09f9afcfe9a9d9fe6",
+            "hash": "d4abea48d73dc9bba375a4bcc511927e03468b678cd53efeb1dfe907be2a5a38",
             "line": "violated: ChildEndsBeforeParent",
-            "states": "171 states generated, 131 distinct states found, 28 states left on queue.",
+            "states": "125 states generated, 109 distinct states found, 36 states left on queue.",
             "violated": [
               "ChildEndsBeforeParent"
             ]
           },
           "Tracing.violates.EveryStartedSpanEnds.cfg": {
             "green": false,
-            "hash": "7c4bcf35b29195eff11fff30c27b71325c6a1041f3592783e1636cf36413fcb9",
+            "hash": "bb754ef0df6feaf91aa585abaa8bdc0f5e0673828d3c88013e7b27a2c777b2a0",
             "line": "violated: EveryStartedSpanEnds",
-            "states": "130 states generated, 100 distinct states found, 31 states left on queue.",
+            "states": "80 states generated, 72 distinct states found, 21 states left on queue.",
             "violated": [
               "EveryStartedSpanEnds"
             ]
           },
           "Tracing.violates.NothingRecordedWhenOff.cfg": {
             "green": false,
-            "hash": "048fb2355c8b1f84dfcf5208d4e455c12c1270912e948f0787895723b4dcd740",
+            "hash": "d447f1b0520c051621901f2344dfcb654d5f552066a17c4986ad20e5f4625745",
             "line": "violated: NothingRecordedWhenOff",
-            "states": "149 states generated, 109 distinct states found, 17 states left on queue.",
+            "states": "48 states generated, 48 distinct states found, 18 states left on queue.",
             "violated": [
               "NothingRecordedWhenOff"
             ]
           },
           "Tracing.violates.ReachDisposedInFlight.cfg": {
             "green": false,
-            "hash": "1c3a3a768413426f050a19ab8e752cae136749b28995268954c2355a4e228c28",
+            "hash": "774f824889a683d955c57663895b0317ced159958f24f298aa292ce88d0a57ea",
             "line": "violated: ReachDisposedInFlight",
-            "states": "208 states generated, 148 distinct states found, 6 states left on queue.",
+            "states": "208 states generated, 152 distinct states found, 3 states left on queue.",
             "violated": [
               "ReachDisposedInFlight"
             ]
           },
           "Tracing.violates.ReachRetriedAttemptTraced.cfg": {
             "green": false,
-            "hash": "c44657f94c22e4ac129606beecbfded81a37c6d11ba779986a85d30b4fdc6643",
+            "hash": "0fd010adbd40eb0db68d8cf01df5ab5b38686a6a1382ef231c76465ab48513af",
             "line": "violated: ReachRetriedAttemptTraced",
-            "states": "202 states generated, 146 distinct states found, 0 states left on queue.",
+            "states": "202 states generated, 150 distinct states found, 0 states left on queue.",
             "violated": [
               "ReachRetriedAttemptTraced"
             ]
           },
           "Tracing.violates.ReachRetryTracedWhileOff.cfg": {
             "green": false,
-            "hash": "10b8fe12417920c871d85620400c21c08042cb87b60b84c513638a8237a9caf0",
+            "hash": "73fb35c5d63799c69f533aa1c228d9f72df5f7dd19dfb9fad068ee3f55c027b6",
             "line": "violated: ReachRetryTracedWhileOff",
-            "states": "190 states generated, 138 distinct states found, 0 states left on queue.",
+            "states": "190 states generated, 142 distinct states found, 0 states left on queue.",
             "violated": [
               "ReachRetryTracedWhileOff"
             ]
           },
           "Tracing.violates.ResendCountSent.cfg": {
             "green": false,
-            "hash": "60fb3a7c6ab17d202cab4e979db956c2cbac9a05ee226cace49b72a6362e4358",
+            "hash": "2068e81a2b51fa3e5504481dfdde1859333767bf81155e3ea48d656c2a995144",
             "line": "violated: ResendCountSent",
-            "states": "172 states generated, 128 distinct states found, 0 states left on queue.",
+            "states": "172 states generated, 132 distinct states found, 0 states left on queue.",
             "violated": [
               "ResendCountSent"
             ]
           },
           "Tracing.violates.RetriesAlwaysTraced.cfg": {
             "green": false,
-            "hash": "a525b0aaccd1daa544ffbce38b80d346f72e71af51d9ffe5d0849f895bb2ba97",
+            "hash": "33d1e391b40bcb4e228ed09df27b1f31f0d70cb3821159f4a214c936eff55153",
             "line": "violated: RetriesAlwaysTraced",
-            "states": "181 states generated, 133 distinct states found, 0 states left on queue.",
+            "states": "190 states generated, 142 distinct states found, 0 states left on queue.",
             "violated": [
               "RetriesAlwaysTraced"
             ]
           },
           "Tracing.violates.SinkFailureChangesNothing.cfg": {
             "green": false,
-            "hash": "63bbfef52c3b2d3f0ecf67f9c5a0fcb05f3c0e174f61c8a7c1cd11f41160b7a3",
+            "hash": "a2c27e9152ea39ac36cda1fe5f049fe82e3356e1d15ef0c35aced86b39dec6bf",
             "line": "violated: SinkFailureChangesNothing",
-            "states": "127 states generated, 97 distinct states found, 20 states left on queue.",
+            "states": "146 states generated, 108 distinct states found, 14 states left on queue.",
             "violated": [
               "SinkFailureChangesNothing"
             ]
           },
+          "Tracing.violates.SinkFailureKeepsHeaders.cfg": {
+            "green": false,
+            "hash": "74d45b8559b2a62382813cf71b0069f035475ed8a637efa440e51b2a12947996",
+            "line": "violated: SinkFailureKeepsHeaders",
+            "states": "188 states generated, 138 distinct states found, 0 states left on queue.",
+            "violated": [
+              "SinkFailureKeepsHeaders"
+            ]
+          },
           "Tracing.violates.TraceHeadersStayHome.cfg": {
             "green": false,
-            "hash": "620fc158d1ff4e95d394eefdd83f915a8c4a5e017d5bf637ea540a77533942b7",
+            "hash": "ad204c58ea9b1f7134729ec9f9398119dea9ec9ee3978ad877e1747010988e0b",
             "line": "violated: TraceHeadersStayHome",
-            "states": "161 states generated, 119 distinct states found, 0 states left on queue.",
+            "states": "150 states generated, 114 distinct states found, 0 states left on queue.",
             "violated": [
               "TraceHeadersStayHome"
             ]
@@ -3371,7 +3380,7 @@
     "verdicts": {
       "counts": {
         "doubled": 0,
-        "features": 109,
+        "features": 112,
         "main_only": 4156,
         "main_only_in_features": 4156,
         "mapped": 8909,
@@ -3382,15 +3391,16 @@
       "pass": true
     }
   },
-  "passed": 19,
-  "read_at_head": "86ae2d41b68ddcf915f39945e1d61f2dffb6a684",
+  "passed": 21,
+  "read_at_head": "59fb0b2a4eb4b131e66bf005e59f3df583064fc7",
   "step": {
     "failing": [
-      "doors_mapped"
+      "fluent",
+      "gate2"
     ],
-    "name": "Feature rows",
-    "next": "Write spec/<Module>/features.json and module.md for each module.",
-    "number": 6,
+    "name": "The fluent API, gate 2",
+    "next": "Write spec/Fluent/sentences.json; present gate 2.",
+    "number": 7,
     "phase": "D"
   },
   "total": 26
