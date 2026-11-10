@@ -2257,6 +2257,33 @@
       "probe": "AspNetCoreBinding",
       "expect": "core-frombody-left-out-member-starts: {\"given_name\":\"Rose\",\"ward\":\"East\",\"pharmacy\":\"North\"} binds GivenName=Rose Ward=Rehab Pharmacy=Central",
       "source": "spec/probes/AspNetCoreBinding/NamingProbes.cs"
+    },
+    {
+      "id": "core-stj-default-encoder-html",
+      "statement": "System.Text.Json's default encoder writes <, > and & in a string as \\u003C, \\u003E and \\u0026.",
+      "host": "net10",
+      "oracle": "System.Text.Json 10",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-default-encoder-html: System.Text.Json's default encoder writes \"</script><b>Ada</b> & co\" as \"\\u003C/script\\u003E\\u003Cb\\u003EAda\\u003C/b\\u003E \\u0026 co\"",
+      "source": "spec/probes/AspNetCoreBinding/RenderProbes.cs"
+    },
+    {
+      "id": "core-append-version-hash",
+      "statement": "ASP.NET Core's asp-append-version writes a file's v as the SHA-256 of its bytes in URL-safe base64 with no padding.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC's IFileVersionProvider",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-append-version-hash: asp-append-version writes /probe.js?v=TSWI_qBti_2VbeAlGDD2LmC4q5Xkx3qur0HVYU2j-b0; the SHA-256 of the file's bytes in URL-safe base64 with no padding is TSWI_qBti_2VbeAlGDD2LmC4q5Xkx3qur0HVYU2j-b0; equal True",
+      "source": "spec/probes/AspNetCoreBinding/RenderProbes.cs"
+    },
+    {
+      "id": "html-script-text-ends-at-close-tag",
+      "statement": "A script element's text ends at the first </script, and the rest parses as markup; with <, > and & written as JSON escapes the text holds the whole JSON, which JSON.parse reads back.",
+      "host": "node",
+      "oracle": "parse5 8.0.1, the WHATWG HTML tokenizer",
+      "probe": "html-script-text.mjs",
+      "expect": "html-script-text-ends-at-close-tag: a script whose text holds {\"name\":\"</script><b>Ada</b>\"} ends at its </script>, its text \"{\\\"name\\\":\\\"\", and the rest parses as markup with 1 b element; with <, > and & written as \\u003C, \\u003E and \\u0026 the text is the whole JSON true, no b element parses (0) and JSON.parse reads the name back true",
+      "source": "spec/probes/html-script-text.mjs"
     }
   ]
 }

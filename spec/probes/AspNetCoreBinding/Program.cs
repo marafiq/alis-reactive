@@ -197,6 +197,7 @@ try
     await DateProbes.Run(new Uri(app.Urls.First()));
     FluentDateProbes.Run();
     await NamingProbes.Run();
+    RenderProbes.Run(app.Services, app.Environment.WebRootPath);
 }
 finally
 {
