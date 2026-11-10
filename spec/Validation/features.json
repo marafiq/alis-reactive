@@ -2131,11 +2131,11 @@
         },
         {
           "for": "X13.5",
-          "page": "A ward page with two containers, admission and discharge, each with its own summary; Open the line loads into a slot inside admission a line holding a Note input, and Close the line unloads it; Save admission posts admission and its endpoint answers a 400 for Bed, \"Choose a bed.\", which no input renders; Save discharge posts discharge and its endpoint answers a 400 for Reason, \"Give a reason.\", which no input renders.",
-          "gesture": "Click Open the line and Save admission, then Close the line, then click Save discharge.",
-          "outcome": "\"Choose a bed.\" shows in admission's summary and stays there after Close the line; \"Give a reason.\" shows in discharge's summary only.",
-          "opposite": "Clicking Save discharge alone shows \"Give a reason.\" in discharge's summary and admission's summary stays empty.",
-          "defect": "One summary serves the page, so both messages show in one; or the line takes admission's summary with it when it unloads, so \"Choose a bed.\" leaves.",
+          "page": "The admission screen with two request containers, the intake form and the next-of-kin form, each with its own summary; Open the line loads into a slot inside the intake form a line holding a Note input, and Close the line unloads it; Save intake posts the intake form and Save next of kin posts the next-of-kin form. The harness seeds each endpoint's answer: the intake's a 400 for Bed, \"Choose a bed.\", and the next of kin's a 400 for Relationship, \"Give the relationship.\", members no input renders.",
+          "gesture": "Click Open the line and Save intake, then Close the line, then click Save next of kin.",
+          "outcome": "\"Choose a bed.\" shows in the intake form's summary and stays there after Close the line; \"Give the relationship.\" shows in the next-of-kin form's summary only.",
+          "opposite": "Clicking Save next of kin alone shows \"Give the relationship.\" in the next-of-kin form's summary and the intake form's summary stays empty.",
+          "defect": "One summary serves the page, so both messages show in one; or the line takes the intake form's summary with it when it unloads, so \"Choose a bed.\" leaves.",
           "existing_test": "redesign WhenALoadedLineJoinsTheFormAndLeaves.the_forms_summary_outlives_a_slot_that_joined_it_and_left"
         },
         {

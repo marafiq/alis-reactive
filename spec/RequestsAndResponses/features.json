@@ -1355,11 +1355,12 @@
         },
         {
           "for": "X10.6",
-          "page": "Two Parallel GETs that the test app answers after 1 and 3 seconds, each route appending its name to a log, and a step after Parallel appending settled.",
-          "gesture": "Click Load both.",
-          "outcome": "After 3 seconds the log reads fast, slow, settled, with settled once.",
-          "opposite": "With both answered at once, the log ends with settled once.",
-          "defect": "The steps after Parallel run after the first answer, so the log reads fast, settled, slow; or once per branch, so settled shows twice."
+          "page": "The residents screen's Refresh counts runs Parallel: a GET of the wing's residents whose route appends residents to the activity log, and a GET of its discharges whose route appends discharges; the step after Parallel appends settled. The harness gates each GET (Lanes.tla's Settle).",
+          "gesture": "Click Refresh counts; once the harness reports both GETs held, release the residents GET and wait until the log reads residents; then release the discharges GET.",
+          "outcome": "Before the discharges' release the log reads residents; after it the log reads residents, discharges, settled, with settled once.",
+          "opposite": "With both GETs released together, the log ends with settled once.",
+          "defect": "The steps after Parallel run after the first answer, so the log reads residents, settled, discharges; or once per branch, so settled shows twice.",
+          "observes": "Lanes.tla:Settle"
         },
         {
           "for": "X10.7",
@@ -1371,8 +1372,8 @@
         },
         {
           "for": "X10.8",
-          "page": "A census GET under the defaults' retry policy, which the test app answers 503 and then 200; its WhileLoading appends loading to a log, its Finally appends done, and a counting busy component counts its show calls.",
-          "gesture": "Click Load census.",
+          "page": "The residents screen's Load census sends a GET under the defaults' retry policy; its WhileLoading appends loading to a log, its Finally appends done, and a counting busy component counts its show calls. The harness seeds the census endpoint's answers, 503 and then 200, and runs the retry's wait on the clock, never on real time.",
+          "gesture": "Click Load census; run the clock forward by the standard first wait.",
           "outcome": "The census shows, the log reads loading, done once, and the busy count reads 1.",
           "opposite": "With NoRetry(), the 503 runs the error route and the census keeps its dash.",
           "defect": "Each attempt runs WhileLoading and Finally, so the log reads loading, loading, done, done; the busy indicator shown per attempt, so the count reads 2; or the 503 routed at once, so the census never shows.",
@@ -1405,19 +1406,20 @@
         },
         {
           "for": "X10.14",
-          "page": "Two Parallel GETs whose routes each write their name into one text; the test app answers the first after 2 seconds and the second after 1.",
-          "gesture": "Click Load both.",
-          "outcome": "The text reads first.",
-          "opposite": "With the first answered after 1 second and the second after 2, the text reads second.",
-          "defect": "Routes run in authored order rather than arrival, so the text reads second in the first case."
+          "page": "The residents screen's Refresh census runs Parallel: a first GET, authored first, whose route writes first into census-source, and a second GET whose route writes second into it. The harness gates each GET (Lanes.tla's Settle).",
+          "gesture": "Click Refresh census; once the harness reports both GETs held, release the second and wait until census-source reads second; then release the first.",
+          "outcome": "census-source reads first.",
+          "opposite": "Released first, then second once census-source reads first: census-source reads second.",
+          "defect": "Routes run in authored order rather than arrival, so census-source stays empty after the second's release and reads second once the first is released.",
+          "observes": "Lanes.tla:Settle"
         },
         {
           "for": "X10.15",
-          "page": "A GET under the defaults' retry policy whose route for 500 appends error to a log; the test app counts the attempts it receives. A second GET is answered 503 and then 200.",
-          "gesture": "Click Load on the first, then Load on the second.",
-          "outcome": "The first logs error once and the app counted 1 attempt; the second shows its success text.",
+          "page": "The residents screen's first GET runs under the defaults' retry policy, and its route for 500 appends error to a log; the harness counts the attempts it receives. Its second GET runs under the same policy. The harness seeds the first endpoint's answer, 500, and the second's, 503 and then 200, and runs the retry's wait on the clock, never on real time.",
+          "gesture": "Click Load on the first; click Load on the second and run the clock forward by the standard first wait.",
+          "outcome": "The first logs error once and the harness counted 1 attempt; the second shows its success text.",
           "opposite": "With NoRetry() on the second, its 503 route runs.",
-          "defect": "A 500 retried, so the app counts 2 attempts; or a 503 not retried, so the second runs its error route.",
+          "defect": "A 500 retried, so the harness counts 2 attempts; or a 503 not retried, so the second runs its error route.",
           "observes": "Request.tla:Attempt"
         },
         {

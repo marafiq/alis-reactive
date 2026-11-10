@@ -563,8 +563,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   so no browser test provokes a race by timing. A promise on an async lane names the one action of a spec's `Next`
   it observes (`Request.tla` Route, `Run.tla`, `Composition.tla`, `Ownership.tla`, `Lanes.tla`, `Realtime.tla`,
   `Tracing.tla`, `CallbackProperty.tla`), the test app's endpoint holds the machine at that action until the
-  test's gesture releases it, and every action is named by one promise: the browser proves the code refines each
-  action once, and the browser test count is the actions plus the cells plus each slice's own surface. A timer the
+  test releases it through the harness, a request of the test's own and never a control on the page under test,
+  and every action is named by one promise: the browser proves the code refines each action once, and the browser test count is the actions plus the cells plus each slice's own surface. A timer the
   plan carries (a toast's time, a debounce, a retry's wait) runs on Playwright's clock (`Page.Clock`), never real
   time, and a collection the design's weak holds depend on is forced by Playwright's Page.RequestGCAsync, confirmed
   by the page's own weak hold before the test goes on (X12.18). An action that fires under no mutant-free run leaves its

@@ -263,10 +263,10 @@
       "promises": [
         {
           "for": "X21.1",
-          "page": "A nurses' station page whose stream WardBoard declares Bulletin and AllClear; the page's Bulletin handler adds one to a tally shown in bulletins, and its AllClear handler writes clear into all-clear; Send a torn bulletin makes the endpoint write a Bulletin whose data is the text a bulletin, not JSON, and then an AllClear whose data is {}.",
-          "gesture": "Click Send a torn bulletin.",
+          "page": "The medication round, whose stream WardBoard declares Bulletin and AllClear; the page's Bulletin handler adds one to a tally shown in bulletins, and its AllClear handler writes clear into all-clear. The harness pushes on WardBoard the messages the test names, their data as written.",
+          "gesture": "Open the round and wait until the harness reports WardBoard open. Push through the harness a Bulletin whose data is the text a bulletin, not JSON, then an AllClear whose data is {}.",
           "outcome": "bulletins reads 0, all-clear reads clear, and the console holds one error naming the stream's URL and the event bulletin.",
-          "opposite": "Send a bulletin, whose data is {}, shows bulletins at 1, and the console holds no error.",
+          "opposite": "A pushed Bulletin whose data is {} shows bulletins at 1, and the console holds no error.",
           "defect": "The handler runs with nothing as its data and bulletins reads 1; or the parse error throws inside the listener, so no error names the event and the AllClear after it leaves all-clear empty.",
           "existing_test": "redesign WhenTheServerClosesAStream.an_event_whose_data_is_not_json_runs_no_pipeline"
         },
@@ -281,37 +281,37 @@
         },
         {
           "for": "X21.3",
-          "page": "A nurses' station page whose stream WardBoard writes each News message's text into news, whose reconnecting steps write dropped into board-dropped and whose reconnected steps write back into board-back; Drop the board makes the endpoint end the stream's response and hold the browser's next connection until Reopen the board lets it in; Post news makes the endpoint write a News message with the text typed beside it.",
-          "gesture": "Click Drop the board and wait until board-dropped reads dropped; click Reopen the board and wait until board-back reads back; then type Fall in room 4 and click Post news.",
-          "outcome": "board-dropped reads dropped while board-back stays empty until Reopen the board; then board-back reads back, and news reads Fall in room 4.",
-          "opposite": "Before Drop the board, board-dropped and board-back are empty, and Post news with Ada is up shows Ada is up in news.",
+          "page": "The medication round, whose stream WardBoard writes each News message's text into news, whose reconnecting steps write dropped into board-dropped and whose reconnected steps write back into board-back. The harness drops WardBoard and holds its next connection until it reopens it (Realtime.tla's Drop and Reconnected), and pushes News messages with the text the test names.",
+          "gesture": "Open the round. Drop WardBoard through the harness; wait until board-dropped reads dropped and the harness reports the next connection held. Reopen WardBoard through the harness; wait until board-back reads back. Push News with Fall in room 4 through the harness.",
+          "outcome": "board-dropped reads dropped while board-back stays empty until the harness reopens WardBoard; then board-back reads back, and news reads Fall in room 4.",
+          "opposite": "Before the drop, board-dropped and board-back are empty, and a pushed News with Ada is up shows Ada is up in news.",
           "defect": "A stream raises no lifecycle trigger, so board-dropped and board-back stay empty while the browser reconnects (Alis.Reactive.Assets/runtime/realtime/hub.ts:116 at 65fdf118d lists a hub's alone), or the message after the reconnection runs no handler and news stays empty.",
           "observes": "Realtime.tla:Reconnected"
         },
         {
           "for": "X21.8",
-          "page": "A medication round page whose stream RoundNews's Dose handler posts the dose to /doses under the request defaults, whose busy indicator is the page's; Drop the round makes the endpoint end the stream's response and hold the browser's next connection until Reopen the round lets it in, the stream's reconnecting steps write dropped into round-dropped and its reconnected steps write back into round-back; Post a dose makes the endpoint write a Dose message, and the endpoint holds the /doses answer until the test releases it.",
-          "gesture": "Click Drop the round and wait until round-dropped reads dropped; click Reopen the round and wait until round-back reads back; click Post a dose and, once the busy indicator shows, release the /doses answer.",
+          "page": "The medication round, whose stream RoundNews's Dose handler posts the dose to /doses under the request defaults, whose busy indicator is the page's; the stream's reconnecting steps write dropped into round-dropped and its reconnected steps write back into round-back. The harness drops RoundNews and holds its next connection until it reopens it (Realtime.tla's Drop and Reconnected), pushes a Dose message, and gates the POST /doses the message's run sends (Realtime.tla's Answer).",
+          "gesture": "Open the round. Drop RoundNews through the harness; wait until round-dropped reads dropped and the harness reports the next connection held. Reopen RoundNews through the harness; wait until round-back reads back. Push a Dose through the harness; once the harness reports POST /doses held and the busy indicator shows, release it.",
           "outcome": "The busy indicator stays hidden while round-dropped reads dropped and round-back is empty, shows once the dose's request is sent, and hides when its answer is released.",
-          "opposite": "With the stream open and no dose posted, the busy indicator stays hidden.",
+          "opposite": "With the stream open and no dose pushed, the busy indicator stays hidden.",
           "defect": "The reconnection holds the busy indicator, so it shows for the whole outage; or the request a message's run sends is left out of the page's count, so the indicator never shows for it or hides before it settles.",
           "observes": "Realtime.tla:Drop"
         },
         {
           "for": "X21.9",
-          "page": "A ward page under ShowReconnect() with the Native reconnect offer, whose plan names the stream WardBoard, and whose Open the bed card loads into bed-slot a card whose plan names the stream BedBoard; Close both boards makes both endpoints end their responses and answer the browser's next connection with 503, so both streams give up; Reopen the ward board makes WardBoard's endpoint answer again.",
-          "gesture": "Click Open the bed card and Close both boards, then Close the bed card, then Reopen the ward board and click Retry.",
-          "outcome": "One reconnect offer shows after Close both boards; it stays shown after Close the bed card; it hides once WardBoard opens after Retry.",
-          "opposite": "With the bed card open and only BedBoard given up, Close the bed card hides the offer.",
+          "page": "The medication round under ShowReconnect() with the Native reconnect offer, whose plan names the stream WardBoard, and whose Open the bed card loads into bed-slot a card whose plan names the stream BedBoard. The harness refuses WardBoard and BedBoard: it ends each open connection and answers each next one 503 until it reopens the stream, so both streams give up (Realtime.tla's GiveUp).",
+          "gesture": "Click Open the bed card. Refuse WardBoard and BedBoard through the harness; wait until the harness reports a next connection of each refused. Click Close the bed card. Reopen WardBoard through the harness and click Retry.",
+          "outcome": "One reconnect offer shows once both streams give up; it stays shown after Close the bed card; it hides once WardBoard opens after Retry.",
+          "opposite": "With the bed card open and only BedBoard refused, Close the bed card hides the offer.",
           "defect": "The offer is a flag per connection, not a count, so it shows twice, or unloading the card hides it while WardBoard is still given up, or it stays shown after WardBoard opens.",
           "observes": "Realtime.tla:GiveUp"
         },
         {
           "for": "X21.10",
-          "page": "A nurses' station page under ShowReconnect() with the Native reconnect offer, whose stream WardBoard gives up when Close the board makes its endpoint end its response and answer the browser's next connection with 503; Reopen the board makes the endpoint answer again; the endpoint's Welcome message, written to each connection it accepts, writes the number of connections accepted into board-call.",
-          "gesture": "Click Close the board, then Retry, then Reopen the board and Retry again.",
-          "outcome": "The offer stays shown after the first Retry, which the endpoint refuses, and hides after the second once board-call reads 2.",
-          "opposite": "Without Close the board, the offer never shows and board-call reads 1.",
+          "page": "The medication round under ShowReconnect() with the Native reconnect offer, whose stream is WardBoard; the endpoint's Welcome message, written to each connection it accepts, writes the number of connections accepted into board-call. The harness refuses WardBoard: it ends its connection and answers each next one 503 until it reopens it, so the stream gives up (Realtime.tla's GiveUp).",
+          "gesture": "Open the round and wait until board-call reads 1. Refuse WardBoard through the harness and wait for the reconnect offer; click Retry and wait until the harness reports the retry's connection refused. Reopen WardBoard through the harness and click Retry again.",
+          "outcome": "The offer stays shown after the first Retry, which the harness refuses, and hides after the second once board-call reads 2.",
+          "opposite": "Without the refusal, the offer never shows and board-call reads 1.",
           "defect": "A click on Retry hides the offer before the stream opens, so it is hidden while the retry fails (Alis.Reactive.Assets/runtime/realtime/retry-indicator.ts:47-53 at 65fdf118d), or a failed retry leaves it hidden.",
           "existing_test": "main WhenLiveConnectionDrops.clicking_retry_while_the_outage_continues_keeps_the_indicator_visible",
           "observes": "Realtime.tla:Retry"
@@ -326,44 +326,44 @@
         },
         {
           "for": "X21.12",
-          "page": "A nurses' station page under ShowReconnect() whose scripts provide no reconnect component, whose one plan names the stream WardBoard and writes each News message's text into news; Post news makes the endpoint write a News message with the text typed beside it.",
-          "gesture": "Open the page, then type Ada is up and click Post news.",
-          "outcome": "news stays empty, and the console holds one error naming reconnect.",
-          "opposite": "With the Native reconnect component on the page, Post news shows Ada is up in news and the console holds no error.",
+          "page": "The medication round under ShowReconnect() whose scripts provide no reconnect component, whose one plan names the stream WardBoard and writes each News message's text into news. The harness pushes News with the text the test names and reports how many connections the push reached.",
+          "gesture": "Open the round and wait until the console holds an error naming reconnect. Push News with Ada is up through the harness and wait until it reports the connections the push reached.",
+          "outcome": "news stays empty, the harness reports the push reached no connection, and the console holds one error naming reconnect.",
+          "opposite": "On the same host, the resident record, whose plan names no stream, opens with no error in the console.",
           "defect": "The stream opens and runs its handlers, so the missing offer shows only at the first outage, when the page offers nothing."
         },
         {
           "for": "M10.X4",
-          "page": "A nurses' station page under ShowReconnect() with the Native reconnect offer, whose plan names the stream FacilityAlerts, whose Alert handler writes each alert's message into alert and whose closed steps write closed into alerts-closed; Stop live alerts closes the stream and writes stopped into alerts-state; Sound the all clear makes the endpoint write an Alert reading All clear.",
-          "gesture": "Click Stop live alerts, then Sound the all clear.",
-          "outcome": "alerts-state reads stopped, alert and alerts-closed stay empty, and the reconnect offer stays hidden.",
-          "opposite": "Without Stop live alerts, Sound the all clear shows All clear in alert.",
+          "page": "The medication round under ShowReconnect() with the Native reconnect offer, whose plan names the stream FacilityAlerts, whose Alert handler writes each alert's message into alert and whose closed steps write closed into alerts-closed; Stop live alerts closes the stream and writes stopped into alerts-state. The harness pushes an Alert reading All clear on FacilityAlerts and reports how many connections the push reached.",
+          "gesture": "Click Stop live alerts; wait until alerts-state reads stopped and the harness reports no open FacilityAlerts connection in the test's world. Push an Alert reading All clear through the harness and wait until it reports the connections the push reached.",
+          "outcome": "alerts-state reads stopped, alert and alerts-closed stay empty, the harness reports the push reached no connection, and the reconnect offer stays hidden.",
+          "opposite": "Without Stop live alerts, the pushed Alert shows All clear in alert.",
           "defect": "The close is taken as the server giving up, so alerts-closed reads closed or the offer shows; or the All clear still runs the handler and alert reads All clear.",
           "existing_test": "redesign WhenNurseStopsLiveAlerts.stopping_live_alerts_says_so_and_raises_no_reconnect_banner"
         },
         {
           "for": "X21.8",
-          "page": "A page whose stream Feed's reconnecting steps write dropped into feed-dropped and whose reconnected steps write back into feed-back; Drop the feed makes the endpoint end the stream's response and hold the browser's next connection until Reopen the feed lets it in; Load sends GET /items under the request defaults, whose busy indicator is the page's, and the endpoint holds that answer until the test releases it.",
-          "gesture": "Click Drop the feed and wait until feed-dropped reads dropped; click Load, then release its answer; then click Reopen the feed.",
-          "outcome": "The busy indicator stays hidden while feed-dropped reads dropped, shows once Load's request is sent and hides when its answer is released, with feed-back still empty; feed-back reads back after Reopen the feed.",
+          "page": "The medication round, whose stream Feed's reconnecting steps write dropped into feed-dropped and whose reconnected steps write back into feed-back, and whose Load sends GET /items under the request defaults, whose busy indicator is the page's. The harness drops Feed and holds its next connection until it reopens it (Realtime.tla's Drop and Reconnected), and gates GET /items (Realtime.tla's Answer).",
+          "gesture": "Open the round. Drop Feed through the harness; wait until feed-dropped reads dropped and the harness reports the next connection held. Click Load; once the harness reports GET /items held, release it. Reopen Feed through the harness.",
+          "outcome": "The busy indicator stays hidden while feed-dropped reads dropped, shows once Load's request is sent and hides when its answer is released, with feed-back still empty; feed-back reads back after the harness reopens Feed.",
           "opposite": "With the stream open, Load and its release show and hide the indicator the same way.",
           "defect": "The reconnection counts as a request in flight, so the indicator shows at the drop and stays shown after Load's answer settles, until the stream reconnects (Realtime.tla's StreamHoldsBusy mutant, which breaks IndicatorNeverStaysShown).",
           "observes": "Realtime.tla:BeginPage"
         },
         {
           "for": "X21.8",
-          "page": "A page whose stream Feed's Item handler posts the item to /items under the request defaults, whose busy indicator is the page's; the post's success route writes saved into item-status, and its Finally awaits the ConformanceComponent's async method, which the page's Settle button resolves; Push an item makes the endpoint write an Item message, and the endpoint holds the /items answer until the test releases it.",
-          "gesture": "Click Push an item; once the busy indicator shows, release the /items answer and wait until item-status reads saved; then click Settle.",
-          "outcome": "After the release item-status reads saved and the busy indicator still shows; after Settle it hides.",
+          "page": "The medication round, whose stream Feed's Item handler posts the item to /items under the request defaults, whose busy indicator is the page's; the post's success route writes saved into item-status, and its Finally awaits the dose scanner's Settle(). The harness pushes an Item message, gates POST /items (Realtime.tla's Answer), and gates the scanner's settle, which holds the post's Finally (Realtime.tla's DefaultFinally).",
+          "gesture": "Open the round and wait until the harness reports Feed open. Push an Item through the harness; once the harness reports POST /items held and the busy indicator shows, release it. Once the harness reports the scanner's settle held, check that item-status reads saved and the busy indicator shows; then release the settle.",
+          "outcome": "While the scanner's settle is held item-status reads saved and the busy indicator still shows; after the settle's release it hides.",
           "opposite": "With no item pushed, the busy indicator stays hidden and item-status stays empty.",
           "defect": "The answer releases the hold, so the indicator hides when item-status reads saved while the request's Finally still awaits, before the defaults' Finally runs (X10.3's busy targets hide after the defaults' Finally; Realtime.tla's IndicatorNeverHidesEarly over Holding).",
           "observes": "Realtime.tla:Answer"
         },
         {
           "for": "X21.8",
-          "page": "A page whose stream Feed's Item handler posts the item to /items under the request defaults, whose busy indicator is the page's; Push an item makes the endpoint write an Item message, and the endpoint holds the /items answer until the test releases it; Load sends GET /list under the same defaults, answered at once, and its success route writes loaded into list-status.",
-          "gesture": "Click Push an item; once the busy indicator shows, click Load and wait until list-status reads loaded; then release the /items answer.",
-          "outcome": "The busy indicator stays shown after list-status reads loaded, and hides once the /items answer is released.",
+          "page": "The medication round, whose stream Feed's Item handler posts the item to /items under the request defaults, whose busy indicator is the page's, and whose Load sends GET /list under the same defaults, its success route writing loaded into list-status. The harness pushes an Item message and gates POST /items (Realtime.tla's Answer); GET /list is answered at once.",
+          "gesture": "Open the round and wait until the harness reports Feed open. Push an Item through the harness; once the harness reports POST /items held and the busy indicator shows, click Load and wait until list-status reads loaded; then release POST /items.",
+          "outcome": "The busy indicator stays shown after list-status reads loaded, and hides once POST /items is released.",
           "opposite": "Load alone, with no item pushed, shows the indicator and hides it when list-status reads loaded.",
           "defect": "The message's request and the page's are counted apart, so the indicator never shows for the message's request, or hides when the page's request settles while the message's is still in flight (Realtime.tla's MessageRequestUncounted mutant, which breaks IndicatorNeverHidesEarly).",
           "observes": "Realtime.tla:DefaultFinally"
@@ -656,17 +656,17 @@
       "promises": [
         {
           "for": "X12.5",
-          "page": "A ward page whose hub WardLine pushes StatusChanged with a resident and a status; the page's own handler writes each status's resident into page-status; Open Ada's card and Open Ben's card load the residents' cards into ada-slot and ben-slot, and each card's plan writes the status of its own resident into its own card-status; Post a status makes the hub push StatusChanged for the resident and the status typed beside it.",
-          "gesture": "Click Open Ada's card and Open Ben's card, then Close Ada's card, then type Ben and Resting and click Post a status.",
+          "page": "The medication round, whose hub WardLine pushes StatusChanged with a resident and a status; the page's own handler writes each status's resident into page-status; Open Ada's card and Open Ben's card load the residents' cards into ada-slot and ben-slot, and each card's plan writes the status of its own resident into its own card-status. The harness pushes StatusChanged on WardLine for the resident and the status the test names.",
+          "gesture": "Click Open Ada's card and Open Ben's card, then Close Ada's card; wait until the harness reports WardLine open. Push StatusChanged for Ben, Resting through the harness.",
           "outcome": "page-status reads Ben and Ben's card-status reads Resting.",
-          "opposite": "With both cards open, Post a status for Ada reading Awake shows Awake in Ada's card-status.",
+          "opposite": "With both cards open, a pushed StatusChanged for Ada, Awake shows Awake in Ada's card-status.",
           "defect": "Unloading Ada's card stops the shared connection or removes Ben's card's handler, so Ben's card-status stays empty."
         },
         {
           "for": "X12.6",
-          "page": "A ward page under ShowReconnect() with the Native reconnect offer, whose Open the bed card loads into bed-slot a card whose plan names the hub BedLine, which no other plan of the page names; Hang up the bed line makes the hub's server close the connection and refuse every connection after it, so the hub gives up.",
-          "gesture": "Click Open the bed card and Hang up the bed line, wait for the reconnect offer, then Close the bed card.",
-          "outcome": "The reconnect offer shows after Hang up the bed line and hides after Close the bed card.",
+          "page": "The medication round under ShowReconnect() with the Native reconnect offer, whose Open the bed card loads into bed-slot a card whose plan names the hub BedLine, which no other plan of the page names. The harness refuses BedLine: its server closes the connection and refuses each next one, and the harness runs the clock through the hub client's reconnection waits, so the hub gives up (Ownership.tla's ServerHangsUp).",
+          "gesture": "Click Open the bed card. Refuse BedLine through the harness and run the clock through the client's reconnection waits; wait for the reconnect offer. Click Close the bed card.",
+          "outcome": "The reconnect offer shows once the hub gives up and hides after Close the bed card.",
           "opposite": "With the page's own plan also naming BedLine, Close the bed card keeps the offer shown.",
           "defect": "The offer outlives the connection's last holder, so it stays shown with nothing left to retry, as main releases the hub without withdrawing it (Alis.Reactive.Assets/runtime/execution/realtime/signalr.ts:134-141 at 623dd4a27).",
           "existing_test": "redesign WhenASlotListensToALiveConnection.unloading_the_slot_whose_hub_the_server_hung_up_on_withdraws_its_retry_offer",
@@ -674,10 +674,10 @@
         },
         {
           "for": "X21.4",
-          "page": "A ward page whose hub RoundFeed's StatusChanged handler writes each status's resident into status-resident and adds one to a tally shown in statuses; Ask for two statuses makes the hub call StatusChanged with two arguments, and Post a status calls it with one object for the resident typed beside it.",
-          "gesture": "Click Ask for two statuses, then type Ada and click Post a status.",
+          "page": "The medication round, whose hub RoundFeed's StatusChanged handler writes each status's resident into status-resident and adds one to a tally shown in statuses. The harness pushes StatusChanged on RoundFeed with the arguments the test names.",
+          "gesture": "Open the round and wait until the harness reports RoundFeed open. Push StatusChanged with two arguments through the harness, then StatusChanged with one object for Ada.",
           "outcome": "statuses reads 1, status-resident reads Ada, and the console holds one error naming the hub's URL and statusChanged.",
-          "opposite": "Post a status for Ada and then for Ben shows statuses at 2, and the console holds no error.",
+          "opposite": "Pushed StatusChanged objects for Ada and then Ben show statuses at 2, and the console holds no error.",
           "defect": "The handler runs with the first of the two arguments, so statuses reads 2; or the push throws inside the client's handler and no error names the method.",
           "existing_test": "redesign WhenTheServerPushesToAPage.a_client_method_the_server_calls_with_anything_but_one_object_runs_no_pipeline"
         },
@@ -691,36 +691,38 @@
         },
         {
           "for": "M10.X1",
-          "page": "A nurse line page under ShowReconnect() with the Native reconnect offer, whose hub WardLine's endpoint refuses every connection while the line is refused, whose closed steps write closed into line-closed and whose reconnecting steps write dropped into line-dropped.",
-          "gesture": "Open the page with the line refused, and wait for the reconnect offer.",
+          "page": "The medication round under ShowReconnect() with the Native reconnect offer, whose hub WardLine's closed steps write closed into line-closed, whose reconnecting steps write dropped into line-dropped, and whose welcome writes the call's number into line-call. The harness refuses WardLine from the page's first connection and runs the clock through the hub's start retries, so its start fails its last try (Realtime.tla's Connect).",
+          "gesture": "Refuse WardLine through the harness. Open the round and run the clock through the start's retry waits; wait for the reconnect offer.",
           "outcome": "line-closed reads closed, line-dropped stays empty, and the reconnect offer shows.",
-          "opposite": "With the line answered, the page shows line-call at 1, line-closed stays empty, and the offer stays hidden.",
+          "opposite": "Without the refusal, line-call reads 1, line-closed stays empty, and the offer stays hidden.",
           "defect": "A start that fails its last try shows the offer and runs no closed steps, so line-closed stays empty; or it runs the reconnecting steps and line-dropped reads dropped.",
           "existing_test": "redesign WhenTheServerDropsAHub.a_hub_the_server_refuses_on_every_try_is_offered_for_retry",
           "observes": "Realtime.tla:Connect"
         },
         {
           "for": "M10.X2",
-          "page": "A nurse line page under ShowReconnect() with the Native reconnect offer, whose hub WardLine's reconnected steps write back into line-back; Hang up the line makes the hub's server close the connection and refuse every connection until Answer the line again lets the next one in, and the hub's welcome writes the call's number into line-call.",
-          "gesture": "Click Hang up the line and wait for the reconnect offer, then click Answer the line again and Retry.",
+          "page": "The medication round under ShowReconnect() with the Native reconnect offer, whose hub WardLine's reconnected steps write back into line-back and whose welcome writes the call's number into line-call. The harness refuses WardLine: its server closes the connection and refuses each next one until it reopens it, and the harness runs the clock through the hub client's reconnection waits, so the hub gives up (Realtime.tla's GiveUp).",
+          "gesture": "Open the round and wait until line-call reads 1. Refuse WardLine through the harness and run the clock through the reconnection waits; wait for the reconnect offer. Reopen WardLine through the harness and click Retry.",
           "outcome": "line-call reads 2, line-back reads back, and the offer hides.",
-          "opposite": "Before Hang up the line, line-back is empty and line-call reads 1.",
-          "defect": "The retry opens the hub and runs no reconnected steps, so line-call reads 2 while line-back stays empty."
+          "opposite": "Before the refusal, line-back is empty and line-call reads 1.",
+          "defect": "The retry opens the hub and runs no reconnected steps, so line-call reads 2 while line-back stays empty.",
+          "observes": "Realtime.tla:GiveUp"
         },
         {
           "for": "M10.X3",
-          "page": "A nurse line page whose on-load handler invokes the hub WardLine's Roster and writes its answer into roster, and whose hub answers Roster with Ada, Ben; its reconnecting steps write dropped into line-dropped and its reconnected steps write back into line-back; Drop the line makes the hub's server drop the connection and refuse the client's reconnections until Answer the line again; Ask for the roster invokes Roster again and writes the answer into roster-again.",
-          "gesture": "Open the page, then click Drop the line and, while line-dropped reads dropped, click Ask for the roster.",
+          "page": "The medication round, whose on-load handler invokes the hub WardLine's Roster and writes its answer into roster, and whose hub answers Roster with Ada, Ben; its reconnecting steps write dropped into line-dropped and its reconnected steps write back into line-back; Ask for the roster invokes Roster again and writes the answer into roster-again. The harness drops WardLine and holds its next connection until it reopens it (Realtime.tla's Drop and Reconnected).",
+          "gesture": "Open the round. Drop WardLine through the harness; wait until line-dropped reads dropped and the harness reports the next connection held, then click Ask for the roster.",
           "outcome": "roster reads Ada, Ben once the page opens, with no error in the console then; after Ask for the roster, roster-again stays empty and the console holds one error naming the hub and Roster.",
-          "opposite": "After Answer the line again and once line-back reads back, Ask for the roster shows Ada, Ben in roster-again with no new error.",
-          "defect": "The on-load invoke runs before the first start completes and is rejected, so roster stays empty and the console holds an error at every load; or the invoke during the reconnection waits for it and logs nothing."
+          "opposite": "After the harness reopens WardLine and once line-back reads back, Ask for the roster shows Ada, Ben in roster-again with no new error.",
+          "defect": "The on-load invoke runs before the first start completes and is rejected, so roster stays empty and the console holds an error at every load; or the invoke during the reconnection waits for it and logs nothing.",
+          "observes": "Realtime.tla:Drop"
         },
         {
           "for": "X12.6",
-          "page": "A page under ShowReconnect() with the Native reconnect offer, whose Open the card loads into card-slot a card whose plan names the hub Line, which no other plan of the page names, and writes the call's number into line-call when the hub welcomes it; Hang up makes the hub's server close the connection and refuse every connection until Answer again lets the next one in.",
-          "gesture": "Click Open the card and Hang up, wait for the reconnect offer, then click Answer again and Retry.",
-          "outcome": "The reconnect offer shows after Hang up and hides after Retry, line-call reads 2, and the card stays open.",
-          "opposite": "Without Hang up, the offer never shows and line-call reads 1.",
+          "page": "The medication round under ShowReconnect() with the Native reconnect offer, whose Open the card loads into card-slot a card whose plan names the hub Line, which no other plan of the page names, and writes the call's number into line-call when the hub welcomes it. The harness refuses Line: its server closes the connection and refuses each next one until it reopens it, and the harness runs the clock through the hub client's reconnection waits, so the hub gives up.",
+          "gesture": "Click Open the card and wait until line-call reads 1. Refuse Line through the harness and run the clock through the reconnection waits; wait for the reconnect offer. Reopen Line through the harness and click Retry.",
+          "outcome": "The reconnect offer shows once the hub gives up and hides after Retry, line-call reads 2, and the card stays open.",
+          "opposite": "Without the refusal, the offer never shows and line-call reads 1.",
           "defect": "A retry that starts only the page's hubs skips the hub the card's slot holds, so line-call keeps 1 and the offer stays shown (Ownership.tla's HubKeptWhileHeld and OfferOnlyWhileHeld).",
           "observes": "Ownership.tla:Retry"
         }

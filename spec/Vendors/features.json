@@ -942,11 +942,12 @@
         },
         {
           "for": "X12.13",
-          "page": "A ward page whose slot bed-card, loaded by Open the card and unloaded by Close the card, renders a bed monitor the app brings; the card's plan has the monitor's Alarmed handler, which adds one to the page's tally and writes it into alarms-heard, an element outside the slot. The monitor's button Sound the alarm raises Alarmed, and its button Restart, the monitor's host, destroys it and puts a new monitor on the same element; every monitor's unsubscribe adds one to the page's count of calls in off-calls, and a monitor's destroy, by Restart or on alis:unmount, calls no unsubscribe.",
-          "gesture": "Click Open the card, Sound the alarm, Restart, Sound the alarm, then Close the card.",
+          "page": "The resident record, whose slot bed-card, loaded by Open the card and unloaded by Close the card, renders a bed monitor the app brings; the card's plan has the monitor's Alarmed handler, which adds one to the page's tally and writes it into alarms-heard, an element outside the slot. The monitor's button Sound the alarm raises Alarmed; every monitor's unsubscribe adds one to the page's count of calls in off-calls, and a monitor's destroy, by its host or on alis:unmount, calls no unsubscribe. The harness's restart, standing for the monitor's host, destroys it and puts a new monitor on the same element (Ownership.tla's HostDestroys).",
+          "gesture": "Click Open the card and Sound the alarm; restart the monitor through the harness; click Sound the alarm, then Close the card.",
           "outcome": "alarms-heard reads 1, and off-calls reads 0 after Close the card.",
-          "opposite": "Without Restart, Close the card writes 1 into off-calls.",
-          "defect": "The handler follows the element to the new object, so alarms-heard reads 2; or the release calls the unsubscribe of the object the element holds now, so off-calls reads 1."
+          "opposite": "Without the restart, Close the card writes 1 into off-calls.",
+          "defect": "The handler follows the element to the new object, so alarms-heard reads 2; or the release calls the unsubscribe of the object the element holds now, so off-calls reads 1.",
+          "observes": "Ownership.tla:HostDestroys"
         },
         {
           "for": "M12.X2",
@@ -968,10 +969,10 @@
         },
         {
           "for": "X12.13",
-          "page": "A page that renders the ConformanceComponent at the id conformance, whose button Raise raises its Raised event and whose button Restart, its host, destroys the object and puts a new ConformanceComponent object on the same element; every object's unsubscribe adds one to the page's count in off-calls, and a destroy calls no unsubscribe. Open the slot loads the slot holder, whose plan, when it loads, listens to the ConformanceComponent's Raised, reached by its element's id, adding one to the page's tally and writing it into heard, an element outside the slot; Close the slot unloads it.",
-          "gesture": "Click Open the slot, Raise, Restart, Raise, then Close the slot.",
+          "page": "The bench page renders the ConformanceComponent at the id conformance, whose button Raise raises its Raised event; every object's unsubscribe adds one to the page's count in off-calls, and a destroy calls no unsubscribe. The harness's restart, standing for the component's host, destroys the object and puts a new ConformanceComponent object on the same element (Ownership.tla's HostDestroysListened). Open the slot loads the slot holder, whose plan, when it loads, listens to the ConformanceComponent's Raised, reached by its element's id, adding one to the page's tally and writing it into heard, an element outside the slot; Close the slot unloads it.",
+          "gesture": "Click Open the slot and Raise; restart the component through the harness; click Raise, then Close the slot.",
           "outcome": "heard reads 1, off-calls reads 0 after Close the slot, and the console shows no error.",
-          "opposite": "Without Restart, Close the slot writes 1 into off-calls.",
+          "opposite": "Without the restart, Close the slot writes 1 into off-calls.",
           "defect": "The release removes the listen from the object the element holds now, which never subscribed, or calls the destroyed object's unsubscribe, so off-calls reads 1 or the console shows an error; or the listen follows the element to the new object, so heard reads 2 (Ownership.tla's RemoveOnDestroyed mutant, which breaks NoRemoveOnDestroyedListened).",
           "observes": "Ownership.tla:HostDestroysListened"
         }

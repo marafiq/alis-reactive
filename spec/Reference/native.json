@@ -2455,8 +2455,8 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A page whose card slot holds a ConformanceComponent, a Restart button whose click lets the component's host destroy it and mount a new one, and Close card and Open card buttons.",
-        "gesture": "Click Restart, Close card, then Open card.",
+        "page": "The bench page whose card slot holds a ConformanceComponent, with Close card and Open card buttons; the harness's restart, standing for the component's host, destroys it and mounts a new one (Ownership.tla's HostDestroys).",
+        "gesture": "Restart the component through the harness; click Close card, then Open card.",
         "outcome": "The page's error line stays empty and the reopened card shows its component with the value a-1.",
         "opposite": "Closing without a restart also leaves the error line empty.",
         "defect": "The unload removes the listener from the destroyed component, whose element no longer holds it, so removeEventListener throws and the error line reads it.",
