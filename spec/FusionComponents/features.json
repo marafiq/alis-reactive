@@ -1411,6 +1411,324 @@
    ]
   },
   {
+   "id": "M21.F10",
+   "summary": "FusionCheckBox: one declaration of the Syncfusion CheckBox by its JavaScript names, checked, indeterminate, disabled, dataBind, click, focusIn and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it; the input it is, its checked state committed by change; and the render helpers that render it bound to a member of bool. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionCheckBox",
+    "Alis.Reactive.Fusion:FusionCheckBoxChangeArgs",
+    "Alis.Reactive.Fusion:FusionCheckBoxEvents",
+    "Alis.Reactive.Fusion:FusionCheckBoxExtensions",
+    "Alis.Reactive.Fusion:FusionCheckBoxHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionCheckBoxReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"checked\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<bool>.Named(\"indeterminate\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxExtensions.cs:17"
+    },
+    {
+     "line": "main",
+     "text": ".EmitSet(CheckedProperty, ValueExpression.Literal(isChecked))",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxExtensions.cs:37"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().CheckBoxFor(setup.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Checked => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:24"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Click() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:36"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:44"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<bool> Checked => ReadOnly<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:52"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().CheckBoxFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:78"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionCheckBox declares Checked, Indeterminate and Disabled as Property<bool>, the booleans EJ2 declares with no generic mark and starts at false (@syncfusion/ej2-buttons/src/check-box/check-box.d.ts:46-52); DataBind, Click and FocusIn as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N10",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionCheckBox.ChangeEventArgs, EJ2's change payload, reads Checked, the state after the click, as the browser hands it (probe:ej2-payload-checkbox-change).",
+     "doors": [
+      "M21.N10",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionCheckBox bound to a member of bool is an input: its Checked, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N10",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionCheckBox() and field.FusionCheckBox(build => ..), over a member of bool, render the box under the field's id and binding name, checked as the member is, by EJ2's builder that binds the member.",
+     "doors": [
+      "M21.N10",
+      "M7.N2",
+      "M21.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionCheckBox's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.PhotoConsent).Component<FusionCheckBox>() reaches it in any block (N14.4).",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N10"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxExtensions.cs:9-87"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxHtmlExtensions.cs:14-32"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxReactiveExtensions.cs:11-34"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:21-83"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's CheckBox as its TypeScript declares it (@syncfusion/ej2-buttons/src/check-box/check-box.d.ts, ChangeEventArgs in @syncfusion/ej2-buttons/src/common/common.d.ts), and its change payload as the browser hands it (probe:ej2-payload-checkbox-change), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionCheckBox.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N10"
+     ]
+    },
+    {
+     "door": "FusionCheckBoxChangeArgs.Checked.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10"
+     ]
+    },
+    {
+     "door": "FusionCheckBoxChangeArgs.Checked.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N10",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCheckBoxEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10"
+     ]
+    },
+    {
+     "door": "FusionCheckBoxEvents.Changed.get -> TypedEvent<FusionCheckBoxChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10"
+     ]
+    },
+    {
+     "door": "FusionCheckBoxExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionCheckBoxReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N10"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxExtensions.Checked<TModel>(this ComponentRef<FusionCheckBox!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxExtensions.Click<TModel>(this ComponentRef<FusionCheckBox!, TModel!>! self) -> ComponentRef<FusionCheckBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxExtensions.Disabled<TModel>(this ComponentRef<FusionCheckBox!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxExtensions.FocusIn<TModel>(this ComponentRef<FusionCheckBox!, TModel!>! self) -> ComponentRef<FusionCheckBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxExtensions.Indeterminate<TModel>(this ComponentRef<FusionCheckBox!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxExtensions.SetChecked<TModel>(this ComponentRef<FusionCheckBox!, TModel!>! self, bool isChecked) -> ComponentRef<FusionCheckBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxExtensions.SetDisabled<TModel>(this ComponentRef<FusionCheckBox!, TModel!>! self, bool disabled) -> ComponentRef<FusionCheckBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxExtensions.SetIndeterminate<TModel>(this ComponentRef<FusionCheckBox!, TModel!>! self, bool isIndeterminate) -> ComponentRef<FusionCheckBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxHtmlExtensions.FusionCheckBox<TModel>(this InputBoundField<TModel!, bool>! setup, System.Action<Syncfusion.EJ2.Buttons.CheckBoxBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionCheckBoxReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Buttons.CheckBoxBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionCheckBoxEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Buttons.CheckBoxBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N10"
+     ]
+    },
+    {
+     "door": "static readonly FusionCheckBoxEvents.Instance -> FusionCheckBoxEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N10"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F11",
    "summary": "FusionChipList: one declaration of the Syncfusion ChipList by its JavaScript names, each named as EJ2 names it, add, select, remove, find, getSelectedChips, dataBind and selectedChips, each EJ2 33.1.47's public member; the payloads of click and deleted; the chip data find and getSelectedChips return, each chip's data typed by the app, a multiple selection's indexes read as EJ2 writes them (M21.X401); the selection typed by the app among the kinds the browser holds; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over eleven files whose calls name members by strings over ComponentRef, payload classes with setters, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, with Indexes declared again.",
    "status": "both",
@@ -3194,6 +3512,982 @@
    ]
   },
   {
+   "id": "M21.F15",
+   "summary": "FusionDatePicker: one declaration of the Syncfusion DatePicker by its JavaScript names, value, focusIn, focusOut and change, each EJ2 33.1.47's public member; the payload of change; the input it is, generic over the member it binds, its value that member's own type, committed by change and sent as the core sends a DateTime or a DateTimeOffset; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and its payload's typed by the bound member, nullable as EJ2 documents the value, and its payload nested under EJ2's interface name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionDatePicker",
+    "Alis.Reactive.Fusion:FusionDatePickerChangeArgs",
+    "Alis.Reactive.Fusion:FusionDatePickerEvents",
+    "Alis.Reactive.Fusion:FusionDatePickerExtensions",
+    "Alis.Reactive.Fusion:FusionDatePickerHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionDatePickerReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<DateTime>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerExtensions.cs:20"
+    },
+    {
+     "line": "main",
+     "text": "ValueExpression.LiteralRaw(value.ToString(\"yyyy-MM-dd\", CultureInfo.InvariantCulture), Shape.Date));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerExtensions.cs:35"
+    },
+    {
+     "line": "main",
+     "text": "this InputBoundField<TModel, TProp> setup,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<DateTime> Value => Property<DateTime>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:35"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<DateTime?> Value => ReadOnly<DateTime?>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "this InputBoundField<TModel, TProp> field,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:70"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().DatePickerFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:74"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDatePicker<TValue> declares the EJ2 DatePicker by its JavaScript names, TValue the type of the member it binds, since EJ2 marks the picker's value a generic type (@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:83-87): value as Value, a Property<TValue> that holds null until a date is chosen, so the bound member's type admits null, DateTime? or DateTimeOffset? (M21.X701), a DateTime? written and read as a wall date and time with no offset and a DateTimeOffset? as the browser's clock with its offset for its day (D3.9, D3.13); FocusIn and FocusOut as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N15",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDatePicker<TValue>.ChangedEventArgs, EJ2's change payload, reads Value, a TValue, since EJ2 marks the payload's value a generic type (@syncfusion/ej2-calendars/src/calendar/calendar.d.ts:694-698), and IsInteracted.",
+     "doors": [
+      "M21.N15",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionDatePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
+     "doors": [
+      "M21.N15",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionDatePicker() and field.FusionDatePicker(build => ..) render FusionDatePicker<TProp>, TProp the bound member's type, under the field's id and binding name, by EJ2's builder that binds the member; the vendor contract analyzer checks TProp (M21.X702).",
+     "doors": [
+      "M21.N15",
+      "M7.N2",
+      "M21.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionDatePicker<TProp>'s Reactive(d => d.Change, pipeline) handles its change from the plan's start, its payload typed by the bound member; pipeline.Input(m => m.AdmissionDate).Component<FusionDatePicker<DateTime?>>() reaches it in any block (N14.4).",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N15"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerExtensions.cs:15-59"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerHtmlExtensions.cs:18-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerReactiveExtensions.cs:11-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:20-79"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7",
+    "Q3"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's DatePicker as its TypeScript declares it (@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts, ChangedEventArgs in @syncfusion/ej2-calendars/src/calendar/calendar.d.ts), and the core's date wire form (spec/Core/DESIGN.md D3.8, D3.9), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X701",
+     "rung": "analyzer",
+     "defect": "Both lines declare the picker's value as a DateTime with no null: the redesign's Value is Property<DateTime> (Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:23 at 65fdf118d) and main's SetValue takes a DateTime (Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerExtensions.cs:31 at 623dd4a27), so no view clears it, where EJ2 documents the date null until chosen and marks it a generic type (@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:83-87): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019. The rewrite's FusionDatePicker<TValue> types Value by the member it binds, and the analyzer checks each type argument the views give: a date ALIS037 holds, DateTime or DateTimeOffset (D17.5), whose read admits null (ALIS019), so a DateTime? or DateTimeOffset? member binds it and a DateTime or DateTimeOffset member is refused."
+    },
+    {
+     "id": "M21.X702",
+     "rung": "analyzer",
+     "defect": "Both lines render the DatePicker over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:70 at 65fdf118d), while the input reads its value as a DateTime, so a picker bound to a member of text or a number compiles and the form sends a date where the endpoint binds that member. The rewrite renders FusionDatePicker<TProp>, and the vendor contract analyzer (N17.2) refuses a TProp that is no date by ALIS037, whose closed set holds DateTime and DateTimeOffset (D17.5)."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionDatePicker.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N15"
+     ]
+    },
+    {
+     "door": "FusionDatePickerChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15"
+     ]
+    },
+    {
+     "door": "FusionDatePickerChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N15",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDatePickerChangeArgs.Value.get -> System.DateTime?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15"
+     ]
+    },
+    {
+     "door": "FusionDatePickerChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N15",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDatePickerEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15"
+     ]
+    },
+    {
+     "door": "FusionDatePickerEvents.Changed.get -> TypedEvent<FusionDatePickerChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15"
+     ]
+    },
+    {
+     "door": "FusionDatePickerExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionDatePickerReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N15"
+     ]
+    },
+    {
+     "door": "static FusionDatePickerExtensions.FocusIn<TModel>(this ComponentRef<FusionDatePicker!, TModel!>! self) -> ComponentRef<FusionDatePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDatePickerExtensions.FocusOut<TModel>(this ComponentRef<FusionDatePicker!, TModel!>! self) -> ComponentRef<FusionDatePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDatePickerExtensions.SetValue<TModel>(this ComponentRef<FusionDatePicker!, TModel!>! self, System.DateTime value) -> ComponentRef<FusionDatePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDatePickerExtensions.Value<TModel>(this ComponentRef<FusionDatePicker!, TModel!>! self) -> TypedComponentSource<System.DateTime>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDatePickerHtmlExtensions.FusionDatePicker<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Calendars.DatePickerBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionDatePickerReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Calendars.DatePickerBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionDatePickerEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Calendars.DatePickerBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N15"
+     ]
+    },
+    {
+     "door": "static readonly FusionDatePickerEvents.Instance -> FusionDatePickerEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N15"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F16",
+   "summary": "FusionDateRangePicker: one declaration of the Syncfusion DateRangePicker by its JavaScript names, startDate, endDate, value, focusIn, focusOut and change, each EJ2 33.1.47's public member, its value declared as the list of two days the browser holds; the payload of change, read as the browser hands it; the input it is, its two days committed by change and sent as the core sends a DateTime; and the render helpers that render it bound to a list of dates. Main spreads the slice over six files whose events and reads name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its days typed nullable as EJ2 documents them, its payload nested under EJ2's interface name, and its render helpers typed by the member.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionDateRangePicker",
+    "Alis.Reactive.Fusion:FusionDateRangePickerChangeArgs",
+    "Alis.Reactive.Fusion:FusionDateRangePickerEvents",
+    "Alis.Reactive.Fusion:FusionDateRangePickerExtensions",
+    "Alis.Reactive.Fusion:FusionDateRangePickerHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionDateRangePickerReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:22"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<DateTime>.Named(\"startDate\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerExtensions.cs:27"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<DateTime[]>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerExtensions.cs:33"
+    },
+    {
+     "line": "main",
+     "text": "public int DaySpan { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/Events/FusionDateRangePickerOnChanged.cs:21"
+    },
+    {
+     "line": "main",
+     "text": "this InputBoundField<TModel, TProp> setup,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<DateTime> StartDate => Property<DateTime>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:22"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<DateTime[]> Value => Property<DateTime[]>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:28"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<int> DaySpan => ReadOnly<int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:48"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().DateRangePickerFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:79"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDateRangePicker declares StartDate and EndDate as Property<DateTime?> and Value as Property<DateTime[]?>, the dates EJ2 declares with no generic mark (@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts:176-183, :285-295), each nullable as D17.5 reads EJ2's null default until a range is chosen (M21.X703), Value a list of the two days by M21.D702; FocusIn and FocusOut as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N16",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDateRangePicker.RangeEventArgs, EJ2's change payload, reads StartDate and EndDate as DateTime?, DaySpan, the days the range holds, and IsInteracted, as the browser hands them (probe:ej2-payload-daterangepicker-change, probe:ej2-daterangepicker-range-after-typing).",
+     "doors": [
+      "M21.N16",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionDateRangePicker bound to a member of DateTime[] or DateTime[]? is an input: its Value, committed by Change, is what a form sends, each day's text with no offset (D3.8), and what a check reads.",
+     "doors": [
+      "M21.N16",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionDateRangePicker() and field.FusionDateRangePicker(build => ..) render the picker under the field's id and binding name, over a member of DateTime[] or DateTime[]? alone (M21.X704), by EJ2's builder that binds the member.",
+     "doors": [
+      "M21.N16",
+      "M7.N2",
+      "M21.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionDateRangePicker's Reactive(r => r.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.StayPeriod).Component<FusionDateRangePicker>() reaches it in any block (N14.4).",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N16"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerExtensions.cs:22-69"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerHtmlExtensions.cs:18-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerReactiveExtensions.cs:11-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:19-84"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7",
+    "Q3"
+   ],
+   "meanings": [
+    {
+     "id": "M21.D702",
+     "meaning": "DateRangePicker's value, which EJ2's TypeScript types Date[] | DateRange (@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts:183), is declared as a list of DateTime, since the browser holds the range's two days as a list of two dates once a range is typed (probe:ej2-daterangepicker-value-after-typing) and the change payload hands its value as a list (probe:ej2-payload-daterangepicker-change); the DateRange arm, an object of start and end, is not declared. The fact reruns on every Syncfusion upgrade, and its proof is a test the rewrite ships."
+    }
+   ],
+   "oracle": "Syncfusion EJ2 33.1.47's DateRangePicker as its TypeScript declares it (@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts, RangeEventArgs there), its value and change payload as the browser holds and hands them (probe:ej2-payload-daterangepicker-change, probe:ej2-daterangepicker-value-after-typing, probe:ej2-daterangepicker-range-after-typing), and the core's date wire form (spec/Core/DESIGN.md D3.8, D3.9), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X703",
+     "rung": "analyzer",
+     "defect": "Both lines declare the range's start, end and value with no null: the redesign's StartDate and EndDate are Property<DateTime> and its Value Property<DateTime[]> (Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:22, :25, :28 at 65fdf118d), and main's reads are DateTime and DateTime[] (Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerExtensions.cs:27-33 at 623dd4a27), where EJ2 documents each null until a range is chosen (@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts:181-183, :287-289, :293-295): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite declares Property<DateTime?> for the two days and Property<DateTime[]?> for the value."
+    },
+    {
+     "id": "M21.X704",
+     "rung": "type",
+     "defect": "Both lines render the DateRangePicker over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:75 at 65fdf118d), while the input sends a list of two dates, the redesign's own page binding a DateTime[]? (Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/DateRangePicker/DateRangePickerModel.cs:15 at 65fdf118d), so a picker bound to a single date or to text compiles and the endpoint binds a list into it. The rewrite's helpers take a member of DateTime[] or DateTime[]? alone."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionDateRangePicker.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerChangeArgs.DaySpan.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerChangeArgs.DaySpan.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N16",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerChangeArgs.EndDate.get -> System.DateTime?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerChangeArgs.EndDate.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N16",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N16",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerChangeArgs.StartDate.get -> System.DateTime?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerChangeArgs.StartDate.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N16",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerEvents.Changed.get -> TypedEvent<FusionDateRangePickerChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionDateRangePickerReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "static FusionDateRangePickerExtensions.EndDate<TModel>(this ComponentRef<FusionDateRangePicker!, TModel!>! self) -> TypedComponentSource<System.DateTime>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateRangePickerExtensions.StartDate<TModel>(this ComponentRef<FusionDateRangePicker!, TModel!>! self) -> TypedComponentSource<System.DateTime>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateRangePickerExtensions.Value<TModel>(this ComponentRef<FusionDateRangePicker!, TModel!>! self) -> TypedComponentSource<System.DateTime[]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateRangePickerHtmlExtensions.FusionDateRangePicker<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Calendars.DateRangePickerBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateRangePickerReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Calendars.DateRangePickerBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionDateRangePickerEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Calendars.DateRangePickerBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N16"
+     ]
+    },
+    {
+     "door": "static readonly FusionDateRangePickerEvents.Instance -> FusionDateRangePickerEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N16"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F17",
+   "summary": "FusionDateTimePicker: one declaration of the Syncfusion DateTimePicker by its JavaScript names, value, focusIn, focusOut and change, each EJ2 33.1.47's public member; the payload of change; the input it is, generic over the member it binds, its value that member's own type, committed by change and sent as a DateTime with no offset or, for a DateTimeOffset member, as an instant with the browser's offset; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters, a write that drops the seconds and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and its payload's typed by the bound member, nullable as EJ2 documents the value, and its payload nested under EJ2's interface name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionDateTimePicker",
+    "Alis.Reactive.Fusion:FusionDateTimePickerChangeArgs",
+    "Alis.Reactive.Fusion:FusionDateTimePickerEvents",
+    "Alis.Reactive.Fusion:FusionDateTimePickerExtensions",
+    "Alis.Reactive.Fusion:FusionDateTimePickerHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionDateTimePickerReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<DateTime>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerExtensions.cs:20"
+    },
+    {
+     "line": "main",
+     "text": "ValueExpression.LiteralRaw(value.ToString(\"yyyy-MM-ddTHH:mm\", CultureInfo.InvariantCulture), Shape.Date));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerExtensions.cs:35"
+    },
+    {
+     "line": "main",
+     "text": "this InputBoundField<TModel, TProp> setup,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<DateTime> Value => Property<DateTime>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:35"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<DateTime?> Value => ReadOnly<DateTime?>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "this InputBoundField<TModel, TProp> field,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:70"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().DateTimePickerFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:74"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDateTimePicker<TValue> declares the EJ2 DateTimePicker by its JavaScript names, TValue the type of the member it binds, since EJ2 marks the picker's value a generic type (@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:90-93): value as Value, a Property<TValue> that holds null until a moment is chosen, so the bound member's type admits null, DateTime? or DateTimeOffset? (M21.X705), a DateTime? written and read as a wall date and time with no offset and a DateTimeOffset? as the browser's clock with its offset for its day (D3.9, D3.13); FocusIn and FocusOut as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N17",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionDateTimePicker<TValue>.ChangedEventArgs, EJ2's change payload, reads Value, a TValue, since EJ2 marks the payload's value a generic type (@syncfusion/ej2-calendars/src/calendar/calendar.d.ts:694-698), and IsInteracted.",
+     "doors": [
+      "M21.N17",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionDateTimePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
+     "doors": [
+      "M21.N17",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionDateTimePicker() and field.FusionDateTimePicker(build => ..) render FusionDateTimePicker<TProp>, TProp the bound member's type, under the field's id and binding name, by EJ2's builder that binds the member; the vendor contract analyzer checks TProp (M21.X706).",
+     "doors": [
+      "M21.N17",
+      "M7.N2",
+      "M21.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionDateTimePicker<TProp>'s Reactive(d => d.Change, pipeline) handles its change from the plan's start, its payload typed by the bound member; pipeline.Input(m => m.VisitStarts).Component<FusionDateTimePicker<DateTimeOffset?>>() reaches it in any block (N14.4).",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N17"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerExtensions.cs:15-59"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerHtmlExtensions.cs:18-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerReactiveExtensions.cs:11-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:20-79"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7",
+    "Q3"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's DateTimePicker as its TypeScript declares it (@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts, ChangedEventArgs in @syncfusion/ej2-calendars/src/calendar/calendar.d.ts), and the core's date wire form (spec/Core/DESIGN.md D3.8, D3.9), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X705",
+     "rung": "analyzer",
+     "defect": "Both lines declare the picker's value as a DateTime with no null: the redesign's Value is Property<DateTime> (Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:23 at 65fdf118d) and main's SetValue takes a DateTime (Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerExtensions.cs:31 at 623dd4a27), where EJ2 documents the value null until chosen and marks it a generic type (@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:90-93): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019. The rewrite's FusionDateTimePicker<TValue> types Value by the member it binds, and the analyzer checks each type argument the views give: a date ALIS037 holds, DateTime or DateTimeOffset (D17.5), whose read admits null (ALIS019), so a DateTime? or DateTimeOffset? member binds it and a DateTime or DateTimeOffset member is refused."
+    },
+    {
+     "id": "M21.X706",
+     "rung": "type",
+     "defect": "Both lines render the DateTimePicker over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:70 at 65fdf118d), while the input reads its value as a DateTime (Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:23 at 65fdf118d): a picker bound to text compiles, and one bound to a DateTimeOffset member sends the picked moment as a DateTime, with no offset (D3.9), so the endpoint receives a wall time with no instant where the member holds one. The rewrite's FusionDateTimePicker<TProp> takes the bound member's type, so a DateTimeOffset? member's Value is written and read as an instant, sent as the browser's clock with its offset for its day (D3.9, D3.13), and the vendor contract analyzer (N17.2) refuses a TProp that is no date by ALIS037 (D17.5)."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionDateTimePicker.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N17"
+     ]
+    },
+    {
+     "door": "FusionDateTimePickerChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17"
+     ]
+    },
+    {
+     "door": "FusionDateTimePickerChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N17",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDateTimePickerChangeArgs.Value.get -> System.DateTime?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17"
+     ]
+    },
+    {
+     "door": "FusionDateTimePickerChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N17",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionDateTimePickerEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17"
+     ]
+    },
+    {
+     "door": "FusionDateTimePickerEvents.Changed.get -> TypedEvent<FusionDateTimePickerChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17"
+     ]
+    },
+    {
+     "door": "FusionDateTimePickerExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionDateTimePickerReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N17"
+     ]
+    },
+    {
+     "door": "static FusionDateTimePickerExtensions.FocusIn<TModel>(this ComponentRef<FusionDateTimePicker!, TModel!>! self) -> ComponentRef<FusionDateTimePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateTimePickerExtensions.FocusOut<TModel>(this ComponentRef<FusionDateTimePicker!, TModel!>! self) -> ComponentRef<FusionDateTimePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateTimePickerExtensions.SetValue<TModel>(this ComponentRef<FusionDateTimePicker!, TModel!>! self, System.DateTime value) -> ComponentRef<FusionDateTimePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateTimePickerExtensions.Value<TModel>(this ComponentRef<FusionDateTimePicker!, TModel!>! self) -> TypedComponentSource<System.DateTime>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateTimePickerHtmlExtensions.FusionDateTimePicker<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Calendars.DateTimePickerBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionDateTimePickerReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Calendars.DateTimePickerBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionDateTimePickerEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Calendars.DateTimePickerBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N17"
+     ]
+    },
+    {
+     "door": "static readonly FusionDateTimePickerEvents.Instance -> FusionDateTimePickerEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N17"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F20",
    "summary": "FusionDropDownList: one declaration of the Syncfusion DropDownList by its JavaScript names, value, text, dataSource, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, generic over the member it binds, its value that member's own type and committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed by the bound member and its text Property<string?>, each admitting null as the vendor holds them (M21.X506), and its data named as every framework read names it (M21.D1).",
    "status": "both",
@@ -3969,6 +5263,341 @@
      "verdict": "renamed",
      "to": [
       "M21.N21"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F22",
+   "summary": "FusionUploader, both lines' FusionFileUpload renamed to Fusion and EJ2's class name: one declaration of the Syncfusion Uploader by its JavaScript names, getFilesData, clearAll and selected, each EJ2 33.1.47's public member, and FilesChanged, the framework's own event once the files are listed; the payloads of its two events and the file item, read as the browser hands them; the input it is, the browser files of the files the user chose committed by FilesChanged; and the render helpers that render it bound to a file member, automatic upload off. Main reads the files as text through a private member and declares payload members EJ2 does not hand; the redesign declares it in one file with its component code, the shape the rewrite keeps, reading the list through EJ2's public getFilesData, its payloads nested under EJ2's interface names, and its render helpers typed by the member.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionFileUpload",
+    "Alis.Reactive.Fusion:FusionFileUploadEvents",
+    "Alis.Reactive.Fusion:FusionFileUploadExtensions",
+    "Alis.Reactive.Fusion:FusionFileUploadFilesChangedArgs",
+    "Alis.Reactive.Fusion:FusionFileUploadHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionFileUploadReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionFileUploadSelectedArgs",
+    "Alis.Reactive.Fusion:FusionUploaderFile"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"filesData\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadExtensions.cs:22"
+    },
+    {
+     "line": "main",
+     "text": "public int FilesCount { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/Events/FusionFileUploadOnSelected.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().Uploader(setup.ElementId)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<IReadOnlyList<BrowserFile>> Files => FilesData.Each(file => file.RawFile!);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "private ReadOnly<IReadOnlyList<FusionUploaderFile>> FilesData => ReadOnly<IReadOnlyList<FusionUploaderFile>>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:21"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Files, committedBy: FilesChanged);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:40"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Cancel => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:50"
+    },
+    {
+     "line": "redesign",
+     "text": "public BrowserFile? RawFile { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:74"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = setup.Helper.EJS().Uploader(setup.ElementId)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:106"
+    },
+    {
+     "line": "redesign",
+     "text": "uploader.trigger(\"filesChanged\", { filesData: uploader.filesData.slice() }));",
+     "cite": "Alis.Reactive.Assets/components/fusion/file-upload.ts:18"
+    },
+    {
+     "line": "proposed",
+     "text": "The declaration takes EJ2's class name, FusionUploader, Fusion and EJ2's Uploader (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:483), the prefix keeping it apart from Syncfusion's own C# names beside it, as UploaderBuilder in Syncfusion.EJ2.Inputs (the owner, 2026-11-09: \"to avoid name collision\"); both lines' FusionFileUpload and its render helpers are renamed to it.",
+     "doors": [
+      "M21.N22"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionUploader declares GetFilesData as a method returning the files the uploader lists, EJ2's public getFilesData, in place of the filesData both lines read, which EJ2 marks private (M21.X707); Files as the browser File of each listed file by M21.D701; ClearAll as a method; and Selected, EJ2's event before files are added, and FilesChanged, raised by the framework's component code once they are, as events whose payload is the listener's first argument; each EJ2 member named as EJ2 33.1.47 names it.",
+     "doors": [
+      "M21.N22",
+      "N5.4",
+      "N17.1",
+      "N10.7"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionUploader.SelectedEventArgs, EJ2's selected payload, reads FilesData, the files just chosen, and writes Cancel, which refuses them, as the browser hands them (probe:ej2-payload-uploader-selected); FusionUploader.FilesChangedEventArgs reads FilesData, the files the uploader lists; and FusionUploader.FileInfo, EJ2's file item, reads Name, Size, Type, Status and RawFile (probe:ej2-uploader-getfilesdata-selected, probe:ej2-uploader-getfilesdata-preloaded). A count is p.From(args.FilesData).Count(), which carries main's FilesCount (M21.X708).",
+     "doors": [
+      "M21.N22",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionUploader bound to a file member, IFormFile or a list of it on net10 and MVC 5's posted-file base or a list of it on net48 (D10.23), is an input: its Files, committed by FilesChanged, is what a form-data request sends, a file going in form data alone (D9.16), and a check reads it (M21.X710).",
+     "doors": [
+      "M21.N22",
+      "M7.N3",
+      "N10.7"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionUploader() and field.FusionUploader(build => ..) render the uploader under the field's id and binding name with automatic upload off, so the files go with the form; the framework's own component code raises FilesChanged once the uploader holds the chosen files, since EJ2's change follows a server upload alone.",
+     "doors": [
+      "M21.N22",
+      "M7.N2",
+      "M21.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionUploader's Reactive(u => u.Selected, pipeline) and Reactive(u => u.FilesChanged, pipeline) handle its events from the plan's start; pipeline.Input(m => m.CarePlanDocuments).Component<FusionUploader>() reaches it in any block (N14.4).",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N22"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadExtensions.cs:17-33"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:18-40"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadReactiveExtensions.cs:10-36"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:16-116"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/components/fusion/file-upload.ts:13-21"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7",
+    "Q3",
+    "Q9"
+   ],
+   "meanings": [
+    {
+     "id": "M21.D701",
+     "meaning": "An Uploader's files are what its public getFilesData() lists (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:1177): each item's rawFile is the browser's File for a file the user chose (probe:ej2-uploader-getfilesdata-selected) and text for one the app lists through the builder's files (probe:ej2-uploader-getfilesdata-preloaded), where EJ2's TypeScript types rawFile string | Blob (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:97). FileInfo.RawFile is declared BrowserFile?, and text read as a file reads nothing (D3.3), so Files, and the form-data request that sends it, holds the files the user chose alone. FilesChanged is the framework's: its component code raises it after EJ2's selected and removing, once the list holds the change, since EJ2's change fires after a server upload or removal alone (@syncfusion/ej2-inputs/src/uploader/uploader.js:1130, :2249), and its payload's FilesData is getFilesData()'s list."
+    }
+   ],
+   "oracle": "Syncfusion EJ2 33.1.47's Uploader as its TypeScript declares it (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts, SelectedEventArgs and FileInfo there), its selected payload and file items as the browser hands them (probe:ej2-payload-uploader-selected, probe:ej2-uploader-getfilesdata-selected, probe:ej2-uploader-getfilesdata-preloaded), and as its source raises change (@syncfusion/ej2-inputs/src/uploader/uploader.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X707",
+     "rung": "analyzer",
+     "defect": "The redesign reads the uploader's filesData, which EJ2 marks @private (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:535-540): its declaration's FilesData (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:21 at 65fdf118d), which its Files and its input read, and its component code's FilesChanged payload (Alis.Reactive.Assets/components/fusion/file-upload.ts:18 at 65fdf118d); main names it as the value member (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:16 at 623dd4a27). The vendor contract analyzer (N17.2) refuses a member its type does not make public by ALIS016 (D17.5). The rewrite reads the same list through getFilesData(), which EJ2 declares public (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:1177), in the declaration and in its component code."
+    },
+    {
+     "id": "M21.X708",
+     "rung": "type",
+     "defect": "Main's selected payload declares FilesCount and IsInteracted (Alis.Reactive.Fusion/Components/FusionFileUpload/Events/FusionFileUploadOnSelected.cs:12, :15 at 623dd4a27), members EJ2's selected payload does not have (@syncfusion/ej2-inputs/src/uploader/uploader.js:1290-1300; probe:ej2-payload-uploader-selected), so a condition on the count of chosen files reads nothing and never holds. The rewrite's FusionUploader.SelectedEventArgs in M21.N22 declares neither, so such a read does not compile, and counts FilesData."
+    },
+    {
+     "id": "M21.X709",
+     "rung": "type",
+     "defect": "Main reads the uploader's value as text, ComponentProperty<string> over filesData (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadExtensions.cs:22, :29 at 623dd4a27), a list of file items (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:540), so a comparison of it with text compiles and reads a list. The rewrite's Files in M21.N22 is ReadOnly<IReadOnlyList<BrowserFile>>, as the redesign's is."
+    },
+    {
+     "id": "M21.X710",
+     "rung": "type",
+     "defect": "Both lines render the Uploader over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:102 at 65fdf118d), while the input sends files, so an uploader bound to text compiles and the endpoint binds no file into it. The rewrite's helpers in M21.N22 take a file member alone, IFormFile or a list of it on net10 and MVC 5's posted-file base or a list of it on net48, the file members D10.23 names (spec/Core/DESIGN.md:2313-2314)."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionFileUpload.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N22"
+     ]
+    },
+    {
+     "door": "FusionFileUploadEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N22"
+     ]
+    },
+    {
+     "door": "FusionFileUploadEvents.Selected.get -> TypedEvent<FusionFileUploadSelectedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N22"
+     ]
+    },
+    {
+     "door": "FusionFileUploadExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N22",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionFileUploadReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N22"
+     ]
+    },
+    {
+     "door": "FusionFileUploadSelectedArgs.FilesCount.get -> int",
+     "verdict": "refused",
+     "reason": "EJ2's selected payload has no filesCount (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:154-196; @syncfusion/ej2-inputs/src/uploader/uploader.js:1290-1300; probe:ej2-payload-uploader-selected), so main's read finds nothing (M21.X708); the count of the files just chosen is p.From(args.FilesData).Count() over the payload's FilesData.",
+     "carriers": [
+      "M21.N22",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionFileUploadSelectedArgs.FilesCount.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N22",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionFileUploadSelectedArgs.IsInteracted.get -> bool",
+     "verdict": "refused",
+     "reason": "EJ2's selected payload has no isInteracted (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:154-196; probe:ej2-payload-uploader-selected), so main's read finds nothing (M21.X708); a selection is always the user's, by the file chooser or a drop.",
+     "carriers": [
+      "M21.N22",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionFileUploadSelectedArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N22",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionFileUploadExtensions.Value<TModel>(this ComponentRef<FusionFileUpload!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N22",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionFileUploadHtmlExtensions.FusionFileUpload<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Inputs.UploaderBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N22",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionFileUploadReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.UploaderBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionFileUploadEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.UploaderBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N22"
+     ]
+    },
+    {
+     "door": "static readonly FusionFileUploadEvents.Instance -> FusionFileUploadEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N22"
      ]
     }
    ]
@@ -11296,6 +12925,327 @@
    ]
   },
   {
+   "id": "M21.F36",
+   "summary": "FusionRadioButton: one declaration of the Syncfusion RadioButton by its JavaScript names, checked, disabled, dataBind, getSelectedValue, click, focusIn and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it; and the render helper that renders one button under the developer's id. Main spreads the slice over seven files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter, and a builder class of its own whose Reactive extension wires the change; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component and its payload nested under EJ2's interface name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionRadioButton",
+    "Alis.Reactive.Fusion:FusionRadioButtonBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionRadioButtonChangeArgs",
+    "Alis.Reactive.Fusion:FusionRadioButtonEvents",
+    "Alis.Reactive.Fusion:FusionRadioButtonExtensions",
+    "Alis.Reactive.Fusion:FusionRadioButtonHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionRadioButtonReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"getSelectedValue\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonExtensions.cs:21"
+    },
+    {
+     "line": "main",
+     "text": "=> self.Read<string>(SelectedValueMethod);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonExtensions.cs:75"
+    },
+    {
+     "line": "main",
+     "text": "public sealed class FusionRadioButtonBuilder<TModel> :",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonBuilder.cs:14"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().RadioButton(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonHtmlExtensions.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Checked => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:24"
+    },
+    {
+     "line": "redesign",
+     "text": "public TypedSource<string> GetSelectedValue() => Method<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:33"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> Value => ReadOnly<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:50"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = html.EJS().RadioButton(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:77"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionRadioButton>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:80"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionRadioButton declares Checked and Disabled as Property<bool>; DataBind, Click and FocusIn as methods; GetSelectedValue as a method returning the value of the group's checked button as text; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N36",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionRadioButton.ChangeArgs, EJ2's change payload, reads Value, the checked button's value, as the browser hands it (probe:ej2-payload-radiobutton-change).",
+     "doors": [
+      "M21.N36",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionRadioButton(plan, elementId, build => ..) renders one button under the id the developer chose, as both lines do; the rendered component's Reactive(r => r.Change, pipeline) handles its change from the plan's start, in place of main's FusionRadioButtonBuilder<TModel> and its Reactive extension, and pipeline.Component<FusionRadioButton>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N36",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonBuilder.cs:14-54"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonExtensions.cs:9-76"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonHtmlExtensions.cs:15-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonReactiveExtensions.cs:9-26"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:21-82"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's RadioButton as its TypeScript declares it (@syncfusion/ej2-buttons/src/radio-button/radio-button.d.ts, ChangeArgs there), and its change payload as the browser hands it (probe:ej2-payload-radiobutton-change), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionRadioButtonBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionRadioButtonBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionRadioButtonBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionRadioButtonChangeArgs.Value.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36"
+     ]
+    },
+    {
+     "door": "FusionRadioButtonChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N36",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionRadioButtonEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36"
+     ]
+    },
+    {
+     "door": "FusionRadioButtonEvents.Changed.get -> TypedEvent<FusionRadioButtonChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36"
+     ]
+    },
+    {
+     "door": "FusionRadioButtonExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionRadioButtonReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N36"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonExtensions.Checked<TModel>(this ComponentRef<FusionRadioButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonExtensions.Click<TModel>(this ComponentRef<FusionRadioButton!, TModel!>! self) -> ComponentRef<FusionRadioButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonExtensions.Disabled<TModel>(this ComponentRef<FusionRadioButton!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonExtensions.FocusIn<TModel>(this ComponentRef<FusionRadioButton!, TModel!>! self) -> ComponentRef<FusionRadioButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonExtensions.SelectedValue<TModel>(this ComponentRef<FusionRadioButton!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonExtensions.SetChecked<TModel>(this ComponentRef<FusionRadioButton!, TModel!>! self, bool isChecked) -> ComponentRef<FusionRadioButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonExtensions.SetDisabled<TModel>(this ComponentRef<FusionRadioButton!, TModel!>! self, bool disabled) -> ComponentRef<FusionRadioButton!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonHtmlExtensions.FusionRadioButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.RadioButtonBuilder!>! build) -> FusionRadioButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonHtmlExtensions.FusionRadioButton<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.RadioButtonBuilder!>! build) -> FusionRadioButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionRadioButtonReactiveExtensions.Reactive<TModel, TArgs>(this FusionRadioButtonBuilder<TModel!>! builder, System.Func<FusionRadioButtonEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionRadioButtonBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N36"
+     ]
+    },
+    {
+     "door": "static readonly FusionRadioButtonEvents.Instance -> FusionRadioButtonEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N36"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F37",
    "summary": "FusionRating: one declaration of the Syncfusion Rating by its JavaScript names, value, dataBind, reset and valueChanged, each EJ2 33.1.47's public member; the payload of valueChanged; the input it is, its value committed by valueChanged; and the render helpers that render it bound to a member of double. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its payload nested under EJ2's interface name and the rating started at the member's value.",
    "status": "both",
@@ -13860,6 +15810,290 @@
    ]
   },
   {
+   "id": "M21.F46",
+   "summary": "FusionSwitch: one declaration of the Syncfusion Switch by its JavaScript names, checked and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it, with no member the browser lacks; the input it is, its state committed by change; and the render helpers that render it bound to a member of bool. Main spreads the slice over six files whose events, writes and reads name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name and stripped of the IsInteracted no switch hands.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionSwitch",
+    "Alis.Reactive.Fusion:FusionSwitchChangeArgs",
+    "Alis.Reactive.Fusion:FusionSwitchEvents",
+    "Alis.Reactive.Fusion:FusionSwitchExtensions",
+    "Alis.Reactive.Fusion:FusionSwitchHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionSwitchReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"checked\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "public bool IsInteracted { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/Events/FusionSwitchOnChanged.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().SwitchFor(setup.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Checked => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:18"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<bool> IsInteracted => ReadOnly<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().SwitchFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:60"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSwitch declares Checked as Property<bool>, the boolean EJ2 declares with no generic mark and starts at false (@syncfusion/ej2-buttons/src/switch/switch.d.ts:45-51), and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N46",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSwitch.ChangeEventArgs, EJ2's change payload, reads Checked, the state after the flip, and declares no IsInteracted, which the browser does not hand (probe:ej2-payload-switch-change; M21.X711).",
+     "doors": [
+      "M21.N46",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionSwitch bound to a member of bool is an input: its Checked, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N46",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionSwitch() and field.FusionSwitch(build => ..), over a member of bool, render the switch under the field's id and binding name, on as the member is, by EJ2's builder that binds the member.",
+     "doors": [
+      "M21.N46",
+      "M7.N2",
+      "M21.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionSwitch's Reactive(w => w.Change, pipeline) handles its flip from the plan's start; pipeline.Input(m => m.FallAlerts).Component<FusionSwitch>() reaches it in any block (N14.4).",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N46"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchExtensions.cs:9-29"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchHtmlExtensions.cs:14-32"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchReactiveExtensions.cs:11-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:15-65"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Switch as its TypeScript declares it (@syncfusion/ej2-buttons/src/switch/switch.d.ts, ChangeEventArgs in @syncfusion/ej2-buttons/src/common/common.d.ts), as its source raises change (@syncfusion/ej2-buttons/src/switch/switch.js), and its change payload as the browser hands it (probe:ej2-payload-switch-change), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X711",
+     "rung": "type",
+     "defect": "Both lines declare IsInteracted on the Switch's change payload (Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:34 at 65fdf118d; Alis.Reactive.Fusion/Components/FusionSwitch/Events/FusionSwitchOnChanged.cs:15 at 623dd4a27), a member the browser does not hand: EJ2 triggers change with checked and event (@syncfusion/ej2-buttons/src/switch/switch.js:97-98), ej2-base adds the name alone (@syncfusion/ej2-base/src/observer.js:92), and a real click hands checked, event and name (probe:ej2-payload-switch-change). A condition on it reads nothing and never holds, so a handler meant for the user's flip never runs. The rewrite's FusionSwitch.ChangeEventArgs in M21.N46 declares no IsInteracted, so such a read does not compile."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionSwitch.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N46"
+     ]
+    },
+    {
+     "door": "FusionSwitchChangeArgs.Checked.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N46"
+     ]
+    },
+    {
+     "door": "FusionSwitchChangeArgs.Checked.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N46",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSwitchChangeArgs.IsInteracted.get -> bool",
+     "verdict": "refused",
+     "reason": "EJ2's Switch hands change's listener checked and event alone (@syncfusion/ej2-buttons/src/switch/switch.js:97), with the name ej2-base writes, and no isInteracted (probe:ej2-payload-switch-change), so the read finds nothing (M21.X711); a flip the user makes is the one Change a page sees, since a write of Checked raises none.",
+     "carriers": [
+      "M21.N46",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSwitchChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N46",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSwitchEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N46"
+     ]
+    },
+    {
+     "door": "FusionSwitchEvents.Changed.get -> TypedEvent<FusionSwitchChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N46"
+     ]
+    },
+    {
+     "door": "FusionSwitchExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N46",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionSwitchReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N46"
+     ]
+    },
+    {
+     "door": "static FusionSwitchExtensions.SetChecked<TModel>(this ComponentRef<FusionSwitch!, TModel!>! self, bool isChecked) -> ComponentRef<FusionSwitch!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N46",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSwitchExtensions.Value<TModel>(this ComponentRef<FusionSwitch!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N46",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSwitchHtmlExtensions.FusionSwitch<TModel>(this InputBoundField<TModel!, bool>! setup, System.Action<Syncfusion.EJ2.Buttons.SwitchBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N46",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionSwitchReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Buttons.SwitchBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionSwitchEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Buttons.SwitchBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N46"
+     ]
+    },
+    {
+     "door": "static readonly FusionSwitchEvents.Instance -> FusionSwitchEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N46"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F48",
    "summary": "FusionTextArea: one declaration of the Syncfusion TextArea by its JavaScript names, value, dataBind, focusIn, focusOut, input, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its four events; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over nine files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and its payloads nested under EJ2's interface names.",
    "status": "both",
@@ -14701,6 +16935,320 @@
      "verdict": "renamed",
      "to": [
       "M21.N49"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F50",
+   "summary": "FusionTimePicker: one declaration of the Syncfusion TimePicker by its JavaScript names, value, focusIn, focusOut and change, each EJ2 33.1.47's public member; the payload of change; the input it is, generic over the member it binds, its value that member's own type, committed by change and sent as the core sends a DateTime or a DateTimeOffset; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters, a write of the time as text and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value and its payload's typed by the bound member, nullable as EJ2 documents the value, and its payload nested under EJ2's interface name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionTimePicker",
+    "Alis.Reactive.Fusion:FusionTimePickerChangeArgs",
+    "Alis.Reactive.Fusion:FusionTimePickerEvents",
+    "Alis.Reactive.Fusion:FusionTimePickerExtensions",
+    "Alis.Reactive.Fusion:FusionTimePickerHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionTimePickerReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<DateTime>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerExtensions.cs:20"
+    },
+    {
+     "line": "main",
+     "text": "ValueExpression.LiteralRaw(value.ToString(\"HH:mm\", CultureInfo.InvariantCulture), Shape.Date));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerExtensions.cs:35"
+    },
+    {
+     "line": "main",
+     "text": "this InputBoundField<TModel, TProp> setup,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<DateTime> Value => Property<DateTime>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:20"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:32"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<DateTime?> Value => ReadOnly<DateTime?>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:40"
+    },
+    {
+     "line": "redesign",
+     "text": "this InputBoundField<TModel, TProp> field,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:67"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().TimePickerFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:71"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTimePicker<TValue> declares the EJ2 TimePicker by its JavaScript names, TValue the type of the member it binds, since EJ2 marks the picker's value a generic type (@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts:373-376): value as Value, a Property<TValue> that holds null until a time is chosen, so the bound member's type admits null, DateTime? or DateTimeOffset? (M21.X712), a DateTime? written and read as a wall date and time with no offset and a DateTimeOffset? as the browser's clock with its offset for its day (D3.9, D3.13); FocusIn and FocusOut as methods; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N50",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTimePicker<TValue>.ChangeEventArgs, EJ2's change payload, reads Value, a TValue, since EJ2 marks the payload's value a generic type (@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts:13-17), and IsInteracted.",
+     "doors": [
+      "M21.N50",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionTimePicker<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends, a DateTime? as its wall text with no offset and a DateTimeOffset? as the browser's clock with its offset (D3.8, D3.9), and what a check reads.",
+     "doors": [
+      "M21.N50",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionTimePicker() and field.FusionTimePicker(build => ..) render FusionTimePicker<TProp>, TProp the bound member's type, under the field's id and binding name, by EJ2's builder that binds the member; the vendor contract analyzer checks TProp (M21.X713).",
+     "doors": [
+      "M21.N50",
+      "M7.N2",
+      "M21.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionTimePicker<TProp>'s Reactive(t => t.Change, pipeline) handles its change from the plan's start, its payload typed by the bound member; pipeline.Input(m => m.MedicationRound).Component<FusionTimePicker<DateTime?>>() reaches it in any block (N14.4).",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N50"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerExtensions.cs:15-59"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerHtmlExtensions.cs:18-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerReactiveExtensions.cs:11-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:17-76"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7",
+    "Q3"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's TimePicker as its TypeScript declares it (@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts, ChangeEventArgs there), and the core's date wire form (spec/Core/DESIGN.md D3.8, D3.9), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X712",
+     "rung": "analyzer",
+     "defect": "Both lines declare the picker's value as a DateTime with no null: the redesign's Value is Property<DateTime> (Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:20 at 65fdf118d) and main's SetValue takes a DateTime (Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerExtensions.cs:31 at 623dd4a27), where EJ2 documents the time null until chosen and marks it a generic type (@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts:373-376): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019. The rewrite's FusionTimePicker<TValue> types Value by the member it binds, and the analyzer checks each type argument the views give: a date ALIS037 holds, DateTime or DateTimeOffset (D17.5), whose read admits null (ALIS019), so a DateTime? or DateTimeOffset? member binds it and a DateTime or DateTimeOffset member is refused."
+    },
+    {
+     "id": "M21.X713",
+     "rung": "analyzer",
+     "defect": "Both lines render the TimePicker over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:67 at 65fdf118d), while the input reads its value as a DateTime, so a picker bound to text or a number compiles and the form sends a date where the endpoint binds that member. The rewrite renders FusionTimePicker<TProp>, and the vendor contract analyzer (N17.2) refuses a TProp that is no date by ALIS037, whose closed set holds DateTime and DateTimeOffset (D17.5)."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionTimePicker.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N50"
+     ]
+    },
+    {
+     "door": "FusionTimePickerChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50"
+     ]
+    },
+    {
+     "door": "FusionTimePickerChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N50",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTimePickerChangeArgs.Value.get -> System.DateTime?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50"
+     ]
+    },
+    {
+     "door": "FusionTimePickerChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N50",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTimePickerEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50"
+     ]
+    },
+    {
+     "door": "FusionTimePickerEvents.Changed.get -> TypedEvent<FusionTimePickerChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50"
+     ]
+    },
+    {
+     "door": "FusionTimePickerExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionTimePickerReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N50"
+     ]
+    },
+    {
+     "door": "static FusionTimePickerExtensions.FocusIn<TModel>(this ComponentRef<FusionTimePicker!, TModel!>! self) -> ComponentRef<FusionTimePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTimePickerExtensions.FocusOut<TModel>(this ComponentRef<FusionTimePicker!, TModel!>! self) -> ComponentRef<FusionTimePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTimePickerExtensions.SetValue<TModel>(this ComponentRef<FusionTimePicker!, TModel!>! self, System.DateTime value) -> ComponentRef<FusionTimePicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTimePickerExtensions.Value<TModel>(this ComponentRef<FusionTimePicker!, TModel!>! self) -> TypedComponentSource<System.DateTime>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTimePickerHtmlExtensions.FusionTimePicker<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Calendars.TimePickerBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionTimePickerReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Calendars.TimePickerBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionTimePickerEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Calendars.TimePickerBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N50"
+     ]
+    },
+    {
+     "door": "static readonly FusionTimePickerEvents.Instance -> FusionTimePickerEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N50"
      ]
     }
    ]

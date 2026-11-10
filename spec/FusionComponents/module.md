@@ -85,6 +85,14 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionBreadcrumb/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts:144`, `:223`).
+- `M21.N10` kept: `FusionCheckBox`: `Checked`, `Indeterminate` and `Disabled` as `Property<bool>`, `DataBind`, `Click`,
+  `FocusIn` and `Change`, with `IInputComponent.Input` committed by `Change` (M7.N3); the payload
+  `FusionCheckBox.ChangeEventArgs` (`Checked`, `probe:ej2-payload-checkbox-change`); and the render helpers
+  `field.FusionCheckBox()` and `field.FusionCheckBox(build => ..)` over a member of `bool`. It replaces main's six files
+  (`Alis.Reactive.Fusion/Components/FusionCheckBox/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-buttons/src/check-box/check-box.d.ts:52`, `:73`, `:66`, `:198`, `:206`, `:39`,
+  `@syncfusion/ej2-buttons/src/common/common.d.ts:93`, `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N11` kept: `FusionChipList`: `Add`; `Select(index)`, `Select(indexes)` and `Select(values, selectionType)` with
   `FusionChipList.SelectionType`; `Remove(index)` and `Remove(indexes)`; `Find` returning a
   `FusionChipList.ChipDataArgs`; `GetSelectedChips<TData>()` and `GetSelectedChip<TData>()` (`getSelectedChips`,
@@ -123,6 +131,36 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/context-menu/context-menu.d.ts:77`, `:84`;
   `@syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242`, `:552`).
+- `M21.N15` kept: `FusionDatePicker<TValue>`, TValue the type of the member it binds, as EJ2 marks the picker's value a
+  generic type (`@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:83-87`): `Value`, a `Property<TValue>` whose
+  type argument admits null (M21.X701), `FocusIn`, `FocusOut` and `Change`, with `IInputComponent.Input` committed by
+  `Change` (M7.N3); the payload `FusionDatePicker<TValue>.ChangedEventArgs` (`Value`, a `TValue`, and `IsInteracted`);
+  and the render helpers `field.FusionDatePicker()` and `field.FusionDatePicker(build => ..)`, which render it with the
+  bound member's type, a date ALIS037 holds (M21.X702). It replaces main's six files
+  (`Alis.Reactive.Fusion/Components/FusionDatePicker/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:87`, `:488`, `:494`,
+  `@syncfusion/ej2-calendars/src/calendar/calendar.d.ts:551`, `:698`, `:710`).
+- `M21.N16` kept: `FusionDateRangePicker`: `StartDate` and `EndDate` as `Property<DateTime?>` and `Value` as
+  `Property<DateTime[]?>` (M21.X703, M21.D702), `FocusIn`, `FocusOut` and `Change`, with `IInputComponent.Input`
+  committed by `Change` (M7.N3); the payload `FusionDateRangePicker.RangeEventArgs` (`StartDate`, `EndDate`, `DaySpan`,
+  `IsInteracted`, `probe:ej2-payload-daterangepicker-change`); and the render helpers `field.FusionDateRangePicker()`
+  and `field.FusionDateRangePicker(build => ..)` over a member of `DateTime[]` or `DateTime[]?` alone (M21.X704). It
+  replaces main's six files (`Alis.Reactive.Fusion/Components/FusionDateRangePicker/` at 623dd4a27), whose doors carry
+  their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts:289`, `:295`, `:183`, `:793`, `:799`, `:265`,
+  `:37`, `:39`, `:41`, `:51`).
+- `M21.N17` kept: `FusionDateTimePicker<TValue>`, TValue the type of the member it binds, as EJ2 marks the picker's
+  value a generic type (`@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:90-93`): `Value`, a
+  `Property<TValue>` whose type argument admits null (M21.X705), `FocusIn`, `FocusOut` and `Change`, with
+  `IInputComponent.Input` committed by `Change` (M7.N3), its value written and read as a date for a `DateTime?` member
+  and as an instant for a `DateTimeOffset?` one (M21.X706); the payload `FusionDateTimePicker<TValue>.ChangedEventArgs`
+  (`Value`, a `TValue`, and `IsInteracted`); and the render helpers `field.FusionDateTimePicker()` and
+  `field.FusionDateTimePicker(build => ..)`, which render it with the bound member's type, a date ALIS037 holds. It
+  replaces main's six files (`Alis.Reactive.Fusion/Components/FusionDateTimePicker/` at 623dd4a27), whose doors carry
+  their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:93`, `:511`, `:517`,
+  `@syncfusion/ej2-calendars/src/calendar/calendar.d.ts:551`, `:698`, `:710`).
 - `M21.N20` kept: `FusionDropDownList<TValue>`, TValue the type of the member it binds, as EJ2 marks DropDownList's
   value a generic type (`@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:306`): `Value`, a
   `Property<TValue>` whose type argument admits null, `Text` as `Property<string?>` (M21.X506), `DataSource<TItem>()`,
@@ -144,6 +182,19 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts:127`, `:131`, `:135`, `:627`, `:646`, `:695`,
   `:931`, `:964`, `:978`).
+- `M21.N22` kept: `FusionUploader`, Fusion and EJ2's class name
+  (`@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:483`), which both lines' `FusionFileUpload` is renamed to (the
+  owner, 2026-11-09): `GetFilesData` in place of the private `filesData` (M21.X707), `Files` (M21.D701), `ClearAll`,
+  `Selected` and the framework's `FilesChanged`, with `IInputComponent.Input` committed by `FilesChanged` (M7.N3); the
+  payloads `FusionUploader.SelectedEventArgs` (`FilesData`, `Cancel`, `probe:ej2-payload-uploader-selected`) and
+  `FusionUploader.FilesChangedEventArgs` (`FilesData`), with no `FilesCount` or `IsInteracted` (M21.X708); the item
+  `FusionUploader.FileInfo` (`Name`, `Size`, `Type`, `Status`, `RawFile`); the framework's component code that raises
+  `FilesChanged` (`Alis.Reactive.Assets/components/fusion/file-upload.ts` at 65fdf118d), reading the list through
+  `getFilesData()`; and the render helpers `field.FusionUploader()` and `field.FusionUploader(build => ..)` over a file
+  member alone (M21.X710). It replaces main's six files (`Alis.Reactive.Fusion/Components/FusionFileUpload/` at
+  623dd4a27), whose doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2
+  33.1.47's public member (`@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:1177`, `:1170`, `:724`, `:162`, `:166`,
+  `:92`, `:101`, `:109`, `:105`, `:97`).
 - `M21.N23` kept: `FusionGrid`: `DataSource<TRow>()` and `Page<TRow>()` (`dataSource`, CS0111), `Refresh`, the paging,
   sorting, filtering, searching and grouping methods, the column methods (`ShowColumns` and `HideColumns` by field,
   `AutoFitColumns` with and without a field, `ReorderColumns`, `GetColumnByField` returning a `FusionGrid.Column`,
@@ -270,6 +321,14 @@ Each name is gate 2's; each door is the capability it carries.
   => ..)`. It replaces main's eight files (`Alis.Reactive.Fusion/Components/FusionPivotView/` at 623dd4a27), whose doors
   carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1447`, `:1476`, `:2244`, `:2460`, `:2467`, `:2816`).
+- `M21.N36` kept: `FusionRadioButton`: `Checked` and `Disabled` as `Property<bool>`, `DataBind`, `GetSelectedValue`,
+  `Click`, `FocusIn` and `Change`; the payload `FusionRadioButton.ChangeArgs` (`Value`,
+  `probe:ej2-payload-radiobutton-change`); and the render helper `Html.FusionRadioButton(plan, elementId, build => ..)`,
+  which returns the rendered component in place of main's `FusionRadioButtonBuilder<TModel>`. It replaces main's seven
+  files (`Alis.Reactive.Fusion/Components/FusionRadioButton/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-buttons/src/radio-button/radio-button.d.ts:49`, `:63`, `:134`, `:187`, `:195`, `:36`, `:202`,
+  `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N37` kept: `FusionRating`: `Value` as `Property<double>`, since EJ2's value starts at 0, `DataBind`, `Reset` and
   `ValueChanged`, with `IInputComponent.Input` committed by `ValueChanged` (M7.N3); the payload
   `FusionRating.RatingChangedEventArgs` (`Value`, `PreviousValue`, `IsInteracted`); and the render helpers
@@ -320,6 +379,13 @@ Each name is gate 2's; each door is the capability it carries.
   `@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:39`, `:186`, `:281`,
   `@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:11`, `:23`, `:27`), and `insertedText` the member its JavaScript
   hands (`@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.js:420`, `:508`).
+- `M21.N46` kept: `FusionSwitch`: `Checked` as `Property<bool>` and `Change`, with `IInputComponent.Input` committed by
+  `Change` (M7.N3); the payload `FusionSwitch.ChangeEventArgs` (`Checked`), with no `IsInteracted`, which the browser
+  does not hand (M21.X711, `probe:ej2-payload-switch-change`); and the render helpers `field.FusionSwitch()` and
+  `field.FusionSwitch(build => ..)` over a member of `bool`. It replaces main's six files
+  (`Alis.Reactive.Fusion/Components/FusionSwitch/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-buttons/src/switch/switch.d.ts:51`, `:38`, `@syncfusion/ej2-buttons/src/common/common.d.ts:93`).
 - `M21.N48` kept: `FusionTextArea`: `Value` as `Property<string?>` (M21.X603), `DataBind`, `FocusIn`, `FocusOut`,
   `Input`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3); the payloads
   `FusionTextArea.InputEventArgs` (`Value`, `PreviousValue`), `FusionTextArea.ChangedEventArgs` (`Value`,
@@ -339,6 +405,15 @@ Each name is gate 2's; each door is the capability it carries.
   623dd4a27), whose doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2
   33.1.47's public member (`@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:81`, `:195`, `:201`, `:207`, `:213`, `:286`,
   `:314`, `:320`, `:11`, `:19`, `:23`, `:27`, `:31`, `@syncfusion/ej2-base/src/component.d.ts:129`).
+- `M21.N50` kept: `FusionTimePicker<TValue>`, TValue the type of the member it binds, as EJ2 marks the picker's value a
+  generic type (`@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts:373-376`): `Value`, a `Property<TValue>` whose
+  type argument admits null (M21.X712), `FocusIn`, `FocusOut` and `Change`, with `IInputComponent.Input` committed by
+  `Change` (M7.N3); the payload `FusionTimePicker<TValue>.ChangeEventArgs` (`Value`, a `TValue`, and `IsInteracted`);
+  and the render helpers `field.FusionTimePicker()` and `field.FusionTimePicker(build => ..)`, which render it with the
+  bound member's type, a date ALIS037 holds (M21.X713). It replaces main's six files
+  (`Alis.Reactive.Fusion/Components/FusionTimePicker/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts:376`, `:640`, `:632`, `:439`, `:17`, `:12`).
 - `M21.N51` kept: `FusionToolbar`: `Disable` and `Clicked`, whose payload `FusionToolbar.ClickEventArgs` reads its
   `item`, a `FusionToolbar.ItemModel`; and the render helper `Html.FusionToolbar(plan, id, build => ..)`. It replaces
   main's seven files (`Alis.Reactive.Fusion/Components/FusionToolbar/` at 623dd4a27), whose doors carry their verdicts
@@ -502,3 +577,28 @@ features they give.
   (`Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs:29` at 623dd4a27) where EJ2's value
   is a color that starts at `#008000ff` (`@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts:41-46`); the
   rewrite's `Value` is `Property<string>`, as the redesign's.
+- A picker's value holds null as the vendor's does (M21.X701, M21.X703, M21.X705, M21.X712). Both lines declare the
+  value of DatePicker, DateTimePicker, TimePicker and DateRangePicker as a date with no null
+  (`Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:23` at 65fdf118d), where EJ2 documents each
+  null until one is chosen (`@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:83-87`); ALIS019 refuses the
+  declarations. The rewrite's DatePicker, DateTimePicker and TimePicker are generic over the member they bind, as EJ2
+  marks each value a generic type, their value admitting null as the member's type does, and the DateRangePicker's days
+  are `DateTime?`, so a view can clear a picker.
+- A picker binds the member its value reads (M21.X702, M21.X704, M21.X706, M21.X713, M21.X710). Both lines render the
+  four pickers and the uploader over a member of any type
+  (`Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:70` at 65fdf118d); the rewrite's DatePicker,
+  DateTimePicker and TimePicker take the bound member's type as their type argument, which the vendor contract analyzer
+  holds to a date (ALIS037), the DateRangePicker's and the uploader's helpers take the list of dates or the file member
+  each value is, and a DateTimePicker bound to a `DateTimeOffset?` sends the picked moment as an instant with the
+  browser's offset, where both lines send a wall time with none (D3.9).
+- A payload declares what the browser hands (M21.X708, M21.X711, M21.D702). Both lines declare `IsInteracted` on the
+  Switch's change payload and main declares `FilesCount` and `IsInteracted` on the uploader's selected payload, members
+  no listener receives (`probe:ej2-payload-switch-change`, `probe:ej2-payload-uploader-selected`), so a condition on
+  them never holds; the rewrite declares neither, and DateRangePicker's value, a union in its TypeScript, is the list of
+  two dates the browser holds (`probe:ej2-daterangepicker-value-after-typing`), each fact a test the rewrite ships and
+  reruns on every upgrade.
+- The uploader reads its files through the vendor's public door (M21.X707, M21.D701). The redesign reads the uploader's
+  `filesData`, which EJ2 marks private (`@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:535-540`), in its declaration
+  and its component code; the rewrite calls the public `getFilesData()`
+  (`@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:1177`), sends the files the user chose alone, and takes EJ2's
+  class name, `FusionUploader`.

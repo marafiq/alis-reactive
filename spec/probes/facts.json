@@ -3016,6 +3016,141 @@
         "gesture": "Right-click the bed area, then press Escape.",
         "outcome": "The focus label reads Focused."
       }
+    },
+    {
+      "id": "ej2-payload-checkbox-change",
+      "statement": "EJ2 33.1.47's CheckBox hands change's listener these members by kind, checked a boolean.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-payload-checkbox-change: checked:boolean,event:object,name:string",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F10",
+        "page": "A photo consent page whose consent FusionCheckBox's Change handler sets consent-state's text to the payload's Checked.",
+        "gesture": "Click Consent to photos.",
+        "outcome": "consent-state shows true."
+      }
+    },
+    {
+      "id": "ej2-payload-switch-change",
+      "statement": "EJ2 33.1.47's Switch hands change's listener checked, event and name alone, with no isInteracted, which both lines declare.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-payload-switch-change: checked:boolean,event:object,name:string",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F46",
+        "page": "A fall alert settings page whose alerts FusionSwitch's Change handler sets alerts-state's text to the payload's Checked.",
+        "gesture": "Click the alerts switch.",
+        "outcome": "alerts-state shows true."
+      }
+    },
+    {
+      "id": "ej2-payload-radiobutton-change",
+      "statement": "EJ2 33.1.47's RadioButton hands change's listener these members by kind, value the checked button's text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-payload-radiobutton-change: event:object,name:string,value:string",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F36",
+        "page": "A visit slot page with Morning and Evening FusionRadioButtons, whose Evening button's Change handler sets slot-choice's text to the payload's Value.",
+        "gesture": "Click Evening.",
+        "outcome": "slot-choice shows Evening."
+      }
+    },
+    {
+      "id": "ej2-payload-daterangepicker-change",
+      "statement": "EJ2 33.1.47's DateRangePicker hands change's listener these members by kind after a typed range, its value a list where its TypeScript declares Date[] | DateRange.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-payload-daterangepicker-change: daySpan:number,element:Element,endDate:Date,event:object,isInteracted:boolean,name:string,startDate:Date,text:string,value:Array",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F16",
+        "page": "A respite stay page whose stay FusionDateRangePicker's Change handler sets stay-start's text to the payload's StartDate and stay-end's to its EndDate.",
+        "gesture": "Type 11/10/2026 - 11/14/2026 into the stay box and press Tab.",
+        "outcome": "stay-start shows 2026-11-10 and stay-end shows 2026-11-14."
+      }
+    },
+    {
+      "id": "ej2-daterangepicker-value-after-typing",
+      "statement": "EJ2 33.1.47's DateRangePicker holds its value as a list of two dates after a typed range, where its TypeScript declares Date[] | DateRange.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-daterangepicker-value-after-typing: Array(Date,Date)",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F16",
+        "page": "A respite stay page whose Check button's handler sets stay-days's text to the count of the stay FusionDateRangePicker's Value.",
+        "gesture": "Type 11/10/2026 - 11/14/2026 into the stay box, press Tab, and click Check.",
+        "outcome": "stay-days shows 2."
+      }
+    },
+    {
+      "id": "ej2-daterangepicker-range-after-typing",
+      "statement": "EJ2 33.1.47's DateRangePicker holds a typed range's start and end as local days and counts its days inclusive.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-daterangepicker-range-after-typing: Tue Nov 10 2026,Sat Nov 14 2026,5",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F16",
+        "page": "A respite stay page whose stay FusionDateRangePicker's Change handler sets stay-span's text to the payload's DaySpan.",
+        "gesture": "Type 11/10/2026 - 11/14/2026 into the stay box and press Tab.",
+        "outcome": "stay-span shows 5."
+      }
+    },
+    {
+      "id": "ej2-payload-uploader-selected",
+      "statement": "EJ2 33.1.47's Uploader hands selected's listener these members by kind, filesData a list and cancel a boolean, with no filesCount or isInteracted, which main declares.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-payload-uploader-selected: cancel:boolean,currentRequest:null,customFormData:null,event:object,filesData:Array,isCanceled:boolean,isModified:boolean,modifiedFilesData:Array,name:string,progressInterval:string",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F22",
+        "page": "A care plan upload page whose documents FusionUploader's Selected handler sets picked-count's text to the count of the payload's FilesData.",
+        "gesture": "Choose care-plan.pdf in the documents uploader.",
+        "outcome": "picked-count shows 1."
+      }
+    },
+    {
+      "id": "ej2-uploader-getfilesdata-selected",
+      "statement": "EJ2 33.1.47's Uploader lists a chosen file through getFilesData() with these members by kind, rawFile the browser's File, where its TypeScript declares string | Blob.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-uploader-getfilesdata-selected: id:string,name:string,rawFile:File,size:number,status:string,statusCode:string,type:string,validationMessages:object",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F22",
+        "page": "A care plan upload page whose documents FusionUploader is bound to CarePlanDocuments and whose Save button posts the form as form data to an endpoint that echoes each received file's name.",
+        "gesture": "Choose care-plan.pdf in the documents uploader and click Save.",
+        "outcome": "The echo shows care-plan.pdf."
+      }
+    },
+    {
+      "id": "ej2-uploader-getfilesdata-preloaded",
+      "statement": "EJ2 33.1.47's Uploader lists a file the app gives through its files option with rawFile as text, not a File.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys and a chosen file",
+      "probe": "ej2-payloads-u7.mjs",
+      "expect": "ej2-uploader-getfilesdata-preloaded: name:string,rawFile:string,size:number,status:string,statusCode:string,type:string,validationMessages:object",
+      "source": "spec/probes/ej2-payloads-u7.mjs",
+      "proof": {
+        "feature": "M21.F22",
+        "page": "A care plan upload page whose documents FusionUploader starts with intake-form listed by its files option, and whose Save button posts the form as form data to an endpoint that echoes the count of files it received.",
+        "gesture": "Click Save.",
+        "outcome": "The echo shows 0."
+      }
     }
   ]
 }
