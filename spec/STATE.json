@@ -1528,8 +1528,8 @@
     },
     "probes": {
       "counts": {
-        "browser": 117,
-        "facts": 385,
+        "browser": 121,
+        "facts": 389,
         "net10": 121,
         "net48": 85,
         "node": 62
@@ -3646,7 +3646,7 @@
     }
   },
   "passed": 33,
-  "read_at_head": "43f98e1c8bd269338c141a9bd616b95e5d8d749a",
+  "read_at_head": "ec736a6cadfd79e9c9278ae7786914d58357a094",
   "step": {
     "failing": [],
     "name": "End of session",
