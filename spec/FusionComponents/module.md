@@ -67,11 +67,12 @@ Each name is gate 2's; each door is the capability it carries.
   `ExecutePrompt(prompt)`, `AddPromptResponse(outputResponse)`, the whole response (M21.D901), and
   `AddPromptResponse(Arg<FusionAIAssistView.PromptModel>)`, a prompt with its response, `ScrollToBottom`,
   `PromptRequest`, `PromptChanged` and `StopRespondingClick`; the payloads `FusionAIAssistView.PromptRequestEventArgs`
-  (`Prompt`, `PromptSuggestions`, no `Cancel`, M21.X901), `FusionAIAssistView.PromptChangedEventArgs` (`Value`,
-  `PreviousValue`) and `FusionAIAssistView.StopRespondingEventArgs` (`Prompt`, `DataIndex`), and
-  `FusionAIAssistView.PromptModel` (`Prompt`, `Response`); and the render helper
-  `Html.FusionAIAssistView(plan, elementId, build => ..)`, which writes `enableStreaming` false after `build` and
-  returns the rendered component in place of main's `FusionAIAssistViewBuilder<TModel>`. It replaces main's nine files
+  (`Prompt` and `PromptSuggestions` as `string?` and `string[]?` (M21.X905), no `Cancel`, M21.X901),
+  `FusionAIAssistView.PromptChangedEventArgs` (`Value` and `PreviousValue`, each a `string?` (M21.X905)) and
+  `FusionAIAssistView.StopRespondingEventArgs` (`Prompt`, `DataIndex`), and `FusionAIAssistView.PromptModel` (`Prompt`,
+  a `string?` (M21.X905), and `Response`); and the render helper `Html.FusionAIAssistView(plan, elementId, build =>
+  ..)`, which writes `enableStreaming` false after `build` and returns the rendered component in place of main's
+  `FusionAIAssistViewBuilder<TModel>`. It replaces main's nine files
   (`Alis.Reactive.Fusion/Components/FusionAIAssistView/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts:480`, `:538`, `:940`, `:950`, `:959`, `:728`,
@@ -283,12 +284,12 @@ Each name is gate 2's; each door is the capability it carries.
   (`@syncfusion/ej2-grids/src/grid/base/grid.d.ts:1558`, `:3067`, `:3076`, `:3479`, `:3565`, `:3687`, `:3849`, `:3859`,
   `:3870`).
 - `M21.N24` kept: `FusionInPlaceEditor<TValue>`, TValue the type of the member it binds: `Value` (`value`), a
-  `Property<TValue>` (M21.X404); `Disabled` and `EnableEditMode`, a `Property<bool>` each; `Save`;
-  `Element.ClassList.Add` and `Remove`; `BeginEdit`, `EndEdit`, `Change`, `ActionBegin`, `ActionSuccess`, `SubmitClick`
-  and `CancelClick` and their payloads, nested in it under EJ2's names, change's `Value` and `PreviousValue` the bound
-  member's type; `IInputComponent.Input` committed by `EndEdit` (M7.N3); and the render helpers
-  `field.FusionInPlaceEditor()` and `field.FusionInPlaceEditor(build => ..)`, which render it with the member's type and
-  start it at the member's value by M21.D1. It replaces main's twelve files
+  `Property<TValue>` whose type argument admits null (M21.X404); `Disabled` and `EnableEditMode`, a `Property<bool>`
+  each; `Save`; `Element.ClassList.Add` and `Remove`; `BeginEdit`, `EndEdit`, `Change`, `ActionBegin`, `ActionSuccess`,
+  `SubmitClick` and `CancelClick` and their payloads, nested in it under EJ2's names, change's `Value` and
+  `PreviousValue` the bound member's type; `IInputComponent.Input` committed by `EndEdit` (M7.N3); and the render
+  helpers `field.FusionInPlaceEditor()` and `field.FusionInPlaceEditor(build => ..)`, which render it with the member's
+  type and start it at the member's value by M21.D1. It replaces main's twelve files
   (`Alis.Reactive.Fusion/Components/FusionInPlaceEditor/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:187`, `:320`, `:336`, `:408`, `:415`,
@@ -361,10 +362,10 @@ Each name is gate 2's; each door is the capability it carries.
   (`@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts:361`, `:389`, `:437`,
   `:443`, `:451`, `:757`, `:898`, `:905`, `:913`, `:920`).
 - `M21.N32` kept: `FusionNumericTextBox<TValue>`, `TValue` the bound member's type as EJ2 marks the value generic:
-  `Value` and `Min` as `Property<TValue>` (M21.X607), `FocusIn`, `FocusOut`, `Increment`, `Decrement`, `Change`, `Focus`
-  and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3); the payloads
-  `FusionNumericTextBox<TValue>.ChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<TValue>`, M21.X608, and
-  `IsInteracted`), `FusionNumericTextBox<TValue>.NumericFocusEventArgs` and
+  `Value` and `Min` as `Property<TValue>`, whose type argument admits null (M21.X607), `FocusIn`, `FocusOut`,
+  `Increment`, `Decrement`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3);
+  the payloads `FusionNumericTextBox<TValue>.ChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<TValue>`,
+  M21.X608, and `IsInteracted`), `FusionNumericTextBox<TValue>.NumericFocusEventArgs` and
   `FusionNumericTextBox<TValue>.NumericBlurEventArgs`, of which the declaration reads no member; and the render helper
   `field.FusionNumericTextBox(build => ..)`, which renders `FusionNumericTextBox<TProp>`. It replaces main's eight files
   (`Alis.Reactive.Fusion/Components/FusionNumericTextBox/` at 623dd4a27), whose doors carry their verdicts in
@@ -427,13 +428,13 @@ Each name is gate 2's; each door is the capability it carries.
   (`@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts:750`, `:1249`, `:1432`,
   `@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts:557`, `:561`).
 - `M21.N39` kept: `FusionSchedule`: `CurrentView`, `SelectedDate`, `EventSettings` as
-  `LiveObject<FusionSchedule.EventSettingsModel>()` with `DataSource<TEvent>()`, `DataBind`, `GetEvents<TEvent>`,
-  `AddEvent`, `SaveEvent`, `DeleteEvent<TKey>`, `OpenEditor`, `CloseEditor`, `RefreshEvents`, `Print` and `ScrollTo`;
-  `FusionSchedule.CurrentAction`, with System.Text.Json's string enum converter (M21.X305); nine events and their
-  payloads, nested in it under EJ2's names, an event's data the app's own class `TEvent` and `Navigating`'s dates read
-  as `DateTime` (M21.X306); and the render helper `Html.FusionSchedule(plan, id, build => ..)`. It replaces main's
-  fifteen files (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors carry their verdicts in
-  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  `LiveObject<FusionSchedule.EventSettingsModel>(nullable: true)` (M21.X307) with `DataSource<TEvent>()`, `DataBind`,
+  `GetEvents<TEvent>`, `AddEvent`, `SaveEvent`, `DeleteEvent<TKey>`, `OpenEditor`, `CloseEditor`, `RefreshEvents`,
+  `Print` and `ScrollTo`; `FusionSchedule.CurrentAction`, with System.Text.Json's string enum converter (M21.X305); nine
+  events and their payloads, nested in it under EJ2's names, an event's data the app's own class `TEvent` and
+  `Navigating`'s dates read as `DateTime` (M21.X306); and the render helper `Html.FusionSchedule(plan, id, build =>
+  ..)`. It replaces main's fifteen files (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors
+  carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:250`, `:274`, `:707`, `:867`, `:1716`, `:1726`, `:1878`).
 - `M21.N40` kept: `FusionSidebar`: `IsOpen` as `Property<bool>`, `Show`, `Hide`, `Toggle`, `Open` and `Close`; the
   payload `FusionSidebar.EventArgs` (`IsInteracted`, and `Cancel`, which EJ2 reads back and neither line declares); and
@@ -443,12 +444,12 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts:106`, `:246`, `:238`, `:265`, `:202`, `:196`, `:320`, `:332`).
 - `M21.N41` kept: `FusionSlider<TValue>`, `TValue` the bound member's type as EJ2 marks the value generic: one `Value`
-  as `Property<TValue>`, one number for a slider of one handle and a list of numbers for a range (M21.X614); `DataBind`,
-  `Change` and `Changed`, with `IInputComponent.Input` committed by `Changed` (M7.N3); the payload
-  `FusionSlider<TValue>.SliderChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<TValue>`, M21.X616, `Text`,
-  `Action`, `IsInteracted`); and the render helpers `field.FusionSlider()` and `field.FusionSlider(build => ..)`, which
-  render `FusionSlider<TProp>` at the member's value (M21.X615), a list member as EJ2's `Range` type
-  (`@syncfusion/ej2-inputs/src/slider/slider.d.ts:423`). It replaces main's six files
+  as `Property<TValue>`, whose type argument admits null, one number for a slider of one handle and a list of numbers
+  for a range (M21.X614); `DataBind`, `Change` and `Changed`, with `IInputComponent.Input` committed by `Changed`
+  (M7.N3); the payload `FusionSlider<TValue>.SliderChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<TValue>`,
+  M21.X616, `Text`, `Action`, `IsInteracted`); and the render helpers `field.FusionSlider()` and
+  `field.FusionSlider(build => ..)`, which render `FusionSlider<TProp>` at the member's value (M21.X615), a list member
+  as EJ2's `Range` type (`@syncfusion/ej2-inputs/src/slider/slider.d.ts:423`). It replaces main's six files
   (`Alis.Reactive.Fusion/Components/FusionSlider/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inputs/src/slider/slider.d.ts:366`, `:514`, `:521`, `:70`, `:76`, `:80`, `:84`, `:88`,
