@@ -23,7 +23,8 @@ The validator's own condition and rule types (`ClientValidation*` on main, `ICon
 `FixedComparisonRule`, `MemberComparisonRule`, `BrowserRule` and `BrowserRuleSet` on the redesign) are module 8's, which
 writes the same core through the lambda door. A Fusion template's conditional (`FusionConditionalBuilder<TModel>`) is
 the template engine's, not this core (D8.4), and module 22's. The sources a condition reads (`TypedSource<T>` and its
-kin) are module 2's.
+kin) are module 2's. A date's or a time's comparison defects, X6.57 and X6.58, are module 4's, whose row holds a
+condition's promise for each (D6.12).
 
 ## Doors
 
@@ -73,8 +74,8 @@ The meaning `M3.D1` is in `spec/Conditions/features.json`, on the feature it giv
   D8.9.
 - A date or a time compares as .NET compares it, to the tick (D6.12, X8.27). The redesign compares two `Date`s by
   `getTime` and orders by it (`Alis.Reactive.Assets/runtime/grammar/operators.ts:4-8`,
-  `Alis.Reactive.Assets/runtime/grammar/operators.ts:17-18` at 65fdf118d), so a wall time daylight saving skips orders as
-  the hour after it and a tick past a time equals it, and it refuses ordering a `TimeSpan`
+  `Alis.Reactive.Assets/runtime/grammar/operators.ts:17-18` at 65fdf118d), so a wall time daylight saving skips orders
+  as the hour after it and a tick past a time equals it, and it refuses ordering a `TimeSpan`
   (`Alis.Reactive/Members/BrowserOrder.cs:10-15` at 65fdf118d). The core reads each operand through its key
   (`spec/Core/conversions.md`), keeps the redesign's 16 date tests and orders a `TimeSpan`; `In`, `NotIn` and `Between`
   over a date compare keys too (M3.D1).

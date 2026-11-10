@@ -51,15 +51,17 @@ Module 4 adds no door of its own: every capability its doors carry is a core doo
 
 - A list that reads nothing reads nothing (D6.3), so a condition on its `Any()` does not hold and its `Count()` shows
   nothing. Both lines read it as a list of no item, and a text or a number as a list of one
-  (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:106-110`, `Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93`
-  at 65fdf118d; `Alis.Reactive.Assets/runtime/values/array-op-engine.ts:108-116` at 623dd4a27), so a missing list
-  counts 0 (X6.4, X6.7).
+  (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:106-110`,
+  `Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93` at 65fdf118d;
+  `Alis.Reactive.Assets/runtime/values/array-op-engine.ts:108-116` at 623dd4a27), so a missing list counts 0 (X6.4,
+  X6.7).
 - `Sum` agrees with .NET for each number type (D6.11). Both lines add a term that is not a finite number as 0 and add
   decimals in binary floating point (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:171-178`,
   `Alis.Reactive.Assets/runtime/grammar/operators.ts:99-102` at 65fdf118d;
-  `Alis.Reactive.Assets/runtime/values/array-op-engine.ts:25-27`, `Alis.Reactive.Assets/runtime/values/array-op-engine.ts:118-121`
-  at 623dd4a27), so 0.1 and 0.2 sum to 0.30000000000000004, a null term adds nothing where .NET throws, and an `int`
-  total runs past its range (X6.9, X6.47).
+  `Alis.Reactive.Assets/runtime/values/array-op-engine.ts:25-27`,
+  `Alis.Reactive.Assets/runtime/values/array-op-engine.ts:118-121` at 623dd4a27), so 0.1 and 0.2 sum to
+  0.30000000000000004, a null term adds nothing where .NET throws, and an `int` total runs past its range (X6.9,
+  X6.47).
 - `OrderBy` orders as .NET does (D6.13). Both lines turn a key that is not a number into text and compare by code unit,
   so a null key orders among text after the numbers (`Alis.Reactive.Assets/runtime/grammar/operators.ts:104-117` at
   65fdf118d, `Alis.Reactive.Assets/runtime/values/array-op-engine.ts:123-135` at 623dd4a27); the core orders null
@@ -83,11 +85,12 @@ Module 4 adds no door of its own: every capability its doors carry is a core doo
   both start it with `From`. The core's operations extend the source and return one (D6.10).
 - A live list counts, filters, tests and finds over a delegate on its item, its members required (D6.8, D6.9): the
   redesign's declared list has only `At`, `Count` and `Each` (`Alis.Reactive/Components/JsMembers.cs:128-147` at
-  65fdf118d), so a view counts or finds live items only after projecting them to data. The POC's live `Select` writes its field with no
-  `nonNull` (`poc/Alis.Reactive.Poc/Components/LiveObjects.cs:35-36`), since gate 1's P6 came after it; the rewrite
-  builds D6.16 for live items (M4.X9).
+  65fdf118d), so a view counts or finds live items only after projecting them to data. The POC's live `Select` writes
+  its field with no `nonNull` (`poc/Alis.Reactive.Poc/Components/LiveObjects.cs:35-36`), since gate 1's P6 came after
+  it; the rewrite builds D6.16 for live items (M4.X9).
 - A date or a time in a list's lambda compares and orders as .NET does, to the tick (D6.12, D6.13, X6.11, X6.29). The
   redesign sorts by a `Date`'s `getTime` (`Alis.Reactive.Assets/runtime/grammar/operators.ts:119-121` at 65fdf118d),
   which drops ticks below a millisecond and orders a wall time daylight saving skips as the hour after it; the core
   sorts by each item's key with `compareOrdinal`, and a lookup in a list the view holds compares keys, so one instant
-  written at two offsets is found.
+  written at two offsets is found. X6.57 and X6.58 are this module's, with a promise for each place their lines name:
+  a list's lambda, a pipeline condition, and for X6.57 a validator's check (D16.16).

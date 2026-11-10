@@ -791,10 +791,10 @@
         },
         {
           "for": "X6.57",
-          "page": "An app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy, and a visit list counted by v => v.At < cutoff, a DateTime the view holds.",
-          "gesture": "Open the page.",
-          "outcome": "The page is refused where the view renders with X6.57's message, naming v.At < cutoff.",
-          "opposite": "Without the app's converter, the page renders and counts the visits before the cutoff.",
+          "page": "A visits index with the link Open the visit count, to a visit count page in an app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy, whose Count button counts the visit list by v => v.At < cutoff, a DateTime the view holds, into visit-count.",
+          "gesture": "On the visits index, click Open the visit count.",
+          "outcome": "The visit count page is refused where the view renders with X6.57's message, naming v.At < cutoff.",
+          "opposite": "Without the app's converter, the visit count page renders, and Count writes the number of visits before the cutoff into visit-count.",
           "defect": "The page renders and reads the converter's text: as text it orders 01.11.2026 before 31.10.2026 and counts a November visit before an October cutoff, or as a key it stops the pipeline and no count shows."
         },
         {
@@ -804,6 +804,30 @@
           "outcome": "No count shows, the log stays empty, and the console holds one error naming the text 10/27/2026.",
           "opposite": "With that item's At held as 2026-10-27, the count shows and the log reads checked; held as 2026-02-30, a day no month holds, the count shows without that visit, the log reads checked and the console holds no error.",
           "defect": "The text read as nothing, so the count shows without that visit and the log reads checked; or parsed by the browser's Date, so it counts as October 27, a reading no endpoint's binding shares on both hosts. Or 2026-02-30 stops the pipeline too, so with it no count shows."
+        },
+        {
+          "for": "X6.57",
+          "page": "A handovers index with the link Open the handover, to a handover page in an app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy; its Check handover button gets the handover, whose success route's When orders the body's At, a DateTime, before a cutoff the view holds and writes early into handover-status.",
+          "gesture": "On the handovers index, click Open the handover.",
+          "outcome": "The handover page is refused where the view renders with X6.57's message, naming the At read.",
+          "opposite": "Without the app's converter, the handover page renders, and Check handover, answered with an At before the cutoff, writes early into handover-status.",
+          "defect": "The page renders and reads the converter's text: as text it orders 01.11.2026 before 31.10.2026, so a November handover writes early, or as a key it stops the pipeline and handover-status stays empty."
+        },
+        {
+          "for": "X6.57",
+          "page": "A visits index with the link Book a visit, to a visit form in an app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy; the form's At date picker is bound to a DateTime under VisitValidator's RuleFor(v => v.At).GreaterThan(new DateTime(2026, 11, 1)).WithMessage(\"Book a visit after November 1.\"), and Save posts the form.",
+          "gesture": "On the visits index, click Book a visit.",
+          "outcome": "The visit form is refused where the view renders with X6.57's message, naming At's GreaterThan rule.",
+          "opposite": "Without the app's converter, the visit form renders, and picking 2026-10-27 in At and clicking Save shows \"Book a visit after November 1.\" beside At, with no request sent.",
+          "defect": "The form renders and its browser rule reads At in a form the app's converter decides and the browser cannot read as the value .NET holds, so the browser and the endpoint disagree on a visit; or the rule is left to the server in silence, so Save sends a visit dated 2026-10-27 that only the endpoint's answer refuses."
+        },
+        {
+          "for": "X6.58",
+          "page": "A net10 rota test component with a Starts text box and a Change button, whose click raises its Changed event with a payload declared with Starts, a TimeOnly, which its JavaScript fills with the box's text; the handler's When orders Starts before new TimeOnly(12, 0) and writes morning, Else afternoon, then writes checked into a log.",
+          "gesture": "Type 7:00 PM into Starts and click Change, then type 19:00 and click Change.",
+          "outcome": "After 7:00 PM neither morning nor afternoon shows, the log stays empty and the console holds one error naming the text 7:00 PM; after 19:00 the line reads afternoon and the log reads checked.",
+          "opposite": "Typed 07:00 and changed, the line reads morning; typed 24:00 and changed, a time no day holds, the line reads afternoon, the log reads checked and the console holds no error.",
+          "defect": "The text read as nothing, so the Else runs, afternoon shows and the log reads checked though nothing named the text; or compared as text, so the branch runs by the letters of 7:00 PM. Or 24:00 stops the pipeline too, so with it the log stays empty."
         }
       ],
       "verdicts": [

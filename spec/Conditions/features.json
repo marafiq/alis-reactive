@@ -354,14 +354,6 @@
           "rung": "behavior"
         },
         {
-          "id": "X6.57",
-          "rung": "refusal"
-        },
-        {
-          "id": "X6.58",
-          "rung": "behavior"
-        },
-        {
           "id": "M3.X1",
           "rung": "behavior",
           "defect": "A value test over nothing reads as JavaScript reads it: IsNull holds over a member past a holder that holds null, NotNull holds there too, or IsEmpty does not hold over nothing, so a branch runs that M3.D1 does not run, or the reverse (M3.D1, M3.N1)."
@@ -521,22 +513,6 @@
           "outcome": "noon, then not noon; the same moment, then another moment; an open day, a closed day, an open day.",
           "opposite": "At ?starts=12:00:00.0000000 the noon page reads noon.",
           "defect": "The texts compared, so 12:00 never equals noon's 12:00:00 and -08:00 never equals +00:00; milliseconds compared, so 12:00:00.0000001 reads noon; or In looked up by includes of the picker's Date among the literal texts, so no day is open."
-        },
-        {
-          "for": "X6.57",
-          "page": "An app whose JSON options add a DateTime converter of their own that writes dd.MM.yyyy, and a handover page whose button's When orders the response body's At, a DateTime, before a cutoff the view holds.",
-          "gesture": "Open the page.",
-          "outcome": "The page is refused where the view renders with X6.57's message, naming the At read.",
-          "opposite": "Without the app's converter, the page renders and the branch runs for an At before the cutoff.",
-          "defect": "The page renders and reads the converter's text: as text it orders 01.11.2026 before 31.10.2026, so a November handover runs the branch, or as a key it stops the pipeline."
-        },
-        {
-          "for": "X6.58",
-          "page": "A net10 rota test component with a Starts text box and a Change button, whose click raises its Changed event with a payload declared with Starts, a TimeOnly, which its JavaScript fills with the box's text; the handler's When orders Starts before new TimeOnly(12, 0) and writes morning, Else afternoon, then writes checked into a log.",
-          "gesture": "Type 7:00 PM into Starts and click Change, then type 19:00 and click Change.",
-          "outcome": "After 7:00 PM neither morning nor afternoon shows, the log stays empty and the console holds one error naming the text 7:00 PM; after 19:00 the line reads afternoon and the log reads checked.",
-          "opposite": "Typed 07:00 and changed, the line reads morning; typed 24:00 and changed, a time no day holds, the line reads afternoon, the log reads checked and the console holds no error.",
-          "defect": "The text read as nothing, so the Else runs, afternoon shows and the log reads checked though nothing named the text; or compared as text, so the branch runs by the letters of 7:00 PM. Or 24:00 stops the pipeline too, so with it the log stays empty."
         },
         {
           "for": "X8.22",

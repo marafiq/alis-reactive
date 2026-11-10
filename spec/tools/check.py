@@ -987,10 +987,13 @@ def check_features_lost():
 def defect_problems(model, core_rungs, doors, analyzer_ids):
     problems = []
     seen = set()
+    owners = {}
     for feature in model["features"]:
         name = feature["id"]
         for defect in feature.get("defects", []):
             identifier, rung = defect.get("id", ""), defect.get("rung")
+            if CORE_DEFECT.match(identifier) and owners.setdefault(identifier, name) != name:
+                problems.append(f"{name}: {identifier} is placed in {owners[identifier]} too; a core defect has one feature")
             if rung not in RUNGS:
                 problems.append(f"{name}: {identifier} rung {rung!r}")
             elif CORE_DEFECT.match(identifier):
