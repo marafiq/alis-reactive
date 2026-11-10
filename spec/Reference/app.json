@@ -1,0 +1,8454 @@
+{
+  "app": "the care home conformance app: one app whose screens a care home's staff would use, its component bench and refusal routes as the test infrastructure they are, run under a closed set of host variants; every browser test of the framework runs on one of its screens",
+  "areas": {
+    "care": "a screen a care home's staff uses; it holds only what a user does",
+    "bench": "the component bench: the object-surface variations of the custom components, which are no business behavior",
+    "refusals": "one route per refusal where the view renders, each a deliberately broken view whose error the test reads"
+  },
+  "harness": {
+    "seed": "writes the test's own data under its world key, through typed builders",
+    "gate": "holds a named TLA+ action of the test's world until the test releases it; the test waits until the harness reports it held",
+    "push": "makes the server push a stream or hub message to the test's world",
+    "drop": "ends the test's stream or hub connection and holds the browser's next one until reopen",
+    "reopen": "lets the held next connection in",
+    "restart": "makes a component's host destroy its object and put a new one on the same element",
+    "clock": "Playwright's Page.Clock, for every timer a plan carries",
+    "gc": "Playwright's Page.RequestGCAsync, confirmed by the page's own weak hold"
+  },
+  "partKinds": {
+    "native": "a plain-DOM input or element the core's doors render or reach",
+    "conformance": "ConformanceComponent",
+    "conformanceElement": "ConformanceElement, the second custom component",
+    "peer": "ConformancePeer, the component a payload hands",
+    "fusion": "a Syncfusion component through its Fusion slice; never a part of a core module's test",
+    "nativeSlice": "a Native slice's component (NativeDrawer, NativeToast, NativeConfirm, NativeLoader, NativeActionLink, NativeCheckList and the rest)",
+    "plugin": "a plugin by name",
+    "slot": "a slot partials load into",
+    "form": "a request container",
+    "stream": "a server-sent event stream (net10)",
+    "hub": "a SignalR hub (net10)",
+    "endpoint": "a server endpoint the screen's requests reach"
+  },
+  "hosts": [
+    {
+      "id": "net10",
+      "what": "ASP.NET Core MVC on net10 with the app's default options: camel-case members and enum names, Fusion registered, ShowBusy() with NativeLoader, ShowReconnect() with the Native offer, request defaults sending X-Requested-With with a 401 route, a catch-all, ShowValidationErrors() and the standard retry, antiforgery in a header, Flags<CareDays>() and Flags<RotaDays>() named, its process clock in America/New_York",
+      "framework": "net10"
+    },
+    {
+      "id": "net48",
+      "what": "the MVC 5 twin on net48 under IIS, the same models, controllers and views, its process clock at UTC, run by verify-net48",
+      "framework": "net48"
+    },
+    {
+      "id": "numbersAsText",
+      "what": "the app's JSON options write numbers as text",
+      "framework": "net10"
+    },
+    {
+      "id": "dateConverter",
+      "what": "the app's JSON options add a DateTime converter that writes dd.MM.yyyy",
+      "framework": "net10"
+    },
+    {
+      "id": "snakeCase",
+      "what": "the app's JSON options name members in snake case",
+      "framework": "net10"
+    },
+    {
+      "id": "pascalCase",
+      "what": "the app's JSON options name members by their C# names, no naming policy",
+      "framework": "net10"
+    },
+    {
+      "id": "jsonContract",
+      "what": "the app's JSON options ignore members that hold their default (WhenWritingDefault), respect required constructor parameters, and remove Admission.Pharmacy through their resolver",
+      "framework": "net10"
+    },
+    {
+      "id": "enumsAsNumbers",
+      "what": "the app's JSON options write enums as numbers",
+      "framework": "net10"
+    },
+    {
+      "id": "classNames",
+      "what": "AddReactiveClassNames with Bootstrap's invalid-feedback and is-invalid",
+      "framework": "net10"
+    },
+    {
+      "id": "tracingExporterThrows",
+      "what": "the OpenTelemetry adapter with an exporter that throws on every span",
+      "framework": "net10"
+    },
+    {
+      "id": "tracing",
+      "what": "the OpenTelemetry adapter registered, exporting to the test app's collector, with a sampler the test steers per request",
+      "framework": "net10"
+    },
+    {
+      "id": "defaultHooks",
+      "what": "request defaults whose WhileLoading awaits the session plugin's Renew and whose Finally appends defaults finally and awaits Flush, each settled at once unless the test holds it",
+      "framework": "net10"
+    },
+    {
+      "id": "noBusyComponent",
+      "what": "ShowBusy() with no script that provides the busy component",
+      "framework": "net10"
+    },
+    {
+      "id": "realtimeNoOffer",
+      "what": "AddReactiveRealtime choosing neither ShowReconnect() nor NoReconnectOffer()",
+      "framework": "net10"
+    },
+    {
+      "id": "noReconnectComponent",
+      "what": "ShowReconnect() with no script that provides the reconnect component",
+      "framework": "net10"
+    },
+    {
+      "id": "noRequests",
+      "what": "an app that never calls AddReactiveRequests",
+      "framework": "net10"
+    },
+    {
+      "id": "noAntiforgeryChoice",
+      "what": "AddReactiveRequests naming no antiforgery choice",
+      "framework": "net10"
+    },
+    {
+      "id": "fusionShell",
+      "what": "a layout that renders FusionToast and FusionConfirmDialog in place of the Native ones",
+      "framework": "net10"
+    }
+  ],
+  "screens": [
+    {
+      "id": "residents",
+      "area": "care",
+      "title": "Residents",
+      "user": "finds residents by search as you type, wing, status and sort, reads the counts, and opens or discharges one from its row",
+      "parts": [
+        {
+          "id": "search",
+          "kind": "native",
+          "role": "the search box that finds residents as you type"
+        },
+        {
+          "id": "filters",
+          "kind": "native",
+          "role": "the wing select, status checkboxes and sort order"
+        },
+        {
+          "id": "list",
+          "kind": "native",
+          "role": "the resident list and its counts, written from the data the server sends"
+        },
+        {
+          "id": "rows",
+          "kind": "nativeSlice",
+          "role": "each row's actions, NativeActionLink and NativeActionButton"
+        },
+        {
+          "id": "listSlot",
+          "kind": "slot",
+          "role": "the slot a filtered list of residents loads into"
+        },
+        {
+          "id": "residentsEndpoint",
+          "kind": "endpoint",
+          "role": "the residents endpoint: search, census, photos, exports and their failures"
+        },
+        {
+          "id": "census",
+          "kind": "conformance",
+          "role": "the census panel, the screen's custom widget"
+        }
+      ]
+    },
+    {
+      "id": "bed-board",
+      "area": "care",
+      "under": "residents",
+      "title": "Bed board",
+      "user": "sees the wing's beds in a grid and acts on a bed from its context menu",
+      "parts": [
+        {
+          "id": "grid",
+          "kind": "fusion",
+          "role": "the residents grid, FusionGrid with its templates, edit templates and validation"
+        },
+        {
+          "id": "bedMenu",
+          "kind": "fusion",
+          "role": "the bed area's FusionContextMenu"
+        }
+      ]
+    },
+    {
+      "id": "admission",
+      "area": "care",
+      "title": "Admission",
+      "user": "admits a resident through the intake form: details, dates and time zone, care level, next of kin under its own prefix, allergies, documents, and the funding section that loads when its condition holds, checked in the browser and on the server",
+      "parts": [
+        {
+          "id": "intakeForm",
+          "kind": "form",
+          "role": "the intake form, a request container with its summary"
+        },
+        {
+          "id": "inputs",
+          "kind": "native",
+          "role": "the intake's inputs: name, dates and times, room, doses, contact and address fields"
+        },
+        {
+          "id": "nextOfKin",
+          "kind": "native",
+          "role": "the next-of-kin section rendered by PartialFor under its prefix"
+        },
+        {
+          "id": "sectionSlot",
+          "kind": "slot",
+          "role": "the slot the funding or state section loads into when its condition holds"
+        },
+        {
+          "id": "intakeEndpoint",
+          "kind": "endpoint",
+          "role": "the admissions endpoint: save, checks, beds and its error bodies"
+        },
+        {
+          "id": "carePicker",
+          "kind": "conformance",
+          "role": "the care level picker, the screen's custom widget"
+        },
+        {
+          "id": "nativeInputs",
+          "kind": "nativeSlice",
+          "role": "NativeCheckList visit days, NativeRadioGroup wing and NativeHiddenField assigned bed"
+        },
+        {
+          "id": "documents",
+          "kind": "native",
+          "role": "the intake form's document rows, each a file and its caption"
+        }
+      ]
+    },
+    {
+      "id": "admission-clinical",
+      "area": "care",
+      "under": "admission",
+      "title": "Admission: clinical and placement",
+      "user": "records allergies and tags, the current medication, the first language, the ward and the bed, and pastes a referral letter into the form",
+      "parts": [
+        {
+          "id": "allergies",
+          "kind": "fusion",
+          "role": "the allergy picker, FusionMultiSelect with its item template"
+        },
+        {
+          "id": "chips",
+          "kind": "fusion",
+          "role": "the allergy chips, FusionChips"
+        },
+        {
+          "id": "medication",
+          "kind": "fusion",
+          "role": "the current medication field, FusionAutoComplete"
+        },
+        {
+          "id": "language",
+          "kind": "fusion",
+          "role": "the preferred language, FusionComboBox"
+        },
+        {
+          "id": "ward",
+          "kind": "fusion",
+          "role": "the ward choice, FusionDropDownList"
+        },
+        {
+          "id": "bed",
+          "kind": "fusion",
+          "role": "the bed choice, FusionMultiColumnComboBox"
+        },
+        {
+          "id": "smartPaste",
+          "kind": "fusion",
+          "role": "Paste from referral, FusionSmartPasteButton"
+        },
+        {
+          "id": "clinicalForm",
+          "kind": "form",
+          "role": "the clinical step's own request container"
+        },
+        {
+          "id": "clinicalSlot",
+          "kind": "slot",
+          "role": "the slot the clinical step's sections load into"
+        },
+        {
+          "id": "clinicalEndpoint",
+          "kind": "endpoint",
+          "role": "the clinical step's endpoints"
+        }
+      ]
+    },
+    {
+      "id": "record",
+      "area": "care",
+      "title": "Resident record",
+      "user": "reads and edits one resident: tabs that load as partials, nested sections, notes added and refreshed, and the record's own custom widget",
+      "parts": [
+        {
+          "id": "tabSlot",
+          "kind": "slot",
+          "role": "the tabs, each loaded as a partial into the record's slot"
+        },
+        {
+          "id": "innerSlot",
+          "kind": "slot",
+          "role": "a section's own slot inside a tab, such as a care plan goal or a pinned note"
+        },
+        {
+          "id": "tabForm",
+          "kind": "form",
+          "role": "a tab's form, a request container with its summary"
+        },
+        {
+          "id": "notes",
+          "kind": "native",
+          "role": "the notes list, note box and the record's texts"
+        },
+        {
+          "id": "recordEndpoint",
+          "kind": "endpoint",
+          "role": "the resident endpoint: tabs, notes, care plan and its failures"
+        },
+        {
+          "id": "carePanel",
+          "kind": "conformance",
+          "role": "the care panel, the record's custom widget: vitals monitor, visit planner and call bell"
+        },
+        {
+          "id": "radio",
+          "kind": "plugin",
+          "role": "the ward radio plugin the record's cards listen to"
+        }
+      ]
+    },
+    {
+      "id": "record-contacts",
+      "area": "care",
+      "under": "record",
+      "title": "Contacts and visits",
+      "user": "keeps the resident's contacts, preferences and visit schedule, and mentions staff in a note",
+      "parts": [
+        {
+          "id": "contactsGrid",
+          "kind": "fusion",
+          "role": "the contacts and links grids, FusionGrid with validation"
+        },
+        {
+          "id": "preferences",
+          "kind": "fusion",
+          "role": "meal rating and room temperature, FusionRating and FusionSlider"
+        },
+        {
+          "id": "visits",
+          "kind": "fusion",
+          "role": "the visit schedule, FusionSchedule in week view"
+        },
+        {
+          "id": "mention",
+          "kind": "fusion",
+          "role": "the note box's FusionMention of staff"
+        }
+      ]
+    },
+    {
+      "id": "round",
+      "area": "care",
+      "title": "Medication round",
+      "user": "works a live round: the board updates from the server, doses are given with a confirmation, several saved at once, failures retried and shown",
+      "parts": [
+        {
+          "id": "board",
+          "kind": "stream",
+          "role": "the live round board, a server-sent event stream"
+        },
+        {
+          "id": "nurseLine",
+          "kind": "hub",
+          "role": "the nurse line, a SignalR hub"
+        },
+        {
+          "id": "doses",
+          "kind": "native",
+          "role": "the due doses with Give buttons, order forms and the round's texts"
+        },
+        {
+          "id": "cardSlot",
+          "kind": "slot",
+          "role": "the resident card slot on the round"
+        },
+        {
+          "id": "roundEndpoint",
+          "kind": "endpoint",
+          "role": "the round endpoint: doses, orders, supplies and their failures"
+        },
+        {
+          "id": "collector",
+          "kind": "endpoint",
+          "role": "the trace collector the OpenTelemetry adapter exports to, and the second origin a referral checks"
+        },
+        {
+          "id": "scanner",
+          "kind": "conformance",
+          "role": "the dose scanner, the round's custom widget"
+        }
+      ]
+    },
+    {
+      "id": "handover",
+      "area": "care",
+      "under": "round",
+      "title": "Round handover",
+      "user": "unlocks the medicine cabinet with a code, works through the round's resident list, asks the assistant and writes the handover note",
+      "parts": [
+        {
+          "id": "cabinet",
+          "kind": "fusion",
+          "role": "the medication cabinet code, FusionOtpInput"
+        },
+        {
+          "id": "residentList",
+          "kind": "fusion",
+          "role": "the round's residents, FusionListView"
+        },
+        {
+          "id": "assistant",
+          "kind": "fusion",
+          "role": "the medication assistant, FusionAIAssistView"
+        },
+        {
+          "id": "handover",
+          "kind": "fusion",
+          "role": "the handover note, FusionSmartTextArea"
+        }
+      ]
+    },
+    {
+      "id": "shell",
+      "area": "care",
+      "title": "App shell",
+      "user": "the layout around every screen: drawer, toast, confirm, loader, action links, plugins and the community's culture and time zone",
+      "parts": [
+        {
+          "id": "drawer",
+          "kind": "nativeSlice",
+          "role": "NativeDrawer"
+        },
+        {
+          "id": "toast",
+          "kind": "nativeSlice",
+          "role": "NativeToast"
+        },
+        {
+          "id": "confirm",
+          "kind": "nativeSlice",
+          "role": "NativeConfirm"
+        },
+        {
+          "id": "loader",
+          "kind": "nativeSlice",
+          "role": "NativeLoader"
+        },
+        {
+          "id": "layout",
+          "kind": "native",
+          "role": "the layout: the runtime's asset links, cached fragments and plans that compose by id"
+        }
+      ]
+    },
+    {
+      "id": "fusion-layout",
+      "area": "care",
+      "under": "shell",
+      "title": "Layout built with Syncfusion",
+      "user": "the layout of an app that builds its menu, toast and confirm dialog with Syncfusion",
+      "parts": [
+        {
+          "id": "menu",
+          "kind": "fusion",
+          "role": "the ward menu, FusionMenu"
+        },
+        {
+          "id": "fusionObjects",
+          "kind": "fusion",
+          "role": "FusionToast and FusionConfirmDialog, in the layout of the fusionShell host"
+        }
+      ],
+      "hosts": [
+        "fusionShell"
+      ]
+    },
+    {
+      "id": "bench",
+      "area": "bench",
+      "title": "Component bench",
+      "user": "test infrastructure: ConformanceComponent, ConformanceElement and ConformancePeer with every variation of their members, events and versions",
+      "parts": [
+        {
+          "id": "conformance",
+          "kind": "conformance",
+          "role": "ConformanceComponent"
+        },
+        {
+          "id": "conformanceElement",
+          "kind": "conformanceElement",
+          "role": "ConformanceElement"
+        },
+        {
+          "id": "peer",
+          "kind": "peer",
+          "role": "ConformancePeer"
+        },
+        {
+          "id": "plugins",
+          "kind": "plugin",
+          "role": "the bench's plugins: EventTarget, plain object, callback property, registry and two scripts that provide one name"
+        }
+      ]
+    },
+    {
+      "id": "refusals",
+      "area": "refusals",
+      "title": "Refusal routes",
+      "user": "test infrastructure: one deliberately broken view per refusal",
+      "parts": []
+    }
+  ],
+  "placements": [
+    {
+      "feature": "M4.F1",
+      "for": "X6.3",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.4",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.5",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.7",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.9",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.12",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.15",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.16",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.19",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.20",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.24",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.26",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.27",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.28",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.32",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.34",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.35",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.36",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.37",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.39",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.40",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.41",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.42",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.43",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "numbersAsText"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.44",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.45",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.47",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.48",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.51",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.53",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.54",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.55",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "M4.X2",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "listSlot",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "M4.X3",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.11",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.29",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.43",
+      "index": 1,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.57",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "dateConverter"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.58",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.57",
+      "index": 1,
+      "screen": "refusals",
+      "hosts": [
+        "dateConverter"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.57",
+      "index": 2,
+      "screen": "refusals",
+      "hosts": [
+        "dateConverter"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F1",
+      "for": "X6.58",
+      "index": 1,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F2",
+      "for": "M4.X4",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F2",
+      "for": "M4.X5",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F2",
+      "for": "M4.X6",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F2",
+      "for": "M4.X7",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F2",
+      "for": "M4.X9",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M4.F2",
+      "for": "M4.X8",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.4",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.6",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.11",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.13",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.14",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint",
+        "carePanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.15",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.23",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.26",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "M3.X1",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.19",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.20",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.21",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.22",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.27",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "carePicker"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.27",
+      "index": 1,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "carePicker"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.27",
+      "index": 2,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "carePicker"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.27",
+      "index": 3,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "carePicker"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F1",
+      "for": "X8.22",
+      "index": 1,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F2",
+      "for": "X8.7",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F2",
+      "for": "X8.8",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M3.F2",
+      "for": "X8.12",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X4.2",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X4.5",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X5.3",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X5.4",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X5.11",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X5.12",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X11.3",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "M11.X1",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "snakeCase"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "M11.X2",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "snakeCase"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "M11.X3",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X7.9",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F1",
+      "for": "X7.9",
+      "index": 1,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F2",
+      "for": "X4.3",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F2",
+      "for": "X5.7",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F2",
+      "for": "X5.8",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M11.F2",
+      "for": "X5.10",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "X7.8",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "X6.56",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "X12.12",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "M5.X1",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "M5.X2",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "M5.X3",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.4",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.6",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "jsonContract"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.7",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.8",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.9",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.10",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "jsonContract"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.11",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.13",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X4.13",
+      "index": 1,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.2",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "drawer",
+        "confirm",
+        "layout"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.4",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "scanner"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.5",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.8",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.9",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.11",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.12",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.13",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.14",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.15",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "defaultHooks"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.16",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.18",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "defaultHooks"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.20",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "defaultHooks"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint",
+        "carePicker"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.21",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "defaultHooks"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.22",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "defaultHooks"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint",
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.23",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "defaultHooks"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M23.F1",
+      "for": "M23.X1",
+      "index": 0,
+      "screen": "fusion-layout",
+      "hosts": [
+        "fusionShell"
+      ],
+      "parts": [
+        "fusionObjects"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M23.F2",
+      "for": "M23.X2",
+      "index": 0,
+      "screen": "fusion-layout",
+      "hosts": [
+        "fusionShell"
+      ],
+      "parts": [
+        "fusionObjects"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M23.F2",
+      "for": "M23.X3",
+      "index": 0,
+      "screen": "fusion-layout",
+      "hosts": [
+        "fusionShell"
+      ],
+      "parts": [
+        "fusionObjects"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F1",
+      "for": "M21.X2",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F1",
+      "for": "M21.X2",
+      "index": 1,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F2",
+      "for": "M21.X3",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F3",
+      "for": "M21.X901",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "assistant"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F5",
+      "for": "M21.X503",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "medication"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F5",
+      "for": "M21.X503",
+      "index": 1,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "medication"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F11",
+      "for": "M21.X401",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "chips"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F13",
+      "for": "M21.X505",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "language"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F14",
+      "for": "M21.X405",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "bedMenu"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F20",
+      "for": "M21.X507",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "ward"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F20",
+      "for": "M21.X507",
+      "index": 1,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "ward"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X201",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X201",
+      "index": 1,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X201",
+      "index": 2,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X203",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X203",
+      "index": 1,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X203",
+      "index": 2,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X204",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X204",
+      "index": 1,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X205",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "contactsGrid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X205",
+      "index": 1,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "contactsGrid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F23",
+      "for": "M21.X206",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F28",
+      "for": "M21.X509",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "residentList"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F28",
+      "for": "M21.X509",
+      "index": 1,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "residentList"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F29",
+      "for": "M21.X510",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "mention"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F30",
+      "for": "M21.X406",
+      "index": 0,
+      "screen": "fusion-layout",
+      "hosts": [
+        "fusionShell"
+      ],
+      "parts": [
+        "menu"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F31",
+      "for": "M21.X512",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "bed"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F31",
+      "for": "M21.X512",
+      "index": 1,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "bed"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F33",
+      "for": "M21.X612",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "cabinet"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F37",
+      "for": "M21.X613",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "preferences"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F39",
+      "for": "M21.X306",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "visits"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F39",
+      "for": "M21.X306",
+      "index": 1,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "visits"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F39",
+      "for": "M21.X306",
+      "index": 2,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "visits"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F41",
+      "for": "M21.X615",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "preferences"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F42",
+      "for": "M21.X803",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "smartPaste"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F42",
+      "for": "M21.X803",
+      "index": 1,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "smartPaste"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F42",
+      "for": "M21.X804",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "smartPaste"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F42",
+      "for": "M21.X805",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F43",
+      "for": "M21.X605",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "handover"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F1",
+      "for": "X15.1",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F1",
+      "for": "X15.2",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F1",
+      "for": "X15.5",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "pascalCase"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F1",
+      "for": "M22.X3",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F2",
+      "for": "X15.3",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F2",
+      "for": "M22.X1",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F2",
+      "for": "M22.X4",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F2",
+      "for": "M22.X2",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M22.F3",
+      "for": "X15.4",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "X14.4",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "X14.9",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "nextOfKin",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "X14.10",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "nextOfKin",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "X14.11",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "nextOfKin",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "X14.15",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "X14.16",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "M7.X1",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "M7.X3",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "carePicker"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F1",
+      "for": "M7.X7",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "classNames"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F2",
+      "for": "X14.5",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F2",
+      "for": "X14.7",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "sectionSlot"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F2",
+      "for": "X14.8",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "nextOfKin",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F2",
+      "for": "X14.12",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F2",
+      "for": "M7.X4",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
+      "for": "X13.1",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "tabForm",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
+      "for": "X13.2",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
+      "for": "M7.X6",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "nextOfKin"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F1",
+      "for": "M25.X1",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "drawer"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F1",
+      "for": "M25.X2",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "drawer"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F2",
+      "for": "M25.X3",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "loader"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "X17.33",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "X17.34",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "X17.35",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "X17.36",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "X17.37",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows",
+        "listSlot"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "X17.38",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "loader"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M25.F3",
+      "for": "M25.X4",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "rows"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F4",
+      "for": "X17.6",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "confirm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F4",
+      "for": "X17.7",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "drawer"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F4",
+      "for": "X17.8",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "confirm"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M25.F4",
+      "for": "M25.X5",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "confirm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F4",
+      "for": "M25.X6",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "confirm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F4",
+      "for": "M25.X7",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "confirm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F5",
+      "for": "X17.9",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "toast"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ]
+    },
+    {
+      "feature": "M25.F5",
+      "for": "M25.X8",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "toast"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F5",
+      "for": "M25.X9",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "toast"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F4",
+      "for": "M24.X4",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nativeInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F4",
+      "for": "M24.X5",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nativeInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F6",
+      "for": "M24.X2",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nativeInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F7",
+      "for": "M24.X3",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nativeInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M18.F1",
+      "for": "X13.4",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "nextOfKin",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M18.F1",
+      "for": "M18.X1",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M18.F1",
+      "for": "M18.X1",
+      "index": 1,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "cardSlot",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "X12.1",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "X12.2",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "X12.3",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "X12.8",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "sectionSlot"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "X12.11",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "X12.14",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "X12.15",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "radio"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "X12.17",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "tabForm",
+        "notes",
+        "recordEndpoint",
+        "radio"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X2",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "innerSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X3",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "innerSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X4",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M9.F2",
+      "for": "M9.X5",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X1.4",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X2.3",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X2.4",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "nextOfKin",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.3",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.4",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.5",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.6",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.7",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.8",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.9",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.10",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.12",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.13",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ]
+    },
+    {
+      "feature": "M15.F1",
+      "for": "X3.14",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M13.F1",
+      "for": "X17.25",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance",
+        "plugins"
+      ],
+      "harness": [
+        "seed",
+        "push"
+      ]
+    },
+    {
+      "feature": "M13.F1",
+      "for": "X17.26",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance",
+        "plugins"
+      ],
+      "harness": [
+        "seed",
+        "push"
+      ]
+    },
+    {
+      "feature": "M13.F1",
+      "for": "M13.X2",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance",
+        "plugins"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ]
+    },
+    {
+      "feature": "M13.F2",
+      "for": "X17.24",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance",
+        "plugins"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ]
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.1",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "push"
+      ]
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.2",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "cardSlot"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.3",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "push",
+        "drop",
+        "reopen"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.8",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "push",
+        "drop",
+        "reopen"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.9",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "cardSlot",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "reopen"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.10",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "drop",
+        "reopen"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.11",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "realtimeNoOffer"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.12",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "noReconnectComponent"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "push"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F1",
+      "for": "M10.X4",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "push"
+      ]
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.8",
+      "index": 1,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "drop",
+        "reopen"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.8",
+      "index": 2,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "push"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F1",
+      "for": "X21.8",
+      "index": 3,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "push"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F2",
+      "for": "X12.5",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nurseLine",
+        "doses",
+        "cardSlot"
+      ],
+      "harness": [
+        "seed",
+        "push"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F2",
+      "for": "X12.6",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nurseLine",
+        "doses",
+        "cardSlot"
+      ],
+      "harness": [
+        "seed",
+        "drop"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F2",
+      "for": "X21.4",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nurseLine",
+        "doses"
+      ],
+      "harness": [
+        "seed",
+        "push"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F2",
+      "for": "X21.5",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "nurseLine",
+        "doses"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M10.F2",
+      "for": "M10.X1",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nurseLine",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "drop"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F2",
+      "for": "M10.X2",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nurseLine",
+        "doses"
+      ],
+      "harness": [
+        "seed",
+        "drop"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F2",
+      "for": "M10.X3",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nurseLine",
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "drop"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M10.F2",
+      "for": "X12.6",
+      "index": 1,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "nurseLine",
+        "doses",
+        "cardSlot"
+      ],
+      "harness": [
+        "seed",
+        "drop"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X1",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "layout"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X1",
+      "index": 1,
+      "screen": "shell",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "layout"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X2",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X3",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X4",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.8",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.9",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.10",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.11",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "search",
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.13",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.15",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.16",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.17",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.18",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "scanner"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.19",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "scanner"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.20",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.21",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.22",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.23",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.24",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.24",
+      "index": 1,
+      "screen": "record",
+      "hosts": [
+        "enumsAsNumbers"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.25",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X10.10",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "M6.X5",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.26",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "noAntiforgeryChoice"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X10.28",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "noRequests"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X10.28",
+      "index": 1,
+      "screen": "refusals",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.2",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.3",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.4",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.5",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.6",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.7",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net48"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.8",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.11",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.12",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.13",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "scanner"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.14",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.15",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.16",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.17",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "tabForm",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.19",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint",
+        "census"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.20",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "noBusyComponent"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "M6.X1",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "M6.X2",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "M6.X3",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "M6.X4",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "list",
+        "residentsEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F2",
+      "for": "X10.29",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M14.F1",
+      "for": "X19.3",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "gate",
+        "seed"
+      ]
+    },
+    {
+      "feature": "M14.F1",
+      "for": "M14.X1",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "layout"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M14.F1",
+      "for": "X19.4",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformanceElement"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M26.F1",
+      "for": "X20.1",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "collector"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M26.F2",
+      "for": "X20.3",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "collector"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M26.F2",
+      "for": "X20.5",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracingExporterThrows"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M26.F3",
+      "for": "X20.2",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "collector"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "clock"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M26.F3",
+      "for": "X20.4",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "collector"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M26.F3",
+      "for": "X20.7",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "tracing"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "collector"
+      ],
+      "harness": [
+        "seed",
+        "gate",
+        "clock"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M1.F1",
+      "for": "X11.10",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "scanner"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M1.F1",
+      "for": "X11.19",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F1",
+      "for": "X11.6",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M1.F1",
+      "for": "X11.7",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M1.F1",
+      "for": "X11.24",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F1",
+      "for": "M1.X1",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F2",
+      "for": "M1.X2",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "scanner"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F2",
+      "for": "M1.X3",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "innerSlot",
+        "tabForm",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F2",
+      "for": "M1.X4",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "innerSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F2",
+      "for": "M1.X5",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F2",
+      "for": "M1.X10",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F2",
+      "for": "M1.X8",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M1.F2",
+      "for": "M1.X9",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M16.F1",
+      "for": "X18.5",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "snakeCase"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M16.F1",
+      "for": "X18.6",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "jsonContract"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M16.F1",
+      "for": "X18.7",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "scanner"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M16.F1",
+      "for": "X18.8",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F1",
+      "for": "X16.9",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F1",
+      "for": "X16.10",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F1",
+      "for": "X16.22",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F1",
+      "for": "X16.27",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F2",
+      "for": "X16.8",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F3",
+      "for": "X16.2",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F3",
+      "for": "X16.3",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F3",
+      "for": "X16.4",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F3",
+      "for": "X16.6",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X8.3",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X1.5",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X12.4",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X13.3",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "cardSlot",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X13.5",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.5",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.7",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "tabForm",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.15",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.16",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.17",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.18",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.19",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs",
+        "sectionSlot",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M8.F4",
+      "for": "X16.20",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.5",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.10",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.13",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.14",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "numbersAsText"
+      ],
+      "parts": [
+        "doses",
+        "scanner"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.6",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.6",
+      "index": 1,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.6",
+      "index": 2,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.6",
+      "index": 3,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.7",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.7",
+      "index": 1,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.7",
+      "index": 2,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.11",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.11",
+      "index": 1,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.12",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.12",
+      "index": 1,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F2",
+      "for": "M2.X1",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F2",
+      "for": "M2.X2",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F2",
+      "for": "M2.X3",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters",
+        "list"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.3",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformanceElement"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.10",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformanceElement",
+        "plugins"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.11",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformanceElement"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.12",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformanceElement"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.14",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.15",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.17",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformanceElement"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.20",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.21",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.22",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.23",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.49",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.50",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.51",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.52",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed",
+        "restart"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X12.9",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance",
+        "peer"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X12.10",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X12.16",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance",
+        "plugins"
+      ],
+      "harness": [
+        "seed",
+        "clock"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.49",
+      "index": 1,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.49",
+      "index": 2,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X17.50",
+      "index": 1,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F1",
+      "for": "X12.18",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance",
+        "peer"
+      ],
+      "harness": [
+        "seed",
+        "drop",
+        "gc",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M12.F2",
+      "for": "X17.4",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed",
+        "restart"
+      ]
+    },
+    {
+      "feature": "M12.F2",
+      "for": "X12.7",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "innerSlot",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F2",
+      "for": "X12.13",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes",
+        "carePanel"
+      ],
+      "harness": [
+        "seed",
+        "restart"
+      ],
+      "rewrite": true
+    },
+    {
+      "feature": "M12.F2",
+      "for": "M12.X2",
+      "index": 0,
+      "screen": "refusals",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F2",
+      "for": "M12.X4",
+      "index": 0,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M12.F2",
+      "for": "X12.13",
+      "index": 1,
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed",
+        "restart",
+        "gate"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.27",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10",
+        "net48"
+      ],
+      "parts": [
+        "intakeForm",
+        "documents"
+      ],
+      "harness": [
+        "seed"
+      ]
+    }
+  ],
+  "cells": [
+    {
+      "cell": "prop.scalar.read",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "prop.scalar.write",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "prop.dotted.read",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "prop.dotted.write",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "prop.object.memberRead",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "prop.object.memberWrite",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "prop.list.lambda",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "prop.readOnly",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "prop.writeOnly",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.void",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.value",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.object.memberRead",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.object.methodCall",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.async.void",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.async.value",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.arg.scalar",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.arg.object",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "method.arg.list",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.scalar",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.object",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.list",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.method",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.promise",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.deepAsync",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.writeOnly.payload.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.writeOnly.held.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.writeOnly.held.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.liveObjects.payload.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.liveObjects.payload.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.liveObjects.held.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.liveObjects.held.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.methodValue.payload.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.methodValue.payload.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.methodValue.held.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.methodValue.held.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.methodAsyncValue.payload.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.methodAsyncValue.payload.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.methodAsyncValue.held.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.methodAsyncValue.held.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.returnedObject.payload.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.returnedObject.payload.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.returnedObject.held.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.returnedObject.held.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.returnedObjects.payload.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.returnedObjects.payload.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.returnedObjects.held.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.returnedObjects.held.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.callback.payload.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.callback.held.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.callback.held.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.component.payload.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.component.payload.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.component.held.before",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "event.poc15.component.held.after",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "absence.member",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "absence.past",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "absence.promise",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.PropertySet",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.WriteOnlySet",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.ElementText",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.ElementHtml",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.ElementClass",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.ConditionLeft",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.ConditionRight",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.TextTestOperand",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.MatchesPattern",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.RequestMember",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.Header",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.DispatchPayloadMember",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.MethodArgument",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.PluginArgument",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "source.HubArgument",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.get",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.post",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.put",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.delete",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.beside.route",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.beside.query",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.beside.header",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.beside.static",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.beside.hidden",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.into",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.whileLoading",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.response.success",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.response.error",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.chained",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.parallel",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "http.finally",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "lane.confirm",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "lane.push",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "lane.slot.load",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "lane.slot.unloadListener",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "lane.slot.hostDestroyed",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "validation.rule",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "validation.condition",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "validation.live",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "validation.summary",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "validation.listItem",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "cell": "validation.prefix",
+      "screen": "bench",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "conformance"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "prop.scalar.read",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "prop.scalar.write",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "prop.dotted.read",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "prop.dotted.write",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "method.void",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "method.arg.scalar",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "event.scalar",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "event.object",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "event.list",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "event.method",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "event.poc15.component.held.before",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "http.post",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies",
+        "clinicalForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "http.into",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies",
+        "clinicalSlot"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "lane.slot.unloadListener",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "lane.slot.hostDestroyed",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "template.render",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "template.conditional",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "validation.live",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies",
+        "clinicalForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "own": "validation.prefix",
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergies",
+        "clinicalSlot",
+        "clinicalForm"
+      ],
+      "harness": [
+        "seed"
+      ]
+    }
+  ]
+}

@@ -10,6 +10,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 SPEC = Path(__file__).resolve().parent.parent
@@ -1884,6 +1885,116 @@ def check_actions():
                   actions=len(actions), named=len(actions & named), unnamed=len(unnamed), promises=len(observed))
 
 
+APP_AREAS = {"care", "bench", "refusals"}
+APP_SLICE_KINDS = {"FusionComponents": "fusion", "FusionTemplates": "fusion", "FusionAppLevelObjects": "fusion",
+                   "NativeComponents": "nativeSlice", "NativeAppLevelObjects": "nativeSlice"}
+APP_REALTIME = {"stream", "hub"}
+APP_FRAMEWORKS = {"net10", "net48"}
+
+
+def app_tests():
+    tests = {}
+    for path in feature_files():
+        for feature in json.loads(path.read_text()).get("features", []):
+            rungs = {defect["id"]: defect["rung"] for defect in feature.get("defects", [])}
+            seen = Counter()
+            for promise in feature.get("promises", []):
+                key = (feature["id"], promise["for"], seen[promise["for"]])
+                seen[promise["for"]] += 1
+                tests[key] = {"module": path.parent.name, "rung": rungs.get(promise["for"])}
+    return tests
+
+
+def app_reference_tests():
+    native = json.loads((SPEC / "Reference" / "native.json").read_text())
+    syncfusion = json.loads((SPEC / "Reference" / "syncfusion.json").read_text())
+    cells = {("cell", name) for name, entry in native["cells"].items() if "promise" in entry}
+    return cells | {("own", name) for name in syncfusion.get("own", {})}
+
+
+def app_screen_problems(app, screens, hosts):
+    problems = []
+    for screen in screens.values():
+        name = screen["id"]
+        problems += [f"screen {name} is in no area of {sorted(APP_AREAS)}"] if screen.get("area") not in APP_AREAS else []
+        problems += [f"screen {name} says nothing of what a user does"] if not is_prose(screen.get("user")) else []
+        problems += [f"screen {name} is under {screen['under']}, no screen"] if "under" in screen and screen["under"] not in screens else []
+        problems += [f"screen {name} runs on {host}, no host" for host in screen.get("hosts", []) if host not in hosts]
+        problems += [f"screen {name}'s {part['id']} is a {part['kind']}, no part kind" for part in screen["parts"] if part["kind"] not in app["partKinds"]]
+        fusion = [part["id"] for part in screen["parts"] if part["kind"] == "fusion"]
+        problems += ([f"care screen {name} loads Syncfusion ({', '.join(fusion)}) on its own page; it belongs on a page under it"]
+                     if fusion and screen.get("area") == "care" and "under" not in screen else [])
+    for host in hosts.values():
+        problems += [f"host {host['id']} says nothing of its options"] if not is_prose(host.get("what")) else []
+        problems += [f"host {host['id']} runs on {host.get('framework')!r}"] if host.get("framework") not in APP_FRAMEWORKS else []
+    return problems
+
+
+def app_placement_problems(app, where, entry, screens, hosts, module, rung):
+    screen = screens.get(entry["screen"])
+    if screen is None:
+        return [f"{where} runs on {entry['screen']}, no screen"]
+    parts = {part["id"]: part for part in screen["parts"]}
+    kinds = {parts[part]["kind"] for part in entry["parts"] if part in parts}
+    problems = [f"{where} uses {part}, which {screen['id']} lacks" for part in entry["parts"] if part not in parts]
+    problems += [f"{where} runs on {host}, no host" for host in entry["hosts"] if host not in hosts]
+    problems += [f"{where} runs on {host}, which {screen['id']} is not on" for host in entry["hosts"] if "hosts" in screen and host not in screen["hosts"]]
+    problems += [f"{where} uses the harness verb {verb!r}, which app.json's harness lacks" for verb in entry["harness"] if verb not in app["harness"]]
+    problems += [f"{where} uses a stream or hub on net48" for host in entry["hosts"] if kinds & APP_REALTIME and hosts.get(host, {}).get("framework") == "net48"]
+    if module is None:
+        return problems
+    refused = rung == "refusal"
+    problems += [f"{where} is a refusal on {screen['id']}, where only refusal routes hold one"] if refused and screen["area"] != "refusals" else []
+    problems += [f"{where} is a {rung} on the refusal routes"] if not refused and screen["area"] == "refusals" else []
+    slice_kind = APP_SLICE_KINDS.get(module)
+    if slice_kind is None:
+        loaded = sorted(part["id"] for part in screen["parts"] if part["kind"] == "fusion")
+        problems += [f"{where}, a core test, runs on {screen['id']}, whose page loads Syncfusion ({', '.join(loaded)})"] if loaded else []
+        problems += [f"{where}, a core test, runs on {host}, whose layout is Syncfusion's" for host in entry["hosts"] if host == "fusionShell"]
+    elif not refused:
+        held = {part["kind"] for part in screen["parts"]}
+        problems += [f"{where}, a {module} test, runs on {screen['id']}, which holds no {slice_kind} part"] if slice_kind not in held else []
+    return problems
+
+
+def check_app():
+    path = SPEC / "Reference" / "app.json"
+    if not path.exists():
+        return not_started(path)
+    app = json.loads(path.read_text())
+    screens = {screen["id"]: screen for screen in app["screens"]}
+    hosts = {host["id"]: host for host in app["hosts"]}
+    problems = app_screen_problems(app, screens, hosts)
+    tests, references = app_tests(), app_reference_tests()
+    placed, used = Counter(), set()
+    for entry in app["placements"]:
+        key = (entry["feature"], entry["for"], entry["index"])
+        where = f"{entry['feature']} {entry['for']} #{entry['index']}"
+        known = tests.get(key)
+        problems += [f"{where} is placed, and no promise of features.json is it"] if known is None else []
+        placed[key] += 1
+        used |= {(entry["screen"], part) for part in entry["parts"]}
+        problems += app_placement_problems(app, where, entry, screens, hosts, (known or {}).get("module"), (known or {}).get("rung"))
+    reached = Counter()
+    for entry in app["cells"]:
+        key = ("cell", entry["cell"]) if "cell" in entry else ("own", entry["own"])
+        reached[key] += 1
+        used |= {(entry["screen"], part) for part in entry["parts"]}
+        problems += [f"{key[0]} {key[1]} is placed, and the references promise no such cell"] if key not in references else []
+        problems += [f"cell {key[1]} runs on {entry['screen']}, where the native reference's cells run on the bench"] if key[0] == "cell" and entry["screen"] != "bench" else []
+        problems += app_placement_problems(app, f"{key[0]} {key[1]}", entry, screens, hosts, None, None)
+    problems += [f"{feature} {defect} #{index} is placed {count} times" for (feature, defect, index), count in placed.items() if count > 1]
+    problems += [f"{feature} {defect} #{index} runs on no screen" for (feature, defect, index) in tests if (feature, defect, index) not in placed]
+    problems += [f"{kind} {name} runs on no screen" for kind, name in sorted(references - set(reached))]
+    problems += [f"{screen['id']}'s {part['id']} is used by no test" for screen in screens.values() for part in screen["parts"] if (screen["id"], part["id"]) not in used]
+    rewrite = sorted(f"{entry['feature']} {entry['for']} #{entry['index']}" for entry in app["placements"] if entry.get("rewrite"))
+    problems += [f"{len(rewrite)} tests put the environment on a care screen, which the harness does: {', '.join(rewrite[:6])}"] if rewrite else []
+    detail = (f"{len(placed)} feature tests and {len(reached)} cell tests on {len(screens)} screens under {len(hosts)} hosts; "
+              "no core test loads Syncfusion")
+    return result(not problems, "; ".join(problems[:6]) or detail, screens=len(screens), hosts=len(hosts), placed=len(placed),
+                  cells=len(reached), rewrite=len(rewrite), problems=len(problems))
+
+
 def check_hedges():
     files = prose_files()
     listed = git("ls-files", "--cached", "--others", "--exclude-standard", "spec").splitlines()
@@ -1956,6 +2067,7 @@ CHECKS = [
     ("hedges", "zero hedge words", check_hedges),
     ("no_comments", "no comment in the spec's Python or TLA+", check_no_comments),
     ("actions", "every action of the async lanes' specs named by one promise, the test app's endpoint holding it", check_actions),
+    ("app", "every test placed on the care home app, no core test loading Syncfusion, no environment on a care screen", check_app),
 ]
 
 STEPS = [
@@ -1968,7 +2080,7 @@ STEPS = [
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
-    (10, "E", "check.py complete", ["hedges", "no_comments", "actions"], "Finish every check and make each pass."),
+    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app"], "Finish every check and make each pass."),
     (11, "E", "REWRITE.md", ["rewrite_units"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]

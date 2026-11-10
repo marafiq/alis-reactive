@@ -1968,6 +1968,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   choice is refused where the view renders with "'{method} {url}' sends no antiforgery token, since the app chose
   none: call Antiforgery(AntiforgeryIn.Header), Antiforgery(AntiforgeryIn.FormField) or NoAntiforgery() in
   AddReactiveRequests."
+- `X9.27` behavior (D9.8): a multipart body with two documents, each a file nested by C# path beside its caption, one
+  file name past US-ASCII, and a text field binds on both hosts: the endpoint reads both files with their names, sizes
+  and captions, and the field.
 
 ## Q10. The request's flow and its response
 
@@ -2771,8 +2774,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `X11.6` behavior: under `replace`, a cascade whose first answer arrives after the second shows the
   second's items.
 - `X11.7` behavior: under `skip`, a save clicked twice while its request is in flight sends one request.
-- `X11.8` behavior: a filtering handler writes `PreventDefaultAction`, fetches the matching items and calls
-  `UpdateData` with them, and the list shows the fetched items (`probe:ej2-filtering-args-members`).
+- `X11.8` behavior (D11.4): a handler writes a payload member before its first await, which the vendor reads when its
+  listeners return, then sends a request and in its success route calls a payload method with the answer: the
+  component shows what the method was given.
 - `X11.9` behavior: after an awaited step, a write to a property of an object the payload holds changes that
   object.
 - `X11.10` behavior (D11.5): two handlers of one click run in the order the plan subscribed them, the first to its

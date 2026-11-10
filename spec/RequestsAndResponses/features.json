@@ -407,6 +407,10 @@
           "id": "M6.X5",
           "rung": "behavior",
           "defect": "A HEAD request reads a body or runs a route of a kind other than none: HEAD sends no body, its routes are of kind none, its Accept is */* and its route reads the status and the headers (D9.3, D10.6, D10.19, N10.7); an action answers HEAD only under [HttpHead] on both hosts, so a HEAD to an [HttpGet] action on net10 runs the route for 405."
+        },
+        {
+          "id": "X9.27",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -525,11 +529,19 @@
         },
         {
           "for": "X9.24",
-          "page": "A care plan picker holding Weekend, Mon under the app's string enum converter sets r => r.Care, a flags enum the startup names with Flags<CareDays>(); a second page under the app's numbers holds 97; each GET's endpoint echoes the Care it bound.",
-          "gesture": "Click Send care on the first page, then on the second.",
-          "outcome": "Both URLs hold Care=Mon%2C+Weekend and both echoes read Mon, Weekend.",
+          "page": "A care plan picker holding Weekend, Mon under the app's string enum converter sets r => r.Care, a flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "gesture": "Click Send care.",
+          "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
           "opposite": "With Mon alone held, the URL holds Care=Mon.",
-          "defect": "The held text sent as it is, so the URL holds Care=Weekend%2C+Mon; or 97 sent as its number, so the echo reads 97."
+          "defect": "The held text sent as it is, so the URL holds Care=Weekend%2C+Mon."
+        },
+        {
+          "for": "X9.24",
+          "page": "The same care plan picker in an app whose JSON options write enums as numbers holds 97 and sets r => r.Care, the flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "gesture": "Click Send care.",
+          "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
+          "opposite": "Holding 1, the URL holds Care=Mon.",
+          "defect": "97 sent as its number, so the echo reads 97."
         },
         {
           "for": "X9.25",
@@ -578,6 +590,14 @@
           "outcome": "The page is refused where it renders with \"'GET /Rounds' is rendered in an app that never called AddReactiveRequests or set MVC's resolver; call services.AddReactiveRequests(requests => ..) once at startup and set the resolver over the container with DependencyResolver.SetResolver in Application_Start.\"",
           "opposite": "With DependencyResolver.SetResolver set over the app's container in Application_Start, the page renders and Load shows the rounds.",
           "defect": "The refusal names AddReactiveRequests alone, which the app called, so the developer looks for a call that is there; or the view reads only an IServiceProvider, which MVC 5 hands it none of, so the page is refused even with the resolver set (M19.X4)."
+        },
+        {
+          "for": "X9.27",
+          "page": "The admission screen's documents step: the intake form holds the resident's name and two document rows, each a file input and a caption, bound to Documents[0].File, Documents[0].Caption, Documents[1].File and Documents[1].Caption; Save posts the form as multipart, and the endpoint writes the name and each bound document's file name, size in bytes and caption into saved.",
+          "gesture": "Type Ada Byron as the name; choose consent.pdf, 1,024 bytes, with the caption Consent in the first row, and Überweisung.pdf, 2,048 bytes, with the caption Referral in the second; click Save.",
+          "outcome": "saved reads Ada Byron; consent.pdf 1024 Consent; Überweisung.pdf 2048 Referral.",
+          "opposite": "With the two rows' files exchanged, saved reads Ada Byron; Überweisung.pdf 2048 Consent; consent.pdf 1024 Referral.",
+          "defect": "The files sent as text or keyed by their input's id, so the endpoint binds no document; or the name past US-ASCII mangled, so the second document's name is not Überweisung.pdf; or a caption bound apart from its file, so the captions follow the order of the files and not their rows."
         }
       ],
       "verdicts": [

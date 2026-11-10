@@ -432,11 +432,11 @@
         },
         {
           "for": "X11.8",
-          "page": "A medication picker, a FusionMultiSelect that allows filtering and whose own items are Aspirin and Insulin. Its Filtering handler writes the event's PreventDefaultAction, sends GET /medications with the event's Text in the query, and in the success route calls the event's UpdateData with the answer's items; the endpoint answers Heparin and Hepatitis B vaccine for hep, and Warfarin for war.",
-          "gesture": "Type hep into the medication picker.",
-          "outcome": "The picker's popup lists Heparin and Hepatitis B vaccine.",
-          "opposite": "Typing war instead lists Warfarin.",
-          "defect": "The call to UpdateData after the send is refused or dropped as a write to the payload, so the popup lists no item; or PreventDefaultAction is written after the picker's turn, so the picker filters its own items and lists neither answer."
+          "page": "The component bench's ConformanceComponent with its own search box: its Raised payload carries the box's text, the component reads the payload's WriteOnlyText when its listeners return and shows it in its note line, and the payload method Fill shows the names it is given in its list. The Raised handler writes the payload's WriteOnlyText as Filtered, sends GET /items with the payload's Text in the query, and in the success route calls the payload's Fill with the answer's names; the endpoint answers Alpha and Alpine for al, and Beta for be.",
+          "gesture": "Type al into the component's search box and click its Raise button.",
+          "outcome": "The note line reads Filtered and the list shows Alpha and Alpine.",
+          "opposite": "With be typed, the list shows Beta.",
+          "defect": "The call to Fill after the send is refused or dropped as a write to the payload, so the list shows no name; or WriteOnlyText is written after the component read it, so the note line stays empty."
         },
         {
           "for": "X11.9",

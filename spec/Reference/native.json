@@ -893,6 +893,13 @@
           "door": "LiveObject<ConformancePeer>",
           "csharp": "Peer",
           "type": "ConformancePeer"
+        },
+        {
+          "js": "fill",
+          "kind": "method",
+          "ts": "fill(names: string[]): void",
+          "door": "Method",
+          "csharp": "Fill(Arg<IReadOnlyList<string>> names)"
         }
       ]
     }
