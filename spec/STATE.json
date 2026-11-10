@@ -1398,6 +1398,14 @@
       "detail": "not started: spec/Reference/matrix.json, spec/Reference/syncfusion.json, spec/Reference/native.json absent",
       "pass": false
     },
+    "module_cites": {
+      "counts": {
+        "cites": 375,
+        "unresolved": 0
+      },
+      "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main",
+      "pass": true
+    },
     "no_comments": {
       "counts": {
         "comments": 0
@@ -3373,8 +3381,8 @@
       "pass": false
     }
   },
-  "passed": 14,
-  "read_at_head": "160bc588653488800a0f41b9e9091cb53e52e8f5",
+  "passed": 15,
+  "read_at_head": "8b01c945394336dac4bf8e5c5dc2d635f701abbc",
   "step": {
     "failing": [
       "doors_mapped",
@@ -3387,5 +3395,5 @@
     "number": 6,
     "phase": "D"
   },
-  "total": 25
+  "total": 26
 }
