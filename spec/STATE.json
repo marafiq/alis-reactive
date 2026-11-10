@@ -304,14 +304,23 @@
         "DateWire": {
           "DateWire.cfg": {
             "green": true,
-            "hash": "0ba5bef19d81c0f4e51a617148124aa3612d263de4579b32d86146e528ee913f",
+            "hash": "eae9a82fc80bca27ee4aa90699ba6eb00b9a71e4d7de2fd98a312ec937cc2119",
             "line": "Model checking completed. No error has been found.",
-            "states": "2592 states generated, 1296 distinct states found, 0 states left on queue.",
+            "states": "5184 states generated, 2592 distinct states found, 0 states left on queue.",
             "violated": []
+          },
+          "DateWire.violates.DateInFormCarriesItsTime.cfg": {
+            "green": false,
+            "hash": "8a9274aa50b64748ecf976b20f0609c6b96f90c17d413f68d82ec958afcbf7b2",
+            "line": "violated: DateInFormCarriesItsTime",
+            "states": "",
+            "violated": [
+              "DateInFormCarriesItsTime"
+            ]
           },
           "DateWire.violates.DateShowsItsDayAtMidnight.cfg": {
             "green": false,
-            "hash": "3d6a8068b998c093fd951537c3a0eb108d7ce4961e8764373a8db59733eaa3ab",
+            "hash": "8055d75e5061819b5d0fb15d9a8a9d1bc2b7059f279cbc03de3b3c521f11ff9e",
             "line": "violated: DateShowsItsDayAtMidnight",
             "states": "",
             "violated": [
@@ -320,7 +329,7 @@
           },
           "DateWire.violates.DateTimeCarriesNoOffset.cfg": {
             "green": false,
-            "hash": "dd6e303e3203f786c0ca833a6f704cae84968e01e0dbee054f3667429c9525c2",
+            "hash": "0ac1c45b7873b00eaf21f3a43d39916d70d61e25e6e37e693995c12cdbc9ed2f",
             "line": "violated: DateTimeCarriesNoOffset",
             "states": "",
             "violated": [
@@ -329,7 +338,7 @@
           },
           "DateWire.violates.DayIsItsDayAlone.cfg": {
             "green": false,
-            "hash": "286374cec7f31b47368f2705bfd4b17ca57a654e046c31284e4ddd120b442e15",
+            "hash": "68e5558928652529268f180ecd611a755278da310c55b5735175531b86d62954",
             "line": "violated: DayIsItsDayAlone",
             "states": "",
             "violated": [
@@ -338,7 +347,7 @@
           },
           "DateWire.violates.InstantCarriesItsClockOffset.cfg": {
             "green": false,
-            "hash": "6046bd2591c66f8b0be4c174e268424c3d1ede5932d1b6bad0adf7c52822b373",
+            "hash": "9876dbcd3f780ca7b69e0266727a0d2690619bff77dc1fa346d95bbd913f46ad",
             "line": "violated: InstantCarriesItsClockOffset",
             "states": "",
             "violated": [
@@ -347,7 +356,7 @@
           },
           "DateWire.violates.NothingWritesNoText.cfg": {
             "green": false,
-            "hash": "02a0e1e1a2815eb1a270804f078a0802670ecd7edf69bd93764e5c9e6fcde9fb",
+            "hash": "cff9926190fb7b8e4f911a2b9fc18fcc3c5f5b046034a34370b4f4dd9186174b",
             "line": "violated: NothingWritesNoText",
             "states": "",
             "violated": [
@@ -356,7 +365,7 @@
           },
           "DateWire.violates.ReachOffsetChangesBetweenDays.cfg": {
             "green": false,
-            "hash": "b61c1b7dcd08c0cc036f1620347f46a5e312ef438553c7749bd4e40a2b40b0b0",
+            "hash": "d9c227a0a7c6316296bea285b11bd8037383d45fd982f12e3c5801364c1ff79a",
             "line": "violated: ReachOffsetChangesBetweenDays",
             "states": "",
             "violated": [
@@ -365,7 +374,7 @@
           },
           "DateWire.violates.ReachUtcKindWritten.cfg": {
             "green": false,
-            "hash": "949fd8be26dbda49f477bd55b04b7e740a3248a8127d2bc57554c0a4f7eae9e2",
+            "hash": "8d411cf9d87c8d1cb7b848de6914844175a4b57f8d08b6af021ee614c29f27f5",
             "line": "violated: ReachUtcKindWritten",
             "states": "",
             "violated": [
@@ -374,7 +383,7 @@
           },
           "DateWire.violates.TimeIsItsTimeAlone.cfg": {
             "green": false,
-            "hash": "cff2735522d8db434eee792a794dfc1062545c74c57a958014cc63e242940940",
+            "hash": "df503f7d57b93d7bb3de578de344bb1eb4ed0cac93bd62d86ffb65c35ca23349",
             "line": "violated: TimeIsItsTimeAlone",
             "states": "",
             "violated": [
@@ -1456,9 +1465,9 @@
     "probes": {
       "counts": {
         "browser": 111,
-        "facts": 368,
+        "facts": 370,
         "net10": 118,
-        "net48": 77,
+        "net48": 79,
         "node": 62
       },
       "detail": "every fact printed by its probe or found at its source line, every browser fact with the proof the rewrite ships",
@@ -1913,14 +1922,23 @@
         "DateWire": {
           "DateWire.cfg": {
             "green": true,
-            "hash": "0ba5bef19d81c0f4e51a617148124aa3612d263de4579b32d86146e528ee913f",
+            "hash": "eae9a82fc80bca27ee4aa90699ba6eb00b9a71e4d7de2fd98a312ec937cc2119",
             "line": "Model checking completed. No error has been found.",
-            "states": "2592 states generated, 1296 distinct states found, 0 states left on queue.",
+            "states": "5184 states generated, 2592 distinct states found, 0 states left on queue.",
             "violated": []
+          },
+          "DateWire.violates.DateInFormCarriesItsTime.cfg": {
+            "green": false,
+            "hash": "8a9274aa50b64748ecf976b20f0609c6b96f90c17d413f68d82ec958afcbf7b2",
+            "line": "violated: DateInFormCarriesItsTime",
+            "states": "",
+            "violated": [
+              "DateInFormCarriesItsTime"
+            ]
           },
           "DateWire.violates.DateShowsItsDayAtMidnight.cfg": {
             "green": false,
-            "hash": "3d6a8068b998c093fd951537c3a0eb108d7ce4961e8764373a8db59733eaa3ab",
+            "hash": "8055d75e5061819b5d0fb15d9a8a9d1bc2b7059f279cbc03de3b3c521f11ff9e",
             "line": "violated: DateShowsItsDayAtMidnight",
             "states": "",
             "violated": [
@@ -1929,7 +1947,7 @@
           },
           "DateWire.violates.DateTimeCarriesNoOffset.cfg": {
             "green": false,
-            "hash": "dd6e303e3203f786c0ca833a6f704cae84968e01e0dbee054f3667429c9525c2",
+            "hash": "0ac1c45b7873b00eaf21f3a43d39916d70d61e25e6e37e693995c12cdbc9ed2f",
             "line": "violated: DateTimeCarriesNoOffset",
             "states": "",
             "violated": [
@@ -1938,7 +1956,7 @@
           },
           "DateWire.violates.DayIsItsDayAlone.cfg": {
             "green": false,
-            "hash": "286374cec7f31b47368f2705bfd4b17ca57a654e046c31284e4ddd120b442e15",
+            "hash": "68e5558928652529268f180ecd611a755278da310c55b5735175531b86d62954",
             "line": "violated: DayIsItsDayAlone",
             "states": "",
             "violated": [
@@ -1947,7 +1965,7 @@
           },
           "DateWire.violates.InstantCarriesItsClockOffset.cfg": {
             "green": false,
-            "hash": "6046bd2591c66f8b0be4c174e268424c3d1ede5932d1b6bad0adf7c52822b373",
+            "hash": "9876dbcd3f780ca7b69e0266727a0d2690619bff77dc1fa346d95bbd913f46ad",
             "line": "violated: InstantCarriesItsClockOffset",
             "states": "",
             "violated": [
@@ -1956,7 +1974,7 @@
           },
           "DateWire.violates.NothingWritesNoText.cfg": {
             "green": false,
-            "hash": "02a0e1e1a2815eb1a270804f078a0802670ecd7edf69bd93764e5c9e6fcde9fb",
+            "hash": "cff9926190fb7b8e4f911a2b9fc18fcc3c5f5b046034a34370b4f4dd9186174b",
             "line": "violated: NothingWritesNoText",
             "states": "",
             "violated": [
@@ -1965,7 +1983,7 @@
           },
           "DateWire.violates.ReachOffsetChangesBetweenDays.cfg": {
             "green": false,
-            "hash": "b61c1b7dcd08c0cc036f1620347f46a5e312ef438553c7749bd4e40a2b40b0b0",
+            "hash": "d9c227a0a7c6316296bea285b11bd8037383d45fd982f12e3c5801364c1ff79a",
             "line": "violated: ReachOffsetChangesBetweenDays",
             "states": "",
             "violated": [
@@ -1974,7 +1992,7 @@
           },
           "DateWire.violates.ReachUtcKindWritten.cfg": {
             "green": false,
-            "hash": "949fd8be26dbda49f477bd55b04b7e740a3248a8127d2bc57554c0a4f7eae9e2",
+            "hash": "8d411cf9d87c8d1cb7b848de6914844175a4b57f8d08b6af021ee614c29f27f5",
             "line": "violated: ReachUtcKindWritten",
             "states": "",
             "violated": [
@@ -1983,7 +2001,7 @@
           },
           "DateWire.violates.TimeIsItsTimeAlone.cfg": {
             "green": false,
-            "hash": "cff2735522d8db434eee792a794dfc1062545c74c57a958014cc63e242940940",
+            "hash": "df503f7d57b93d7bb3de578de344bb1eb4ed0cac93bd62d86ffb65c35ca23349",
             "line": "violated: TimeIsItsTimeAlone",
             "states": "",
             "violated": [
@@ -3432,7 +3450,7 @@
     }
   },
   "passed": 23,
-  "read_at_head": "6f968fba6d20b779765d1b507780470522a77e38",
+  "read_at_head": "2f0b28ecd50429286dd10453a1be51d0289aa55f",
   "step": {
     "failing": [
       "matrix"
