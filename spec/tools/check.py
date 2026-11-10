@@ -1241,8 +1241,8 @@ def check_claude_md():
 
 def check_hedges():
     files = prose_files()
-    json_files = sorted(SPEC.glob("**/*.json"))
-    json_files = [path for path in json_files if path != STATE]
+    listed = git("ls-files", "--cached", "--others", "--exclude-standard", "spec").splitlines()
+    json_files = sorted(REPO / name for name in listed if name.endswith(".json") and REPO / name != STATE)
     hits = []
     for path in files:
         for number, line in enumerate(without_code(path.read_text()).splitlines(), 1):

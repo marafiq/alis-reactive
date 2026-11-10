@@ -898,3 +898,5 @@
   Evidence: @syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:1337-1354, @syncfusion/ej2-charts/src/bullet-chart/user-interaction/tooltip.js:86-118, bullet-chart.d.ts:669-671 with FusionBulletChart.cs:29 at 65fdf118d.
 - 2026-11-10 next for module 21, by the lead: D17.5 reads a member EJ2 documents `@default null` as admitting null, and unit 9 kept four payload members non-null (AIAssistView's prompt and promptSuggestions, Carousel's value and previousValue) on a probe's present values; a sweep reads every unit's payload members against D17.5 in one rule
   Evidence: unit 9's report; spec/Core/DESIGN.md D17.5.
+- 2026-11-10 hedges reads the spec's JSON git would track (cached and not-ignored files), so the probe host's build output (spec/probes/AspNetCoreBinding/bin, obj) no longer changes its count with the order checks run in
+  Evidence: spec/tools/check.py check_hedges; plants: a hedge word in obj/ -> not counted (50 files); one in a new unstaged spec JSON -> "spec/HedgePlant/features.json should".
