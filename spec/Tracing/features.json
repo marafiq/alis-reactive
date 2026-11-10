@@ -1,0 +1,528 @@
+{
+  "module": "Tracing",
+  "features": [
+    {
+      "id": "M26.F1",
+      "summary": "A render's trace and the server's activity source. C# writes the plan's trace as on only when the activity of the request that renders the view is recorded, W3C Trace Context's sampled flag, and as off otherwise, so whether a page traces is the server's decision and the browser reads no attribute, query text or storage to decide it. Under on the plan carries the render activity's traceparent and tracestate, console as the app's tracing options set it, and each handler's source, the view as MVC names it and the line of the builder call; under off no source is written, so a page carries no view path unless its render was traced. On both hosts the framework records on one ActivitySource named Alis.Reactive an activity for rendering a plan, the validation door and the error door, and the app's own OpenTelemetry SDK listens to it; on net48 the source comes from the System.Diagnostics.DiagnosticSource package pinned to one version. Neither line traces: main writes a log level of trace on every plan and its runtime takes its level from it, and the redesign reads a level from the page's own attribute, warn when absent.",
+      "status": "new",
+      "types": [],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "var planScript = $\"<script type=\\\"application/json\\\" id=\\\"alis-plan-{elementId}\\\" data-reactive-plan data-trace=\\\"trace\\\">{planJson}</script>\";",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:98"
+        },
+        {
+          "line": "main",
+          "text": "var planScript = $\"<script type=\\\"application/json\\\" id=\\\"alis-plan-{elementId}\\\" data-reactive-plan data-trace=\\\"trace\\\">{planJson}</script>\";",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:115"
+        },
+        {
+          "line": "main",
+          "text": "const traceLevel = planElement.dataset.trace as TraceLevel | undefined;",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:61"
+        },
+        {
+          "line": "main",
+          "text": "if (traceLevel) trace.setLevel(traceLevel);",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:62"
+        },
+        {
+          "line": "redesign",
+          "text": "var markup = new System.Text.StringBuilder($\"<script type=\\\"application/json\\\" data-reactive-plan>{json}</script>\");",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:125"
+        },
+        {
+          "line": "redesign",
+          "text": "const named = root.dataset[\"alisTrace\"];",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:14"
+        },
+        {
+          "line": "redesign",
+          "text": "if (named === undefined) return \"warn\";",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:15"
+        },
+        {
+          "line": "redesign",
+          "text": "setLevel(levelOf(document.documentElement));",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:42"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static string ViewPathOf(ViewContext view) =>",
+          "cite": "Alis.Reactive/Razor/RenderedPage.cs:40"
+        },
+        {
+          "line": "proposed",
+          "text": "C# writes the plan's trace as on only when the activity of the request that renders the view is recorded, W3C Trace Context's sampled flag, carrying that render activity's traceparent and tracestate, and as off otherwise; the browser reads no attribute, query text or storage to decide it (D20.1). In development the app's sampler records every request, and in production the app sets its own ratio.",
+          "doors": [
+            "N20.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "On both hosts the framework records on one ActivitySource named Alis.Reactive an activity for rendering a plan, the validation door (its validator, rule set and failure count) and the error door; the app adds its own OpenTelemetry SDK and listens to that source by its name, on net10 with builder.Services.AddOpenTelemetry().WithTracing(tracing => tracing.AddSource(ReactiveTracing.SourceName)), the constant's name being gate 2's. On net48 the source comes from the System.Diagnostics.DiagnosticSource package pinned to one version, and joining an inbound traceparent takes the app's ASP.NET instrumentation module, a fact the unit probes (D20.8).",
+          "doors": [
+            "N20.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Under on the plan carries console as the app's tracing options set it at the framework's one startup call, and one Source per handler: the view as MVC names it, which the redesign's RenderedPage.ViewPathOf reads on both hosts for its errors today, and the line of the builder call, read by CallerFilePath and CallerLineNumber at the builder door, which read the line a #line directive sets (D20.7, probe:core-caller-line-follows-line-directive). Under off no source is written.",
+          "doors": [
+            "N20.3",
+            "N19.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Main's data-trace and the redesign's data-alis-trace leave for the plan's trace: no page sets its own level, and a page whose render the server did not record traces nothing (D20.1, D20.5).",
+          "doors": [
+            "N20.3"
+          ]
+        }
+      ],
+      "nodes": [
+        "off",
+        "on"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:93-98"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:110-115"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:73-79"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/PlanExtensions.cs:121-129"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Razor/RenderedPage.cs:40-45"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:61-62"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:7-11"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:7-18"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:42"
+        }
+      ],
+      "core": [
+        "Q20",
+        "Q19"
+      ],
+      "meanings": [],
+      "oracle": "W3C Trace Context, whose traceparent carries a trace id, a parent id and the sampled flag, and whose tracestate carries vendor data; .NET's System.Diagnostics Activity and ActivitySource, whose Recorded property is the sampled flag and whose activities a listener the app's OpenTelemetry SDK adds by the source's name receives; and the C# compiler's CallerFilePath and CallerLineNumber, which read the line a #line directive sets (probe:core-caller-line-follows-line-directive).",
+      "checker": [
+        "core:Q20",
+        "core:Q19",
+        "Tracing.tla:NothingRecordedWhenOff"
+      ],
+      "defects": [
+        {
+          "id": "X20.1",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X20.1",
+          "page": "A medication round page rendered by a request the app's sampler does not record, so the view writes the trace off, in a test app whose layout registers the OpenTelemetry adapter exporting to the test app's collector, whose page lists every span it received. Its Save button posts the dose form to an endpoint that answers 200 with the traceparent and baggage it received written into its body, and the success route sets that body as the text of echo. The promise observes Tracing.tla's Route: the endpoint holds its answer, so the machine waits between Attempt and Respond until the test app clicks Release on its gate page, and the run then routes the 200 and ends.",
+          "gesture": "Click Save; on the gate page click Release; wait until echo has text; open the collector page.",
+          "outcome": "echo reads traceparent none, baggage none, and the collector page lists no span.",
+          "opposite": "The same page rendered by a request the sampler records, so the view writes the trace on: echo reads a traceparent whose trace id is the page's, and the collector lists a run span holding a send span holding one attempt span under that trace id.",
+          "defect": "A port that records whatever its page says, or starts its spans before it reads the plan's trace, lists spans for a page whose render no one recorded, and sends a traceparent the server's parent-based sampler then records against the app's ratio (Tracing.tla's RecordsWhenOff mutant, which breaks NothingRecordedWhenOff). Main's level of trace on every plan (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:98 at 623dd4a27) is today's form of that mistake."
+        }
+      ],
+      "verdicts": []
+    },
+    {
+      "id": "M26.F2",
+      "summary": "The diagnostics port, its spans and its sinks. The browser has one diagnostics port, internal, called at the dispatch of each union, which returns nothing the runtime reads, so on and off run the same statements in the same order with the same results. Its spans are closed: a plan's boot, a handler run, a send and each of its attempts, a MethodAsync, a Confirm, a hub invoke, each block of an all, and a slot's load and unload; a stop with its reason, a required member a holder lacks, a refused check and a boundary error are events on the span that holds them. A span records ids, kinds, member wire names, event names, the route template, the status, the attempt and the outcome, never a value. Every span ends exactly once and after its children, however its run ends: completed, stopped, replaced or disposed. The port has two sinks: the console, which prints every boundary error and, under on with console set, each ended span; and the object a page registers under the sink contract trace, which the OpenTelemetry adapter, a separate package the core names nowhere, fulfils (M26.D1). A sink's error is the one error the port catches: it is logged once, and the run goes on. Today both lines log through a level and print the values they are given.",
+      "status": "new",
+      "types": [],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "let active = LEVELS.off;",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:7"
+        },
+        {
+          "line": "main",
+          "text": "consoleMethod(`${tag} ${msg} ${safeStringify(details)}`, details);",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:40"
+        },
+        {
+          "line": "main",
+          "text": "log.trace(\"set\", { target: reaction.on.component, property: reaction.property, value });",
+          "cite": "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:159"
+        },
+        {
+          "line": "main",
+          "text": "log.trace(\"call\", { target: reaction.on.scope, method: reaction.method, args: argumentValues });",
+          "cite": "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:185"
+        },
+        {
+          "line": "main",
+          "text": "log.trace(\"compare\", { op: condition.op, left: left.shaped, right });",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/compare-engine.ts:176"
+        },
+        {
+          "line": "redesign",
+          "text": "consoleMethod(`${tag} ${msg} ${safeStringify(details)}`, details);",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:46"
+        },
+        {
+          "line": "redesign",
+          "text": "log.trace(\"set\", { target: traceName(statement.target), path: statement.path, value });",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:38"
+        },
+        {
+          "line": "redesign",
+          "text": "log.trace(\"test.failed\", { field: nameAt(entry.field.name, indexes), value, message: test.message });",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:75"
+        },
+        {
+          "line": "redesign",
+          "text": "log.debug(\"fetch.send\", { method: request.method, url });",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:30"
+        },
+        {
+          "line": "proposed",
+          "text": "The browser's diagnostics port is internal: the runtime calls it at the dispatch of each union, which Q19 makes one place per kind, and it returns nothing the runtime reads, so on and off run the same statements in the same order with the same results (D20.2, D20.9).",
+          "doors": [
+            "N20.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Its spans are closed: a plan's boot, a handler run, a send and each of its attempts, a MethodAsync, a Confirm, a hub invoke, each block of an all, and a slot's load and unload. A stop with its reason, a required member a holder lacks, a refused check and a boundary error are events on the span that holds them, and an attempt records its method, its status, its resend count and its URL as its route template (D20.4).",
+          "doors": [
+            "N20.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A span records ids, kinds, member wire names, event names, the route template, the status, the attempt and the outcome, and never an input's text, a body, a payload, a query value or a path value (D20.5).",
+          "doors": [
+            "N20.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Every span ends exactly once and after its children, however its run ends: completed, stopped, replaced (D11.7) or disposed (D11.8, D12.4) (D20.6).",
+          "doors": [
+            "N20.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The port's sinks are the console, which prints every boundary error and, under on with console set, each ended span, and the one object a page registers under the sink contract trace, which the OpenTelemetry adapter fulfils; the core alone calls it, and a sink's first error is logged once and that sink is called no more on the page (M26.D1).",
+          "doors": [
+            "N20.1",
+            "N20.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The OpenTelemetry adapter is a separate package built on the port, pinning @opentelemetry/api, the web SDK and the OTLP HTTP exporter, which the app configures; the core names it nowhere. Its name and configuration are gate 2's, the default the package Alis.Reactive.OpenTelemetry with one layout helper that takes the OTLP HTTP traces URL and the service name (D20.2).",
+          "doors": [
+            "N20.2"
+          ]
+        }
+      ],
+      "nodes": [
+        "on",
+        "request",
+        "call",
+        "all",
+        "stop"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:98"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:115"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:7-45"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:159-185"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/compare-engine.ts:176"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/diagnostics/trace.ts:7-51"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:38-43"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:75"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:30"
+        }
+      ],
+      "core": [
+        "Q20",
+        "Q11",
+        "Q12"
+      ],
+      "meanings": [
+        {
+          "id": "M26.D1",
+          "meaning": "The port has two sinks and no other: the console, which the runtime writes, and the one object a page registers under the contract name trace through the page's plugin queue, as the busy indicator and the notice are registered (D10.21). The OpenTelemetry adapter (N20.2) is such an object, and so is an app's own. The core alone calls the contract's one member, ended(span), once for each span as it ends, after its children, the span carrying its name from the closed vocabulary (D20.4), its trace id, its own id and its parent's, its start and end times, its outcome, and the attributes and events D20.5 admits; no pipeline has a door to it. A page that registers no trace object traces to the console alone. The first error a sink throws is logged once to the console as an error naming the sink and the span, and that sink is called no more on the page (D20.6). The ids the port mints and the headers an attempt sends never depend on a sink, so a failing sink changes no request (D20.3, D20.9, D20.11). The adapter exports each span inside that call, so an error its exporter throws is the sink's error the port logs."
+        }
+      ],
+      "oracle": "OpenTelemetry's trace data model, in which a span has a trace id, a span id, a parent span id, a name, start and end times, attributes and events, and ends once; its HTTP client conventions for an attempt's method, status, resend count and route template; and the browser's console, where an error the port logs is shown once.",
+      "checker": [
+        "core:Q20",
+        "core:Q11",
+        "Tracing.tla:EveryStartedSpanEnds",
+        "Tracing.tla:ChildEndsBeforeParent",
+        "Tracing.tla:SinkFailureChangesNothing",
+        "Tracing.tla:SinkFailureKeepsHeaders"
+      ],
+      "defects": [
+        {
+          "id": "X20.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X20.5",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X20.3",
+          "page": "A bed board page whose view renders the trace on, in a test app whose layout registers the OpenTelemetry adapter exporting to the test app's collector, whose page lists the spans of a trace as a tree with each span's outcome. Its Find beds button runs a handler under the replace policy (D11.7) that GETs the ward's free beds and sets their count as the text of beds. The promise observes Tracing.tla's Abort: the endpoint holds every answer, so the first run waits between Attempt and Respond when the second click replaces it, and the second run waits there until the test app clicks Release on its gate page.",
+          "gesture": "Click Find beds; click Find beds again; on the gate page click Release; wait until beds reads 4; open the collector page.",
+          "outcome": "beds reads 4, and the collector lists under the page's trace id two run spans: the first ended with outcome replaced, holding its send span and that send's attempt span, both ended; the second ended with outcome completed, holding its send and attempt spans.",
+          "opposite": "One click of Find beds and Release: beds reads 4, and the collector lists one run span, ended with outcome completed.",
+          "defect": "A port that ends a run's span only when its pipeline routes leaves the replaced run's span open, so the collector never receives it and lists only the second run (Tracing.tla's ReplacedRunLeftOpen mutant, which breaks EveryStartedSpanEnds)."
+        },
+        {
+          "for": "X20.5",
+          "page": "An intake page whose view renders the trace on, in a test app whose layout registers the OpenTelemetry adapter configured with an exporter that throws on every span, so the trace sink throws (M26.D1). Its Save button posts the intake form to an endpoint that answers 200 at once with the count of saves, saved 1 and then saved 2, and the success route sets that text as the text of status. The promise observes Tracing.tla's Trigger, the click that starts a run; no endpoint holds the machine, since Trigger waits on the click alone, and the sink's first throw comes before it, when the plan's boot span ends.",
+          "gesture": "Open the page; click Save; wait until status reads saved 1; click Save; wait until status reads saved 2.",
+          "outcome": "status reads saved 1 and then saved 2, and the console shows one error, logged as the page started, naming the trace sink, and no other error.",
+          "opposite": "The same page with an exporter that does not throw: status reads saved 1 and then saved 2, the console shows no error, and the collector lists the boot span and both runs.",
+          "defect": "A port that lets a sink's error reach the run stops the handler where it starts, so status stays empty (Tracing.tla's SinkErrorStopsRun mutant, which breaks SinkFailureChangesNothing); one that logs each failure shows an error for every span."
+        }
+      ],
+      "verdicts": []
+    },
+    {
+      "id": "M26.F3",
+      "summary": "The trace context a request carries to the server. Under on each send attempt sends W3C Trace Context's traceparent and tracestate naming its own span, a child of its handler run's, so the endpoint's activities, the validation door's among them, join the page's trace, and a slot's content plan, rendered by a traced request, nests in it. Every attempt after a send's first sends traceparent with the sampled flag set and W3C baggage holding http.request.resend_count, the attempt's own span under on and one trace id the send mints under off, so the server's parent-based sampler records a retry and what it calls; under off the first attempt carries neither, since no one knows it will fail. The trace headers go to the page's own origin only. A request's own header named traceparent, tracestate or baggage is refused, at build by ALIS030 and where the view renders on code ALIS030 does not follow. Neither line sends a trace header, and both lines' Header door takes any non-empty name.",
+      "status": "new",
+      "types": [],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public GatherBuilder<TModel> Header(string name, string value)",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:72"
+        },
+        {
+          "line": "main",
+          "text": "internal static HeaderName Of(string value) => new HeaderName(value);",
+          "cite": "Alis.Reactive/PlanModel/WireTerms/PlanTerms.cs:203"
+        },
+        {
+          "line": "main",
+          "text": "const response = await fetch(fetchRequest.url, fetchRequest.init);",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/http.ts:92"
+        },
+        {
+          "line": "redesign",
+          "text": "public GatherBuilder<TRequest, TModel> Header(string name, string value)",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:187"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static HeaderName Of(string value) => new HeaderName(value);",
+          "cite": "Alis.Reactive/WireTerms/PlanTerms.cs:91"
+        },
+        {
+          "line": "redesign",
+          "text": "headers[name] = wireText(value, name);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:92"
+        },
+        {
+          "line": "redesign",
+          "text": "response = await fetch(url, init);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:35"
+        },
+        {
+          "line": "proposed",
+          "text": "Under on each send attempt sends traceparent and tracestate naming its own span, a child of its handler run's, so the endpoint's activities join the page's trace; a slot's content is rendered by a traced request, so its plan's trace context is the server's span and nested partials nest in the trace. The trace context is the run's, and HttpSend carries none (D20.3).",
+          "doors": [
+            "N20.1",
+            "N20.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Every attempt after a send's first sends traceparent with the sampled flag set and baggage holding http.request.resend_count, the attempt's own span under on and one trace id the send mints for its retries under off; under off the first attempt carries neither (D20.11).",
+          "doors": [
+            "N20.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The trace headers go to the page's own origin only, and a request to another origin carries none; the services behind the endpoint receive them from the server's own propagation (D20.3, D9.12, probe:browser-cross-origin-traceparent-preflight).",
+          "doors": [
+            "N20.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A request's own header named traceparent, tracestate or baggage is refused, at build by ALIS030 and where the view renders on code ALIS030 does not follow, with \"The traceparent header belongs to tracing: remove it from this request's headers.\" (D9.11, D18.6).",
+          "doors": [
+            "N18.7"
+          ]
+        }
+      ],
+      "nodes": [
+        "request",
+        "on",
+        "off"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:72-81"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanModel/WireTerms/PlanTerms.cs:199-203"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:187-197"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/WireTerms/PlanTerms.cs:87-91"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/http.ts:87-100"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:28-56"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:58-78"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:88-95"
+        }
+      ],
+      "core": [
+        "Q20",
+        "Q10",
+        "Q9",
+        "Q18"
+      ],
+      "meanings": [],
+      "oracle": "W3C Trace Context (traceparent and tracestate, the sampled flag) and W3C Baggage, with OpenTelemetry's attribute http.request.resend_count; RFC 9110's idempotent methods, which D10.14 retries; and the Fetch Standard's CORS protocol, under which Chromium preflights a cross-origin GET that carries traceparent and sends the same headers to the page's own origin as written (probe:browser-cross-origin-traceparent-preflight, probe:browser-same-origin-trace-headers-sent).",
+      "checker": [
+        "core:Q20",
+        "core:Q10",
+        "Tracing.tla:AttemptsJoinTheTrace",
+        "Tracing.tla:TraceHeadersStayHome",
+        "Tracing.tla:RetriesAlwaysTraced",
+        "Tracing.tla:ResendCountSent"
+      ],
+      "defects": [
+        {
+          "id": "X20.2",
+          "rung": "behavior"
+        },
+        {
+          "id": "X20.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X20.6",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X20.7",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X20.2",
+          "page": "A ward census page whose view renders the trace on, in a test app whose layout registers the OpenTelemetry adapter exporting to the test app's collector, whose page lists the spans of a trace as a tree. Its Load census button GETs the ward's census under the defaults' standard retry (N10.3) and sets the count as the text of census; the endpoint answers the first attempt 503 with no Retry-After and the second 200 with 12, and lists each traceparent it received on the test app's echo page. The promise observes Tracing.tla's Respond with a retry: the endpoint holds the first attempt's answer, so the machine waits between Attempt and Respond until the test app clicks Release on its gate page, which answers 503; the retry's wait runs on Playwright's clock (Page.Clock), installed before the click, never on real time.",
+          "gesture": "Install Playwright's clock; click Load census; on the gate page click Release; run the clock forward by the standard first wait; wait until census reads 12; open the collector page and the echo page.",
+          "outcome": "census reads 12; the collector lists under the page's trace id one run span holding one send span holding two attempt spans, GET with status 503, and GET with status 200 and resend count 1; the echo page lists two traceparents, each naming one of those attempt spans.",
+          "opposite": "An endpoint that answers 200 at once: census reads 12, and the send span holds one attempt span, GET with status 200 and no resend count.",
+          "defect": "A port that makes one span per send and none per attempt lists one span with the last status, and one that names the run's span in every attempt's traceparent echoes one parent for both attempts (Tracing.tla's AttemptHeaderFromRun mutant, which breaks AttemptsJoinTheTrace)."
+        },
+        {
+          "for": "X20.4",
+          "page": "A referral page whose view renders the trace on. Its Check pharmacy button GETs the pharmacy's stock from the test app's second host, another origin, which allows the page's origin and the trace headers by CORS, lists every request it receives on its own log page, and answers with the traceparent it received, which the success route sets as the text of pharmacy-echo; its Check ward button sends the same GET to the page's own origin, which answers into ward-echo. The promise observes Tracing.tla's Attempt to another origin: the second host holds its answer, so the machine waits between Attempt and Respond until the test app clicks Release on its gate page.",
+          "gesture": "Click Check pharmacy; on the gate page click Release; wait until pharmacy-echo has text; open the second host's log page.",
+          "outcome": "pharmacy-echo reads traceparent none, and the second host's log lists one GET and no OPTIONS.",
+          "opposite": "Click Check ward: ward-echo reads a traceparent naming the attempt's span under the page's trace id (probe:browser-same-origin-trace-headers-sent).",
+          "defect": "A runtime that adds the trace headers to every request (Tracing.tla's HeaderToEveryOrigin mutant, which breaks TraceHeadersStayHome) hands the page's trace id to another party and turns each cross-origin GET into a preflighted one: Chromium sends OPTIONS asking traceparent first, and where the other origin does not allow the header the GET is never sent and fetch rejects with a TypeError (probe:browser-cross-origin-traceparent-preflight). Here pharmacy-echo shows the traceparent and the log lists an OPTIONS."
+        },
+        {
+          "for": "X20.7",
+          "page": "A ward census page rendered by a request the app's sampler does not record, so the view writes the trace off. Its Load census button GETs the ward's census under the defaults' standard retry (N10.3) and sets the count as the text of census; the endpoint answers the first attempt 503 and the second 200 with 12, and lists the traceparent and baggage of each attempt it received on the test app's echo page. The promise observes Tracing.tla's second Attempt: the endpoint holds the first attempt's answer, so the machine waits between Attempt and Respond until the test app clicks Release on its gate page, which answers 503; the retry's wait runs on Playwright's clock (Page.Clock), installed before the click, never on real time.",
+          "gesture": "Install Playwright's clock; click Load census; on the gate page click Release; run the clock forward by the standard first wait; wait until census reads 12; open the echo page.",
+          "outcome": "census reads 12; the echo page lists attempt 1 with traceparent none and baggage none, and attempt 2 with a traceparent whose flags read 01 and baggage http.request.resend_count=1.",
+          "opposite": "An endpoint that answers 200 at once: census reads 12, and the echo page lists one attempt with traceparent none and baggage none.",
+          "defect": "A runtime that sends a retry as it sent the first attempt (Tracing.tla's RetryUntracedWhenOff mutant, which breaks RetriesAlwaysTraced) leaves the server's sampler free to drop the retried request and what it calls, and one that sends no resend count (ResendCountMissing, which breaks ResendCountSent) leaves the server unable to tell a retry from a first attempt."
+        }
+      ],
+      "verdicts": []
+    }
+  ]
+}

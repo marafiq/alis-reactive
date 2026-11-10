@@ -3931,6 +3931,51 @@
         "gesture": "Click Open notes, click the drawer's Close button, then click Open empty.",
         "outcome": "The drawer shows with an empty heading and an empty content."
       }
+    },
+    {
+      "id": "browser-cross-origin-traceparent-preflight",
+      "statement": "A GET to another origin that carries a traceparent header is preceded by an OPTIONS preflight whose Access-Control-Request-Headers names traceparent, and when that origin's answer allows the page's origin but no header, the GET is never sent and fetch rejects with a TypeError.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks, against two node HTTP servers on different ports",
+      "probe": "tracing-m26.mjs",
+      "expect": "browser-cross-origin-traceparent-preflight: OPTIONS asking traceparent; fetch TypeError",
+      "source": "spec/probes/tracing-m26.mjs",
+      "proof": {
+        "feature": "M26.F3",
+        "page": "X20.4's referral page: the trace on, a Check pharmacy button that GETs the pharmacy's stock from the test app's second host, another origin that allows the page's origin by CORS and lists every request it receives on its log page.",
+        "gesture": "Click Check pharmacy; on the gate page click Release; open the second host's log page.",
+        "outcome": "The log lists one GET and no OPTIONS, and pharmacy-echo reads traceparent none."
+      }
+    },
+    {
+      "id": "browser-cross-origin-plain-get-no-preflight",
+      "statement": "The same GET to another origin without a traceparent header is sent with no preflight, and fetch resolves with its 200.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks, against two node HTTP servers on different ports",
+      "probe": "tracing-m26.mjs",
+      "expect": "browser-cross-origin-plain-get-no-preflight: GET; fetch status 200",
+      "source": "spec/probes/tracing-m26.mjs",
+      "proof": {
+        "feature": "M26.F3",
+        "page": "X20.4's referral page: the trace on, a Check pharmacy button that GETs the pharmacy's stock from the test app's second host, another origin that allows the page's origin by CORS and lists every request it receives on its log page.",
+        "gesture": "Click Check pharmacy; on the gate page click Release; open the second host's log page.",
+        "outcome": "The log lists one GET and no OPTIONS, and pharmacy-echo has text."
+      }
+    },
+    {
+      "id": "browser-same-origin-trace-headers-sent",
+      "statement": "A GET to the page's own origin carrying traceparent, tracestate and baggage reaches the server with each header as written and no preflight: fetch drops none of them.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks, against two node HTTP servers on different ports",
+      "probe": "tracing-m26.mjs",
+      "expect": "browser-same-origin-trace-headers-sent: GET with traceparent 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01, tracestate alis=1, baggage http.request.resend_count=1; fetch status 200",
+      "source": "spec/probes/tracing-m26.mjs",
+      "proof": {
+        "feature": "M26.F3",
+        "page": "X20.7's ward census page: the trace off, a Load census button that GETs the ward's census under the standard retry, an endpoint that answers 503 and then 200 and lists the traceparent and baggage of each attempt on the echo page.",
+        "gesture": "Install Playwright's clock; click Load census; on the gate page click Release; run the clock forward by the standard first wait; open the echo page.",
+        "outcome": "Attempt 2 lists a traceparent whose flags read 01 and baggage http.request.resend_count=1."
+      }
     }
   ]
 }
