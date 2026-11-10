@@ -57,6 +57,20 @@ Each name is gate 2's; each door is the capability it carries.
   writes the C# values it hands EJ2 by M21.D1, so `AddReactiveFusion` leaves (gate 2). Every Fusion declaration marks
   `optional: true` on each member EJ2's TypeScript marks `?` (D5.3, N5.4), which ALIS022 checks both ways; neither line
   has the mark.
+- `M21.N5` kept: `FusionAutoComplete`: `Value`, typed by the items' value member as M21.N1's items overload types
+  MultiSelect's (gate 2) and admitting null (M21.X501), `DataSource<TItem>()`, `Enabled`, `DataBind`, `FocusIn`,
+  `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change` and `Filtering`, with `IInputComponent.Input` committed by
+  `Change` (M7.N3); the payloads `FusionAutoComplete.ChangeEventArgs` (`Value`, `IsInteracted`) and
+  `FusionAutoComplete.FilteringEventArgs` (`Text`, `PreventDefaultAction`, `UpdateData`); and the render helpers
+  `field.FusionAutoComplete(build => ..)` and `field.FusionAutoComplete(items, build => ..)`, which hands EJ2 the items
+  by M21.D1, with `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X503). `Text` leaves: EJ2
+  marks AutoComplete's `text` `@private` (M21.X502, gate 2). It replaces main's seven files
+  (`Alis.Reactive.Fusion/Components/FusionAutoComplete/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:231`, `:373`, `:380`, `:387`,
+  `@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts:140`, `:256`, `:263`,
+  `@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:157`, `:365`,
+  `@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:390`, `:826`, `:838`, `:847`).
 - `M21.N6` kept: `FusionBreadcrumb`: `ActiveItem` (`activeItem`), `DataBind` and `ItemClick`, whose payload
   `FusionBreadcrumbItemClickArgs` reads its `item`; and the render helper `Html.FusionBreadcrumb(plan, id, build =>
   ..)`. It replaces main's seven files (`Alis.Reactive.Fusion/Components/FusionBreadcrumb/` at 623dd4a27), whose doors
@@ -71,6 +85,18 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionChipList/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-buttons/src/chips/chip-list.d.ts:287`, `:428`, `:439`, `:449`, `:461`, `:468`).
+- `M21.N13` kept: `FusionComboBox`: `Value`, typed by the items' value member as M21.N1's items overload types
+  MultiSelect's (gate 2) and admitting null, `Text` as `Property<string?>` (M21.X504), `Index` as `Property<int?>`,
+  `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change`, `Focus` and `Blur`, with
+  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionComboBox.ChangeEventArgs` (`Value`,
+  `IsInteracted`), and the focus and blur payloads, which EJ2 types as `Object`, declaring no member (their class name a
+  gate 2 gap); and the render helpers `field.FusionComboBox()`, `field.FusionComboBox(build => ..)` and
+  `field.FusionComboBox(items, build => ..)`, which hands EJ2 the items by M21.D1, a door neither line has, with
+  `Fields<TItem>(text, value)` (M21.X505). It replaces main's eight files
+  (`Alis.Reactive.Fusion/Components/FusionComboBox/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:92`, `:223`, `:231`, `:360`, `:367`, `:373`, `:380`, `:387`,
+  `@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:365`, `:389`, `:395`).
 - `M21.N14` kept: `FusionContextMenu`: `Open(top, left)` and `Close`; `BeforeItemRender`, `BeforeOpen`, `OnOpen`,
   `BeforeClose`, `OnClose` and `Select` and their payloads, `FusionContextMenuBeforeOpenArgs` with `IsFocused`
   (optional, `isFocused`); and the render helper `Html.FusionContextMenu(plan, id, build => ..)`. It replaces main's
@@ -78,6 +104,26 @@ Each name is gate 2's; each door is the capability it carries.
   in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/context-menu/context-menu.d.ts:77`, `:84`;
   `@syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242`, `:552`).
+- `M21.N20` kept: `FusionDropDownList`: `Value`, typed by the items' value member as M21.N1's items overload types
+  MultiSelect's (gate 2) and admitting null, `Text` as `Property<string?>` (M21.X506), `DataSource<TItem>()`,
+  `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change`, `Focus` and `Blur`, with
+  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionDropDownList.ChangeEventArgs` (`Value`,
+  `IsInteracted`), and the focus and blur payloads, which EJ2 types as `Object`, declaring no member (their class name a
+  gate 2 gap); and the render helpers `field.FusionDropDownList()`, `field.FusionDropDownList(build => ..)` and
+  `field.FusionDropDownList(items, build => ..)`, which hands EJ2 the items by M21.D1, with `Fields<TItem>(text, value)`
+  and `Fields<TItem>(text, value, groupBy)` (M21.X507). It replaces main's eight files
+  (`Alis.Reactive.Fusion/Components/FusionDropDownList/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:301`, `:308`, `:365`, `:389`, `:395`, `:685`,
+  `:694`, `:700`, `:706`, `:742`, `@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base.d.ts:390`).
+- `M21.N21` kept: `FusionDropDownTree`: `Value` as `Property<string[]?>` and `Text` as `Property<string?>` (M21.X508),
+  `DataBind`, `ShowPopup`, `HidePopup`, `Clear` and `Change`, with `IInputComponent.Input` committed by `Change`
+  (M7.N3); the payload `FusionDropDownTree.DdtChangeEventArgs` (`Value`, `OldValue`, `IsInteracted`); and the render
+  helpers `field.FusionDropDownTree()` and `field.FusionDropDownTree(build => ..)`. It replaces main's six files
+  (`Alis.Reactive.Fusion/Components/FusionDropDownTree/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts:127`, `:131`, `:135`, `:627`, `:646`, `:695`,
+  `:931`, `:964`, `:978`).
 - `M21.N23` kept: `FusionGrid`: `Rows<TRow>()` and `Page<TRow>()` (`dataSource`), `Refresh`, the paging, sorting,
   filtering, searching and grouping methods, the column methods (`ShowColumn` and `HideColumn` by `showColumns` and
   `hideColumns` with `"field"`, `AutoFitColumns`, `AutoFitColumn` by `autoFitColumns`, `ReorderColumns`,
@@ -112,6 +158,31 @@ Each name is gate 2's; each door is the capability it carries.
   main's seven files (`Alis.Reactive.Fusion/Components/FusionKanban/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:112`, `:234`, `:429`, `:468`, `:484`, `:502`, `:511`, `:527`).
+- `M21.N27` kept: `FusionListBox`: `Value`, a list typed by the items' value member as M21.N1's items overload types
+  MultiSelect's (gate 2), `DataBind`, `SelectItems`, `SelectAll` and `EnableItems`, each taking every argument EJ2
+  takes, and `Change`; the payload `FusionListBox.ListBoxChangeEventArgs` (`Value`); and the render helpers
+  `Html.FusionListBox(plan, id, build => ..)` and `Html.FusionListBox(plan, id, items, build => ..)`, which hands EJ2
+  the items by M21.D1, a door neither line has. It replaces main's seven files
+  (`Alis.Reactive.Fusion/Components/FusionListBox/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-dropdowns/src/list-box/list-box.d.ts:156`, `:274`, `:409`, `:418`, `:425`, `:724`).
+- `M21.N28` kept: `FusionListView`: `SelectItem<TItem>` and `UnselectItem<TItem>`, each taking the item as the list
+  holds it (M21.X509), `CheckAllItems`, `UncheckAllItems` and `Select`; the payload `FusionListView.SelectEventArgs`
+  (`Text`, `Index`, `IsInteracted`, `IsChecked`, `Cancel`); and the render helper
+  `Html.FusionListView(plan, id, build => ..)`. It replaces main's seven files
+  (`Alis.Reactive.Fusion/Components/FusionListView/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-lists/src/list-view/list-view.d.ts:392`, `:462`, `:466`, `:532`, `:538`, `:706`, `:818`, `:826`,
+  `:830`, `:834`).
+- `M21.N29` kept: `FusionMention`: `Search`, `ShowPopup`, `HidePopup`, `Change`, `Opened` and `Closed`; the payloads
+  `FusionMention.MentionChangeEventArgs` (`Value`, typed by the items' value member as M21.N1's items overload types
+  MultiSelect's (gate 2), `IsInteracted`) and `FusionMention.PopupEventArgs`; and the render helpers
+  `Html.FusionMention(plan, id, build => ..)` and `Html.FusionMention(plan, id, items, build => ..)`, which hands EJ2
+  the items by M21.D1, with `Fields<TItem>(text, value)` (M21.X510), the Mention's instance handed to the view's id by
+  the framework's own component code (`Alis.Reactive.Assets/components/fusion/mention.ts:7-11` at 65fdf118d). It
+  replaces main's eight files (`Alis.Reactive.Fusion/Components/FusionMention/` at 623dd4a27), whose doors carry their
+  verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-dropdowns/src/mention/mention.d.ts:15`, `:282`, `:294`, `:300`, `:407`, `:413`, `:469`).
 - `M21.N30` kept: `FusionMenu`: `Open` and `Close`; `BeforeItemRender`, `BeforeOpen`, `OnOpen`, `BeforeClose`,
   `OnClose` and `Select` and their payloads, `FusionMenuBeforeOpenArgs` with `IsFocused` (optional, `isFocused`); and
   the render helper `Html.FusionMenu(plan, id, build => ..)`. It replaces main's twelve files
@@ -119,6 +190,17 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/menu/menu.d.ts:119`, `:126`;
   `@syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242`, `:552`).
+- `M21.N31` kept: `FusionMultiColumnComboBox`: `Value` and `Text` as `Property<string?>` (M21.X511),
+  `DataSource<TRow>()`, `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup` and `Change`, with
+  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionMultiColumnComboBox.ChangeEventArgs`
+  (`Value`, typed by the rows' value member as M21.N1's items overload types MultiSelect's (gate 2), `IsInteracted`);
+  and the render helpers `field.FusionMultiColumnComboBox()`, `field.FusionMultiColumnComboBox(build => ..)` and
+  `field.FusionMultiColumnComboBox(rows, build => ..)`, which hands EJ2 the rows by M21.D1, with
+  `Fields<TItem>(text, value)` and `Fields<TItem>(text, value, groupBy)` (M21.X512). It replaces main's six files
+  (`Alis.Reactive.Fusion/Components/FusionMultiColumnComboBox/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts:361`, `:389`, `:437`,
+  `:443`, `:451`, `:757`, `:898`, `:905`, `:913`, `:920`).
 - `M21.N34` kept: `FusionPivotView`: `CurrentView` (`currentView`, which EJ2 marks `@hidden`, a gate 2 item),
   `DataSourceSettings` as `LiveObject<FusionPivotViewDataSourceSettings>()` with `Rows<TRow>()` (`dataSource`),
   `DisplayOption` as `LiveObject<FusionPivotViewDisplayOption>()` with `View` and `Primary` (M21.D301), `Refresh`,
@@ -217,3 +299,25 @@ features they give.
   typed by its member through `pipeline.Input` (M21.X404).
 - A context menu's and a menu's `beforeOpen` payload keeps `isFocused`, which main reads and the redesign dropped
   (`@syncfusion/ej2-navigations/src/common/menu-base.d.ts:552`), declared optional as EJ2 marks it.
+- A box's value and text hold null as the vendor's do (M21.X501, M21.X504, M21.X506, M21.X508, M21.X511). The redesign
+  declares the value and text of AutoComplete, ComboBox, DropDownList, DropDownTree and MultiColumnComboBox non-null
+  (`Alis.Reactive.Fusion/Components/FusionDropDownList/FusionDropDownList.cs:24` at 65fdf118d) where EJ2 documents each
+  null until a choice (`@syncfusion/ej2-dropdowns/src/drop-down-list/drop-down-list.d.ts:305-308`); ALIS019 refuses the
+  declarations, and a value that admits null keeps main's clears.
+- AutoComplete names no private member (M21.X502). Both lines write `text`, which EJ2 marks `@private` on AutoComplete
+  (`@syncfusion/ej2-dropdowns/src/auto-complete/auto-complete.d.ts:197-200`); the designed default, gate 2's, sets what
+  the box shows through `Value`.
+- One naming for every list's data (M21.X503, M21.X505, M21.X507, M21.X510, M21.X512). AutoComplete, ComboBox,
+  DropDownList, Mention and MultiColumnComboBox each name a field by one rule and their data by another, on one line or
+  both (`Alis.Reactive.Fusion/Components/FusionComboBox/FusionComboBox.cs:101` at 65fdf118d); an items overload of each
+  render helper writes the data by the plan's writer (M21.D1), so a field named `label` finds `label`.
+- A list item is selected by the item the list holds (M21.X509). Both lines select a ListView item by its text, which
+  EJ2 finds only in a list of text (`@syncfusion/ej2-lists/src/list-view/list-view.js:1552-1572`), so a list of objects
+  selects nothing; the rewrite takes the item.
+- A Mention renders with no script in the view. Main's render helper writes a script that waits for the page and falls
+  back to the target's instance (`Alis.Reactive.Fusion/Components/FusionMention/FusionMentionHtmlExtensions.cs:73-80` at
+  623dd4a27); the redesign hands the instance over in the framework's own component code
+  (`Alis.Reactive.Assets/components/fusion/mention.ts:7-11` at 65fdf118d), which the rewrite keeps.
+- A ListBox method takes every argument EJ2 takes. Main gives `selectItems`, `selectAll` and `enableItems` six C# names
+  with the state and `isValue` fixed (`Alis.Reactive.Fusion/Components/FusionListBox/FusionListBoxExtensions.cs:19-35`
+  at 623dd4a27); the redesign takes each as an `Arg`, which the rewrite keeps.
