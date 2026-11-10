@@ -1385,7 +1385,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 57,
+        "files": 60,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1443,13 +1443,20 @@
       "pass": true
     },
     "matrix": {
-      "counts": {},
-      "detail": "not started: spec/Reference/matrix.json, spec/Reference/syncfusion.json, spec/Reference/native.json absent",
-      "pass": false
+      "counts": {
+        "bullets": 36,
+        "carried": 2,
+        "cells": 103,
+        "native": 101,
+        "problems": 0,
+        "syncfusion": 60
+      },
+      "detail": "MultiSelect covers 60 of 103 cells from its .d.ts; WardRound runs 101 of 103, and FusionMultiSelect carries the other 2",
+      "pass": true
     },
     "module_cites": {
       "counts": {
-        "cites": 1026,
+        "cites": 1033,
         "unresolved": 0
       },
       "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
@@ -1464,8 +1471,8 @@
     },
     "probes": {
       "counts": {
-        "browser": 111,
-        "facts": 378,
+        "browser": 113,
+        "facts": 380,
         "net10": 120,
         "net48": 85,
         "node": 62
@@ -1478,12 +1485,14 @@
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
+        "matrix_promised": 0,
+        "matrix_runs": 161,
         "promises": 392,
         "rows": 8909,
         "unmapped": 0
       },
-      "detail": "every refusal and behavior defect has a promise",
-      "pass": true
+      "detail": "not started: none of the 161 cells the reference components run has a promise",
+      "pass": false
     },
     "questions": {
       "counts": {
@@ -3556,14 +3565,14 @@
     }
   },
   "passed": 23,
-  "read_at_head": "7208f1e6cdcdc00c6cbb5bd52ca5d46045b66362",
+  "read_at_head": "2b0e48f4f3f6212a18d4ab9e4c23c6adb52798cd",
   "step": {
     "failing": [
-      "matrix"
+      "promises"
     ],
-    "name": "The reference components",
-    "next": "Write spec/Reference/matrix.json, syncfusion.json, native.json.",
-    "number": 8,
+    "name": "The promises",
+    "next": "Give every refusal and behavior defect and every matrix cell its promise.",
+    "number": 9,
     "phase": "D"
   },
   "total": 26
