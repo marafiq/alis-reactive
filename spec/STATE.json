@@ -1470,7 +1470,7 @@
         "files": 4,
         "members": 6
       },
-      "detail": "each of 4 shipped files main changed from 623dd4a27 to 7b9e987cc is cited there by a feature's sentence, and each of 6 public members it added has a verdict",
+      "detail": "each of 4 shipped files main changed from 623dd4a27 to 7b9e987cc is cited there by a feature's sentence, and each of 6 public declarations or exports it added has a verdict",
       "pass": true
     },
     "main_surface": {
@@ -1528,8 +1528,8 @@
     },
     "probes": {
       "counts": {
-        "browser": 116,
-        "facts": 384,
+        "browser": 117,
+        "facts": 385,
         "net10": 121,
         "net48": 85,
         "node": 62
@@ -3637,7 +3637,7 @@
     }
   },
   "passed": 32,
-  "read_at_head": "133ace61b7c0051e7d80263526dace3dafea975f",
+  "read_at_head": "965a2eaeeb4f22a4ae9dd4df91dd9a8f7f26fa53",
   "step": {
     "failing": [],
     "name": "End of session",
