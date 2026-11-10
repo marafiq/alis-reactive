@@ -118,6 +118,15 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-form-decimal-culture-en-us",
+      "statement": "Under the en-US request culture a form decimal binds 1.5 as 1.5 and binds 1,5 as 15, silently, the reverse of de-DE.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-form-decimal-culture-en-us: under the en-US request culture 1.5 binds 1.5; 1,5 binds 15",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
       "id": "core-query-decimal-invariant",
       "statement": "Under the de-DE request culture a query decimal binds 1.5 as 1.5 and binds 1,5 as 15, silently.",
       "host": "net10",

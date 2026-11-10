@@ -42,6 +42,7 @@ try
     Console.WriteLine("core-template-prefix-name: " + new Microsoft.AspNetCore.Mvc.ViewFeatures.TemplateInfo { HtmlFieldPrefix = "NextOfKin" }.GetFullHtmlFieldName("Name"));
     Console.WriteLine("core-form-binds-indexed-name: " + await Form(client, "/roster", "Members%5B1%5D.Name=B&Members%5B0%5D.Name=A"));
     Console.WriteLine("core-form-decimal-culture: 1,5 binds " + await Form(client, "/amount", "Value=1%2C5") + "; 1.5 binds " + await Form(client, "/amount", "Value=1.5"));
+    Console.WriteLine("core-form-decimal-culture-en-us: under the en-US request culture 1.5 binds " + await Form(client, "/amount?culture=en-US&ui-culture=de-DE", "Value=1.5") + "; 1,5 binds " + await Form(client, "/amount?culture=en-US&ui-culture=de-DE", "Value=1%2C5"));
     Console.WriteLine("core-form-decimal-group: 1.234,5 binds " + await Form(client, "/amount", "Value=1.234%2C5") + "; 1,5e3 binds " + await Form(client, "/amount", "Value=1%2C5e3") + "; ' 1,5 ' binds " + await Form(client, "/amount", "Value=%201%2C5%20"));
     Console.WriteLine("core-form-int-culture: Count=1.234 binds " + await Form(client, "/counts", "Count=1.234") + "; Count=1,0 binds " + await Form(client, "/counts", "Count=1%2C0"));
     Console.WriteLine("core-form-date-kind: 2026-11-06T10:00:00 binds " + await Form(client, "/when", "When=2026-11-06T10%3A00%3A00") + "; 2026-11-06 binds " + await Form(client, "/when", "When=2026-11-06"));
