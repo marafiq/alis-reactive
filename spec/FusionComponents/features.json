@@ -791,7 +791,7 @@
     },
     {
      "line": "proposed",
-     "text": "DataStateChange, ToolbarClick, RecordClick<TRow>(), RowSelected<TRow>(), ActionBegin<TRow>(), ActionComplete<TRow>(), BeginEdit<TRow>(), CellSave<TRow, TValue>(), CellSaved<TRow, TValue>() and BeforeBatchSave<TRow>() hand payloads read with Read, each payload's cancel its Property<bool>; a payload declares a name only where EJ2's type does, recordClick's and toolbarClick's, so dataStateChange's, its action's, rowSelected's, actionBegin's and actionComplete's declare none.",
+     "text": "DataStateChange, ToolbarClick, RecordClick<TRow>(), RowSelected<TRow>(), ActionBegin<TRow>(), ActionComplete<TRow>(), BeginEdit<TRow>(), CellSave<TRow, TValue>(), CellSaved<TRow, TValue>() and BeforeBatchSave<TRow>() hand payloads read with Read, each payload's cancel its Property<bool>; every payload, and dataStateChange's action, declares name, the event's name EJ2's observer writes on each payload a listener hears (probe:ej2-payload-grid-dataStateChange, probe:ej2-payload-grid-rowSelected).",
      "doors": [
       "M21.N23",
       "N5.6",
@@ -970,11 +970,6 @@
      "defect": "Main calls the grid's excelExport, csvExport and pdfExport as plain calls (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridToolingExtensions.cs:38-59 at 623dd4a27) and the redesign declares them Method() (Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:207-213 at 65fdf118d), while each returns a promise (@syncfusion/ej2-grids/src/grid/base/grid.d.ts:3849, :3859, :3870): the step after an export runs before its file is written, and a failed export goes unseen. The rewrite declares them MethodAsync (D11.3, B15)."
     },
     {
-     "id": "M21.X202",
-     "rung": "analyzer",
-     "defect": "Both lines declare a name EJ2's types do not: on dataStateChange's payload (Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnDataStateChange.cs:18 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:326 at 65fdf118d; @syncfusion/ej2-grids/src/grid/base/interface.d.ts:2479-2508), on its action (Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnDataStateChange.cs:131 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:452 at 65fdf118d; @syncfusion/ej2-grids/src/grid/base/interface.d.ts:2495), on rowSelected's (Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnRowSelected.cs:23 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:546 at 65fdf118d; @syncfusion/ej2-grids/src/grid/base/interface.d.ts:1374-1402) and on actionBegin's and actionComplete's (Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnEditing.cs:27 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:588 at 65fdf118d; @syncfusion/ej2-grids/src/grid/base/grid.d.ts:1790, :1796). EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), which no contract declares. The vendor contract analyzer (N17.2) refuses each by ALIS016, and the rewrite's payloads declare no name where EJ2's type declares none; recordClick's and toolbarClick's keep theirs (@syncfusion/ej2-grids/src/grid/base/interface.d.ts:1438)."
-    },
-    {
      "id": "M21.X203",
      "rung": "refusal",
      "defect": "A rule a grid column's editor cannot check is dropped where the view renders with nothing said: a rule under a condition (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:96 at 623dd4a27, :112 at 65fdf118d); a rule EJ2's column validator has no key for, as GreaterThan or a comparison with another member (:104-138 at 623dd4a27, :120-144 at 65fdf118d); and one of two patterns on one column (:119-121 at 623dd4a27, where the second replaces the first, and :132 at 65fdf118d, which keeps the first). The column saves a value its validator refuses, and only the server's answer says so. The rewrite refuses it where the view renders: \"'{member}' has a rule the grid column's editor cannot check ({rule}); check it on the server with ServerOnly(), or give the column a rule its editor checks.\""
@@ -1107,9 +1102,8 @@
     },
     {
      "door": "FusionGridAction.Name.get -> string?",
-     "verdict": "refused",
-     "reason": "EJ2's action, a PageEventArgs, GroupEventArgs, FilterEventArgs, SearchEventArgs, SortEventArgs or LazyLoadGroupArgs, declares no name (@syncfusion/ej2-grids/src/grid/base/interface.d.ts:2495); EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), a member no contract declares, so the vendor contract analyzer refuses the member (ALIS016, N17.2, M21.X202). A handler knows its event by the event it handles, the declaration's DataStateChange.",
-     "carriers": [
+     "verdict": "renamed",
+     "to": [
       "M21.N23"
      ]
     },
@@ -1425,9 +1419,8 @@
     },
     {
      "door": "FusionGridDataStateChangeArgs.Name.get -> string?",
-     "verdict": "refused",
-     "reason": "EJ2's DataStateChangeEventArgs declares no name (@syncfusion/ej2-grids/src/grid/base/interface.d.ts:2479-2508); EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), a member no contract declares, so the vendor contract analyzer refuses the member (ALIS016, N17.2, M21.X202). A handler knows its event by the event it handles, the declaration's DataStateChange.",
-     "carriers": [
+     "verdict": "renamed",
+     "to": [
       "M21.N23"
      ]
     },
@@ -1586,9 +1579,8 @@
     },
     {
      "door": "FusionGridEditActionArgs<TRow>.Name.get -> string?",
-     "verdict": "refused",
-     "reason": "EJ2's actionBegin and actionComplete payload in none of its twelve types declares no name (@syncfusion/ej2-grids/src/grid/base/grid.d.ts:1790, :1796); EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), a member no contract declares, so the vendor contract analyzer refuses the member (ALIS016, N17.2, M21.X202). A handler knows its event by the event it handles, the declaration's ActionBegin<TRow>() or ActionComplete<TRow>().",
-     "carriers": [
+     "verdict": "renamed",
+     "to": [
       "M21.N23"
      ]
     },
@@ -1886,9 +1878,8 @@
     },
     {
      "door": "FusionGridRowSelectedArgs<TRow>.Name.get -> string?",
-     "verdict": "refused",
-     "reason": "EJ2's RowSelectEventArgs declares no name (@syncfusion/ej2-grids/src/grid/base/interface.d.ts:1374-1402); EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), a member no contract declares, so the vendor contract analyzer refuses the member (ALIS016, N17.2, M21.X202). A handler knows its event by the event it handles, the declaration's RowSelected<TRow>().",
-     "carriers": [
+     "verdict": "renamed",
+     "to": [
       "M21.N23"
      ]
     },

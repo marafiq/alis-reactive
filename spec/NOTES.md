@@ -848,3 +848,5 @@
   Evidence: the owner's two messages, 2026-11-09; probe:ej2-schedule-save-event-action.
 - 2026-11-09 probe, by the lead: spec/probes/ej2-payloads.mjs mounts EJ2 33.1.47's bundle in Chromium (Playwright 1.63.0's own node, the test host's pin) and records each payload's own members by kind from real clicks; ej2-base's Observer.notify writes `name` on every payload with a listener (observer.js:92), so unit 2's X202 is wrong; rowSelected's rowIndexes is a number for one row where the TypeScript says number[].
   Evidence: the eight ej2-payload and ej2-schedule facts in spec/probes/facts.json; check_probes host "browser".
+- 2026-11-09 M21.X202 withdrawn by the browser facts: `name` is on every Grid payload and on dataStateChange's action, so main's four Name getters are renamed to the redesign's and no payload drops its name; unit 2 had refused them on the TypeScript's absence alone, which the owner's rule no longer allows.
+  Evidence: probe:ej2-payload-grid-rowSelected, probe:ej2-payload-grid-dataStateChange, probe:ej2-payload-grid-actionBegin; @syncfusion/ej2-base/src/observer.js:92.

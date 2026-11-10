@@ -141,9 +141,7 @@ features they give.
 - A column checks an email or a URL as the server does (M21.X205). Main gives a column EJ2's own email and url rules
   (`@syncfusion/ej2-inputs/src/form-validator/form-validator.js:29-32`); the rewrite writes the validator's own
   patterns (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:62` at 65fdf118d).
-- A payload declares only what its type declares (M21.X202): both lines read a name on four payloads whose EJ2 types
-  declare none (`@syncfusion/ej2-grids/src/grid/base/interface.d.ts:1374-1402`, `:2479-2508`); and an enum argument is
-  written as the vendor reads it (M21.X207, `@syncfusion/ej2-grids/src/grid/base/enum.d.ts:40`).
+- An enum argument is written as the vendor reads it (M21.X207, `@syncfusion/ej2-grids/src/grid/base/enum.d.ts:40`).
 - A Kanban dialog's action is typed (M21.X301). The redesign's `OpenDialog` takes text
   (`Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:87` at 65fdf118d), and its sandbox keeps EJ2's
   `"Add"` as a constant of its own; the rewrite takes `FusionKanbanDialogAction`, written as `openDialog` reads it.
