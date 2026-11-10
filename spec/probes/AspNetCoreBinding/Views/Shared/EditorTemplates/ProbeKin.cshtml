@@ -1,0 +1,3 @@
+@model ProbeKin
+@Html.TextBoxFor(m => m.Name)
+@await Html.PartialAsync("~/Views/Probe/_ProbeAddress.cshtml", Model.Address)

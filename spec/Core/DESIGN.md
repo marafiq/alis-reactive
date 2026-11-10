@@ -3330,6 +3330,19 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   and `DeclaringType` (`Alis.Reactive/Inputs/IdGenerator.cs:63-73`); it refuses an interface declarer
   (`Alis.Reactive/Inputs/IdGenerator.cs:52-57`). The POC refuses a generic declaring class and reads no contract for an
   input, and stands until the rewrite's inputs unit (`spec/NOTES.md`, 2026-11-09, C11).
+- MVC's own doors that give a member's view its prefix need no framework door: on net10 the page's plan reads an input
+  that `EditorFor` renders by type, by a template it names or the model's `[UIHint]` names, and for each item of a list,
+  that MVC's `<partial for>` renders, and that a controller's partial renders under the member's prefix into a slot
+  (`tests/Alis.Reactive.Poc.PlaywrightTests/Partials/WhenMvcRendersAMembersView.cs`,
+  `tests/Alis.Reactive.Poc.PlaywrightTests/Partials/WhenAPartialIsRenderedForAMember.cs`); on net48 a template's
+  prefix is the member's full name (`probe:mvc5-template-prefix`).
+- A partial rendered with a model and no prefix names its inputs as MVC's own helpers do, under the view's prefix and
+  no member's name, so its post binds nothing and the page's plan stops at the member's id: on net10 it keeps the
+  view's prefix (`probe:core-partial-model-prefix`), and on net48 it starts with none, inside a template too
+  (`probe:mvc5-partial-model-fresh-prefix`).
+- `EditorFor` renders nothing for a model already rendered up its template chain, or for a null of a type the chain
+  rendered as null, on both hosts (`probe:core-template-visited`, `probe:mvc5-template-visited`); `PartialFor` has no
+  such guard.
 
 **Defects.**
 - `X14.1` type: an input outside its plan's block does not compile: new:N14.2.

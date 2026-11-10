@@ -613,6 +613,24 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-partial-model-prefix",
+      "statement": "On net10 a partial rendered with a model keeps the view's prefix and adds no member's name: at the page a partial for Kin names Name, and inside the template for Kin a partial for its Address names Kin.City, so neither binds the member it renders.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-partial-model-prefix: at the page a partial for Kin names [Name]; inside the template for Kin a partial for its Address names [Kin.Name, Kin.City]",
+      "source": "spec/probes/AspNetCoreBinding/ViewProbes.cs"
+    },
+    {
+      "id": "core-template-visited",
+      "statement": "On net10 EditorFor renders nothing for a model already rendered up its template chain, or for a null of a type the chain already rendered as null; sibling calls share no chain.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-template-visited: a null Next renders [Next]; a Next that is the model itself renders [Next]; a distinct Next renders [Next, Next.Next]",
+      "source": "spec/probes/AspNetCoreBinding/ViewProbes.cs"
+    },
+    {
       "id": "mvc5-viewdata-copy-shares-template-info",
       "statement": "On net48 a ViewDataDictionary copied from another shares its TemplateInfo, so a prefix set on the copy moves the original's.",
       "host": "net48",
@@ -620,6 +638,33 @@
       "probe": "spec/probes/aspnetwebstack/ViewDataDictionary.cs.txt",
       "expect": "TemplateInfo = dictionary.TemplateInfo;",
       "source": "spec/probes/aspnetwebstack/ViewDataDictionary.cs.txt:48"
+    },
+    {
+      "id": "mvc5-partial-model-fresh-prefix",
+      "statement": "On net48 a partial rendered with a model and no view data gets a new ViewDataDictionary, so it starts with no prefix, even inside a template.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/HtmlHelper.cs.txt",
+      "expect": "newViewData = new ViewDataDictionary(model);",
+      "source": "spec/probes/aspnetwebstack/HtmlHelper.cs.txt:539"
+    },
+    {
+      "id": "mvc5-template-visited",
+      "statement": "On net48 a template renders nothing for a model, or a null's type, already rendered up its template chain.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt",
+      "expect": "if (html.ViewDataContainer.ViewData.TemplateInfo.VisitedObjects.Contains(visitedObjectsKey))",
+      "source": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt:288"
+    },
+    {
+      "id": "mvc5-template-prefix",
+      "statement": "On net48 a template's prefix is the member's full name under the view's prefix.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt",
+      "expect": "HtmlFieldPrefix = html.ViewContext.ViewData.TemplateInfo.GetFullHtmlFieldName(htmlFieldName),",
+      "source": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt:301"
     },
     {
       "id": "mvc5-sections-checked-in-layouts-only",

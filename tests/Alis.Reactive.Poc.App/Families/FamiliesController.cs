@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Poc.App.Families;
@@ -18,6 +19,20 @@ public sealed class FamiliesController : Controller
 
     public IActionResult MobileContact() => View(Helen());
 
+    public IActionResult FamilyByNamedTemplate() => View(Helen());
+
+    public IActionResult FamilyByHint() => View(Helen());
+
+    public IActionResult ContactsByEditor() => View(Helen());
+
+    public IActionResult FamilyBySlot() => View(Helen());
+
+    public IActionResult NextOfKinWithPrefix()
+    {
+        ViewData.TemplateInfo.HtmlFieldPrefix = "NextOfKin";
+        return PartialView("_NextOfKin", Helen().NextOfKin);
+    }
+
     private static FamilyForm Helen() => new()
     {
         ResidentName = "Helen Park",
@@ -34,6 +49,7 @@ public sealed class FamilyForm
 
     public List<Contact> Contacts { get; set; } = [];
 
+    [UIHint("Guardian")]
     public Relative? Guardian { get; set; }
 }
 
