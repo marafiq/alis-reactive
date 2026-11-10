@@ -2319,7 +2319,13 @@
       "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-payload-grid-rowSelected: data:object,foreignKeyData:object,isHeaderCheckBoxClicked:boolean,isInteracted:boolean,name:string,previousRow:undefined,previousRowIndex:undefined,row:Element,rowIndex:number,rowIndexes:number,target:Element",
-      "source": "spec/probes/ej2-payloads.mjs"
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A residents grid of Ada in North and Rose in East, rendered by Html.FusionGrid(plan, \"residents\", rows, build => ..), whose RowSelected<Resident>() handler sets the row label's text from the payload's RowIndex, the name label's from its Data's Name and the event label's from its Name.",
+        "gesture": "Click Ada's Name cell.",
+        "outcome": "The row label reads 0, the name label Ada and the event label rowSelected."
+      }
     },
     {
       "id": "ej2-payload-grid-recordClick",
@@ -2328,7 +2334,13 @@
       "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-payload-grid-recordClick: cancel:boolean,cell:Element,cellIndex:number,column:object,event:object,name:string,row:Element,rowData:object,rowIndex:number,target:Element",
-      "source": "spec/probes/ej2-payloads.mjs"
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A residents grid of Ada in North and Rose in East, rendered by Html.FusionGrid(plan, \"residents\", rows, build => ..), whose RecordClick<Resident>() handler sets the clicked label's text from the payload's RowData's Name and the cell label's from its CellIndex.",
+        "gesture": "Click Ada's Name cell.",
+        "outcome": "The clicked label reads Ada and the cell label 1."
+      }
     },
     {
       "id": "ej2-payload-grid-toolbarClick",
@@ -2337,7 +2349,13 @@
       "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-payload-grid-toolbarClick: cancel:boolean,item:object,name:string,originalEvent:object",
-      "source": "spec/probes/ej2-payloads.mjs"
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A residents grid of Ada in North and Rose in East, rendered by Html.FusionGrid(plan, \"residents\", rows, build => ..) and a Discharge toolbar item, whose ToolbarClick handler sets the action label's text from the payload's Item's Text and the event label's from its Name.",
+        "gesture": "Click Discharge.",
+        "outcome": "The action label reads Discharge and the event label toolbarClick."
+      }
     },
     {
       "id": "ej2-payload-grid-actionBegin",
@@ -2346,7 +2364,13 @@
       "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-payload-grid-actionBegin: cancel:boolean,columnName:string,direction:string,name:string,requestType:string,target:Element,type:string",
-      "source": "spec/probes/ej2-payloads.mjs"
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A residents grid of Ada in North and Rose in East, rendered by Html.FusionGrid(plan, \"residents\", rows, build => ..) with sorting, whose ActionBegin<Resident>() handler sets the request label's text from the payload's RequestType and the event label's from its Name.",
+        "gesture": "Click the Name header.",
+        "outcome": "The request label reads sorting and the event label actionBegin."
+      }
     },
     {
       "id": "ej2-payload-grid-actionComplete",
@@ -2355,7 +2379,13 @@
       "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-payload-grid-actionComplete: cancel:boolean,columnName:string,direction:string,name:string,promise:undefined,requestType:string,rows:Array,target:Element,type:string",
-      "source": "spec/probes/ej2-payloads.mjs"
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A residents grid of Ada in North and Rose in East, rendered by Html.FusionGrid(plan, \"residents\", rows, build => ..) with sorting, whose ActionComplete<Resident>() handler sets the request label's text from the payload's RequestType and the event label's from its Name.",
+        "gesture": "Click the Name header.",
+        "outcome": "The request label reads sorting and the event label actionComplete."
+      }
     },
     {
       "id": "ej2-payload-grid-dataStateChange",
@@ -2364,7 +2394,13 @@
       "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-payload-grid-dataStateChange: action:object,name:string,requiresCounts:boolean,sorted:Array | action cancel:boolean,columnName:string,direction:string,name:string,requestType:string,target:Element,type:string",
-      "source": "spec/probes/ej2-payloads.mjs"
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A custom-bound residents grid whose DataSource<Resident>() holds a page of Ada and Rose, whose DataStateChange handler sets the request label's text from the payload's Action's RequestType and the event label's from its Name.",
+        "gesture": "Click the Name header.",
+        "outcome": "The request label reads sorting and the event label dataStateChange."
+      }
     },
     {
       "id": "ej2-payload-schedule-navigating",
@@ -2373,7 +2409,13 @@
       "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-payload-schedule-navigating: action:string,cancel:boolean,currentDate:Date,name:string,previousDate:Date",
-      "source": "spec/probes/ej2-payloads.mjs"
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F39",
+        "page": "A shift schedule in week view whose selected date is 2026-11-09, opened in America/Los_Angeles, whose Navigating handler sets the week label's text from the payload's CurrentDate and the previous label's from its PreviousDate.",
+        "gesture": "Click the schedule's Next button.",
+        "outcome": "The week label reads 2026-11-16 and the previous label 2026-11-09."
+      }
     },
     {
       "id": "ej2-schedule-save-event-action",
@@ -2382,7 +2424,13 @@
       "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-schedule-save-event-action: saveEvent with 1 the subject is Round; with 'Save' it is Rounds by text",
-      "source": "spec/probes/ej2-payloads.mjs"
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F39",
+        "page": "A shift schedule in week view on 2026-11-09 holding the 9:00 shift Round, whose Rename button calls SaveEvent with that shift, its subject Rounds by text, and FusionSchedule.CurrentAction.Save.",
+        "gesture": "Click Rename.",
+        "outcome": "The 9:00 appointment reads Rounds by text."
+      }
     },
     {
       "id": "ej2-payload-otpinput-focus",
@@ -2592,6 +2640,381 @@
         "page": "A care note page whose inline FusionSmartTextArea suggests from an endpoint that answers OK:[ two glasses of water], with an AfterSuggestionInsert handler that sets suggestion-taken's text to the payload's InsertedText.",
         "gesture": "Type Resident drank into the note, pause, then press Tab.",
         "outcome": "suggestion-taken shows two glasses of water."
+      }
+    },
+    {
+      "id": "ej2-grid-get-batch-changes",
+      "statement": "EJ2 33.1.47's Grid, after a batch edit of one cell, returns from getBatchChanges an object of addedRecords, changedRecords and deletedRecords, each a list of the app's rows, where its TypeScript says Object.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-grid-get-batch-changes: {addedRecords:Array<>,changedRecords:Array<{id:number,name:string}>,deletedRecords:Array<>}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A residents grid of Ada and Rose in batch edit mode, whose Pending button sets the pending label's text from the first of GetBatchChanges<Resident>()'s ChangedRecords' Name.",
+        "gesture": "Double-click Ada's Name cell, type Ada Byron, press Enter, then click Pending.",
+        "outcome": "The pending label reads Ada Byron."
+      }
+    },
+    {
+      "id": "ej2-payload-grid-beforeBatchSave",
+      "statement": "EJ2 33.1.47's Grid hands beforeBatchSave's listener batchChanges as the same three lists of the app's rows, name among its members.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-grid-beforeBatchSave: batchChanges:object,cancel:boolean,name:string | batchChanges {addedRecords:Array<>,changedRecords:Array<{id:number,name:string}>,deletedRecords:Array<>}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F23",
+        "page": "A residents grid of Ada and Rose in batch edit mode, whose Update button calls EndEdit and whose BeforeBatchSave<Resident>() handler sets the saving label's text from the first of the payload's BatchChanges' ChangedRecords' Name.",
+        "gesture": "Double-click Ada's Name cell, type Ada Byron, press Enter, then click Update.",
+        "outcome": "The saving label reads Ada Byron."
+      }
+    },
+    {
+      "id": "ej2-payload-inplaceeditor-beginEdit",
+      "statement": "EJ2 33.1.47's InPlaceEditor hands beginEdit's listener these members by kind, name among them.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-inplaceeditor-beginEdit: cancel:boolean,cancelFocus:boolean,mode:string,name:string",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's name FusionInPlaceEditor<string> of type Text bound to GivenName, which holds Ada, whose BeginEdit handler sets the mode label's text from the payload's Mode and the event label's from its Name.",
+        "gesture": "Click Ada.",
+        "outcome": "The mode label reads Inline and the event label beginEdit."
+      }
+    },
+    {
+      "id": "ej2-payload-inplaceeditor-endEdit",
+      "statement": "EJ2 33.1.47's InPlaceEditor hands endEdit's listener these members by kind, name among them.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-inplaceeditor-endEdit: action:string,cancel:boolean,mode:string,name:string",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's name FusionInPlaceEditor<string> of type Text bound to GivenName, which holds Ada, whose EndEdit handler sets the action label's text from the payload's Action and the event label's from its Name.",
+        "gesture": "Click Ada, type Ada Byron and click Save.",
+        "outcome": "The action label reads submit and the event label endEdit."
+      }
+    },
+    {
+      "id": "ej2-payload-inplaceeditor-change",
+      "statement": "EJ2 33.1.47's InPlaceEditor of type Text hands change's listener value and previousValue as text, name among its members.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-inplaceeditor-change: name:string,previousValue:string,value:string | value string | previousValue string",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's name FusionInPlaceEditor<string> of type Text bound to GivenName, which holds Ada, whose Change handler sets the new label's text from the payload's Value, the old label's from its PreviousValue and the event label's from its Name.",
+        "gesture": "Click Ada, type Ada Byron and click Save.",
+        "outcome": "The new label reads Ada Byron, the old label Ada and the event label change."
+      }
+    },
+    {
+      "id": "ej2-payload-inplaceeditor-actionBegin",
+      "statement": "EJ2 33.1.47's InPlaceEditor hands actionBegin's listener its submission as data, an object of name, primaryKey and value, name among its members.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-inplaceeditor-actionBegin: data:object,name:string | data {name:string,primaryKey:string,value:string}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's name FusionInPlaceEditor<string> of type Text bound to GivenName, which holds Ada, whose ActionBegin handler sets the sent label's text from the payload's Data's Value and the event label's from its Name.",
+        "gesture": "Click Ada, type Ada Byron and click Save.",
+        "outcome": "The sent label reads Ada Byron and the event label actionBegin."
+      }
+    },
+    {
+      "id": "ej2-payload-inplaceeditor-actionSuccess",
+      "statement": "EJ2 33.1.47's InPlaceEditor with no url hands actionSuccess's listener value as text and data as an empty object, name among its members.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-inplaceeditor-actionSuccess: data:object,name:string,value:string | value string | data {}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's name FusionInPlaceEditor<string> of type Text bound to GivenName, which holds Ada, with no url, whose ActionSuccess handler sets the saved label's text from the payload's Value and the event label's from its Name.",
+        "gesture": "Click Ada, type Ada Byron and click Save.",
+        "outcome": "The saved label reads Ada Byron and the event label actionSuccess."
+      }
+    },
+    {
+      "id": "ej2-payload-inplaceeditor-submitClick",
+      "statement": "EJ2 33.1.47's InPlaceEditor hands submitClick's listener the click's MouseEvent, whose own members are isTrusted and the name EJ2 sets on it.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-inplaceeditor-submitClick: isTrusted:boolean,name:string",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's name FusionInPlaceEditor<string> of type Text bound to GivenName, which holds Ada, whose SubmitClick handler sets the event label's text from the payload's Name.",
+        "gesture": "Click Ada, type Ada Byron and click Save.",
+        "outcome": "The event label reads submitClick."
+      }
+    },
+    {
+      "id": "ej2-payload-inplaceeditor-cancelClick",
+      "statement": "EJ2 33.1.47's InPlaceEditor hands cancelClick's listener the click's MouseEvent, whose own members are isTrusted and the name EJ2 sets on it.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-inplaceeditor-cancelClick: isTrusted:boolean,name:string",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's name FusionInPlaceEditor<string> of type Text bound to GivenName, which holds Ada, whose CancelClick handler sets the event label's text from the payload's Name.",
+        "gesture": "Click Ada, then click Cancel.",
+        "outcome": "The event label reads cancelClick."
+      }
+    },
+    {
+      "id": "ej2-inplaceeditor-change-Text",
+      "statement": "EJ2 33.1.47's InPlaceEditor of type Text hands change's value and previousValue as text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-inplaceeditor-change-Text: name:string,previousValue:string,value:string | value string | previousValue string",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's name FusionInPlaceEditor<string> of type Text bound to GivenName, which holds Ada, whose Change handler sets the new label's text to Longer when the payload's Value is longer than its PreviousValue and to Shorter otherwise.",
+        "gesture": "Click Ada, type Ada Byron and click Save.",
+        "outcome": "The new label reads Longer."
+      }
+    },
+    {
+      "id": "ej2-inplaceeditor-change-Numeric",
+      "statement": "EJ2 33.1.47's InPlaceEditor of type Numeric hands change's value and previousValue as numbers.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-inplaceeditor-change-Numeric: name:string,previousValue:number,value:number | value number | previousValue number",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's doses FusionInPlaceEditor<int> of type Numeric bound to Doses, which holds 9, whose Change handler sets the trend label's text to Raised when the payload's Value is greater than its PreviousValue and to Lowered otherwise.",
+        "gesture": "Click 9, type 10 and click Save.",
+        "outcome": "The trend label reads Raised, where a comparison of text would order 10 before 9."
+      }
+    },
+    {
+      "id": "ej2-inplaceeditor-change-Date",
+      "statement": "EJ2 33.1.47's InPlaceEditor of type Date hands change's value and previousValue as Dates.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-inplaceeditor-change-Date: name:string,previousValue:Date,value:Date | value Date | previousValue Date",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A care plan's review FusionInPlaceEditor<DateTime?> of type Date bound to ReviewOn, which holds 2026-11-09, opened in America/Los_Angeles, whose Change handler sets the review label's text from the payload's Value.",
+        "gesture": "Click the date, type 11/12/2026 and click Save.",
+        "outcome": "The review label reads 2026-11-12."
+      }
+    },
+    {
+      "id": "ej2-inplaceeditor-change-DateRange",
+      "statement": "EJ2 33.1.47's InPlaceEditor of type DateRange hands change's value and previousValue as lists of Dates, not the DateRange object its TypeScript lists.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-inplaceeditor-change-DateRange: name:string,previousValue:Array,value:Array | value Array<Date> | previousValue Array<Date>",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's stay FusionInPlaceEditor<DateTime[]?> of type DateRange bound to Stay, which holds 2026-11-09 to 2026-11-16, opened in America/Los_Angeles, whose Change handler sets the start label's text from the payload's Value's first item and the end label's from its second.",
+        "gesture": "Click the stay, type 11/10/2026 - 11/17/2026 and click Save.",
+        "outcome": "The start label reads 2026-11-10 and the end label 2026-11-17."
+      }
+    },
+    {
+      "id": "ej2-inplaceeditor-change-MultiSelect",
+      "statement": "EJ2 33.1.47's InPlaceEditor of type MultiSelect over text items hands change's value and previousValue as lists of text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-inplaceeditor-change-MultiSelect: name:string,previousValue:Array,value:Array | value Array<string> | previousValue Array<string>",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's allergies FusionInPlaceEditor<string[]?> of type MultiSelect over Penicillin, Latex and Peanuts bound to Allergies, which holds Penicillin, whose Change handler sets the added label's text from the payload's Value's second item.",
+        "gesture": "Click Penicillin, choose Latex and click Save.",
+        "outcome": "The added label reads Latex."
+      }
+    },
+    {
+      "id": "ej2-inplaceeditor-action-begin-values",
+      "statement": "EJ2 33.1.47's InPlaceEditor hands actionBegin's data.value as text for each of the five editor types, a number, a date and a list among them.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-inplaceeditor-action-begin-values: Text {name:string,primaryKey:string,value:string}; Numeric {name:string,primaryKey:string,value:string}; Date {name:string,primaryKey:string,value:string}; DateRange {name:string,primaryKey:string,value:string}; MultiSelect {name:string,primaryKey:string,value:string}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F24",
+        "page": "A resident's doses FusionInPlaceEditor<int> of type Numeric bound to Doses, which holds 3, whose ActionBegin handler sets the sent label's text from the payload's Data's Value.",
+        "gesture": "Click 3, type 4 and click Save.",
+        "outcome": "The sent label reads 4."
+      }
+    },
+    {
+      "id": "ej2-chiplist-single-selection",
+      "statement": "EJ2 33.1.47's ChipList of chips with values under a single selection holds the chosen chip's value as text in selectedChips, a kind its TypeScript does not declare, and getSelectedChips returns one chip's text, index, data and element.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-chiplist-single-selection: selectedChips string; getSelectedChips() {data:{text:string,value:string},element:Element,index:number,text:string}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F11",
+        "page": "An allergies chip list of Penicillin, Latex and Peanuts with the values pen, lat and pea under Selection.Single, whose Show button sets the value label's text from GetSelectedChip<Allergy>()'s Data's Value, the index label's from its Index and the text label's from its Text.",
+        "gesture": "Click Latex, then click Show.",
+        "outcome": "The value label reads lat, the index label 1 and the text label Latex."
+      }
+    },
+    {
+      "id": "ej2-chiplist-multiple-selection",
+      "statement": "EJ2 33.1.47's ChipList of chips with values under a multiple selection holds the chosen values as a list of text in selectedChips, and getSelectedChips returns texts, data, elements and Indexes, the last with a capital I.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-chiplist-multiple-selection: selectedChips Array<string>; getSelectedChips() {Indexes:Array<number>,data:Array<{text:string,value:string}>,elements:Array<Element>,texts:Array<string>}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F11",
+        "page": "An allergies chip list of Penicillin, Latex and Peanuts with the values pen, lat and pea under Selection.Multiple, whose Show button sets the index label's text from the second of GetSelectedChips<Allergy>()'s Indexes and the value label's from the second of SelectedChips<string[]>().",
+        "gesture": "Click Penicillin and Peanuts, then click Show.",
+        "outcome": "The index label reads 2 and the value label pea."
+      }
+    },
+    {
+      "id": "ej2-chiplist-texts-selection",
+      "statement": "EJ2 33.1.47's ChipList of text chips under a single selection holds the chosen chip's index as a number in selectedChips, and getSelectedChips' data is the chip's text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-chiplist-texts-selection: selectedChips number; getSelectedChips() {data:string,element:Element,index:number,text:string}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F11",
+        "page": "An allergies chip list of the text chips Penicillin and Latex under Selection.Single, whose Show button sets the index label's text from SelectedChips<int>() and the text label's from GetSelectedChip<string>()'s Data.",
+        "gesture": "Click Latex, then click Show.",
+        "outcome": "The index label reads 1 and the text label Latex."
+      }
+    },
+    {
+      "id": "ej2-chiplist-multipleTexts-selection",
+      "statement": "EJ2 33.1.47's ChipList of text chips under a multiple selection holds the chosen indexes as a list of numbers in selectedChips, and getSelectedChips' data is the chips' texts.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-chiplist-multipleTexts-selection: selectedChips Array<number>; getSelectedChips() {Indexes:Array<number>,data:Array<string>,elements:Array<Element>,texts:Array<string>}",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F11",
+        "page": "An allergies chip list of the text chips Penicillin, Latex and Peanuts under Selection.Multiple, whose Show button sets the index label's text from the second of SelectedChips<int[]>() and the text label's from the second of GetSelectedChips<string>()'s Data.",
+        "gesture": "Click Penicillin and Peanuts, then click Show.",
+        "outcome": "The index label reads 2 and the text label Peanuts."
+      }
+    },
+    {
+      "id": "ej2-payload-kanban-queryCellInfo-text",
+      "statement": "EJ2 33.1.47's Kanban whose columns' keyField is text hands queryCellInfo's data as a list of header objects whose keyField is that text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-kanban-queryCellInfo-text: cancel:boolean,data:Array,element:Element,name:string,requestType:string | data Array<{count:number,keyField:string,textField:string}>",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F26",
+        "page": "A care board whose cards' status is text and whose columns' keys are Open and Done, whose QueryCellInfo<string>() handler sets the header label's text to Open seen when a header's KeyField equals Open.",
+        "gesture": "Open the page.",
+        "outcome": "The header label reads Open seen."
+      }
+    },
+    {
+      "id": "ej2-payload-kanban-queryCellInfo-number",
+      "statement": "EJ2 33.1.47's Kanban whose columns' keyField is a number hands queryCellInfo's data as a list of header objects whose keyField is that number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-kanban-queryCellInfo-number: cancel:boolean,data:Array,element:Element,name:string,requestType:string | data Array<{count:number,keyField:number,textField:string}>",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F26",
+        "page": "A care board whose cards' status is a number and whose columns' keys are 1 and 2, whose QueryCellInfo<int>() handler sets the header label's text to Column 1 seen when a header's KeyField equals 1.",
+        "gesture": "Open the page.",
+        "outcome": "The header label reads Column 1 seen."
+      }
+    },
+    {
+      "id": "ej2-payload-menu-beforeOpen",
+      "statement": "EJ2 33.1.47's Menu hands beforeOpen's listener these members by kind, with no isFocused.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-menu-beforeOpen: cancel:boolean,element:Element,event:object,items:Array,left:number,name:string,parentItem:object,showSubMenuOn:string,top:number",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F30",
+        "page": "A ward FusionMenu with Ward over North and East, whose BeforeOpen handler sets the opening label's text from the payload's ParentItem's Text and the focus label's to Focused when its IsFocused is true and to No focus otherwise.",
+        "gesture": "Click Ward.",
+        "outcome": "The opening label reads Ward and the focus label No focus."
+      }
+    },
+    {
+      "id": "ej2-payload-menu-beforeClose",
+      "statement": "EJ2 33.1.47's Menu hands beforeClose's listener isFocused as a boolean, name among its members.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-menu-beforeClose: cancel:boolean,element:Element,event:object,isFocused:boolean,items:Array,name:string,parentItem:object",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F30",
+        "page": "A ward FusionMenu with Ward over North and East, whose BeforeClose handler sets the focus label's text to Focused when the payload's IsFocused is true and to No focus otherwise.",
+        "gesture": "Click Ward, then press Escape.",
+        "outcome": "The focus label reads Focused."
+      }
+    },
+    {
+      "id": "ej2-payload-contextmenu-beforeOpen",
+      "statement": "EJ2 33.1.47's ContextMenu hands beforeOpen's listener these members by kind, with no isFocused.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-contextmenu-beforeOpen: cancel:boolean,element:Element,event:object,items:Array,left:number,name:string,parentItem:null,showSubMenuOn:string,top:number",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F14",
+        "page": "A bed FusionContextMenu on the bed area with Ward over North and East, whose BeforeOpen handler sets the opening label's text from the payload's first item's Text and the focus label's to Focused when its IsFocused is true and to No focus otherwise.",
+        "gesture": "Right-click the bed area.",
+        "outcome": "The opening label reads Ward and the focus label No focus."
+      }
+    },
+    {
+      "id": "ej2-payload-contextmenu-beforeClose",
+      "statement": "EJ2 33.1.47's ContextMenu hands beforeClose's listener isFocused as a boolean, name among its members.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-contextmenu-beforeClose: cancel:boolean,element:Element,event:object,isFocused:boolean,items:Array,name:string,parentItem:null",
+      "source": "spec/probes/ej2-payloads.mjs",
+      "proof": {
+        "feature": "M21.F14",
+        "page": "A bed FusionContextMenu on the bed area with Ward over North and East, whose BeforeClose handler sets the focus label's text to Focused when the payload's IsFocused is true and to No focus otherwise.",
+        "gesture": "Right-click the bed area, then press Escape.",
+        "outcome": "The focus label reads Focused."
       }
     }
   ]
