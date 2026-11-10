@@ -514,6 +514,24 @@
       "source": "spec/probes/referencesource/DateTimeConverter.cs.txt:72"
     },
     {
+      "id": "net48-parse-t-is-iso8601",
+      "statement": ".NET Framework's DateTime.Parse reads a year, month and day followed by T as ISO 8601.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTimeParse.cs.txt",
+      "expect": "return (ParseISO8601(ref raw, ref str, styles, ref result));",
+      "source": "spec/probes/referencesource/DateTimeParse.cs.txt:2420"
+    },
+    {
+      "id": "net48-iso8601-gregorian",
+      "statement": ".NET Framework builds an ISO 8601 date in the Gregorian calendar, whatever the culture's calendar.",
+      "host": "net48",
+      "oracle": ".NET Framework reference source, microsoft/referencesource main",
+      "probe": "spec/probes/referencesource/DateTimeParse.cs.txt",
+      "expect": "Calendar calendar = GregorianCalendar.GetDefaultInstance();",
+      "source": "spec/probes/referencesource/DateTimeParse.cs.txt:2830"
+    },
+    {
       "id": "core-number-text-culture",
       "statement": ".NET writes a number's text under de-DE with the culture's decimal separator, no group separator, and the same shortest digits JavaScript writes.",
       "host": "net10",

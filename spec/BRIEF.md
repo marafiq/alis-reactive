@@ -800,7 +800,9 @@ A door with no sentence in any view gets a proposed sentence.
 
 Each module also gets `spec/<Module>/module.md`: the core questions it uses, and the improvements it proposes, each with its evidence.
 
-**7. The fluent API, `spec/Fluent/sentences.json`.** Every sentence, today's and proposed. `check.py` checks:
+**7. The fluent API, `spec/Fluent/sentences.json`.** What the compiler cannot know of the sentences: each name's
+meaning, each string parameter's kind, the names kept in two shapes and the refused cells. The sentences themselves,
+today's and proposed, stay in their features' rows, one carrier (the owner, gate 2's G11). `check.py` checks:
 - **One concept, one name, in every context.**
 - **Every value position takes every source** (the Q7 matrix). Each cell is a sentence, or refused with a reason the owner approves.
 - **The same meaning has the same shape** across modules.

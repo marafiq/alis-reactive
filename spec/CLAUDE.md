@@ -73,6 +73,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-10, at gate 2: "run few experiments with software devs about their authoring experience and
   consider but core design don't take 90 degree turn - it's about bringing more finished and polished questions to
   me". A form goes to the owner after authoring experiments have polished it, and no experiment turns the core design.
+- The owner, 2026-11-10, gate 2's G13: a form the spec deferred to gate 2 is approved at what its line writes, the form
+  or default it states, else the door as the POC or spec/api compiles it; an item with neither comes back to the owner
+  with a form before the unit that builds it.
 - The owner, 2026-11-06, to be made unmistakable: the framework depends on no consumer. The dependency is
   inverted: Fusion and Native are consumers built on the core's public surface, and the core names none of them.
 - The owner, 2026-11-06: bad patterns start small and spiral, so each mechanism stays limited to its exact use

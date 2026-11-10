@@ -177,7 +177,8 @@ Terms used throughout:
   hosts bind form values under the request's culture. Into the query and the route it goes as its invariant
   text, because both hosts bind those under the invariant culture.
 - D3.8 A date and an instant are shown and sent as `spec/Core/DateWire.tla` states (`yyyy-MM-dd`, the time
-  when not midnight, an instant's clock offset). A date or an instant that reads nothing writes no text: a request
+  when not midnight, an instant's clock offset; in form data a date or a day with its time, D3.9). A date or an
+  instant that reads nothing writes no text: a request
   sends it by D9.10's table, so a `DateTimeOffset` is left out and binds its start, and a `DateTimeOffset?` binds
   `null`.
 - D3.9 Every date text is ISO 8601-1:2019's extended format, and an instant's is the RFC 3339 profile of it
@@ -185,6 +186,12 @@ Terms used throughout:
   - A `DateTime` is a local date and time with no offset. Both hosts bind that text as an Unspecified
     `DateTime`, the same wall time on any server clock (`probe:core-form-date-kind`, `probe:mvc5-datetime-parse`).
   - A `DateTimeOffset` is an RFC 3339 date-time with its offset, `Z` at zero.
+  - In form data a `DateTime` and a `DateOnly` are sent with their time, `2026-10-27T00:00:00` at midnight, never as the
+    day alone (gate 2's G0), since both hosts bind form values under the request's culture (D3.7). The day alone binds
+    in that culture's calendar, th-TH's 2026-10-27 as 1483-10-27, and a date with its time binds Gregorian under every
+    culture net10 knows (`probe:core-form-day-calendar`, `probe:core-form-date-forms-every-culture`). On net48 MVC 5
+    binds it by `DateTime.Parse` under the culture (`probe:mvc5-datetime-parse`), which reads a date followed by `T` as
+    ISO 8601 (`probe:net48-parse-t-is-iso8601`) in the Gregorian calendar (`probe:net48-iso8601-gregorian`).
   - A `DateTime` is never sent with an offset: System.Text.Json reads an offset into a `DateTime` as the
     server's local time (`probe:core-stj-offset-into-datetime`), which moves the wall time by the server's
     clock.
@@ -280,6 +287,7 @@ Terms used throughout:
 - `DateWire.tla:NothingWritesNoText`
 - `DateWire.tla:DayIsItsDayAlone`
 - `DateWire.tla:TimeIsItsTimeAlone`
+- `DateWire.tla:DateInFormCarriesItsTime`
 - `probe:core-stj-datetime-kind`
 - `probe:core-stj-datetime-nested-kind`
 - `probe:core-query-day-time`

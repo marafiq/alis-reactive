@@ -4,7 +4,7 @@ EXTENDS Integers
 CONSTANT Mutant
 
 Mutants == {"none", "DateSentWithOffset", "MidnightWritesTime", "PageDayOffset", "EmptyInstantSentAsEarliest",
-            "DayWritesTime", "TimeWritesDay"}
+            "DayWritesTime", "TimeWritesDay", "FormSendsDayAlone"}
 
 ASSUME Mutant \in Mutants
 
@@ -13,9 +13,9 @@ MinutesOfDay == {0, 30, 1410}
 Offsets == {-60, 0, 60}
 PageDay == 1
 
-VARIABLES offset, kind, clrKind, present, day, minute
+VARIABLES offset, kind, clrKind, present, day, minute, carrier
 
-vars == <<offset, kind, clrKind, present, day, minute>>
+vars == <<offset, kind, clrKind, present, day, minute, carrier>>
 
 Init ==
     /\ offset \in [Days -> Offsets]
@@ -24,6 +24,7 @@ Init ==
     /\ present \in BOOLEAN
     /\ day \in Days
     /\ minute \in MinutesOfDay
+    /\ carrier \in {"text", "form"}
 
 Next == UNCHANGED vars
 
@@ -36,11 +37,13 @@ Text(form, d, m, time, hasZone, zone) ==
 
 Earliest == Text("text", 0, 0, TRUE, TRUE, 0)
 
+InForm == carrier = "form" /\ Mutant # "FormSendsDayAlone"
+
 DateText ==
-    Text("text", day, minute, minute # 0 \/ Mutant = "MidnightWritesTime",
+    Text("text", day, minute, minute # 0 \/ InForm \/ Mutant = "MidnightWritesTime",
          Mutant = "DateSentWithOffset", offset[day])
 
-DayText == Text("text", day, 0, Mutant = "DayWritesTime", FALSE, 0)
+DayText == Text("text", day, 0, InForm \/ Mutant = "DayWritesTime", FALSE, 0)
 
 TimeText == Text("text", IF Mutant = "TimeWritesDay" THEN day ELSE 0, minute, TRUE, FALSE, 0)
 
@@ -62,7 +65,10 @@ DateTimeCarriesNoOffset ==
     (present /\ kind = "date") => (~Sent.hasZone /\ Sent.day = day /\ Sent.minute = minute)
 
 DateShowsItsDayAtMidnight ==
-    (present /\ kind = "date") => (Sent.time <=> minute # 0)
+    (present /\ kind = "date" /\ carrier = "text") => (Sent.time <=> minute # 0)
+
+DateInFormCarriesItsTime ==
+    (present /\ kind \in {"date", "day"} /\ carrier = "form") => (Sent.time /\ Sent.day = day /\ ~Sent.hasZone)
 
 InstantCarriesItsClockOffset ==
     (present /\ kind = "instant") =>
@@ -72,7 +78,7 @@ InstantCarriesItsClockOffset ==
         /\ Sent.minute = minute
         /\ ParsedUtc(Sent) = Utc
 
-DayIsItsDayAlone == (present /\ kind = "day") => (Sent.day = day /\ ~Sent.time /\ ~Sent.hasZone)
+DayIsItsDayAlone == (present /\ kind = "day" /\ carrier = "text") => (Sent.day = day /\ ~Sent.time /\ ~Sent.hasZone)
 
 TimeIsItsTimeAlone == (present /\ kind = "time") => (Sent.day = 0 /\ Sent.minute = minute /\ ~Sent.hasZone)
 
