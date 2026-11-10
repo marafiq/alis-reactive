@@ -1,0 +1,6 @@
+namespace Alis.Reactive.Plants;
+
+public static class CompileErrorPlant
+{
+    public static int Ward => "north";
+}

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import hashlib
 import io
+import itertools
 import json
 import os
 import platform
@@ -1213,11 +1214,147 @@ def check_promises():
     return feature_result(model["problems"] + promise_problems(model, tests), counts, counts["unmapped"] == 0, "every refusal and behavior defect has a promise")
 
 
-def check_fluent():
+FLUENT_STRING_KINDS = {"text", "url", "element-id", "header-name", "css-class", "js-name"}
+FLUENT_UNTYPED_KINDS = {"object", "type", "object[]", "type[]"}
+FLUENT_SLOT_ROW = re.compile(r"^[\w-]+\.\w+\(\w+\)#\d+:\w+$")
+FLUENT_TABLE_TITLE = "Callback parameter naming convention (locked):"
+FLUENT_LATER = ["F1", "F2"]
+
+
+def check_fluent(plant=None):
     path = SPEC / "Fluent" / "sentences.json"
     if not path.exists():
         return not_started(path)
-    return not_built("the fluent checks")
+    surface, refused = fluent_surface(plant)
+    if refused:
+        return result(False, refused)
+    rows = json.loads(path.read_text()).get("strings", {})
+    shapes, shape_counts = fluent_shape_problems(surface, rows)
+    callbacks, callback_counts = fluent_callback_problems(surface, fluent_callback_table())
+    strings, string_counts = fluent_string_problems(surface, rows)
+    judged = {"F3": shapes, "F4": callbacks, "F5": strings}
+    counts = {"members": len(surface["members"]), "lambda_parameters": len(surface["lambdas"]), **shape_counts, **callback_counts, **string_counts}
+    counts.update({check: "pass" if not found else "fail" for check, found in judged.items()})
+    counts.update({check: "not built" for check in FLUENT_LATER})
+    first = [problem for found in judged.values() for problem in found[:2]]
+    detail = "; ".join(first) or "F3, F4 and F5 pass"
+    return result(False, detail + "; " + ", ".join(FLUENT_LATER) + " not built", **counts)
+
+
+def fluent_surface(plant):
+    build = subprocess.run(["dotnet", "build", str(SPEC / "api" / "CshtmlStages"), "-nologo", "-v", "q", "-p:EmitCompilerGeneratedFiles=true"],
+                           capture_output=True, text=True, cwd=REPO)
+    if build.returncode != 0:
+        errors = [line.strip() for line in build.stdout.splitlines() if " error " in line]
+        return None, "spec/api does not build: " + (errors[0] if errors else build.stdout.strip()[-300:])
+    with tempfile.TemporaryDirectory() as folder:
+        written = Path(folder) / "surface.json"
+        command = ["dotnet", "run", "--project", str(SPEC / "probes" / "FluentSurface"), "--", str(REPO), "--out", str(written)]
+        completed = subprocess.run(command + (["--plant", str(plant)] if plant else []), capture_output=True, text=True, cwd=REPO)
+        if completed.returncode != 0:
+            return None, "the fluent console refused: " + next(iter(completed.stderr.strip().splitlines()), "exit " + str(completed.returncode))
+        return json.loads(written.read_text()), None
+
+
+def fluent_type_name(receiver):
+    head, bracket, arguments = receiver.partition("<")
+    return head.rsplit(".", 1)[-1] + bracket + arguments
+
+
+def fluent_string_key(member, parameter, rows):
+    qualified = f"{member['receiverName']}.{member['member']}({parameter['name']})"
+    plain = f"{member['member']}({parameter['name']})"
+    return qualified if qualified in rows else plain if plain in rows else None
+
+
+def fluent_shape(member, rows):
+    kinds = []
+    for parameter in member["parameters"]:
+        kind = parameter["kind"]
+        if kind in ("string", "string[]"):
+            key = fluent_string_key(member, parameter, rows)
+            kind = kind.replace("string", "string:" + (rows[key] if key else "?"), 1)
+        kinds.append(kind)
+    if len(kinds) > 1 and kinds[0] == "path":
+        kinds = kinds[1:]
+    return "(" + ",".join(kinds) + ")>" + member["result"]
+
+
+def fluent_shape_problems(surface, rows):
+    receivers_by_name = {}
+    for member in surface["members"]:
+        if member["memberKind"] == "method":
+            receivers_by_name.setdefault(member["member"], {}).setdefault(member["receiver"], set()).add(fluent_shape(member, rows))
+    shared = {name: receivers for name, receivers in sorted(receivers_by_name.items()) if len(receivers) > 1}
+    problems = []
+    for name, receivers in shared.items():
+        groups = {}
+        for receiver, shapes in receivers.items():
+            groups.setdefault(" | ".join(sorted(shapes)), []).append(fluent_type_name(receiver))
+        if len(groups) > 1:
+            problems.append(f"F3 {name}: " + "; ".join(f"{shapes} on {', '.join(sorted(names))}" for shapes, names in sorted(groups.items())))
+    return problems, {"F3_names": len(shared), "F3_differ": len(problems)}
+
+
+def fluent_callback_table():
+    lines = (REPO / ".claude" / "rules" / "csharp.md").read_text().splitlines()
+    table = [line for line in itertools.takewhile(lambda line: line.startswith("|"), itertools.dropwhile(lambda line: not line.startswith("|"), lines[lines.index(FLUENT_TABLE_TITLE) + 1:]))]
+    rows = {}
+    for line in table[2:]:
+        cells = [re.findall(r"`([^`]+)`", cell) for cell in line.strip("|").split("|")]
+        rows[cells[0][0]] = cells[1][0]
+    return rows
+
+
+def fluent_callback_problems(surface, table):
+    slot_rows = {key: name for key, name in table.items() if FLUENT_SLOT_ROW.match(key)}
+    type_rows = {key: name for key, name in table.items() if key not in slot_rows}
+    problems, used, judged, hides, unlisted, renamed = [], set(), 0, 0, 0, 0
+    for parameter in surface["lambdas"]:
+        place = f"{parameter['file']}:{parameter['line']}"
+        for hidden in parameter["hides"]:
+            hides += 1
+            problems.append(f"F4 {place} '{parameter['name']}' hides the enclosing '{hidden}'")
+        if not parameter["framework"]:
+            continue
+        judged += 1
+        key = parameter["slot"] if parameter["slot"] in slot_rows else parameter["delegate"] if parameter["delegate"] in type_rows else None
+        if key is None:
+            unlisted += 1
+            problems.append(f"F4 {place} '{parameter['name']}': {parameter['slot']} has no row")
+            continue
+        used.add(key)
+        expected = slot_rows.get(key, type_rows.get(key))
+        if parameter["name"] != expected:
+            renamed += 1
+            problems.append(f"F4 {place} '{parameter['name']}': {parameter['slot']} is '{expected}'")
+    stale = sorted(set(table) - used)
+    problems += [f"F4 row '{key}' names no callback" for key in stale]
+    return problems, {"F4_parameters": judged, "F4_slots": len(surface["slots"]), "F4_no_row": unlisted, "F4_other_name": renamed, "F4_hides": hides, "F4_stale_rows": len(stale)}
+
+
+def fluent_string_problems(surface, rows):
+    problems, used, judged, untyped = [], set(), 0, 0
+    for member in surface["members"]:
+        for parameter in member["parameters"]:
+            qualified = f"{member['receiverName']}.{member['member']}({parameter['name']})"
+            if parameter["kind"] in FLUENT_UNTYPED_KINDS:
+                untyped += 1
+                problems.append(f"F5 {qualified}: {parameter['type']}")
+                continue
+            if parameter["kind"] not in ("string", "string[]") or parameter["callerMemberName"]:
+                continue
+            judged += 1
+            key = fluent_string_key(member, parameter, rows)
+            if key is None:
+                problems.append(f"F5 {qualified}: no string kind")
+                continue
+            used.add(key)
+            if rows[key] not in FLUENT_STRING_KINDS:
+                problems.append(f"F5 {key}: '{rows[key]}' is no string kind")
+    stale = sorted(set(rows) - used)
+    problems = list(dict.fromkeys(problems)) + [f"F5 row '{key}' names no string parameter" for key in stale]
+    return problems, {"F5_parameters": judged, "F5_rows": len(rows), "F5_untyped": untyped, "F5_stale_rows": len(stale)}
 
 
 def check_matrix():

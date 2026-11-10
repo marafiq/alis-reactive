@@ -1,0 +1,9 @@
+using System;
+using Alis.Reactive.Components;
+
+namespace Alis.Reactive.Plants;
+
+public sealed class MemberStringPlant
+{
+    public ReadOnly<string> ReadMember(string member) => throw new NotSupportedException();
+}
