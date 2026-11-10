@@ -31,7 +31,7 @@
         "delivery": 1,
         "invariant": 31,
         "meanings": 50,
-        "probe": 73,
+        "probe": 74,
         "uncarried": 0
       },
       "detail": "each of 243 D lines and 50 module meanings has at least one carrier that resolves: a defect naming it in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it",
@@ -1519,8 +1519,8 @@
     },
     "probes": {
       "counts": {
-        "browser": 113,
-        "facts": 381,
+        "browser": 115,
+        "facts": 383,
         "net10": 121,
         "net48": 85,
         "node": 62
@@ -3628,7 +3628,7 @@
     }
   },
   "passed": 31,
-  "read_at_head": "9b43a200011d1a1b726080b0341cf77ab3508d93",
+  "read_at_head": "8489a0fd8ef9f61c48ad63df20e0f2b28ea52562",
   "step": {
     "failing": [],
     "name": "End of session",
