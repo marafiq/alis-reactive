@@ -11,7 +11,8 @@ sealed record LambdaParameter(
     string Type,
     bool Framework,
     string Name,
-    IReadOnlyList<string> Hides);
+    IReadOnlyList<string> Hides,
+    IReadOnlyList<string> HiddenTypes);
 
 static class Lambdas
 {
@@ -40,7 +41,8 @@ static class Lambdas
                         parameter.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
                         Surface.IsFrameworkType(parameter.Type),
                         parameter.Name,
-                        Hidden(model, lambda, bound, parameter.Name));
+                        Hidden(model, lambda, bound, parameter.Name).Select(symbol => symbol.Name).Distinct().ToList(),
+                        Hidden(model, lambda, bound, parameter.Name).Select(HeldType).Distinct().ToList());
             }
         }
     }
@@ -73,11 +75,15 @@ static class Lambdas
             : converted.Name + "<" + string.Join(", ", converted.TypeArguments.Select(argument =>
                 Surface.Definition(argument).ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat))) + ">";
 
-    static IReadOnlyList<string> Hidden(SemanticModel model, LambdaExpressionSyntax lambda, IMethodSymbol bound, string name) =>
+    static IEnumerable<ISymbol> Hidden(SemanticModel model, LambdaExpressionSyntax lambda, IMethodSymbol bound, string name) =>
         model.LookupSymbols(lambda.SpanStart, name: name)
             .Where(symbol => symbol is ILocalSymbol or IParameterSymbol or IRangeVariableSymbol)
-            .Where(symbol => !SymbolEqualityComparer.Default.Equals(symbol.ContainingSymbol, bound))
-            .Select(symbol => symbol.Name)
-            .Distinct()
-            .ToList();
+            .Where(symbol => !SymbolEqualityComparer.Default.Equals(symbol.ContainingSymbol, bound));
+
+    static string HeldType(ISymbol symbol) => symbol switch
+    {
+        ILocalSymbol local => Surface.ShortName(Surface.Definition(local.Type).ToDisplayString()),
+        IParameterSymbol parameter => Surface.ShortName(Surface.Definition(parameter.Type).ToDisplayString()),
+        _ => symbol.Kind.ToString(),
+    };
 }

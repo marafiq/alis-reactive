@@ -62,7 +62,7 @@ analyzers, whose code is module 20's.
   the catch-all `OnError((failed, pipeline) => ..)` over `Failure`. Main's `ResponseBody<TResponse>` and the redesign's
   `Data<TResponse>` as a route's body go to `Response<TRequest, TBody>.Body` (N10.7), read with `Read` (N5.6).
 - `Chained`: main's `Chained(Action<HttpRequestBuilder<TModel>>)` and the redesign's two `Chained` overloads go to
-  `Chained((reply, next) => ..)`, a pipeline that receives the typed reply (D10.9, D10.16).
+  `Chained((reply, pipeline) => ..)`, a pipeline that receives the typed reply (D10.9, D10.16).
 - `Parallel`: main's `Parallel(params Action<HttpRequestBuilder<TModel>>[])`, the redesign's `Parallel` over
   `RequestStart<TModel>` and both lines' `OnAllSettled` go to `Parallel(params Action<Pipeline<TModel>>[] branches)`,
   each branch a pipeline and the steps after it the all-settled block (D10.10).

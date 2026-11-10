@@ -7,8 +7,8 @@ public static class VerbsAgree
 {
     public static void EachVerbNamesOnlyItsOwnTypeArgument(Pipeline<IntakeView> pipeline, PipelineVerbs<IntakeView> verbs)
     {
-        var query = (QueryParts<BedQuery> parts) => { parts.Path(q => q.Ward, "north"); };
-        var body = (BodyParts<BedRequest> parts) => { parts.Path(r => r.Ward, "north"); };
+        var query = (QueryParts<BedQuery> request) => { request.Path(q => q.Ward, "north"); };
+        var body = (BodyParts<BedRequest> request) => { request.Path(r => r.Ward, "north"); };
 
         Agree<HeadRequest<IntakeView, NoModel>>(pipeline.Head("/Wards"), verbs.Head("/Wards"));
         Agree<HeadRequest<IntakeView, BedQuery>>(
@@ -37,7 +37,7 @@ public static class VerbsAgree
 
         var get = pipeline.Get<BedQuery>("/Wards/{ward}/Beds", query);
         Agree<GetRequest<IntakeView, BedQuery>>(get.Validate<IntakeView, BedQuery, BedQueryValidator>(), new GetStages<IntakeView, BedQuery>().Validate<BedQueryValidator>());
-        var counted = get.OnSuccess<Census>((census, done) => done.Notice().Info("Counted"));
+        var counted = get.OnSuccess<Census>((census, pipeline) => pipeline.Notice().Info("Counted"));
         Agree<GetRequest<IntakeView, BedQuery, Response<BedQuery, Census>>>(
             counted.Validate<IntakeView, BedQuery, Response<BedQuery, Census>, BedQueryValidator>(),
             new GetStages<IntakeView, BedQuery, Response<BedQuery, Census>>().Validate<BedQueryValidator>());

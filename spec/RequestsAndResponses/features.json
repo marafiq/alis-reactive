@@ -973,14 +973,14 @@
         },
         {
           "line": "proposed",
-          "text": ".OnSuccess<IntakeCreated>((created, done) => done.Notice().Success(\"Resident admitted\"))",
+          "text": ".OnSuccess<IntakeCreated>((created, pipeline) => pipeline.Notice().Success(\"Resident admitted\"))",
           "doors": [
             "N10.7"
           ]
         },
         {
           "line": "proposed",
-          "text": ".Chained((created, next) => next.Get<SummaryQuery>(\"/Residents/{residentId}/Summary\", query => query.Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id))).Into(\"resident-summary\"))",
+          "text": ".Chained((created, pipeline) => pipeline.Get<SummaryQuery>(\"/Residents/{residentId}/Summary\", request => request.Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id))).Into(\"resident-summary\"))",
           "doors": [
             "N10.7",
             "N5.6"
@@ -995,14 +995,14 @@
         },
         {
           "line": "proposed",
-          "text": ".OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success(\"Resident admitted\"))",
+          "text": ".OnSuccess(Content.Json<IntakeCreated>(), (created, pipeline) => pipeline.Notice().Success(\"Resident admitted\"))",
           "doors": [
             "N10.7"
           ]
         },
         {
           "line": "proposed",
-          "text": ".OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))",
+          "text": ".OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowErrors(refused.Body))",
           "doors": [
             "N10.7"
           ]
@@ -1017,7 +1017,7 @@
         },
         {
           "line": "proposed",
-          "text": ".OnError((failed, pipeline) => pipeline.When(failed.Outcome.Eq(FailureOutcome.Network)).Then(offline => offline.Element(\"desk-status\").Text.Set(\"The desk is offline.\")))",
+          "text": ".OnError((failed, pipeline) => pipeline.When(failed.Outcome.Eq(FailureOutcome.Network)).Then(pipeline => pipeline.Element(\"desk-status\").Text.Set(\"The desk is offline.\")))",
           "doors": [
             "N10.7",
             "N8.2"
@@ -1025,7 +1025,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Parallel(badge => badge.Post<HoldVisitRequest>(badgeUrl, request => request.Set(r => r.SlotId, earliest)), card => card.Get<FrontDeskSlot>(arrivalUrl, request => request.Set(r => r.SlotId, earliest)).Into(\"alis-drawer-content\"));",
+          "text": "pipeline.Parallel(pipeline => pipeline.Post<HoldVisitRequest>(badgeUrl, request => request.Set(r => r.SlotId, earliest)), pipeline => pipeline.Get<FrontDeskSlot>(arrivalUrl, request => request.Set(r => r.SlotId, earliest)).Into(\"alis-drawer-content\"));",
           "doors": [
             "N10.7"
           ]

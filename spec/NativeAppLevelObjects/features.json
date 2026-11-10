@@ -113,7 +113,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Element(NativeDrawer.TitleId).Text.Set(\"Care notes\"); pipeline.Get<NotesQuery>(\"/Residents/{residentId}/Notes\", query => query.Set(q => q.ResidentId, 7)).Into(NativeDrawer.ContentId);",
+          "text": "pipeline.Element(NativeDrawer.TitleId).Text.Set(\"Care notes\"); pipeline.Get<NotesQuery>(\"/Residents/{residentId}/Notes\", request => request.Set(q => q.ResidentId, 7)).Into(NativeDrawer.ContentId);",
           "doors": [
             "M25.N1",
             "M5.N1",
@@ -396,7 +396,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Post<IntakeView, ResidentForm>(\"/Residents\", request => request.Form(\"drawer-resident-form\")).WhileLoading(loading => loading.Element(\"resident-form-status\").Text.Set(\"Saving resident...\")).Finally(done => done.Element(\"resident-form-status\").Text.Set(\"\"));",
+          "text": "pipeline.Post<IntakeView, ResidentForm>(\"/Residents\", request => request.Form(\"drawer-resident-form\")).WhileLoading(pipeline => pipeline.Element(\"resident-form-status\").Text.Set(\"Saving resident...\")).Finally(pipeline => pipeline.Element(\"resident-form-status\").Text.Set(\"\"));",
           "doors": [
             "N10.7",
             "M5.N1",
@@ -628,7 +628,7 @@
         },
         {
           "line": "proposed",
-          "text": "var open = rows.NativeActionLink((activated, pipeline) => pipeline.Get<ResidentQuery>(\"/Residents/{residentId}\", query => query.Set(q => q.ResidentId, activated.Row.Read(r => r.Id))).OnSuccess(Content.Html, (loaded, done) => done.Into(\"resident-detail\", loaded.Body)));",
+          "text": "var open = rows.NativeActionLink((activated, pipeline) => pipeline.Get<ResidentQuery>(\"/Residents/{residentId}\", request => request.Set(q => q.ResidentId, activated.Row.Read(r => r.Id))).OnSuccess(Content.Html, (loaded, pipeline) => pipeline.Into(\"resident-detail\", loaded.Body)));",
           "doors": [
             "N17.12",
             "M25.N3",
@@ -637,7 +637,7 @@
         },
         {
           "line": "proposed",
-          "text": "var discharge = rows.NativeActionButton((activated, pipeline) => pipeline.When(pipeline.Component<NativeConfirm>().Ask(activated.Row.Read(r => r.Name))).Truthy().Then(yes => yes.Post<IntakeView, DischargeRequest>(\"/Residents/{residentId}/Discharge\", request => request.Set(r => r.ResidentId, activated.Row.Read(r => r.Id))).OnSuccess<CensusCount>((census, done) => activated.Element.Text.Set(\"Discharged\"))));",
+          "text": "var discharge = rows.NativeActionButton((activated, pipeline) => pipeline.When(pipeline.Component<NativeConfirm>().Ask(activated.Row.Read(r => r.Name))).Truthy().Then(pipeline => pipeline.Post<IntakeView, DischargeRequest>(\"/Residents/{residentId}/Discharge\", request => request.Set(r => r.ResidentId, activated.Row.Read(r => r.Id))).OnSuccess<CensusCount>((census, done) => activated.Element.Text.Set(\"Discharged\"))));",
           "doors": [
             "N17.12",
             "M25.N3",
@@ -932,7 +932,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.When(confirm.Ask(\"Discharge Ada from the ward?\")).Truthy().Then(yes => yes.Post<IntakeView, DischargeRequest>(\"/Residents/{residentId}/Discharge\", request => request.Set(r => r.ResidentId, 7))).Else(no => no.Element(\"decision\").Text.Set(\"Kept\"));",
+          "text": "pipeline.When(confirm.Ask(\"Discharge Ada from the ward?\")).Truthy().Then(pipeline => pipeline.Post<IntakeView, DischargeRequest>(\"/Residents/{residentId}/Discharge\", request => request.Set(r => r.ResidentId, 7))).Else(pipeline => pipeline.Element(\"decision\").Text.Set(\"Kept\"));",
           "doors": [
             "M25.N4",
             "N17.3",

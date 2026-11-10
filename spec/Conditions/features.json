@@ -99,7 +99,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.When(pain.Gte(4)).Then(then => then.Element(\"plan\").Text.Set(\"Call the doctor\")).ElseIf(pain.Gte(2)).Then(then => then.Element(\"plan\").Text.Set(\"Give pain relief\")).Else(otherwise => otherwise.Element(\"plan\").Text.Set(\"No action\"));",
+          "text": "pipeline.When(pain.Gte(4)).Then(pipeline => pipeline.Element(\"plan\").Text.Set(\"Call the doctor\")).ElseIf(pain.Gte(2)).Then(pipeline => pipeline.Element(\"plan\").Text.Set(\"Give pain relief\")).Else(pipeline => pipeline.Element(\"plan\").Text.Set(\"No action\"));",
           "doors": [
             "N8.2",
             "M5.N5",
@@ -108,7 +108,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.When(pain.Gt(1).And(risk.Gt(1)).And(pain.Eq(5).Or(risk.Eq(5)))).Then(then => then.Element(\"watch\").Text.Set(\"Watch closely\"));",
+          "text": "pipeline.When(pain.Gt(1).And(risk.Gt(1)).And(pain.Eq(5).Or(risk.Eq(5)))).Then(pipeline => pipeline.Element(\"watch\").Text.Set(\"Watch closely\"));",
           "doors": [
             "N8.2",
             "M5.N5",
@@ -117,7 +117,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.When(name.In(\"Ada\", \"Ben\").And(room.Matches(\"^[A-Z][0-9]{2}$\"))).Then(then => then.Element(\"on-round\").Text.Set(\"On the round\"));",
+          "text": "pipeline.When(name.In(\"Ada\", \"Ben\").And(room.Matches(\"^[A-Z][0-9]{2}$\"))).Then(pipeline => pipeline.Element(\"on-round\").Text.Set(\"On the round\"));",
           "doors": [
             "M3.N1",
             "N8.2",
@@ -127,7 +127,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.When(args.Read(x => x.Score).Gte(90)).Then(then => then.Element(\"grade\").Text.Set(\"A\"));",
+          "text": "pipeline.When(args.Read(x => x.Score).Gte(90)).Then(pipeline => pipeline.Element(\"grade\").Text.Set(\"A\"));",
           "doors": [
             "N5.6",
             "N8.2",
@@ -137,7 +137,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.When(approval.Body.Read(body => body.Status).Eq(\"approved\")).Then(then => then.Element(\"status\").Text.Set(\"Approved\"));",
+          "text": "pipeline.When(approval.Body.Read(body => body.Status).Eq(\"approved\")).Then(pipeline => pipeline.Element(\"status\").Text.Set(\"Approved\"));",
           "doors": [
             "N10.7",
             "N5.6",
@@ -933,7 +933,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.When(alerts.Any(alert => alert.Severity == AlertSeverity.Critical && !alert.Acknowledged)).Then(then => then.Element(\"escalate\").Text.Set(\"Escalate\"));",
+          "text": "pipeline.When(alerts.Any(alert => alert.Severity == AlertSeverity.Critical && !alert.Acknowledged)).Then(pipeline => pipeline.Element(\"escalate\").Text.Set(\"Escalate\"));",
           "doors": [
             "N6.1",
             "N8.1",

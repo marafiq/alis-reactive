@@ -9,20 +9,20 @@ using Alis.Reactive.Requests;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddReactiveRequests(requests => requests
-    .WhileLoading(loading =>
+    .WhileLoading(pipeline =>
     {
-        loading.Element("app-status").Text.Set("Working");
-        loading.Element("app").Classes.Add("busy");
+        pipeline.Element("app-status").Text.Set("Working");
+        pipeline.Element("app").Classes.Add("busy");
     })
-    .Finally(done =>
+    .Finally(pipeline =>
     {
-        done.Element("app").Classes.Remove("busy");
-        done.Element("app-status").Text.Set("Ready");
+        pipeline.Element("app").Classes.Remove("busy");
+        pipeline.Element("app-status").Text.Set("Ready");
     })
-    .OnError(401, Content.None, (expired, shown) =>
+    .OnError(401, Content.None, (expired, pipeline) =>
     {
-        shown.Notice().Warning(expired.Headers.Get("WWW-Authenticate"));
-        shown.Element("sign-in").Classes.Add("shown");
+        pipeline.Notice().Warning(expired.Headers.Get("WWW-Authenticate"));
+        pipeline.Element("sign-in").Classes.Add("shown");
     }));
 var app = builder.Build();
 app.MapDefaultControllerRoute();

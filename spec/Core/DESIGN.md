@@ -2328,7 +2328,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     (reply, pipeline) => ..)` and the catch-all `OnError((failed, pipeline) => ..)` or, typed, `OnError<TError>((failed,
     pipeline) => ..)`, with the readers `Content.None`,
     `Content.Json<T>()`, `Content.Text`, `Content.Html` and `Content.File` (D10.6). `OnSuccess<T>` returns a request that
-    carries `T`, so its `Chained((reply, next) => ..)` receives the typed reply by construction. `Validate<TValidator>()`,
+    carries `T`, so its `Chained((reply, pipeline) => ..)` receives the typed reply by construction. `Validate<TValidator>()`,
     `TValidator : ReactiveValidator<TRequest>` (D16.1), checks the body the request sends (Q16); `Busy(elementId, ..)`,
     `Busy()` and `NoBusy()` say where its busy indicator shows (D10.21); `WhileLoading`, `Finally`, `NoDefaults()` and
     `NoValidation()` complete it. `ShowErrors(problem)` is a step of a route's pipeline that shows any
@@ -2395,7 +2395,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   pipeline.Post<IntakeRequest>("/Wards/{ward}/Intake", request => request
           .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
           .Form(intake))
-      .OnSuccess<IntakeCreated>((created, done) => done.Notice().Success("Resident admitted"))
+      .OnSuccess<IntakeCreated>((created, pipeline) => pipeline.Notice().Success("Resident admitted"))
       .Chained((created, next) => next
           .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
               .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
@@ -2407,12 +2407,12 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
               .Set(r => r.Ward, pipeline.PageUrl<IntakePage>().Read(q => q.Ward))
               .Form(intake)))
       .Validate<IntakeValidator>()
-      .OnSuccess(Content.Json<IntakeCreated>(), (created, done) => done.Notice().Success("Resident admitted"))
-      .OnError(400, Content.Json<ValidationProblem>(), (refused, shown) => shown.ShowErrors(refused.Body))
+      .OnSuccess(Content.Json<IntakeCreated>(), (created, pipeline) => pipeline.Notice().Success("Resident admitted"))
+      .OnError(400, Content.Json<ValidationProblem>(), (refused, pipeline) => pipeline.ShowErrors(refused.Body))
       .Chained((created, next) => next
           .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
               .Path(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
-          .OnSuccess(Content.Html, (summary, loaded) => loaded.Into("resident-summary", summary.Body)));
+          .OnSuccess(Content.Html, (summary, pipeline) => pipeline.Into("resident-summary", summary.Body)));
   ```
   The first is the condensed form under defaults that hold `ShowBusy()`, `ShowValidationErrors()` and a catch-all notice;
   the second writes the same plan less those defaults' parts, which both compose identically. `intake` is the

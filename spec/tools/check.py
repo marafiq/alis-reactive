@@ -1216,7 +1216,6 @@ def check_promises():
 
 FLUENT_STRING_KINDS = {"text", "url", "element-id", "header-name", "css-class", "js-name"}
 FLUENT_UNTYPED_KINDS = {"object", "type", "object[]", "type[]"}
-FLUENT_SLOT_ROW = re.compile(r"^[\w-]+\.\w+\(\w+\)#\d+:\w+$")
 FLUENT_TABLE_TITLE = "Callback parameter naming convention (locked):"
 FLUENT_CONCEPT_ID = re.compile(r"^(?:D\d+\.\d+|N\d+\.\d+|M\d+\.[DN]\d+)$")
 FLUENT_CELL_DECISIONS = {"D7.1": "Positions", "D7.2": "Sources"}
@@ -1333,35 +1332,35 @@ def fluent_callback_table():
     rows = {}
     for line in table[2:]:
         cells = [re.findall(r"`([^`]+)`", cell) for cell in line.strip("|").split("|")]
-        rows[cells[0][0]] = cells[1][0]
+        rows[cells[0][0]] = cells[1][0] if cells[1] else None
     return rows
 
 
 def fluent_callback_problems(surface, table):
-    slot_rows = {key: name for key, name in table.items() if FLUENT_SLOT_ROW.match(key)}
-    type_rows = {key: name for key, name in table.items() if key not in slot_rows}
-    problems, used, judged, hides, unlisted, renamed = [], set(), 0, 0, 0, 0
+    rows = {key.partition("<")[0]: name for key, name in table.items() if not key.startswith(("Action<", "Func<"))}
+    problems, used, judged, hides, unlisted, renamed, data = [], set(), 0, 0, 0, 0, 0
     for parameter in surface["lambdas"]:
         place = f"{parameter['file']}:{parameter['line']}"
-        for hidden in parameter["hides"]:
+        held = parameter["type"].partition("<")[0]
+        nested_pipeline = held == "Pipeline" and parameter["name"] == rows.get("Pipeline") and set(parameter["hiddenTypes"]) <= {"Pipeline"}
+        for hidden in [] if nested_pipeline else parameter["hides"]:
             hides += 1
             problems.append(f"F4 {place} '{parameter['name']}' hides the enclosing '{hidden}'")
         if not parameter["framework"]:
             continue
         judged += 1
-        key = parameter["slot"] if parameter["slot"] in slot_rows else parameter["delegate"] if parameter["delegate"] in type_rows else None
-        if key is None:
+        if held not in rows:
             unlisted += 1
-            problems.append(f"F4 {place} '{parameter['name']}': {parameter['slot']} has no row")
+            problems.append(f"F4 {place} '{parameter['name']}': {parameter['slot']} hands {held}, which has no row")
             continue
-        used.add(key)
-        expected = slot_rows.get(key, type_rows.get(key))
-        if parameter["name"] != expected:
+        used.add(held)
+        if rows[held] is None:
+            data += 1
+        elif parameter["name"] != rows[held]:
             renamed += 1
-            problems.append(f"F4 {place} '{parameter['name']}': {parameter['slot']} is '{expected}'")
-    stale = sorted(set(table) - used)
-    problems += [f"F4 row '{key}' names no callback" for key in stale]
-    return problems, {"F4_parameters": judged, "F4_slots": len(surface["slots"]), "F4_no_row": unlisted, "F4_other_name": renamed, "F4_hides": hides, "F4_stale_rows": len(stale)}
+            problems.append(f"F4 {place} '{parameter['name']}': {parameter['slot']} is '{rows[held]}'")
+    return problems, {"F4_parameters": judged, "F4_slots": len(surface["slots"]), "F4_no_row": unlisted, "F4_other_name": renamed,
+                      "F4_data": data, "F4_hides": hides, "F4_rows": len(rows), "F4_rows_unused": len(set(rows) - used)}
 
 
 def fluent_string_problems(surface, rows):

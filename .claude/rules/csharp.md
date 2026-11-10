@@ -30,6 +30,20 @@ Callback parameter naming convention (locked):
 | `Action<GatherBuilder>` | `gather` |
 | `Action<ResponseBuilder>` | `response` |
 | `Func<ConditionStart<TModel>, Guard<TModel>>` | `group` |
+| `Pipeline<TModel>` | `pipeline` |
+| `BodyParts<TRequest>` | `request` |
+| `QueryParts<TRequest>` | `request` |
+| `JsonBody<TRequest>` | `body` |
+| `MultipartBody<TRequest>` | `body` |
+| `UrlEncodedBody<TRequest>` | `body` |
+| `RequestDefaults` | `requests` |
+| `Response<TRequest, TReply>` | the app's word for what it holds |
+| `Failure<TError>` | the app's word for what it holds |
+| `RowActivated<TRow>` | the app's word for what it holds |
+
+The rows from `Pipeline<TModel>` on name the types the rewrite's callbacks hand (gate 2, `spec/NOTES.md`). A nested
+callback's `pipeline` hides the enclosing one, since every pipeline writes to the block it is written in; no other
+parameter hides an enclosing name, since nested callbacks read the replies around them.
 
 ## Fail-Fast, Not Fallback
 

@@ -323,14 +323,14 @@
         },
         {
           "line": "proposed",
-          "text": ".OnSuccess(Content.Html, (summary, loaded) => loaded.Into(\"resident-summary\", summary.Body))",
+          "text": ".OnSuccess(Content.Html, (summary, pipeline) => pipeline.Into(\"resident-summary\", summary.Body))",
           "doors": [
             "N10.7"
           ]
         },
         {
           "line": "proposed",
-          "text": "pipeline.Listen(object, o => o.Event, (args, p) => ..)",
+          "text": "pipeline.Listen(object, o => o.Event, (args, pipeline) => ..)",
           "doors": [
             "N12.1"
           ]

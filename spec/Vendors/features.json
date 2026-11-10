@@ -231,7 +231,7 @@
         },
         {
           "line": "proposed",
-          "text": "p.Listen(opened.Read(o => o.Card), card => card.Cleaned, (cleaned, inner) => inner.Element(\"cleaned-by\").Text.Set(cleaned.Read(c => c.Nurse)));",
+          "text": "p.Listen(opened.Read(o => o.Card), card => card.Cleaned, (cleaned, pipeline) => pipeline.Element(\"cleaned-by\").Text.Set(cleaned.Read(c => c.Nurse)));",
           "doors": [
             "N12.1",
             "N5.6"
@@ -766,7 +766,7 @@
         },
         {
           "line": "proposed",
-          "text": "plan.Render<DoseTimer>(\"dose-timer\", Html.Partial(\"_DoseTimer\")).Reactive(t => t.Elapsed, (elapsed, p) => p.Element(\"elapsed-for\").Text.Set(elapsed.Read(e => e.Resident)));",
+          "text": "plan.Render<DoseTimer>(\"dose-timer\", Html.Partial(\"_DoseTimer\")).Reactive(t => t.Elapsed, (elapsed, pipeline) => pipeline.Element(\"elapsed-for\").Text.Set(elapsed.Read(e => e.Resident)));",
           "doors": [
             "M12.N3",
             "N5.6"

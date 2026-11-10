@@ -925,14 +925,14 @@
         },
         {
           "line": "proposed",
-          "text": "plan.Plugin<ShiftLog>().Reactive(log => log.Signed, p => p.Element(\"log-signed\").Text.Set(\"signed\"));",
+          "text": "plan.Plugin<ShiftLog>().Reactive(log => log.Signed, pipeline => pipeline.Element(\"log-signed\").Text.Set(\"signed\"));",
           "doors": [
             "N17.11"
           ]
         },
         {
           "line": "proposed",
-          "text": "plan.Plugin<BedStore>().Reactive(store => store.Freed, (freed, p) => p.Element(\"bed-freed\").Text.Set(freed.Bed));",
+          "text": "plan.Plugin<BedStore>().Reactive(store => store.Freed, (freed, pipeline) => pipeline.Element(\"bed-freed\").Text.Set(freed.Bed));",
           "doors": [
             "N17.11"
           ]

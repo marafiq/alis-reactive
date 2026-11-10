@@ -20,39 +20,39 @@ public static class RowActionsUsage
         {
             pipeline.Element("census-note").Text.Set(activated.Row.Read(r => r.Name));
             pipeline.When(activated.Row.Read(r => r.Ward).Eq("respite"))
-                .Then(respite =>
+                .Then(pipeline =>
                 {
-                    respite.Notice().Warning(activated.Row.Read(r => r.Name));
-                    respite.Element("respite").Classes.Add("pending");
+                    pipeline.Notice().Warning(activated.Row.Read(r => r.Name));
+                    pipeline.Element("respite").Classes.Add("pending");
                 });
             pipeline.Post<IntakeView, DischargeRequest>("/Residents/{residentId}/Discharge", request => request
                     .Set(r => r.ResidentId, activated.Row.Read(r => r.Id))
                     .Set(r => r.Ward, activated.Row.Read(r => r.Ward)))
-                .OnError<ValidationProblem>(400, (refused, shown) =>
+                .OnError<ValidationProblem>(400, (refused, pipeline) =>
                 {
-                    shown.ShowErrors(refused.Body);
+                    pipeline.ShowErrors(refused.Body);
                     activated.Element.Classes.Add("refused");
                 })
-                .OnSuccess<CensusCount>((census, done) =>
+                .OnSuccess<CensusCount>((census, pipeline) =>
                 {
-                    done.Element("occupied").Text.Set(census.Body.Read(c => c.Occupied));
+                    pipeline.Element("occupied").Text.Set(census.Body.Read(c => c.Occupied));
                     activated.Element.Text.Set("Discharged");
                     activated.Element.Classes.Add("done");
                 })
-                .Chained((census, next) => next
-                    .Get<WardQuery>("/Wards/{ward}/Residents", query => query
+                .Chained((census, pipeline) => pipeline
+                    .Get<WardQuery>("/Wards/{ward}/Residents", request => request
                         .Set(q => q.Ward, census.Request.Read(r => r.Ward)))
                     .Into("residents"));
         });
         var open = rows.NativeActionLink((activated, pipeline) =>
         {
             pipeline.Element("resident-detail").Classes.Add("loading");
-            pipeline.Get<ResidentQuery>("/Residents/{residentId}", query => query
+            pipeline.Get<ResidentQuery>("/Residents/{residentId}", request => request
                     .Set(q => q.ResidentId, activated.Row.Read(r => r.Id)))
-                .OnSuccess(Content.Html, (loaded, done) =>
+                .OnSuccess(Content.Html, (loaded, pipeline) =>
                 {
-                    done.Into("resident-detail", loaded.Body);
-                    done.Element("resident-detail").Classes.Remove("loading");
+                    pipeline.Into("resident-detail", loaded.Body);
+                    pipeline.Element("resident-detail").Classes.Remove("loading");
                 });
         });
         foreach (var resident in residents)
@@ -66,14 +66,14 @@ public static class RowActionsUsage
         => grid.Reactive(g => g.Command, (command, pipeline) =>
         {
             pipeline.When(command.Name.Eq("discharge"))
-                .Then(discharging =>
+                .Then(pipeline =>
                 {
-                    discharging.Post<IntakeView, DischargeRequest>("/Residents/{residentId}/Discharge", request => request
+                    pipeline.Post<IntakeView, DischargeRequest>("/Residents/{residentId}/Discharge", request => request
                             .Set(r => r.ResidentId, command.Row.Read(r => r.Id)))
-                        .OnSuccess<CensusCount>((census, done) =>
+                        .OnSuccess<CensusCount>((census, pipeline) =>
                         {
-                            done.Element("occupied").Text.Set(census.Body.Read(c => c.Occupied));
-                            done.Notice().Success("Discharged");
+                            pipeline.Element("occupied").Text.Set(census.Body.Read(c => c.Occupied));
+                            pipeline.Notice().Success("Discharged");
                         });
                 });
         });

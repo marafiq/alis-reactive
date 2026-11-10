@@ -5,83 +5,83 @@
 }
 <div id="census"></div>
 @(plan.Render<CensusBoard>("census", Html.Raw("<div></div>"))
-    .Reactive(b => b.Counted, (counted, handled) =>
+    .Reactive(b => b.Counted, (counted, pipeline) =>
     {
-        var intake = handled.Container<IntakeView, IntakeRequest>("intake");
-        handled.Element("status").Text.Set(counted.Ward);
+        var intake = pipeline.Container<IntakeView, IntakeRequest>("intake");
+        pipeline.Element("status").Text.Set(counted.Ward);
         foreach (var ward in new[] { "north", "south" })
         {
-            handled.Element(ward).Classes.Remove("current");
+            pipeline.Element(ward).Classes.Remove("current");
         }
 
-        handled.When(counted.Ward.Eq("north"))
-            .Then(north =>
+        pipeline.When(counted.Ward.Eq("north"))
+            .Then(pipeline =>
             {
-                north.Element("north").Classes.Add("current");
-                north.Notice().Info(counted.Ward);
+                pipeline.Element("north").Classes.Add("current");
+                pipeline.Notice().Info(counted.Ward);
             })
-            .Else(other =>
+            .Else(pipeline =>
             {
-                other.Element("north").Classes.Remove("current");
-                other.Validate(intake);
+                pipeline.Element("north").Classes.Remove("current");
+                pipeline.Validate(intake);
             });
-        handled.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake).Set(r => r.Ward, counted.Ward))
-            .WhileLoading(loading =>
+        pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Inputs(intake).Set(r => r.Ward, counted.Ward))
+            .WhileLoading(pipeline =>
             {
-                loading.Element("status").Text.Set("Sending");
-                loading.Element("save").Classes.Add("pending");
+                pipeline.Element("status").Text.Set("Sending");
+                pipeline.Element("save").Classes.Add("pending");
             })
-            .Finally(done =>
+            .Finally(pipeline =>
             {
-                done.Element("save").Classes.Remove("pending");
-                done.Element("status").Text.Set("Sent");
+                pipeline.Element("save").Classes.Remove("pending");
+                pipeline.Element("status").Text.Set("Sent");
             })
-            .OnError<ValidationProblem>(400, (refused, shown) =>
+            .OnError<ValidationProblem>(400, (refused, pipeline) =>
             {
-                shown.ShowErrors(refused.Body);
-                shown.Element("status").Text.Set(refused.Headers.Get("X-Reason"));
+                pipeline.ShowErrors(refused.Body);
+                pipeline.Element("status").Text.Set(refused.Headers.Get("X-Reason"));
             })
-            .OnSuccess<IntakeCreated>((created, done) =>
+            .OnSuccess<IntakeCreated>((created, pipeline) =>
             {
-                done.Element("admitted").Text.Set(created.Request.Read(r => r.Name));
-                done.When(created.Status.Eq(201))
-                    .Then(admitted =>
+                pipeline.Element("admitted").Text.Set(created.Request.Read(r => r.Name));
+                pipeline.When(created.Status.Eq(201))
+                    .Then(pipeline =>
                     {
-                        admitted.Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                        pipeline.Get<SummaryQuery>("/Residents/{residentId}/Summary", request => request
                                 .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
-                            .OnSuccess<ResidentSummary>((summary, shown) =>
+                            .OnSuccess<ResidentSummary>((summary, pipeline) =>
                             {
-                                shown.When(summary.Body.Read(s => s.Ward.Name).Eq(created.Request.Read(r => r.Ward)))
-                                    .Then(same =>
+                                pipeline.When(summary.Body.Read(s => s.Ward.Name).Eq(created.Request.Read(r => r.Ward)))
+                                    .Then(pipeline =>
                                     {
-                                        same.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name));
-                                        same.Element("ward").Classes.Add("confirmed");
+                                        pipeline.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name));
+                                        pipeline.Element("ward").Classes.Add("confirmed");
                                     });
-                                shown.Element("summary").Classes.Add("loaded");
+                                pipeline.Element("summary").Classes.Add("loaded");
                             });
-                        admitted.Element("status").Text.Set("Admitted");
+                        pipeline.Element("status").Text.Set("Admitted");
                     });
-                done.Notice().Success("Resident admitted");
+                pipeline.Notice().Success("Resident admitted");
             })
-            .Chained((created, next) =>
+            .Chained((created, pipeline) =>
             {
-                next.Element("status").Text.Set("Handing over");
-                next.Post<IntakeView, HandoverRequest>("/Handovers", request => request
+                pipeline.Element("status").Text.Set("Handing over");
+                pipeline.Post<IntakeView, HandoverRequest>("/Handovers", request => request
                         .Set(h => h.ResidentId, created.Body.Read(c => c.Resident.Id))
                         .Set(h => h.Ward, created.Request.Read(r => r.Ward)))
-                    .OnSuccess(done => done.Notice().Success("Handed over"));
-                next.Element("handover").Classes.Add("sent");
+                    .OnSuccess(pipeline => pipeline.Notice().Success("Handed over"));
+                pipeline.Element("handover").Classes.Add("sent");
             });
-        handled.Parallel(
-            first =>
+        pipeline.Parallel(
+            pipeline =>
             {
-                first.Element("left").Text.Set(counted.Ward);
-                first.Element("left").Classes.Add("loaded");
+                pipeline.Element("left").Text.Set(counted.Ward);
+                pipeline.Element("left").Classes.Add("loaded");
             },
-            second =>
+            pipeline =>
             {
-                second.Element("right").Text.Set(counted.Ward);
-                second.Element("right").Classes.Add("loaded");
+                pipeline.Element("right").Text.Set(counted.Ward);
+                pipeline.Element("right").Classes.Add("loaded");
             });
     }))
 @{
@@ -89,12 +89,12 @@
     var open = rows.NativeActionLink((activated, pipeline) =>
     {
         pipeline.Element("resident-detail").Classes.Add("loading");
-        pipeline.Get<ResidentQuery>("/Residents/{residentId}", query => query
+        pipeline.Get<ResidentQuery>("/Residents/{residentId}", request => request
                 .Set(q => q.ResidentId, activated.Row.Read(r => r.Id)))
-            .OnSuccess(Content.Html, (loaded, done) =>
+            .OnSuccess(Content.Html, (loaded, pipeline) =>
             {
-                done.Into("resident-detail", loaded.Body);
-                done.Element("resident-detail").Classes.Remove("loading");
+                pipeline.Into("resident-detail", loaded.Body);
+                pipeline.Element("resident-detail").Classes.Remove("loading");
             });
     });
     var discharge = rows.NativeActionButton((activated, pipeline) =>
@@ -102,9 +102,9 @@
         pipeline.Element("census-note").Text.Set(activated.Row.Read(r => r.Name));
         pipeline.Post<IntakeView, DischargeRequest>("/Residents/{residentId}/Discharge", request => request
                 .Set(r => r.ResidentId, activated.Row.Read(r => r.Id)))
-            .OnSuccess<CensusCount>((census, done) =>
+            .OnSuccess<CensusCount>((census, pipeline) =>
             {
-                done.Element("occupied").Text.Set(census.Body.Read(c => c.Occupied));
+                pipeline.Element("occupied").Text.Set(census.Body.Read(c => c.Occupied));
                 activated.Element.Text.Set("Discharged");
             });
     });

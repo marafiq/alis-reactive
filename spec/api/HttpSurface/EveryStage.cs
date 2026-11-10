@@ -16,201 +16,201 @@ public static class EveryStage
         => EveryModule(pipeline, pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward), intake);
 
     public static void InAHandler(Rendered<CensusBoard, IntakeView> board, RequestForm<IntakeRequest> intake)
-        => board.Reactive(b => b.Counted, (counted, handled) => EveryModule(handled, counted.Ward, intake));
+        => board.Reactive(b => b.Counted, (counted, pipeline) => EveryModule(pipeline, counted.Ward, intake));
 
     public static void InEachBranch(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
     {
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
         pipeline.When(ward.Eq("north"))
-            .Then(north => EveryModule(north, ward, intake))
+            .Then(pipeline => EveryModule(pipeline, ward, intake))
             .ElseIf(ward.Eq("south"))
-            .Then(south => EveryModule(south, ward, intake))
-            .Else(other => EveryModule(other, ward, intake));
+            .Then(pipeline => EveryModule(pipeline, ward, intake))
+            .Else(pipeline => EveryModule(pipeline, ward, intake));
     }
 
     public static void InEachParallelBranch(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
     {
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
         pipeline.Parallel(
-            first => EveryModule(first, ward, intake),
-            second => EveryModule(second, ward, intake));
+            pipeline => EveryModule(pipeline, ward, intake),
+            pipeline => EveryModule(pipeline, ward, intake));
     }
 
     public static void InEachPartOfARequest(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
     {
         var ward = pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward);
         pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
-            .WhileLoading(loading => EveryModule(loading, ward, intake))
-            .Finally(done => EveryModule(done, ward, intake))
-            .OnError<ValidationProblem>(400, (refused, shown) => EveryRouteModule(shown, refused.Headers.Get("X-Reason"), refused.Body, intake))
-            .OnError(409, Content.Text, (conflict, shown) => EveryModule(shown, conflict.Body, intake))
-            .OnError((failed, shown) => EveryModule(shown, failed.Headers.Get("X-Error"), intake))
-            .OnSuccess(Content.Json<ValidationProblem>(), (answered, done) => EveryRouteModule(done, answered.Headers.Get("Location"), answered.Body, intake))
-            .Chained((answered, next) => EveryModule(next, answered.Request.Read(r => r.Ward), intake));
+            .WhileLoading(pipeline => EveryModule(pipeline, ward, intake))
+            .Finally(pipeline => EveryModule(pipeline, ward, intake))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => EveryRouteModule(pipeline, refused.Headers.Get("X-Reason"), refused.Body, intake))
+            .OnError(409, Content.Text, (conflict, pipeline) => EveryModule(pipeline, conflict.Body, intake))
+            .OnError((failed, pipeline) => EveryModule(pipeline, failed.Headers.Get("X-Error"), intake))
+            .OnSuccess(Content.Json<ValidationProblem>(), (answered, pipeline) => EveryRouteModule(pipeline, answered.Headers.Get("Location"), answered.Body, intake))
+            .Chained((answered, pipeline) => EveryModule(pipeline, answered.Request.Read(r => r.Ward), intake));
     }
 
     public static void AChainReadsEveryReplyAroundIt(Pipeline<IntakeView> pipeline, RequestForm<IntakeRequest> intake)
         => pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake))
-            .OnSuccess<IntakeCreated>((created, done) => done
+            .OnSuccess<IntakeCreated>((created, pipeline) => pipeline
                 .When(created.Status.Eq(201).And(created.Body.Read(c => c.Resident.Id).Gt(0)))
-                .Then(admitted => admitted.Element("admitted").Text.Set(created.Request.Read(r => r.Name)))
-                .Else(other => other.Notice().Warning(created.Headers.Get("X-Reason"))))
-            .Chained((created, next) => next
-                .Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                .Then(pipeline => pipeline.Element("admitted").Text.Set(created.Request.Read(r => r.Name)))
+                .Else(pipeline => pipeline.Notice().Warning(created.Headers.Get("X-Reason"))))
+            .Chained((created, pipeline) => pipeline
+                .Get<SummaryQuery>("/Residents/{residentId}/Summary", request => request
                     .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
-                .OnSuccess<ResidentSummary>((summary, shown) => shown
+                .OnSuccess<ResidentSummary>((summary, pipeline) => pipeline
                     .When(summary.Body.Read(s => s.Ward.Name).Eq(created.Request.Read(r => r.Ward)))
-                    .Then(same => same.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name)))
-                    .Else(moved => moved.Element("ward").Text.Set(pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))))
-                .Chained((summary, last) => last
+                    .Then(pipeline => pipeline.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name)))
+                    .Else(pipeline => pipeline.Element("ward").Text.Set(pipeline.PageUrl<IntakeView, IntakePage>().Read(q => q.Ward))))
+                .Chained((summary, pipeline) => pipeline
                     .Post<IntakeView, HandoverRequest>("/Handovers", request => request
                         .Set(h => h.ResidentId, created.Body.Read(c => c.Resident.Id))
                         .Set(h => h.Ward, created.Request.Read(r => r.Ward))
                         .Set(h => h.Room, summary.Body.Read(s => s.Room.Number))
                         .Set(h => h.Version, summary.Headers.Get("ETag")))
-                    .OnSuccess(done => done.Notice().Success("Handed over"))));
+                    .OnSuccess(pipeline => pipeline.Notice().Success("Handed over"))));
 
     public static void InTheDefaults(IServiceCollection services, RequestForm<IntakeRequest> intake)
         => services.AddReactiveRequests(requests => requests
-            .WhileLoading(loading => EveryModule(loading, loading.Element("app-status").Text, intake))
-            .Finally(done => EveryModule(done, done.Element("app-status").Text, intake))
-            .OnError(401, Content.None, (expired, shown) => EveryModule(shown, expired.Headers.Get("WWW-Authenticate"), intake))
-            .OnError((failed, shown) => EveryModule(shown, failed.Headers.Get("X-Error"), intake)));
+            .WhileLoading(pipeline => EveryModule(pipeline, pipeline.Element("app-status").Text, intake))
+            .Finally(pipeline => EveryModule(pipeline, pipeline.Element("app-status").Text, intake))
+            .OnError(401, Content.None, (expired, pipeline) => EveryModule(pipeline, expired.Headers.Get("WWW-Authenticate"), intake))
+            .OnError((failed, pipeline) => EveryModule(pipeline, failed.Headers.Get("X-Error"), intake)));
 
     public static void ManyStatementsInEveryStage(Rendered<CensusBoard, IntakeView> board, RequestForm<IntakeRequest> intake, string[] wards)
-        => board.Reactive(b => b.Counted, (counted, handled) =>
+        => board.Reactive(b => b.Counted, (counted, pipeline) =>
         {
-            handled.Element("status").Text.Set(counted.Ward);
+            pipeline.Element("status").Text.Set(counted.Ward);
             foreach (var ward in wards)
             {
-                handled.Element(ward).Classes.Remove("current");
+                pipeline.Element(ward).Classes.Remove("current");
             }
 
-            handled.When(counted.Ward.Eq("north"))
-                .Then(north =>
+            pipeline.When(counted.Ward.Eq("north"))
+                .Then(pipeline =>
                 {
-                    north.Element("north").Classes.Add("current");
-                    north.Notice().Info(counted.Ward);
+                    pipeline.Element("north").Classes.Add("current");
+                    pipeline.Notice().Info(counted.Ward);
                 })
-                .Else(other =>
+                .Else(pipeline =>
                 {
-                    other.Element("north").Classes.Remove("current");
-                    other.Validate(intake);
+                    pipeline.Element("north").Classes.Remove("current");
+                    pipeline.Validate(intake);
                 });
-            handled.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Set(r => r.Ward, counted.Ward))
-                .WhileLoading(loading =>
+            pipeline.Post<IntakeView, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Set(r => r.Ward, counted.Ward))
+                .WhileLoading(pipeline =>
                 {
-                    loading.Element("status").Text.Set("Sending");
-                    loading.Element("save").Classes.Add("pending");
+                    pipeline.Element("status").Text.Set("Sending");
+                    pipeline.Element("save").Classes.Add("pending");
                 })
-                .Finally(done =>
+                .Finally(pipeline =>
                 {
-                    done.Element("save").Classes.Remove("pending");
-                    done.Element("status").Text.Set("Sent");
+                    pipeline.Element("save").Classes.Remove("pending");
+                    pipeline.Element("status").Text.Set("Sent");
                 })
-                .OnError<ValidationProblem>(400, (refused, shown) =>
+                .OnError<ValidationProblem>(400, (refused, pipeline) =>
                 {
-                    shown.ShowErrors(refused.Body);
-                    shown.Element("status").Text.Set(refused.Headers.Get("X-Reason"));
-                    shown.Element("save").Classes.Add("refused");
+                    pipeline.ShowErrors(refused.Body);
+                    pipeline.Element("status").Text.Set(refused.Headers.Get("X-Reason"));
+                    pipeline.Element("save").Classes.Add("refused");
                 })
-                .OnError((failed, shown) =>
+                .OnError((failed, pipeline) =>
                 {
-                    shown.Notice().Error(failed.Headers.Get("X-Error"));
-                    shown.Element("save").Classes.Add("failed");
+                    pipeline.Notice().Error(failed.Headers.Get("X-Error"));
+                    pipeline.Element("save").Classes.Add("failed");
                 })
-                .OnSuccess<IntakeCreated>((created, done) =>
+                .OnSuccess<IntakeCreated>((created, pipeline) =>
                 {
-                    done.Element("admitted").Text.Set(created.Request.Read(r => r.Name));
-                    done.When(created.Status.Eq(201))
-                        .Then(admitted =>
+                    pipeline.Element("admitted").Text.Set(created.Request.Read(r => r.Name));
+                    pipeline.When(created.Status.Eq(201))
+                        .Then(pipeline =>
                         {
-                            admitted.Element("resident").Text.Set(created.Request.Read(r => r.Name));
-                            admitted.Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query
+                            pipeline.Element("resident").Text.Set(created.Request.Read(r => r.Name));
+                            pipeline.Get<SummaryQuery>("/Residents/{residentId}/Summary", request => request
                                     .Set(q => q.ResidentId, created.Body.Read(c => c.Resident.Id)))
-                                .OnSuccess<ResidentSummary>((summary, shown) =>
+                                .OnSuccess<ResidentSummary>((summary, pipeline) =>
                                 {
-                                    shown.Element("room").Text.Set(summary.Headers.Get("ETag"));
-                                    shown.When(summary.Body.Read(s => s.Ward.Name).Eq(created.Request.Read(r => r.Ward)))
-                                        .Then(same =>
+                                    pipeline.Element("room").Text.Set(summary.Headers.Get("ETag"));
+                                    pipeline.When(summary.Body.Read(s => s.Ward.Name).Eq(created.Request.Read(r => r.Ward)))
+                                        .Then(pipeline =>
                                         {
-                                            same.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name));
-                                            same.Element("ward").Classes.Add("confirmed");
+                                            pipeline.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name));
+                                            pipeline.Element("ward").Classes.Add("confirmed");
                                         })
-                                        .Else(moved =>
+                                        .Else(pipeline =>
                                         {
-                                            moved.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name));
-                                            moved.Notice().Warning(created.Request.Read(r => r.Ward));
+                                            pipeline.Element("ward").Text.Set(summary.Body.Read(s => s.Ward.Name));
+                                            pipeline.Notice().Warning(created.Request.Read(r => r.Ward));
                                         });
-                                    shown.Element("summary").Classes.Add("loaded");
+                                    pipeline.Element("summary").Classes.Add("loaded");
                                 });
-                            admitted.Element("status").Text.Set("Admitted");
+                            pipeline.Element("status").Text.Set("Admitted");
                         });
-                    done.Notice().Success("Resident admitted");
+                    pipeline.Notice().Success("Resident admitted");
                 })
-                .Chained((created, next) =>
+                .Chained((created, pipeline) =>
                 {
-                    next.Element("status").Text.Set("Handing over");
-                    next.Post<IntakeView, HandoverRequest>("/Handovers", request => request
+                    pipeline.Element("status").Text.Set("Handing over");
+                    pipeline.Post<IntakeView, HandoverRequest>("/Handovers", request => request
                             .Set(h => h.ResidentId, created.Body.Read(c => c.Resident.Id))
                             .Set(h => h.Ward, created.Request.Read(r => r.Ward)))
-                        .OnSuccess(done =>
+                        .OnSuccess(pipeline =>
                         {
-                            done.Element("status").Text.Set("Handed over");
-                            done.Notice().Success("Handed over");
+                            pipeline.Element("status").Text.Set("Handed over");
+                            pipeline.Notice().Success("Handed over");
                         });
-                    next.Element("handover").Classes.Add("sent");
+                    pipeline.Element("handover").Classes.Add("sent");
                 });
-            handled.Parallel(
-                first =>
+            pipeline.Parallel(
+                pipeline =>
                 {
-                    first.Element("left").Text.Set(counted.Ward);
-                    first.Get<SummaryQuery>("/Residents/{residentId}/Summary", query => query.Set(q => q.ResidentId, 4))
-                        .OnSuccess<ResidentSummary>((summary, shown) =>
+                    pipeline.Element("left").Text.Set(counted.Ward);
+                    pipeline.Get<SummaryQuery>("/Residents/{residentId}/Summary", request => request.Set(q => q.ResidentId, 4))
+                        .OnSuccess<ResidentSummary>((summary, pipeline) =>
                         {
-                            shown.Element("left").Text.Set(summary.Body.Read(s => s.Ward.Name));
-                            shown.Element("left").Classes.Add("loaded");
+                            pipeline.Element("left").Text.Set(summary.Body.Read(s => s.Ward.Name));
+                            pipeline.Element("left").Classes.Add("loaded");
                         });
                 },
-                second =>
+                pipeline =>
                 {
-                    second.Element("right").Text.Set(counted.Ward);
-                    second.Element("right").Classes.Add("loaded");
+                    pipeline.Element("right").Text.Set(counted.Ward);
+                    pipeline.Element("right").Classes.Add("loaded");
                 });
-            handled.Element("status").Text.Set("Counted");
+            pipeline.Element("status").Text.Set("Counted");
         });
 
     public static void ManyStatementsInTheDefaults(IServiceCollection services)
         => services.AddReactiveRequests(requests => requests
-            .WhileLoading(loading =>
+            .WhileLoading(pipeline =>
             {
-                loading.Element("app-status").Text.Set("Working");
-                loading.Element("app").Classes.Add("busy");
+                pipeline.Element("app-status").Text.Set("Working");
+                pipeline.Element("app").Classes.Add("busy");
             })
-            .Finally(done =>
+            .Finally(pipeline =>
             {
-                done.Element("app").Classes.Remove("busy");
-                done.Element("app-status").Text.Set("Ready");
+                pipeline.Element("app").Classes.Remove("busy");
+                pipeline.Element("app-status").Text.Set("Ready");
             })
-            .OnError(401, Content.None, (expired, shown) =>
+            .OnError(401, Content.None, (expired, pipeline) =>
             {
-                shown.Notice().Warning(expired.Headers.Get("WWW-Authenticate"));
-                shown.Element("sign-in").Classes.Add("shown");
+                pipeline.Notice().Warning(expired.Headers.Get("WWW-Authenticate"));
+                pipeline.Element("sign-in").Classes.Add("shown");
             }));
 
     private static void EveryModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, RequestForm<IntakeRequest> intake)
     {
         var ward = pipeline.PageUrl<TModel, IntakePage>().Read(q => q.Ward);
-        pipeline.When(ward.Eq("north")).Then(north => north.Element("ward").Text.Set(ward));
+        pipeline.When(ward.Eq("north")).Then(pipeline => pipeline.Element("ward").Text.Set(ward));
         pipeline.Element("status").Text.Set(text);
         pipeline.Component<CensusBoard>("census").Note.Set(text);
         pipeline.When(pipeline.Element("status").Text.Eq("north"))
-            .Then(north => north.Notice().Info(text))
-            .Else(other => other.Element("status").Classes.Add("quiet"));
+            .Then(pipeline => pipeline.Notice().Info(text))
+            .Else(pipeline => pipeline.Element("status").Classes.Add("quiet"));
         pipeline.Validate(intake);
         pipeline.Unload("resident-card");
         pipeline.Post<TModel, IntakeRequest>("/Wards/{ward}/Intake", request => request.Form(intake).Set(r => r.Name, text))
-            .OnSuccess(Content.Html, (loaded, done) => done.Into("resident-card", loaded.Body));
+            .OnSuccess(Content.Html, (loaded, pipeline) => pipeline.Into("resident-card", loaded.Body));
     }
 
     private static void EveryRouteModule<TModel>(Pipeline<TModel> pipeline, ITypedSource<string?> text, ITypedSource<ValidationProblem> problem, RequestForm<IntakeRequest> intake)

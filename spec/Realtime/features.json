@@ -125,7 +125,7 @@
         },
         {
           "line": "proposed",
-          "text": "t.ServerPush(alerts, s => s.Alert, (alert, p) => p.Element(\"alert\").Text.Set(alert.Read(a => a.Message)))",
+          "text": "t.ServerPush(alerts, s => s.Alert, (alert, pipeline) => pipeline.Element(\"alert\").Text.Set(alert.Read(a => a.Message)))",
           "doors": [
             "N21.1",
             "N5.1"
@@ -500,7 +500,7 @@
         },
         {
           "line": "proposed",
-          "text": "t.SignalR(residents, h => h.StatusChanged, (status, p) => p.Element(\"status\").Text.Set(status.Read(s => s.Status)))",
+          "text": "t.SignalR(residents, h => h.StatusChanged, (status, pipeline) => pipeline.Element(\"status\").Text.Set(status.Read(s => s.Status)))",
           "doors": [
             "N21.1",
             "N5.1"
