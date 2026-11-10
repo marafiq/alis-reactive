@@ -1223,12 +1223,18 @@ def check_promises():
 
 def matrix_promise_problems():
     problems, unpromised, runs = [], [], 0
+    matrix = SPEC / "Reference" / "matrix.json"
+    if not matrix.exists():
+        return ["not started: spec/Reference/matrix.json absent"], 0, 0
+    rungs = core_defect_rungs()
+    compiled = {cell["id"] for cell in json.loads(matrix.read_text())["cells"]
+                if cell["outcome"] == "refused" and any(rungs.get(meaning) in MATRIX_COMPILER_RUNGS for meaning in cell["meaning"])}
     for name, field in [("syncfusion.json", "member"), ("native.json", "members")]:
         path = SPEC / "Reference" / name
         if not path.exists():
             return [f"not started: spec/Reference/{name} absent"], 0, 0
         for cell, entry in json.loads(path.read_text())["cells"].items():
-            if field not in entry:
+            if field not in entry or cell in compiled:
                 continue
             runs += 1
             promise = entry.get("promise")
@@ -1585,6 +1591,11 @@ MATRIX_GROUPS = {
 }
 MATRIX_OUTCOMES = {"runs", "refused"}
 MATRIX_NATIVE_CARRIED = {"templates": "FusionMultiSelect"}
+MATRIX_NO_KINDS = {"templates"}
+MATRIX_COMPILER_RUNGS = {"type", "analyzer"}
+MATRIX_REFUSING_RUNGS = {"type", "analyzer", "refusal"}
+MATRIX_GAP = re.compile(r'public static void (\w+)\([^)]*\) => NoDoor\.Position\("([^":]+):')
+MATRIX_VENDOR = ("name", "objectPath", "subscribe", "unsubscribe")
 MATRIX_POC15 = re.compile(r"^event\.poc15\.(\w+)\.(payload|held)\.(before|after)$")
 MATRIX_TYPE_KINDS = {"component", "live", "payload", "data"}
 MATRIX_CALLED = {"method", "methodValue", "methodAsync", "methodAsyncValue", "returnedObject", "returnedObjects"}
@@ -1633,11 +1644,17 @@ def matrix_problems(matrix):
     named = fluent_cell_names()["D7.1"]
     problems += [f"D7.1 names Positions.{name}, which no source cell runs" for name in named if name not in positions]
     problems += [f"a source cell runs at Positions.{name}, which D7.1 does not name" for name in positions if name not in named]
-    known, kinds = design_ids(), spec_node_set()
+    known, kinds, rungs = design_ids(), spec_node_set(), core_defect_rungs()
+    gaps = dict(MATRIX_GAP.findall((SPEC / "api" / "Cells" / "Positions.cs").read_text()))
     for cell in matrix["cells"]:
         name = cell["id"]
         problems += ([f"{name} is in group {cell['group']}, its bullet in {listed[name]['group']}"] if name in listed and listed[name]["group"] != cell["group"] else [])
-        problems += ([f"{name} states no meaning or no kind"] if not cell["meaning"] or not cell["kinds"] else [])
+        problems += ([f"{name} states no meaning"] if not cell["meaning"] else [])
+        problems += ([f"{name} writes no schema kind"] if not cell["kinds"] and cell["group"] not in MATRIX_NO_KINDS else [])
+        problems += ([f"{name} writes {', '.join(cell['kinds'])}, where D15 gives a template no schema node"] if cell["kinds"] and cell["group"] in MATRIX_NO_KINDS else [])
+        refusing = [meaning for meaning in cell["meaning"] if rungs.get(meaning) in MATRIX_REFUSING_RUNGS]
+        problems += ([f"{name} is refused, and none of {', '.join(cell['meaning'])} is a type, analyzer or refusal defect"] if cell["outcome"] == "refused" and not refusing else [])
+        problems += ([f"{name} at Positions.{cell.get('position')} carries the gap {cell.get('gap')!r}, where spec/api/Cells names {gaps.get(cell.get('position'))!r}"] if cell["group"] == "source" and cell.get("gap") != gaps.get(cell.get("position")) else [])
         problems += [f"{name} rests on {meaning}, which spec/Core/DESIGN.md does not state" for meaning in cell["meaning"] if meaning not in known]
         problems += [f"{name} writes {kind}, no kind of spec/Core/Schema.tla" for kind in cell["kinds"] if kind not in kinds]
         problems += ([f"{name} has the outcome {cell['outcome']!r}"] if cell["outcome"] not in MATRIX_OUTCOMES else [])
@@ -1649,6 +1666,8 @@ def native_declaration_problems(types):
     for declared in types.values():
         names = [member["js"] for member in declared["members"]]
         problems += ([f"WardRound's {declared['name']} is a {declared['kind']!r} type"] if declared["kind"] not in MATRIX_TYPE_KINDS else [])
+        vendor = declared.get("vendor") or {}
+        problems += ([f"the component {declared['name']} carries no vendor data"] if declared["kind"] == "component" and not all(is_prose(vendor.get(part)) for part in MATRIX_VENDOR) else [])
         problems += [f"{declared['name']} declares {name} twice" for name in sorted({name for name in names if names.count(name) > 1})]
         for member in declared["members"]:
             label = f"{declared['name']}.{member['js']}"
@@ -1681,15 +1700,16 @@ def native_resolve(types, path):
 
 
 def native_door_problems(cell, door, holder, member, chain, types):
+    root = chain[0][0]["name"]
     if door == "component" and holder == "payload":
-        fits = member["kind"] == "event" and types[member["type"]]["kind"] == "component"
+        fits = member["kind"] == "event" and types[member["type"]]["kind"] == "component" and member["type"] != root
     elif door == "component":
-        fits = member["kind"] == "component" and chain[-1][0]["kind"] == "payload"
+        fits = member["kind"] == "component" and chain[-1][0]["kind"] == "payload" and member["type"] != root
     elif holder == "payload":
         fits = member["kind"] == door and chain[-1][0]["kind"] == "payload"
     else:
         fits = member["kind"] == door and chain[-1][0]["kind"] != "payload" and len(chain) > 1 and chain[-2][0]["kind"] == "payload"
-    return [] if fits else [f"{cell}: {member['js']} is not a {door} {'on the payload' if holder == 'payload' else 'an object the payload holds'}"]
+    return [] if fits else [f"{cell}: {member['js']} is not a {door} {'on the payload' if holder == 'payload' else 'on an object the payload holds'}"]
 
 
 def native_problems(native, matrix, syncfusion):

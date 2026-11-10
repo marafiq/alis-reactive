@@ -1,13 +1,6 @@
 {
   "component": "WardRound",
   "what": "the native reference: a plain-DOM input the framework's own test app writes in TypeScript and declares in C# as an app brings a component, on the core's public surface only (its own vendor data, alis:mount); a nurse's round of a ward, its value the resident at the bedside",
-  "vendor": {
-    "name": "ward-round",
-    "objectPath": "wardRound",
-    "subscribe": "addEventListener",
-    "unsubscribe": "removeEventListener",
-    "payload": "the listener's first argument (D17.4)"
-  },
   "input": {
     "value": "WardRound.value",
     "commit": "WardRound.change"
@@ -38,6 +31,13 @@
     {
       "name": "WardRound",
       "kind": "component",
+      "vendor": {
+        "name": "ward-round",
+        "objectPath": "wardRound",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener",
+        "payload": "the listener's first argument (D17.4)"
+      },
       "members": [
         {
           "js": "value",
@@ -187,12 +187,32 @@
           "type": "DoseDue"
         },
         {
-          "js": "ready",
+          "js": "pumpAttached",
           "kind": "event",
-          "ts": "ready: the listener's first argument, the WardRound itself",
-          "door": "Event<WardRound>",
-          "csharp": "Ready",
-          "type": "WardRound"
+          "ts": "pumpAttached: the listener's first argument, the BedsidePump attached at the bedside",
+          "door": "Event<BedsidePump>",
+          "csharp": "PumpAttached",
+          "type": "BedsidePump"
+        }
+      ]
+    },
+    {
+      "name": "BedsidePump",
+      "kind": "component",
+      "vendor": {
+        "name": "bedside-pump",
+        "objectPath": "bedsidePump",
+        "subscribe": "addEventListener",
+        "unsubscribe": "removeEventListener",
+        "payload": "the listener's first argument (D17.4)"
+      },
+      "members": [
+        {
+          "js": "rate",
+          "kind": "property",
+          "ts": "rate: number",
+          "door": "Property<double>",
+          "csharp": "Rate"
         }
       ]
     },
@@ -432,12 +452,12 @@
           "type": "DoseTrolley"
         },
         {
-          "js": "round",
+          "js": "pump",
           "kind": "component",
-          "ts": "readonly round: WardRound",
-          "door": "LiveObject<WardRound>",
-          "csharp": "Round",
-          "type": "WardRound"
+          "ts": "readonly pump: BedsidePump",
+          "door": "LiveObject<BedsidePump>",
+          "csharp": "Pump",
+          "type": "BedsidePump"
         }
       ]
     },
@@ -953,31 +973,31 @@
     },
     "event.poc15.component.payload.before": {
       "members": [
-        "WardRound.ready"
+        "WardRound.pumpAttached.rate"
       ],
       "version": "current",
-      "door": "WardRound.ready"
+      "door": "WardRound.pumpAttached"
     },
     "event.poc15.component.payload.after": {
       "members": [
-        "WardRound.ready"
+        "WardRound.pumpAttached.rate"
       ],
       "version": "current",
-      "door": "WardRound.ready"
+      "door": "WardRound.pumpAttached"
     },
     "event.poc15.component.held.before": {
       "members": [
-        "WardRound.doseDue.round"
+        "WardRound.doseDue.pump.rate"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.round"
+      "door": "WardRound.doseDue.pump"
     },
     "event.poc15.component.held.after": {
       "members": [
-        "WardRound.doseDue.round"
+        "WardRound.doseDue.pump.rate"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.round"
+      "door": "WardRound.doseDue.pump"
     },
     "absence.member": {
       "members": [
