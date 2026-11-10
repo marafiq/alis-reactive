@@ -14,12 +14,12 @@
       "counts": {
         "cells": 118,
         "hosts": 18,
-        "placed": 449,
+        "placed": 450,
         "problems": 0,
         "rewrite": 0,
         "screens": 13
       },
-      "detail": "449 feature tests and 118 cell tests on 13 screens under 18 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, and each Native or Fusion component a test's page names is held by a part it lists",
+      "detail": "450 feature tests and 118 cell tests on 13 screens under 18 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "carriers": {
@@ -1544,7 +1544,7 @@
         "mapped": 8909,
         "matrix_promised": 118,
         "matrix_runs": 118,
-        "promises": 449,
+        "promises": 450,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1564,10 +1564,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 567,
+        "tests": 568,
         "units": 26
       },
-      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 3, U4 2, U5 2, U6 5, U7 99, U8 0, U9 20, U10 19, U11 6, U12 80, U13 40, U14 22, U15 47, U16 35, U17 3, U18 4, U19 14, U20 3, U21 25, U22 8, U23 26, U24 32, U25 69, U26 3",
+      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 3, U4 2, U5 2, U6 5, U7 99, U8 0, U9 20, U10 16, U11 6, U12 84, U13 40, U14 22, U15 47, U16 35, U17 3, U18 4, U19 14, U20 3, U21 25, U22 8, U23 26, U24 32, U25 69, U26 3",
       "pass": true
     },
     "slice_tests": {
@@ -3646,7 +3646,7 @@
     }
   },
   "passed": 33,
-  "read_at_head": "831b4d5f8dcda7a2f0e3ba3051ef86f672bba221",
+  "read_at_head": "43f98e1c8bd269338c141a9bd616b95e5d8d749a",
   "step": {
     "failing": [],
     "name": "End of session",
