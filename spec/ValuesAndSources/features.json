@@ -128,6 +128,22 @@
         {
           "id": "X7.14",
           "rung": "behavior"
+        },
+        {
+          "id": "X7.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X7.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X7.11",
+          "rung": "refusal"
+        },
+        {
+          "id": "X7.12",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -162,6 +178,94 @@
           "outcome": "The counter shows 6.",
           "opposite": "A found supply whose vial count is 0 leaves the counter at 1.",
           "defect": "The text 5 reaches the method, so the counter shows 15."
+        },
+        {
+          "for": "X7.6",
+          "page": "A pump page whose alarm card shows the alarm's note IfNull the pump's summary, Infusing 50 ml/h, and two buttons that raise the alarm with the note Line occluded or with a null note.",
+          "gesture": "Click the button that raises the alarm with a null note.",
+          "outcome": "The card shows Infusing 50 ml/h.",
+          "opposite": "Raised with the note Line occluded, the card shows Line occluded and not the summary.",
+          "defect": "The null note reaches the card, so it shows nothing or the text null, or the summary is taken over a held note."
+        },
+        {
+          "for": "X7.6",
+          "page": "A pump page whose Show last alarm button passes the pump's last alarm IfNull the text No alarm to the caption's setCaption method, on a pump whose last alarm reads nothing and one whose last alarm is Air in line.",
+          "gesture": "Click Show last alarm on the pump with no alarm.",
+          "outcome": "The caption shows No alarm.",
+          "opposite": "On the pump whose last alarm is Air in line, the caption shows Air in line.",
+          "defect": "The method receives undefined, so the caption shows undefined or keeps its earlier text."
+        },
+        {
+          "for": "X7.6",
+          "page": "A resident page whose Check button runs When(weight IfNull 70 > 65) to show Heavy, else Light, over a resident whose weight holds null and one whose weight is 60.",
+          "gesture": "Click Check on the resident whose weight holds null.",
+          "outcome": "The badge shows Heavy.",
+          "opposite": "On the resident whose weight is 60, the badge shows Light: the held weight is compared, not the fallback.",
+          "defect": "The null weight is compared as null, so the badge shows Light, or the fallback replaces the held 60 and shows Heavy."
+        },
+        {
+          "for": "X7.6",
+          "page": "A fluid chart whose Set target button sets the target from Choose on the order's restriction flag, 1000 ml when it holds and the measured intake when it reads nothing; the intake is a component method that shows how many times it was called.",
+          "gesture": "Click Set target on an order whose flag holds, then on an order whose flag reads nothing.",
+          "outcome": "The target shows 1000 ml, then the measured intake, 850 ml, and the intake's call count shows 1.",
+          "opposite": "Set on the flagged order alone, the call count stays 0.",
+          "defect": "Both arms are read each time, so the call count shows 2, or the flag that reads nothing takes the first arm and shows 1000 ml."
+        },
+        {
+          "for": "X7.7",
+          "page": "A fluid balance page whose Record button sets the chart's nullable intake property from the intake field widened with OrNull(), and an intake field that can be cleared.",
+          "gesture": "Type 500 in the intake field and click Record.",
+          "outcome": "The chart shows 500 ml.",
+          "opposite": "With the field cleared, Record sets the chart's intake to its empty state.",
+          "defect": "The widened value is dropped or written as text, so the chart keeps its earlier intake or shows the text 500."
+        },
+        {
+          "for": "X7.7",
+          "page": "A fluid balance page whose Check button runs When(intake.OrNull() > target) to show Over target, else Within target, with a target of 1000 ml that can be cleared.",
+          "gesture": "Type 1200 and click Check, then type 500 and click Check, then clear the target and click Check.",
+          "outcome": "The badge shows Over target, then Within target, then Within target.",
+          "opposite": "With the target set back to 400 and an intake of 500, Check shows Over target.",
+          "defect": "JavaScript's 500 > null holds, so the cleared target shows Over target."
+        },
+        {
+          "for": "X7.7",
+          "page": "A pump page whose Show summary button passes the pump's summary widened to string? to the caption's setCaption method, on a pump whose summary is Infusing 50 ml/h and one with no summary.",
+          "gesture": "Click Show summary on the pump whose summary is Infusing 50 ml/h.",
+          "outcome": "The caption shows Infusing 50 ml/h.",
+          "opposite": "On the pump with no summary, the caption shows its empty state.",
+          "defect": "The widened source writes nothing, so the caption keeps its earlier text."
+        },
+        {
+          "for": "X7.11",
+          "page": "A medication page whose dose badge shows a found chart's status, which the member's own JSON converter writes, IfNull the status a select on the page holds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X7.11's message, naming the chart's status and its own converter.",
+          "opposite": "The same IfNull with the fallback DoseStatus.Given, a value the view writes, renders, and the badge shows Given for a resident with no chart.",
+          "defect": "The two forms join, so the badge holds the converter's text on one arm and the select's text on the other, and a comparison with Given fails on one of them."
+        },
+        {
+          "for": "X7.11",
+          "page": "A medication page whose dose badge shows Choose on a test between a found chart's status, which the member's own JSON converter writes, and the status a select on the page holds.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with X7.11's message, naming the chart's status and its own converter.",
+          "opposite": "The same Choose with the literal arm DoseStatus.Given renders, and the badge shows Given when the test holds.",
+          "defect": "The two forms join, so the badge holds the converter's text on one arm and the select's text on the other, and a comparison with Given fails on one of them."
+        },
+        {
+          "for": "X7.12",
+          "page": "A medication page whose Check button runs When(chart status IfNull DoseStatus.Given equals DoseStatus.Given) to show Given, else Not given, where the status member is written by its own converter as text, over a resident with no chart found and one whose chart says Missed.",
+          "gesture": "Search the resident with no chart found and click Check.",
+          "outcome": "The badge shows Given.",
+          "opposite": "On the resident whose chart says Missed, the badge shows Not given.",
+          "defect": "The fallback is written as the enum's number while the found status is the converter's text, so the comparison fails and the badge shows Not given."
+        },
+        {
+          "for": "X7.12",
+          "page": "A medication page whose Check button runs When(Choose(test, DoseStatus.Given, chart status) equals DoseStatus.Given) to show Given, else Not given, beside a found chart whose status its own converter writes as Missed.",
+          "gesture": "Tick the test box and click Check.",
+          "outcome": "The badge shows Given.",
+          "opposite": "With the box cleared, the badge shows Not given, the found chart's Missed.",
+          "defect": "The literal arm is written as the enum's number while the found status is the converter's text, so the comparison fails and the badge shows Not given."
         }
       ],
       "verdicts": [

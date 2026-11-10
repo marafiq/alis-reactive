@@ -266,6 +266,14 @@
       ],
       "defects": [
         {
+          "id": "X7.2",
+          "rung": "type"
+        },
+        {
+          "id": "X7.4",
+          "rung": "type"
+        },
+        {
           "id": "X8.1",
           "rung": "type"
         },

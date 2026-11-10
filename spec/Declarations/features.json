@@ -349,6 +349,10 @@
           "id": "M11.X3",
           "rung": "behavior",
           "defect": "A write to, or a read of, a member an object a method returned lacks gives the object that member or reads nothing, and a read through a returned object that is nothing, declared without nullable: true, reads nothing, where each stops its pipeline (D5.3, D5.5). The redesign reads and writes a returned object's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:123, Alis.Reactive/PlanModel/Reactions/Steps.cs:88 at 65fdf118d), while it calls them as required (Alis.Reactive/PlanModel/Reactions/Steps.cs:114 at 65fdf118d)."
+        },
+        {
+          "id": "X7.9",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -433,6 +437,22 @@
           "outcome": "ward-read reads South; note-tried reads noting and note-done is empty; read-tried reads reading, and row-label and read-done are empty.",
           "opposite": "Read Ada's row shows Ada Byron in ada-label.",
           "defect": "The write gives Ada's row a note and note-done reads noted, or the read through no row reads nothing and read-done reads read, as the redesign's returned objects read and write as optional."
+        },
+        {
+          "for": "X7.9",
+          "page": "A ward page whose census component declares its count as int?, as its TypeScript reads number | null, and a Count button that sets it from the count of the ward's residents, an int.",
+          "gesture": "Click Count on a ward of 12 residents.",
+          "outcome": "The census shows 12.",
+          "opposite": "On an empty ward, the census shows 0 and not its empty state.",
+          "defect": "The int source does not reach the int? member, so the census keeps its empty state."
+        },
+        {
+          "for": "X7.9",
+          "page": "A ward page whose census component declares its count as int?, and a Total beds button that sets it from the sum of each room's beds, an int.",
+          "gesture": "Click Total beds on a ward whose four rooms hold 2 beds each.",
+          "outcome": "The census shows 8.",
+          "opposite": "On a ward with no rooms, the census shows 0 and not its empty state.",
+          "defect": "The int sum does not reach the int? member, so the census keeps its empty state."
         }
       ],
       "verdicts": []

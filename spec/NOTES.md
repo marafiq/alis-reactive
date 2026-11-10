@@ -822,3 +822,5 @@
   Evidence: AnalyzerHelpers.cs:13-19 at 65fdf118d names Fusion, Native and NativeTagHelpers; root CLAUDE.md, Rules, "Typed APIs only".
 - 2026-11-09 check, by the lead: every core defect is placed in exactly one feature, and the defects check lists each one no feature places; 31 are, 7 of them Q7's (X7.2 to X7.12), which module 2 owns and never placed, the rest modules 22, 23, 25 and 26's.
   Evidence: check_defects at f9151b5bd passed on a full row set with any core defect unplaced; DESIGN:1298-1329.
+- 2026-11-09 the seven Q7 defects placed: X7.2 and X7.4 (type, N7.3) in M3.F1, which names N7.3; X7.6, X7.7, X7.11 and X7.12 (N7.4, N7.5, D7.7) in M2.F1; X7.9 (N7.6) in M11.F1, which keeps NullableWrites.Set; eleven promises, one per place each line names.
+  Evidence: DESIGN:1298-1333; Conditions/module.md:13, ValuesAndSources/module.md:25-26, Declarations/module.md:47.
