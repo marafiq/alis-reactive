@@ -338,7 +338,7 @@
         {
           "id": "M11.X1",
           "rung": "behavior",
-          "defect": "A declared member's default name follows the app's JSON naming, so under a snake-case app a declaration's SetRate calls set_rate, which the vendor's object lacks, and the pipeline stops; or data read past a declared member follows camel case where the app writes snake case (M11.D1, D2.9)."
+          "defect": "A declared member's default name follows the app's JSON naming, so under a snake-case app a declaration's SetRate calls set_rate, which the vendor's object lacks, and the pipeline stops; or data read past a declared member follows camel case where the app writes snake case (M11.D1, D2.7, D2.9)."
         },
         {
           "id": "M11.X2",

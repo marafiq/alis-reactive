@@ -489,7 +489,7 @@
         {
           "id": "M4.X3",
           "rung": "behavior",
-          "defect": "An operation changes the list it reads: a sort that orders the vendor's own array in place, where D6.6 sorts by toSorted and leaves the list as the vendor holds it, so a later read of the same list reads the sorted order."
+          "defect": "An operation changes the list it reads: a sort that orders the vendor's own array in place, where the core sorts by toSorted (D6.6) and leaves the list as the vendor holds it, so a later read of the same list reads the sorted order."
         }
       ],
       "promises": [
@@ -1008,7 +1008,7 @@
         {
           "id": "M4.X7",
           "rung": "behavior",
-          "defect": "Find(predicate, field) over live objects stops where no item matched, or reads the field optional: it reads nothing when no item matched, and a kept item that lacks the field's declared member stops the pipeline (D6.9, D4.1)."
+          "defect": "Find(predicate, field) over live objects stops where no item matched, or reads the field optional: it reads nothing when no item matched, and a kept item that lacks the field's declared member stops the pipeline (D6.9, D4.1, D4.9)."
         },
         {
           "id": "M4.X9",

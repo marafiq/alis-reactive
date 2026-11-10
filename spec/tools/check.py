@@ -706,12 +706,31 @@ def check_kinds():
         problems.append(f"schema.md's proposed set differs from Schema.tla's Kinds: {sorted(proposed ^ spec_nodes)}")
     added = sorted(row["Kind"] for row in rows if row["Proposed"] == "added")
     removed = sorted(row["Kind"] for row in rows if row["Proposed"] == "removed")
+    problems += closed_set_problems(len(proposed), len(grammar), added, removed)
     detail = "; ".join(problems[:6]) or (
         f"grammar, plan.schema.json and schema.md agree on today's {len(grammar)}; proposed {len(proposed)} equals Schema.tla's"
         f" node set, one handler each; diff +{','.join(added)} -{','.join(removed) or 'none'};"
         f" {len(several_today)} kinds have two handlers today")
     return result(not problems, detail, today=len(grammar), proposed=len(proposed), added=len(added), removed=len(removed),
                   several_handlers_today=len(several_today))
+
+
+CLOSED_SET = re.compile(r"closed at (\d+) kinds: today's (\d+) but (.*?), and (.*?), the (\d+) `spec/Core/schema\.md` marks added")
+
+
+def closed_set_problems(proposed, today, added, removed):
+    stated = next((item for lines in (design_sections() or {}).values() for item in bullets(section_parts(lines).get("Decision", ""))
+                   if item.startswith("- D19.2 ")), "")
+    match = CLOSED_SET.search(stated)
+    if match is None:
+        return ["D19.2 states no closed set as 'closed at N kinds: today's N but .., and .., the N spec/Core/schema.md marks added'"]
+    closed, today_stated, removed_stated, added_stated, added_count = match.groups()
+    problems = [f"D19.2 closes the set at {closed} kinds, and schema.md proposes {proposed}"] if int(closed) != proposed else []
+    problems += [f"D19.2 counts {today_stated} kinds today, and the grammar holds {today}"] if int(today_stated) != today else []
+    problems += [f"D19.2 removes {sorted(backticked(removed_stated))}, and schema.md removes {removed}"] if sorted(backticked(removed_stated)) != removed else []
+    problems += [f"D19.2 adds {sorted(backticked(added_stated))}, and schema.md adds {added}"] if sorted(backticked(added_stated)) != added else []
+    problems += [f"D19.2 counts {added_count} added, and schema.md adds {len(added)}"] if int(added_count) != len(added) else []
+    return problems
 
 
 def gate_answered(number):
@@ -1188,6 +1207,101 @@ def check_defects():
     if not problems and unplaced:
         return result(False, f"every feature row valid; {counts['unmapped']} of {counts['rows']} spec doors in no feature; core defects no feature places: {', '.join(unplaced)}", **counts)
     return feature_result(problems, counts, counts["unmapped"] == 0, "every defect on its rung, every core defect in a feature; no promise for a type or analyzer defect")
+
+
+CARRIER_ID = r"(?:M\d+\.[DNX]\d+|[DNXR]\d+\.\d+)"
+CARRIER_GROUP = re.compile(rf"\(({CARRIER_ID}(?:, {CARRIER_ID})*)\)")
+MEANING_NAMED = re.compile(r"\b(?:M\d+\.D\d+|D\d+\.\d+)\b")
+DEFECT_NAMED = re.compile(r"\b(?:M\d+\.X\d+|X\d+\.\d+)\b")
+CARRIER_NAMED = re.compile(r"\b(?:([A-Z][A-Za-z]+)\.tla:(\w+)|probe:([\w-]+(?:\.[\w-]+)*)|check:(\w+))")
+RUNG_SLOT = re.compile(r"^- `?X\d+\.\d+`? (?:type|analyzer|refusal|behavior) \(([^)]*)\):")
+DELIVERY_TESTS = re.compile(r"^- The delivery tests run on both fresh apps:(.*?)(?=^- |^#|\Z)", re.MULTILINE | re.DOTALL)
+CARRIER_KINDS = ["defect", "invariant", "probe", "check", "cell", "delivery"]
+
+
+def grouped(text, pattern):
+    return {named for group in CARRIER_GROUP.findall(text) for named in pattern.findall(group)}
+
+
+def stated_meanings(sections):
+    lines, defects, problems = {}, {}, []
+    for body in sections.values():
+        parts = section_parts(body)
+        for item in bullets(parts.get("Decision", "")):
+            match = re.match(r"^- (D\d+\.\d+) ", item)
+            if match:
+                problems += [f"{match.group(1)} is stated twice"] if match.group(1) in lines else []
+                lines[match.group(1)] = item
+        for item in bullets(parts.get("Defects", "")):
+            match, slot = DEFECT.match(item), RUNG_SLOT.match(item)
+            if match:
+                defects[match.group(1)] = grouped(item, MEANING_NAMED) | (set(MEANING_NAMED.findall(slot.group(1))) if slot else set())
+    for path in feature_files():
+        for feature in json.loads(path.read_text()).get("features", []):
+            for meaning in feature.get("meanings", []):
+                problems += [f"{meaning['id']} is stated twice"] if meaning["id"] in lines else []
+                lines[meaning["id"]] = meaning["meaning"]
+            defects.update({defect["id"]: grouped(defect["defect"], MEANING_NAMED) for defect in feature.get("defects", []) if "defect" in defect})
+    return lines, defects, problems
+
+
+def named_carrier(spec, invariant, probe, check, probes, checks):
+    if spec:
+        defined, listed = tla_invariants(spec)
+        return "invariant", f"{spec}.tla:{invariant}", defined is not None and invariant in defined and invariant in listed
+    if probe:
+        return "probe", f"probe:{probe}", probe in probes
+    return "check", f"check:{check}", check in checks
+
+
+def check_carriers():
+    sections = design_sections()
+    if sections is None:
+        return not_started(SPEC / "Core" / "DESIGN.md")
+    lines, defects, problems = stated_meanings(sections)
+    carriers = {identifier: set() for identifier in lines}
+
+    def carry(meaning, kind, where):
+        if meaning in carriers:
+            carriers[meaning].add(kind)
+        else:
+            problems.append(f"{where} names {meaning}, which no D line or module meaning states")
+
+    for defect, meanings in defects.items():
+        for meaning in sorted(meanings):
+            carry(meaning, "defect", defect)
+    for cell in json.loads((SPEC / "Reference" / "matrix.json").read_text())["cells"]:
+        for meaning in cell["meaning"]:
+            if MEANING_NAMED.fullmatch(meaning):
+                carry(meaning, "cell", f"cell {cell['id']}")
+    delivery = DELIVERY_TESTS.search((SPEC / "REWRITE.md").read_text())
+    problems += [] if delivery else ["REWRITE.md holds no bullet of the delivery tests"]
+    for meaning in sorted(grouped(delivery.group(1), MEANING_NAMED) if delivery else set()):
+        carry(meaning, "delivery", "REWRITE.md's delivery tests")
+    probes, checks = probe_ids(), {identifier for identifier, _, _ in CHECKS}
+    for identifier, text in lines.items():
+        for named in sorted(grouped(text, DEFECT_NAMED)):
+            if named in defects:
+                carriers[identifier].add("defect")
+            else:
+                problems.append(f"{identifier} names {named}, which no defect is")
+        for found in CARRIER_NAMED.findall(text):
+            kind, name, resolves = named_carrier(*found, probes, checks)
+            if resolves:
+                carriers[identifier].add(kind)
+            else:
+                problems.append(f"{identifier} names {name}, which is no {'invariant its spec defines and its cfg checks' if kind == 'invariant' else kind + ' of spec/'}")
+    for path in sorted(SPEC.glob("*/module.md")):
+        problems += [f"{path.relative_to(REPO)} cites {named}, which no features.json meaning states"
+                     for named in sorted(set(re.findall(r"\bM\d+\.D\d+\b", path.read_text()))) if named not in lines]
+    uncarried = [identifier for identifier, kinds in carriers.items() if not kinds]
+    problems += [f"carried by nothing: {', '.join(uncarried[:12])}" + (f" and {len(uncarried) - 12} more" if len(uncarried) > 12 else "")] if uncarried else []
+    core = sum(1 for identifier in lines if identifier.startswith("D"))
+    counts = {"d_lines": core, "meanings": len(lines) - core, "uncarried": len(uncarried)}
+    counts.update({kind: sum(1 for kinds in carriers.values() if kind in kinds) for kind in CARRIER_KINDS})
+    return result(not problems, "; ".join(problems[:6]) or
+                  f"each of {core} D lines and {len(lines) - core} module meanings has at least one carrier that resolves: a defect naming it "
+                  "in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it", **counts)
 
 
 def unplaced_core_defects(model, rungs):
@@ -2294,6 +2408,7 @@ CHECKS = [
     ("matrix", "the conformance matrix, every cell run by FusionMultiSelect's or ConformanceComponent's declaration", check_matrix),
     ("native_behaviors", "every behavior native.json states names tests of the spec", check_native_behaviors),
     ("defects", "every defect on its highest rung, every core defect in a feature; no test for a type or analyzer defect", check_defects),
+    ("carriers", "every D line and module meaning carried by a resolving defect, invariant, probe, check, cell or delivery test", check_carriers),
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("test_rules", "every rule and smell of tests.md held by a test rule or a named check", check_test_rules),
@@ -2314,7 +2429,7 @@ STEPS = [
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
-    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app"], "Finish every check and make each pass."),
+    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers"], "Finish every check and make each pass."),
     (11, "E", "REWRITE.md", ["rewrite_units"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]

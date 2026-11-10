@@ -44,7 +44,8 @@ Terms used throughout:
   inputs reach a JSON body at their position (X14.10).
 - D1.6 The MVC binding name is one function of a CLR member path, `BindingName`: member names joined by
   `.`, and an index written `[n]` directly after the step before it, as MVC's own
-  `CreateSubPropertyName` and `CreateSubIndexName` write them. It is computed only in C#.
+  `CreateSubPropertyName` and `CreateSubIndexName` write them. It is computed only in C#
+  (`probe:mvc5-sub-property-name`, `probe:mvc5-sub-index-name`).
 - D1.7 Binding name text appears only where the server speaks it: an input's `name` attribute, form-data and
   query keys, and the error keys a server's validation returns. The browser compares a server key with a
   binding name as whole text and never parses a name.
@@ -77,13 +78,13 @@ Terms used throughout:
 - The browser parses names today: `Alis.Reactive.Assets/runtime/plugins/model.ts:113`.
 
 **Defects.**
-- `X1.1` type: a step that is not a member, an index or each cannot be constructed: new:N1.1.
-- `X1.2` type: a member whose name looks like a marker is still a member: new:N1.1 writes members as strings only.
-- `X1.3` type: writing, calling or subscribing to a projection over items does not compile; the projection is a
+- `X1.1` type (D1.1, D1.3): a step that is not a member, an index or each cannot be constructed: new:N1.1.
+- `X1.2` type (D1.2): a member whose name looks like a marker is still a member: new:N1.1 writes members as strings only.
+- `X1.3` type (D1.5): writing, calling or subscribing to a projection over items does not compile; the projection is a
   `ReadOnly<IReadOnlyList<TField>>`, which has no `Set` (`Alis.Reactive/Components/JsMembers.cs:140`).
-- `X1.4` refusal: a dictionary keyed by a type System.Text.Json cannot write as a property name: "A dictionary
+- `X1.4` refusal (D1.4): a dictionary keyed by a type System.Text.Json cannot write as a property name: "A dictionary
   keyed by {type} cannot be sent: System.Text.Json writes no property name for its keys; key it by text or a number."
-- `X1.5` behavior: a server error key `Members[1].Name` shows its message in the request's summary, and at the
+- `X1.5` behavior (D1.6, D1.7): a server error key `Members[1].Name` shows its message in the request's summary, and at the
   input the request sent under that binding name.
 
 ## Q2. One read
@@ -98,8 +99,10 @@ Terms used throughout:
   path (wire names, D2.4), the JSON name of a data read (D2.5), and the element id (Q14).
 - D2.4 A request body names each member as the endpoint's binder reads it, one rule per host:
   - net10: the name System.Text.Json's contract gives the member under the endpoint's MVC `JsonOptions`
-    (`JsonPropertyName`, else the naming policy), read from `JsonSerializerOptions.GetTypeInfo`.
-  - net48: the CLR name, which MVC 5's `JsonValueProviderFactory` and `DefaultModelBinder` match ignoring case.
+    (`JsonPropertyName`, else the naming policy), read from `JsonSerializerOptions.GetTypeInfo`
+    (`probe:core-frombody-binds-json-name`).
+  - net48: the CLR name, which MVC 5's `JsonValueProviderFactory` and `DefaultModelBinder` match ignoring case
+    (`probe:mvc5-json-value-provider-case`).
 - D2.5 Form-data and query keys are binding names (CLR names) on both hosts, since MVC binds form and query
   values by property name and ignores `JsonPropertyName` (`probe:core-query-object-json-name`). A member net10
   binds under another name (`[FromQuery(Name)]`, `[BindProperty(Name)]`, `[ModelBinder(Name)]`) binds nothing
@@ -148,10 +151,10 @@ Terms used throughout:
 - G3: the holder decides requiredness (`Alis.Reactive/PlanModel/Values/Target.cs:57`, `Alis.Reactive/PlanModel/Values/Target.cs:80`).
 
 **Defects.**
-- `X2.1` type: reading a member a model or declaration does not have does not compile; every read starts from a
+- `X2.1` type (D2.1): reading a member a model or declaration does not have does not compile; every read starts from a
   typed lambda (`Alis.Reactive/Components/JsMembers.cs:37`).
-- `X2.2` type: a plugin cannot be handed a member path as text: new:N2.1 gives the model plugin no text door.
-- `X2.3` behavior: a request member declared `[JsonPropertyName("given")]` reaches a net10 `[FromBody]` endpoint
+- `X2.2` type (D2.2): a plugin cannot be handed a member path as text: new:N2.1 gives the model plugin no text door.
+- `X2.3` behavior (D1.8, D2.4): a request member declared `[JsonPropertyName("given")]` reaches a net10 `[FromBody]` endpoint
   bound.
 - `X2.4` behavior: an input a partial renders under the prefix `Kin` has an id, a name, a body path and an error
   key that agree, so the server's message for `Kin.Name` shows at that input.
@@ -166,9 +169,9 @@ Terms used throughout:
 - D3.2 There is one conversion node, `as(expr, shape)`. The operators `toNumber`, `toDate`, `toBoolean` and
   `toText` leave the grammar, and a validation rule converts with `as` like every read. A comparison or a sort of a
   date or a time reads each operand through its key (D6.12), an operator C# writes only as an argument of a
-  comparison or a sort's comparison, so a key is no conversion: no value position takes it.
+  comparison or a sort's comparison, so a key is no conversion: no value position takes it (`Schema.tla:KeysOnlyCompared`).
 - D3.3 A conversion of a present value the shape cannot hold yields nothing. No conversion passes the
-  unconverted value on.
+  unconverted value on (`Absence.tla:FailedConversionReadsNothing`).
 - D3.4 The conversions are the table of `spec/Core/conversions.md`, one row per source kind and shape; the
   browser implements exactly that table.
 - D3.5 Blank is nothing, or text that is empty or white space as .NET's `string.IsNullOrWhiteSpace` defines it.
@@ -177,13 +180,14 @@ Terms used throughout:
   chooses no default by shape.
 - D3.7 A number goes into JSON as a JSON number. Into form data it goes as its text with the decimal
   separator of the culture the view renders under, which C# writes into the request argument, because both
-  hosts bind form values under the request's culture. Into the query and the route it goes as its invariant
-  text, because both hosts bind those under the invariant culture.
+  hosts bind form values under the request's culture (`probe:core-form-decimal-culture`,
+  `probe:mvc5-form-current-culture`). Into the query and the route it goes as its invariant text, because both hosts
+  bind those under the invariant culture (`probe:core-query-decimal-invariant`, `probe:mvc5-query-invariant-culture`).
 - D3.8 A date and an instant are shown and sent as `spec/PathsAndWire/DateWire.tla` states (`yyyy-MM-dd`, the time
   when not midnight, an instant's clock offset; in form data a date or a day with its time, D3.9). A date or an
   instant that reads nothing writes no text: a request
   sends it by D9.10's table, so a `DateTimeOffset` is left out and binds its start, and a `DateTimeOffset?` binds
-  `null`.
+  `null` (`DateWire.tla:NothingWritesNoText`, `DateWire.tla:InstantCarriesItsClockOffset`).
 - D3.9 Every date text is ISO 8601-1:2019's extended format, and an instant's is the RFC 3339 profile of it
   (the owner, 2026-11-06: dates to the standards).
   - A `DateTime` is a local date and time with no offset. Both hosts bind that text as an Unspecified
@@ -338,21 +342,21 @@ Terms used throughout:
 - B2: `value`, `shape` and `list` carry one fact (`Alis.Reactive/Grammar/PlanDocument.cs:165`).
 
 **Defects.**
-- `X3.1` type: a second conversion cannot be written: new:N3.1.
-- `X3.2` type: a file cannot be read as text or sent as JSON by accident: new:N3.2 gives it its own shape, and
+- `X3.1` type (D3.2): a second conversion cannot be written: new:N3.1.
+- `X3.2` type (D3.1): a file cannot be read as text or sent as JSON by accident: new:N3.2 gives it its own shape, and
   the request argument (Q9) accepts a `file` member only in form data.
-- `X3.3` behavior: the text `abc` in an input bound to an `int` member that starts at 5 reads 5 wherever the input is
+- `X3.3` behavior (D3.3, D3.4): the text `abc` in an input bound to an `int` member that starts at 5 reads 5 wherever the input is
   a source, never `abc` or `NaN`, and its check fails the member with the binder's message before `GreaterThan(0)`
   runs (N3.3, D16.7).
-- `X3.4` behavior: a blank input bound to an `int` member initialized to 5 sends 5 and validates as 5.
-- `X3.5` behavior: a decimal sent as form data from a view rendered under `de-DE` binds `1,5` on the endpoint.
-- `X3.6` behavior: under `de-DE`, `1,5` typed in a decimal input passes `GreaterThan(1)` in the browser, as the
+- `X3.4` behavior (D3.5, D3.6): a blank input bound to an `int` member initialized to 5 sends 5 and validates as 5.
+- `X3.5` behavior (D3.7): a decimal sent as form data from a view rendered under `de-DE` binds `1,5` on the endpoint.
+- `X3.6` behavior (D19.8): under `de-DE`, `1,5` typed in a decimal input passes `GreaterThan(1)` in the browser, as the
   server passes it, whatever the browser's own locale.
 - `X3.7` behavior: a date of birth a net48 endpoint answers through N10.6 shows its own day in a browser whose
   clock is behind the server's.
 - `X3.8` behavior: a decimal set as an element's text under `de-DE` shows `1234,5`, as the server's view shows
   it.
-- `X3.9` behavior: a view rendered under the zone `America/New_York` shows a visit's `DateTimeOffset` at its New
+- `X3.9` behavior (D3.8): a view rendered under the zone `America/New_York` shows a visit's `DateTimeOffset` at its New
   York wall time and offset in a browser whose clock is in another zone, and sends a picked time back with
   New York's offset for that day.
 - `X3.10` behavior (D3.13): a visit planner receives as a `Date` a date a step passes, one inside an object, each
@@ -405,7 +409,7 @@ Terms used throughout:
   that promise adds no second error.
 - D4.5 A missing value set as an element's text or HTML shows nothing; a missing class name changes no class.
 - D4.6 A path value that reads nothing stops its request before it is sent, and its `Finally` runs: the request's
-  `guard` state stops it on what its `check` state read (D10.23).
+  `guard` state stops it on what its `check` state read (D10.23) (`Absence.tla:MissingPathValueStopsAndFinallyRuns`).
 - D4.7 A method called inside a condition runs only when its term is reached: `and`, `or` and `cond` evaluate
   their terms in order and stop at the first that decides, and an `ElseIf`'s condition runs only when no branch
   before it ran. C# writes a method's result as a `let` at its line (D5.11). A result called after the block's
@@ -464,7 +468,7 @@ Terms used throughout:
   it do not run.
 - `X4.3` behavior: an event payload that lacks a member its declaration names stops the pipeline (D4.1, D5.3), and a
   field of data the payload holds that the data lacks reads its start (D4.2).
-- `X4.4` behavior: a path value that reads nothing sends no request, shows none of its busy targets, and runs its
+- `X4.4` behavior (D4.6): a path value that reads nothing sends no request, shows none of its busy targets, and runs its
   `Finally`.
 - `X4.5` behavior: a `Method()` that returns a promise stops its pipeline after the call and names `MethodAsync`.
 - `X4.6` behavior: a dose that lacks `refills`, which the app omits at its default, reads 0; one that lacks `unit`,
@@ -622,6 +626,7 @@ Terms used throughout:
 - `N5.7` new, its form gate 2's: a `JsObject`'s iterator, declared with the declaration of its items, live or data
   (D5.13); the list operations of N6.1 and D6.10 take an object that declares one. It replaces the redesign's
   `HtmlElement.Children` and `ElementClassList.Items`, each a `ReactiveArray` over a member read with no declaration
+ 
   (`Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:52-53`, `Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:120-121`).
 
 **Evidence.**
@@ -635,11 +640,11 @@ Terms used throughout:
   (`Alis.Reactive/PlanModel/Reactions/Steps.cs:114`); D5.5 makes every member required.
 
 **Defects.**
-- `X5.1` type: a pushed message cannot be written to: new:N5.1 types it `Data<TMessage>`, which has no `Set`.
-- `X5.2` type: a method cannot be called on data with no declared methods; `Data<T>` exposes reads only
+- `X5.1` type (D5.7): a pushed message cannot be written to: new:N5.1 types it `Data<TMessage>`, which has no `Set`.
+- `X5.2` type (D5.2): a method cannot be called on data with no declared methods; `Data<T>` exposes reads only
   (`Alis.Reactive/PlanAuthoring/Pipelines/TriggerBuilder.cs:50`).
 - `X5.3` behavior: a returned object that lacks a declared method stops the pipeline at the call.
-- `X5.5` type: a property's object cannot be mistaken for a method's returned object, and no member scan
+- `X5.5` type (D5.8): a property's object cannot be mistaken for a method's returned object, and no member scan
   decides it: new:N5.2.
 - `X5.6` type: a vendor method with more arguments than a declaration door takes: new:N5.3 takes any number.
 - `X5.4` behavior: a field of the object a property holds reads its start when the object lacks it (D4.2), and
@@ -987,7 +992,7 @@ Terms used throughout:
   the redesign writes before every operation (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs:108`).
 
 **Defects.**
-- `X6.1` type: a list cannot be counted two ways: new:N6.1 leaves one `Count()`.
+- `X6.1` type (D6.2): a list cannot be counted two ways: new:N6.1 leaves one `Count()`.
 - `X6.2` analyzer: a list's lambda that calls a member outside the table: "'{term}' has no browser form in a
   list's lambda; use a member the framework translates, or move the work to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.3` behavior: `Where(x => x.Name.Trim() == "")` over a list whose item lacks `Name`, whose start is null,
@@ -1054,7 +1059,7 @@ Terms used throughout:
   is null when the view renders."
 - `X6.25` analyzer (D6.5): `Contains` with an equality comparer: "'{term}' passes an equality comparer, which the
   browser does not have; look up without it, or move the work to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
-- `X6.26` behavior (D6.5): `wards.Contains(d.Ward)` over an array, an enum array written by name, a `List<T>` and
+- `X6.26` behavior (D6.5, D18.2): `wards.Contains(d.Ward)` over an array, an enum array written by name, a `List<T>` and
   an array typed as a sequence keeps the items the view lists; `d.Medicine.Contains('o')` finds a letter; a list's
   `Count` and an array's `Length` count their items.
 - `X6.27` behavior (D6.13): a text key with no comparer orders as .NET orders it under the view's culture: en-US and
@@ -1313,6 +1318,7 @@ Terms used throughout:
 - B10: a gathered field's type is erased (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:167`) while
   `p.Bound` keeps it (`Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:142`); Q9 takes the gather side.
 - Two builders make an object from sources: `GatherBuilder` and `DispatchPayloadBuilder`
+ 
   (`Alis.Reactive/PlanAuthoring/Pipelines/DispatchPayloadBuilder.cs:31`, `Alis.Reactive/PlanAuthoring/Pipelines/DispatchPayloadBuilder.cs:45`).
 - A write of a source that reads nothing writes whatever the browser read, `undefined` included
   (`Alis.Reactive.Assets/runtime/grammar/execute.ts:35-40`); no C# states it.
@@ -1323,8 +1329,8 @@ Terms used throughout:
 - `X7.2` type: a text test against a source that is not text does not compile: new:N7.3.
 - `X7.3` type: an object argument built from sources is typed member by member, so a member of the wrong type
   or a member the type lacks does not compile: new:N7.1.
-- `X7.4` type: a pattern read in the browser cannot reach `Matches`: new:N7.3 gives `Matches` no source overload.
-- `X7.5` behavior: a property set from a payload field the payload lacks writes `null`, and the component
+- `X7.4` type (D7.5): a pattern read in the browser cannot reach `Matches`: new:N7.3 gives `Matches` no source overload.
+- `X7.5` behavior (D4.9): a property set from a payload field the payload lacks writes `null`, and the component
   shows its empty state.
 - `X7.8` behavior (D7.6): a pump card's class is added, removed, toggled on and toggled off, and a class name that
   reads nothing leaves the card's class as it was, where `classList.add(null)` adds "null"; HTML set on an element
@@ -1368,7 +1374,7 @@ Terms used throughout:
 **Decision.**
 - D8.1 One condition core: the `Condition` nodes (comparison, text test, membership, value test, all, any,
   not), the operators of Q7 and the sources of Q7. The browser evaluates every pipeline condition, array
-  predicate and validator condition with it.
+  predicate and validator condition with it (`Validation.tla:ConditionAgrees`).
 - D8.2 Two doors write it. The pipeline door is the typed builder (`p.When(source)`, `ElseIf`, `Else`, `And`,
   `Or`, groups). The lambda door translates an expression tree with the one table
   `spec/Core/translated-members.md`; array predicates and validator conditions use it.
@@ -1383,7 +1389,7 @@ Terms used throughout:
 - D8.4 Template conditionals are not this core. Syncfusion's template engine evaluates them on its own
   data, and Q15 states what that engine evaluates.
 - D8.5 Every term reads by Q4: a term over a source that reads nothing does not hold, and a term with a
-  method call runs only when it is reached.
+  method call runs only when it is reached (`Absence.tla:ConditionTermsLazy`).
 - D8.6 A pipeline condition has one syntax: `When(source)`, `ElseIf(source)`, `And(source)` and `Or(source)`,
   where the source is any typed source of Q7, an event payload's member included (`When(args.ClosedBy)`).
   Main's second form, a payload and a path lambda (`When(args, x => x.IsExpanded)`), is refused, and
@@ -1473,11 +1479,11 @@ Terms used throughout:
   (`Alis.Reactive.Assets/runtime/grammar/execute.ts:60-65`, `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:17-19`).
 
 **Defects.**
-- `X8.1` type: a condition on an operand of the wrong type does not compile: the operator is generic over
+- `X8.1` type (D8.2): a condition on an operand of the wrong type does not compile: the operator is generic over
   the source's type (`Alis.Reactive/PlanAuthoring/Conditions/ConditionOperators.cs:16`).
-- `X8.2` analyzer: an array predicate with a term the lambda door cannot translate: "{term} has no browser form
+- `X8.2` analyzer (D8.2): an array predicate with a term the lambda door cannot translate: "{term} has no browser form
   in an array predicate; use a member the framework translates, or move the test to the server." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
-- `X8.3` behavior: a validator condition `WhenOnServer` declares, with a term the lambda door cannot translate,
+- `X8.3` behavior (D16.9): a validator condition `WhenOnServer` declares, with a term the lambda door cannot translate,
   gates its rules on the server only; the browser sends the request and shows the server's message.
 - `X8.4` behavior: `When(a).ElseIf(b).Else()` runs the first branch whose condition holds and no other.
 - `X8.5` analyzer: a response body captured in a C# variable inside `OnSuccess` and read after the request is
@@ -1485,11 +1491,11 @@ Terms used throughout:
   inside that request's routes or the blocks they hold." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
 - `X8.6` behavior: a branch with three steps in a `{}` body runs all three, in order, and none when its
   condition does not hold.
-- `X8.7` behavior: over a dose that lacks `ward`, whose start is null, `d.Ward != "North"` and `!(d.Ward == "North")`
+- `X8.7` behavior (D8.1): over a dose that lacks `ward`, whose start is null, `d.Ward != "North"` and `!(d.Ward == "North")`
   both keep it (D4.2);
   a dose whose `priority` holds null is kept by `d.Priority != 2` and left out by `d.Priority <= 2` and
   `d.Priority < 2`, as .NET's lifted operators decide (D8.9).
-- `X8.8` behavior: `or` keeps an item whose left term reads nothing when its right term holds, and `and` whose left
+- `X8.8` behavior (D8.5): `or` keeps an item whose left term reads nothing when its right term holds, and `and` whose left
   term reads nothing and right term is false reads false, so `not` of it holds (D8.9).
 - `X8.9` analyzer (D8.7): an `ElseIf` or `Else` written after another step of its block, or after a method its
   condition does not read: "An ElseIf or an Else continues the When it follows, before any other step of its block:
@@ -1498,9 +1504,9 @@ Terms used throughout:
   lambda door gives for it. At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X8.11` behavior (D11.5): the steps after a branch that awaits run once its method settles, and at once when the
   branch is not taken.
-- `X8.12` behavior (D8.9): a branch whose condition orders a null runs none of its steps, where JavaScript's
+- `X8.12` behavior (D8.9, D8.1): a branch whose condition orders a null runs none of its steps, where JavaScript's
   `null < 80` holds.
-- `X8.13` behavior (D4.7): a method called in the right term of `Or` runs only when the left term does not hold, and
+- `X8.13` behavior (D4.7, D8.5): a method called in the right term of `Or` runs only when the left term does not hold, and
   in the right term of `And` only when the left term holds.
 - `X8.14` behavior (D4.7, D8.7): a method called in an `ElseIf`'s condition runs only when no branch before it ran,
   so a second `ElseIf`'s does not run when the first holds; an async one is awaited there, and its branch runs once it
@@ -1723,14 +1729,15 @@ Terms used throughout:
   - The run records each input it sent, under the binding name it sent it by (D10.18).
 - D9.16 A file is the shape `file`, sent only in form data or as the whole body. A set member of file shape in a
   request with no body, a JSON, URL-encoded or text body
-  is refused by an analyzer; a file input a request sends in a GET or a JSON body stops the request when it is sent.
+  is refused by an analyzer; a file input a request sends in a GET or a JSON body stops the request when it is sent
+  (`Request.tla:FileOnlyInFormData`).
 - D9.17 A block holds one request at its own level. A request in a block inside it (a branch, a route, `Finally`,
   a `Parallel` branch) is that block's, and requests in nested blocks run one after another, each after the one
   before it settles (D11.5). ALIS008 keeps refusing a second request in one block, retargeted to the verbs of
   `Pipeline<TModel>` in every stage, both lambda forms and every file (N9.9), with its reason corrected: `Chained`
   runs a request after another succeeds, `Parallel` sends them at once, and a request in `Finally` runs after every
   outcome.
-- D9.18 `pipeline.PageUrl<TPage>()` (N10.7) reads the page's own URL. It is a source (Q7), not a part of the request.
+- D9.18 `pipeline.PageUrl<TPage>()` (N10.7) reads the page's own URL. It is a source (Q7), not a part of the request (M2.X1, M2.X3).
 - D9.19 A member whose source holds an object or a list of objects is sent in a query or in form data as its
   fields, each keyed by its C# path (`Address.City`, `Lines[0].Name`, and a list of scalars inside an item as the
   repeated `Lines[0].Beds`) and read from the source by its JSON name (D2.6), as the binder reads them
@@ -1923,11 +1930,11 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - P1: 8046bc4c5 checked a request for the unprefixed name; b24c65775 left a number-keyed dictionary unsent in JSON.
 
 **Defects.**
-- `X9.1` type: a body format on a GET does not compile: new:N9.2.
+- `X9.1` type (D9.2): a body format on a GET does not compile: new:N9.2.
 - `X9.2` type: `Form()` naming no form does not compile, and neither does `Form` given a container that is not a
   form: new:N9.2.
 - `X9.3` type: a named input whose type the request member does not hold does not compile: new:N9.3.
-- `X9.4` analyzer: a file-shaped set member in a GET or a JSON body: new:N9.4.
+- `X9.4` analyzer (D9.16): a file-shaped set member in a GET or a JSON body: new:N9.4.
 - `X9.5` analyzer: a placeholder no member fills: "The URL '{url}' has the placeholder {name}, and the request has no
   member named {name}; add the member, or take the placeholder out of the URL." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X9.6` analyzer: a date in a placeholder: "{member} is a date, and a date cannot fill the placeholder {name}: IIS
@@ -1936,8 +1943,8 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   Text or File." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X9.8` behavior: a non-nullable member that reads nothing is left out of the JSON body, and the endpoint binds
   its starting value with no model error.
-- `X9.9` behavior: a path value that reads nothing sends no request, runs its `Finally`, and runs no step after it.
-- `X9.10` behavior: a path value read as "a/b" sends no request and runs its `Finally`.
+- `X9.9` behavior (D9.5): a path value that reads nothing sends no request, runs its `Finally`, and runs no step after it.
+- `X9.10` behavior (D9.5): a path value read as "a/b" sends no request and runs its `Finally`.
 - `X9.11` behavior: a query member read as "a b+c&d" reaches the endpoint as "a b+c&d".
 - `X9.12` analyzer: a fixed header value with a line break: "The header {name} holds a line break, which HTTP does
   not carry in a field value; send it in the body." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
@@ -1945,9 +1952,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `X9.14` type: `Form` inside a JSON body does not compile: new:N9.2.
 - `X9.15` behavior: a native form's `<select form="intake">` outside the form's element is sent with the form's other
   controls and its hand-written `<input name="Code">`, and the endpoint reads one antiforgery field.
-- `X9.16` behavior: a fieldset container inside the intake form: the fieldset's request sends the fieldset's inputs
+- `X9.16` behavior (D14.8): a fieldset container inside the intake form: the fieldset's request sends the fieldset's inputs
   only, and the form's request sends both.
-- `X9.17` behavior: a request that reaches a container by its id under a model it was not rendered for stops before
+- `X9.17` behavior (D14.8): a request that reaches a container by its id under a model it was not rendered for stops before
   it sends, the network log holds no request, and the console names the id and both models.
 - `X9.18` behavior: a component holding `"night-shift"`, the held form of `Night` under `JsonStringEnumMemberName`, sets
   a request member, and the endpoint reads `Night`.
@@ -1986,9 +1993,10 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - D10.1 A request runs in this closed order, the states of D10.23: the read of its argument and its check; the
   defaults' `WhileLoading`, then its own; its guards (path values, the container it sends, its `Input`s, its busy
   targets' elements, the contracts the defaults name), the send and one response route; its own `Finally`, then the
-  defaults', each when its `WhileLoading` completed; then `Chained`; then the steps after the request.
+  defaults', each when its `WhileLoading` completed; then `Chained`; then the steps after the request
+  (`Request.tla:StepsAfterRunUnlessStopped`).
 - D10.2 A check that fails shows its failures (D16.13), sends nothing, runs neither `WhileLoading` nor `Finally`,
-  and stops its pipeline: no step after the request runs.
+  and stops its pipeline: no step after the request runs (`Request.tla:FailedCheckSendsNothing`).
 - D10.3 A `WhileLoading` that stops sends nothing, runs no `Finally` and stops its pipeline. `Finally` runs
   exactly when `WhileLoading` ran, after every outcome, a stop inside a route included. The defaults' layer wraps the
   request's: each layer's `Finally` runs exactly when its own `WhileLoading` completed, the request's first, so a stop
@@ -2467,33 +2475,33 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 **Defects.**
 - `X10.1` type: a route's data is typed by the route that declares it, `Data<TResponse>` and `Data<TError>`
   (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:220`).
-- `X10.2` behavior: with `X-Requested-With` among the configured headers, a request whose cookie session expired
+- `X10.2` behavior (D9.12, D10.7): with `X-Requested-With` among the configured headers, a request whose cookie session expired
   runs the route for 401 on net10 (`probe:core-cookie-auth-ajax`) and on net48 under Katana
   (`probe:katana-ajax-redirect-is-200`). Without it the server redirects to its login page, and the request
   ends there: a route that declares JSON runs the catch-all, and a route with no body runs `OnSuccess`.
-- `X10.3` behavior: a network failure runs `OnError()`, then its `Finally`, and its busy targets hide after the
+- `X10.3` behavior (D10.1): a network failure runs `OnError()`, then its `Finally`, and its busy targets hide after the
   defaults' `Finally`.
-- `X10.4` behavior: a form check that fails sends nothing and runs no step after the request.
+- `X10.4` behavior (D10.2): a form check that fails sends nothing and runs no step after the request.
 - `X10.5` behavior: a server's validation errors show at the inputs whose binding names they key, on both hosts.
 - `X10.6` behavior: `OnAllSettled` runs once, after the slower of two parallel requests answers.
-- `X10.8` behavior: a GET whose policy retries 503 answers the second attempt's success, shows its busy targets once
+- `X10.8` behavior (D10.15): a GET whose policy retries 503 answers the second attempt's success, shows its busy targets once
   and runs its `Finally` once.
-- `X10.9` type: a policy that retries a POST cannot be written: new:N10.3.
+- `X10.9` type (D10.14): a policy that retries a POST cannot be written: new:N10.3.
 - `X10.7` behavior: on net48 under IIS, a 400 with validation errors shows each message at its input; the
   `verify-net48` run proves it.
-- `X10.10` behavior: a nullable member whose condition fails is not in the body the request sends, and the
+- `X10.10` behavior (D10.16): a nullable member whose condition fails is not in the body the request sends, and the
   endpoint answers with the member's starting value, not null.
-- `X10.11` behavior: a chained request whose condition fails is not sent, and the first request's success
+- `X10.11` behavior (D10.16): a chained request whose condition fails is not sent, and the first request's success
   steps and the steps after it ran.
-- `X10.12` behavior: a request that writes only its method, URL, form and success shows a 400's errors at its
+- `X10.12` behavior (D10.12, D10.17): a request that writes only its method, URL, form and success shows a 400's errors at its
   own form, through the defaults' route.
 - `X10.13` behavior: a component that edits a row it was given from a response leaves the response as sent, and
   a `Chained` request that reads the response's rows sends the server's rows, not the component's.
 - `X10.14` behavior: two `Parallel` requests whose routes write one text: the page shows the text of the route whose
   response the test app sends last.
-- `X10.15` behavior: a GET answered 500 runs its error route once, with no second attempt; a GET answered 503 and
+- `X10.15` behavior (D10.14): a GET answered 500 runs its error route once, with no second attempt; a GET answered 503 and
   then 200 runs its success route.
-- `X10.16` behavior: two `Parallel` requests on one target, the test app answering one after 1 second and the other
+- `X10.16` behavior (D11.9): two `Parallel` requests on one target, the test app answering one after 1 second and the other
   after 5: the target's indicator and `aria-busy` stay until the second answers; on two targets, the first target's
   indicator hides at 1 second while the second's stays to 5.
 - `X10.17` behavior: a request whose busy target is an element the page lacks stops before it sends, and the network
@@ -2517,7 +2525,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `X10.24` type (N10.7): a second `Chained` does not compile: `spec/api/HttpSurface/refused/SecondChained.CS0023.cs.txt:13`. The chain does not compile; a staged value used twice is ALIS030's: new:N18.7.
 - `X10.25` analyzer (D10.21, D10.13): a second `Busy` or `NoBusy`, a status outside 300 to 599, a second route for
   one status and a second catch-all: new:N18.7.
-- `X10.26` analyzer (D9.17): a second request in one block, at its own level, in every stage and file: ALIS008,
+- `X10.26` analyzer (D9.17, D11.6): a second request in one block, at its own level, in every stage and file: ALIS008,
   new:N9.9.
 - `X10.27` analyzer (N10.7): a request's parts object written by two statements, and a request held in a variable and
   written twice (a second `Chained` among them), each of which compiles: new:N18.7.
@@ -2770,14 +2778,14 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `X11.1` analyzer: a handler that writes a property of its payload after an awaited step (an async method, a
   request, a `Confirm`) is refused where the view renders with "A write to the event's payload after an awaited
   step reaches no vendor: write it before the first request, Confirm or async method." At build by ALIS032, and where the view renders on code it does not follow (D18.6): new:N18.9.
-- `X11.2` behavior: a drawer whose close handler writes `Cancel` and then asks stays open while the dialog
+- `X11.2` behavior (D11.2): a drawer whose close handler writes `Cancel` and then asks stays open while the dialog
   asks, and closes on yes.
 - `X11.3` behavior: a method declared with `Method` whose vendor returns a promise stops its pipeline, and the
   step after it does not run. The console holds the stop's one error (D11.3), which a test does not read
   (`.claude/rules/tests.md`, rule 4).
-- `X11.4` behavior: a `MethodAsync` that rejects stops its pipeline, its request's `Finally` runs, and its busy
+- `X11.4` behavior (D11.2): a `MethodAsync` that rejects stops its pipeline, its request's `Finally` runs, and its busy
   targets hide.
-- `X11.5` behavior: a slot unloaded while its request is in flight runs no route of that request, and its busy
+- `X11.5` behavior (D11.6): a slot unloaded while its request is in flight runs no route of that request, and its busy
   targets hide.
 - `X11.6` behavior: under `replace`, a cascade whose first answer arrives after the second shows the
   second's items.
@@ -2812,7 +2820,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `X11.19` behavior (D11.11): a click whose handler runs no awaited step and a second handler of the same click both
   write before the click's own handling reads them: the second starts in the click's turn, and the first has ended
   (`Run.tla:SyncRunEndsInItsTurn`, `Run.tla:SecondHandlerStartsInTheTurn`).
-- `X11.20` behavior (D10.23): a stop in the route of a request a route sends: the inner request's `Finally` and its
+- `X11.20` behavior (D10.23, D9.1): a stop in the route of a request a route sends: the inner request's `Finally` and its
   defaults' run, then the outer's own and its defaults', and no step after either request runs
   (`Run.tla:NothingRunsAfterAStop`).
 - `X11.21` behavior (D10.3, D11.7): a second click under `replace` while the first request's own `WhileLoading`
@@ -2841,7 +2849,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - D12.2 What a plan asks for belongs to its plan's owner:
   - its handlers' listeners, on any element or object, the page's included;
   - its holds on a hub or a stream;
-  - its registrations, with their rules, and its containers, each with its summary and live check;
+  - its registrations, with their rules, and its containers, each with its summary and live check
+    (`Ownership.tla:RulesLeaveWithTheirOwner`);
   - its runs (Q11).
 - D12.3 What HTML carries belongs to the owner of the innermost slot around it, else the page:
   - the components mounted in it, which construct on `alis:mount` and destroy themselves on `alis:unmount`;
@@ -2906,7 +2915,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   which calls the value it replaced and no listener (D17.3). A check that throws is that listener's error, and its
   removal is not called.
 - D12.6 A hub or a stream is held by every owner whose plans name it. The connection opens at the first hold
-  and closes at the last release, and its retry offer goes with it. A step reaches only a held connection.
+  and closes at the last release, and its retry offer goes with it. A step reaches only a held connection
+  (`Ownership.tla:HubKeptWhileHeld`).
 - D12.7 Live validation is one capture-phase listener per page. An input an event reaches is checked by the
   live checks of the containers that hold it (D16.15). Nothing is wired per element, so nothing per element
   is released. A registration and a container leave with their plan's owner, so a slot's own checks leave with
@@ -3046,7 +3056,7 @@ plans name.
   (`Alis.Reactive/Razor/RenderedPage.cs:70-87`, `Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:66-69`): D12.9.
 
 **Defects.**
-- `X12.1` behavior: after the outer slot unloads, a click on a page button that an inner slot's plan listened to
+- `X12.1` behavior (D12.2): after the outer slot unloads, a click on a page button that an inner slot's plan listened to
   runs nothing.
 - `X12.2` behavior: after a slot loads three times, a click on its button runs its handler once.
 - `X12.3` behavior: a field a reloaded slot renders shows its message on blur.
@@ -3054,8 +3064,8 @@ plans name.
   requires unloads, the page's save reads that member's start, as the endpoint binds a body that lacks it, and the
   page's rule holds the save with its message in the page container's summary; the slot's own validator's
   registration leaves with the slot (D16.3), so its rules check nothing after it.
-- `X12.5` behavior: two slots listen to one hub; after one unloads, the other still shows the server's pushes.
-- `X12.6` behavior: unloading the slot whose hub the server hung up on hides the retry offer.
+- `X12.5` behavior (D12.6): two slots listen to one hub; after one unloads, the other still shows the server's pushes.
+- `X12.6` behavior (D12.6): unloading the slot whose hub the server hung up on hides the retry offer.
 - `X12.7` behavior: a slot whose component its host destroyed unloads with no console error, and the next load
   listens.
 - `X12.8` behavior: content the server rendered inside a slot's container stops listening at the slot's first
@@ -3073,7 +3083,7 @@ plans name.
   steps before it ran and the steps after it run nothing; so does one that writes over notes a closed card loaded
   into a slot outside it. Once the only plan that named a slot leaves and the slot holds no loaded content, a step
   writes over it.
-- `X12.14` behavior (D12.8): a card a slot loads listens to the page's monitor, reached by its element's id, and
+- `X12.14` behavior (D12.8, D14.2): a card a slot loads listens to the page's monitor, reached by its element's id, and
   shows each reading the monitor raises; after the slot unloads, the monitor's next reading changes no card text,
   and the page's own `.Reactive` handler of the same event still shows it.
 - `X12.13` behavior (D12.5): after a monitor's host restarts it, destroying the component and putting a new object
@@ -3111,7 +3121,7 @@ plans name.
   | a request's failures: every one in its summary place, each also at the input it sent under that key | the request's container's summary, else the notice |
   | the summary, one per container, rendered by the container's block | the container |
   | listeners, holds, registrations and runs | the owner (Q12) |
-  | a plan's culture and time zone, written by C# for the view (D3.11, D3.12) | the owner, by its plan |
+  | a plan's culture and time zone, written by C# for the view (D3.11, D3.12) | the owner, by its plan (M18.X1) |
   | the argument, the attempts, the response and the route of one request | the request, until it settles |
 
 - D13.2 A plan's id keys nothing: it names the plan in traces only, and many plans of a page share one id freely.
@@ -3170,13 +3180,13 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - Each entry of a form's registrations leaves with its owner (`Alis.Reactive.Assets/runtime/plugins/form/form.ts:232-245`).
 
 **Defects.**
-- `X13.1` behavior: two partials of different models each render an input that binds `Value`, each in its own
+- `X13.1` behavior (D13.3): two partials of different models each render an input that binds `Value`, each in its own
   form; each card's save sends its own value.
-- `X13.2` behavior: a container holding two inputs that bind one name sends nothing on save, and the console names
+- `X13.2` behavior (D13.3): a container holding two inputs that bind one name sends nothing on save, and the console names
   both element ids.
-- `X13.3` behavior: a row a slot loads into the container is checked by the page's item rule when its request saves.
+- `X13.3` behavior (D13.5, D16.14): a row a slot loads into the container is checked by the page's item rule when its request saves.
 - `X13.4` behavior: a server message for a member an editor template rendered shows beside that input.
-- `X13.5` behavior: two containers on one page keep their own summaries, and a container's summary stays after a
+- `X13.5` behavior (D13.6): two containers on one page keep their own summaries, and a container's summary stays after a
   slot that joined it unloads.
 
 ## Q14. MVC partials and ids
@@ -3394,14 +3404,14 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   or check."
 - `X14.5` refusal: an id rendered twice by one plan is refused with "Input '{name}' renders element id '{id}' a
   second time in this plan: render the field once, or each copy for its own member with Html.PartialFor."
-- `X14.6` analyzer: a JSON request over a number-keyed dictionary entry is refused with "{member} sits under
+- `X14.6` analyzer (D14.5): a JSON request over a number-keyed dictionary entry is refused with "{member} sits under
   '{prefix}', a dictionary entry keyed by a number, which JSON reads as a list position: send this request
   with AsFormData()." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X14.7` behavior: a slot's content that renders an input id the page holds runs none of its handlers, and the
   console names the id and both views.
 - `X14.8` behavior: an `EditorFor` template's input of `NextOfKin.Name` shows the page's server message for
   `NextOfKin.Name` beside it, and the page's rule checks it.
-- `X14.9` behavior: one partial rendered by `PartialFor` for two members posts each card's own values.
+- `X14.9` behavior (D13.2, D14.1, D14.2): one partial rendered by `PartialFor` for two members posts each card's own values.
 - `X14.10` behavior: a list-item partial under `Members[1]` sends its inputs at position 1 in a JSON body.
 - `X14.11` behavior: on net48 a partial rendered by `PartialFor` leaves the page's own inputs posting under their
   names; the `verify-net48` run proves it.
@@ -3419,7 +3429,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   'm => m.Dose.Value' binds Value, which Decimal? declares, not a member of {model}: bind 'm => m.Dose', which takes
   a Decimal?." At build by ALIS033, and where the view renders on code it does not follow
   (D18.6): new:N18.10.
-- `X14.15` refusal (D14.3, R14.1): an input of `m => m.Items.Count` is refused with "Input 'm => m.Items.Count' binds
+- `X14.15` refusal (D14.3, R14.1, D18.2): an input of `m => m.Items.Count` is refused with "Input 'm => m.Items.Count' binds
   Count, which {List<Item>} declares, and the app's JSON options write {List<Item>} as {a list | one value}, so the
   input has no body path: bind a member of a class they write as an object."
 - `X14.16` refusal (R14.2): a plan's block that ends with its view's prefix moved is refused with "The field prefix of
@@ -3478,15 +3488,15 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   translated to the engine's text by a third translator (`Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:22-25`).
 
 **Defects.**
-- `X15.1` behavior: a grid row whose name holds `<img src=x onerror=alert(1)>` shows that text in its template
+- `X15.1` behavior (D15.4): a grid row whose name holds `<img src=x onerror=alert(1)>` shows that text in its template
   cell, and no image element renders.
-- `X15.2` behavior: a row with no address shows an empty cell where the template reads the address's city, and
+- `X15.2` behavior (D15.4): a row with no address shows an empty cell where the template reads the address's city, and
   the grid's other rows render.
 - `X15.3` behavior: a template condition on the item's status shows the badge for an active row and the other
   branch for an inactive one.
 - `X15.4` behavior: a template's event button raises its app event with the row's id, and the page's handler of
   that event runs.
-- `X15.5` behavior: with the app's JSON options naming members in Pascal case, a template reads `Name` from a
+- `X15.5` behavior (D15.4, M22.D3): with the app's JSON options naming members in Pascal case, a template reads `Name` from a
   row the server sent.
 
 ## Q16. Validation
@@ -3505,7 +3515,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     carries.
   - The condensed default (D10.17): a request whose model has a registered validator is checked by it under the
     default rule set, whatever it sends, a container or none, with its failures placed by D16.13. Naming a rule set,
-    or no check (`NoValidation()`), overrides it; the form of the sentence goes to gate 2.
+    or no check (`NoValidation()`), overrides it; the form of the sentence goes to gate 2
+    (`Validation.tla:OnlyTheNamedValidator`).
 - D16.3 A partial is attached or independent, and both nest (the owner, 2026-11-06).
   - Attached: a partial rendered for a member under MVC's prefix, by any of MVC's own doors (`EditorFor` by the
     member's type, by a template it names or the model's `[UIHint]` names, and for each item of a list; `<partial
@@ -3637,7 +3648,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - A single-line input's value holds no line break (`probe:html-input-line-breaks`), so that copy matters for a
     text area and for a member no input holds.
 - D16.12 The validation spec of step 5 checks that the two sides give one verdict on every body of its domain, for
-  each check of D16.10 and each condition of D16.8.
+  each check of D16.10 and each condition of D16.8 (`Validation.tla:Agreement`).
 - D16.13 A message's place is carried in the plan, never read from the page (B5).
   - C# writes each input's message element id beside the input's id, so the `_error` id convention leaves.
   - Every failure of a check, the browser's verdict and the server's 400 alike, shows in the request's summary
@@ -3811,15 +3822,15 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   (`Alis.Reactive/Members/ClrShape.cs:75-80`), have no browser rule.
 
 **Defects.**
-- `X16.1` type: a request checked by a validator of another model does not compile: new:N16.2.
+- `X16.1` type (D16.2): a request checked by a validator of another model does not compile: new:N16.2.
 - `X16.2` behavior: on net10, a JSON save whose model starts its lead with a name, and whose lead type starts the
   name empty, sends only the lead's phone; the browser shows "Lead name is required." before sending, as the
   endpoint answers.
 - `X16.3` behavior: a form-data save sends one member of a deputy that starts null, whose type starts its name with
   text; the browser lets the save through, and the endpoint saves it.
-- `X16.4` behavior: typing "12a" in a count bound to an int shows "The value '12a' is not valid for Count." and
+- `X16.4` behavior (D19.8): typing "12a" in a count bound to an int shows "The value '12a' is not valid for Count." and
   sends nothing.
-- `X16.5` behavior: with the Texas partial loaded the save is checked by the Texas rules; after the page loads
+- `X16.5` behavior (D16.2): with the Texas partial loaded the save is checked by the Texas rules; after the page loads
   the Massachusetts partial instead, the save is checked by the Massachusetts rules only, and the endpoint agrees
   on each.
 - `X16.6` behavior: a request that sends only the status, set beside the intake container it does not send, is
@@ -3844,17 +3855,17 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   the notice and sends nothing.
 - `X16.16` behavior: an `Input` of the request's view outside every container, sent under `r => r.Ward`, shows the
   server's "Ward is required." at its own message element and in the notice.
-- `X16.17` behavior: the page and a slot's partial each render an input that binds `Name`; the slot's request sends
+- `X16.17` behavior (D19.7): the page and a slot's partial each render an input that binds `Name`; the slot's request sends
   its own container, and its 400 for `Name` shows at the slot's input and in the slot container's summary only.
 - `X16.18` behavior: a native form's hand-written `<input name="Code">` fails on the server, and its message shows
   in the form's summary only.
 - `X16.19` behavior: the slot that holds the sent input reloads while the request is in flight; the 400's message
   shows in the page container's summary and not at the reloaded input.
-- `X16.20` behavior: a live fieldset container inside a live form container: blurring the empty name both hold
+- `X16.20` behavior (D19.7): a live fieldset container inside a live form container: blurring the empty name both hold
   shows "Name is required." once.
 - `X16.21` analyzer: `ShowValidationErrors` on a pipeline that is no request's route: "ShowValidationErrors shows a request's failures,
   and this pipeline is no request's route; call it inside OnError or OnSuccess." At build by ALIS031, and where the view renders on code it does not follow (D18.6): new:N18.8.
-- `X16.22` behavior: a save that leaves out `Care`, an enum the app names as flags whose model starts it at
+- `X16.22` behavior (M8.D1): a save that leaves out `Care`, an enum the app names as flags whose model starts it at
   `Mon | Tue`, passes `IsInEnum` in the browser, and the endpoint saves Mon, Tue; a save that leaves out `Rota`, an enum
   the app names as flags with no value for zero, which starts at 0, shows "'Rota' has a range of values which does not
   include '0'." in the browser and sends nothing, as FluentValidation's `IsInEnum` answers on the server
@@ -4430,11 +4441,11 @@ plans (Q19).
   '{vendor}' names it '{name}': give it [JsonPropertyName(\"{name}\")]": new:N17.2.
 - `X17.3` behavior: a CustomEvent with no detail reaches its handler as the declaration says, the same on every
   dispatch.
-- `X17.4` behavior: a component an app brings, declared and rendered outside the framework's packages, runs every
+- `X17.4` behavior (D15.1, D17.1, D17.2): a component an app brings, declared and rendered outside the framework's packages, runs every
   step kind (a read, a write, a call, an event) with no change to the framework.
-- `X17.5` analyzer: a vendor name outside its characters: "Vendor name '{name}' must start with a letter and contain
+- `X17.5` analyzer (D17.7): a vendor name outside its characters: "Vendor name '{name}' must start with a letter and contain
   only ASCII letters, digits, underscore, or hyphen." At build by ALIS034, and where the view renders on code it does not follow (D18.6): new:N18.12.
-- `X17.6` behavior: a page that loads no Fusion asset asks NativeConfirm in a `When`; the branch runs on OK and
+- `X17.6` behavior (D15.1, D17.1): a page that loads no Fusion asset asks NativeConfirm in a `When`; the branch runs on OK and
   not on Cancel.
 - `X17.7` behavior: Escape in a confirm opened over a drawer answers false, and the drawer stays open.
 - `X17.8` behavior: a save replaced while its confirm is open closes that dialog, and only the second save's
@@ -4752,10 +4763,10 @@ shapes, starts and the payload's path of each event.
   node C# adds fails typecheck; the generated contract is the TypeScript side of the same type knowledge.
 
 **Defects.**
-- `X18.1` analyzer: a `GetProperties` call in a shipped package outside the owner's list: new:N18.1.
+- `X18.1` analyzer (D18.1, D18.3): a `GetProperties` call in a shipped package outside the owner's list: new:N18.1.
 - `X18.2` analyzer: `Method()` called from a member other than the one it declares: new:N18.2 (POC 13e).
 - `X18.3` type: a request that sends a container of another model does not compile: new:N18.3.
-- `X18.4` type: a button's type written as text does not compile: new:N18.4.
+- `X18.4` type (D18.5): a button's type written as text does not compile: new:N18.4.
 - `X18.5` behavior: on net10, with the app's JSON options naming members in snake case, a request's JSON body sends
   `given_name`, and the endpoint binds it (`probe:core-frombody-naming-policy`).
 - `X18.6` behavior: a member the app's JSON options ignore is not in a JSON body, and the check reads its
@@ -4773,13 +4784,13 @@ shapes, starts and the payload's path of each event.
   browser, derived from Q1 to Q18, Q20 and Q21. C# writes those nodes and nothing else, and the browser runs those nodes
   and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
   write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
-  `spec/NOTES.md`).
+  `spec/NOTES.md`) (`check:kinds`, `Schema.tla:KindsHandledOnce`).
 - D19.2 The set is closed at 51 kinds: today's 33 but `try`, and `request`, `stop`, `listen`, `data`, `start`,
   `nothing`, `unbound`, `signal`, `answer`, `file`, `each`, `returned`, `living`, `held`, `stream`, `clock`, `zone`,
   `off` and `on`, the 19 `spec/Core/schema.md` marks added and `spec/Schema/Schema.tla` checks. `try` leaves, its
   `finally` carried by a `request`'s layers, since nothing but a request's `Finally` wrote it (the owner's amendment of
   G2, 2026-11-08, D10.23); no other kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
-  to the owner with its use case.
+  to the owner with its use case (`check:kinds`).
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).
 - D19.4 C# declares no enum (schema.md S8). A closed choice with no data is a sealed class with a private constructor
@@ -4787,7 +4798,7 @@ shapes, starts and the payload's path of each event.
   and `PathMembers` become such classes; the public `VendorEventPayload` leaves for N17.1's path (D17.4).
 - D19.5 Every kind has exactly one handler. The switch that picks a default by shape leaves, since C# writes each
   input's blank (D3.6, N3.3), and the object locator's two switches become one switch that returns the locator's
-  driver (G1).
+  driver (G1) (`Schema.tla:KindsHandledOnce`).
 - D19.6 A handler carries its payload's path (D17.4), and the vendor does not: the vendors map is shared by name across
   plans, so two plans that listen to different events of one component, read differently, agree on the vendor.
 - D19.7 The form plugin's data is one registration, one validator under one rule set and keyed by both, holding the
@@ -4799,7 +4810,7 @@ shapes, starts and the payload's path of each event.
 - D19.8 A number shape carries what a text converts under: `of`, an integer or a fraction, which picks the culture's
   number text for the host, and `text`, the view's culture or the invariant one (D3.11).
 - D19.9 `HttpSend`, `HttpResponse`, `FormCheck` and `FormPlace` are typed contracts generated beside the grammar, not
-  kinds (G2): `HttpSend` is a `request`'s `send` value and `HttpResponse` the reply it binds (D10.23).
+  kinds (G2): `HttpSend` is a `request`'s `send` value and `HttpResponse` the reply it binds (D10.23) (`check:kinds`).
 - D19.10 The plan's version is 7. A plan of another version is JSON the framework did not produce, refused at boot with
   one error (M14.D1), and at a slot's load by stopping the load before its release (M9.D2).
 
@@ -4840,12 +4851,12 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   `Alis.Reactive/Grammar/PlanDocument.cs:184-187`.
 
 **Defects.**
-- `X19.1` type: an operator or a path's members made from an integer does not compile: new:N19.1.
-- `X19.2` type: a grammar node built with a field left out does not compile, since each constructor takes every field
+- `X19.1` type (D19.4): an operator or a path's members made from an integer does not compile: new:N19.1.
+- `X19.2` type (D19.3): a grammar node built with a field left out does not compile, since each constructor takes every field
   and none is nullable: new:N19.3.
 - `X19.3` refusal: a plan of version 6 is refused at boot with "This plan was written for plan version 6; this page
   runs version 7."
-- `X19.4` behavior: two partials whose plans listen to different events of one component, one reading its argument
+- `X19.4` behavior (D19.6): two partials whose plans listen to different events of one component, one reading its argument
   and one its event's detail, each run their steps with the payload they declare.
 
 ## Q20. Tracing
@@ -4855,7 +4866,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   activity of the request that renders the view is recorded, W3C Trace Context's sampled flag, and as `off` otherwise.
   The browser decides nothing but D20.11's: no attribute, no query text, no storage, so the level read from
   `data-alis-trace` leaves. In development the app's sampler records every request; in production the app sets its own ratio (the
-  owner, 2026-11-06: optional, never always on).
+  owner, 2026-11-06: optional, never always on) (`Tracing.tla:NothingRecordedWhenOff`).
 - D20.2 The core takes no telemetry library. The browser has one diagnostics port, called at the dispatch of each
   union, which Q19 makes one place per kind, and two sinks:
   - the console, which prints every boundary error, and each ended span when the trace is on and its `console` is set,
@@ -4932,14 +4943,14 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 - Neither line traces: `git grep` finds no `traceparent`, OpenTelemetry or `ActivitySource` at 65fdf118d or 623dd4a27.
 
 **Defects.**
-- `X20.1` behavior: with the trace off, a save lists no span on the collector page, and its endpoint echoes no
+- `X20.1` behavior (D20.1): with the trace off, a save lists no span on the collector page, and its endpoint echoes no
   `traceparent`.
-- `X20.2` behavior: with the trace on, a GET retried once after a 503 lists two attempt spans under one send span,
+- `X20.2` behavior (D20.3, D20.4, D20.9): with the trace on, a GET retried once after a 503 lists two attempt spans under one send span,
   under the page's trace id.
-- `X20.3` behavior: a handler replaced while its request is in flight lists its run span ended with the outcome replaced.
-- `X20.4` behavior: with the trace on, a request to another origin carries no `traceparent`, which that endpoint echoes.
-- `X20.5` behavior: with an exporter that throws on every span, a save succeeds and the console shows one error.
-- `X20.7` behavior: with the trace off, a GET retried after a 503 reaches the endpoint the second time with a sampled
+- `X20.3` behavior (D20.4, D20.6, M26.D1): a handler replaced while its request is in flight lists its run span ended with the outcome replaced.
+- `X20.4` behavior (D20.3): with the trace on, a request to another origin carries no `traceparent`, which that endpoint echoes.
+- `X20.5` behavior (D20.2, D20.6, D20.9, M26.D1): with an exporter that throws on every span, a save succeeds and the console shows one error.
+- `X20.7` behavior (D20.11): with the trace off, a GET retried after a 503 reaches the endpoint the second time with a sampled
   `traceparent` and `baggage` holding `http.request.resend_count=1`, which the endpoint echoes, and the first time with
   neither.
 - `X20.6` analyzer: a request header named `traceparent` is refused where the view renders with "The traceparent header
@@ -5086,21 +5097,21 @@ invoke and send.
   `tests/Alis.Reactive.Framework.App/Alis.Reactive.Framework.App.csproj:4`.
 
 **Defects.**
-- `X21.1` behavior: a stream message whose data is not JSON runs no handler and logs one error, and the next message
+- `X21.1` behavior (D21.1): a stream message whose data is not JSON runs no handler and logs one error, and the next message
   runs its handler.
-- `X21.2` behavior: a slot that only reads a stream's state reads it open while the slot is loaded.
-- `X21.3` behavior: when the server restarts, a page runs its `reconnecting` steps, then its `reconnected` steps, and the
+- `X21.2` behavior (D21.6, D21.12): a slot that only reads a stream's state reads it open while the slot is loaded.
+- `X21.3` behavior (D21.5, D21.9): when the server restarts, a page runs its `reconnecting` steps, then its `reconnected` steps, and the
   next message runs its handler.
 - `X21.4` behavior: a hub push with two arguments runs no handler and logs one error.
-- `X21.5` behavior: a page whose plans name no hub requests no SignalR asset.
-- `X21.6` type: an endpoint and a view that name one server event differently, or give it two message types, do not
+- `X21.5` behavior (D21.1): a page whose plans name no hub requests no SignalR asset.
+- `X21.6` type (D21.3): an endpoint and a view that name one server event differently, or give it two message types, do not
   compile: new:N21.1.
-- `X21.7` type: a net48 view that writes a stream, a hub or a message trigger does not compile: new:N21.6.
+- `X21.7` type (D21.9): a net48 view that writes a stream, a hub or a message trigger does not compile: new:N21.6.
 - `X21.8` behavior: while a stream reconnects and no request is in flight, the page shows no busy indicator, and a
   request a message's run sends shows it until that request settles.
-- `X21.9` behavior: with the page's stream and a slot's stream both given up, the reconnect offer shows once; unloading
+- `X21.9` behavior (D21.5, M25.D7): with the page's stream and a slot's stream both given up, the reconnect offer shows once; unloading
   the slot keeps it, and the page's stream opening hides it.
-- `X21.10` behavior: a retry keeps the reconnect offer shown until a connection opens, and a retry that fails keeps it
+- `X21.10` behavior (M25.D7): a retry keeps the reconnect offer shown until a connection opens, and a retry that fails keeps it
   shown.
 - `X21.11` refusal: a view that names a stream or a hub in an app with no reconnect choice: "A page that names a stream
   or a hub needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime."
