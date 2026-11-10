@@ -4687,7 +4687,7 @@ shapes, starts and the payload's path of each event.
 - D19.9 `HttpSend`, `HttpResponse`, `FormCheck` and `FormPlace` are typed contracts generated beside the grammar, not
   kinds (G2): `HttpSend` is a `request`'s `send` value and `HttpResponse` the reply it binds (D10.23).
 - D19.10 The plan's version is 7. A plan of another version is JSON the framework did not produce, refused at boot with
-  one error.
+  one error (M14.D1), and at a slot's load by stopping the load before its release (M9.D2).
 
 **Schema nodes.** Every node of `spec/Core/schema.md`.
 

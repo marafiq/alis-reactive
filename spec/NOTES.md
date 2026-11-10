@@ -774,3 +774,5 @@
   Evidence: spec/Vendors/features.json, X17.3 and X17.15's promises.
 - 2026-11-09 the questions check now refuses a section that names a module meaning, door or defect (M<n>.D, N or X) no module states, found when a plant of M12.D9 in N18.12 passed every check; the nine module ids the core names today each resolve.
   Evidence: check.py module_statements; plant "Q18: names M12.D9, which no module states".
+- 2026-11-09 module 14, schema, by a fork the lead checked at the source: M14.F1 owns main's `PlanNodeDiscriminator<T>` (8 rows), the one grammar type left unmapped, refused as the plan writer's insides and carried by N14.2; M14.D1 at boot a plan script that is not JSON or holds no number version is refused as a plan of another version is, one error each, and the page's other plans start, where both lines throw out of the whole boot. Closed with it: D19.10 and M9.D2 refuse such a plan at a slot's load by stopping the load before its release, the fork's question of the slot's case.
+  Evidence: rows.py "rows valid", unmapped 7175 to 7167; discover.ts:19-24 at 65fdf118d and root.ts:64-70 at 623dd4a27 read by the lead.

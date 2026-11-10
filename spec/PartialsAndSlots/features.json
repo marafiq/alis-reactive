@@ -425,7 +425,7 @@
         },
         {
           "id": "M9.D2",
-          "meaning": "A load reads every plan its content holds before it releases anything. Content that holds a plan whose JSON does not parse stops the step with one error naming the slot, before the release, so the slot keeps its content, its owner and their listeners, and the steps after it run nothing. The loaded body is data the network brought, a real boundary, and a slot left half replaced would hold content with no owner."
+          "meaning": "A load reads every plan its content holds before it releases anything. Content that holds a plan whose JSON does not parse, or that holds no number version or another version (D19.10, M14.D1), stops the step with one error naming the slot, before the release, so the slot keeps its content, its owner and their listeners, and the steps after it run nothing. The loaded body is data the network brought, a real boundary, and a slot left half replaced would hold content with no owner."
         }
       ],
       "oracle": "The DOM Standard's dispatch, whose inner invoke reports a listener's exception and runs the next listener (DOM Standard 2.9), and the HTML Standard: fragment parsing marks each script it creates as already started, so innerHTML runs none, a script element inserted by the DOM runs once, and custom element reactions are invoked with report (HTML Standard 4.13.6).",
