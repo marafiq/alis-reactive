@@ -61,7 +61,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   declaring-class id is that decision.
 - The owner, 2026-11-06: templates have a typed way to write HTML, with much room to grow; keep it. It relies on
   Syncfusion's compile, and it stays the Fusion module's, not rewritten: it brings a JavaScript dependency the
-  bundle always holds and no server dependency.
+  bundle always holds and no server dependency. The owner, 2026-11-10, raised a core template engine at gate 2 and
+  reversed it the same hour, so the rewrite proceeds (verbatim in `spec/NOTES.md`): Syncfusion's engine stays through
+  the rewrite, and a core engine returns only as the owner's own decision.
+- The owner, 2026-11-10: "u made it look like serval time that it was easy and SF will work without any issues". A
+  new direction is put to the owner with its cost and its risks beside its evidence, never with the evidence alone.
+- The owner, 2026-11-10, at gate 2: "run few experiments with software devs about their authoring experience and
+  consider but core design don't take 90 degree turn - it's about bringing more finished and polished questions to
+  me". A form goes to the owner after authoring experiments have polished it, and no experiment turns the core design.
 - The owner, 2026-11-06, to be made unmistakable: the framework depends on no consumer. The dependency is
   inverted: Fusion and Native are consumers built on the core's public surface, and the core names none of them.
 - The owner, 2026-11-06: bad patterns start small and spiral, so each mechanism stays limited to its exact use
