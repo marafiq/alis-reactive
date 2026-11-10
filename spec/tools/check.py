@@ -1950,12 +1950,55 @@ def check_rewrite():
                   tests=sum(landed.values()), problems=len(problems))
 
 
+TEST_RULE = re.compile(r"^(\d+)\. \*\*(.+?)\.\*\*")
+TEST_SMELL = re.compile(r"^- (.+) \(\d+(?:, \d+)*\)\.$")
+TEST_ID_ROW = re.compile(r"^\| (TEST\d{3}) \| .+ \|$")
+TEST_HELD_ROW = re.compile(r"^\| ([^|]+?) \| ([^|]+) \|$")
+TEST_RANGE = re.compile(r"TEST001 to (TEST\d{3})")
+TEST_CHECKS = {"the bindings check", "the planted-defect run", "check_promises", "check_app", "the harness"}
+
+
+def test_rules_section(text):
+    start = text.find("### 2.10 The test rules")
+    return text[start:text.find("\n## 3.", start)] if start >= 0 else ""
+
+
+def check_test_rules():
+    path = SPEC / "REWRITE.md"
+    if not path.exists():
+        return not_started(path)
+    lines = (SPEC.parent / ".claude" / "rules" / "tests.md").read_text().splitlines()
+    rules = [f"{found.group(1)}. {found.group(2)}" for found in map(TEST_RULE.match, lines) if found]
+    smells = [found.group(1) for found in map(TEST_SMELL.match, lines) if found]
+    text = path.read_text()
+    section = test_rules_section(text).splitlines()
+    ids = [found.group(1) for found in map(TEST_ID_ROW.match, section) if found]
+    held = [(found.group(1), [name.strip() for name in found.group(2).split(",")]) for found in map(TEST_HELD_ROW.match, section)
+            if found and not TEST_ID_ROW.match(found.group(0)) and found.group(1) not in ("Id", "---", "`.claude/rules/tests.md`")]
+    problems = [] if section else ["REWRITE.md has no section 2.10 The test rules"]
+    problems += [f"test rule {name} stands at place {place}" for place, name in enumerate(ids, 1) if name != f"TEST{place:03d}"]
+    keys = Counter(key for key, _ in held)
+    problems += [f"tests.md's {line!r} is held by {keys[line]} rows" for line in rules + smells if keys[line] != 1]
+    problems += [f"REWRITE.md holds {key!r}, no rule or smell of tests.md" for key in keys if key not in rules + smells]
+    used = {name for _, names in held for name in names}
+    problems += [f"{key!r} is held by {name!r}, no test rule and no named check" for key, names in held for name in names
+                 if name not in ids and name not in TEST_CHECKS]
+    problems += [f"{name} holds no rule or smell of tests.md" for name in ids if name not in used]
+    last = ids[-1] if ids else "TEST000"
+    problems += [f"REWRITE.md says TEST001 to {named}, and the rules end at {last}" for named in TEST_RANGE.findall(text) if named != last]
+    detail = (f"tests.md's {len(rules)} rules and {len(smells)} smells each held in REWRITE.md by test rules TEST001 to {last} "
+              f"or a named check, every test rule holding one")
+    return result(not problems, "; ".join(problems[:6]) or detail, rules=len(rules), smells=len(smells), ids=len(ids),
+                  problems=len(problems))
+
+
 CLAUDE_REPLACED = [
     ("CLAUDE.md", "(rare: the grammar is closed)"),
     (".claude/rules/csharp.md", "A fallback is a rare, deliberate, justified exception"),
     ("CLAUDE.md", "Do not build other gates, coverage maps, checklists or proof artifacts"),
     ("CLAUDE.md", "never by analogy or an upfront grid"),
     (".claude/rules/tests.md", "no component library appears on a framework test's page"),
+    (".claude/rules/tests.md", "Watch the behavior in a real browser before writing the test that pins it"),
 ]
 CLAUDE_ADDED = ["## Spec-first", "`spec/BRIEF.md`", "`spec/REWRITE.md`", "`spec/CLAUDE.md`", "TLC green", "stability rules"]
 
@@ -1966,7 +2009,7 @@ def check_claude_md():
                 if " ".join(phrase.split()) in " ".join((root / name).read_text().split())]
     text = (root / "CLAUDE.md").read_text()
     problems += [f"CLAUDE.md lacks {needed!r}" for needed in CLAUDE_ADDED if needed not in text]
-    detail = "root CLAUDE.md is spec-first: the five lines replaced, and the thesis, principles, stability rules, unit order and modules named"
+    detail = "root CLAUDE.md is spec-first: the six lines replaced, and the thesis, principles, stability rules, unit order and modules named"
     return result(not problems, "; ".join(problems) or detail, problems=len(problems))
 
 
@@ -2226,6 +2269,7 @@ CHECKS = [
     ("defects", "every defect on its highest rung, every core defect in a feature; no test for a type or analyzer defect", check_defects),
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
+    ("test_rules", "every rule and smell of tests.md held by a test rule or a named check", check_test_rules),
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
     ("hedges", "zero hedge words", check_hedges),
     ("no_comments", "no comment in the spec's Python or TLA+", check_no_comments),

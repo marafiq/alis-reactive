@@ -22,13 +22,18 @@ in the line.
   | The compiler | the type stages and the ALIS analyzers: what a view, a validator or a declaration cannot write | every build |
   | The render | a refusal the compiler cannot see, on the refusal routes | Playwright |
   | Playwright | behavior: a gesture and its visible outcome, in Chromium | every pull request |
+  | The test rules | that a browser test cannot lean on the code it tests: TEST001 to TEST013 (section 2.10) | every build of a Playwright project |
   | verify-net48 | the same tests on MVC 5, and the packed packages on a fresh MVC 5 app | every pull request |
   | Vitest, PlanTests | feedback while coding (BRIEF.md, Principles 10); never counted as proof | the inner loop |
 
+- **Tests stand apart from the code.** A Playwright project references no assembly of the framework or of the
+  conformance app; it reaches a page only through the browser and the world contract, so a test cannot compute what
+  the code computes. Its quality rules are compiler rules in a project of their own. The feedback projects, vitest
+  beside the runtime and PlanTests, reference the code they give feedback on and are never counted as proof.
 - **A feature is one path through the spec to the code.** `spec/<Module>/features.json` names its question, its
   sentences, its nodes, its TLA+ invariants, its defects and its tests; each test names its screen, hosts, parts and
-  held steps in `spec/Reference/app.json`. A new feature runs: spec line, TLC green, code, its tests failing on the
-  planted defect then passing, commit.
+  held steps in `spec/Reference/app.json`. A new feature runs: spec line, TLC green, its tests written from their
+  promises and failing, the screen and the doors until they pass, each test failing on its planted defect, commit.
 
 ## 2. The repository
 
@@ -62,11 +67,16 @@ Alis.Reactive.Fusion/                 net48;net10.0, PackageId AlisReactive.Fusi
 build/EmptyPackage.proj  build/EmptyPackage.md   packed once per empty id
 
 tests/
+  Alis.Reactive.Conformance.World/            net48;net10.0, on no Alis.Reactive assembly: the world's records, its
+                                              typed seed builders, the gate names generated from the TLA+ specs
   Alis.Reactive.Conformance.App/              net10 MVC: Care/<Screen>/, Bench/, Refusals/<Module>/, Shared/,
                                               Components/<Declaration>/, HostVariants/, World/
   Alis.Reactive.Conformance.App.Net48/        the MVC 5 twin: links the app's files, consumes the packed packages
   Alis.Reactive.Conformance.PlaywrightTests/  Harness/, <Module>/<Screen>/When*.cs, <Module>/Hosts/<Host>/,
-                                              <Slice module>/<Slice>/ for a slice's own tests
+                                              <Slice module>/<Slice>/ for a slice's own tests; on the world alone
+  Alis.Reactive.TestRules/                    netstandard2.0, never packed: TEST001 to TEST013 on each Playwright
+                                              project
+  Alis.Reactive.TestRules.AnalyzerTests/      each test rule's refused case and accepted case
   Alis.Reactive.Consumer.Net10/               a fresh net10 app on the packed packages, outside the slnx
   Alis.Reactive.Consumer.Net48/               a fresh MVC 5 app on the packed packages, outside the slnx
   Alis.Reactive.PlanTests/<Module>/           feedback
@@ -77,8 +87,10 @@ spec/                                         the design source: this file, CLAU
 ```
 
 The Playwright project keeps the `PlaywrightTests` suffix, so the deny rule on a raw `dotnet test` of a Playwright
-project holds. The consumer apps and the twin each hold an empty `Directory.Build.props` and a
-`Directory.Packages.props` that turns central management off, so their builds see what a fresh app sees.
+project holds. It names the app with `ReferenceOutputAssembly="false"`, so the app builds first and none of its types
+reach a test; the app's `World/` holds the world's middleware and endpoints on the world contract. The consumer apps
+and the twin each hold an empty `Directory.Build.props` and a `Directory.Packages.props` that turns central management
+off, so their builds see what a fresh app sees.
 
 ### 2.2 One name in five places
 
@@ -161,13 +173,14 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   person can run the app. Teardown ends the world and fails any gate still parked.
 - **The verbs** are app.json's: seed, gate, push, drop, refuse, reopen, restart, clock, gc. A placement lists its
   verbs and its held steps, each held step with the TLA+ action it holds, and check_app refuses a verb with no step.
-  Gates are generated from the `Next` of the eight async specs (`Gates.g.cs`, one enum per spec): the test arms a gate
+  Gates are generated from the `Next` of the eight async specs into the world contract (`Gates.g.cs`, one enum per
+  spec), so the app and the tests name a gate the same way without either seeing the other: the test arms a gate
   before its gesture, waits until the harness reports it held, asserts the held state, then releases it by its own
   request; a release before the gate is reached fails the test. Restart is the test app's host script on the harness's
   word. Clock is `Page.Clock`, installed only by a test that names it. Gc is `Page.RequestGCAsync`, confirmed by the
   page's own weak hold.
 - **Bindings.** `Promises.g.cs` is generated from app.json and the features: a test carries `[FailsFor(...)]` naming its
-  feature, defect and index, or its cell. The living check fails when the generated files differ from what the spec
+  feature, defect and index, or its cell. The bindings check fails when the generated files differ from what the spec
   writes, when a test names no test of the spec or a test of the spec has no test, and when a test never reached the
   gate its held steps name.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
@@ -288,6 +301,73 @@ MSBuild never runs npm; an app whose bundle is missing refuses to start.
 - Native and Fusion depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U3's delivery job reads it
   back from each nuspec.
 
+### 2.10 The test rules
+
+A test written after its code, by an author who read that code, drifts toward what the code does. On the redesign at
+65fdf118d, 51 Playwright test files find their inputs with the framework's own `IdGenerator.For` (14 on main at
+7b9e987cc), so the id the generator writes is the id the test looks for and a wrong one passes; rule 7 of
+`.claude/rules/tests.md` forbade it in prose. In the rewrite every rule and smell of that file is held by a compiler
+rule or a named check:
+- **The reference cut.** A Playwright project compiles against the target framework, Playwright, NUnit and its test
+  platform, and `Alis.Reactive.Conformance.World`, and nothing else (TEST001). A test finds an element by its role,
+  label or text, or by an id written as a literal; the InputsAndIds tests assert each derived id as a literal, so a
+  wrong id fails them.
+- **Test first.** A unit's tests are written from their promises in `features.json` and their screens in `app.json`
+  before the doors they need, and run red; the screen and the doors make them pass; each then fails on its planted
+  defect. The reference cut is what lets a test compile before its door exists.
+- **The rules project.** `tests/Alis.Reactive.TestRules` holds the rules as Roslyn analyzers on every Playwright
+  project, apart from the framework's analyzers, which ship inside AlisReactive;
+  `tests/Alis.Reactive.TestRules.AnalyzerTests` holds each rule's refused case and accepted case. Unit U2 lands both
+  before the first feature test, and check.py's `test_rules` binds each line of the second table to
+  `.claude/rules/tests.md`.
+
+| Id | Refuses |
+|---|---|
+| TEST001 | a reference beyond the target framework's assemblies, Playwright, NUnit and its test platform, and the world contract: the framework, the app, a mocking or a snapshot library |
+| TEST002 | script run in the page or a stubbed network: `EvaluateAsync`, `EvaluateHandleAsync`, `AddInitScriptAsync`, `ExposeFunctionAsync`, `ExposeBindingAsync`, `RouteAsync`, `RouteFromHARAsync`, `RouteWebSocketAsync`, and a literal that names `ej2_instances` or `window.alis` |
+| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |
+| TEST004 | a skipped, repeated or ordered test: `[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` |
+| TEST005 | a branch or a loop in a test method: `if`, `switch`, `?:`, `for`, `foreach`, `while`, `do`, `try`, `goto` |
+| TEST006 | a one-shot read of the page (`InnerTextAsync`, `TextContentAsync`, `InputValueAsync`, `GetAttributeAsync`, `InnerHTMLAsync`, `IsVisibleAsync`, `IsHiddenAsync`, `IsCheckedAsync`, `IsEnabledAsync`, `CountAsync`, `AllInnerTextsAsync`, `AllTextContentsAsync`); a page is asserted through `Expect` alone, and `Assert.That` reads only a request the page sent, its body and its headers |
+| TEST007 | an expected value, or a locator's selector, role name, label or text, that is neither a compile-time constant nor a generated promise constant |
+| TEST008 | a partial match on the page: `ToContainTextAsync`, or a `Regex` in a page matcher; a regex reads only a request's header |
+| TEST009 | an expected value equal to a constant the same test typed into the same locator |
+| TEST010 | a test whose every assertion is an absence (`ToBeHiddenAsync`, a `Not` matcher, `ToHaveCountAsync(0)`, `ToBeEmptyAsync`, an empty text) |
+| TEST011 | `Expect` or `Assert` outside a test method: a helper builds a page or performs a gesture, and never asserts |
+| TEST012 | a test method without exactly one `[FailsFor]` taking a generated promise constant, or a fixture not named `When` and its situation |
+| TEST013 | a test method that performs no gesture itself: a navigation, click, fill, press, select, check, drag or file, or a harness release or push |
+
+| `.claude/rules/tests.md` | Held by |
+|---|---|
+| 1. One promise, named as the promise | TEST012, the bindings check |
+| 2. The public surface only | TEST001 |
+| 3. Real collaborators | TEST001, TEST002 |
+| 4. An outcome someone observes | TEST002, TEST006 |
+| 5. Fails for the defect it names | the planted-defect run, TEST010 |
+| 6. Both sides of every promise | check_promises |
+| 7. No tautology | TEST001, TEST007, TEST008, TEST009 |
+| 8. Independent and deterministic | TEST003, TEST004, TEST005, the harness |
+| 9. Readable as the specification | TEST005, TEST011, TEST013 |
+| 10. Complete | the bindings check, check_app |
+| A mock, stub, spy or fake, of framework code or of the boundary it talks to | TEST001, TEST002 |
+| A page arranged through internals, internal constructors or reflection | TEST001 |
+| jsdom, or any stand-in for the browser, offered as proof | TEST001 |
+| A golden, snapshot or plan-JSON assertion offered as proof of behavior | TEST001, TEST007 |
+| Asserting the arrange: typing "Helen" and asserting the input says "Helen" | TEST009 |
+| An expected value computed by framework code | TEST001, TEST007 |
+| An assertion the defect also satisfies, such as an empty element with no positive control | TEST010, the planted-defect run |
+| Only the happy path | check_promises |
+| One test proving several promises, or two tests proving one | TEST012, the bindings check |
+| A helper that asserts, or hides the gesture under test | TEST011, TEST013 |
+| A sleep, a retry, or an order between tests | TEST003, TEST004 |
+| A name that describes the code instead of the promise | the bindings check |
+| A component library on a framework test's page | check_app, the harness |
+
+check_promises gives every promise its opposite case as a promise of its own; the bindings check is section 2.5's; the
+planted-defect run is `scripts/plant-defect.sh`, its red line in the unit's commit; the harness gives each test its
+own world and fails a core test whose page requests the EJ2 script. A test's name is the author's sentence: the
+bindings check makes its promise, not its name, the specification it is held to.
+
 ## 3. What retires
 
 Each retirement waits for `features_lost` at 0 and the rule files that name the item rewritten; "nothing references it"
@@ -306,9 +386,9 @@ is never the reason.
 
 ## 4. Units
 
-A unit ends when every test check.py assigns it passes on `scripts/playwright.sh`, each having failed first on its
-planted defect, the specs its module owns are green under TLC with each mutant failing, and its analyzer cases pass;
-the commit names the run and its result line.
+A unit ends when every test check.py assigns it passes on `scripts/playwright.sh`, each written from its promise
+before the doors it needs and failing then, and failing again on its planted defect, the specs its module owns are
+green under TLC with each mutant failing, and its analyzer cases pass; the commit names the run and its result line.
 
 The order is the order pages need doors, not the SliceTree's. A unit for Schema alone has no page to prove it on, so
 U3 is a walking skeleton that gives every row its folder and the thinnest door, and each unit after it widens the
@@ -325,10 +405,11 @@ ALIS013 and module 20's rules, the lint at its strictest, `scripts/check.sh` gre
 ### U2. The harness, the conformance app's shell and CI
 Features: none
 
-The app's areas, hosts, world, verbs, generated gates and bindings; the Playwright project's harness, result line and
-leftover-server check; the CI workflows. Its own tests prove the harness: two worlds isolated, a gate held then
-released, a release before reached failing, a zero-test run failing. It measures and writes the waits, the budget and
-the parallelism (section 2.5, 2.8).
+The app's areas, hosts, world, verbs, generated gates and bindings; the world contract; the Playwright project's
+harness, result line and leftover-server check; the test rules TEST001 to TEST013 with their cases (section 2.10),
+before any feature test is written; the CI workflows. Its own tests prove the harness: two worlds isolated, a gate
+held then released, a release before reached failing, a zero-test run failing. It measures and writes the waits, the
+budget and the parallelism (section 2.5, 2.8).
 
 ### U3. The walking skeleton, the packs and delivery
 Features: M19.F1

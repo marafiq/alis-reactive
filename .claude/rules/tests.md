@@ -58,7 +58,7 @@ shipped components and the sandbox journeys and adds the Component and journey t
     refusal a developer can meet, with its message. Completeness is measured by defects, not lines: a defect
     no test catches is a missing test.
 
-Watch the behavior in a real browser before writing the test that pins it.
+Write the test from its promise before the code it needs, watch it fail, then watch it pass in a real browser.
 
 ## Smells
 

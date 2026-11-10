@@ -577,6 +577,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   by the page's own weak hold before the test goes on (X12.18). An action that fires under no mutant-free run leaves its
   spec's `Next` (Tracing.tla's Finish and Send, Run.tla's ChainedSecond, 2026-11-10). Step 9 writes the actions
   into the promises; step 10's check.py refuses an action no promise names and a promise naming an action its spec lacks.
+- The owner, 2026-11-10 (verbatim in `spec/NOTES.md`): the tests' quality checks live in a project of their own, apart
+  from the code, since a test written beside its implementation mimics it and the quality falls slowly. The lead's
+  design, `spec/REWRITE.md` section 2.10: a Playwright project references no assembly of the framework or the app,
+  only the world contract, Alis.Reactive.Conformance.World, so a test finds an element as a user does and expects a
+  literal; Alis.Reactive.TestRules holds the test rules TEST001 to TEST013, Roslyn analyzers with their cases, which
+  with check.py's test_rules hold every rule and smell of `.claude/rules/tests.md`; a unit writes its tests from their
+  promises before the doors they need, and U2 lands the rules before the first feature test. The evidence: 51 test
+  files of the redesign find their inputs with IdGenerator.For, which rule 7 of tests.md forbade in prose.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
