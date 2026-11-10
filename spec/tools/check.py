@@ -367,12 +367,14 @@ def answered_questions(questions):
     analyzer_ids = {row["id"] for row in table("analyzers.tsv")}
     probes = probe_ids()
     new_doors = all_new_doors(sections)
+    stated = module_statements()
     answered, problems, seen = [], [], {}
     for question in questions:
         if question not in sections:
             problems.append(f"{question} absent")
             continue
         found, defects = judge_section(question, sections[question], new_doors, analyzer_ids, probes)
+        found += [f"names {named}, which no module states" for named in sorted(set(MODULE_STATEMENT.findall("\n".join(sections[question])))) if named not in stated]
         for identifier in defects:
             if identifier in seen:
                 found.append(f"defect {identifier} also in {seen[identifier]}")
@@ -700,6 +702,17 @@ def module_names():
 
 def module_doors():
     return {door for path in SPEC.glob("*/module.md") for door in MODULE_DOOR.findall(path.read_text())}
+
+
+MODULE_STATEMENT = re.compile(r"\bM\d+\.[DNX]\d+\b")
+
+
+def module_statements():
+    stated = set(module_doors())
+    for path in feature_files():
+        for feature in json.loads(path.read_text()).get("features", []):
+            stated |= {entry.get("id") for entry in feature.get("meanings", []) + feature.get("defects", [])}
+    return stated
 
 
 def core_defect_rungs():

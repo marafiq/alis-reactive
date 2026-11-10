@@ -772,3 +772,5 @@
   Evidence: spec/Vendors/features.json; spec/Core/DESIGN.md D17.3, D19.6.
 - 2026-11-09 from module 12: three redesign tests flip with D17.4: WhenTheElementIsTheComponent's a_dom_event_with_no_detail and a_custom_event_with_no_detail tests (X17.3), and WhenADeclarationIsNewerThanItsComponent's a_read_of_a_payload_the_component_does_not_pass test (X17.15).
   Evidence: spec/Vendors/features.json, X17.3 and X17.15's promises.
+- 2026-11-09 the questions check now refuses a section that names a module meaning, door or defect (M<n>.D, N or X) no module states, found when a plant of M12.D9 in N18.12 passed every check; the nine module ids the core names today each resolve.
+  Evidence: check.py module_statements; plant "Q18: names M12.D9, which no module states".
