@@ -26,7 +26,9 @@
     "form": "a request container",
     "stream": "a server-sent event stream (net10)",
     "hub": "a SignalR hub (net10)",
-    "endpoint": "a server endpoint the screen's requests reach"
+    "endpoint": "a server endpoint the screen's requests reach",
+    "partial": "a partial rendered with the page that carries its own plan, composed by PlanId",
+    "validator": "a ReactiveValidator<T> registered through DI, whose rules the plan carries by component ID"
   },
   "partModules": {
     "form": "RequestsAndResponses",
@@ -36,7 +38,9 @@
     "hub": "Realtime",
     "plugin": "Plugins",
     "conformance": "Vendors",
-    "fusion": "FusionComponents"
+    "fusion": "FusionComponents",
+    "partial": "PartialsAndSlots",
+    "validator": "Validation"
   },
   "hosts": [
     {
@@ -176,6 +180,12 @@
           "kind": "conformance",
           "role": "the census panel, the screen's custom widget, a ConformanceComponent whose records and items the array lambdas read",
           "declares": "ConformanceComponent"
+        },
+        {
+          "id": "residentsBusy",
+          "kind": "nativeSlice",
+          "module": "NativeAppLevelObjects",
+          "role": "the host's busy indicator, NativeLoader, which ShowBusy() shows over a request's target"
         }
       ]
     },
@@ -253,6 +263,16 @@
           "kind": "native",
           "role": "the intake form's document rows, each a file and its caption",
           "module": "InputsAndIds"
+        },
+        {
+          "id": "kinCards",
+          "kind": "partial",
+          "role": "the contact cards, partials the page renders with Html.PartialFor, each with its own plan"
+        },
+        {
+          "id": "intakeValidator",
+          "kind": "validator",
+          "role": "the intake's validator: the resident, the next of kin and the visit rules"
         }
       ]
     },
@@ -392,6 +412,16 @@
           "id": "mention",
           "kind": "fusion",
           "role": "the note box's FusionMention of staff"
+        },
+        {
+          "id": "contactsEndpoint",
+          "kind": "endpoint",
+          "role": "the contacts endpoints: the week's shifts the schedule posts to"
+        },
+        {
+          "id": "contactsValidator",
+          "kind": "validator",
+          "role": "the contacts grid's validators, their email and address rules"
         }
       ]
     },
@@ -437,6 +467,11 @@
           "kind": "conformance",
           "role": "the dose scanner, the round's custom widget, a ConformanceComponent whose methods, choice and records the round's requests use",
           "declares": "ConformanceComponent"
+        },
+        {
+          "id": "roundValidator",
+          "kind": "validator",
+          "role": "the round's validator: the doses and their strengths"
         }
       ]
     },
@@ -466,6 +501,11 @@
           "id": "handover",
           "kind": "fusion",
           "role": "the handover note, FusionSmartTextArea"
+        },
+        {
+          "id": "handoverEndpoint",
+          "kind": "endpoint",
+          "role": "the handover endpoints: the assistant's answers"
         }
       ]
     },
@@ -504,6 +544,16 @@
           "kind": "native",
           "role": "the layout: the runtime's asset links, cached fragments and plans that compose by id",
           "module": "RenderingAndDelivery"
+        },
+        {
+          "id": "shellSlot",
+          "kind": "slot",
+          "role": "the drawer's content, a partial loaded into it"
+        },
+        {
+          "id": "shellEndpoint",
+          "kind": "endpoint",
+          "role": "the shell's endpoints: the panels' refreshes, the drawer's partials, the discharge and the loader's requests"
         }
       ]
     },
@@ -580,6 +630,31 @@
           "id": "benchSlot",
           "kind": "slot",
           "role": "the bench's slot, a card partial loaded and unloaded"
+        },
+        {
+          "id": "benchEndpoint",
+          "kind": "endpoint",
+          "role": "the test app's bench endpoints: items, code, card, record and the forms' posts, and their failures"
+        },
+        {
+          "id": "benchPartials",
+          "kind": "partial",
+          "role": "the bench's partials rendered with the page, each with its own plan"
+        },
+        {
+          "id": "benchStream",
+          "kind": "stream",
+          "role": "the test stream the bench subscribes to on net10"
+        },
+        {
+          "id": "benchHub",
+          "kind": "hub",
+          "role": "the test hub the bench invokes on net10"
+        },
+        {
+          "id": "benchValidator",
+          "kind": "validator",
+          "role": "the bench's validator, its rules bound to the conformance declarations by component ID"
         }
       ]
     },
@@ -588,7 +663,24 @@
       "area": "refusals",
       "title": "Refusal routes",
       "user": "test infrastructure: one deliberately broken view per refusal",
-      "parts": []
+      "parts": [
+        {
+          "id": "refusalEndpoint",
+          "kind": "endpoint",
+          "role": "the endpoints a refusal page's requests name: the refused page sends none, and its rendering twin sends to them"
+        },
+        {
+          "id": "refusalValidator",
+          "kind": "validator",
+          "role": "the validators the refused pages render under"
+        },
+        {
+          "id": "refusalDrawer",
+          "kind": "nativeSlice",
+          "role": "NativeDrawer on the refused pages that close one",
+          "module": "NativeAppLevelObjects"
+        }
+      ]
     }
   ],
   "placements": [
@@ -1189,7 +1281,10 @@
       "hosts": [
         "dateConverter"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint",
+        "refusalValidator"
+      ],
       "harness": [
         "seed"
       ]
@@ -1760,7 +1855,8 @@
         "snakeCase"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -2206,7 +2302,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -2374,7 +2471,10 @@
       "hosts": [
         "defaultHooks"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint",
+        "refusalDrawer"
+      ],
       "harness": [
         "seed"
       ]
@@ -2525,7 +2625,9 @@
         "net10"
       ],
       "parts": [
-        "allergies"
+        "allergies",
+        "clinicalForm",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2540,7 +2642,8 @@
         "net10"
       ],
       "parts": [
-        "allergies"
+        "allergies",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2570,7 +2673,8 @@
         "net10"
       ],
       "parts": [
-        "assistant"
+        "assistant",
+        "handoverEndpoint"
       ],
       "harness": [
         "seed"
@@ -2585,7 +2689,9 @@
         "net10"
       ],
       "parts": [
-        "medication"
+        "medication",
+        "clinicalForm",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2600,7 +2706,8 @@
         "net10"
       ],
       "parts": [
-        "medication"
+        "medication",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2630,7 +2737,9 @@
         "net10"
       ],
       "parts": [
-        "language"
+        "language",
+        "clinicalForm",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2660,7 +2769,9 @@
         "net10"
       ],
       "parts": [
-        "ward"
+        "ward",
+        "clinicalForm",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2675,7 +2786,8 @@
         "net10"
       ],
       "parts": [
-        "ward"
+        "ward",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2734,7 +2846,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalValidator"
+      ],
       "harness": [
         "seed"
       ]
@@ -2747,7 +2861,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalValidator"
+      ],
       "harness": [
         "seed"
       ]
@@ -2760,7 +2876,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalValidator"
+      ],
       "harness": [
         "seed"
       ]
@@ -2804,7 +2922,8 @@
         "net10"
       ],
       "parts": [
-        "contactsGrid"
+        "contactsGrid",
+        "contactsValidator"
       ],
       "harness": [
         "seed"
@@ -2819,7 +2938,8 @@
         "net10"
       ],
       "parts": [
-        "contactsGrid"
+        "contactsGrid",
+        "contactsValidator"
       ],
       "harness": [
         "seed"
@@ -2909,7 +3029,9 @@
         "net10"
       ],
       "parts": [
-        "bed"
+        "bed",
+        "clinicalForm",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2924,7 +3046,8 @@
         "net10"
       ],
       "parts": [
-        "bed"
+        "bed",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -2999,7 +3122,8 @@
         "net10"
       ],
       "parts": [
-        "visits"
+        "visits",
+        "contactsEndpoint"
       ],
       "harness": [
         "seed"
@@ -3059,7 +3183,9 @@
         "net10"
       ],
       "parts": [
-        "smartPaste"
+        "smartPaste",
+        "clinicalSlot",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -3232,7 +3358,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -3299,7 +3427,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -3312,7 +3442,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -3327,7 +3459,8 @@
       ],
       "parts": [
         "intakeForm",
-        "inputs"
+        "inputs",
+        "intakeValidator"
       ],
       "harness": [
         "seed"
@@ -3344,7 +3477,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "carePicker"
+        "carePicker",
+        "intakeValidator"
       ],
       "harness": [
         "seed"
@@ -3361,7 +3495,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "intakeValidator"
       ],
       "harness": [
         "seed"
@@ -3375,7 +3510,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -3408,7 +3545,8 @@
         "intakeForm",
         "inputs",
         "nextOfKin",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "intakeValidator"
       ],
       "harness": [
         "seed"
@@ -3491,7 +3629,8 @@
       ],
       "parts": [
         "inputs",
-        "nextOfKin"
+        "nextOfKin",
+        "kinCards"
       ],
       "harness": [
         "seed"
@@ -3506,7 +3645,9 @@
         "net10"
       ],
       "parts": [
-        "drawer"
+        "drawer",
+        "shellSlot",
+        "shellEndpoint"
       ],
       "harness": [
         "seed"
@@ -3536,7 +3677,8 @@
         "net10"
       ],
       "parts": [
-        "loader"
+        "loader",
+        "shellEndpoint"
       ],
       "harness": [
         "seed",
@@ -3564,7 +3706,8 @@
         "net10"
       ],
       "parts": [
-        "rows"
+        "rows",
+        "residentsEndpoint"
       ],
       "harness": [
         "seed"
@@ -3594,7 +3737,8 @@
         "net10"
       ],
       "parts": [
-        "rows"
+        "rows",
+        "residentsEndpoint"
       ],
       "harness": [
         "seed"
@@ -3609,7 +3753,8 @@
         "net10"
       ],
       "parts": [
-        "rows"
+        "rows",
+        "residentsEndpoint"
       ],
       "harness": [
         "seed",
@@ -3633,7 +3778,8 @@
       ],
       "parts": [
         "rows",
-        "listSlot"
+        "listSlot",
+        "residentsEndpoint"
       ],
       "harness": [
         "seed"
@@ -3648,7 +3794,8 @@
         "net10"
       ],
       "parts": [
-        "loader"
+        "loader",
+        "shellEndpoint"
       ],
       "harness": [
         "seed",
@@ -3701,7 +3848,10 @@
         "net10"
       ],
       "parts": [
-        "drawer"
+        "drawer",
+        "confirm",
+        "shellSlot",
+        "shellEndpoint"
       ],
       "harness": [
         "seed"
@@ -3716,7 +3866,8 @@
         "net10"
       ],
       "parts": [
-        "confirm"
+        "confirm",
+        "shellEndpoint"
       ],
       "harness": [
         "seed",
@@ -3983,7 +4134,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "sectionSlot"
+        "sectionSlot",
+        "intakeValidator"
       ],
       "harness": [
         "seed"
@@ -4046,7 +4198,8 @@
       "parts": [
         "tabSlot",
         "notes",
-        "radio"
+        "radio",
+        "recordEndpoint"
       ],
       "harness": [
         "seed"
@@ -4145,7 +4298,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -4195,7 +4350,8 @@
       ],
       "parts": [
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "roundValidator"
       ],
       "harness": [
         "seed"
@@ -4211,7 +4367,8 @@
       ],
       "parts": [
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "roundValidator"
       ],
       "harness": [
         "seed"
@@ -4245,7 +4402,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "intakeValidator"
       ],
       "harness": [
         "seed"
@@ -5214,7 +5372,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "sectionSlot"
       ],
       "harness": [
         "seed"
@@ -5262,7 +5421,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -5275,7 +5436,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -5288,7 +5451,9 @@
       "hosts": [
         "net10"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -5399,7 +5564,9 @@
       "hosts": [
         "noAntiforgeryChoice"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -5412,7 +5579,9 @@
       "hosts": [
         "noRequests"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -5425,7 +5594,9 @@
       "hosts": [
         "net48"
       ],
-      "parts": [],
+      "parts": [
+        "refusalEndpoint"
+      ],
       "harness": [
         "seed"
       ]
@@ -5457,10 +5628,18 @@
       "parts": [
         "filters",
         "list",
-        "residentsEndpoint"
+        "residentsEndpoint",
+        "residentsBusy"
       ],
       "harness": [
         "seed"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the summary endpoint ends the connection without an answer"
+        }
       ]
     },
     {
@@ -5474,7 +5653,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "intakeValidator"
       ],
       "harness": [
         "seed"
@@ -5553,7 +5733,8 @@
       ],
       "parts": [
         "list",
-        "residentsEndpoint"
+        "residentsEndpoint",
+        "residentsBusy"
       ],
       "harness": [
         "seed",
@@ -5891,7 +6072,8 @@
         "net10"
       ],
       "parts": [
-        "element"
+        "element",
+        "benchPartials"
       ],
       "harness": [
         "seed"
@@ -6304,7 +6486,8 @@
       "parts": [
         "intakeForm",
         "inputs",
-        "intakeEndpoint"
+        "intakeEndpoint",
+        "intakeValidator"
       ],
       "harness": [
         "seed"
@@ -7052,7 +7235,8 @@
         "net10"
       ],
       "parts": [
-        "store"
+        "store",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -7189,7 +7373,8 @@
         "net10"
       ],
       "parts": [
-        "callbacks"
+        "callbacks",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -7204,7 +7389,8 @@
         "net10"
       ],
       "parts": [
-        "callbacks"
+        "callbacks",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -7219,7 +7405,8 @@
         "net10"
       ],
       "parts": [
-        "callbacks"
+        "callbacks",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -7234,7 +7421,8 @@
         "net10"
       ],
       "parts": [
-        "callbacks"
+        "callbacks",
+        "benchSlot"
       ],
       "harness": [
         "seed",
@@ -7308,7 +7496,8 @@
         "net10"
       ],
       "parts": [
-        "callbacks"
+        "callbacks",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -7323,7 +7512,8 @@
         "net10"
       ],
       "parts": [
-        "callbacks"
+        "callbacks",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -7338,7 +7528,8 @@
         "net10"
       ],
       "parts": [
-        "callbacks"
+        "callbacks",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -7354,7 +7545,8 @@
       ],
       "parts": [
         "conformance",
-        "peer"
+        "peer",
+        "benchSlot"
       ],
       "harness": [
         "seed",
@@ -7463,7 +7655,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchSlot"
       ],
       "harness": [
         "seed",
@@ -8558,7 +8751,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8571,7 +8765,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8610,7 +8805,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "plugins"
       ],
       "harness": [
         "seed"
@@ -8623,7 +8819,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchHub"
       ],
       "harness": [
         "seed"
@@ -8636,7 +8833,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8649,7 +8847,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8662,7 +8861,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8675,7 +8875,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8688,7 +8889,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8701,7 +8903,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8714,7 +8917,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8727,7 +8931,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8740,7 +8945,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8753,7 +8959,9 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -8766,7 +8974,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed",
@@ -8787,7 +8996,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8800,7 +9010,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8813,7 +9024,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8826,7 +9038,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed",
@@ -8852,7 +9065,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint"
       ],
       "harness": [
         "seed"
@@ -8878,7 +9092,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchStream"
       ],
       "harness": [
         "seed",
@@ -8899,7 +9114,9 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -8912,7 +9129,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchSlot"
       ],
       "harness": [
         "seed"
@@ -8925,7 +9143,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchSlot"
       ],
       "harness": [
         "seed",
@@ -8946,7 +9165,9 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint",
+        "benchValidator"
       ],
       "harness": [
         "seed"
@@ -8959,7 +9180,9 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint",
+        "benchValidator"
       ],
       "harness": [
         "seed"
@@ -8972,7 +9195,9 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint",
+        "benchValidator"
       ],
       "harness": [
         "seed"
@@ -8985,7 +9210,9 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint",
+        "benchValidator"
       ],
       "harness": [
         "seed"
@@ -8998,7 +9225,9 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint",
+        "benchValidator"
       ],
       "harness": [
         "seed"
@@ -9011,7 +9240,9 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "benchEndpoint",
+        "benchValidator"
       ],
       "harness": [
         "seed"
@@ -9141,7 +9372,8 @@
         "net10"
       ],
       "parts": [
-        "allergies"
+        "allergies",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -9182,7 +9414,8 @@
       ],
       "parts": [
         "allergies",
-        "clinicalSlot"
+        "clinicalSlot",
+        "clinicalEndpoint"
       ],
       "harness": [
         "seed"
@@ -9195,7 +9428,8 @@
         "net10"
       ],
       "parts": [
-        "allergies"
+        "allergies",
+        "clinicalSlot"
       ],
       "harness": [
         "seed"
@@ -9208,7 +9442,8 @@
         "net10"
       ],
       "parts": [
-        "allergies"
+        "allergies",
+        "clinicalSlot"
       ],
       "harness": [
         "seed"

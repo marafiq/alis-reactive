@@ -1330,10 +1330,10 @@
         },
         {
           "for": "X10.3",
-          "page": "A summary card whose GET writes the resident's name on success, writes Offline into the error text in its catch-all, and whose Finally writes Done into the status; the card is the request's busy target under ShowBusy(). The test drops the connection.",
+          "page": "A summary card whose GET writes the resident's name on success, writes Offline into the error text in its catch-all, and whose Finally writes Done into the status; the card is the request's busy target under ShowBusy(). The harness seeds the summary endpoint to end the connection without an answer.",
           "gesture": "Click Load summary.",
           "outcome": "The error text reads Offline, the status reads Done, and the card's busy indicator and aria-busy are gone.",
-          "opposite": "With the server answering 200, the card shows the name and no Offline.",
+          "opposite": "With the summary endpoint seeded to answer 200, the card shows the name and no Offline.",
           "defect": "The catch-all not run, so Offline never shows; Finally not run, so Done never shows; or the indicator left on the card.",
           "observes": "Request.tla:DefaultFinally"
         },
