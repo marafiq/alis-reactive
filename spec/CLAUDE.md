@@ -504,6 +504,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   pay load", and every payload door the POCs proved are cells (BRIEF.md section 8). With the owner's
   yes, a shipped slice's proofs cover only what its declaration adds (its members' names and shapes, its browser
   facts, its own defects) and never re-prove a cell through another slice.
+- The owner, 2026-11-10, confirming the reference component (verbatim in `spec/NOTES.md`): the framework is held stable at
+  several levels, the analyzers as a harness and the browser tests. The browser tests run on one custom TypeScript
+  component whose features are wide enough to cover the surface of every feature the framework supports: each
+  variation at the sizes that show its rule (a payload walked one level, then two), with TLA+ carrying the rest, so no
+  test is bound by a vendor's speed or limited by its capability. Syncfusion's onboarding is proven by one component,
+  FusionMultiSelect, exercising the same kinds of features on its own members and what it brings of its own. The
+  custom component's name says it covers the framework's features, never a domain word such as a ward: the owner took
+  ConformanceComponent, the component the conformance matrix runs on, the same day.
 - The owner, 2026-11-09: "TLA+ ... help design this out because main badly failed at slow tests and broken ones
   that can not be fully relied". The lead's design within it: the TLC specs carry every ordering of the async lanes,
   so no browser test provokes a race by timing. A promise on an async lane names the one action of a spec's `Next`
