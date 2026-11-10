@@ -1080,7 +1080,8 @@ def prose_cites(text):
 
 
 def installed_package_lines(path):
-    for folder in [REPO, *REPO.parents]:
+    checkout = Path(git("rev-parse", "--path-format=absolute", "--git-common-dir")).parent
+    for folder in [REPO, *REPO.parents, checkout]:
         candidate = folder / "node_modules" / path
         if candidate.is_file():
             return len(candidate.read_text().splitlines())
