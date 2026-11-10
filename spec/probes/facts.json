@@ -4105,6 +4105,36 @@
         "gesture": "Install Playwright's clock; click Load census; on the gate page click Release; run the clock forward by the standard first wait; open the echo page.",
         "outcome": "Attempt 2 lists a traceparent whose flags read 01 and baggage http.request.resend_count=1."
       }
+    },
+    {
+      "id": "signalr-requests-carry-no-trace-context",
+      "statement": "@microsoft/signalr 10.0.11 sends no traceparent, tracestate or baggage header on its negotiate, its polls, its sends or its close by long polling, nor on its negotiate or its WebSocket upgrade, and an invoke completes with the hub's result on both transports.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks, loading @microsoft/signalr 10.0.11's browser bundle against a node HTTP server that answers SignalR's negotiate, long polling, a WebSocket upgrade (ws 7.5.11) and the JSON hub protocol, recording every request and message",
+      "probe": "signalr-trace-context.mjs",
+      "expect": "signalr-requests-carry-no-trace-context: @microsoft/signalr 10.0.11 sent negotiate, poll, send, close by long polling and negotiate, upgrade, message by WebSockets; 0 carrying a trace header; invoked 7 and invoked 7",
+      "source": "spec/probes/signalr-trace-context.mjs",
+      "proof": {
+        "feature": "M26.F3",
+        "page": "X21.15's round page under the tracing host: the trace on, the server's OpenTelemetry SDK also listening to ASP.NET Core's SignalR hub activities, and a Call nurse button whose pipeline invokes the nurse line hub's Call method, connected over WebSockets and, in a second fixture, over long polling.",
+        "gesture": "Click Call nurse; open the collector page.",
+        "outcome": "The collector lists the click's run span under the page's trace id and the hub's Call activity under a trace id of its own."
+      }
+    },
+    {
+      "id": "signalr-invocation-message-keys",
+      "statement": "An invocation message @microsoft/signalr 10.0.11 sends holds arguments, invocationId, target and type and no headers member, by long polling and by WebSockets, so no trace context rides on an invoke.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks, loading @microsoft/signalr 10.0.11's browser bundle against a node HTTP server that answers SignalR's negotiate, long polling, a WebSocket upgrade (ws 7.5.11) and the JSON hub protocol, recording every request and message",
+      "probe": "signalr-trace-context.mjs",
+      "expect": "signalr-invocation-message-keys: @microsoft/signalr 10.0.11 invokes with arguments,invocationId,target,type by long polling and arguments,invocationId,target,type by WebSockets",
+      "source": "spec/probes/signalr-trace-context.mjs",
+      "proof": {
+        "feature": "M26.F3",
+        "page": "X21.15's round page under the tracing host: the trace on, the server's OpenTelemetry SDK also listening to ASP.NET Core's SignalR hub activities, and a Call nurse button whose pipeline invokes the nurse line hub's Call method, connected over WebSockets and, in a second fixture, over long polling.",
+        "gesture": "Click Call nurse; open the collector page.",
+        "outcome": "The collector lists the click's run span under the page's trace id and the hub's Call activity under a trace id of its own."
+      }
     }
   ]
 }
