@@ -22,9 +22,9 @@ public static partial class Positions
 
     public static void ConditionRight(Pipeline<CellView> pipeline, CellBoard target, TypedSource<string?> value) => pipeline.When(target.Wing.Eq(value));
 
-    public static void TextTestOperand(TypedSource<string?> value) => NoDoor.Position("N7.3: no text test, MinLength, Between or membership operator on a pipeline condition");
+    public static void TextTestOperand(TypedSource<string?> value) => NoDoor.Position("M3.N1, N7.3: no text test, MinLength, Between or membership operator on a pipeline condition");
 
-    public static void MatchesPattern(TypedSource<string?> value) => NoDoor.Position("D7.5: no Matches operator on a pipeline condition");
+    public static void MatchesPattern(TypedSource<string?> value) => NoDoor.Position("M3.N1: no Matches operator on a pipeline condition");
 
     public static void RequestMember(PipelineVerbs<CellView> verbs, TypedSource<string?> value) => verbs.Post<CellRequest>("/cells", request => request.Json(body => body.Set(r => r.Note, value)));
 

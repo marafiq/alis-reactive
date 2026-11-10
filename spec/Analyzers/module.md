@@ -48,6 +48,8 @@ Kept from the core, each the analyzer that holds its rule:
   `Inputs`, `Input` or a header (D17.15).
 - `N17.2` the vendor contract analyzer, ALIS014 to ALIS022 and the type check ALIS037 (D17.5).
 - `N16.5` ALIS038, the flags analyzer; `M1.N6` ALIS039, the app event analyzer.
+- `N18.14` ALIS040, the nullable source analyzer: a source whose nullability differs from its argument's or operand's
+  is an error in every app (D7.3).
 - `N6.3` `ReadsNothingSuppressor`, ALIS026 and ALIS027, and `N9.5` `RequestKeysSuppressor`, ALIS036, the two
   suppressors whose meanings are modules 4's and 6's; `N9.4` ALIS029, a file-shaped member in a GET or a JSON body;
   ALIS028, `ITypedSource<T>`'s analyzer (N6.4).
@@ -83,6 +85,7 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS028, ALIS029 | a typed source; a file member | new (N6.4, N9.4) |
 | ALIS030 to ALIS035 | the request, `ShowValidationErrors`, blocks, lambdas, declarations, a row's link | new (N18.7 to N18.13) |
 | ALIS038, ALIS039 | the flags door; two app events of one name | new (N16.5, M1.N6) |
+| ALIS040 | a source whose nullability differs from its argument's or operand's | new (N18.14) |
 
 ## Improvements
 

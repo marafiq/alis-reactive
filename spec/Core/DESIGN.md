@@ -1196,11 +1196,14 @@ Terms used throughout:
   (`Sources.Object`), a list built from sources (`Sources.List`), and a value chosen from sources by `IfNull` or
   `Choose` (D6.14, `Sources.IfNull`, `Sources.Choose`).
 - D7.3 Every position takes a literal of its type and every source whose type is assignable to it:
-  `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position. A set takes a source
+  `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position. A condition operator's
+  left operand is the one position that takes no literal: it is the source the operator tests, as `p.When(source)`
+  reads (D8.2), and the literal stands on the right (`Positions.ConditionLeft`, gate 2's G9). A set takes a source
   as `ITypedSource<out T>`, and so does an element's class name, `ClassList`'s `Add`, `Remove` and `Toggle` (M5.N2,
   gate 2's G9), so a narrower reference type and a text without null reach them as they are. C# converts a
   method's `Arg<T>` only from a `TypedSource<T>`: it refuses a conversion from the covariant interface (CS0552), warns
-  where only nullability differs (CS8620), has no conversion from a struct's source to its nullable's (CS1503), takes no
+  where only nullability differs (CS8620), which ALIS040 refuses as an error in every app (N18.14, gate 2's G8), has
+  no conversion from a struct's source to its nullable's (CS1503), takes no
   conversion operator in an extension block (CS9282), and a second operator on `TypedSource<T>` makes the plain case
   ambiguous (CS0457). A struct's source reaches its nullable at a set as C# assignment widens it: `Set` on a
   `Property<T?>` or `WriteOnly<T?>` takes a `T` source (N7.6). At an argument and in a comparison, where C# offers no
@@ -1342,6 +1345,12 @@ Terms used throughout:
   argument; a condition compares a null weight's fallback and a held weight itself; a fluid target chooses its
   first value when the test holds and its second, a measured intake, when the test reads nothing, and measures
   nothing when the second is not chosen.
+- `X7.15` analyzer (D7.3): a pump's last alarm with its fallback, a `string` source, passed to the caption's `string?`
+  argument or compared with the pump's `string?` note, in an app that leaves CS8620 a warning: "'{source}' is a source
+  of '{type}', and '{position}' takes '{type}?'; write .OrNull() to pass it as '{type}?'." At build by ALIS040:
+  new:N18.14.
+- `X7.16` type (D7.3): a literal at a condition operator's left operand does not compile: the comparisons are extension
+  methods on a typed source, so `"North".Eq(wing)` finds no `Eq` on a string (CS1929): new:N8.2.
 
 ## Q8. Conditions: three kinds
 
@@ -4638,6 +4647,12 @@ shapes, starts and the payload's path of each event.
 - `N18.13` new: ALIS035, the row-action analyzer: a `NativeActionLink` whose block's one request at its own level is no
   GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
   `Inputs`, `Input` or a header (D17.15).
+- `N18.14` new: ALIS040, the nullable source analyzer: a source passed where a method's or a plugin's argument or a
+  condition operator's right operand takes its type with other nullability, which C# reports as the warning CS8620,
+  is refused as an error in every compilation that references the core, whatever the app does with warnings (D7.3,
+  gate 2's G8). No overload can refuse it, since nullability is no part of a C# signature. The analyzer reads the
+  annotations the compiler reads, so where a file's nullable context is disabled the two types are one and the source
+  is passed as held. `OrNull()` (N7.5) widens a source to its nullable type, and `IfNull` (N7.4) narrows one.
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4), two constant definitions of one vendor name whose data differ in one compilation

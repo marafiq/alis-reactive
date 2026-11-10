@@ -577,9 +577,17 @@
   "cells": {
     "refused": [
       {
+        "position": "ConditionLeft",
+        "source": "Literal",
+        "reason": "D7.3",
+        "errors": [
+          "CS1929"
+        ]
+      },
+      {
         "position": "ConditionRight",
         "source": "IfNull",
-        "reason": "D7.3",
+        "reason": "N18.14",
         "errors": [
           "CS8620"
         ]
@@ -587,7 +595,7 @@
       {
         "position": "MethodArgument",
         "source": "IfNull",
-        "reason": "D7.3",
+        "reason": "N18.14",
         "errors": [
           "CS8620"
         ]
@@ -595,7 +603,7 @@
       {
         "position": "PluginArgument",
         "source": "IfNull",
-        "reason": "D7.3",
+        "reason": "N18.14",
         "errors": [
           "CS8620"
         ]

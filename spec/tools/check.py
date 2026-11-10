@@ -1242,7 +1242,7 @@ def check_fluent(plant=None):
               **shape_counts, **callback_counts, **string_counts}
     counts.update({check: "pass" if not found else "fail" for check, found in judged.items()})
     first = [problem for found in judged.values() for problem in found[:2]]
-    return result(not first, "; ".join(first) or "one concept per name, every Q7 cell compiles or is refused as named, one shape per name, callbacks named as the locked table names them, every string parameter of a closed kind", **counts)
+    return result(not first, "; ".join(first) or "one concept per name, every Q7 cell compiles, is refused as named or waits on a door the spec marks new, one shape per name, callbacks named as the locked table names them, every string parameter of a closed kind", **counts)
 
 
 def fluent_surface(plant):
@@ -1457,9 +1457,9 @@ def fluent_cell_rows(path):
 def fluent_cell_problems(cells, refused):
     named = fluent_cell_names()
     problems = fluent_cell_set_problems(cells, named)
-    judged, gaps, counts = fluent_cell_judgement(cells, refused)
+    judged, counts = fluent_cell_judgement(cells, refused)
     forms, passed, total = fluent_refused_forms()
-    problems += judged + forms + gaps
+    problems += judged + forms
     counts.update({
         "F2_positions": len(cells["positions"]), "F2_position_gaps": sum(1 for end in cells["positions"] if end["gap"]),
         "F2_sources": len(cells["sources"]), "F2_source_gaps": sum(1 for end in cells["sources"] if end["gap"]),
@@ -1488,7 +1488,8 @@ def fluent_cell_judgement(cells, refused):
     rows = {(row["position"], row["source"]): row for row in refused}
     problems = [f"F2 refused row {position} x {source}: {row['reason']} states no such refusal" for (position, source), row in rows.items()
                 if not fluent_decision_stated(row["reason"])]
-    gaps = []
+    doors = fluent_designed_doors()
+    cited = set()
     counts = {"F2_cells": len(cells["results"]), "F2_compiling": 0, "F2_refused": 0, "F2_gaps": 0, "F2_failing": 0}
     for cell in cells["results"]:
         label = f"F2 {cell['position']} x {cell['source']}"
@@ -1497,7 +1498,9 @@ def fluent_cell_judgement(cells, refused):
         if cell["gap"]:
             counts["F2_gaps"] += 1
             problems += [f"{label}: refused for {', '.join(row['errors'])} but has no door"] if row else []
-            gaps.append(f"{label}: no door ({cell['gap']})")
+            gap_doors, uncited = fluent_gap_doors(cell["gap"], doors)
+            cited |= gap_doors
+            problems += [f"{label}: {part} cites no door the spec marks new" for part in uncited]
         elif row is None and not errors:
             counts["F2_compiling"] += 1
         elif row is None:
@@ -1510,7 +1513,27 @@ def fluent_cell_judgement(cells, refused):
         else:
             problems.append(f"{label}: refused for {', '.join(row['errors'])} but fails {', '.join(errors)}")
     problems += [f"F2 refused row {position} x {source} names no cell" for position, source in rows]
-    return problems, gaps, counts
+    counts["F2_gap_doors"] = len(cited)
+    return problems, counts
+
+
+FLUENT_GAP = re.compile(r"^((?:N\d+\.\d+|M\d+\.N\d+)(?:, (?:N\d+\.\d+|M\d+\.N\d+))*): \S")
+
+
+def fluent_designed_doors():
+    texts = [(SPEC / "Core" / "DESIGN.md").read_text()] + [path.read_text() for path in SPEC.glob("*/module.md")]
+    return {door for text in texts for door in NEW_DOOR_BULLET.findall(text)}
+
+
+def fluent_gap_doors(gap, doors):
+    cited, uncited = set(), []
+    for part in gap.split("; "):
+        named = FLUENT_GAP.match(part)
+        ids = named.group(1).split(", ") if named else []
+        if not ids or any(door not in doors for door in ids):
+            uncited.append(f"'{part}'")
+        cited |= set(ids) & doors
+    return cited, uncited
 
 
 def fluent_decision_stated(reason):

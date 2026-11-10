@@ -9,9 +9,10 @@ the page's own URL read as a source. Module 2 of `spec/CLAUDE.md`.
 - Q3: the one conversion, `as` with a shape, carries a value held in another form to the position's type by one table
   (D3.3, D3.4), and a second conversion cannot be written (N3.1). Each shape's forms per host, a date's at a live
   member among them (D3.13), are module 15's.
-- Q7: the positions and the sources are closed sets (D7.1, D7.2); every position takes every source, a literal
-  included, typed by `where TSource : TValue` (X7.1); a source in the app's form meets a live object as held,
-  converted, mapped or refused (D7.7, gate 1's P8).
+- Q7: the positions and the sources are closed sets (D7.1, D7.2); every position takes every source, typed by
+  `where TSource : TValue` (X7.1), and a literal but at a condition operator's left operand, the source it tests (D7.3,
+  X7.16); a source whose nullability differs from an argument's or an operand's is refused in every app (N18.14,
+  X7.15); a source in the app's form meets a live object as held, converted, mapped or refused (D7.7, gate 1's P8).
 - Q10: the page's URL is a typed object, `pipeline.PageUrl<TPage>()` or `PageUrl<TPage>(template)`, whose `Read(q =>
   q.A.B)` reads a placeholder member from the path and any other from the query by its C# path, as the action that
   rendered the page bound it, the member's start when the key is absent or its text does not convert, keys compared

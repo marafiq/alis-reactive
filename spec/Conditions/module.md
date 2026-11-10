@@ -10,7 +10,8 @@ validator's condition all write. Module 3 of `spec/CLAUDE.md`.
   reached (D4.7, D8.5).
 - Q5: a method's result a term reads is the call at its line (D5.11).
 - Q6: a list's predicate is a lambda the lambda door translates into the same core (D8.2, N8.1).
-- Q7: every operand takes a literal or a source, `Matches` a literal pattern only (D7.5, N7.3).
+- Q7: an operator's left operand is the source it tests and takes no literal (D7.3); every other operand takes a
+  literal or a source, `Matches` a literal pattern only (D7.5, N7.3).
 - Q8: one condition core (D8.1), two doors that write it (D8.2, D8.3), one syntax for a pipeline condition (D8.6), a
   branch as a block (D8.7) and a lexical scope (D8.8), one meaning of comparison and logic (D8.9), and the forms a
   source is held in (D8.10).

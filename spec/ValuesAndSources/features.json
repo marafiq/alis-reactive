@@ -144,6 +144,14 @@
         {
           "id": "X7.12",
           "rung": "behavior"
+        },
+        {
+          "id": "X7.15",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X7.16",
+          "rung": "type"
         }
       ],
       "promises": [
