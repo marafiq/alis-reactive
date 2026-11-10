@@ -53,8 +53,10 @@ Each name is gate 2's; each door is the capability it carries.
 - `M21.N2` kept: the package. `FusionComponent`, the base of every Fusion declaration, carries `FusionVendor`:
   `ComponentVendor.Define("fusion", objectPath: "ej2_instances.0", subscribe: "addEventListener", unsubscribe:
   "removeEventListener")`, with no payload kind, since each event declares its payload's place (N17.1; module 12). It
-  replaces main's string vendor (`Alis.Reactive.Fusion/FusionComponent.cs:14` at 623dd4a27). Every Fusion render
-  helper writes the C# values it hands EJ2 by M21.D1, so `AddReactiveFusion` leaves (gate 2).
+  replaces main's string vendor (`Alis.Reactive.Fusion/FusionComponent.cs:14` at 623dd4a27). Every Fusion render helper
+  writes the C# values it hands EJ2 by M21.D1, so `AddReactiveFusion` leaves (gate 2). Every Fusion declaration marks
+  `optional: true` on each member EJ2's TypeScript marks `?` (D5.3, N5.4), which ALIS022 checks both ways; neither line
+  has the mark.
 - `M21.N23` kept: `FusionGrid`: `Rows<TRow>()` and `Page<TRow>()` (`dataSource`), `Refresh`, the paging, sorting,
   filtering, searching and grouping methods, the column methods (`ShowColumn` and `HideColumn` by `showColumns` and
   `hideColumns` with `"field"`, `AutoFitColumns`, `AutoFitColumn` by `autoFitColumns`, `ReorderColumns`,
@@ -70,6 +72,33 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-grids/src/grid/base/grid.d.ts:1558`, `:3067`, `:3076`, `:3479`, `:3687`, `:3849`, `:3859`,
   `:3870`).
+- `M21.N26` kept: `FusionKanban`: `Cards<TCard>()` (`dataSource`), `GetColumnData<TCard>`, `GetSwimlaneData<TCard>`,
+  `DataBind`, `AddCard`, `UpdateCard`, `DeleteCard` (a card, a list or a key, M21.X302), `AddColumn`, `DeleteColumn`,
+  `ShowColumn`, `HideColumn`, `ShowSpinner`, `HideSpinner`, `OpenDialog` with `FusionKanbanDialogAction` (M21.X301)
+  and `CloseDialog`; fourteen events and their payloads, each cancel a `Property<bool>` and `DataSourceChanged`'s
+  `EndEdit` and `CancelEdit` its methods; `FusionKanbanColumn` and `FusionKanbanHeaderArgs`, each member named by
+  `[JsonPropertyName]` (M21.X303); and the render helper `Html.FusionKanban(plan, id, build => ..)`. It replaces
+  main's seven files (`Alis.Reactive.Fusion/Components/FusionKanban/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:112`, `:234`, `:429`, `:468`, `:484`, `:502`, `:511`, `:527`).
+- `M21.N34` kept: `FusionPivotView`: `CurrentView` (`currentView`, which EJ2 marks `@hidden`, a gate 2 item),
+  `DataSourceSettings` as `LiveObject<FusionPivotViewDataSourceSettings>()` with `Rows<TRow>()` (`dataSource`),
+  `DisplayOption` as `LiveObject<FusionPivotViewDisplayOption>()` with `View` and `Primary` (M21.D301), `Refresh`,
+  `GetPersistData`, `LoadPersistData`, `ShowConditionalFormattingDialog` and `CreateCalculatedFieldDialog`; `DataBound`
+  and `CellSelecting`, whose payload reads its cell as `FusionPivotViewCellData`, each member named by
+  `[JsonPropertyName]` (M21.X304); and the render helper `Html.FusionPivotView(plan, id, build => ..)`. It replaces
+  main's eight files (`Alis.Reactive.Fusion/Components/FusionPivotView/` at 623dd4a27), whose doors carry their verdicts
+  in `spec/FusionComponents/features.json`. Each JavaScript name but `currentView` is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1447`, `:1476`, `:2244`, `:2460`, `:2467`, `:2816`).
+- `M21.N39` kept: `FusionSchedule`: `CurrentView`, `SelectedDate`, `EventSettings` as
+  `LiveObject<FusionScheduleEventSettings>()` with `Events<TEvent>()` (`dataSource`), `DataBind`, `GetEvents<TEvent>`,
+  `AddEvent`, `SaveEvent`, `DeleteEvent<TKey>`, `OpenEditor`, `CloseEditor`, `RefreshEvents`, `Print` and `ScrollTo`;
+  `ScheduleAction`, with System.Text.Json's string enum converter (M21.X305); nine events and their payloads, an
+  event's data the app's own class `TEvent` and `Navigating`'s dates read as `DateTime` (M21.X306); and the render
+  helper `Html.FusionSchedule(plan, id, build => ..)`. It replaces main's fifteen files
+  (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:250`, `:274`, `:707`, `:867`, `:1716`, `:1726`, `:1878`).
 
 The meaning `M21.D1` and the defects `M21.X1` to `M21.X3` are in `spec/FusionComponents/features.json`, on the
 features they give.
@@ -115,3 +144,26 @@ features they give.
 - A payload declares only what its type declares (M21.X202): both lines read a name on four payloads whose EJ2 types
   declare none (`@syncfusion/ej2-grids/src/grid/base/interface.d.ts:1374-1402`, `:2479-2508`); and an enum argument is
   written as the vendor reads it (M21.X207, `@syncfusion/ej2-grids/src/grid/base/enum.d.ts:40`).
+- A Kanban dialog's action is typed (M21.X301). The redesign's `OpenDialog` takes text
+  (`Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:87` at 65fdf118d), and its sandbox keeps EJ2's
+  `"Add"` as a constant of its own; the rewrite takes `FusionKanbanDialogAction`, written as `openDialog` reads it.
+- A card is deleted by its key again (M21.X302). The redesign's `DeleteCard` takes only a class
+  (`Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:58` at 65fdf118d), so main's delete by a response's
+  card id (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Kanban/Index.cshtml:109` at 623dd4a27) does
+  not compile; the rewrite takes a card, a list or a key, as `deleteCard` does.
+- Every Kanban, PivotView and Schedule method takes any source (Q7). Main's `AddColumn`, `OpenAddDialog` and
+  `OpenEditDialog` write C# literals only, and its `ColumnData`, `SwimlaneData`, `ShowColumn` and `ScrollTo` take a
+  literal string (`Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:147-158` at 623dd4a27); the
+  redesign takes an `Arg` of each, which the rewrite keeps.
+- An event's data is the app's own class. Main's `FusionScheduleEventData` holds one app's staffing fields
+  (`Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45` at 623dd4a27); the
+  redesign reads `TEvent`, which the rewrite keeps.
+- A schedule's dates are dates (M21.X306). Main declares `Navigating`'s dates as text, so a label shows the UTC instant
+  (`Alis.Reactive.Assets/runtime/shared/shape-convert.ts:155` at 623dd4a27) and a request sends it; the redesign and
+  the rewrite read `DateTime`.
+- An enum argument and a data member are written as the vendor reads them (M21.X303 to M21.X305). `ScheduleAction`
+  carries System.Text.Json's string enum converter, and the Kanban column and header and the pivot's cell name each
+  member by `[JsonPropertyName]`.
+- A pivot's shown view is read from public members (M21.D301). Both lines read `currentView`, which EJ2 marks
+  `@hidden` (`@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1037-1038`); the public `displayOption`
+  carries the same view.

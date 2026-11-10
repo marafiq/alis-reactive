@@ -523,6 +523,15 @@
      "doors": [
       "M21.N2"
      ]
+    },
+    {
+     "line": "proposed",
+     "text": "Every Fusion declaration marks optional: true on each member EJ2's TypeScript marks ?, as Kanban's ActionEventArgs marks cancel and Schedule's NavigatingEventArgs its dates, so a member EJ2 leaves out reads nothing and a required one it lacks stops the pipeline; ALIS022 checks the marks both ways.",
+     "doors": [
+      "M21.N2",
+      "N5.4",
+      "N17.2"
+     ]
     }
    ],
    "nodes": [
@@ -2510,6 +2519,2590 @@
      "verdict": "renamed",
      "to": [
       "M21.N23"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F26",
+   "summary": "FusionKanban: one declaration of the Syncfusion Kanban by its JavaScript names, its cards, columns, swimlanes, spinner and card dialog, each EJ2 33.1.47's public member; the payloads of its fourteen events; the column and header data it writes and reads; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over seven files whose calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, a builder of its own and a Reactive extension on it, and deletes a card by its key; the redesign declares it in one file, the shape the rewrite keeps, with the dialog's action typed as EJ2 reads it, a card deleted by its key again, and its data named as the vendor names it.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionKanban",
+    "Alis.Reactive.Fusion:FusionKanbanActionArgs<TCard>",
+    "Alis.Reactive.Fusion:FusionKanbanBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionKanbanCardClickArgs<TCard>",
+    "Alis.Reactive.Fusion:FusionKanbanCardRenderedArgs<TCard>",
+    "Alis.Reactive.Fusion:FusionKanbanColumn",
+    "Alis.Reactive.Fusion:FusionKanbanDataBindingArgs<TCard>",
+    "Alis.Reactive.Fusion:FusionKanbanDataSourceChangedArgs<TCard>",
+    "Alis.Reactive.Fusion:FusionKanbanDialogArgs<TCard>",
+    "Alis.Reactive.Fusion:FusionKanbanDragArgs<TCard>",
+    "Alis.Reactive.Fusion:FusionKanbanEmptyArgs",
+    "Alis.Reactive.Fusion:FusionKanbanEventArgsExtensions",
+    "Alis.Reactive.Fusion:FusionKanbanEvents",
+    "Alis.Reactive.Fusion:FusionKanbanExtensions",
+    "Alis.Reactive.Fusion:FusionKanbanHeaderArgs",
+    "Alis.Reactive.Fusion:FusionKanbanHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionKanbanQueryCellInfoArgs",
+    "Alis.Reactive.Fusion:FusionKanbanReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentProperty<object>.Named(\"dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:17"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Mapped(\"addCardAt\", \"addCard\").WithArgs<object, int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:29"
+    },
+    {
+     "line": "main",
+     "text": "return self.EmitCall(DataBindMethod);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:94"
+    },
+    {
+     "line": "main",
+     "text": "ValueExpression.LiteralRaw(column, Shape.Any),",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:156"
+    },
+    {
+     "line": "main",
+     "text": "=> self.EmitCall(OpenDialogMethod, DialogArgs(\"Add\", card));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:193"
+    },
+    {
+     "line": "main",
+     "text": "\"actionBegin\", new FusionKanbanActionArgs<TCard>());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanEvents.cs:14"
+    },
+    {
+     "line": "main",
+     "text": "\"cancel\",",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/Events/FusionKanbanEventArgs.cs:91"
+    },
+    {
+     "line": "main",
+     "text": "return new FusionKanbanBuilder<TModel>(plan, elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanHtmlExtensions.cs:32"
+    },
+    {
+     "line": "main",
+     "text": "s.Component<FusionKanban>(\"care-kanban\").DeleteCard(json, x => x.CardId);",
+     "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Kanban/Index.cshtml:109"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<IEnumerable<TCard>> Cards<TCard>() where TCard : class => Property<IEnumerable<TCard>>(\"dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:29"
+    },
+    {
+     "line": "redesign",
+     "text": "public void DeleteCard<TCard>(Arg<TCard> cardData) where TCard : class => Method(cardData);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:58"
+    },
+    {
+     "line": "redesign",
+     "text": "public void OpenDialog<TCard>(Arg<string> action, Arg<TCard> data) where TCard : class => Method(action, data);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:87"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Cancel => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:175"
+    },
+    {
+     "line": "redesign",
+     "text": "public string KeyField { get; set; } = \"\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:257"
+    },
+    {
+     "line": "redesign",
+     "text": "public void EndEdit() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:307"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionKanban>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:361"
+    },
+    {
+     "line": "redesign",
+     "text": "public const string AddDialog = \"Add\";",
+     "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Kanban/KanbanModel.cs:36"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionKanban declares the EJ2 Kanban by its JavaScript names: dataSource as Cards<TCard>(); getColumnData and getSwimlaneData as methods that return cards; dataBind, addCard, updateCard, deleteCard, addColumn, deleteColumn, showColumn, hideColumn, showSpinner, hideSpinner, openDialog and closeDialog; each EJ2 33.1.47's public member, and each argument taking any source of its type.",
+     "doors": [
+      "M21.N26",
+      "N5.3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "DeleteCard<TCard>(Arg<TCard> cardData) takes a card, a list of cards or a card's key, text or a number, with no class constraint, as deleteCard takes string | number | Record | Record[] and finds a key by the board's headerField, so a response's card id deletes its card as main's DeleteCard(json, x => x.CardId) does (M21.X302).",
+     "doors": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "OpenDialog takes FusionKanbanDialogAction, Add, Edit or Delete, an enum that carries System.Text.Json's string enum converter, so the live form writes Add as openDialog's CurrentAction takes it, as main's OpenAddDialog and OpenEditDialog wrote it (M21.X301).",
+     "doors": [
+      "M21.N26"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Cards<TCard>().Set(source) and then DataBind() replace the board's cards from any source, the two steps main's SetDataSource wrote as one.",
+     "doors": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "ActionBegin<TCard>(), ActionComplete<TCard>(), DataBinding<TCard>(), DataBound, CardClick<TCard>(), CardDoubleClick<TCard>(), QueryCellInfo, CardRendered<TCard>(), DragStart<TCard>(), Drag<TCard>(), DragStop<TCard>(), DialogOpen<TCard>(), DialogClose<TCard>() and DataSourceChanged<TCard>() hand payloads read with Read, each payload's cancel its Property<bool>, and DataSourceChanged's endEdit and cancelEdit its methods.",
+     "doors": [
+      "M21.N26",
+      "N5.6",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionKanbanColumn and FusionKanbanHeaderArgs name each member by [JsonPropertyName] as ColumnsModel and HeaderArgs name it: headerText, keyField, allowToggle, isExpanded, textField and count (M21.X303).",
+     "doors": [
+      "M21.N26"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionKanban(plan, id, build => ..) renders the board; its Reactive(k => k.CardClick<TCard>(), pipeline) and its other events handle it from the plan's start, and pipeline.Component<FusionKanban>(id) reaches it from any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N26"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method",
+    "data"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:14-222"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanEvents.cs:6-78"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/Events/FusionKanbanEventArgs.cs:7-159"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanHtmlExtensions.cs:16-34"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanReactiveExtensions.cs:9-23"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanBuilder.cs:14-53"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:25-363"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Kanban as its TypeScript declares it (@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts, its event payloads in src/kanban/base/interface.d.ts, ReturnType and CurrentAction in src/kanban/base/type.d.ts, ColumnsModel in src/kanban/models/columns-model.d.ts) and as its crud module finds a card by key (src/kanban/actions/crud.js), each JavaScript name read there by hand, each event's payload interface to its closing brace with the interfaces it extends, scratchpad m21/tools/dts.py's flags taken as leads; and the browser.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X301",
+     "rung": "type",
+     "defect": "The redesign's OpenDialog takes its action as Arg<string> (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:87 at 65fdf118d) where EJ2's openDialog takes CurrentAction, 'Add' | 'Edit' | 'Delete' (@syncfusion/ej2-kanban/src/kanban/base/type.d.ts:15), so a view compiles with any text, and the redesign's sandbox keeps the vendor's literal as a constant of its own (Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/Kanban/KanbanModel.cs:36 at 65fdf118d); main's OpenAddDialog and OpenEditDialog wrote Add and Edit themselves (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:193, :200 at 623dd4a27). The rewrite's OpenDialog in M21.N26 takes FusionKanbanDialogAction, an enum that carries System.Text.Json's string enum converter (X17.46)."
+    },
+    {
+     "id": "M21.X302",
+     "rung": "type",
+     "defect": "The redesign's DeleteCard takes only a class (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:58 at 65fdf118d) where EJ2's deleteCard takes a card's key as string | number, a card or a list of cards (@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:502) and finds a key by the board's headerField (@syncfusion/ej2-kanban/src/kanban/actions/crud.js:114-117), so the build refuses main's delete of a card by the number a response holds (Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Kanban/Index.cshtml:109 at 623dd4a27). The rewrite's DeleteCard in M21.N26 takes a card, a list or a key, as FusionSchedule's DeleteEvent<TKey> takes an id (Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:65 at 65fdf118d)."
+    },
+    {
+     "id": "M21.X303",
+     "rung": "analyzer",
+     "defect": "FusionKanbanColumn and FusionKanbanHeaderArgs carry no [JsonPropertyName] on either line (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:216-222 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:254-264, :317-330 at 65fdf118d), while addColumn's ColumnsModel and QueryCellInfo's HeaderArgs name keyField, headerText, allowToggle, isExpanded, textField and count (@syncfusion/ej2-kanban/src/kanban/models/columns-model.d.ts:15-44, @syncfusion/ej2-kanban/src/kanban/base/interface.d.ts:177-184): the vendor contract analyzer's type check (N17.2) refuses each member by ALIS037 (X17.48), and the rewrite names each by [JsonPropertyName]. HeaderArgs' keyField holds string | number (@syncfusion/ej2-kanban/src/kanban/base/interface.d.ts:179), which FusionKanbanHeaderArgs reads as string; a read fits every kind the API holds, so ALIS037 refuses it as a value of more than one kind, a gap D17.5 names. The designed default, gate 2's since it amends D17.5: a read whose kinds are text, numbers and dates is declared string and reads a number as JavaScript's own text and a date as its local day, the text every use on both lines shows or compares; its cost is that a number held there orders as text, 10 before 9. FusionKanbanColumn's keyField is a write, which string fits."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionKanbanActionArgs<TCard>.AddedRecords.get -> System.Collections.Generic.List<TCard!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.AddedRecords.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.ChangedRecords.get -> System.Collections.Generic.List<TCard!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.ChangedRecords.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.DeletedRecords.get -> System.Collections.Generic.List<TCard!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.DeletedRecords.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.RequestType.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanActionArgs<TCard>.RequestType.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionKanbanBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionKanbanBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionKanbanCardClickArgs<TCard>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanCardClickArgs<TCard>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanCardClickArgs<TCard>.Data.get -> TCard!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanCardClickArgs<TCard>.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanCardRenderedArgs<TCard>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanCardRenderedArgs<TCard>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanCardRenderedArgs<TCard>.Data.get -> TCard!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanCardRenderedArgs<TCard>.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataBindingArgs<TCard>.Count.get -> int?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataBindingArgs<TCard>.Count.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataBindingArgs<TCard>.Result.get -> System.Collections.Generic.List<TCard!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataBindingArgs<TCard>.Result.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.AddedRecords.get -> System.Collections.Generic.List<TCard!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.AddedRecords.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.ChangedRecords.get -> System.Collections.Generic.List<TCard!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.ChangedRecords.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.DeletedRecords.get -> System.Collections.Generic.List<TCard!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.DeletedRecords.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.Index.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.Index.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.RequestType.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDataSourceChangedArgs<TCard>.RequestType.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDialogArgs<TCard>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDialogArgs<TCard>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDialogArgs<TCard>.Data.get -> TCard!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDialogArgs<TCard>.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDialogArgs<TCard>.RequestType.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDialogArgs<TCard>.RequestType.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDragArgs<TCard>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDragArgs<TCard>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDragArgs<TCard>.Data.get -> System.Collections.Generic.List<TCard!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDragArgs<TCard>.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanDragArgs<TCard>.DropIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanDragArgs<TCard>.DropIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanEventArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.ActionBegin<TCard>() -> TypedEvent<FusionKanbanActionArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.ActionComplete<TCard>() -> TypedEvent<FusionKanbanActionArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.CardClick<TCard>() -> TypedEvent<FusionKanbanCardClickArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.CardDoubleClick<TCard>() -> TypedEvent<FusionKanbanCardClickArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.CardRendered<TCard>() -> TypedEvent<FusionKanbanCardRenderedArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.DataBinding<TCard>() -> TypedEvent<FusionKanbanDataBindingArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.DataBound.get -> TypedEvent<FusionKanbanEmptyArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.DataSourceChanged<TCard>() -> TypedEvent<FusionKanbanDataSourceChangedArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.DialogClose<TCard>() -> TypedEvent<FusionKanbanDialogArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.DialogOpen<TCard>() -> TypedEvent<FusionKanbanDialogArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.Drag<TCard>() -> TypedEvent<FusionKanbanDragArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.DragStart<TCard>() -> TypedEvent<FusionKanbanDragArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.DragStop<TCard>() -> TypedEvent<FusionKanbanDragArgs<TCard!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanEvents.QueryCellInfo.get -> TypedEvent<FusionKanbanQueryCellInfoArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionKanbanQueryCellInfoArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanQueryCellInfoArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanQueryCellInfoArgs.Data.get -> System.Collections.Generic.List<FusionKanbanHeaderArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanQueryCellInfoArgs.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanQueryCellInfoArgs.RequestType.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "FusionKanbanQueryCellInfoArgs.RequestType.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N26",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionKanbanReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static FusionKanbanEventArgsExtensions.Cancel(this FusionKanbanQueryCellInfoArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static FusionKanbanEventArgsExtensions.Cancel<TCard>(this FusionKanbanActionArgs<TCard!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static FusionKanbanEventArgsExtensions.Cancel<TCard>(this FusionKanbanCardClickArgs<TCard!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static FusionKanbanEventArgsExtensions.Cancel<TCard>(this FusionKanbanDialogArgs<TCard!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static FusionKanbanEventArgsExtensions.Cancel<TCard>(this FusionKanbanDragArgs<TCard!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static FusionKanbanEventArgsExtensions.CancelEdit<TCard>(this FusionKanbanDataSourceChangedArgs<TCard!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static FusionKanbanEventArgsExtensions.EndEdit<TCard>(this FusionKanbanDataSourceChangedArgs<TCard!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.AddCard<TModel, TResponse>(this ComponentRef<FusionKanban!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path, int index) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.AddColumn<TModel>(this ComponentRef<FusionKanban!, TModel!>! self, FusionKanbanColumn! column, int index) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.Cards<TModel, TCard>(this ComponentRef<FusionKanban!, TModel!>! self) -> TypedComponentSource<TCard![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.CloseDialog<TModel>(this ComponentRef<FusionKanban!, TModel!>! self) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.ColumnData<TModel, TCard>(this ComponentRef<FusionKanban!, TModel!>! self, string! columnKey) -> TypedComponentSource<TCard![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.DeleteCard<TModel, TResponse>(this ComponentRef<FusionKanban!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "kept",
+     "as": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.DeleteColumn<TModel>(this ComponentRef<FusionKanban!, TModel!>! self, int index) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.HideColumn<TModel>(this ComponentRef<FusionKanban!, TModel!>! self, string! key) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.HideSpinner<TModel>(this ComponentRef<FusionKanban!, TModel!>! self) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.OpenAddDialog<TModel, TCard>(this ComponentRef<FusionKanban!, TModel!>! self, TCard! card) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.OpenEditDialog<TModel, TCard>(this ComponentRef<FusionKanban!, TModel!>! self, TCard! card) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.SetDataSource<TModel, TElement>(this ComponentRef<FusionKanban!, TModel!>! self, TypedSource<TElement[]!>! source) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.SetDataSource<TModel, TResponse>(this ComponentRef<FusionKanban!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.ShowColumn<TModel>(this ComponentRef<FusionKanban!, TModel!>! self, string! key) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.ShowSpinner<TModel>(this ComponentRef<FusionKanban!, TModel!>! self) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.SwimlaneData<TModel, TCard>(this ComponentRef<FusionKanban!, TModel!>! self, string! swimlaneKey) -> TypedComponentSource<TCard![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanExtensions.UpdateCard<TModel, TResponse>(this ComponentRef<FusionKanban!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> ComponentRef<FusionKanban!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionKanbanHtmlExtensions.FusionKanban<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Kanban.KanbanBuilder!>! build) -> FusionKanbanBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionKanbanHtmlExtensions.FusionKanban<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Kanban.KanbanBuilder!>! build) -> FusionKanbanBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionKanbanReactiveExtensions.Reactive<TModel, TArgs>(this FusionKanbanBuilder<TModel!>! builder, System.Func<FusionKanbanEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionKanbanBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N26"
+     ]
+    },
+    {
+     "door": "static readonly FusionKanbanEvents.Instance -> FusionKanbanEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N26"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F34",
+   "summary": "FusionPivotView: one declaration of the Syncfusion PivotView by its JavaScript names, its rows through dataSourceSettings, its display options, refresh, its saved layout and its two dialogs, each EJ2 33.1.47's public member but currentView, which EJ2 marks @hidden; the payloads of dataBound and cellSelecting and the cell data cellSelecting hands; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over eight files whose calls name members by strings over ComponentRef, payload classes with setters, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, with the shown view readable from the public displayOption (M21.D301) and its cell data named as the vendor names it.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionPivotView",
+    "Alis.Reactive.Fusion:FusionPivotViewBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionPivotViewCellData",
+    "Alis.Reactive.Fusion:FusionPivotViewCellSelectingArgs",
+    "Alis.Reactive.Fusion:FusionPivotViewDataBoundArgs",
+    "Alis.Reactive.Fusion:FusionPivotViewDataSourceSettings",
+    "Alis.Reactive.Fusion:FusionPivotViewEvents",
+    "Alis.Reactive.Fusion:FusionPivotViewExtensions",
+    "Alis.Reactive.Fusion:FusionPivotViewHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionPivotViewReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(\"currentView\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewExtensions.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<object>.Mapped(\"dataSource\", \"dataSourceSettings.dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewExtensions.cs:18"
+    },
+    {
+     "line": "main",
+     "text": "return self.Refresh();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewExtensions.cs:57"
+    },
+    {
+     "line": "main",
+     "text": "public string ActualText { get; set; } = \"\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/Events/FusionPivotViewCellSelectingArgs.cs:18"
+    },
+    {
+     "line": "main",
+     "text": "return new FusionPivotViewBuilder<TModel>(plan, elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewHtmlExtensions.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> CurrentView => ReadOnly<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:25"
+    },
+    {
+     "line": "redesign",
+     "text": "public FusionPivotViewDataSourceSettings DataSourceSettings => Object<FusionPivotViewDataSourceSettings>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:28"
+    },
+    {
+     "line": "redesign",
+     "text": "public TypedSource<string> GetPersistData(Arg<bool> isRemoveDatasource) => Method<string>(isRemoveDatasource);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:35"
+    },
+    {
+     "line": "redesign",
+     "text": "public string RowHeaders { get; set; } = \"\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:93"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Property<IEnumerable<TRow>>(\"dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:110"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionPivotView>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:138"
+    },
+    {
+     "line": "redesign",
+     "text": "figure.When(cell.Get(x => x.ActualText)).Eq(\"careHours\")",
+     "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/PivotView/Index.cshtml:112"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionPivotView declares the EJ2 PivotView by its JavaScript names: dataSourceSettings as LiveObject<FusionPivotViewDataSourceSettings>(), whose dataSource is Rows<TRow>(); refresh, getPersistData, loadPersistData, showConditionalFormattingDialog and createCalculatedFieldDialog as methods; dataBound and cellSelecting as events whose payload is the listener's first argument; each EJ2 33.1.47's public member.",
+     "doors": [
+      "M21.N34",
+      "N5.5",
+      "N5.3",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionPivotView declares displayOption as LiveObject<FusionPivotViewDisplayOption>(), whose view and primary are each a ReadOnly<string>, the public members EJ2 starts the shown view from and its toolbar keeps in step, so a view reads the shown view by M21.D301 without the @hidden currentView.",
+     "doors": [
+      "M21.N34",
+      "N5.5"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Rows<TRow>().Set(source) and then Refresh() replace the pivot's rows from any source, the two steps main's SetDataSource wrote as one; GetPersistData(true) and LoadPersistData(source) save and restore a layout, a response's text among the sources.",
+     "doors": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "CellSelecting's payload reads its cell as FusionPivotViewCellData, data past the declared member (D5.4), whose members carry [JsonPropertyName] as IAxisSet names them: axis, formattedText, value, actualValue, rowIndex, colIndex, isSum and isGrandSum; actualText, rowHeaders and columnHeaders, which IAxisSet types as more than one kind, are declared string and read as text by M21.X304's designed default, gate 2's.",
+     "doors": [
+      "M21.N34",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionPivotView(plan, id, build => ..) renders the pivot; its Reactive(v => v.CellSelecting, pipeline) and Reactive(v => v.DataBound, pipeline) handle it from the plan's start, and pipeline.Component<FusionPivotView>(id) reaches it from any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N34"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method",
+    "data"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewExtensions.cs:12-108"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewEvents.cs:6-18"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/Events/FusionPivotViewCellSelectingArgs.cs:7-28"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewHtmlExtensions.cs:15-33"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewReactiveExtensions.cs:9-23"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewBuilder.cs:14-53"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:21-140"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [
+    {
+     "id": "M21.D301",
+     "meaning": "A pivot's shown view, which EJ2 keeps in currentView, a member it marks @hidden (@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1037-1038), is its public displayOption.primary while displayOption.view is Both, the one display whose toolbar switches between table and chart, and displayOption.view otherwise: EJ2 starts currentView from them (@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.js:1131-1132), and its toolbar sets primary with each switch (@syncfusion/ej2-pivotview/src/common/popups/toolbar.js:1360-1361, :1627-1628). A view reads it from the public members with When(pivot.DisplayOption.View).Eq(\"Both\"), reading Primary in its branch and View in Else; no declared member computes it, since the vendor declares none."
+    }
+   ],
+   "oracle": "Syncfusion EJ2 33.1.47's PivotView as its TypeScript declares it (@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts, DisplayOptionModel in src/pivotview/base/pivotview-model.d.ts, View and Primary in src/common/base/enum.d.ts, PivotCellSelectedEventArgs in src/common/base/interface.d.ts, IAxisSet in src/base/engine.d.ts) and as its view and toolbar set the shown view (src/pivotview/base/pivotview.js, src/common/popups/toolbar.js), each JavaScript name read there by hand, each event's payload interface to its closing brace with the interfaces it extends, scratchpad m21/tools/dts.py's flags taken as leads; and the browser.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X304",
+     "rung": "analyzer",
+     "defect": "FusionPivotViewCellData carries no [JsonPropertyName] on either line (Alis.Reactive.Fusion/Components/FusionPivotView/Events/FusionPivotViewCellSelectingArgs.cs:15-28 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:69-103 at 65fdf118d), while cellSelecting's data is an IAxisSet (@syncfusion/ej2-pivotview/src/common/base/interface.d.ts:440), which names axis, formattedText, actualText and the rest (@syncfusion/ej2-pivotview/src/base/engine.d.ts:1481-1632): the vendor contract analyzer's type check (N17.2) refuses each member by ALIS037 (X17.48), and the rewrite names each by [JsonPropertyName]. IAxisSet's actualText holds number | string and its rowHeaders and columnHeaders string | number | Date (@syncfusion/ej2-pivotview/src/base/engine.d.ts:1489, :1557, :1561), which both lines read as string and the redesign's sandbox shows and compares as text (Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/PivotView/Index.cshtml:102, :112 at 65fdf118d); a read fits every kind the API holds, so ALIS037 refuses each as a value of more than one kind, a gap D17.5 names. The designed default, gate 2's since it amends D17.5: a read whose kinds are text, numbers and dates is declared string and reads a number as JavaScript's own text and a date as its local day, the text every use on both lines shows or compares; its cost is that a number held there orders as text, 10 before 9."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionPivotViewBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionPivotViewBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionPivotViewBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionPivotViewCellSelectingArgs.Data.get -> FusionPivotViewCellData!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34"
+     ]
+    },
+    {
+     "door": "FusionPivotViewCellSelectingArgs.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N34",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionPivotViewEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34"
+     ]
+    },
+    {
+     "door": "FusionPivotViewEvents.CellSelecting.get -> TypedEvent<FusionPivotViewCellSelectingArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34"
+     ]
+    },
+    {
+     "door": "FusionPivotViewEvents.DataBound.get -> TypedEvent<FusionPivotViewDataBoundArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34"
+     ]
+    },
+    {
+     "door": "FusionPivotViewExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionPivotViewReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N34"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.CreateCalculatedFieldDialog<TModel>(this ComponentRef<FusionPivotView!, TModel!>! self) -> ComponentRef<FusionPivotView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.CurrentView<TModel>(this ComponentRef<FusionPivotView!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.LoadPersistedLayout<TModel, TResponse>(this ComponentRef<FusionPivotView!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, string!>!>! path) -> ComponentRef<FusionPivotView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.LoadPersistedLayout<TModel>(this ComponentRef<FusionPivotView!, TModel!>! self, string! persistedLayout) -> ComponentRef<FusionPivotView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.PersistedLayout<TModel>(this ComponentRef<FusionPivotView!, TModel!>! self, bool removeDataSource = true) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.Refresh<TModel>(this ComponentRef<FusionPivotView!, TModel!>! self) -> ComponentRef<FusionPivotView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.SetDataSource<TModel, TResponse>(this ComponentRef<FusionPivotView!, TModel!>! self, ResponseBody<TResponse!>! source) -> ComponentRef<FusionPivotView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.SetDataSource<TModel, TResponse>(this ComponentRef<FusionPivotView!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> ComponentRef<FusionPivotView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewExtensions.ShowConditionalFormattingDialog<TModel>(this ComponentRef<FusionPivotView!, TModel!>! self) -> ComponentRef<FusionPivotView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewHtmlExtensions.FusionPivotView<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.PivotView.PivotViewBuilder!>! build) -> FusionPivotViewBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewHtmlExtensions.FusionPivotView<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.PivotView.PivotViewBuilder!>! build) -> FusionPivotViewBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionPivotViewReactiveExtensions.Reactive<TModel, TArgs>(this FusionPivotViewBuilder<TModel!>! builder, System.Func<FusionPivotViewEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionPivotViewBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N34"
+     ]
+    },
+    {
+     "door": "static readonly FusionPivotViewEvents.Instance -> FusionPivotViewEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N34"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F39",
+   "summary": "FusionSchedule: one declaration of the Syncfusion Schedule by its JavaScript names, its view, selected date, events through eventSettings, its editor, refresh, print and scroll, each EJ2 33.1.47's public member; the payloads of its nine events, an event's data the app's own class; ScheduleAction, the actions its methods take; the render helper that renders it with an element id the view gives and a plan; and the Fusion components of the partials a request loads beside it. Main spreads the slice over fifteen files whose calls name members by strings over ComponentRef, payload classes with setters, one app's event fields in a framework type, dates read as text, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, with its dates read as dates and its actions written as EJ2 reads them.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionSchedule",
+    "Alis.Reactive.Fusion:FusionScheduleActionBeginArgs",
+    "Alis.Reactive.Fusion:FusionScheduleActionBeginArgs<TEvent>",
+    "Alis.Reactive.Fusion:FusionScheduleActionCompleteArgs",
+    "Alis.Reactive.Fusion:FusionScheduleBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionScheduleCellClickArgs",
+    "Alis.Reactive.Fusion:FusionScheduleDataBoundArgs",
+    "Alis.Reactive.Fusion:FusionScheduleEventClickArgs",
+    "Alis.Reactive.Fusion:FusionScheduleEventData",
+    "Alis.Reactive.Fusion:FusionScheduleEventRenderedArgs",
+    "Alis.Reactive.Fusion:FusionScheduleEventRenderedArgs<TEvent>",
+    "Alis.Reactive.Fusion:FusionScheduleEventSettings",
+    "Alis.Reactive.Fusion:FusionScheduleEvents",
+    "Alis.Reactive.Fusion:FusionScheduleExtensions",
+    "Alis.Reactive.Fusion:FusionScheduleHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionScheduleNavigatingArgs",
+    "Alis.Reactive.Fusion:FusionSchedulePopupCloseArgs",
+    "Alis.Reactive.Fusion:FusionSchedulePopupData",
+    "Alis.Reactive.Fusion:FusionSchedulePopupOpenArgs",
+    "Alis.Reactive.Fusion:FusionSchedulePopupOpenArgs<TEvent>",
+    "Alis.Reactive.Fusion:FusionSchedulePopupOpenArgsExtensions",
+    "Alis.Reactive.Fusion:FusionScheduleReactiveExtensions",
+    "Alis.Reactive.Fusion:ScheduleAction"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentProperty<object>.Mapped(\"eventDataSource\", \"eventSettings.dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:62"
+    },
+    {
+     "line": "main",
+     "text": "=> self.Read<FusionScheduleEventData[]>(GetEventsMethod);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:116"
+    },
+    {
+     "line": "main",
+     "text": "=> self.EmitCall(SaveEventMethod, new System.Collections.Generic.List<ValueExpression> { data, ValueExpression.Literal(action.ToString()) });",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:198"
+    },
+    {
+     "line": "main",
+     "text": "public string CurrentDate { get; set; } = \"\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnNavigating.cs:13"
+    },
+    {
+     "line": "main",
+     "text": "public int ShiftId { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:32"
+    },
+    {
+     "line": "main",
+     "text": "pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), \"cancel\", ValueExpression.Literal(true)));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs:49"
+    },
+    {
+     "line": "main",
+     "text": "if (value instanceof Date) return ok(value.toISOString());",
+     "cite": "Alis.Reactive.Assets/runtime/shared/shape-convert.ts:155"
+    },
+    {
+     "line": "main",
+     "text": ".FromEvent(args, x => x.CurrentDate, \"currentDate\")",
+     "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/Index.cshtml:291"
+    },
+    {
+     "line": "main",
+     "text": "@Html.EJS().ScriptManager()",
+     "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/_EditAssignmentForm.cshtml:60"
+    },
+    {
+     "line": "main",
+     "text": "ej.base.append(Array.from(fragmentHost.childNodes), container, true);",
+     "cite": "Alis.Reactive.Assets/runtime/execution/partials/inject.ts:33"
+    },
+    {
+     "line": "redesign",
+     "text": "public TypedSource<TEvent[]> GetEvents<TEvent>() where TEvent : class => Method<TEvent[]>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:42"
+    },
+    {
+     "line": "redesign",
+     "text": "public void SaveEvent<TEvent>(Arg<TEvent> data, Arg<ScheduleAction> currentAction) where TEvent : class => Method(data, currentAction);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:56"
+    },
+    {
+     "line": "redesign",
+     "text": "public void DeleteEvent<TKey>(Arg<TKey> id, Arg<ScheduleAction> currentAction) => Method(id, currentAction);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:65"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<DateTime> CurrentDate => ReadOnly<DateTime>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:203"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<IEnumerable<TEvent>> Events<TEvent>() where TEvent : class => Property<IEnumerable<TEvent>>(\"dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:271"
+    },
+    {
+     "line": "redesign",
+     "text": "public enum ScheduleAction",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:278"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionSchedule>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:327"
+    },
+    {
+     "line": "redesign",
+     "text": "if (value is Enum option) return LiteralRaw(JavaScriptTextOf(option), shape);",
+     "cite": "Alis.Reactive/PlanModel/Values/ValueExpression.cs:52"
+    },
+    {
+     "line": "redesign",
+     "text": "@Html.EJS().ScriptManager()",
+     "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/_EditAssignmentForm.cshtml:69"
+    },
+    {
+     "line": "redesign",
+     "text": "runInsertedScripts(target);",
+     "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:35"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSchedule declares the EJ2 Schedule by its JavaScript names: currentView and selectedDate as properties; eventSettings as LiveObject<FusionScheduleEventSettings>(), whose dataSource is Events<TEvent>(); dataBind, getEvents, addEvent, saveEvent, deleteEvent, openEditor, closeEditor, refreshEvents, print and scrollTo as methods; each EJ2 33.1.47's public member, and each argument taking any source of its type.",
+     "doors": [
+      "M21.N39",
+      "N5.5",
+      "N5.3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "ScheduleAction carries System.Text.Json's string enum converter, so the live form writes Save, DeleteOccurrence and the other actions as saveEvent, deleteEvent and openEditor's CurrentAction takes them (M21.X305).",
+     "doors": [
+      "M21.N39"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "An event's data is the app's own class: GetEvents<TEvent>(), ActionBegin<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read it as TEvent; AddEvent, SaveEvent and OpenEditor take it from any source, and DeleteEvent<TKey> an event's key; Events<TEvent>().Set(source) and then DataBind() replace the events, the two steps main's SetDataSource wrote as one.",
+     "doors": [
+      "M21.N39",
+      "M12.N2",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Navigating's payload reads currentDate and previousDate as ReadOnly<DateTime>, so a text set from either shows its local day and a request sends it as offsetless text (M21.X306).",
+     "doors": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "CellClick, EventClick, ActionBegin<TEvent>(), ActionComplete, Navigating, PopupOpen<TEvent>(), PopupClose, DataBound and EventRendered<TEvent>() hand payloads read with Read, each payload's cancel its Property<bool>.",
+     "doors": [
+      "M21.N39",
+      "N5.6",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A Fusion component in a partial that a request loads into a slot beside the schedule starts by the ScriptManager script the partial ends with, which the load runs after the content replaces the slot's and before the partial's plan starts (M9.D1); both lines run it so, main through EJ2's append and the redesign by replacing each script, and the plan each partial starts is module 9's.",
+     "doors": [
+      "M21.N39",
+      "N10.7",
+      "N14.2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionSchedule(plan, id, build => ..) renders the schedule; its Reactive(c => c.Navigating, pipeline) and its other events handle it from the plan's start, and pipeline.Component<FusionSchedule>(id) reaches it from any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N39"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method",
+    "data",
+    "date"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:12-241"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleEvents.cs:6-62"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnNavigating.cs:7-29"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:8-45"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs:10-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleReactiveExtensions.cs:9-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleBuilder.cs:14-51"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:26-329"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/shared/shape-convert.ts:151-158"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/partials/inject.ts:31-36"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:24-41"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/plugins/slot.ts:79-88"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q3",
+    "Q7",
+    "Q12",
+    "Q14"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Schedule as its TypeScript declares it (@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts, its event payloads in src/schedule/base/interface.d.ts, CurrentAction and View in src/schedule/base/type.d.ts, EventSettingsModel in src/schedule/models/event-settings-model.d.ts), each JavaScript name read there by hand, each event's payload interface to its closing brace with the interfaces it extends, scratchpad m21/tools/dts.py's flags taken as leads; the sandbox's edit partials on both lines; and the browser, by the promises.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X305",
+     "rung": "analyzer",
+     "defect": "The redesign's ScheduleAction carries no string converter (Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:278 at 65fdf118d), which its own literal writer covers by writing an enum argument by its name (Alis.Reactive/PlanModel/Values/ValueExpression.cs:52 at 65fdf118d); in the live form (D7.7) saveEvent, deleteEvent and openEditor receive 1 for Save where CurrentAction is 'Add' | 'Save' | 'Delete' | 'DeleteOccurrence' | 'DeleteSeries' | 'EditOccurrence' | 'EditSeries' | 'EditFollowingEvents' | 'DeleteFollowingEvents' (@syncfusion/ej2-schedule/src/schedule/base/type.d.ts:36). The vendor contract analyzer's type check (N17.2) refuses the enum against the vendor's literal union by ALIS037 (X17.46), and the rewrite's ScheduleAction carries System.Text.Json's string enum converter. Main writes the action as text by hand (Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:198, :203, :208 at 623dd4a27)."
+    },
+    {
+     "id": "M21.X306",
+     "rung": "behavior",
+     "defect": "Main declares Navigating's currentDate and previousDate as text (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnNavigating.cs:13, :16 at 623dd4a27) where EJ2 hands a Date (@syncfusion/ej2-schedule/src/schedule/base/interface.d.ts:194, :196), and main's text conversion writes a Date as its UTC instant (Alis.Reactive.Assets/runtime/shared/shape-convert.ts:155 at 623dd4a27): a label set from either shows 2026-11-16T08:00:00.000Z in America/Los_Angeles where a date shown as text is its local day, 2026-11-16, and the request main's sandbox gathers currentDate into (Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Schedule/Index.cshtml:291 at 623dd4a27) sends that instant where a DateTime goes with no offset. The redesign reads both as ReadOnly<DateTime> (Alis.Reactive.Fusion/Components/FusionSchedule/FusionSchedule.cs:203, :206 at 65fdf118d), which the rewrite keeps."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X306",
+     "page": "A shift schedule in week view whose selected date is 2026-11-09, opened in America/Los_Angeles, with a Navigating handler that sets the week label's text from the payload's CurrentDate.",
+     "gesture": "Click the schedule's Next button.",
+     "outcome": "The week label reads 2026-11-16.",
+     "opposite": "Clicking Previous instead reads 2026-11-02.",
+     "defect": "The label reads 2026-11-16T08:00:00.000Z, the instant's UTC text, as main declares the date as text."
+    },
+    {
+     "for": "M21.X306",
+     "page": "A shift schedule in week view whose selected date is 2026-11-09, opened in America/Los_Angeles, with a Navigating handler that sets the previous label's text from the payload's PreviousDate.",
+     "gesture": "Click the schedule's Next button.",
+     "outcome": "The previous label reads 2026-11-09.",
+     "opposite": "Clicking Next a second time reads 2026-11-16.",
+     "defect": "The label reads 2026-11-09T08:00:00.000Z, the instant's UTC text, as main declares the date as text."
+    },
+    {
+     "for": "M21.X306",
+     "page": "A shift schedule in week view whose selected date is 2026-11-09, opened in America/Los_Angeles, with a Navigating handler that posts the payload's CurrentDate as currentDate to the week's shifts endpoint.",
+     "gesture": "Click the schedule's Next button.",
+     "outcome": "The request's body sends currentDate as 2026-11-16.",
+     "opposite": "Clicking Previous instead sends 2026-11-02.",
+     "defect": "The body sends 2026-11-16T08:00:00.000Z, an instant with an offset, where a DateTime goes as its text with none."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionScheduleActionBeginArgs",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleActionBeginArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleActionBeginArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleActionBeginArgs.FusionScheduleActionBeginArgs() -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleActionBeginArgs.RequestType.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleActionBeginArgs.RequestType.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleActionCompleteArgs.RequestType.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleActionCompleteArgs.RequestType.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionScheduleBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionScheduleBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionScheduleCellClickArgs.EndTime.get -> System.DateTime",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleCellClickArgs.EndTime.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleCellClickArgs.GroupIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleCellClickArgs.GroupIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleCellClickArgs.IsAllDay.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleCellClickArgs.IsAllDay.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleCellClickArgs.StartTime.get -> System.DateTime",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleCellClickArgs.StartTime.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventClickArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventClickArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.CategoryColor.get -> string?",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.CategoryColor.set -> void",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.FusionScheduleEventData() -> void",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.Id.get -> int",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.Id.set -> void",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.IsUnassigned.get -> bool",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.IsUnassigned.set -> void",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.ShiftId.get -> int",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.ShiftId.set -> void",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.StaffName.get -> string?",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.StaffName.set -> void",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.StaffRole.get -> string?",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.StaffRole.set -> void",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.Subject.get -> string!",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventData.Subject.set -> void",
+     "verdict": "refused",
+     "reason": "One app's staffing fields, ShiftId, IsUnassigned, StaffName and StaffRole, in a framework type (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnEventRendered.cs:23-45 at 623dd4a27), which no other app's events hold; an event's data is the app's own class, TEvent, which GetEvents<TEvent>(), EventRendered<TEvent>() and PopupOpen<TEvent>() read.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventRenderedArgs",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventRenderedArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventRenderedArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventRenderedArgs.Data.get -> FusionScheduleEventData!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventRenderedArgs.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventRenderedArgs.FusionScheduleEventRenderedArgs() -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventRenderedArgs.Type.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEventRenderedArgs.Type.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.ActionBegin.get -> TypedEvent<FusionScheduleActionBeginArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.ActionComplete.get -> TypedEvent<FusionScheduleActionCompleteArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.CellClicked.get -> TypedEvent<FusionScheduleCellClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.DataBound.get -> TypedEvent<FusionScheduleDataBoundArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.EventClicked.get -> TypedEvent<FusionScheduleEventClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.EventRendered.get -> TypedEvent<FusionScheduleEventRenderedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.Navigating.get -> TypedEvent<FusionScheduleNavigatingArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.PopupClose.get -> TypedEvent<FusionSchedulePopupCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleEvents.PopupOpen.get -> TypedEvent<FusionSchedulePopupOpenArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.Action.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.Action.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.CurrentDate.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.CurrentDate.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.CurrentView.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.CurrentView.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.PreviousDate.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.PreviousDate.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.PreviousView.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.PreviousView.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.ViewIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleNavigatingArgs.ViewIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupCloseArgs.Type.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupCloseArgs.Type.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupData",
+     "verdict": "refused",
+     "reason": "A framework type that holds two fields of one app's events, Id and Subject (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs:25-32 at 623dd4a27); a popup's data is the app's own class, TEvent, which PopupOpen<TEvent>() reads.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupData.FusionSchedulePopupData() -> void",
+     "verdict": "refused",
+     "reason": "A framework type that holds two fields of one app's events, Id and Subject (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs:25-32 at 623dd4a27); a popup's data is the app's own class, TEvent, which PopupOpen<TEvent>() reads.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupData.Id.get -> int",
+     "verdict": "refused",
+     "reason": "A framework type that holds two fields of one app's events, Id and Subject (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs:25-32 at 623dd4a27); a popup's data is the app's own class, TEvent, which PopupOpen<TEvent>() reads.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupData.Id.set -> void",
+     "verdict": "refused",
+     "reason": "A framework type that holds two fields of one app's events, Id and Subject (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs:25-32 at 623dd4a27); a popup's data is the app's own class, TEvent, which PopupOpen<TEvent>() reads.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupData.Subject.get -> string!",
+     "verdict": "refused",
+     "reason": "A framework type that holds two fields of one app's events, Id and Subject (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs:25-32 at 623dd4a27); a popup's data is the app's own class, TEvent, which PopupOpen<TEvent>() reads.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupData.Subject.set -> void",
+     "verdict": "refused",
+     "reason": "A framework type that holds two fields of one app's events, Id and Subject (Alis.Reactive.Fusion/Components/FusionSchedule/Events/FusionScheduleOnPopupOpen.cs:25-32 at 623dd4a27); a popup's data is the app's own class, TEvent, which PopupOpen<TEvent>() reads.",
+     "carriers": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgs",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgs.Data.get -> FusionSchedulePopupData!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgs.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgs.FusionSchedulePopupOpenArgs() -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgs.Type.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgs.Type.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N39",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSchedulePopupOpenArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.AddEvent<TModel, TResponse>(this ComponentRef<FusionSchedule!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.CloseEditor<TModel>(this ComponentRef<FusionSchedule!, TModel!>! self) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.CurrentView<TModel>(this ComponentRef<FusionSchedule!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.DeleteEvent<TModel, TResponse>(this ComponentRef<FusionSchedule!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! idPath, ScheduleAction action = ScheduleAction.Delete) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.GetEvents<TModel>(this ComponentRef<FusionSchedule!, TModel!>! self) -> TypedComponentSource<FusionScheduleEventData![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.OpenEditor<TModel, TResponse>(this ComponentRef<FusionSchedule!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path, ScheduleAction action) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.Print<TModel>(this ComponentRef<FusionSchedule!, TModel!>! self) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.RefreshEvents<TModel>(this ComponentRef<FusionSchedule!, TModel!>! self) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.SaveEvent<TModel, TResponse>(this ComponentRef<FusionSchedule!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path, ScheduleAction action = ScheduleAction.Save) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.ScrollTo<TModel>(this ComponentRef<FusionSchedule!, TModel!>! self, string! hour) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.SelectedDate<TModel>(this ComponentRef<FusionSchedule!, TModel!>! self) -> TypedComponentSource<System.DateTime>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.SetDataSource<TModel, TResponse>(this ComponentRef<FusionSchedule!, TModel!>! self, ResponseBody<TResponse!>! source) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleExtensions.SetDataSource<TModel, TResponse>(this ComponentRef<FusionSchedule!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> ComponentRef<FusionSchedule!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionScheduleHtmlExtensions.FusionSchedule<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Schedule.ScheduleBuilder!>! build) -> FusionScheduleBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionScheduleHtmlExtensions.FusionSchedule<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Schedule.ScheduleBuilder!>! build) -> FusionScheduleBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionSchedulePopupOpenArgsExtensions.PreventDefault(this FusionSchedulePopupOpenArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "static FusionScheduleReactiveExtensions.Reactive<TModel, TArgs>(this FusionScheduleBuilder<TModel!>! builder, System.Func<FusionScheduleEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionScheduleBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N39"
+     ]
+    },
+    {
+     "door": "static readonly FusionScheduleEvents.Instance -> FusionScheduleEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39"
      ]
     }
    ]
