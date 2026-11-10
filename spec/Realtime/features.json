@@ -397,11 +397,11 @@
         },
         {
           "for": "X21.16",
-          "page": "The medication round, whose view renders the trace on, on the host whose layout registers the OpenTelemetry adapter exporting to the harness's collector; its Call nurse button's pipeline invokes the nurse line hub's Call method, which writes into its reply the traceparent of the connection's request as the hub reads it, or the word none, and the click shows the reply in called.",
+          "page": "The medication round, whose view renders the trace on, on the host whose layout registers the OpenTelemetry adapter exporting to the harness's collector; its Call nurse button's pipeline invokes the nurse line hub's Call method. The test app records the traceparent of every request to the nurse line's path, its negotiate included, and Call replies with the first it recorded, or the word none; the click shows the reply in called.",
           "gesture": "Open the round and wait until the harness reports NurseLine open. Click Call nurse; wait until called reads its reply; open the harness's collector page.",
           "outcome": "The collector lists under the page's trace id one run span for the click, and called reads none.",
           "opposite": "The same click on a round whose view renders the trace off: called reads none, and the collector lists no span.",
-          "defect": "A framework that sets the plan's traceparent on the hub's connection makes called read the page's trace id, so every later invoke of that connection looks joined to a click it never came from; one that records no run span for the click lists nothing under the page's trace id."
+          "defect": "A framework that sets the plan's traceparent on the hub's connection sends it on the nurse line's negotiate, which a header given to the connection reaches though the WebSocket upgrade does not (probe:signalr-url-headers-skip-the-upgrade), so called reads the page's trace id and every later invoke of that connection looks joined to a click it never came from; one that records no run span for the click lists nothing under the page's trace id."
         }
       ],
       "verdicts": [

@@ -48,9 +48,10 @@ const negotiation = transport => JSON.stringify({
 const page = `<!doctype html><html><body><main id="probe">
 <button id="poll">Invoke by long polling</button><output id="poll-out"></output>
 <button id="socket">Invoke by WebSockets</button><output id="socket-out"></output>
+<button id="headers">Invoke by WebSockets with a header</button><output id="headers-out"></output>
 </main><script src="/signalr.js"></script><script>
-const invoke = (path, transport, shown) => async () => {
-  const connection = new signalR.HubConnectionBuilder().withUrl(path, { transport }).build();
+const invoke = (path, transport, shown, headers) => async () => {
+  const connection = new signalR.HubConnectionBuilder().withUrl(path, headers ? { transport, headers } : { transport }).build();
   try {
     await connection.start();
     const result = await connection.invoke("Echo", 7);
@@ -62,6 +63,8 @@ const invoke = (path, transport, shown) => async () => {
 };
 document.getElementById("poll").addEventListener("click", invoke("/poll-hub", signalR.HttpTransportType.LongPolling, "poll-out"));
 document.getElementById("socket").addEventListener("click", invoke("/socket-hub", signalR.HttpTransportType.WebSockets, "socket-out"));
+document.getElementById("headers").addEventListener("click", invoke("/headers-hub", signalR.HttpTransportType.WebSockets, "headers-out",
+  { traceparent: "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01" }));
 </script></body></html>`;
 
 const pollKind = request => {
@@ -86,8 +89,8 @@ const server = createServer((request, response) => {
       response.end(bundle);
       return;
     }
-    if (request.url.startsWith("/socket-hub/negotiate")) {
-      record("WebSockets", "negotiate", body, request);
+    if (request.url.startsWith("/socket-hub/negotiate") || request.url.startsWith("/headers-hub/negotiate")) {
+      record(request.url.startsWith("/headers-hub") ? "Headers" : "WebSockets", "negotiate", body, request);
       response.writeHead(200, { "Content-Type": "application/json" });
       response.end(negotiation("WebSockets"));
       return;
@@ -126,12 +129,14 @@ const server = createServer((request, response) => {
   });
 });
 
-const sockets = new WebSocket.Server({ server, path: "/socket-hub" });
+const sockets = new WebSocket.Server({ noServer: true });
+server.on("upgrade", (request, socket, head) => sockets.handleUpgrade(request, socket, head, upgraded => sockets.emit("connection", upgraded, request)));
 sockets.on("connection", (socket, request) => {
-  record("WebSockets", "upgrade", "", request);
+  const transport = request.url.startsWith("/headers-hub") ? "Headers" : "WebSockets";
+  record(transport, "upgrade", "", request);
   socket.on("message", data => {
     const body = data.toString();
-    received.push({ transport: "WebSockets", kind: "message", body, traceparent: "", tracestate: "", baggage: "" });
+    received.push({ transport, kind: "message", body, traceparent: "", tracestate: "", baggage: "" });
     for (const reply of replies(body)) socket.send(reply);
   });
 });
@@ -157,9 +162,13 @@ server.listen(0, "127.0.0.1", async () => {
   await browserPage.click("#socket");
   await browserPage.waitForFunction(() => document.getElementById("socket-out").textContent !== "");
   const shown = `${await browserPage.textContent("#poll-out")} and ${await browserPage.textContent("#socket-out")}`;
-  const carrying = received.filter(entry => entry.traceparent || entry.tracestate || entry.baggage).length;
+  await browserPage.click("#headers");
+  await browserPage.waitForFunction(() => document.getElementById("headers-out").textContent !== "");
+  const carrying = received.filter(entry => entry.transport !== "Headers" && (entry.traceparent || entry.tracestate || entry.baggage)).length;
+  const reached = ["negotiate", "upgrade"].map(kind => `${kind} ${received.some(entry => entry.transport === "Headers" && entry.kind === kind && entry.traceparent) ? "with" : "without"} it`).join(", ");
 
   console.log(`signalr-requests-carry-no-trace-context: @microsoft/signalr ${version} sent ${sent("LongPolling")} by long polling and ${sent("WebSockets")} by WebSockets; ${carrying} carrying a trace header; ${shown}`);
+  console.log(`signalr-url-headers-skip-the-upgrade: a traceparent given to withUrl reaches the WebSocket transport's ${reached}; ${await browserPage.textContent("#headers-out")}`);
   console.log(`signalr-invocation-message-keys: @microsoft/signalr ${version} invokes with ${invocationKeys("LongPolling")} by long polling and ${invocationKeys("WebSockets")} by WebSockets`);
 
   await browser.close();

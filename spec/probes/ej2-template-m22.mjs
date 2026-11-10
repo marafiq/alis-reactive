@@ -125,6 +125,11 @@ const grouping = async page => {
     ["grouped-tight", "(beds>2)&&(a>2)"], ["grouped-spaced", "(beds > 2) && (a > 2)"]]) {
     outcomes.push(`${condition} gives ${column(await renderGrid(page, id, pair, ["${if(" + condition + ")}yes${else}no${/if}"]), 0)}`);
   }
+  const promised = [{ status: "Active", beds: 3 }, { status: "Away", beds: 3 }];
+  for (const [id, condition] of [["promise-tight", "!(status==='Active')&&beds>2"], ["promise-bare", "!status==='Active'&&beds>2"],
+    ["promise-spaced", "!(status === 'Active') && beds > 2"]]) {
+    outcomes.push(`${condition} gives ${column(await renderGrid(page, id, promised, ["${if(" + condition + ")}yes${else}no${/if}"]), 0)}`);
+  }
   console.log(`ej2-grid-template-grouping: ${outcomes.join(", ")}`);
 };
 

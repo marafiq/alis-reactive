@@ -4116,7 +4116,7 @@
       "source": "spec/probes/signalr-trace-context.mjs",
       "proof": {
         "feature": "M10.F1",
-        "page": "X21.16's medication round under the tracing host: the trace on, a Call nurse button whose pipeline invokes the nurse line hub's Call method, which replies with the traceparent of its connection's request, or none.",
+        "page": "X21.16's medication round under the tracing host: the trace on, a Call nurse button whose pipeline invokes the nurse line hub's Call method, which replies with the first traceparent the test app recorded on a request to the nurse line's path, negotiate included, or none.",
         "gesture": "Click Call nurse; open the collector page.",
         "outcome": "The collector lists the click's run span under the page's trace id, and called reads none."
       }
@@ -4131,24 +4131,39 @@
       "source": "spec/probes/signalr-trace-context.mjs",
       "proof": {
         "feature": "M10.F1",
-        "page": "X21.16's medication round under the tracing host: the trace on, a Call nurse button whose pipeline invokes the nurse line hub's Call method, which replies with the traceparent of its connection's request, or none.",
+        "page": "X21.16's medication round under the tracing host: the trace on, a Call nurse button whose pipeline invokes the nurse line hub's Call method, which replies with the first traceparent the test app recorded on a request to the nurse line's path, negotiate included, or none.",
         "gesture": "Click Call nurse; open the collector page.",
         "outcome": "The collector lists the click's run span under the page's trace id, and called reads none."
       }
     },
     {
       "id": "ej2-grid-template-grouping",
-      "statement": "In a template condition, ! over a parenthesized comparison negates it, ! before a bare comparison binds to the member first and reads every row as false, and a run of spaces standing alone between ) and && fails the compile with a SyntaxError where the same condition with no spaces compiles.",
+      "statement": "In a template condition, ! over a parenthesized comparison negates it, ! before a bare comparison binds to the member first and reads every row as false, and a run of spaces standing alone between ) and && fails the compile with a SyntaxError where the same condition with no spaces compiles; M22.X5's own condition reads Ann other and Bo spare when written tight, no|no when its ! is bare, and fails when spaced.",
       "host": "browser",
       "oracle": "Chromium, driven by Playwright 1.63.0, rendering EJ2 33.1.47's Grid with ej2.min.js",
       "probe": "ej2-template-m22.mjs",
-      "expect": "ej2-grid-template-grouping: !(status==='Active') gives no|yes, !status==='Active' gives no|no, (beds>2)&&(a>2) gives yes|no, (beds > 2) && (a > 2) gives SyntaxError",
+      "expect": "ej2-grid-template-grouping: !(status==='Active') gives no|yes, !status==='Active' gives no|no, (beds>2)&&(a>2) gives yes|no, (beds > 2) && (a > 2) gives SyntaxError, !(status==='Active')&&beds>2 gives no|yes, !status==='Active'&&beds>2 gives no|no, !(status === 'Active') && beds > 2 gives SyntaxError",
       "source": "spec/probes/ej2-template-m22.mjs",
       "proof": {
         "feature": "M22.F2",
         "page": "M22.X5's bed board: the Spare column's condition negates a comparison beside &&, over Ann, active with 3 beds, and Bo, away with 3 beds.",
         "gesture": "Open the page.",
         "outcome": "Ann's Spare cell shows other and Bo's shows away with spare beds."
+      }
+    },
+    {
+      "id": "signalr-url-headers-skip-the-upgrade",
+      "statement": "A traceparent the app gives @microsoft/signalr 10.0.11's withUrl reaches the WebSocket transport's negotiate and not its upgrade, so a hub that reads only its connection's upgrade request never sees it, while the negotiate does.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks, loading @microsoft/signalr 10.0.11's browser bundle against a node HTTP server that answers SignalR's negotiate, long polling, a WebSocket upgrade (ws 7.5.11) and the JSON hub protocol, recording every request and message",
+      "probe": "signalr-trace-context.mjs",
+      "expect": "signalr-url-headers-skip-the-upgrade: a traceparent given to withUrl reaches the WebSocket transport's negotiate with it, upgrade without it; invoked 7",
+      "source": "spec/probes/signalr-trace-context.mjs",
+      "proof": {
+        "feature": "M10.F1",
+        "page": "X21.16's medication round under the tracing host: the trace on, a Call nurse button whose pipeline invokes the nurse line hub's Call method, which replies with the first traceparent the test app recorded on a request to the nurse line's path, negotiate included, or none.",
+        "gesture": "Click Call nurse; open the collector page.",
+        "outcome": "The collector lists the click's run span under the page's trace id, and called reads none."
       }
     }
   ]
