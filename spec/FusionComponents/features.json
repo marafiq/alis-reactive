@@ -14927,11 +14927,11 @@
    "promises": [
     {
      "for": "M21.X1019",
-     "page": "A dose record page shown again after a failed post, whose dose given FusionNumericTextBox is rendered by field.FusionNumericTextBox() for a model whose DoseMg is 12.5.",
-     "gesture": "Open the page.",
-     "outcome": "The dose box shows 12.50, EJ2's n2 format (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:163-165).",
-     "opposite": "A model whose DoseMg is null shows an empty box.",
-     "defect": "The box is rendered with no starting value, so it shows empty though the model holds 12.5."
+     "page": "A dose record page whose dose given FusionNumericTextBox field.FusionNumericTextBox() renders for the model's DoseMg, posted by the browser's own submission to an action that renders the page again with DoseMg at the prescribed 12.5 when the dose fails its check.",
+     "gesture": "Type 99 in the dose box and click Save.",
+     "outcome": "The page shows again with 12.50 in the dose box, the value the action left.",
+     "opposite": "Opened for a model whose DoseMg is null, the dose box shows empty.",
+     "defect": "The box shows 99.00, the attempted value, though a typed component shows what the server decided (D17.13); or it shows empty."
     }
    ],
    "verdicts": [
@@ -15308,7 +15308,7 @@
    "promises": [
     {
      "for": "M21.X612",
-     "page": "A medication cabinet page shown again after a failed post, whose unlock code FusionOtpInput of four boxes is rendered by field.FusionOtpInput() for a model whose UnlockCode is 4821.",
+     "page": "A medication cabinet page whose unlock code FusionOtpInput of four boxes is rendered by field.FusionOtpInput() for a model whose UnlockCode is 4821.",
      "gesture": "Open the page.",
      "outcome": "The four code boxes show 4, 8, 2 and 1.",
      "opposite": "A model whose UnlockCode is null shows four empty boxes.",
@@ -17317,7 +17317,7 @@
    "promises": [
     {
      "for": "M21.X1023",
-     "page": "A handover page shown again after a failed post, whose summary FusionRichTextEditor is rendered by field.FusionRichTextEditor() for a model whose Summary is <p>Ate a full lunch.</p>.",
+     "page": "A handover page whose summary FusionRichTextEditor is rendered by field.FusionRichTextEditor() for a model whose Summary is <p>Ate a full lunch.</p>.",
      "gesture": "Open the page.",
      "outcome": "The editor shows Ate a full lunch.",
      "opposite": "A model whose Summary is null shows an empty editor.",
@@ -21101,7 +21101,7 @@
    "promises": [
     {
      "for": "M21.X1027",
-     "page": "A resident profile page shown again after a failed post, whose bed rails FusionSwitch is rendered by field.FusionSwitch() for a model whose BedRailsUp is true.",
+     "page": "A resident profile page whose bed rails FusionSwitch is rendered by field.FusionSwitch() for a model whose BedRailsUp is true.",
      "gesture": "Open the page.",
      "outcome": "The bed rails switch shows on.",
      "opposite": "A model whose BedRailsUp is false shows the switch off.",
@@ -21749,7 +21749,7 @@
    "promises": [
     {
      "for": "M21.X1029",
-     "page": "A resident profile page shown again after a failed post, whose care note FusionTextArea is rendered by field.FusionTextArea() for a model whose CareNote is Prefers tea at seven.",
+     "page": "A resident profile page whose care note FusionTextArea is rendered by field.FusionTextArea() for a model whose CareNote is Prefers tea at seven.",
      "gesture": "Open the page.",
      "outcome": "The care note shows Prefers tea at seven.",
      "opposite": "A model whose CareNote is null shows an empty care note.",
@@ -22187,7 +22187,7 @@
    "promises": [
     {
      "for": "M21.X1030",
-     "page": "A resident profile page shown again after a failed post, whose preferred name FusionTextBox is rendered by field.FusionTextBox() for a model whose PreferredName is Nell.",
+     "page": "A resident profile page whose preferred name FusionTextBox is rendered by field.FusionTextBox() for a model whose PreferredName is Nell.",
      "gesture": "Open the page.",
      "outcome": "The preferred name box shows Nell.",
      "opposite": "A model whose PreferredName is null shows an empty box.",
@@ -22624,7 +22624,7 @@
    "promises": [
     {
      "for": "M21.X1031",
-     "page": "A dose record page shown again after a failed post, whose next dose FusionTimePicker is rendered by field.FusionTimePicker() for a model whose NextDoseAt is 2026-11-10 14:30.",
+     "page": "A dose record page whose next dose FusionTimePicker is rendered by field.FusionTimePicker() for a model whose NextDoseAt is 2026-11-10 14:30.",
      "gesture": "Open the page.",
      "outcome": "The next dose box shows 2:30 PM.",
      "opposite": "A model whose NextDoseAt is null shows an empty box.",

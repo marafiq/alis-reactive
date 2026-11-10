@@ -2262,7 +2262,8 @@ def app_tests():
             for promise in feature.get("promises", []):
                 key = (feature["id"], promise["for"], seen[promise["for"]])
                 seen[promise["for"]] += 1
-                tests[key] = {"module": path.parent.name, "rung": rungs.get(promise["for"]), "page": promise.get("page", "")}
+                tests[key] = {"module": path.parent.name, "rung": rungs.get(promise["for"]), "page": promise.get("page", ""),
+                              "gesture": promise.get("gesture", "")}
     return tests
 
 
@@ -2335,6 +2336,22 @@ def app_placement_problems(app, where, entry, screens, hosts, module, rung):
 
 
 APP_FIELD_RENDERERS = {"conformance", "nativeSlice", "fusion"}
+APP_SERVER_PARTS = {"endpoint", "form", "stream", "hub"}
+APP_FIELD_GESTURE = re.compile(r"(?:^|; |, then |\bthen |, and |\band |, )(?:type|tick|untick|select|choose|pick|clear|enter|fill|set the \w+ to|set it to)\b", re.I)
+APP_SERVER_READ = re.compile(r"\b(?:GETs?|POSTs?|PUTs?|DELETEs?)\b|\bresponse body|\bthe server writes|\bposts (?:the|its) (?:form|container|intake|page)\b|\bLoad (?:a|the) \w+ whose\b")
+
+
+def app_door_part_problems(where, known, entry, screens):
+    if known.get("rung") != "behavior" or entry["screen"] not in screens:
+        return []
+    parts = {part["id"]: part["kind"] for part in screens[entry["screen"]]["parts"]}
+    kinds = {parts[name] for name in entry["parts"] if name in parts}
+    gesture, page = known.get("gesture", ""), known.get("page", "")
+    problems = [f"{where}'s gesture fills a field, and it lists no component that renders one: the core renders no input (M7.N2)"
+                ] if APP_FIELD_GESTURE.search(gesture) and not kinds & APP_FIELD_RENDERERS else []
+    problems += [f"{where} reads what a request or the server sends, and it lists no endpoint, form, stream or hub part"
+                 ] if APP_SERVER_READ.search(f"{page} {gesture}") and not kinds & APP_SERVER_PARTS else []
+    return problems
 SLICE_MODULES = ("NativeComponents", "FusionComponents", "NativeAppLevelObjects", "FusionAppLevelObjects")
 RENDER_HELPER_TYPE = re.compile(r"(?:HtmlExtensions|Builder)(?:<|$)")
 
@@ -2422,6 +2439,7 @@ def check_app():
         problems += app_placement_problems(app, where, entry, screens, hosts, (known or {}).get("module"), (known or {}).get("rung"))
         problems += app_held_problems(where, entry)
         problems += app_named_part_problems(where, (known or {}).get("page", ""), entry, screens)
+        problems += app_door_part_problems(where, known or {}, entry, screens)
     native_cells = json.loads((SPEC / "Reference" / "native.json").read_text())["cells"]
     reached = Counter()
     for entry in app["cells"]:
@@ -2443,7 +2461,8 @@ def check_app():
     problems += [f"{len(rewrite)} tests put the environment on a care screen, which the harness does: {', '.join(rewrite[:6])}"] if rewrite else []
     detail = (f"{len(placed)} feature tests and {len(reached)} cell tests on {len(screens)} screens under {len(hosts)} hosts; "
               "no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, "
-              "and each Native or Fusion component a test's page names is held by a part it lists")
+              "each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or "
+              "reads what the server sends lists the part that does it")
     return result(not problems, "; ".join(problems[:6]) or detail, screens=len(screens), hosts=len(hosts), placed=len(placed),
                   cells=len(reached), rewrite=len(rewrite), problems=len(problems))
 

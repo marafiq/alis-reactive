@@ -1745,7 +1745,8 @@
         "net10"
       ],
       "parts": [
-        "doses"
+        "doses",
+        "roundEndpoint"
       ],
       "harness": [
         "seed"
@@ -1760,7 +1761,8 @@
         "net10"
       ],
       "parts": [
-        "doses"
+        "doses",
+        "roundEndpoint"
       ],
       "harness": [
         "seed"
@@ -1892,7 +1894,8 @@
       ],
       "parts": [
         "inputs",
-        "carePicker"
+        "carePicker",
+        "intakeEndpoint"
       ],
       "harness": [
         "seed"
@@ -3949,7 +3952,8 @@
         "net10"
       ],
       "parts": [
-        "rows"
+        "rows",
+        "residentsEndpoint"
       ],
       "harness": [
         "seed"
@@ -4046,7 +4050,8 @@
         "net10"
       ],
       "parts": [
-        "rows"
+        "rows",
+        "residentsEndpoint"
       ],
       "harness": [
         "seed"
@@ -8017,7 +8022,8 @@
       ],
       "parts": [
         "intakeForm",
-        "documents"
+        "documents",
+        "inputs"
       ],
       "harness": [
         "seed"
