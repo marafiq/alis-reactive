@@ -1177,14 +1177,23 @@ Terms used throughout:
 ## Q7. Every value position takes every source
 
 **Decision.**
-- D7.1 The positions are closed: a property or write-only property set, an element's text, HTML and class name,
-  both operands of every condition operator, a request member (which Q9 places in the route, the
-  query, the body or a header), a header, a dispatch payload member, and a method's, plugin's or hub's argument.
-- D7.2 The sources are closed, each a `TypedSource<T>`: a component's or plugin's member, a method's result
-  (`Method<T>`, `MethodAsync<T>`, a hub's `Invoke<T>`), a page URL member (`pipeline.PageUrl<TPage>()`, N10.7), a
-  field of an event payload or a pushed message, a field of a response body, a member as its container sends it
-  (N13.1), the result of an array operation, a literal, an object built from sources, a list built from sources, and
-  a value chosen from sources by `IfNull` or `Choose` (D6.14).
+- D7.1 The positions are closed: a property or write-only property set (`Positions.PropertySet`,
+  `Positions.WriteOnlySet`), an element's text, HTML and class name (`Positions.ElementText`, `Positions.ElementHtml`,
+  `Positions.ElementClass`), both operands of every condition operator (a comparison's `Positions.ConditionLeft` and
+  `Positions.ConditionRight`, the text tests', `MinLength`'s, `Between`'s and membership's `Positions.TextTestOperand`,
+  `Matches`'s `Positions.MatchesPattern`), a request member (which Q9 places in the route, the query, the body or a
+  header, `Positions.RequestMember`), a header (`Positions.Header`), a dispatch payload member
+  (`Positions.DispatchPayloadMember`), and a method's, plugin's or hub's argument (`Positions.MethodArgument`,
+  `Positions.PluginArgument`, `Positions.HubArgument`).
+- D7.2 The sources are closed, each a `TypedSource<T>`: a component's or plugin's member
+  (`Sources.ComponentMember`, `Sources.PluginMember`), a method's result (`Method<T>`'s `Sources.MethodResult`,
+  `MethodAsync<T>`'s `Sources.MethodAsyncResult`, a hub's `Invoke<T>`'s `Sources.HubInvokeResult`), a page URL member
+  (`pipeline.PageUrl<TPage>()`, N10.7, `Sources.PageUrlMember`), a field of an event payload or a pushed message
+  (`Sources.EventPayloadField`, `Sources.PushedMessageField`), a field of a response body
+  (`Sources.ResponseBodyField`), a member as its container sends it (N13.1, `Sources.ContainerMember`), the result of
+  an array operation (`Sources.ArrayOperationResult`), a literal (`Sources.Literal`), an object built from sources
+  (`Sources.Object`), a list built from sources (`Sources.List`), and a value chosen from sources by `IfNull` or
+  `Choose` (D6.14, `Sources.IfNull`, `Sources.Choose`).
 - D7.3 Every position takes a literal of its type and every source whose type is assignable to it:
   `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position. A set takes a source
   as `ITypedSource<out T>`, so a narrower reference type and a text without null reach it as they are. C# converts a

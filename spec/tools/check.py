@@ -1218,8 +1218,9 @@ FLUENT_STRING_KINDS = {"text", "url", "element-id", "header-name", "css-class", 
 FLUENT_UNTYPED_KINDS = {"object", "type", "object[]", "type[]"}
 FLUENT_SLOT_ROW = re.compile(r"^[\w-]+\.\w+\(\w+\)#\d+:\w+$")
 FLUENT_TABLE_TITLE = "Callback parameter naming convention (locked):"
-FLUENT_LATER = ["F2"]
 FLUENT_CONCEPT_ID = re.compile(r"^(?:D\d+\.\d+|N\d+\.\d+|M\d+\.[DN]\d+)$")
+FLUENT_CELL_DECISIONS = {"D7.1": "Positions", "D7.2": "Sources"}
+FLUENT_REFUSED_FORMS = re.compile(r"^refused: (\d+) of (\d+) fail as named$", re.M)
 
 
 def check_fluent(plant=None):
@@ -1235,22 +1236,23 @@ def check_fluent(plant=None):
     shapes, shape_counts = fluent_shape_problems(surface, rows)
     callbacks, callback_counts = fluent_callback_problems(surface, fluent_callback_table())
     strings, string_counts = fluent_string_problems(surface, rows)
-    judged = {"F1": concepts, "F3": shapes, "F4": callbacks, "F5": strings}
-    counts = {"members": len(surface["members"]), "lambda_parameters": len(surface["lambdas"]), **concept_counts, **shape_counts,
-              **callback_counts, **string_counts}
+    judged = {"F1": concepts}
+    judged["F2"], cell_counts = fluent_cell_problems(surface["cells"], fluent_cell_rows(path))
+    judged.update({"F3": shapes, "F4": callbacks, "F5": strings})
+    counts = {"members": len(surface["members"]), "lambda_parameters": len(surface["lambdas"]), **concept_counts, **cell_counts,
+              **shape_counts, **callback_counts, **string_counts}
     counts.update({check: "pass" if not found else "fail" for check, found in judged.items()})
-    counts.update({check: "not built" for check in FLUENT_LATER})
     first = [problem for found in judged.values() for problem in found[:2]]
-    detail = "; ".join(first) or "F1, F3, F4 and F5 pass"
-    return result(False, detail + "; " + ", ".join(FLUENT_LATER) + " not built", **counts)
+    return result(not first, "; ".join(first) or "one concept per name, every Q7 cell compiles or is refused as named, one shape per name, callbacks named as the locked table names them, every string parameter of a closed kind", **counts)
 
 
 def fluent_surface(plant):
-    build = subprocess.run(["dotnet", "build", str(SPEC / "api" / "CshtmlStages"), "-nologo", "-v", "q", "-p:EmitCompilerGeneratedFiles=true"],
-                           capture_output=True, text=True, cwd=REPO)
-    if build.returncode != 0:
-        errors = [line.strip() for line in build.stdout.splitlines() if " error " in line]
-        return None, "spec/api does not build: " + (errors[0] if errors else build.stdout.strip()[-300:])
+    for project in ["CshtmlStages", "Cells"]:
+        build = subprocess.run(["dotnet", "build", str(SPEC / "api" / project), "-nologo", "-v", "q", "-p:EmitCompilerGeneratedFiles=true"],
+                               capture_output=True, text=True, cwd=REPO)
+        if build.returncode != 0:
+            errors = [line.strip() for line in build.stdout.splitlines() if " error " in line]
+            return None, f"spec/api/{project} does not build: " + (errors[0] if errors else build.stdout.strip()[-300:])
     with tempfile.TemporaryDirectory() as folder:
         written = Path(folder) / "surface.json"
         command = ["dotnet", "run", "--project", str(SPEC / "probes" / "FluentSurface"), "--", str(REPO), "--out", str(written)]
@@ -1384,6 +1386,83 @@ def fluent_string_problems(surface, rows):
     stale = sorted(set(rows) - used)
     problems = list(dict.fromkeys(problems)) + [f"F5 row '{key}' names no string parameter" for key in stale]
     return problems, {"F5_parameters": judged, "F5_rows": len(rows), "F5_untyped": untyped, "F5_stale_rows": len(stale)}
+
+
+def fluent_cell_rows(path):
+    return json.loads(path.read_text()).get("cells", {}).get("refused", [])
+
+
+def fluent_cell_problems(cells, refused):
+    named = fluent_cell_names()
+    problems = fluent_cell_set_problems(cells, named)
+    judged, gaps, counts = fluent_cell_judgement(cells, refused)
+    forms, passed, total = fluent_refused_forms()
+    problems += judged + forms + gaps
+    counts.update({
+        "F2_positions": len(cells["positions"]), "F2_position_gaps": sum(1 for end in cells["positions"] if end["gap"]),
+        "F2_sources": len(cells["sources"]), "F2_source_gaps": sum(1 for end in cells["sources"] if end["gap"]),
+        "F2_forms": total, "F2_forms_as_named": passed,
+    })
+    return problems, counts
+
+
+def fluent_cell_names():
+    decisions = {item.split(" ", 2)[1]: item for item in bullets("\n".join(design_sections()["Q7"]))}
+    return {decision: [name.split(".", 1)[1] for name in backticked(decisions[decision]) if re.fullmatch(holder + r"\.\w+", name)]
+            for decision, holder in FLUENT_CELL_DECISIONS.items()}
+
+
+def fluent_cell_set_problems(cells, named):
+    problems = []
+    for decision, holder in FLUENT_CELL_DECISIONS.items():
+        ends = {end["name"]: end for end in cells[holder.lower()]}
+        problems += [f"F2 {decision} names {name} twice" for name in sorted({name for name in named[decision] if named[decision].count(name) > 1})]
+        problems += [f"F2 {decision} names {name}, which spec/api/Cells lacks" for name in named[decision] if name not in ends]
+        problems += [f"F2 {end['file']}:{end['line']} {holder}.{name}: {decision} does not name it" for name, end in ends.items() if name not in named[decision]]
+    return problems
+
+
+def fluent_cell_judgement(cells, refused):
+    rows = {(row["position"], row["source"]): row for row in refused}
+    problems = [f"F2 refused row {position} x {source}: {row['reason']} states no such refusal" for (position, source), row in rows.items()
+                if not fluent_decision_stated(row["reason"])]
+    gaps = []
+    counts = {"F2_cells": len(cells["results"]), "F2_compiling": 0, "F2_refused": 0, "F2_gaps": 0, "F2_failing": 0}
+    for cell in cells["results"]:
+        label = f"F2 {cell['position']} x {cell['source']}"
+        row = rows.pop((cell["position"], cell["source"]), None)
+        errors = sorted(cell["errors"])
+        if cell["gap"]:
+            counts["F2_gaps"] += 1
+            problems += [f"{label}: refused for {', '.join(row['errors'])} but has no door"] if row else []
+            gaps.append(f"{label}: no door ({cell['gap']})")
+        elif row is None and not errors:
+            counts["F2_compiling"] += 1
+        elif row is None:
+            counts["F2_failing"] += 1
+            problems.append(f"{label}: fails {', '.join(errors)} and is no refused cell")
+        elif errors == sorted(row["errors"]):
+            counts["F2_refused"] += 1
+        elif not errors:
+            problems.append(f"{label}: refused for {', '.join(row['errors'])} but compiles")
+        else:
+            problems.append(f"{label}: refused for {', '.join(row['errors'])} but fails {', '.join(errors)}")
+    problems += [f"F2 refused row {position} x {source} names no cell" for position, source in rows]
+    return problems, gaps, counts
+
+
+def fluent_decision_stated(reason):
+    starts = (f"- {reason} ", f"- `{reason}` ")
+    return any(line.startswith(starts) for lines in design_sections().values() for line in lines)
+
+
+def fluent_refused_forms():
+    run = subprocess.run(["bash", str(SPEC / "api" / "refused.sh")], capture_output=True, text=True, cwd=REPO)
+    summary = FLUENT_REFUSED_FORMS.search(run.stdout)
+    if summary is None:
+        return ["F2 spec/api/refused.sh printed no summary: " + (run.stdout + run.stderr).strip()[-200:]], 0, 0
+    failing = [f"F2 spec/api/refused.sh {line}" for line in run.stdout.splitlines() if line.startswith("FAIL")]
+    return failing, int(summary.group(1)), int(summary.group(2))
 
 
 def check_matrix():

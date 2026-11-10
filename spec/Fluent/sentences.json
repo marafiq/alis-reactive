@@ -575,5 +575,41 @@
       "M12.N3",
       "N17.12"
     ]
+  },
+  "cells": {
+    "refused": [
+      {
+        "position": "ElementClass",
+        "source": "IfNull",
+        "reason": "D7.3",
+        "errors": [
+          "CS8620"
+        ]
+      },
+      {
+        "position": "ConditionRight",
+        "source": "IfNull",
+        "reason": "D7.3",
+        "errors": [
+          "CS8620"
+        ]
+      },
+      {
+        "position": "MethodArgument",
+        "source": "IfNull",
+        "reason": "D7.3",
+        "errors": [
+          "CS8620"
+        ]
+      },
+      {
+        "position": "PluginArgument",
+        "source": "IfNull",
+        "reason": "D7.3",
+        "errors": [
+          "CS8620"
+        ]
+      }
+    ]
   }
 }
