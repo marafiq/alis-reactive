@@ -3451,6 +3451,216 @@
         "gesture": "Click the second resident's link, go back, then click the first resident's link.",
         "outcome": "The second link opens /residents?id=7&tab=care, and the first opens no dialog and leaves the page where it is."
       }
+    },
+    {
+      "id": "ej2-toast-content-markup",
+      "statement": "EJ2 33.1.47's Toast writes a content string that parses as no selector as sanitized HTML, so a b element in it renders.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-content-markup: bold:true text:Ada saved",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), with a note input, a ward board section whose id is ward-board under it, and a Record button whose click sets FusionToast's TimeOut to 0 and its Content to the note's value and shows the toast.",
+        "gesture": "Type <b>Ada</b> 5 mg into the note and click Record.",
+        "outcome": "The toast reads <b>Ada</b> 5 mg, and it holds no bold element."
+      }
+    },
+    {
+      "id": "ej2-toast-content-selector",
+      "statement": "EJ2 33.1.47's Toast moves the page element a content string matches as a CSS selector into the toast.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-content-selector: vitals moved into the toast",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), with a note input, a ward board section whose id is ward-board under it, and a Record button whose click sets FusionToast's TimeOut to 0 and its Content to the note's value and shows the toast.",
+        "gesture": "Type #ward-board into the note and click Record.",
+        "outcome": "The toast reads #ward-board, and the ward board still shows under the note."
+      }
+    },
+    {
+      "id": "ej2-toast-content-selector-template",
+      "statement": "EJ2 33.1.47's Toast compiles a content string that parses as a CSS selector and matches no element as a template, and a ${...} in it that reads past the template's data throws from show, so no toast shows.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-content-selector-template: show throws TypeError: Cannot read properties of undefined (reading 'location'); toast absent",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), with a note input, a ward board section whose id is ward-board under it, and a Record button whose click sets FusionToast's TimeOut to 0 and its Content to the note's value and shows the toast.",
+        "gesture": "Type b[title='${window.location.protocol}'] into the note and click Record.",
+        "outcome": "The toast reads b[title='${window.location.protocol}']."
+      }
+    },
+    {
+      "id": "ej2-toast-title-markup",
+      "statement": "EJ2 33.1.47's Toast writes a title string as sanitized HTML, so a b element in it renders.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-title-markup: bold:true text:Saved",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), with a title input and a Record button whose click sets FusionToast's TimeOut to 0, its Title to the title input's value and its Content to Recorded, and shows the toast.",
+        "gesture": "Type <b>Saved</b> into the title input and click Record.",
+        "outcome": "The toast's title reads <b>Saved</b>, and it holds no bold element."
+      }
+    },
+    {
+      "id": "ej2-toast-text-markup",
+      "statement": "EJ2 33.1.47's Toast writes what a beforeSanitizeHtml answer's helper returns, so a helper that writes a span of the escaped text shows a title's and a content's markup as text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-text-markup: title bold:false text:<b>Saved</b> content bold:false text:<b>Ada</b> saved",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), with a note input, a ward board section whose id is ward-board under it, and a Record button whose click sets FusionToast's TimeOut to 0 and its Content to the note's value and shows the toast.",
+        "gesture": "Type <b>Ada</b> 5 mg into the note and click Record.",
+        "outcome": "The toast reads <b>Ada</b> 5 mg, and it holds no bold element."
+      }
+    },
+    {
+      "id": "ej2-toast-text-selector",
+      "statement": "EJ2 33.1.47's Toast, with a beforeSanitizeHtml answer whose helper writes a span of the escaped text, shows a content that names a page element as text and leaves the element on the page.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-text-selector: title bold:false text:Ward content bold:false text:#chart chart stays on the page",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), with a note input, a ward board section whose id is ward-board under it, and a Record button whose click sets FusionToast's TimeOut to 0 and its Content to the note's value and shows the toast.",
+        "gesture": "Type #ward-board into the note and click Record.",
+        "outcome": "The toast reads #ward-board, and the ward board still shows under the note."
+      }
+    },
+    {
+      "id": "ej2-toast-text-template",
+      "statement": "EJ2 33.1.47's Toast, with a beforeSanitizeHtml answer whose helper writes a span of the escaped text, shows a content that parses as a selector with ${...} in it as text, and show does not throw.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-text-template: title bold:false text:Ward content bold:false text:b[title='${window.location.protocol}']",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), with a note input, a ward board section whose id is ward-board under it, and a Record button whose click sets FusionToast's TimeOut to 0 and its Content to the note's value and shows the toast.",
+        "gesture": "Type b[title='${window.location.protocol}'] into the note and click Record.",
+        "outcome": "The toast reads b[title='${window.location.protocol}']."
+      }
+    },
+    {
+      "id": "ej2-toast-text-null",
+      "statement": "EJ2 33.1.47's Toast shows no content element when its content is null.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-text-null: title bold:false text:Ward content absent",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), and a Record button whose click sets FusionToast's TimeOut to 0, its Title to Recorded and its Content to the click payload's absent member, and shows the toast.",
+        "gesture": "Click Record.",
+        "outcome": "The toast reads Recorded and nothing under it."
+      }
+    },
+    {
+      "id": "ej2-toast-text-title-null",
+      "statement": "EJ2 33.1.47's Toast shows no title element when its title is null.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-text-title-null: title absent content bold:false text:Saved",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), and a Record button whose click sets FusionToast's TimeOut to 0, its Title to the click payload's absent member and its Content to Recorded, and shows the toast.",
+        "gesture": "Click Record.",
+        "outcome": "The toast reads Recorded and shows no title above it."
+      }
+    },
+    {
+      "id": "ej2-toast-show-without-databind",
+      "statement": "EJ2 33.1.47's Toast shows the content and class written just before show with no dataBind between them, and puts the newest toast first.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-toast-show-without-databind: success:true bold:false text:Dose recorded | success:false absent",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F1",
+        "page": "A dose log whose layout renders Html.FusionToast(), and a Record button whose click sets FusionToast's TimeOut to 0, its Content to Dose recorded and its CssClass to Success, and calls Show.",
+        "gesture": "Click Record.",
+        "outcome": "A toast reads Dose recorded in the success style."
+      }
+    },
+    {
+      "id": "ej2-dialog-ask-markup",
+      "statement": "EJ2 33.1.47's Dialog, under both lines' confirm options and sequence, writes a header, content and button text given as a string as sanitized HTML, so markup in them renders.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-dialog-ask-markup: visible true header bold:true text:Confirm content bold:true text:Remove Ada? buttons bold:true text:OK|bold:false text:Cancel",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F2",
+        "page": "A discharge page whose layout renders Html.FusionConfirmDialog(), with a Discharge button whose click asks FusionConfirm the question in the question input and sets outcome's text to Discharged on a true answer and Kept on a false one.",
+        "gesture": "Type <b>Discharge Ada?</b> into the question input and click Discharge.",
+        "outcome": "The dialog reads <b>Discharge Ada?</b>, and it holds no bold element."
+      }
+    },
+    {
+      "id": "ej2-dialog-ask-ok",
+      "statement": "EJ2 33.1.47's Dialog, under both lines' confirm options, hides on its primary button's click, which answers true.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-dialog-ask-ok: visible false answers true",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F2",
+        "page": "A discharge page whose layout renders Html.FusionConfirmDialog(), with a Discharge button whose click asks FusionConfirm the question in the question input and sets outcome's text to Discharged on a true answer and Kept on a false one.",
+        "gesture": "Type Discharge Ada? into the question input, click Discharge, then click OK.",
+        "outcome": "The dialog is gone, and outcome reads Discharged."
+      }
+    },
+    {
+      "id": "ej2-dialog-ask-text",
+      "statement": "EJ2 33.1.47's Dialog, under both lines' confirm options, shows a header and content given as elements with their text, and button texts given as a span of escaped text as text, after dataBind and show.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-dialog-ask-text: visible true header bold:false text:<i>Confirmar</i> content bold:false text:<b>Remove Ada?</b> buttons bold:false text:<b>Sí</b>|bold:false text:Cancelar",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F2",
+        "page": "A care home layout in Spanish that renders Html.FusionConfirmDialog(\"<i>Confirmar</i>\", \"<b>Sí</b>\", \"Cancelar\"), and a resident page whose Discharge button asks FusionConfirm <b>Remove Ada?</b>.",
+        "gesture": "Click Discharge.",
+        "outcome": "The dialog's title reads <i>Confirmar</i>, its message <b>Remove Ada?</b>, its buttons <b>Sí</b> and Cancelar, and none holds a bold or italic element."
+      }
+    },
+    {
+      "id": "ej2-dialog-ask-escape",
+      "statement": "EJ2 33.1.47's Dialog, under both lines' confirm options, hides on Escape and raises its close, which answers false.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-m23.mjs",
+      "expect": "ej2-dialog-ask-escape: visible false answers true,false",
+      "source": "spec/probes/ej2-payloads-m23.mjs",
+      "proof": {
+        "feature": "M23.F2",
+        "page": "A discharge page whose layout renders Html.FusionConfirmDialog(), with a Discharge button whose click asks FusionConfirm the question in the question input and sets outcome's text to Discharged on a true answer and Kept on a false one.",
+        "gesture": "Type Discharge Ada? into the question input, click Discharge, then press Escape.",
+        "outcome": "The dialog is gone, and outcome reads Kept."
+      }
     }
   ]
 }

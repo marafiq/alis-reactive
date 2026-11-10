@@ -1,0 +1,680 @@
+{
+  "module": "FusionAppLevelObjects",
+  "features": [
+    {
+      "id": "M23.F1",
+      "summary": "The page's toast: FusionToast, declared on FusionComponent by the names EJ2's Toast uses, Title and Content as text that reads nothing when absent, TimeOut, ShowCloseButton, ShowProgressBar, CssClass typed by the closed set FusionToastTone, Show and Hide, reached by its fixed id, alisFusionToast, and rendered once by Html.FusionToast() in the layout, where the Fusion package's toast code makes the Toast at the bottom right, newest on top, with a close button. The rewrite shows every title and content as text (M23.D1): both lines hand EJ2 the string as it is, and EJ2 moves a page element a content matches as a selector into the toast, compiles one that parses as a selector and matches none as a template, and writes any other as HTML. Show shows a toast with the properties as written, and Hide hides the newest (M23.D2). Main writes each property through a setter of a C# literal and each tone through a door of its own; the redesign names cssClass Tone.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Fusion:FusionToast",
+        "Alis.Reactive.Fusion:FusionToastExtensions",
+        "Alis.Reactive.Fusion:FusionToastHtmlExtensions",
+        "Alis.Reactive.Fusion:FusionToastTone"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "/// <code>p.Component&lt;FusionToast&gt;().SetContent(\"Saved\").Success().Show()</code>",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:8"
+        },
+        {
+          "line": "main",
+          "text": "public sealed class FusionToast : FusionComponent, IAppLevelComponent",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:10"
+        },
+        {
+          "line": "main",
+          "text": "public const string ElementId = \"alisFusionToast\";",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:15"
+        },
+        {
+          "line": "main",
+          "text": "public string DefaultId => ElementId;",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:18"
+        },
+        {
+          "line": "main",
+          "text": "=> self.EmitSet(TitleProperty, ValueExpression.Literal(title));",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:52"
+        },
+        {
+          "line": "main",
+          "text": "=> self.EmitSet(ContentProperty, ValueExpression.Literal(content));",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:60"
+        },
+        {
+          "line": "main",
+          "text": "=> self.EmitSet(CssClassProperty, ValueExpression.Literal(\"e-toast-success\"));",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:93"
+        },
+        {
+          "line": "main",
+          "text": "=> self.EmitCall(DataBindMethod)",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:125"
+        },
+        {
+          "line": "main",
+          "text": ".EmitCall(ShowMethod);",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:126"
+        },
+        {
+          "line": "main",
+          "text": "return html.EJS().Toast(AppLevel.FusionToast.ElementId)",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:145"
+        },
+        {
+          "line": "main",
+          "text": ".Position(new ToastToastPosition { X = \"Right\", Y = \"Bottom\" })",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:147"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class FusionToast : FusionComponent, IAppLevelComponent",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:27"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> Title => Property<string>();",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:36"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> Content => Property<string>();",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:39"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<int> TimeOut => Property<int>();",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:42"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<FusionToastTone> Tone => Property<FusionToastTone>(\"cssClass\");",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:51"
+        },
+        {
+          "line": "redesign",
+          "text": "public void Show() => Method();",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:54"
+        },
+        {
+          "line": "redesign",
+          "text": "public void Hide() => Method();",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:57"
+        },
+        {
+          "line": "redesign",
+          "text": "[JsonStringEnumMemberName(\"e-toast-success\")]",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:64"
+        },
+        {
+          "line": "redesign",
+          "text": "return html.EJS().Toast(Alis.Reactive.Fusion.FusionToast.ElementId)",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:90"
+        },
+        {
+          "line": "proposed",
+          "text": "FusionToast is declared on FusionComponent, its object EJ2's Toast at ej2_instances.0 of its host, with EJ2's names: Title and Content as Property<string?>, TimeOut as Property<int>, ShowCloseButton and ShowProgressBar as Property<bool>, CssClass as Property<FusionToastTone>, Show() and Hide(), and ElementId, alisFusionToast, and DefaultId.",
+          "doors": [
+            "M23.N1",
+            "M21.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The redesign's Tone is EJ2's cssClass under another name, so the rewrite names it CssClass, with no name: argument; FusionToastTone keeps Success, Warning, Danger and Info, each written as EJ2's class, e-toast-success, e-toast-warning, e-toast-danger and e-toast-info.",
+          "doors": [
+            "M23.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A view reaches the toast by its fixed id, pipeline.Component<FusionToast>(FusionToast.ElementId), sets what the next toast says from any source, a literal, an input's value or a member of a response body, sets its tone, and calls Show.",
+          "doors": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Html.FusionToast() renders the host element once in the layout, and the Fusion package's toast code makes the Toast on it on alis:mount, at the bottom right, newest on top, with a close button, as both lines' render helper sets it, and answers its beforeSanitizeHtml so each title and content shows as text (M23.D1).",
+          "doors": [
+            "M23.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Main's setters, its four tone doors, Show, Hide and its render helper are FusionToast's members and render helper in the rewrite: SetTitle, SetContent and SetTimeout are Title, Content and TimeOut set from any source, ShowCloseButton() and ShowProgressBar() are the properties set to true, and Success, Warning, Danger and Info are CssClass set to the tone.",
+          "doors": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        }
+      ],
+      "nodes": [
+        "set",
+        "do",
+        "call",
+        "element",
+        "lit",
+        "string",
+        "number",
+        "boolean"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:10-19"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:17-152"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:27-97"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:79-87"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.SandboxApp/Views/Shared/_Layout.cshtml:57"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/execute.ts:35-48"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.SandboxApp/Views/Shared/_Layout.cshtml:62"
+        }
+      ],
+      "core": [
+        "Q11",
+        "Q17",
+        "Q5",
+        "Q4"
+      ],
+      "meanings": [
+        {
+          "id": "M23.D1",
+          "meaning": "A toast's Title and Content show as text. The Fusion package's toast code, a component file of its own that reaches the runtime only through alis:mount and alis:unmount, makes the Toast on the host when it mounts and listens to the Toast's beforeSanitizeHtml, a public event (@syncfusion/ej2-notifications/src/toast/toast.d.ts:426), setting the argument's cancel to true and its helper to a function that writes the string as a span whose text is the string with &, <, >, \" and ' written as entities. EJ2 hands each string title and content to that helper before it reads it (@syncfusion/ej2-notifications/src/toast/toast.js:348-350), and a string that starts with < parses as no selector, so EJ2 writes the span and the text shows as typed: markup stays text, a content that names a page element leaves that element where it is, and ${...} is not compiled (probe:ej2-toast-text-markup, probe:ej2-toast-text-selector, probe:ej2-toast-text-template). The span is what makes it text: escaping alone leaves #chart a selector that moves its element into the toast (probe:ej2-toast-content-selector). A Title or a Content that reads nothing writes null, and the toast shows no title or no content (probe:ej2-toast-text-null, probe:ej2-toast-text-title-null), as a missing value set as an element's text shows nothing (D4.5). EJ2 calls the helper only while enableHtmlSanitizer is true (@syncfusion/ej2-notifications/src/toast/toast.js:341), its default (@syncfusion/ej2-notifications/src/toast/toast.d.ts:310), so the toast code leaves it so and FusionToast declares no member that writes it. Both lines show a view's literal markup in a toast as elements; the rewrite shows every string as text, the view's literals included: a gate 2 item, with that default, and a toast that shows markup is an app's own declaration of EJ2's Toast on M12.N1."
+        },
+        {
+          "id": "M23.D2",
+          "meaning": "Show calls the Toast's show with no argument, and the toast it shows holds the title, content, class, time and buttons as last written, with no dataBind before it (probe:ej2-toast-show-without-databind); each Show adds a toast, the newest on top. Hide calls hide with no argument, which hides the newest toast (@syncfusion/ej2-notifications/src/toast/toast.js:379). TimeOut is the toast's milliseconds before it hides itself, 5000 unless written, and 0 keeps it until it is closed (@syncfusion/ej2-notifications/src/toast/toast.d.ts:359); the core waits for none of it (D11.9). CssClass writes the tone's EJ2 class, which EJ2's themes style. The toast code makes the Toast with the options both lines' render helper gives it, its target the body, at the bottom right, newest on top, with a close button, as the redesign's confirm code makes its Dialog on mount (Alis.Reactive.Assets/components/fusion/confirm.ts:73 at 65fdf118d), so the layout's order of scripts does not decide whether the Toast exists when the plan boots; a member a view reads on a host whose Toast was never made stops its pipeline (D4.1)."
+        }
+      ],
+      "oracle": "Syncfusion EJ2's Toast, @syncfusion/ej2 33.1.47's ej2.min.js run in Chromium by spec/probes/ej2-payloads-m23.mjs with Playwright 1.63.0, its source read in @syncfusion/ej2-notifications 33.1.44's toast.js: a content string that a page element matches as a selector moves the element into the toast, one that parses as a selector and matches none is compiled as a template, any other is written as sanitized HTML, a beforeSanitizeHtml answer whose helper writes a span of the escaped text shows each as text, and show reads the properties as written.",
+      "checker": [
+        "core:Q11",
+        "core:Q17",
+        "core:Q4"
+      ],
+      "defects": [
+        {
+          "id": "M23.X1",
+          "rung": "behavior",
+          "defect": "Both lines hand EJ2 a toast's title and content as the string they hold (Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:52 and :60 at 623dd4a27, Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:36 and :39 at 65fdf118d), and EJ2 reads a content string in three ways: a page element it matches as a selector is moved into the toast (probe:ej2-toast-content-selector), one that parses as a selector and matches none is compiled as a template, whose ${...} threw a TypeError so no toast showed (probe:ej2-toast-content-selector-template), and any other is written as sanitized HTML, as a title is (probe:ej2-toast-content-markup, probe:ej2-toast-title-markup). Main takes a C# literal only; the redesign's properties take any source."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M23.X1",
+          "page": "A dose log whose layout renders Html.FusionToast(), with a note input, a ward board section whose id is ward-board under it, and a Record button whose click sets the toast's TimeOut to 0 and its Content to the note's value and shows the toast, reaching it as pipeline.Component<FusionToast>(FusionToast.ElementId).",
+          "gesture": "Type #ward-board into the note and click Record; then type <b>Ada</b> 5 mg and click Record; then type b[title='${window.location.protocol}'] and click Record.",
+          "outcome": "Three toasts show, reading b[title='${window.location.protocol}'], <b>Ada</b> 5 mg and #ward-board as typed, none holds a bold element, and the ward board still shows under the note.",
+          "opposite": "Type Ada 5 mg and click Record: one toast reads Ada 5 mg, and the ward board shows under the note.",
+          "defect": "The redesign hands EJ2 the note as it is (Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToast.cs:39 at 65fdf118d), so the first click moves the ward board into the toast, the second shows Ada in bold, and the third throws from show and shows no toast (probe:ej2-toast-content-selector, probe:ej2-toast-content-markup, probe:ej2-toast-content-selector-template); main's SetContent takes a C# literal only (Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:60 at 623dd4a27), so it cannot show the note, and it shows the same faults for a literal that holds such text."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "FusionToastExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.Danger<TModel>(this ComponentRef<FusionToast!, TModel!>! self) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.Hide<TModel>(this ComponentRef<FusionToast!, TModel!>! self) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.Info<TModel>(this ComponentRef<FusionToast!, TModel!>! self) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.Show<TModel>(this ComponentRef<FusionToast!, TModel!>! self) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.ShowCloseButton<TModel>(this ComponentRef<FusionToast!, TModel!>! self) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.ShowProgressBar<TModel>(this ComponentRef<FusionToast!, TModel!>! self) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.Success<TModel>(this ComponentRef<FusionToast!, TModel!>! self) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.Warning<TModel>(this ComponentRef<FusionToast!, TModel!>! self) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.SetContent<TModel>(this ComponentRef<FusionToast!, TModel!>! self, string! content) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.SetTimeout<TModel>(this ComponentRef<FusionToast!, TModel!>! self, int ms) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.SetTitle<TModel>(this ComponentRef<FusionToast!, TModel!>! self, string! title) -> ComponentRef<FusionToast!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.FusionToast(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html) -> Microsoft.AspNetCore.Html.IHtmlContent!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1"
+          ]
+        },
+        {
+          "door": "static FusionToastExtensions.FusionToast(this System.Web.Mvc.HtmlHelper! html) -> System.Web.IHtmlString!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M23.F2",
+      "summary": "The confirm: FusionConfirm, declared on Component with a vendor of its own, since its object is the Fusion package's confirm object on its host, which asks through an EJ2 Dialog the confirm code makes, and not the Dialog: Ask(message), a MethodAsync<bool> a condition reads as any source, OK answering true and Cancel and Escape false, asks in their order, an ask whose run ends closed (M23.D3); reached by its fixed id, alisConfirmDialog, and rendered once by Html.FusionConfirmDialog() or Html.FusionConfirmDialog(title, ok, cancel) with the app's title and button texts (M23.D4). The message, the title and the button texts show as text. Both lines ask through a global or a plugin named alis.confirm that the core's own Confirm doors call, write the message as the Dialog's HTML, and write the title and buttons in fixed English; main also publishes Show, Hide and SetContent on the Dialog outside an ask.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Fusion:FusionConfirm",
+        "Alis.Reactive.Fusion:FusionConfirmExtensions",
+        "Alis.Reactive.Fusion:FusionConfirmHtmlExtensions"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "/// <code>p.Component&lt;FusionConfirm&gt;().Show()</code>",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirm.cs:9"
+        },
+        {
+          "line": "main",
+          "text": "public sealed class FusionConfirm : FusionComponent, IAppLevelComponent",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirm.cs:11"
+        },
+        {
+          "line": "main",
+          "text": "public const string ElementId = \"alisConfirmDialog\";",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirm.cs:13"
+        },
+        {
+          "line": "main",
+          "text": "return self.EmitSet(ContentProperty, ValueExpression.Literal(message))",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmExtensions.cs:30"
+        },
+        {
+          "line": "main",
+          "text": "=> self.EmitCall(ShowMethod);",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmExtensions.cs:37"
+        },
+        {
+          "line": "main",
+          "text": "=> new HtmlString($\"<div id=\\\"{FusionConfirm.ElementId}\\\"></div>\\n\");",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmExtensions.cs:49"
+        },
+        {
+          "line": "main",
+          "text": "dialog.header = \"Confirm\";",
+          "cite": "Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:57"
+        },
+        {
+          "line": "main",
+          "text": "dialog.content = message;",
+          "cite": "Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:58"
+        },
+        {
+          "line": "main",
+          "text": "dialog.close = () => { resolve(); outerResolve(false); };",
+          "cite": "Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:69"
+        },
+        {
+          "line": "main",
+          "text": "if (event.key === \"Escape\") event.stopPropagation();",
+          "cite": "Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:77"
+        },
+        {
+          "line": "main",
+          "text": "hostWindow.alis.confirm = function (message: string): Promise<boolean> {",
+          "cite": "Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:103"
+        },
+        {
+          "line": "main",
+          "text": "queue = queue.then(() => showConfirmDialog(dialog, message, outerResolve));",
+          "cite": "Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:105"
+        },
+        {
+          "line": "main",
+          "text": "throw new Error(\"[alis] confirm condition requires @Html.FusionConfirmDialog() in layout\");",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/conditions.ts:123"
+        },
+        {
+          "line": "redesign",
+          "text": "public static class FusionConfirmHtmlExtensions",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmHtmlExtensions.cs:12"
+        },
+        {
+          "line": "redesign",
+          "text": "public const string ElementId = \"alisConfirmDialog\";",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmHtmlExtensions.cs:15"
+        },
+        {
+          "line": "redesign",
+          "text": "dialog.header = \"Confirm\";",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:50"
+        },
+        {
+          "line": "redesign",
+          "text": "dialog.content = message;",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:51"
+        },
+        {
+          "line": "redesign",
+          "text": "dialog.close = () => { resolve(); outerResolve(false); };",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:62"
+        },
+        {
+          "line": "redesign",
+          "text": "queue = queue.then(() => showConfirmDialog(dialog, message, outerResolve));",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:88"
+        },
+        {
+          "line": "redesign",
+          "text": "providePlugin(\"alis.confirm\", {",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:94"
+        },
+        {
+          "line": "redesign",
+          "text": "G.Let(accepted, G.Call(G.Obj(scope.Objects.Confirm()), PathMembers.Required, \"ask\", G.Lit(_message)), awaits: true),",
+          "cite": "Alis.Reactive/PlanModel/Conditions/Condition.cs:504"
+        },
+        {
+          "line": "proposed",
+          "text": "FusionConfirm is declared on Component with its own vendor, ComponentVendor.Define(\"fusion-confirm\", objectPath: \"alisConfirm\", subscribe: \"addEventListener\", unsubscribe: \"removeEventListener\"), whose object is the confirm object the Fusion package's confirm code writes on its host, an EventTarget, with ElementId, alisConfirmDialog, and DefaultId; it mirrors the class FusionConfirm that Alis.Reactive.Assets/components/fusion/confirm.ts exports, whose ask(message: string | null, signal: AbortSignal) returns Promise<boolean>, so ALIS014 to ALIS019 check it as any declaration (N17.2).",
+          "doors": [
+            "M23.N2",
+            "M12.N1",
+            "N17.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Ask(message) is a MethodAsync<bool> whose message is any source, declared with the block's abort signal as its second argument, so the object's ask(message, signal) receives a signal the view does not write; a view reaches the confirm by its fixed id, pipeline.Component<FusionConfirm>(FusionConfirm.ElementId), and reads Ask's answer in a condition as any source.",
+          "doors": [
+            "M23.N2",
+            "N17.3",
+            "N17.5",
+            "M12.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The name stays FusionConfirm: EJ2 has no Confirm class, its object is the framework's question over a Dialog the confirm code makes, and FusionDialog is module 21's slice over EJ2's Dialog itself.",
+          "doors": [
+            "M23.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Html.FusionConfirmDialog() renders the host with the title Confirm and the buttons OK and Cancel, and Html.FusionConfirmDialog(title, ok, cancel) with the app's own texts; their form goes to gate 2.",
+          "doors": [
+            "M23.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Main's class, its id, its DefaultId and its constructor stay FusionConfirm's; its FusionConfirmExtensions and render helper are FusionConfirm's render helpers; its Show, Hide and SetContent, which open, close and write the Dialog outside an ask, leave for Ask.",
+          "doors": [
+            "M23.N2"
+          ]
+        }
+      ],
+      "nodes": [
+        "call",
+        "let",
+        "if",
+        "signal",
+        "element",
+        "lit",
+        "string",
+        "boolean"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirm.cs:11-16"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmExtensions.cs:12-50"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmHtmlExtensions.cs:12-24"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Conditions/Condition.cs:504"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:51-107"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/conditions/conditions.ts:119-128"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/fusion/confirm.ts:44-100"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.SandboxApp/Views/Shared/_Layout.cshtml:72"
+        }
+      ],
+      "core": [
+        "Q11",
+        "Q17",
+        "Q5",
+        "Q4"
+      ],
+      "meanings": [
+        {
+          "id": "M23.D3",
+          "meaning": "FusionConfirm.Ask(message) asks the user and answers true or false. The Fusion package's confirm code, on alis:mount of the host, makes the modal Dialog as both lines do, hidden, 400 pixels wide, with no animation and no close icon, closed by Escape, its target the body (Alis.Reactive.Assets/components/fusion/confirm.ts:75-83 at 65fdf118d), keeps an Escape pressed in it from the page beneath (Alis.Reactive.Assets/components/fusion/confirm.ts:67-69 at 65fdf118d), so a drawer behind stays open, and writes its object at the host's alisConfirm: an EventTarget whose ask(message, signal) waits behind the asks before it, as both lines' queue does, then writes the Dialog's header and content as elements whose textContent is the app's title and the message, its buttons with the app's texts as a span of the escaped text, calls dataBind and shows it (probe:ej2-dialog-ask-text). OK answers true; Cancel and Escape answer false, Escape through the Dialog's close (probe:ej2-dialog-ask-ok, probe:ej2-dialog-ask-escape). A message that reads nothing shows no message text, as D4.5 states for an element's text. An abort of the signal, when the run that asked ends (D17.11), closes its open ask and answers false, and takes a waiting ask out of the queue unshown; the answer runs nothing for an ended run (D11.3). On alis:unmount the confirm code answers each open and waiting ask false, destroys the Dialog and removes alisConfirm. The answer is a source a condition reads, awaited before the branch, where its term is reached (D8.6, D4.7). Both lines show a view's literal markup in a message as elements; the rewrite shows every message as text, the view's literals included: the gate 2 item M23.D1 names, with the same default."
+        },
+        {
+          "id": "M23.D4",
+          "meaning": "The confirm's title and its two button texts are the app's, written once by the render helper: Html.FusionConfirmDialog() writes Confirm, OK and Cancel, and Html.FusionConfirmDialog(title, ok, cancel) the texts the view gives, each the view's text as an attribute of the host, data-alis-title, data-alis-ok and data-alis-cancel, which the confirm code reads when it mounts and shows as text on every ask (probe:ej2-dialog-ask-text). A gate 2 item, with this form as its default."
+        }
+      ],
+      "oracle": "Syncfusion EJ2's Dialog, @syncfusion/ej2 33.1.47's ej2.min.js run in Chromium by spec/probes/ej2-payloads-m23.mjs with Playwright 1.63.0 under both lines' confirm options and sequence with real clicks and keys, its source read in @syncfusion/ej2-popups 33.1.44's dialog.js: a header, content or button text given as a string is written as sanitized HTML, an element given as the header or content is appended with its text, a primary button's click and Escape close the Dialog, and Escape raises its close.",
+      "checker": [
+        "core:Q11",
+        "core:Q17"
+      ],
+      "defects": [
+        {
+          "id": "M23.X2",
+          "rung": "behavior",
+          "defect": "Both lines set the confirm Dialog's content to the message string (Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:58 at 623dd4a27, Alis.Reactive.Assets/components/fusion/confirm.ts:51 at 65fdf118d), which EJ2 sanitizes and writes as HTML (probe:ej2-dialog-ask-markup), so markup in a message shows as elements. Both lines take a C# literal message (Alis.Reactive/PlanModel/Conditions/Condition.cs:504 at 65fdf118d); the rewrite's Ask takes any source."
+        },
+        {
+          "id": "M23.X3",
+          "rung": "behavior",
+          "defect": "Both lines write the confirm's title and buttons in fixed English, Confirm, OK and Cancel (Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:57, :62 and :66 at 623dd4a27, Alis.Reactive.Assets/components/fusion/confirm.ts:50, :55 and :59 at 65fdf118d), so an app in another language asks in English."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M23.X2",
+          "page": "A discharge page whose layout renders Html.FusionConfirmDialog(), with a question input and a Discharge button whose click asks FusionConfirm the question input's value and on a true answer sets outcome's text to Discharged.",
+          "gesture": "Type <b>Discharge Ada?</b> into the question input and click Discharge; then click OK.",
+          "outcome": "The dialog reads <b>Discharge Ada?</b> as typed with no bold element, and after OK outcome reads Discharged.",
+          "opposite": "Type Discharge Bo? and click Discharge: the dialog reads Discharge Bo?, and after OK outcome reads Discharged.",
+          "defect": "Both lines take the message as a C# literal only (Alis.Reactive/PlanModel/Conditions/Condition.cs:504 at 65fdf118d), so neither can ask the input's question, and both set the Dialog's content to the string, so a literal <b>Discharge Ada?</b> shows Discharge Ada? in bold with the tags gone (probe:ej2-dialog-ask-markup)."
+        },
+        {
+          "for": "M23.X3",
+          "page": "A care home layout in Spanish that renders Html.FusionConfirmDialog(\"Confirmar\", \"Sí\", \"Cancelar\"), and a resident page whose Discharge button asks FusionConfirm ¿Dar de alta a Ada? and sets outcome's text to Alta on a true answer and Sigue on a false one.",
+          "gesture": "Click Discharge; click Cancelar; click Discharge; press Escape; click Discharge; click Sí.",
+          "outcome": "Each time the dialog's title reads Confirmar and its buttons Sí and Cancelar; outcome reads Sigue after Cancelar and after Escape, and Alta after Sí.",
+          "opposite": "A layout that renders Html.FusionConfirmDialog(): the title reads Confirm and the buttons OK and Cancel.",
+          "defect": "Both lines write Confirm, OK and Cancel whatever the app's language, so the Spanish page asks under an English title with English buttons."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "FusionConfirm",
+          "verdict": "kept",
+          "as": [
+            "M23.N2"
+          ]
+        },
+        {
+          "door": "FusionConfirm.DefaultId.get -> string!",
+          "verdict": "kept",
+          "as": [
+            "M23.N2"
+          ]
+        },
+        {
+          "door": "FusionConfirm.FusionConfirm() -> void",
+          "verdict": "kept",
+          "as": [
+            "M23.N2"
+          ]
+        },
+        {
+          "door": "const FusionConfirm.ElementId = \"alisConfirmDialog\" -> string!",
+          "verdict": "kept",
+          "as": [
+            "M23.N2"
+          ]
+        },
+        {
+          "door": "FusionConfirmExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M23.N2"
+          ]
+        },
+        {
+          "door": "static FusionConfirmExtensions.FusionConfirmDialog(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html) -> Microsoft.AspNetCore.Html.IHtmlContent!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N2"
+          ]
+        },
+        {
+          "door": "static FusionConfirmExtensions.FusionConfirmDialog(this System.Web.Mvc.HtmlHelper! html) -> System.Web.IHtmlString!",
+          "verdict": "renamed",
+          "to": [
+            "M23.N2"
+          ]
+        },
+        {
+          "door": "static FusionConfirmExtensions.Hide<TModel>(this ComponentRef<FusionConfirm!, TModel!>! self) -> ComponentRef<FusionConfirm!, TModel!>!",
+          "verdict": "refused",
+          "reason": "Shows, hides or writes the confirm's Dialog outside an ask, where no button answers: main's confirm code sets the Dialog's buttons and its close only inside an ask (Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:59-69 at 623dd4a27), so a Dialog Show opens holds no button, or the buttons of an ask already answered, whose click answers a question no run awaits, and SetContent writes a C# literal the next ask replaces (Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmExtensions.cs:26-42 at 623dd4a27). A question is Ask, whose answer a condition reads; a dialog a view shows and hides itself is the Fusion Dialog slice of module 21; a dialog the view shows, hides or fills itself is FusionDialog's (M21.N18).",
+          "carriers": [
+            "M23.N2",
+            "M21.N18"
+          ]
+        },
+        {
+          "door": "static FusionConfirmExtensions.SetContent<TModel>(this ComponentRef<FusionConfirm!, TModel!>! self, string! message) -> ComponentRef<FusionConfirm!, TModel!>!",
+          "verdict": "refused",
+          "reason": "Shows, hides or writes the confirm's Dialog outside an ask, where no button answers: main's confirm code sets the Dialog's buttons and its close only inside an ask (Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:59-69 at 623dd4a27), so a Dialog Show opens holds no button, or the buttons of an ask already answered, whose click answers a question no run awaits, and SetContent writes a C# literal the next ask replaces (Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmExtensions.cs:26-42 at 623dd4a27). A question is Ask, whose answer a condition reads; a dialog a view shows and hides itself is the Fusion Dialog slice of module 21; a dialog the view shows, hides or fills itself is FusionDialog's (M21.N18).",
+          "carriers": [
+            "M23.N2",
+            "M21.N18"
+          ]
+        },
+        {
+          "door": "static FusionConfirmExtensions.Show<TModel>(this ComponentRef<FusionConfirm!, TModel!>! self) -> ComponentRef<FusionConfirm!, TModel!>!",
+          "verdict": "refused",
+          "reason": "Shows, hides or writes the confirm's Dialog outside an ask, where no button answers: main's confirm code sets the Dialog's buttons and its close only inside an ask (Alis.Reactive.Assets/runtime/components/fusion/confirm.ts:59-69 at 623dd4a27), so a Dialog Show opens holds no button, or the buttons of an ask already answered, whose click answers a question no run awaits, and SetContent writes a C# literal the next ask replaces (Alis.Reactive.Fusion/AppLevel/FusionConfirm/FusionConfirmExtensions.cs:26-42 at 623dd4a27). A question is Ask, whose answer a condition reads; a dialog a view shows and hides itself is the Fusion Dialog slice of module 21; a dialog the view shows, hides or fills itself is FusionDialog's (M21.N18).",
+          "carriers": [
+            "M23.N2",
+            "M21.N18"
+          ]
+        }
+      ]
+    }
+  ]
+}
