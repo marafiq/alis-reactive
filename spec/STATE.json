@@ -14,12 +14,27 @@
       "counts": {
         "cells": 118,
         "hosts": 18,
-        "placed": 404,
+        "placed": 408,
         "problems": 0,
         "rewrite": 0,
         "screens": 12
       },
-      "detail": "404 feature tests and 118 cell tests on 12 screens under 18 hosts; no core test loads Syncfusion, and a placed test reaches every D17.3 vendor kind on a conformance declaration",
+      "detail": "408 feature tests and 118 cell tests on 12 screens under 18 hosts; no core test loads Syncfusion, and a placed test reaches every D17.3 vendor kind on a conformance declaration",
+      "pass": true
+    },
+    "carriers": {
+      "counts": {
+        "cell": 54,
+        "check": 4,
+        "d_lines": 243,
+        "defect": 226,
+        "delivery": 1,
+        "invariant": 31,
+        "meanings": 50,
+        "probe": 73,
+        "uncarried": 0
+      },
+      "detail": "each of 243 D lines and 50 module meanings has at least one carrier that resolves: a defect naming it in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it",
       "pass": true
     },
     "claude_md": {
@@ -32,7 +47,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 365,
+        "defects": 369,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1302,7 +1317,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 555,
+        "defects": 563,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1520,7 +1535,7 @@
         "mapped": 8909,
         "matrix_promised": 118,
         "matrix_runs": 118,
-        "promises": 404,
+        "promises": 408,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1530,7 +1545,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 389,
+        "defects": 397,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1540,10 +1555,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 522,
+        "tests": 526,
         "units": 26
       },
-      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 3, U4 2, U5 4, U6 2, U7 8, U8 12, U9 114, U10 6, U11 76, U12 4, U13 40, U14 21, U15 47, U16 35, U17 3, U18 4, U19 14, U20 3, U21 25, U22 6, U23 23, U24 31, U25 36, U26 3",
+      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 3, U4 2, U5 4, U6 2, U7 8, U8 12, U9 114, U10 6, U11 77, U12 4, U13 40, U14 21, U15 47, U16 35, U17 3, U18 4, U19 14, U20 3, U21 25, U22 8, U23 24, U24 31, U25 36, U26 3",
       "pass": true
     },
     "survival": {
@@ -3612,8 +3627,8 @@
       "pass": true
     }
   },
-  "passed": 30,
-  "read_at_head": "b0d3477b4024665839a7b4e342565b2cf50c41c3",
+  "passed": 31,
+  "read_at_head": "9b43a200011d1a1b726080b0341cf77ab3508d93",
   "step": {
     "failing": [],
     "name": "End of session",
@@ -3621,5 +3636,5 @@
     "number": 13,
     "phase": "E"
   },
-  "total": 30
+  "total": 31
 }
