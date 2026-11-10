@@ -14,12 +14,12 @@
       "counts": {
         "cells": 118,
         "hosts": 18,
-        "placed": 408,
+        "placed": 409,
         "problems": 0,
         "rewrite": 0,
         "screens": 12
       },
-      "detail": "408 feature tests and 118 cell tests on 12 screens under 18 hosts; no core test loads Syncfusion, and a placed test reaches every D17.3 vendor kind on a conformance declaration",
+      "detail": "409 feature tests and 118 cell tests on 12 screens under 18 hosts; no core test loads Syncfusion, and a placed test reaches every D17.3 vendor kind on a conformance declaration",
       "pass": true
     },
     "carriers": {
@@ -1317,7 +1317,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 563,
+        "defects": 564,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1464,6 +1464,15 @@
       "detail": "grammar, plan.schema.json and schema.md agree on today's 33; proposed 51 equals Schema.tla's node set, one handler each; diff +answer,clock,data,each,file,held,listen,living,nothing,off,on,request,returned,signal,start,stop,stream,unbound,zone -try; 11 kinds have two handlers today",
       "pass": true
     },
+    "main_delta": {
+      "counts": {
+        "cited": 4,
+        "files": 4,
+        "members": 6
+      },
+      "detail": "each of 4 shipped files main changed from 623dd4a27 to 7b9e987cc is cited there by a feature's sentence, and each of 6 public members it added has a verdict",
+      "pass": true
+    },
     "main_surface": {
       "counts": {
         "Alis.Reactive net10.0": 372,
@@ -1496,7 +1505,7 @@
     },
     "module_cites": {
       "counts": {
-        "cites": 1033,
+        "cites": 1036,
         "unresolved": 0
       },
       "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
@@ -1519,8 +1528,8 @@
     },
     "probes": {
       "counts": {
-        "browser": 115,
-        "facts": 383,
+        "browser": 116,
+        "facts": 384,
         "net10": 121,
         "net48": 85,
         "node": 62
@@ -1535,7 +1544,7 @@
         "mapped": 8909,
         "matrix_promised": 118,
         "matrix_runs": 118,
-        "promises": 408,
+        "promises": 409,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1555,10 +1564,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 526,
+        "tests": 527,
         "units": 26
       },
-      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 3, U4 2, U5 4, U6 2, U7 8, U8 12, U9 114, U10 6, U11 77, U12 4, U13 40, U14 21, U15 47, U16 35, U17 3, U18 4, U19 14, U20 3, U21 25, U22 8, U23 24, U24 31, U25 36, U26 3",
+      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 3, U4 2, U5 4, U6 2, U7 8, U8 12, U9 114, U10 6, U11 77, U12 4, U13 40, U14 21, U15 47, U16 35, U17 3, U18 4, U19 14, U20 3, U21 25, U22 8, U23 24, U24 32, U25 36, U26 3",
       "pass": true
     },
     "survival": {
@@ -3627,8 +3636,8 @@
       "pass": true
     }
   },
-  "passed": 31,
-  "read_at_head": "8489a0fd8ef9f61c48ad63df20e0f2b28ea52562",
+  "passed": 32,
+  "read_at_head": "d350293b852d4e906db2e530bf264c781d283348",
   "step": {
     "failing": [],
     "name": "End of session",
@@ -3636,5 +3645,5 @@
     "number": 13,
     "phase": "E"
   },
-  "total": 31
+  "total": 32
 }
