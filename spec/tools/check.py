@@ -1692,7 +1692,7 @@ def native_declaration_problems(types):
     problems = []
     for declared in types.values():
         names = [member["js"] for member in declared["members"]]
-        problems += ([f"WardRound's {declared['name']} is a {declared['kind']!r} type"] if declared["kind"] not in MATRIX_TYPE_KINDS else [])
+        problems += ([f"ConformanceComponent's {declared['name']} is a {declared['kind']!r} type"] if declared["kind"] not in MATRIX_TYPE_KINDS else [])
         vendor = declared.get("vendor") or {}
         problems += ([f"the component {declared['name']} carries no vendor data"] if declared["kind"] == "component" and not all(is_prose(vendor.get(part)) for part in MATRIX_VENDOR) else [])
         problems += [f"{declared['name']} declares {name} twice" for name in sorted({name for name in names if names.count(name) > 1})]
@@ -1834,7 +1834,7 @@ def check_matrix():
     carried = sum(1 for entry in native["cells"].values() if "carriedBy" in entry)
     own = len(syncfusion.get("own", {}))
     detail = (f"MultiSelect covers {covered} of {total} cells from its .d.ts and tests {own} of them as its own; "
-              f"WardRound runs {total - carried} of {total}, and FusionMultiSelect carries the other {carried}")
+              f"ConformanceComponent runs {total - carried} of {total}, and FusionMultiSelect carries the other {carried}")
     return result(not problems, "; ".join(problems[:6]) or detail, cells=total, bullets=len(matrix["bullets"]),
                   syncfusion=covered, own=own, native=total - carried, carried=carried, problems=len(problems))
 
@@ -1948,7 +1948,7 @@ CHECKS = [
     ("module_cites", "every module.md cite resolves at the SHA it names", check_module_cites),
     ("fluent", "every module's sentences consistent", check_fluent),
     ("gate2", "owner gate 2: the fluent API", check_gate(2)),
-    ("matrix", "the conformance matrix, every cell run by FusionMultiSelect's or WardRound's declaration", check_matrix),
+    ("matrix", "the conformance matrix, every cell run by FusionMultiSelect's or ConformanceComponent's declaration", check_matrix),
     ("defects", "every defect on its highest rung, every core defect in a feature; no test for a type or analyzer defect", check_defects),
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),

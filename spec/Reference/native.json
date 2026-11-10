@@ -1,9 +1,9 @@
 {
-  "component": "WardRound",
-  "what": "the native reference: a plain-DOM input the framework's own test app writes in TypeScript and declares in C# as an app brings a component, on the core's public surface only (its own vendor data, alis:mount); a nurse's round of a ward, its value the resident at the bedside",
+  "component": "ConformanceComponent",
+  "what": "the native reference: a TypeScript component the framework's own test app writes and declares in C# as an app brings a component, on the core's public surface only (its own vendor data, alis:mount); each member is named for the framework capability it exercises, and the browser tests of every core module run on it",
   "input": {
-    "value": "WardRound.value",
-    "commit": "WardRound.change"
+    "value": "ConformanceComponent.value",
+    "commit": "ConformanceComponent.change"
   },
   "versions": [
     {
@@ -14,26 +14,26 @@
     {
       "id": "older",
       "differs": [
-        "WardRound.roundId"
+        "ConformanceComponent.readOnlyText"
       ],
       "why": "an older build that lacks a declared member (D4.1, X4.2)"
     },
     {
       "id": "promised",
       "differs": [
-        "WardRound.dueCount()",
-        "WardRound.doseDue.stock"
+        "ConformanceComponent.total()",
+        "ConformanceComponent.raised.count"
       ],
       "why": "a build that returns a promise from a method declared with Method<T> and hands a promise in a payload member declared as a value (D4.3), its drift from the declaration suppressed naming the test that arranges it (spec/CLAUDE.md, the vendor contract of 2026-11-07)"
     }
   ],
   "types": [
     {
-      "name": "WardRound",
+      "name": "ConformanceComponent",
       "kind": "component",
       "vendor": {
-        "name": "ward-round",
-        "objectPath": "wardRound",
+        "name": "conformance-component",
+        "objectPath": "conformanceComponent",
         "subscribe": "addEventListener",
         "unsubscribe": "removeEventListener",
         "payload": "the listener's first argument (D17.4)"
@@ -47,57 +47,127 @@
           "csharp": "Value"
         },
         {
-          "js": "title",
+          "js": "text",
           "kind": "property",
-          "ts": "title: string",
+          "ts": "text: string",
           "door": "Property<string>",
-          "csharp": "Title"
+          "csharp": "Text"
         },
         {
-          "js": "settings",
-          "kind": "liveObject",
-          "ts": "settings: RoundSettings",
-          "door": "LiveObject<RoundSettings>",
-          "csharp": "Settings",
-          "type": "RoundSettings"
-        },
-        {
-          "js": "ward",
-          "kind": "liveObject",
-          "ts": "ward: RoundWard",
-          "door": "LiveObject<RoundWard>",
-          "csharp": "Ward",
-          "type": "RoundWard"
-        },
-        {
-          "js": "beds",
-          "kind": "liveObjects",
-          "ts": "beds: RoundBed[]",
-          "door": "LiveObjects<RoundBed>",
-          "csharp": "Beds",
-          "type": "RoundBed"
-        },
-        {
-          "js": "chart",
+          "js": "count",
           "kind": "property",
-          "ts": "chart: RoundChart",
-          "door": "Property<RoundChart>",
-          "csharp": "Chart",
-          "type": "RoundChart"
+          "ts": "count: number",
+          "door": "Property<int>",
+          "csharp": "Count"
         },
         {
-          "js": "roundId",
+          "js": "amount",
+          "kind": "property",
+          "ts": "amount: number",
+          "door": "Property<decimal>",
+          "csharp": "Amount"
+        },
+        {
+          "js": "ratio",
+          "kind": "property",
+          "ts": "ratio: number",
+          "door": "Property<double>",
+          "csharp": "Ratio"
+        },
+        {
+          "js": "enabled",
+          "kind": "property",
+          "ts": "enabled: boolean",
+          "door": "Property<bool>",
+          "csharp": "Enabled"
+        },
+        {
+          "js": "day",
+          "kind": "property",
+          "ts": "day: Date",
+          "door": "Property<DateTime>",
+          "csharp": "Day"
+        },
+        {
+          "js": "nullableDay",
+          "kind": "property",
+          "ts": "nullableDay: Date | null",
+          "door": "Property<DateTime?>",
+          "csharp": "NullableDay"
+        },
+        {
+          "js": "moment",
+          "kind": "property",
+          "ts": "moment: Date",
+          "door": "Property<DateTimeOffset>",
+          "csharp": "Moment"
+        },
+        {
+          "js": "choice",
+          "kind": "property",
+          "ts": "choice: \"low\" | \"high\"",
+          "door": "Property<Choice>",
+          "csharp": "Choice"
+        },
+        {
+          "js": "nullableCount",
+          "kind": "property",
+          "ts": "nullableCount: number | null",
+          "door": "Property<int?>",
+          "csharp": "NullableCount"
+        },
+        {
+          "js": "optionalText",
+          "kind": "property",
+          "ts": "optionalText?: string",
+          "door": "Property<string?>",
+          "csharp": "OptionalText",
+          "optional": true
+        },
+        {
+          "js": "record",
+          "kind": "property",
+          "ts": "record: Record",
+          "door": "Property<Record>",
+          "csharp": "Record",
+          "type": "Record"
+        },
+        {
+          "js": "records",
+          "kind": "property",
+          "ts": "records: Record[]",
+          "door": "Property<List<Record>>",
+          "csharp": "Records",
+          "type": "Record"
+        },
+        {
+          "js": "nullableRecords",
+          "kind": "property",
+          "ts": "nullableRecords: Record[] | null",
+          "door": "Property<List<Record>?>",
+          "csharp": "NullableRecords",
+          "type": "Record"
+        },
+        {
+          "js": "readOnlyText",
           "kind": "readOnly",
-          "ts": "readonly roundId: string",
+          "ts": "readonly readOnlyText: string",
           "door": "ReadOnly<string>",
-          "csharp": "RoundId"
+          "csharp": "ReadOnlyText"
         },
         {
-          "js": "signature",
-          "kind": "writeOnly",
-          "ts": "set signature(nurse: string)",
-          "door": "WriteOnly<string>",
-          "csharp": "Signature"
+          "js": "readOnlyCount",
+          "kind": "readOnly",
+          "ts": "readonly readOnlyCount: number",
+          "door": "ReadOnly<int>",
+          "csharp": "ReadOnlyCount"
+        },
+        {
+          "js": "calls",
+          "kind": "readOnly",
+          "ts": "readonly calls: number",
+          "door": "ReadOnly<int>",
+          "csharp": "Calls"
         },
         {
           "js": "isDestroyed",
@@ -107,61 +177,200 @@
           "csharp": "IsDestroyed"
         },
         {
-          "js": "refresh",
-          "kind": "method",
-          "ts": "refresh(): void",
-          "door": "Method",
-          "csharp": "Refresh()"
+          "js": "writeOnlyText",
+          "kind": "writeOnly",
+          "ts": "set writeOnlyText(text: string)",
+          "door": "WriteOnly<string>",
+          "csharp": "WriteOnlyText"
         },
         {
-          "js": "dueCount",
+          "js": "outer",
+          "kind": "liveObject",
+          "ts": "outer: Outer",
+          "door": "LiveObject<Outer>",
+          "csharp": "Outer",
+          "type": "Outer"
+        },
+        {
+          "js": "nullableOuter",
+          "kind": "liveObject",
+          "ts": "nullableOuter: Outer | null",
+          "door": "LiveObject<Outer>",
+          "csharp": "NullableOuter",
+          "type": "Outer",
+          "nullable": true
+        },
+        {
+          "js": "items",
+          "kind": "liveObjects",
+          "ts": "items: Item[]",
+          "door": "LiveObjects<Item>",
+          "csharp": "Items",
+          "type": "Item"
+        },
+        {
+          "js": "nullableItems",
+          "kind": "liveObjects",
+          "ts": "nullableItems: Item[] | null",
+          "door": "LiveObjects<Item>",
+          "csharp": "NullableItems",
+          "type": "Item",
+          "nullable": true
+        },
+        {
+          "js": "answer",
+          "kind": "callback",
+          "ts": "answer: ((item: Item) => string) | null",
+          "door": "Callback<Item, string>",
+          "csharp": "Answer"
+        },
+        {
+          "js": "ping",
+          "kind": "method",
+          "ts": "ping(): void",
+          "door": "Method",
+          "csharp": "Ping()"
+        },
+        {
+          "js": "total",
           "kind": "methodValue",
-          "ts": "dueCount(): number",
+          "ts": "total(): number",
           "door": "Method<int>",
-          "csharp": "DueCount()"
+          "csharp": "Total()"
+        },
+        {
+          "js": "echo",
+          "kind": "methodValue",
+          "ts": "echo(text: string): string",
+          "door": "Method<string>",
+          "csharp": "Echo(Arg<string> text)"
+        },
+        {
+          "js": "snapshot",
+          "kind": "methodValue",
+          "ts": "snapshot(): Record",
+          "door": "Method<Record>",
+          "csharp": "Snapshot()",
+          "type": "Record"
         },
         {
           "js": "current",
           "kind": "returnedObject",
-          "ts": "current(): RoundBed",
-          "door": "ReturnedObject<RoundBed>",
+          "ts": "current(): Item",
+          "door": "ReturnedObject<Item>",
           "csharp": "Current()",
-          "type": "RoundBed"
+          "type": "Item"
         },
         {
-          "js": "save",
+          "js": "maybeItem",
+          "kind": "returnedObject",
+          "ts": "maybeItem(): Item | null",
+          "door": "ReturnedObject<Item>",
+          "csharp": "MaybeItem()",
+          "type": "Item",
+          "nullable": true
+        },
+        {
+          "js": "matching",
+          "kind": "returnedObjects",
+          "ts": "matching(): Item[]",
+          "door": "ReturnedObjects<Item>",
+          "csharp": "Matching()",
+          "type": "Item"
+        },
+        {
+          "js": "self",
+          "kind": "returnedObject",
+          "ts": "self(): ConformanceComponent",
+          "door": "ReturnedObject<ConformanceComponent>",
+          "csharp": "Self()",
+          "type": "ConformanceComponent"
+        },
+        {
+          "js": "settle",
           "kind": "methodAsync",
-          "ts": "save(): Promise<void>",
+          "ts": "settle(): Promise<void>",
           "door": "MethodAsync",
-          "csharp": "Save()"
+          "csharp": "Settle()"
         },
         {
-          "js": "fetchDue",
+          "js": "settleCount",
           "kind": "methodAsyncValue",
-          "ts": "fetchDue(): Promise<number>",
+          "ts": "settleCount(): Promise<number>",
           "door": "MethodAsync<int>",
-          "csharp": "FetchDue()"
+          "csharp": "SettleCount()"
         },
         {
-          "js": "note",
-          "kind": "method",
-          "ts": "note(text: string): void",
-          "door": "Method",
-          "csharp": "Note(Arg<string> text)"
+          "js": "settleCheck",
+          "kind": "methodAsyncValue",
+          "ts": "settleCheck(): Promise<boolean>",
+          "door": "MethodAsync<bool>",
+          "csharp": "SettleCheck()"
         },
         {
-          "js": "admit",
-          "kind": "method",
-          "ts": "admit(admission: RoundAdmission): void",
-          "door": "Method",
-          "csharp": "Admit(Arg<RoundAdmission> admission)"
+          "js": "settleRecord",
+          "kind": "methodAsyncValue",
+          "ts": "settleRecord(): Promise<Record>",
+          "door": "MethodAsync<Record>",
+          "csharp": "SettleRecord()",
+          "type": "Record"
         },
         {
-          "js": "admitAll",
+          "js": "settleMaybe",
+          "kind": "methodAsyncValue",
+          "ts": "settleMaybe(): Promise<Record | null>",
+          "door": "MethodAsync<Record?>",
+          "csharp": "SettleMaybe()",
+          "type": "Record"
+        },
+        {
+          "js": "log",
           "kind": "method",
-          "ts": "admitAll(admissions: RoundAdmission[]): void",
+          "ts": "log(text: string): void",
           "door": "Method",
-          "csharp": "AdmitAll(Arg<IReadOnlyList<RoundAdmission>> admissions)"
+          "csharp": "Log(Arg<string> text)"
+        },
+        {
+          "js": "add",
+          "kind": "method",
+          "ts": "add(amount: number): void",
+          "door": "Method",
+          "csharp": "Add(Arg<decimal> amount)"
+        },
+        {
+          "js": "takeNullable",
+          "kind": "method",
+          "ts": "takeNullable(count: number | null): void",
+          "door": "Method",
+          "csharp": "TakeNullable(Arg<int?> count)"
+        },
+        {
+          "js": "takeDay",
+          "kind": "method",
+          "ts": "takeDay(day: Date): void",
+          "door": "Method",
+          "csharp": "TakeDay(Arg<DateTime> day)"
+        },
+        {
+          "js": "takeMoment",
+          "kind": "method",
+          "ts": "takeMoment(moment: Date): void",
+          "door": "Method",
+          "csharp": "TakeMoment(Arg<DateTimeOffset> moment)"
+        },
+        {
+          "js": "take",
+          "kind": "method",
+          "ts": "take(record: Record): void",
+          "door": "Method",
+          "csharp": "Take(Arg<Record> record)"
+        },
+        {
+          "js": "takeAll",
+          "kind": "method",
+          "ts": "takeAll(records: Record[]): void",
+          "door": "Method",
+          "csharp": "TakeAll(Arg<IReadOnlyList<Record>> records)"
         },
         {
           "js": "destroy",
@@ -173,158 +382,355 @@
         {
           "js": "change",
           "kind": "event",
-          "ts": "change: the listener's first argument, RoundChange",
-          "door": "Event<RoundChange>",
+          "ts": "change: the listener's first argument, Change",
+          "door": "Event<Change>",
           "csharp": "Change",
-          "type": "RoundChange"
+          "type": "Change"
         },
         {
-          "js": "doseDue",
+          "js": "commit",
           "kind": "event",
-          "ts": "doseDue: the listener's first argument, DoseDue",
-          "door": "Event<DoseDue>",
-          "csharp": "DoseDue",
-          "type": "DoseDue"
+          "ts": "commit: the listener's first argument, Change",
+          "door": "Event<Change>",
+          "csharp": "Commit",
+          "type": "Change"
         },
         {
-          "js": "pumpAttached",
+          "js": "raised",
           "kind": "event",
-          "ts": "pumpAttached: the listener's first argument, the BedsidePump attached at the bedside",
-          "door": "Event<BedsidePump>",
-          "csharp": "PumpAttached",
-          "type": "BedsidePump"
+          "ts": "raised: the listener's first argument, Raised",
+          "door": "Event<Raised>",
+          "csharp": "Raised",
+          "type": "Raised"
+        },
+        {
+          "js": "handed",
+          "kind": "event",
+          "ts": "handed: the listener's first argument, the ConformancePeer it hands",
+          "door": "Event<ConformancePeer>",
+          "csharp": "Handed",
+          "type": "ConformancePeer"
         }
       ]
     },
     {
-      "name": "BedsidePump",
+      "name": "ConformancePeer",
       "kind": "component",
       "vendor": {
-        "name": "bedside-pump",
-        "objectPath": "bedsidePump",
+        "name": "conformance-peer",
+        "objectPath": "conformancePeer",
         "subscribe": "addEventListener",
         "unsubscribe": "removeEventListener",
         "payload": "the listener's first argument (D17.4)"
       },
       "members": [
         {
-          "js": "rate",
+          "js": "ratio",
           "kind": "property",
-          "ts": "rate: number",
+          "ts": "ratio: number",
           "door": "Property<double>",
-          "csharp": "Rate"
+          "csharp": "Ratio"
+        },
+        {
+          "js": "text",
+          "kind": "property",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "change",
+          "kind": "event",
+          "ts": "change: the listener's first argument, Change",
+          "door": "Event<Change>",
+          "csharp": "Change",
+          "type": "Change"
         }
       ]
     },
     {
-      "name": "RoundSettings",
+      "name": "Outer",
       "kind": "live",
       "members": [
         {
-          "js": "pageSize",
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "text",
           "kind": "property",
-          "ts": "pageSize: number",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "count",
+          "kind": "property",
+          "ts": "count: number",
           "door": "Property<int>",
-          "csharp": "PageSize"
+          "csharp": "Count"
+        },
+        {
+          "js": "middle",
+          "kind": "liveObject",
+          "ts": "readonly middle: Middle",
+          "door": "LiveObject<Middle>",
+          "csharp": "Middle",
+          "type": "Middle"
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
         }
       ]
     },
     {
-      "name": "RoundWard",
+      "name": "Middle",
       "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "text",
+          "kind": "property",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "inner",
+          "kind": "liveObject",
+          "ts": "readonly inner: Inner",
+          "door": "LiveObject<Inner>",
+          "csharp": "Inner",
+          "type": "Inner"
+        }
+      ]
+    },
+    {
+      "name": "Inner",
+      "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "text",
+          "kind": "property",
+          "ts": "text: string",
+          "door": "Property<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        },
+        {
+          "js": "settle",
+          "kind": "methodAsyncValue",
+          "ts": "settle(): Promise<string>",
+          "door": "MethodAsync<string>",
+          "csharp": "Settle()"
+        }
+      ]
+    },
+    {
+      "name": "Item",
+      "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "active",
+          "kind": "readOnly",
+          "ts": "readonly active: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "Active"
+        },
+        {
+          "js": "value",
+          "kind": "property",
+          "ts": "value: number",
+          "door": "Property<int>",
+          "csharp": "Value"
+        },
+        {
+          "js": "optionalCount",
+          "kind": "property",
+          "ts": "optionalCount?: number",
+          "door": "Property<int?>",
+          "csharp": "OptionalCount",
+          "optional": true
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        },
+        {
+          "js": "settle",
+          "kind": "methodAsyncValue",
+          "ts": "settle(): Promise<string>",
+          "door": "MethodAsync<string>",
+          "csharp": "Settle()"
+        }
+      ]
+    },
+    {
+      "name": "Held",
+      "kind": "live",
+      "members": [
+        {
+          "js": "writeOnlyText",
+          "kind": "writeOnly",
+          "ts": "set writeOnlyText(text: string)",
+          "door": "WriteOnly<string>",
+          "csharp": "WriteOnlyText"
+        },
+        {
+          "js": "items",
+          "kind": "liveObjects",
+          "ts": "readonly items: Item[]",
+          "door": "LiveObjects<Item>",
+          "csharp": "Items",
+          "type": "Item"
+        },
+        {
+          "js": "total",
+          "kind": "methodValue",
+          "ts": "total(): number",
+          "door": "Method<int>",
+          "csharp": "Total()"
+        },
+        {
+          "js": "settleCount",
+          "kind": "methodAsyncValue",
+          "ts": "settleCount(): Promise<number>",
+          "door": "MethodAsync<int>",
+          "csharp": "SettleCount()"
+        },
+        {
+          "js": "itemAt",
+          "kind": "returnedObject",
+          "ts": "itemAt(position: number): Item",
+          "door": "ReturnedObject<Item>",
+          "csharp": "ItemAt(Arg<int> position)",
+          "type": "Item"
+        },
+        {
+          "js": "matching",
+          "kind": "returnedObjects",
+          "ts": "matching(): Item[]",
+          "door": "ReturnedObjects<Item>",
+          "csharp": "Matching()",
+          "type": "Item"
+        },
+        {
+          "js": "answer",
+          "kind": "callback",
+          "ts": "answer: ((item: Item) => string) | null",
+          "door": "Callback<Item, string>",
+          "csharp": "Answer"
+        },
+        {
+          "js": "item",
+          "kind": "liveObject",
+          "ts": "readonly item: Item",
+          "door": "LiveObject<Item>",
+          "csharp": "Item",
+          "type": "Item"
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        }
+      ]
+    },
+    {
+      "name": "Record",
+      "kind": "data",
       "members": [
         {
           "js": "name",
           "kind": "property",
           "ts": "name: string",
-          "door": "Property<string>",
+          "door": "string",
+          "csharp": "Name"
+        },
+        {
+          "js": "code",
+          "kind": "property",
+          "ts": "code: string",
+          "door": "string",
+          "csharp": "Code"
+        },
+        {
+          "js": "count",
+          "kind": "property",
+          "ts": "count: number",
+          "door": "int",
+          "csharp": "Count"
+        },
+        {
+          "js": "day",
+          "kind": "property",
+          "ts": "day: string",
+          "door": "DateTime",
+          "csharp": "Day"
+        },
+        {
+          "js": "detail",
+          "kind": "property",
+          "ts": "detail: Detail",
+          "door": "Detail",
+          "csharp": "Detail",
+          "type": "Detail"
+        }
+      ]
+    },
+    {
+      "name": "Detail",
+      "kind": "data",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
           "csharp": "Name"
         }
       ]
     },
     {
-      "name": "RoundBed",
-      "kind": "live",
-      "members": [
-        {
-          "js": "resident",
-          "kind": "readOnly",
-          "ts": "readonly resident: string",
-          "door": "ReadOnly<string>",
-          "csharp": "Resident"
-        },
-        {
-          "js": "occupied",
-          "kind": "readOnly",
-          "ts": "readonly occupied: boolean",
-          "door": "ReadOnly<bool>",
-          "csharp": "Occupied"
-        },
-        {
-          "js": "markSeen",
-          "kind": "method",
-          "ts": "markSeen(): void",
-          "door": "Method",
-          "csharp": "MarkSeen()"
-        }
-      ]
-    },
-    {
-      "name": "RoundChart",
-      "kind": "data",
-      "members": [
-        {
-          "js": "resident",
-          "kind": "property",
-          "ts": "resident: string",
-          "door": "string",
-          "csharp": "Resident"
-        },
-        {
-          "js": "allergy",
-          "kind": "property",
-          "ts": "allergy: ChartAllergy",
-          "door": "ChartAllergy",
-          "csharp": "Allergy",
-          "type": "ChartAllergy"
-        }
-      ]
-    },
-    {
-      "name": "ChartAllergy",
-      "kind": "data",
-      "members": [
-        {
-          "js": "severity",
-          "kind": "property",
-          "ts": "severity: string",
-          "door": "string",
-          "csharp": "Severity"
-        }
-      ]
-    },
-    {
-      "name": "RoundAdmission",
-      "kind": "data",
-      "members": [
-        {
-          "js": "resident",
-          "kind": "property",
-          "ts": "resident: string",
-          "door": "string",
-          "csharp": "Resident"
-        },
-        {
-          "js": "bed",
-          "kind": "property",
-          "ts": "bed: string",
-          "door": "string",
-          "csharp": "Bed"
-        }
-      ]
-    },
-    {
-      "name": "RoundChange",
+      "name": "Change",
       "kind": "payload",
       "members": [
         {
@@ -351,287 +757,142 @@
       ]
     },
     {
-      "name": "DoseDue",
+      "name": "Raised",
       "kind": "payload",
       "members": [
         {
-          "js": "isUrgent",
+          "js": "flag",
           "kind": "readOnly",
-          "ts": "readonly isUrgent: boolean",
+          "ts": "readonly flag: boolean",
           "door": "ReadOnly<bool>",
-          "csharp": "IsUrgent"
+          "csharp": "Flag"
         },
         {
-          "js": "resident",
-          "kind": "liveObject",
-          "ts": "readonly resident: DueResident",
-          "door": "LiveObject<DueResident>",
-          "csharp": "Resident",
-          "type": "DueResident"
-        },
-        {
-          "js": "doses",
-          "kind": "liveObjects",
-          "ts": "readonly doses: RoundDose[]",
-          "door": "LiveObjects<RoundDose>",
-          "csharp": "Doses",
-          "type": "RoundDose"
-        },
-        {
-          "js": "snooze",
-          "kind": "method",
-          "ts": "snooze(): void",
-          "door": "Method",
-          "csharp": "Snooze()"
-        },
-        {
-          "js": "stock",
+          "js": "count",
           "kind": "readOnly",
-          "ts": "readonly stock: number",
+          "ts": "readonly count: number",
           "door": "ReadOnly<int>",
-          "csharp": "Stock"
+          "csharp": "Count"
         },
         {
-          "js": "note",
+          "js": "text",
+          "kind": "readOnly",
+          "ts": "readonly text: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Text"
+        },
+        {
+          "js": "nullableText",
+          "kind": "readOnly",
+          "ts": "readonly nullableText: string | null",
+          "door": "ReadOnly<string?>",
+          "csharp": "NullableText"
+        },
+        {
+          "js": "optionalText",
+          "kind": "readOnly",
+          "ts": "readonly optionalText?: string",
+          "door": "ReadOnly<string?>",
+          "csharp": "OptionalText",
+          "optional": true
+        },
+        {
+          "js": "day",
+          "kind": "readOnly",
+          "ts": "readonly day: string",
+          "door": "ReadOnly<DateTime>",
+          "csharp": "Day"
+        },
+        {
+          "js": "record",
+          "kind": "readOnly",
+          "ts": "readonly record: Record",
+          "door": "ReadOnly<Record>",
+          "csharp": "Record",
+          "type": "Record"
+        },
+        {
+          "js": "writeOnlyText",
           "kind": "writeOnly",
-          "ts": "set note(text: string)",
+          "ts": "set writeOnlyText(text: string)",
           "door": "WriteOnly<string>",
-          "csharp": "Note"
+          "csharp": "WriteOnlyText"
         },
         {
-          "js": "alarms",
-          "kind": "liveObjects",
-          "ts": "readonly alarms: RoundAlarm[]",
-          "door": "LiveObjects<RoundAlarm>",
-          "csharp": "Alarms",
-          "type": "RoundAlarm"
-        },
-        {
-          "js": "remaining",
-          "kind": "methodValue",
-          "ts": "remaining(): number",
-          "door": "Method<int>",
-          "csharp": "Remaining()"
-        },
-        {
-          "js": "lookup",
-          "kind": "methodAsyncValue",
-          "ts": "lookup(): Promise<string>",
-          "door": "MethodAsync<string>",
-          "csharp": "Lookup()"
-        },
-        {
-          "js": "nextDose",
-          "kind": "returnedObject",
-          "ts": "nextDose(): RoundDose",
-          "door": "ReturnedObject<RoundDose>",
-          "csharp": "NextDose()",
-          "type": "RoundDose"
-        },
-        {
-          "js": "missed",
-          "kind": "returnedObjects",
-          "ts": "missed(): RoundDose[]",
-          "door": "ReturnedObjects<RoundDose>",
-          "csharp": "Missed()",
-          "type": "RoundDose"
-        },
-        {
-          "js": "signature",
-          "kind": "callback",
-          "ts": "signature: ((dose: RoundDose) => string) | null",
-          "door": "Callback<RoundDose, string>",
-          "csharp": "Signature"
-        },
-        {
-          "js": "trolley",
+          "js": "outer",
           "kind": "liveObject",
-          "ts": "readonly trolley: DoseTrolley",
-          "door": "LiveObject<DoseTrolley>",
-          "csharp": "Trolley",
-          "type": "DoseTrolley"
+          "ts": "readonly outer: Outer",
+          "door": "LiveObject<Outer>",
+          "csharp": "Outer",
+          "type": "Outer"
         },
         {
-          "js": "pump",
+          "js": "items",
+          "kind": "liveObjects",
+          "ts": "readonly items: Item[]",
+          "door": "LiveObjects<Item>",
+          "csharp": "Items",
+          "type": "Item"
+        },
+        {
+          "js": "act",
+          "kind": "method",
+          "ts": "act(): void",
+          "door": "Method",
+          "csharp": "Act()"
+        },
+        {
+          "js": "total",
+          "kind": "methodValue",
+          "ts": "total(): number",
+          "door": "Method<int>",
+          "csharp": "Total()"
+        },
+        {
+          "js": "settle",
+          "kind": "methodAsyncValue",
+          "ts": "settle(): Promise<string>",
+          "door": "MethodAsync<string>",
+          "csharp": "Settle()"
+        },
+        {
+          "js": "current",
+          "kind": "returnedObject",
+          "ts": "current(): Item",
+          "door": "ReturnedObject<Item>",
+          "csharp": "Current()",
+          "type": "Item"
+        },
+        {
+          "js": "matching",
+          "kind": "returnedObjects",
+          "ts": "matching(): Item[]",
+          "door": "ReturnedObjects<Item>",
+          "csharp": "Matching()",
+          "type": "Item"
+        },
+        {
+          "js": "answer",
+          "kind": "callback",
+          "ts": "answer: ((item: Item) => string) | null",
+          "door": "Callback<Item, string>",
+          "csharp": "Answer"
+        },
+        {
+          "js": "held",
+          "kind": "liveObject",
+          "ts": "readonly held: Held",
+          "door": "LiveObject<Held>",
+          "csharp": "Held",
+          "type": "Held"
+        },
+        {
+          "js": "peer",
           "kind": "component",
-          "ts": "readonly pump: BedsidePump",
-          "door": "LiveObject<BedsidePump>",
-          "csharp": "Pump",
-          "type": "BedsidePump"
-        }
-      ]
-    },
-    {
-      "name": "DueResident",
-      "kind": "live",
-      "members": [
-        {
-          "js": "name",
-          "kind": "readOnly",
-          "ts": "readonly name: string",
-          "door": "ReadOnly<string>",
-          "csharp": "Name"
-        },
-        {
-          "js": "room",
-          "kind": "liveObject",
-          "ts": "readonly room: DueRoom",
-          "door": "LiveObject<DueRoom>",
-          "csharp": "Room",
-          "type": "DueRoom"
-        }
-      ]
-    },
-    {
-      "name": "DueRoom",
-      "kind": "live",
-      "members": [
-        {
-          "js": "number",
-          "kind": "readOnly",
-          "ts": "readonly number: string",
-          "door": "ReadOnly<string>",
-          "csharp": "Number"
-        }
-      ]
-    },
-    {
-      "name": "DoseTrolley",
-      "kind": "live",
-      "members": [
-        {
-          "js": "label",
-          "kind": "writeOnly",
-          "ts": "set label(text: string)",
-          "door": "WriteOnly<string>",
-          "csharp": "Label"
-        },
-        {
-          "js": "drawers",
-          "kind": "liveObjects",
-          "ts": "readonly drawers: TrolleyDrawer[]",
-          "door": "LiveObjects<TrolleyDrawer>",
-          "csharp": "Drawers",
-          "type": "TrolleyDrawer"
-        },
-        {
-          "js": "stockCount",
-          "kind": "methodValue",
-          "ts": "stockCount(): number",
-          "door": "Method<int>",
-          "csharp": "StockCount()"
-        },
-        {
-          "js": "weigh",
-          "kind": "methodAsyncValue",
-          "ts": "weigh(): Promise<number>",
-          "door": "MethodAsync<int>",
-          "csharp": "Weigh()"
-        },
-        {
-          "js": "drawerAt",
-          "kind": "returnedObject",
-          "ts": "drawerAt(position: number): TrolleyDrawer",
-          "door": "ReturnedObject<TrolleyDrawer>",
-          "csharp": "DrawerAt(Arg<int> position)",
-          "type": "TrolleyDrawer"
-        },
-        {
-          "js": "emptyDrawers",
-          "kind": "returnedObjects",
-          "ts": "emptyDrawers(): TrolleyDrawer[]",
-          "door": "ReturnedObjects<TrolleyDrawer>",
-          "csharp": "EmptyDrawers()",
-          "type": "TrolleyDrawer"
-        },
-        {
-          "js": "signature",
-          "kind": "callback",
-          "ts": "signature: ((dose: RoundDose) => string) | null",
-          "door": "Callback<RoundDose, string>",
-          "csharp": "Signature"
-        },
-        {
-          "js": "drawer",
-          "kind": "liveObject",
-          "ts": "readonly drawer: TrolleyDrawer",
-          "door": "LiveObject<TrolleyDrawer>",
-          "csharp": "Drawer",
-          "type": "TrolleyDrawer"
-        },
-        {
-          "js": "sign",
-          "kind": "method",
-          "ts": "sign(): void",
-          "door": "Method",
-          "csharp": "Sign()"
-        }
-      ]
-    },
-    {
-      "name": "TrolleyDrawer",
-      "kind": "live",
-      "members": [
-        {
-          "js": "label",
-          "kind": "readOnly",
-          "ts": "readonly label: string",
-          "door": "ReadOnly<string>",
-          "csharp": "Label"
-        },
-        {
-          "js": "unlock",
-          "kind": "methodAsyncValue",
-          "ts": "unlock(): Promise<string>",
-          "door": "MethodAsync<string>",
-          "csharp": "Unlock()"
-        }
-      ]
-    },
-    {
-      "name": "RoundDose",
-      "kind": "live",
-      "members": [
-        {
-          "js": "drug",
-          "kind": "readOnly",
-          "ts": "readonly drug: string",
-          "door": "ReadOnly<string>",
-          "csharp": "Drug"
-        },
-        {
-          "js": "given",
-          "kind": "readOnly",
-          "ts": "readonly given: boolean",
-          "door": "ReadOnly<bool>",
-          "csharp": "Given"
-        },
-        {
-          "js": "give",
-          "kind": "method",
-          "ts": "give(): void",
-          "door": "Method",
-          "csharp": "Give()"
-        }
-      ]
-    },
-    {
-      "name": "RoundAlarm",
-      "kind": "live",
-      "members": [
-        {
-          "js": "reason",
-          "kind": "readOnly",
-          "ts": "readonly reason: string",
-          "door": "ReadOnly<string>",
-          "csharp": "Reason"
-        },
-        {
-          "js": "acknowledge",
-          "kind": "method",
-          "ts": "acknowledge(): void",
-          "door": "Method",
-          "csharp": "Acknowledge()"
+          "ts": "readonly peer: ConformancePeer",
+          "door": "LiveObject<ConformancePeer>",
+          "csharp": "Peer",
+          "type": "ConformancePeer"
         }
       ]
     }
@@ -639,394 +900,394 @@
   "cells": {
     "prop.scalar.read": {
       "members": [
-        "WardRound.title"
+        "ConformanceComponent.text"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.Title.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Show button whose click sets shown's text to conformance.Text.",
         "gesture": "Click Show.",
-        "outcome": "shown reads North round.",
-        "opposite": "On a round titled South round the same click shows South round.",
-        "defect": "The read names the member Title, its C# name, so the component's title reads nothing and shown stays empty."
+        "outcome": "shown reads Alpha.",
+        "opposite": "On a component whose text is Beta the same click shows Beta.",
+        "defect": "The read names the member Text, its C# name, so the component's text reads nothing and shown stays empty."
       }
     },
     "prop.scalar.write": {
       "members": [
-        "WardRound.title"
+        "ConformanceComponent.text"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Rename button whose click sets round.Title to \"North round, late shift\".",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Rename button whose click sets conformance.Text to \"Alpha, renamed\".",
         "gesture": "Click Rename.",
-        "outcome": "The round's heading reads North round, late shift.",
-        "opposite": "Before the click the heading reads North round.",
-        "defect": "The set writes title on the host element instead of the component the vendor's objectPath finds, so the heading keeps North round."
+        "outcome": "The component's heading reads Alpha, renamed.",
+        "opposite": "Before the click the heading reads Alpha.",
+        "defect": "The set writes text on the host element instead of the component the vendor's objectPath finds, so the heading keeps Alpha."
       }
     },
     "prop.dotted.read": {
       "members": [
-        "WardRound.settings.pageSize"
+        "ConformanceComponent.outer.count"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown listing 8 beds a page (settings.pageSize 8), and a Show button whose click sets shown's text to round.Settings.PageSize.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose outer object's count is 8 (outer.count 8), and a Show button whose click sets shown's text to conformance.Outer.Count.",
         "gesture": "Click Show.",
         "outcome": "shown reads 8.",
-        "opposite": "On a round listing 12 beds a page the same click shows 12.",
-        "defect": "The read takes settings.pageSize as one member name, so it reads nothing and shown stays empty."
+        "opposite": "On a component whose outer count is 12 the same click shows 12.",
+        "defect": "The read takes outer.count as one member name, so it reads nothing and shown stays empty."
       }
     },
     "prop.dotted.write": {
       "members": [
-        "WardRound.settings.pageSize"
+        "ConformanceComponent.outer.count"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown of 10 beds listing 8 a page, and a Page by 4 button whose click sets round.Settings.PageSize to 4.",
-        "gesture": "Click Page by 4.",
-        "outcome": "The round's pager reads Beds 1 to 4 of 10.",
-        "opposite": "Before the click the pager reads Beds 1 to 8 of 10.",
-        "defect": "The write sets a member named settings.pageSize on the component, so its settings keep 8 and the pager reads Beds 1 to 8 of 10."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose outer object's count is 8, which the component shows as Outer count: 8, and a Set to 4 button whose click sets conformance.Outer.Count to 4.",
+        "gesture": "Click Set to 4.",
+        "outcome": "The component's outer line reads Outer count: 4.",
+        "opposite": "Before the click it reads Outer count: 8.",
+        "defect": "The write sets a member named outer.count on the component, so its outer object keeps 8 and the line reads Outer count: 8."
       }
     },
     "prop.object.memberRead": {
       "members": [
-        "WardRound.ward.name"
+        "ConformanceComponent.outer.text"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.Ward.Name.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose outer object's text is Gamma, and a Show button whose click sets shown's text to conformance.Outer.Text.",
         "gesture": "Click Show.",
-        "outcome": "shown reads North.",
-        "opposite": "On the South ward's round the same click shows South.",
-        "defect": "The read stops at ward and sets the object as text, so shown reads [object Object]."
+        "outcome": "shown reads Gamma.",
+        "opposite": "On a component whose outer text is Delta the same click shows Delta.",
+        "defect": "The read stops at outer and sets the object as text, so shown reads [object Object]."
       }
     },
     "prop.object.memberWrite": {
       "members": [
-        "WardRound.ward.name"
+        "ConformanceComponent.outer.text"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Rename ward button whose click sets round.Ward.Name to \"North East\".",
-        "gesture": "Click Rename ward.",
-        "outcome": "The round's ward line reads Ward: North East.",
-        "opposite": "Before the click it reads Ward: North.",
-        "defect": "The write lands on round.name instead of round.ward.name, so the ward line keeps Ward: North."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose outer object's text is Gamma, which the component shows as Outer: Gamma, and a Rename outer button whose click sets conformance.Outer.Text to \"Gamma, renamed\".",
+        "gesture": "Click Rename outer.",
+        "outcome": "The component's outer line reads Outer: Gamma, renamed.",
+        "opposite": "Before the click it reads Outer: Gamma.",
+        "defect": "The write lands on the component's own text instead of outer.text, so the outer line keeps Outer: Gamma."
       }
     },
     "prop.list.lambda": {
       "members": [
-        "WardRound.beds.occupied"
+        "ConformanceComponent.items.active"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown of 4 beds, 3 occupied, and a Count button whose click sets shown's text to round.Beds.Count(b => b.Occupied).",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, of 4 items, 3 active, and a Count button whose click sets shown's text to conformance.Items.Count(i => i.Active).",
         "gesture": "Click Count.",
         "outcome": "shown reads 3.",
-        "opposite": "On a round of 4 beds with 1 occupied the same click shows 1.",
-        "defect": "The lambda reads each bed's member by its C# name Occupied, so no bed counts and shown reads 0."
+        "opposite": "On a component of 4 items with 1 active the same click shows 1.",
+        "defect": "The lambda reads each item's member by its C# name Active, so no item counts and shown reads 0."
       }
     },
     "prop.readOnly": {
       "members": [
-        "WardRound.roundId"
+        "ConformanceComponent.readOnlyText"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown whose round id is NR-2026-11-10, and a Show button whose click sets shown's text to round.RoundId.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose read-only text is RO-2026-11-10, and a Show button whose click sets shown's text to conformance.ReadOnlyText.",
         "gesture": "Click Show.",
-        "outcome": "shown reads NR-2026-11-10.",
-        "opposite": "On the next day's round the same click shows NR-2026-11-11.",
-        "defect": "The read of a ReadOnly member is written as a call of roundId, which is no function, so the pipeline stops and shown stays empty."
+        "outcome": "shown reads RO-2026-11-10.",
+        "opposite": "On a component whose read-only text is RO-2026-11-11 the same click shows RO-2026-11-11.",
+        "defect": "The read of a ReadOnly member is written as a call of readOnlyText, which is no function, so the pipeline stops and shown stays empty."
       }
     },
     "prop.writeOnly": {
       "members": [
-        "WardRound.signature"
+        "ConformanceComponent.writeOnlyText"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Sign button whose click sets round.Signature to \"Nurse Okafor\".",
-        "gesture": "Click Sign.",
-        "outcome": "The round's signature line reads Signed by Nurse Okafor.",
-        "opposite": "Before the click it reads Unsigned.",
-        "defect": "The set reads the member before writing it, and a write-only member has no getter, so the step stops and the line reads Unsigned."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Write button whose click sets conformance.WriteOnlyText to \"Kappa\".",
+        "gesture": "Click Write.",
+        "outcome": "The component's write-only line reads Written Kappa.",
+        "opposite": "Before the click it reads Unwritten.",
+        "defect": "The set reads the member before writing it, and a write-only member has no getter, so the step stops and the line reads Unwritten."
       }
     },
     "method.void": {
       "members": [
-        "WardRound.refresh()"
+        "ConformanceComponent.ping()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Refresh button whose click calls round.Refresh().",
-        "gesture": "Click Refresh.",
-        "outcome": "The round's refresh line reads Refreshed 1 time.",
-        "opposite": "Before the click it reads Refreshed 0 times.",
-        "defect": "The call is written as a read of refresh, so the method never runs and the line keeps Refreshed 0 times."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Ping button whose click calls conformance.Ping().",
+        "gesture": "Click Ping.",
+        "outcome": "The component's ping line reads Pinged 1 time.",
+        "opposite": "Before the click it reads Pinged 0 times.",
+        "defect": "The call is written as a read of ping, so the method never runs and the line keeps Pinged 0 times."
       }
     },
     "method.value": {
       "members": [
-        "WardRound.dueCount()"
+        "ConformanceComponent.total()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown with 3 doses due, and a Show button whose click sets shown's text to round.DueCount().",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose total is 3, and a Show button whose click sets shown's text to conformance.Total().",
         "gesture": "Click Show.",
         "outcome": "shown reads 3.",
-        "opposite": "On a round with 1 dose due the same click shows 1.",
+        "opposite": "On a component whose total is 1 the same click shows 1.",
         "defect": "The result is read from the method's function object instead of its call, so shown stays empty."
       }
     },
     "method.object.memberRead": {
       "members": [
-        "WardRound.current().resident"
+        "ConformanceComponent.current().name"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.Current().Resident.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose current item is named One, and a Show button whose click sets shown's text to conformance.Current().Name.",
         "gesture": "Click Show.",
-        "outcome": "shown reads Helen Martinez.",
-        "opposite": "On a round standing at bed 2 the same click shows Arthur Lee.",
+        "outcome": "shown reads One.",
+        "opposite": "On a component whose current item is named Two the same click shows Two.",
         "defect": "The member is read from the method instead of the object it returned, so shown stays empty."
       }
     },
     "method.object.methodCall": {
       "members": [
-        "WardRound.current().markSeen()"
+        "ConformanceComponent.current().act()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Seen button whose click calls round.Current().MarkSeen().",
-        "gesture": "Click Seen.",
-        "outcome": "Bed 1's line reads Helen Martinez, seen, and bed 2's still reads Arthur Lee, not seen.",
-        "opposite": "Before the click bed 1's line reads Helen Martinez, not seen.",
-        "defect": "The call goes to round.markSeen, which WardRound lacks, so the pipeline stops and bed 1 stays not seen."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose current item is One, and an Act button whose click calls conformance.Current().Act().",
+        "gesture": "Click Act.",
+        "outcome": "Item One's line reads One, acted, and item Two's still reads Two, not acted.",
+        "opposite": "Before the click item One's line reads One, not acted.",
+        "defect": "The call goes to conformance.act, which the ConformanceComponent lacks, so the pipeline stops and item One stays not acted."
       }
     },
     "method.async.void": {
       "members": [
-        "WardRound.save()"
+        "ConformanceComponent.settle()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Save button whose click sets shown's text to Saving, awaits round.Save(), which the test app's save endpoint answers when the test releases it, then sets shown's text to Saved.",
-        "gesture": "Click Save.",
-        "outcome": "While the save endpoint is held shown reads Saving, and once it answers shown reads Saved.",
-        "opposite": "A save the endpoint refuses rejects the promise and stops the pipeline, so shown keeps Saving.",
-        "defect": "The step after the call runs before the promise settles, so shown reads Saved while the endpoint is held.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Settle button whose click sets shown's text to Settling, awaits conformance.Settle(), which the test app's settle endpoint answers when the test releases it, then sets shown's text to Settled.",
+        "gesture": "Click Settle.",
+        "outcome": "While the settle endpoint is held shown reads Settling, and once it answers shown reads Settled.",
+        "opposite": "A settle the endpoint refuses rejects the promise and stops the pipeline, so shown keeps Settling.",
+        "defect": "The step after the call runs before the promise settles, so shown reads Settled while the endpoint is held.",
         "observes": "Run.tla:Settle"
       }
     },
     "method.async.value": {
       "members": [
-        "WardRound.fetchDue()"
+        "ConformanceComponent.settleCount()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Show button whose click sets shown's text to conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it.",
         "gesture": "Click Show.",
         "outcome": "While the endpoint is held shown stays empty, and once it answers shown reads 3.",
-        "opposite": "A due count the endpoint refuses stops the pipeline, so shown stays empty.",
+        "opposite": "A count the endpoint refuses stops the pipeline, so shown stays empty.",
         "defect": "The value set is the promise itself, so shown reads [object Promise].",
         "observes": "Run.tla:Settle"
       }
     },
     "method.arg.scalar": {
       "members": [
-        "WardRound.note()"
+        "ConformanceComponent.log()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Note button whose click calls round.Note(\"Fluids checked at 14:00\").",
-        "gesture": "Click Note.",
-        "outcome": "The round's note line reads Fluids checked at 14:00.",
-        "opposite": "Before the click the note line is empty.",
-        "defect": "The argument is passed as a one-item list, so the note line reads [\"Fluids checked at 14:00\"]."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Log button whose click calls conformance.Log(\"Checked at 14:00\").",
+        "gesture": "Click Log.",
+        "outcome": "The component's log line reads Checked at 14:00.",
+        "opposite": "Before the click the log line is empty.",
+        "defect": "The argument is passed as a one-item list, so the log line reads [\"Checked at 14:00\"]."
       }
     },
     "method.arg.object": {
       "members": [
-        "WardRound.admit()"
+        "ConformanceComponent.take()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and an Admit button whose click calls round.Admit with an admission of Mary Chen to bed B7.",
-        "gesture": "Click Admit.",
-        "outcome": "The round's admissions read Mary Chen in B7.",
-        "opposite": "Before the click the admissions read None.",
-        "defect": "The admission's members are written by their C# names Resident and Bed, so the round shows undefined in undefined."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Take button whose click calls conformance.Take with a record named Alpha with the code C7.",
+        "gesture": "Click Take.",
+        "outcome": "The component's records line reads Alpha in C7.",
+        "opposite": "Before the click the records line reads None.",
+        "defect": "The record's members are written by their C# names Name and Code, so the component shows undefined in undefined."
       }
     },
     "method.arg.list": {
       "members": [
-        "WardRound.admitAll()"
+        "ConformanceComponent.takeAll()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and an Admit both button whose click calls round.AdmitAll with Mary Chen to B7 and Tom Price to B8.",
-        "gesture": "Click Admit both.",
-        "outcome": "The round's admissions read Mary Chen in B7; Tom Price in B8.",
-        "opposite": "Before the click the admissions read None.",
-        "defect": "The list is spread into two arguments, so only Mary Chen is admitted."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Take both button whose click calls conformance.TakeAll with Alpha in C7 and Beta in C8.",
+        "gesture": "Click Take both.",
+        "outcome": "The component's records line reads Alpha in C7; Beta in C8.",
+        "opposite": "Before the click the records line reads None.",
+        "defect": "The list is spread into two arguments, so only Alpha is taken."
       }
     },
     "event.scalar": {
       "members": [
-        "WardRound.doseDue.isUrgent"
+        "ConformanceComponent.raised.flag"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to Urgent when args.IsUrgent holds, else Routine; bed 1's dose is urgent.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "shown reads Urgent.",
-        "opposite": "At bed 2, whose dose is routine, the same handler shows Routine.",
-        "defect": "The payload is read from the listener's second argument, so isUrgent reads nothing and bed 1 shows Routine."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to Flagged when args.Flag holds, else Plain; the component's Raise button raises Raised with its flag set, and its Raise plain button with its flag unset.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads Flagged.",
+        "opposite": "Raise plain, with the same handler, shows Plain.",
+        "defect": "The payload is read from the listener's second argument, so flag reads nothing and Raise shows Plain."
       }
     },
     "event.object": {
       "members": [
-        "WardRound.doseDue.resident.room.number"
+        "ConformanceComponent.raised.outer.middle.name"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Resident.Room.Number; Helen Martinez is in room 12B.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "shown reads 12B.",
-        "opposite": "At bed 2, Arthur Lee in room 14A, the same handler shows 14A.",
-        "defect": "The read takes resident.room.number as one member name, so shown stays empty."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Outer.Middle.Name; Raise hands an outer object whose middle is named M-12.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads M-12.",
+        "opposite": "Raise plain, whose payload's middle is named M-14, shows M-14.",
+        "defect": "The read takes outer.middle.name as one member name, so shown stays empty."
       }
     },
     "event.list": {
       "members": [
-        "WardRound.doseDue.doses.drug"
+        "ConformanceComponent.raised.items.name"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Doses.Count(d => !d.Given); bed 1 has Digoxin and Furosemide not given and Paracetamol given.",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Items.Count(i => i.Name != \"Done\"); Raise hands the items Pending A, Pending B and Done.",
+        "gesture": "Click the component's Raise button.",
         "outcome": "shown reads 2.",
-        "opposite": "At bed 2, whose doses are all given, the same handler shows 0.",
-        "defect": "The lambda reads given by the C# name Given, so every dose counts as not given and shown reads 3."
+        "opposite": "Raise plain, whose items are all named Done, shows 0.",
+        "defect": "The lambda reads name by the C# name Name, so every item reads nothing, counts as not Done, and shown reads 3."
       }
     },
     "event.method": {
       "members": [
-        "WardRound.doseDue.snooze()"
+        "ConformanceComponent.raised.act()"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that calls args.Snooze().",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Bed 1's dose line reads Snoozed.",
-        "opposite": "At bed 2, whose handler is the same, the line also reads Snoozed, and before any click both read Due.",
-        "defect": "The call is taken from the component instead of the payload, which WardRound lacks, so the pipeline stops and the line reads Due."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that calls args.Act().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The component's raise line reads Acted.",
+        "opposite": "Before the click the raise line reads Waiting, and Raise plain with the same handler also reads Acted.",
+        "defect": "The call is taken from the component instead of the payload, which the ConformanceComponent lacks, so the pipeline stops and the line reads Waiting."
       }
     },
     "event.promise": {
       "members": [
-        "WardRound.doseDue.stock"
+        "ConformanceComponent.raised.count"
       ],
       "version": "promised",
       "promise": {
-        "page": "The promised version of the ward round page: its WardRound hands a promise in doseDue's stock, declared ReadOnly<int>, and the DoseDue handler sets shown's text to args.Stock, then sets done's text to after.",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "The promised version of the page: its ConformanceComponent hands a promise in raised's count, declared ReadOnly<int>, and the Raised handler sets shown's text to args.Count, then sets done's text to after.",
+        "gesture": "Click the component's Raise button.",
         "outcome": "shown and done stay empty: the read of a promise stops the pipeline.",
-        "opposite": "On the current version, whose stock is 14, the same click shows 14 and done reads after.",
+        "opposite": "On the current version, whose count is 14, the same click shows 14 and done reads after.",
         "defect": "The read hands the promise to the set and runs on, so shown reads [object Promise] and done reads after."
       }
     },
     "event.deepAsync": {
       "members": [
-        "WardRound.doseDue.trolley.drawer.unlock()",
-        "WardRound.doseDue.isUrgent"
+        "ConformanceComponent.raised.held.item.settle()",
+        "ConformanceComponent.raised.flag"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that awaits args.Trolley.Drawer.Unlock(), which the test app's drawer endpoint answers with Drawer 3 open when the test releases it, sets shown's text to the result, then sets urgent's text to Urgent when args.IsUrgent holds.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "While the drawer endpoint is held shown and urgent stay empty; once it answers shown reads Drawer 3 open and urgent reads Urgent.",
-        "opposite": "A drawer the endpoint refuses rejects the promise and stops the handler, so shown and urgent stay empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that awaits args.Held.Item.Settle(), which the test app's item endpoint answers with Item settled when the test releases it, sets shown's text to the result, then sets flagged's text to Flagged when args.Flag holds.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the item endpoint is held shown and flagged stay empty; once it answers shown reads Item settled and flagged reads Flagged.",
+        "opposite": "An item the endpoint refuses rejects the promise and stops the handler, so shown and flagged stay empty.",
         "defect": "The step after the call runs before the promise settles, so shown reads [object Promise] while the endpoint is held.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.writeOnly.payload.before": {
       "members": [
-        "WardRound.doseDue.note"
+        "ConformanceComponent.raised.writeOnlyText"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.note",
+      "door": "ConformanceComponent.raised.writeOnlyText",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets args.Note to \"Given late\".",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Bed 1's note reads Given late, which the round reads when the handler returns.",
-        "opposite": "A handler that writes no note leaves Note: none.",
-        "defect": "The write goes to a copy of the payload, so the round reads no note and shows Note: none."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.WriteOnlyText to \"Kappa\".",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The component's payload line reads Payload text: Kappa, which the component reads when the handler returns.",
+        "opposite": "A handler that writes no text leaves Payload text: none.",
+        "defect": "The write goes to a copy of the payload, so the component reads no text and shows Payload text: none."
       }
     },
     "event.poc15.writeOnly.payload.after": {
       "members": [
-        "WardRound.doseDue.note"
+        "ConformanceComponent.raised.writeOnlyText"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.note"
+      "door": "ConformanceComponent.raised.writeOnlyText"
     },
     "event.poc15.writeOnly.held.before": {
       "members": [
-        "WardRound.doseDue.trolley.label"
+        "ConformanceComponent.raised.held.writeOnlyText"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.label",
+      "door": "ConformanceComponent.raised.held.writeOnlyText",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets args.Trolley.Label to \"Cart A\".",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "The round's trolley line reads Trolley: Cart A.",
-        "opposite": "Before the click it reads Trolley: none.",
-        "defect": "The write lands on args.label instead of the trolley, so the line keeps Trolley: none."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Held.WriteOnlyText to \"Kappa\".",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The component's held line reads Held: Kappa.",
+        "opposite": "Before the click it reads Held: none.",
+        "defect": "The write lands on args.writeOnlyText instead of the held object, so the line keeps Held: none."
       }
     },
     "event.poc15.writeOnly.held.after": {
       "members": [
-        "WardRound.doseDue.trolley.label"
+        "ConformanceComponent.raised.held.writeOnlyText"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.label",
+      "door": "ConformanceComponent.raised.held.writeOnlyText",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets args.Trolley.Label to \"Cart A\".",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "While the due endpoint is held the trolley line reads Trolley: none; once it answers it reads Trolley: Cart A.",
-        "opposite": "Before the click it reads Trolley: none.",
-        "defect": "The run drops a write to an object the payload holds after the await as it drops a payload write, so the line keeps Trolley: none.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Held.WriteOnlyText to \"Kappa\".",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the count endpoint is held the held line reads Held: none; once it answers it reads Held: Kappa.",
+        "opposite": "Before the click it reads Held: none.",
+        "defect": "The run drops a write to an object the payload holds after the await as it drops a payload write, so the line keeps Held: none.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.liveObjects.payload.before": {
       "members": [
-        "WardRound.doseDue.alarms"
+        "ConformanceComponent.raised.items"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.alarms",
+      "door": "ConformanceComponent.raised.items",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Alarms.Count(a => a.Reason == \"Missed dose\").",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Items.Count(i => i.Name == \"Missed\").",
+        "gesture": "Click the component's Raise button.",
         "outcome": "shown reads 2.",
-        "opposite": "At bed 2, with no missed dose, it reads 0.",
-        "defect": "The lambda reads reason by its C# name Reason, so no alarm counts and shown reads 0."
+        "opposite": "Raise plain, with no item named Missed, reads 0.",
+        "defect": "The lambda reads name by its C# name Name, so no item counts and shown reads 0."
       }
     },
     "event.poc15.liveObjects.payload.after": {
       "members": [
-        "WardRound.doseDue.alarms"
+        "ConformanceComponent.raised.items"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.alarms",
+      "door": "ConformanceComponent.raised.items",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Alarms.Count(a => a.Reason == \"Missed dose\").",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers shown reads 1: the round acknowledged one missed dose when the handler returned.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Items.Count(i => i.Name == \"Missed\").",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 1: the component renamed one Missed item when the handler returned.",
         "opposite": "Without the await the same count reads 2.",
         "defect": "The read uses the list as the handler started, so shown reads 2.",
         "observes": "Run.tla:Settle"
@@ -1034,57 +1295,57 @@
     },
     "event.poc15.liveObjects.held.before": {
       "members": [
-        "WardRound.doseDue.trolley.drawers"
+        "ConformanceComponent.raised.held.items"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.drawers",
+      "door": "ConformanceComponent.raised.held.items",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.Drawers.Count(d => d.Label != \"\").",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.Items.Count(i => i.Name != \"\").",
+        "gesture": "Click the component's Raise button.",
         "outcome": "shown reads 4.",
-        "opposite": "On a trolley of 3 labelled drawers it reads 3.",
-        "defect": "The lambda reads label by its C# name Label, so no drawer counts and shown reads 0."
+        "opposite": "On a held object of 3 named items it reads 3.",
+        "defect": "The lambda reads name by its C# name Name, so no item counts and shown reads 0."
       }
     },
     "event.poc15.liveObjects.held.after": {
       "members": [
-        "WardRound.doseDue.trolley.drawers"
+        "ConformanceComponent.raised.held.items"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.drawers",
+      "door": "ConformanceComponent.raised.held.items",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.Drawers.Count(d => d.Label != \"\").",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers shown reads 4.",
-        "opposite": "While the endpoint is held shown stays empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.Items.Count(i => i.Name != \"\").",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 4.",
+        "opposite": "While the count endpoint is held shown stays empty.",
         "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.methodValue.payload.before": {
       "members": [
-        "WardRound.doseDue.remaining()"
+        "ConformanceComponent.raised.total()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.remaining()",
+      "door": "ConformanceComponent.raised.total()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Remaining().",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Total().",
+        "gesture": "Click the component's Raise button.",
         "outcome": "shown reads 3.",
-        "opposite": "At bed 2, with 1 dose left, it reads 1.",
+        "opposite": "Raise plain, whose total is 1, reads 1.",
         "defect": "The result is read from the method's function object, so shown stays empty."
       }
     },
     "event.poc15.methodValue.payload.after": {
       "members": [
-        "WardRound.doseDue.remaining()"
+        "ConformanceComponent.raised.total()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.remaining()",
+      "door": "ConformanceComponent.raised.total()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Remaining().",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers shown reads 2: the round recorded one dose when the handler returned.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Total().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 2: the component counted one down when the handler returned.",
         "opposite": "Without the await it reads 3.",
         "defect": "The call runs at the handler's start instead of after the await, so shown reads 3.",
         "observes": "Run.tla:Settle"
@@ -1092,352 +1353,352 @@
     },
     "event.poc15.methodValue.held.before": {
       "members": [
-        "WardRound.doseDue.trolley.stockCount()"
+        "ConformanceComponent.raised.held.total()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.stockCount()",
+      "door": "ConformanceComponent.raised.held.total()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.StockCount().",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.Total(); the payload's own total is 3.",
+        "gesture": "Click the component's Raise button.",
         "outcome": "shown reads 14.",
-        "opposite": "On a trolley stocked with 9 it reads 9.",
-        "defect": "The call goes to args.stockCount, which the payload lacks, so the pipeline stops and shown stays empty."
+        "opposite": "On a held object whose total is 9 it reads 9.",
+        "defect": "The call goes to the payload's own total instead of the held object's, so shown reads 3."
       }
     },
     "event.poc15.methodValue.held.after": {
       "members": [
-        "WardRound.doseDue.trolley.stockCount()"
+        "ConformanceComponent.raised.held.total()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.stockCount()",
+      "door": "ConformanceComponent.raised.held.total()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.StockCount().",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers shown reads 14.",
-        "opposite": "While the endpoint is held shown stays empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.Total().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 14.",
+        "opposite": "While the count endpoint is held shown stays empty.",
         "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.methodAsyncValue.payload.before": {
       "members": [
-        "WardRound.doseDue.lookup()"
+        "ConformanceComponent.raised.settle()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.lookup()",
+      "door": "ConformanceComponent.raised.settle()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Lookup(), which the test app's allergy endpoint answers with Penicillin allergy when the test releases it.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "While the allergy endpoint is held shown stays empty; once it answers shown reads Penicillin allergy.",
-        "opposite": "An allergy lookup the endpoint refuses stops the handler, so shown stays empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Settle(), which the test app's text endpoint answers with Settled text when the test releases it.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the text endpoint is held shown stays empty; once it answers shown reads Settled text.",
+        "opposite": "A text the endpoint refuses stops the handler, so shown stays empty.",
         "defect": "The value set is the promise itself, so shown reads [object Promise].",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.methodAsyncValue.payload.after": {
       "members": [
-        "WardRound.doseDue.lookup()"
+        "ConformanceComponent.raised.settle()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.lookup()",
+      "door": "ConformanceComponent.raised.settle()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Lookup(), which the test app's allergy endpoint answers with Penicillin allergy when the test releases it.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once both endpoints answer shown reads Penicillin allergy.",
-        "opposite": "While the allergy endpoint is held shown stays empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Settle(), which the test app's text endpoint answers with Settled text when the test releases it.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once both endpoints answer shown reads Settled text.",
+        "opposite": "While the text endpoint is held shown stays empty.",
         "defect": "The second await is not waited for, so shown reads [object Promise].",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.methodAsyncValue.held.before": {
       "members": [
-        "WardRound.doseDue.trolley.weigh()"
+        "ConformanceComponent.raised.held.settleCount()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.weigh()",
+      "door": "ConformanceComponent.raised.held.settleCount()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.Weigh(), which the test app's scale endpoint answers with 42 when the test releases it.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "While the scale endpoint is held shown stays empty; once it answers shown reads 42.",
-        "opposite": "A weighing the endpoint refuses stops the handler, so shown stays empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.SettleCount(), which the test app's held endpoint answers with 42 when the test releases it.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the held endpoint is held shown stays empty; once it answers shown reads 42.",
+        "opposite": "A count the held endpoint refuses stops the handler, so shown stays empty.",
         "defect": "The value set is the promise itself, so shown reads [object Promise].",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.methodAsyncValue.held.after": {
       "members": [
-        "WardRound.doseDue.trolley.weigh()"
+        "ConformanceComponent.raised.held.settleCount()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.weigh()",
+      "door": "ConformanceComponent.raised.held.settleCount()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.Weigh(), which the test app's scale endpoint answers with 42 when the test releases it.",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.SettleCount(), which the test app's held endpoint answers with 42 when the test releases it.",
+        "gesture": "Click the component's Raise button.",
         "outcome": "Once both endpoints answer shown reads 42.",
-        "opposite": "While the scale endpoint is held shown stays empty.",
+        "opposite": "While the held endpoint is held shown stays empty.",
         "defect": "The second await is not waited for, so shown reads [object Promise].",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.returnedObject.payload.before": {
       "members": [
-        "WardRound.doseDue.nextDose()"
+        "ConformanceComponent.raised.current()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.nextDose()",
+      "door": "ConformanceComponent.raised.current()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.NextDose().Drug.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "shown reads Digoxin.",
-        "opposite": "At bed 2, whose next dose is Paracetamol, it reads Paracetamol.",
-        "defect": "The member is read from the method instead of the dose it returned, so shown stays empty."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Current().Name.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads One.",
+        "opposite": "Raise plain, whose current item is Two, reads Two.",
+        "defect": "The member is read from the method instead of the item it returned, so shown stays empty."
       }
     },
     "event.poc15.returnedObject.payload.after": {
       "members": [
-        "WardRound.doseDue.nextDose()"
+        "ConformanceComponent.raised.current()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.nextDose()",
+      "door": "ConformanceComponent.raised.current()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.NextDose().Drug.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers shown reads Furosemide: the round recorded Digoxin when the handler returned.",
-        "opposite": "Without the await it reads Digoxin.",
-        "defect": "The returned dose is the one bound before the await, so shown reads Digoxin.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Current().Name.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads Two: the component moved past One when the handler returned.",
+        "opposite": "Without the await it reads One.",
+        "defect": "The returned item is the one bound before the await, so shown reads One.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.returnedObject.held.before": {
       "members": [
-        "WardRound.doseDue.trolley.drawerAt()"
+        "ConformanceComponent.raised.held.itemAt()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.drawerAt()",
+      "door": "ConformanceComponent.raised.held.itemAt()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.DrawerAt(1).Label.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "shown reads Drawer 1.",
-        "opposite": "DrawerAt(2) on the same page reads Drawer 2.",
-        "defect": "The argument is dropped, so the call returns no drawer and the pipeline stops with shown empty."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.ItemAt(1).Name; the held object's items are named First and Second.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads First.",
+        "opposite": "ItemAt(2) on the same page reads Second.",
+        "defect": "The argument is dropped, so the call returns no item and the pipeline stops with shown empty."
       }
     },
     "event.poc15.returnedObject.held.after": {
       "members": [
-        "WardRound.doseDue.trolley.drawerAt()"
+        "ConformanceComponent.raised.held.itemAt()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.drawerAt()",
+      "door": "ConformanceComponent.raised.held.itemAt()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.DrawerAt(1).Label.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers shown reads Drawer 1.",
-        "opposite": "While the endpoint is held shown stays empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.ItemAt(1).Name.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads First.",
+        "opposite": "While the count endpoint is held shown stays empty.",
         "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.returnedObjects.payload.before": {
       "members": [
-        "WardRound.doseDue.missed()"
+        "ConformanceComponent.raised.matching()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.missed()",
+      "door": "ConformanceComponent.raised.matching()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Missed().Count().",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Matching().Count().",
+        "gesture": "Click the component's Raise button.",
         "outcome": "shown reads 2.",
-        "opposite": "At bed 2, with no missed dose, it reads 0.",
+        "opposite": "Raise plain, with no matching item, reads 0.",
         "defect": "The returned list is read as one object, so shown reads 1."
       }
     },
     "event.poc15.returnedObjects.payload.after": {
       "members": [
-        "WardRound.doseDue.missed()"
+        "ConformanceComponent.raised.matching()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.missed()",
+      "door": "ConformanceComponent.raised.matching()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Missed().Count().",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers shown reads 2.",
-        "opposite": "While the endpoint is held shown stays empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Matching().Count().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 2.",
+        "opposite": "While the count endpoint is held shown stays empty.",
         "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.returnedObjects.held.before": {
       "members": [
-        "WardRound.doseDue.trolley.emptyDrawers()"
+        "ConformanceComponent.raised.held.matching()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.emptyDrawers()",
+      "door": "ConformanceComponent.raised.held.matching()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Trolley.EmptyDrawers().Count().",
-        "gesture": "Click the round's Dose due button at bed 1.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Held.Matching().Count().",
+        "gesture": "Click the component's Raise button.",
         "outcome": "shown reads 1.",
-        "opposite": "On a full trolley it reads 0.",
-        "defect": "The returned list is read as one object, so shown reads 1 on a full trolley too."
+        "opposite": "On a held object with no matching item it reads 0.",
+        "defect": "The returned list is read as one object, so shown reads 1 with no matching item too."
       }
     },
     "event.poc15.returnedObjects.held.after": {
       "members": [
-        "WardRound.doseDue.trolley.emptyDrawers()"
+        "ConformanceComponent.raised.held.matching()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.emptyDrawers()",
+      "door": "ConformanceComponent.raised.held.matching()",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets shown's text to args.Trolley.EmptyDrawers().Count().",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers shown reads 1.",
-        "opposite": "While the endpoint is held shown stays empty.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets shown's text to args.Held.Matching().Count().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers shown reads 1.",
+        "opposite": "While the count endpoint is held shown stays empty.",
         "defect": "The run releases the payload at the await, so the read after it stops the pipeline and shown stays empty.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.callback.payload.before": {
       "members": [
-        "WardRound.doseDue.signature"
+        "ConformanceComponent.raised.answer"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.signature",
+      "door": "ConformanceComponent.raised.answer",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets args.Signature to the answer dose => dose.Drug + \" signed by Nurse Okafor\".",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Bed 1's dose line reads Digoxin signed by Nurse Okafor, which the round asks for when the handler returns.",
-        "opposite": "A handler that sets no signature leaves Digoxin unsigned.",
-        "defect": "The callback is set on a copy of the payload, so the round asks nothing and the line reads Digoxin unsigned."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Answer to the answer item => item.Name + \" answered by Kappa\".",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The component's answer line reads One answered by Kappa, which the component asks for when the handler returns.",
+        "opposite": "A handler that sets no answer leaves One unanswered.",
+        "defect": "The callback is set on a copy of the payload, so the component asks nothing and the line reads One unanswered."
       }
     },
     "event.poc15.callback.payload.after": {
       "members": [
-        "WardRound.doseDue.signature"
+        "ConformanceComponent.raised.answer"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.signature"
+      "door": "ConformanceComponent.raised.answer"
     },
     "event.poc15.callback.held.before": {
       "members": [
-        "WardRound.doseDue.trolley.signature",
-        "WardRound.doseDue.trolley.sign()"
+        "ConformanceComponent.raised.held.answer",
+        "ConformanceComponent.raised.held.act()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.signature",
+      "door": "ConformanceComponent.raised.held.answer",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets args.Trolley.Signature to the answer dose => dose.Drug + \" by Nurse Okafor\", then calls args.Trolley.Sign().",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "The trolley line reads Trolley signed for Digoxin by Nurse Okafor.",
-        "opposite": "Before the click it reads Trolley unsigned.",
-        "defect": "The callback is set on the payload instead of the trolley, so the trolley signs with no answer and reads Trolley unsigned."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Held.Answer to the answer item => item.Name + \" by Kappa\", then calls args.Held.Act().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "The held line reads Held acted for One by Kappa.",
+        "opposite": "Before the click it reads Held not acted.",
+        "defect": "The callback is set on the payload instead of the held object, so the held object acts with no answer and reads Held not acted."
       }
     },
     "event.poc15.callback.held.after": {
       "members": [
-        "WardRound.doseDue.trolley.signature",
-        "WardRound.doseDue.trolley.sign()"
+        "ConformanceComponent.raised.held.answer",
+        "ConformanceComponent.raised.held.act()"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.trolley.signature",
+      "door": "ConformanceComponent.raised.held.answer",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets args.Trolley.Signature to the answer dose => dose.Drug + \" by Nurse Okafor\", then calls args.Trolley.Sign().",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "Once the due endpoint answers the trolley line reads Trolley signed for Digoxin by Nurse Okafor.",
-        "opposite": "While the endpoint is held it reads Trolley unsigned.",
-        "defect": "The run drops a callback set on an object the payload holds after the await as it drops a payload write, so the line keeps Trolley unsigned.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Held.Answer to the answer item => item.Name + \" by Kappa\", then calls args.Held.Act().",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "Once the count endpoint answers the held line reads Held acted for One by Kappa.",
+        "opposite": "While the endpoint is held it reads Held not acted.",
+        "defect": "The run drops a callback set on an object the payload holds after the await as it drops a payload write, so the line keeps Held not acted.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.component.payload.before": {
       "members": [
-        "WardRound.pumpAttached.rate"
+        "ConformanceComponent.handed.ratio"
       ],
       "version": "current",
-      "door": "WardRound.pumpAttached",
+      "door": "ConformanceComponent.handed",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, a BedsidePump at bed 1 running at 25 mL/h, and a PumpAttached handler that sets shown's text to args.Rate, then sets args.Rate to 50.",
-        "gesture": "Click the round's Attach pump button at bed 1.",
-        "outcome": "shown reads 25 and the pump reads Rate 50 mL/h.",
-        "opposite": "Before the click the pump reads Rate 25 mL/h.",
-        "defect": "The payload is taken as plain data, so the write changes a copy and the pump keeps Rate 25 mL/h."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, a ConformancePeer at ratio 25, and a Handed handler that sets shown's text to args.Ratio, then sets args.Ratio to 50.",
+        "gesture": "Click the component's Hand a peer button.",
+        "outcome": "shown reads 25 and the peer reads Ratio 50.",
+        "opposite": "Before the click the peer reads Ratio 25.",
+        "defect": "The payload is taken as plain data, so the write changes a copy and the peer keeps Ratio 25."
       }
     },
     "event.poc15.component.payload.after": {
       "members": [
-        "WardRound.pumpAttached.rate"
+        "ConformanceComponent.handed.ratio"
       ],
       "version": "current",
-      "door": "WardRound.pumpAttached",
+      "door": "ConformanceComponent.handed",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, a BedsidePump at bed 1 running at 25 mL/h, and a PumpAttached handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets args.Rate to 50.",
-        "gesture": "Click the round's Attach pump button at bed 1.",
-        "outcome": "While the due endpoint is held the pump reads Rate 25 mL/h; once it answers it reads Rate 50 mL/h.",
-        "opposite": "Before the click the pump reads Rate 25 mL/h.",
-        "defect": "The run drops a write to a payload that is a component after the await as it drops a plain payload write, so the pump keeps Rate 25 mL/h.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, a ConformancePeer at ratio 25, and a Handed handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Ratio to 50.",
+        "gesture": "Click the component's Hand a peer button.",
+        "outcome": "While the count endpoint is held the peer reads Ratio 25; once it answers it reads Ratio 50.",
+        "opposite": "Before the click the peer reads Ratio 25.",
+        "defect": "The run drops a write to a payload that is a component after the await as it drops a plain payload write, so the peer keeps Ratio 25.",
         "observes": "Run.tla:Settle"
       }
     },
     "event.poc15.component.held.before": {
       "members": [
-        "WardRound.doseDue.pump.rate"
+        "ConformanceComponent.raised.peer.ratio"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.pump",
+      "door": "ConformanceComponent.raised.peer",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that sets shown's text to args.Pump.Rate, then sets args.Pump.Rate to 50; bed 1's BedsidePump runs at 25 mL/h.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "shown reads 25 and the pump reads Rate 50 mL/h.",
-        "opposite": "Before the click the pump reads Rate 25 mL/h.",
-        "defect": "The pump is read through the round's own element instead of the payload's pump, so shown reads nothing and the pump keeps Rate 25 mL/h."
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Peer.Ratio, then sets args.Peer.Ratio to 50; the payload's peer, a ConformancePeer, runs at ratio 25.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "shown reads 25 and the peer reads Ratio 50.",
+        "opposite": "Before the click the peer reads Ratio 25.",
+        "defect": "The peer is read through the component's own element instead of the payload's peer, so shown reads nothing and the peer keeps Ratio 25."
       }
     },
     "event.poc15.component.held.after": {
       "members": [
-        "WardRound.doseDue.pump.rate"
+        "ConformanceComponent.raised.peer.ratio"
       ],
       "version": "current",
-      "door": "WardRound.doseDue.pump",
+      "door": "ConformanceComponent.raised.peer",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a DoseDue handler that first awaits round.FetchDue(), which the test app's due endpoint answers with 3 when the test releases it, then sets args.Pump.Rate to 50; bed 1's BedsidePump runs at 25 mL/h.",
-        "gesture": "Click the round's Dose due button at bed 1.",
-        "outcome": "While the due endpoint is held the pump reads Rate 25 mL/h; once it answers it reads Rate 50 mL/h.",
-        "opposite": "Before the click the pump reads Rate 25 mL/h.",
-        "defect": "The run drops a write to a component the payload holds after the await as it drops a payload write, so the pump keeps Rate 25 mL/h.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Peer.Ratio to 50; the payload's peer, a ConformancePeer, runs at ratio 25.",
+        "gesture": "Click the component's Raise button.",
+        "outcome": "While the count endpoint is held the peer reads Ratio 25; once it answers it reads Ratio 50.",
+        "opposite": "Before the click the peer reads Ratio 25.",
+        "defect": "The run drops a write to a component the payload holds after the await as it drops a payload write, so the peer keeps Ratio 25.",
         "observes": "Run.tla:Settle"
       }
     },
     "absence.member": {
       "members": [
-        "WardRound.roundId"
+        "ConformanceComponent.readOnlyText"
       ],
       "version": "older",
       "promise": {
-        "page": "The older version of the ward round page: its WardRound lacks roundId, and a Show button whose click sets shown's text to round.RoundId, then sets done's text to after.",
+        "page": "The older version of the page: its ConformanceComponent lacks readOnlyText, and a Show button whose click sets shown's text to conformance.ReadOnlyText, then sets done's text to after.",
         "gesture": "Click Show.",
-        "outcome": "shown and done stay empty: the read of a member the round lacks stops the pipeline.",
-        "opposite": "On the current version the same click shows NR-2026-11-10 and done reads after.",
+        "outcome": "shown and done stay empty: the read of a member the component lacks stops the pipeline.",
+        "opposite": "On the current version the same click shows RO-2026-11-10 and done reads after.",
         "defect": "A member the object lacks reads undefined and the pipeline runs on, so done reads after."
       }
     },
     "absence.past": {
       "members": [
-        "WardRound.chart.allergy.severity"
+        "ConformanceComponent.record.detail.name"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, whose chart for Helen Martinez holds no allergy, ChartAllergy's Severity starting as none, and a Show button whose click sets shown's text to round.Chart.Read(c => c.Allergy.Severity).",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, whose record holds no detail, Detail's Name starting as none, and a Show button whose click sets shown's text to conformance.Record.Read(r => r.Detail.Name).",
         "gesture": "Click Show.",
-        "outcome": "shown reads none, the start of a ChartAllergy.",
-        "opposite": "On a chart whose allergy is severe the same click shows severe.",
-        "defect": "The read past the missing allergy stops the pipeline, so shown stays empty."
+        "outcome": "shown reads none, the start of a Detail.",
+        "opposite": "On a record whose detail is named Full the same click shows Full.",
+        "defect": "The read past the missing detail stops the pipeline, so shown stays empty."
       }
     },
     "absence.promise": {
       "members": [
-        "WardRound.dueCount()"
+        "ConformanceComponent.total()"
       ],
       "version": "promised",
       "promise": {
-        "page": "The promised version of the ward round page: its WardRound's dueCount returns a promise of 3, declared Method<int>, and a Show button whose click sets shown's text to round.DueCount(), then sets done's text to after.",
+        "page": "The promised version of the page: its ConformanceComponent's total returns a promise of 3, declared Method<int>, and a Show button whose click sets shown's text to conformance.Total(), then sets done's text to after.",
         "gesture": "Click Show.",
         "outcome": "shown and done stay empty: a promise where a value was declared stops the pipeline at the call.",
         "opposite": "On the current version the same click shows 3 and done reads after.",
@@ -1446,496 +1707,496 @@
     },
     "source.PropertySet": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Copy button whose click sets round.Title to round.Value.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Copy button whose click sets conformance.Text to conformance.Value.",
         "gesture": "Click the page's button.",
-        "outcome": "The round's heading reads r-104.",
-        "opposite": "Before the click it reads North round.",
+        "outcome": "The component's heading reads a-1.",
+        "opposite": "Before the click it reads Alpha.",
         "defect": "The component's member read at Positions.PropertySet reads its name instead of its value, so the heading empties."
       }
     },
     "source.WriteOnlySet": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Sign button whose click sets round.Signature to round.Value.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Write button whose click sets conformance.WriteOnlyText to conformance.Value.",
         "gesture": "Click the page's button.",
-        "outcome": "The signature line reads Signed by r-104.",
-        "opposite": "Before the click it reads Unsigned.",
-        "defect": "The component's member read at Positions.WriteOnlySet reads its name instead of its value, so the line reads Signed by."
+        "outcome": "The write-only line reads Written a-1.",
+        "opposite": "Before the click it reads Unwritten.",
+        "defect": "The component's member read at Positions.WriteOnlySet reads its name instead of its value, so the line reads Written."
       }
     },
     "source.ElementText": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's text to round.Value.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Show button whose click sets shown's text to conformance.Value.",
         "gesture": "Click the page's button.",
-        "outcome": "shown reads r-104.",
-        "opposite": "At bed 2 the same click shows r-105.",
+        "outcome": "shown reads a-1.",
+        "opposite": "With a-2 picked in the component the same click shows a-2.",
         "defect": "The component's member read at Positions.ElementText reads its name instead of its value, so shown stays empty."
       }
     },
     "source.ElementHtml": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Show button whose click sets shown's HTML to round.Value.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Show button whose click sets shown's HTML to conformance.Value.",
         "gesture": "Click the page's button.",
-        "outcome": "shown reads r-104.",
-        "opposite": "At bed 2 the same click shows r-105.",
+        "outcome": "shown reads a-1.",
+        "opposite": "With a-2 picked in the component the same click shows a-2.",
         "defect": "The component's member read at Positions.ElementHtml reads its name instead of its value, so shown stays empty."
       }
     },
     "source.ElementClass": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Mark button whose click adds the class named by round.Value to the element bedside.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Mark button whose click adds the class named by conformance.Value to the element marked.",
         "gesture": "Click the page's button.",
-        "outcome": "bedside carries the class r-104.",
-        "opposite": "At bed 2 the same click adds r-105.",
+        "outcome": "marked carries the class a-1.",
+        "opposite": "With a-2 picked in the component the same click adds a-2.",
         "defect": "The component's member read at Positions.ElementClass reads its name instead of its value, so no class is added."
       }
     },
     "source.ConditionLeft": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Check button whose click sets shown's text to At Helen's bed when round.Value equals \"r-104\", else Elsewhere.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Check button whose click sets shown's text to Picked first when conformance.Value equals \"a-1\", else Elsewhere.",
         "gesture": "Click the page's button.",
-        "outcome": "shown reads At Helen's bed.",
-        "opposite": "At bed 2 the same click shows Elsewhere.",
+        "outcome": "shown reads Picked first.",
+        "opposite": "With a-2 picked in the component the same click shows Elsewhere.",
         "defect": "The component's member read at Positions.ConditionLeft reads its name instead of its value, so every click shows Elsewhere."
       }
     },
     "source.ConditionRight": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a NativeTextBox resident holding r-104 and a Check button whose click sets shown's text to Same bed when the box's value equals round.Value, else Other bed.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, a NativeTextBox typed holding a-1, and a Check button whose click sets shown's text to Same value when the box's value equals conformance.Value, else Other value.",
         "gesture": "Click the page's button.",
-        "outcome": "shown reads Same bed.",
-        "opposite": "With r-105 typed in the box the same click shows Other bed.",
-        "defect": "The component's member read at Positions.ConditionRight reads its name instead of its value, so every click shows Other bed."
+        "outcome": "shown reads Same value.",
+        "opposite": "With a-2 typed in the box the same click shows Other value.",
+        "defect": "The component's member read at Positions.ConditionRight reads its name instead of its value, so every click shows Other value."
       }
     },
     "source.TextTestOperand": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a NativeTextBox note holding \"r-104: fluids\" and a Check button whose click sets shown's text to Note matches when the note's value starts with round.Value, else No match, through M3.N1's text test.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, a NativeTextBox note holding \"a-1: checked\", and a Check button whose click sets shown's text to Note matches when the note's value starts with conformance.Value, else No match, through M3.N1's text test.",
         "gesture": "Click the page's button.",
         "outcome": "shown reads Note matches.",
-        "opposite": "With \"r-105: fluids\" in the box the same click shows No match.",
+        "opposite": "With \"a-2: checked\" in the box the same click shows No match.",
         "defect": "The component's member read at Positions.TextTestOperand reads its name instead of its value, so every click shows No match."
       }
     },
     "source.MatchesPattern": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a round titled ^r-1[0-9]{2}$, a NativeTextBox code holding r-104, and a Check button whose click sets shown's text to Valid when the code matches round.Title, through M3.N1's Matches.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value ^a-[0-9]$, with an element shown, a NativeTextBox code holding a-1, and a Check button whose click sets shown's text to Valid when the code matches conformance.Value, else Invalid, through M3.N1's Matches.",
         "gesture": "Click the page's button.",
         "outcome": "shown reads Valid.",
-        "opposite": "With x-104 in the box the same click shows Invalid.",
+        "opposite": "With x-1 in the box the same click shows Invalid.",
         "defect": "The component's member read at Positions.MatchesPattern reads its name instead of its value, so every click shows Invalid."
       }
     },
     "source.RequestMember": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Send button whose click posts round.Value as the request's Resident to the test app's notes endpoint, which answers Received and the resident, set as shown's text.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Send button whose click posts conformance.Value as the request's Code to the test app's echo endpoint, which answers Received and the code, set as shown's text.",
         "gesture": "Click the page's button.",
-        "outcome": "shown reads Received r-104.",
-        "opposite": "At bed 2 the same click shows Received r-105.",
-        "defect": "The component's member read at Positions.RequestMember reads its name instead of its value, so the endpoint receives no Resident and shown reads Received.",
+        "outcome": "shown reads Received a-1.",
+        "opposite": "With a-2 picked in the component the same click shows Received a-2.",
+        "defect": "The component's member read at Positions.RequestMember reads its name instead of its value, so the endpoint receives no Code and shown reads Received.",
         "observes": "Request.tla:Route"
       }
     },
     "source.Header": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Send button whose click posts to the test app's notes endpoint with the header X-Resident set to round.Value, which the endpoint answers back as shown's text.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Send button whose click posts to the test app's echo endpoint with the header X-Code set to conformance.Value, which the endpoint answers back as shown's text.",
         "gesture": "Click the page's button.",
-        "outcome": "shown reads X-Resident r-104.",
-        "opposite": "At bed 2 the same click shows X-Resident r-105.",
-        "defect": "The component's member read at Positions.Header reads its name instead of its value, so the header is not sent and shown reads X-Resident.",
+        "outcome": "shown reads X-Code a-1.",
+        "opposite": "With a-2 picked in the component the same click shows X-Code a-2.",
+        "defect": "The component's member read at Positions.Header reads its name instead of its value, so the header is not sent and shown reads X-Code.",
         "observes": "Request.tla:Route"
       }
     },
     "source.DispatchPayloadMember": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Tell button whose click dispatches the app event BedReached with Resident set to round.Value through M1.N4's dispatch, and a BedReached handler that sets shown's text to the payload's Resident.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Tell button whose click dispatches the app event Picked with Code set to conformance.Value through M1.N4's dispatch, and a Picked handler that sets shown's text to the payload's Code.",
         "gesture": "Click the page's button.",
-        "outcome": "shown reads r-104.",
-        "opposite": "At bed 2 the same click shows r-105.",
+        "outcome": "shown reads a-1.",
+        "opposite": "With a-2 picked in the component the same click shows a-2.",
         "defect": "The component's member read at Positions.DispatchPayloadMember reads its name instead of its value, so shown stays empty."
       }
     },
     "source.MethodArgument": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Note button whose click calls round.Note(round.Value).",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Log button whose click calls conformance.Log(conformance.Value).",
         "gesture": "Click the page's button.",
-        "outcome": "The round's note line reads r-104.",
-        "opposite": "Before the click the note line is empty.",
-        "defect": "The component's member read at Positions.MethodArgument reads its name instead of its value, so the note line reads nothing."
+        "outcome": "The component's log line reads a-1.",
+        "opposite": "Before the click the log line is empty.",
+        "defect": "The component's member read at Positions.MethodArgument reads its name instead of its value, so the log line reads nothing."
       }
     },
     "source.PluginArgument": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and the page plugin shiftLog and a Log button whose click calls shiftLog.Log(round.Value).",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, the page plugin pageLog, and a Log button whose click calls pageLog.Log(conformance.Value).",
         "gesture": "Click the page's button.",
-        "outcome": "The shift log's last line reads r-104.",
-        "opposite": "Before the click the shift log is empty.",
+        "outcome": "The page log's last line reads a-1.",
+        "opposite": "Before the click the page log is empty.",
         "defect": "The component's member read at Positions.PluginArgument reads its name instead of its value, so the log line is empty."
       }
     },
     "source.HubArgument": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and on net10, a Tell button whose click invokes the ward hub's Announce with round.Value through N21.1's hub door, and the hub's Announced message set as shown's text.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and on net10 a Tell button whose click invokes the test hub's Announce with conformance.Value through N21.1's hub door, and the hub's Announced message set as shown's text.",
         "gesture": "Click the page's button.",
-        "outcome": "shown reads Announced r-104.",
-        "opposite": "At bed 2 the same click shows Announced r-105.",
-        "defect": "The component's member read at Positions.HubArgument reads its name instead of its value, so the hub receives no resident and shown reads Announced.",
+        "outcome": "shown reads Announced a-1.",
+        "opposite": "With a-2 picked in the component the same click shows Announced a-2.",
+        "defect": "The component's member read at Positions.HubArgument reads its name instead of its value, so the hub receives no code and shown reads Announced.",
         "observes": "Realtime.tla:Message"
       }
     },
     "http.get": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a GET to the test app's doses endpoint with round.Value as its query's resident, its success setting shown's text to the body's summary.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the test app's items endpoint with conformance.Value as its query's code, its success setting shown's text to the body's summary.",
         "gesture": "Click Load.",
-        "outcome": "The request is GET /rounds/doses?resident=r-104 and shown reads 3 doses for r-104.",
-        "opposite": "At bed 2 the same click sends r-105 and shows its summary for r-105.",
-        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty resident.",
+        "outcome": "The request is GET /items?code=a-1 and shown reads 3 items for a-1.",
+        "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
         "observes": "Request.tla:Route"
       }
     },
     "http.post": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the test app's doses endpoint with round.Value as the JSON body's resident, its success setting shown's text to the body's summary.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the test app's items endpoint with conformance.Value as the JSON body's code, its success setting shown's text to the body's summary.",
         "gesture": "Click Load.",
-        "outcome": "The body sent is {\"resident\":\"r-104\"} and shown reads Recorded r-104.",
-        "opposite": "At bed 2 the same click sends r-105 and shows its summary for r-105.",
-        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty resident.",
+        "outcome": "The body sent is {\"code\":\"a-1\"} and shown reads Recorded a-1.",
+        "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
         "observes": "Request.tla:Route"
       }
     },
     "http.put": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a PUT to the test app's bed endpoint with round.Value as the form data's Resident, its success setting shown's text to the body's summary.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a PUT to the test app's item endpoint with conformance.Value as the form data's Code, its success setting shown's text to the body's summary.",
         "gesture": "Click Load.",
-        "outcome": "The form data sent holds Resident=r-104 and shown reads Moved r-104.",
-        "opposite": "At bed 2 the same click sends r-105 and shows its summary for r-105.",
-        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty resident.",
+        "outcome": "The form data sent holds Code=a-1 and shown reads Moved a-1.",
+        "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
         "observes": "Request.tla:Route"
       }
     },
     "http.delete": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a DELETE to the test app's round endpoint with round.Value as the JSON body's resident, its success setting shown's text to the body's summary.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a DELETE to the test app's item endpoint with conformance.Value as the JSON body's code, its success setting shown's text to the body's summary.",
         "gesture": "Click Load.",
-        "outcome": "The body sent is {\"resident\":\"r-104\"} and shown reads Closed r-104.",
-        "opposite": "At bed 2 the same click sends r-105 and shows its summary for r-105.",
-        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty resident.",
+        "outcome": "The body sent is {\"code\":\"a-1\"} and shown reads Closed a-1.",
+        "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
+        "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
         "observes": "Request.tla:Route"
       }
     },
     "http.beside.route": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to /wards/{ward}/notes with Ward set to North and round.Value as Resident, the endpoint answering the ward and resident as shown's text.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to /groups/{group}/notes with Group set to Alpha and conformance.Value as Code, the endpoint answering the group and code as shown's text.",
         "gesture": "Click Load.",
-        "outcome": "The request is POST /wards/North/notes, its body holds Resident r-104, and shown reads North: r-104.",
-        "opposite": "With Ward set to South the same click posts to /wards/South/notes.",
-        "defect": "The placeholder is filled from the component's value instead of Ward, so the request goes to /wards/r-104/notes.",
+        "outcome": "The request is POST /groups/Alpha/notes, its body holds Code a-1, and shown reads Alpha: a-1.",
+        "opposite": "With Group set to Beta the same click posts to /groups/Beta/notes.",
+        "defect": "The placeholder is filled from the component's value instead of Group, so the request goes to /groups/a-1/notes.",
         "observes": "Request.tla:Route"
       }
     },
     "http.beside.query": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a GET to the doses endpoint with round.Value as resident and the literal 2026-11-10 as day.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the items endpoint with conformance.Value as code and the literal 2026-11-10 as day.",
         "gesture": "Click Load.",
-        "outcome": "The request is GET /rounds/doses?resident=r-104&day=2026-11-10.",
-        "opposite": "Without the day the request is GET /rounds/doses?resident=r-104.",
-        "defect": "The query keeps only the last member, so the request is GET /rounds/doses?day=2026-11-10.",
+        "outcome": "The request is GET /items?code=a-1&day=2026-11-10.",
+        "opposite": "Without the day the request is GET /items?code=a-1.",
+        "defect": "The query keeps only the last member, so the request is GET /items?day=2026-11-10.",
         "observes": "Request.tla:Route"
       }
     },
     "http.beside.header": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the notes endpoint with round.Value as Resident and the header X-Shift set to Late, the endpoint answering the header as shown's text.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the notes endpoint with conformance.Value as Code and the header X-Mode set to Late, the endpoint answering the header as shown's text.",
         "gesture": "Click Load.",
-        "outcome": "The body holds Resident r-104 and shown reads X-Shift Late.",
-        "opposite": "Without the header shown reads X-Shift none.",
-        "defect": "The header is sent as a body member, so shown reads X-Shift none.",
+        "outcome": "The body holds Code a-1 and shown reads X-Mode Late.",
+        "opposite": "Without the header shown reads X-Mode none.",
+        "defect": "The header is sent as a body member, so shown reads X-Mode none.",
         "observes": "Request.tla:Route"
       }
     },
     "http.beside.static": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the notes endpoint with round.Value as Resident and the literal member Source set to ward-round.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the notes endpoint with conformance.Value as Code and the literal member Source set to conformance.",
         "gesture": "Click Load.",
-        "outcome": "The body sent is {\"resident\":\"r-104\",\"source\":\"ward-round\"}.",
-        "opposite": "Without the literal the body is {\"resident\":\"r-104\"}.",
+        "outcome": "The body sent is {\"code\":\"a-1\",\"source\":\"conformance\"}.",
+        "opposite": "Without the literal the body is {\"code\":\"a-1\"}.",
         "defect": "The literal is written by its C# name Source, so the endpoint binds no source.",
         "observes": "Request.tla:Route"
       }
     },
     "http.beside.hidden": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends the form's inputs, a hidden RoundId of NR-2026-11-10 and the round bound to Resident, to the notes endpoint as form data.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends the form's inputs, a hidden Batch of B-2026-11-10 and the ConformanceComponent bound to Code, to the notes endpoint as form data.",
         "gesture": "Click Load.",
-        "outcome": "The form data sent holds RoundId=NR-2026-11-10 and Resident=r-104.",
-        "opposite": "At bed 2 the same click sends Resident=r-105 beside the same RoundId.",
-        "defect": "The hidden input is skipped as a non-component input, so the form data holds Resident=r-104 alone.",
+        "outcome": "The form data sent holds Batch=B-2026-11-10 and Code=a-1.",
+        "opposite": "With a-2 picked in the component the same click sends Code=a-2 beside the same Batch.",
+        "defect": "The hidden input is skipped as a non-component input, so the form data holds Code=a-1 alone.",
         "observes": "Request.tla:Route"
       }
     },
     "http.into": {
       "members": [
-        "WardRound.change"
+        "ConformanceComponent.change"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward page with an empty card element and an Open bed card button whose click GETs the test app's card endpoint into card; the card's partial renders a WardRound titled Bed 1 round and a Change handler that sets the card's picked text to the round's Value.",
-        "gesture": "Click Open bed card, then bed 2 in the loaded round.",
-        "outcome": "The card shows the heading Bed 1 round and picked reads r-105.",
+        "page": "A page with an empty card element and an Open card button whose click GETs the test app's card endpoint into card; the card's partial renders a ConformanceComponent whose text is Card component and a Change handler that sets the card's picked text to the component's Value.",
+        "gesture": "Click Open card, then Pick a-2 in the loaded component.",
+        "outcome": "The card shows the heading Card component and picked reads a-2.",
         "opposite": "Before the click the card is empty.",
-        "defect": "The loaded partial's plan is not started, so bed 2's click runs no handler and picked stays empty.",
+        "defect": "The loaded partial's plan is not started, so Pick a-2 runs no handler and picked stays empty.",
         "observes": "Request.tla:Route"
       }
     },
     "http.whileLoading": {
       "members": [
-        "WardRound.title"
+        "ConformanceComponent.text"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a GET to the doses endpoint whose WhileLoading sets round.Title to Loading doses and whose success sets it to North round, 3 due.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the items endpoint whose WhileLoading sets conformance.Text to Loading items and whose success sets it to Alpha, 3 items.",
         "gesture": "Click Load.",
-        "outcome": "While the doses endpoint is held the heading reads Loading doses; once it answers it reads North round, 3 due.",
-        "opposite": "A request that stops in its guard sends nothing and the heading keeps North round.",
-        "defect": "WhileLoading runs after the response, so the heading never reads Loading doses.",
+        "outcome": "While the items endpoint is held the heading reads Loading items; once it answers it reads Alpha, 3 items.",
+        "opposite": "A request that stops in its guard sends nothing and the heading keeps Alpha.",
+        "defect": "WhileLoading runs after the response, so the heading never reads Loading items.",
         "observes": "Request.tla:Loading"
       }
     },
     "http.response.success": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the move endpoint, which answers {\"resident\":\"r-105\"}, its success setting round.Value to the body's Resident.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint, which answers {\"code\":\"a-2\"}, its success setting conformance.Value to the body's Code.",
         "gesture": "Click Load.",
-        "outcome": "The round's resident line reads r-105.",
-        "opposite": "When the endpoint answers 409 the success route does not run and the line keeps r-104.",
-        "defect": "The body is read before it is decoded, so round.Value is set to nothing and the line empties.",
+        "outcome": "The component's value line reads a-2.",
+        "opposite": "When the endpoint answers 409 the success route does not run and the line keeps a-1.",
+        "defect": "The body is read before it is decoded, so conformance.Value is set to nothing and the line empties.",
         "observes": "Request.tla:Route"
       }
     },
     "http.response.error": {
       "members": [
-        "WardRound.title"
+        "ConformanceComponent.text"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the move endpoint, which answers 422 with {\"message\":\"Bed 2 is closed\"}, its error route setting round.Title to the error body's Message.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint, which answers 422 with {\"message\":\"a-2 is closed\"}, its error route setting conformance.Text to the error body's Message.",
         "gesture": "Click Load.",
-        "outcome": "The round's heading reads Bed 2 is closed.",
-        "opposite": "When the endpoint answers 200 the error route does not run and the heading keeps North round.",
+        "outcome": "The component's heading reads a-2 is closed.",
+        "opposite": "When the endpoint answers 200 the error route does not run and the heading keeps Alpha.",
         "defect": "The error route reads the success body's shape, so the heading empties.",
         "observes": "Request.tla:Route"
       }
     },
     "http.chained": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the move endpoint whose success sets round.Value to r-105, then Chained a GET to the doses endpoint with round.Value as resident.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint whose success sets conformance.Value to a-2, then Chained a GET to the items endpoint with conformance.Value as code.",
         "gesture": "Click Load.",
-        "outcome": "The chained request is GET /rounds/doses?resident=r-105.",
+        "outcome": "The chained request is GET /items?code=a-2.",
         "opposite": "When the move answers 409 no chained request is sent.",
-        "defect": "The chained request reads round.Value before the first success route ran, so it sends resident=r-104.",
+        "defect": "The chained request reads conformance.Value before the first success route ran, so it sends code=a-1.",
         "observes": "Request.tla:Chained"
       }
     },
     "http.parallel": {
       "members": [
-        "WardRound.title",
-        "WardRound.value"
+        "ConformanceComponent.text",
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends Parallel GETs to the doses endpoint, setting round.Title to its summary, and to the bed endpoint, setting round.Value to its resident; the test releases the bed endpoint first.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends Parallel GETs to the items endpoint, setting conformance.Text to its summary, and to the code endpoint, setting conformance.Value to its code; the test releases the code endpoint first.",
         "gesture": "Click Load.",
-        "outcome": "Once the bed endpoint answers the resident line reads r-105 while the heading keeps North round; once the doses endpoint answers the heading reads 3 due.",
-        "opposite": "A refused bed request leaves r-104 while the doses branch still sets 3 due.",
-        "defect": "The branches' routes run only after both answer, so r-105 shows only with 3 due.",
+        "outcome": "Once the code endpoint answers the value line reads a-2 while the heading keeps Alpha; once the items endpoint answers the heading reads 3 items.",
+        "opposite": "A refused code request leaves a-1 while the items branch still sets 3 items.",
+        "defect": "The branches' routes run only after both answer, so a-2 shows only with 3 items.",
         "observes": "Lanes.tla:AllSettled"
       }
     },
     "http.finally": {
       "members": [
-        "WardRound.title"
+        "ConformanceComponent.text"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Load button whose click sends a POST to the move endpoint whose Finally sets round.Title to Doses checked.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint whose Finally sets conformance.Text to Finished.",
         "gesture": "Click Load.",
-        "outcome": "Once the endpoint answers 200 the heading reads Doses checked.",
-        "opposite": "When the endpoint answers 500 the heading also reads Doses checked.",
-        "defect": "Finally runs only on success, so a 500 leaves North round.",
+        "outcome": "Once the endpoint answers 200 the heading reads Finished.",
+        "opposite": "When the endpoint answers 500 the heading also reads Finished.",
+        "defect": "Finally runs only on success, so a 500 leaves Alpha.",
         "observes": "Request.tla:Finally"
       }
     },
     "lane.confirm": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, and a Move button whose click asks NativeConfirm Move Helen to bed 2? and sets round.Value to r-105 when the answer is yes.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Move button whose click asks NativeConfirm Move to a-2? and sets conformance.Value to a-2 when the answer is yes.",
         "gesture": "Click Move and answer OK.",
-        "outcome": "The round's resident line reads r-105.",
-        "opposite": "Answering Cancel leaves r-104.",
-        "defect": "The write runs before the answer settles, so Cancel still moves Helen to r-105.",
+        "outcome": "The component's value line reads a-2.",
+        "opposite": "Answering Cancel leaves a-1.",
+        "defect": "The write runs before the answer settles, so Cancel still moves the value to a-2.",
         "observes": "Run.tla:Settle"
       }
     },
     "lane.push": {
       "members": [
-        "WardRound.title"
+        "ConformanceComponent.text"
       ],
       "version": "current",
       "promise": {
-        "page": "On net10, a ward round page for North ward whose WardRound round, titled North round, stands at bed 1, Helen Martinez (r-104), with an element shown, subscribed to the ward stream whose BedMoved message sets round.Value to the message's Resident, and an Announce move button that posts to the test app's move endpoint, which pushes BedMoved with r-105.",
-        "gesture": "Click Announce move.",
-        "outcome": "The round's resident line reads r-105.",
-        "opposite": "Before the push it reads r-104.",
-        "defect": "The message's member is read by its C# name Resident, so round.Value is set to nothing and the line empties.",
+        "page": "On net10, a page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, subscribed to the test stream whose Renamed message sets conformance.Text to the message's Text, and an Announce button that posts to the test app's rename endpoint, which pushes Renamed with Beta.",
+        "gesture": "Click Announce.",
+        "outcome": "The component's heading reads Beta.",
+        "opposite": "Before the push it reads Alpha.",
+        "defect": "The message's member is read by its C# name Text, so conformance.Text is set to nothing and the heading empties.",
         "observes": "Realtime.tla:Message"
       }
     },
     "lane.slot.load": {
       "members": [
-        "WardRound.change"
+        "ConformanceComponent.change"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward page whose card slot is loaded on start by a GET to the test app's card endpoint; the card's partial renders a WardRound and a Change handler that sets the card's picked text to the round's Value.",
-        "gesture": "Click bed 2 in the card's round.",
-        "outcome": "picked reads r-105.",
+        "page": "A page whose card slot is loaded on start by a GET to the test app's card endpoint; the card's partial renders a ConformanceComponent and a Change handler that sets the card's picked text to the component's Value.",
+        "gesture": "Click Pick a-2 in the card's component.",
+        "outcome": "picked reads a-2.",
         "opposite": "Before the click picked is empty.",
-        "defect": "The slot's plan subscribes before the round mounts, so bed 2's click runs no handler.",
+        "defect": "The slot's plan subscribes before the component mounts, so Pick a-2 runs no handler.",
         "observes": "Ownership.tla:LoadA"
       }
     },
     "lane.slot.unloadListener": {
       "members": [
-        "WardRound.change"
+        "ConformanceComponent.change"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward page with the page's WardRound and a card slot whose plan listens to the page's round by its element id, setting the page's log text to the round's Value on Change, and a Close card button that unloads the slot.",
-        "gesture": "Click Close card, then bed 2 on the page's round.",
+        "page": "A page with the page's ConformanceComponent and a card slot whose plan listens to the page's component by its element id, setting the page's log text to the component's Value on Change, and a Close card button that unloads the slot.",
+        "gesture": "Click Close card, then Pick a-2 on the page's component.",
         "outcome": "log keeps empty: the unloaded slot's listener is gone.",
-        "opposite": "With the card still loaded the same click on bed 2 sets log to r-105.",
-        "defect": "The unload removes the card's content and leaves its listener on the page's round, so log reads r-105.",
+        "opposite": "With the card still loaded the same click sets log to a-2.",
+        "defect": "The unload removes the card's content and leaves its listener on the page's component, so log reads a-2.",
         "observes": "Ownership.tla:UnloadA"
       }
     },
     "lane.slot.hostDestroyed": {
       "members": [
-        "WardRound.destroy()",
-        "WardRound.isDestroyed",
-        "WardRound.change"
+        "ConformanceComponent.destroy()",
+        "ConformanceComponent.isDestroyed",
+        "ConformanceComponent.change"
       ],
       "version": "current",
       "promise": {
-        "page": "A ward page whose card slot holds a WardRound, a Restart round button whose click lets the round's host destroy it and mount a new one, and Close card and Open card buttons.",
-        "gesture": "Click Restart round, Close card, then Open card.",
-        "outcome": "The page's error line stays empty and the reopened card shows its round at bed 1.",
+        "page": "A page whose card slot holds a ConformanceComponent, a Restart button whose click lets the component's host destroy it and mount a new one, and Close card and Open card buttons.",
+        "gesture": "Click Restart, Close card, then Open card.",
+        "outcome": "The page's error line stays empty and the reopened card shows its component with the value a-1.",
         "opposite": "Closing without a restart also leaves the error line empty.",
-        "defect": "The unload removes the listener from the destroyed round, whose element no longer holds it, so removeEventListener throws and the error line reads it.",
+        "defect": "The unload removes the listener from the destroyed component, whose element no longer holds it, so removeEventListener throws and the error line reads it.",
         "observes": "Ownership.tla:HostDestroys"
       }
     },
@@ -1949,85 +2210,85 @@
     },
     "validation.rule": {
       "members": [
-        "WardRound.value",
-        "WardRound.change"
+        "ConformanceComponent.value",
+        "ConformanceComponent.change"
       ],
       "version": "current",
       "promise": {
-        "page": "A round form for the resident at the bedside, its WardRound bound to RoundForm.Resident, whose ReactiveValidator writes NotEmpty with the message Choose the resident at the bedside., and a Save button that posts the form to the test app's round endpoint.",
+        "page": "A form, its ConformanceComponent bound to ConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's form endpoint.",
         "gesture": "Click Save.",
-        "outcome": "The message Choose the resident at the bedside. shows beside the round and nothing is sent.",
-        "opposite": "After choosing bed 1, Save sends Resident=r-104 and shows the server's Saved r-104.",
-        "defect": "The rule is bound to the round's element by a name its input does not carry, so Save sends the empty form.",
+        "outcome": "The message Pick a code. shows beside the component and nothing is sent.",
+        "opposite": "After Pick a-1, Save sends Code=a-1 and shows the server's Saved a-1.",
+        "defect": "The rule is bound to the component's element by a name its input does not carry, so Save sends the empty form.",
         "observes": "Request.tla:Check"
       }
     },
     "validation.condition": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A round form for the resident at the bedside, its WardRound bound to RoundForm.Resident, whose ReactiveValidator writes NotEmpty with the message Choose the resident at the bedside., and a Save button that posts the form to the test app's round endpoint, the rule written When(m => m.IsNightRound), and a night round box.",
-        "gesture": "Tick night round, then click Save.",
-        "outcome": "The message Choose the resident at the bedside. shows beside the round.",
-        "opposite": "With night round unticked Save sends the form and shows Saved.",
-        "defect": "The condition reads IsNightRound by its C# name, so it never holds and Save sends the empty form.",
+        "page": "A form, its ConformanceComponent bound to ConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's form endpoint, the rule written When(m => m.IsStrict), and a strict box.",
+        "gesture": "Tick strict, then click Save.",
+        "outcome": "The message Pick a code. shows beside the component.",
+        "opposite": "With strict unticked Save sends the form and shows Saved.",
+        "defect": "The condition reads IsStrict by its C# name, so it never holds and Save sends the empty form.",
         "observes": "Request.tla:Check"
       }
     },
     "validation.live": {
       "members": [
-        "WardRound.change"
+        "ConformanceComponent.change"
       ],
       "version": "current",
       "promise": {
-        "page": "A round form for the resident at the bedside, its WardRound bound to RoundForm.Resident, whose ReactiveValidator writes NotEmpty with the message Choose the resident at the bedside., and a Save button that posts the form to the test app's round endpoint, after a Save that showed its message.",
-        "gesture": "Choose bed 1 in the round.",
+        "page": "A form, its ConformanceComponent bound to ConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's form endpoint, after a Save that showed its message.",
+        "gesture": "Click Pick a-1 in the component.",
         "outcome": "The message clears without another Save.",
-        "opposite": "Choosing no bed leaves the message.",
-        "defect": "Live validation listens for the input event, which the round never raises, so the message stays."
+        "opposite": "Picking no value leaves the message.",
+        "defect": "Live validation listens for the input event, which the component never raises, so the message stays."
       }
     },
     "validation.summary": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A round form for the resident at the bedside, its WardRound bound to RoundForm.Resident, whose ReactiveValidator writes NotEmpty with the message Choose the resident at the bedside., and a Save button that posts the form to the test app's round endpoint and a validation summary.",
+        "page": "A form, its ConformanceComponent bound to ConformanceForm.Code, whose ReactiveValidator writes NotEmpty with the message Pick a code., and a Save button that posts the form to the test app's form endpoint, and a validation summary.",
         "gesture": "Click Save.",
-        "outcome": "The summary lists Choose the resident at the bedside.",
-        "opposite": "After choosing bed 1 the summary is empty.",
+        "outcome": "The summary lists Pick a code.",
+        "opposite": "After Pick a-1 the summary is empty.",
         "defect": "The message's place is read from the page instead of the plan, so the summary stays empty."
       }
     },
     "validation.listItem": {
       "members": [
-        "WardRound.value",
-        "WardRound.change"
+        "ConformanceComponent.value",
+        "ConformanceComponent.change"
       ],
       "version": "current",
       "promise": {
-        "page": "A morning handover of two rounds, each a WardRound bound to Rounds[i].Resident, whose ReactiveValidator writes NotEmpty on each round's Resident, and a Save button.",
-        "gesture": "Choose bed 1 in the first round, then click Save.",
-        "outcome": "The message shows beside the second round only, and nothing is sent.",
-        "opposite": "With both rounds chosen Save sends Rounds[0].Resident=r-104 and Rounds[1].Resident=r-105.",
-        "defect": "The rule is bound to Rounds.Resident without the index, so the message shows beside the first round.",
+        "page": "A form of two entries, each a ConformanceComponent bound to Entries[i].Code, whose ReactiveValidator writes NotEmpty on each entry's Code, and a Save button.",
+        "gesture": "Click Pick a-1 in the first component, then click Save.",
+        "outcome": "The message shows beside the second component only, and nothing is sent.",
+        "opposite": "With a-1 picked in the first and a-2 in the second, Save sends Entries[0].Code=a-1 and Entries[1].Code=a-2.",
+        "defect": "The rule is bound to Entries.Code without the index, so the message shows beside the first component.",
         "observes": "Request.tla:Check"
       }
     },
     "validation.prefix": {
       "members": [
-        "WardRound.value"
+        "ConformanceComponent.value"
       ],
       "version": "current",
       "promise": {
-        "page": "A day form whose morning round is rendered by Html.PartialFor(m => m.Morning), its WardRound bound to Resident under the prefix Morning, with NotEmpty on Morning.Resident.",
-        "gesture": "Choose bed 1 in the morning round, then click Save.",
-        "outcome": "The form sends Morning.Resident=r-104 and the server binds it, showing Saved r-104.",
-        "opposite": "Saving with no bed chosen shows the message beside the morning round.",
-        "defect": "The round's name drops the prefix, so the form sends Resident=r-104 and the server binds no morning resident.",
+        "page": "A form whose first entry is rendered by Html.PartialFor(m => m.First), its ConformanceComponent bound to Code under the prefix First, with NotEmpty on First.Code.",
+        "gesture": "Click Pick a-1 in the first entry's component, then click Save.",
+        "outcome": "The form sends First.Code=a-1 and the server binds it, showing Saved a-1.",
+        "opposite": "Saving with no value picked shows the message beside the first entry's component.",
+        "defect": "The component's name drops the prefix, so the form sends Code=a-1 and the server binds no first code.",
         "observes": "Request.tla:Check"
       }
     }
