@@ -1,0 +1,244 @@
+{
+  "module": "OwnershipAndState",
+  "features": [
+    {
+      "id": "M18.F1",
+      "summary": "Ownership and state: the owners are closed, the page and a slot, a slot named in the plan by its container id. Each plan belongs to the slot whose container is the innermost around its script, else the page, and the page is never released. What a plan asks for, its listeners, holds, registrations, containers and runs, and what HTML carries, its components, slots and plans, belong to that owner. Each piece of browser state lives in one place: the page holds the inputs and the containers by element id, each entry under the owner that contributed it, the connections by URL and the app-level contracts; an owner holds a plan's culture and time zone, by its plan; a container holds the inputs inside it and its one summary; and a request holds what it sent until it settles, and places each failure at the input it sent under that key. A plan's id keys nothing. Main's owner is a slot's abort controller, keyed by the slot id a load names, and its state is keyed by plan id: it composes plans by it and finds a plan's summary by it. The redesign holds closed page and slot owners and one page-wide table of inputs, and neither line carries a plan's time zone.",
+      "status": "internal",
+      "types": [],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "private readonly activePlans = new Map<PlanId, PlanDocument>();",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:24"
+        },
+        {
+          "line": "main",
+          "text": "private readonly partialSlotLoads = new Map<SlotId, PartialSlotLoad>();",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:26"
+        },
+        {
+          "line": "main",
+          "text": "slotLoad.abortController.abort();",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:78"
+        },
+        {
+          "line": "main",
+          "text": "let bootAbort = new AbortController();",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/boot.ts:22"
+        },
+        {
+          "line": "main",
+          "text": "clearSummaryForPlan(planId);",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/boot.ts:74"
+        },
+        {
+          "line": "main",
+          "text": "planId.Replace('.', '_').Replace('+', '_') + \"_validation_summary\";",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:143"
+        },
+        {
+          "line": "main",
+          "text": "if (validation === undefined) return addSummaryError(surface.summary, error.name, message);",
+          "cite": "Alis.Reactive.Assets/runtime/validation/orchestrator.ts:167"
+        },
+        {
+          "line": "redesign",
+          "text": "static page(): Owner {",
+          "cite": "Alis.Reactive.Assets/runtime/objects/owner.ts:12"
+        },
+        {
+          "line": "redesign",
+          "text": "static slot(id: string): Owner {",
+          "cite": "Alis.Reactive.Assets/runtime/objects/owner.ts:16"
+        },
+        {
+          "line": "redesign",
+          "text": "internal string Slot(string containerId) => PluginObject(\"$slot:\" + containerId, \"alis.slot\", containerId, PluginData.None);",
+          "cite": "Alis.Reactive/PlanModel/Writing/Scope.cs:234"
+        },
+        {
+          "line": "redesign",
+          "text": "const slot = innermostSlot(script, slotIds);",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:63"
+        },
+        {
+          "line": "redesign",
+          "text": "const inputsById = new Map<string, ModelInput[]>();",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/model.ts:42"
+        },
+        {
+          "line": "redesign",
+          "text": "form.entries = form.entries.filter(entry => !added.includes(entry));",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:241"
+        },
+        {
+          "line": "redesign",
+          "text": "if (id !== undefined && canRenderInline(id)) {",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:182"
+        },
+        {
+          "line": "redesign",
+          "text": "return date === undefined ? undefined : new Instant(date.getTime(), -Math.round(date.getTimezoneOffset()));",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/shape.ts:110"
+        },
+        {
+          "line": "proposed",
+          "text": "A view's plan is a block of the view, and the plan belongs to the slot whose container is the innermost around its script, else the page; no door names an owner.",
+          "doors": [
+            "N14.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A request's Into loads a slot, and the slot owns the plans its content holds until its next load or its unload.",
+          "doors": [
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A listen step's listener belongs to the owner of the plan whose pipeline added it, and leaves at that owner's release.",
+          "doors": [
+            "N12.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A container reads a member as the container sends it, so a read by binding name belongs to a container and names one input.",
+          "doors": [
+            "N13.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A container renders its one summary through its block, and the summary keeps its messages after a slot that joined the container leaves.",
+          "doors": [
+            "N14.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Each view's plan carries the time zone the app chooses for its request, and each plan's steps show and send an instant under its own plan's zone.",
+          "doors": [
+            "N3.5"
+          ]
+        }
+      ],
+      "nodes": [
+        "plugin",
+        "none",
+        "form",
+        "model",
+        "hub",
+        "stream",
+        "listen",
+        "request",
+        "zone"
+      ],
+      "writes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/PlanModel/Writing/Scope.cs:226-238"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ReactivePlan.cs:43-47"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Razor/Extensions/PlanExtensions.cs:128-144"
+        }
+      ],
+      "executes": [
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/owner.ts:6-41"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/root.ts:58-89"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/model.ts:42-101"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/form/form.ts:167-245"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/applied-plans.ts:18-80"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/lifecycle/boot.ts:22-98"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/validation/orchestrator.ts:161-182"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/validation/error-display.ts:57-60"
+        }
+      ],
+      "core": [
+        "Q12",
+        "Q13"
+      ],
+      "meanings": [],
+      "oracle": "The spec itself where the framework is the authority: D12.1's closed owners, D12.2 and D12.3's holdings, D13.1's table and spec/Core/Ownership.tla; the DOM Standard's AbortSignal and dispatch; ECMA-402's Intl for a zone's offsets on a day (probe:intl-iana-zone-offsets); and the endpoint's error body, whose keys are binding names (D10.8).",
+      "checker": [
+        "core:Q12",
+        "core:Q13",
+        "Ownership.tla:NoSlotOutlivesItsContainer",
+        "Ownership.tla:BootContentBelongsToItsSlot",
+        "Ownership.tla:RegistrationsDoNotAccumulate",
+        "Ownership.tla:RulesLeaveWithTheirOwner",
+        "Ownership.tla:HubKeptWhileHeld",
+        "Ownership.tla:OfferOnlyWhileHeld",
+        "Ownership.tla:EveryOwnerReleasedPastAThrow"
+      ],
+      "defects": [
+        {
+          "id": "X13.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "M18.X1",
+          "rung": "behavior",
+          "defect": "A plan's culture or time zone held once per page, the boot plan's, so content a slot loads, which the app rendered under another culture or zone, reads its numbers by the page's culture and shows and sends its instants at the page's zone; or the culture or zone of the plan loaded last replaces the page's for every plan (D13.1: a plan's culture and time zone live with its owner, by its plan). Neither line carries a zone in a plan: both read an instant at the browser clock's offset (Alis.Reactive.Assets/runtime/grammar/shape.ts:110 at 65fdf118d, Alis.Reactive.Assets/runtime/execution/requests/request-wire-format.ts:37 at 623dd4a27)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X13.4",
+          "page": "A move-in page whose form holds the resident's Name and two addresses, rendered through the Address editor template by Html.EditorFor(m => m.Home) and Html.EditorFor(m => m.Postal); the template starts its own plan and renders a Street input with its message element. Save posts the form to an endpoint that answers 400 with the message \"Give a street the post office knows.\" under Home.Street or Postal.Street for each address whose street is Unknown, and otherwise answers Saved into move-in-status, which reads Not saved until then.",
+          "gesture": "Type Ada Lee into Name, Main Road into the Home address's Street and Unknown into the Postal address's Street, and click Save.",
+          "outcome": "\"Give a street the post office knows.\" shows beside the Postal address's Street and in the move-in container's summary, no message shows beside the Home address's Street, and move-in-status keeps Not saved.",
+          "opposite": "With Unknown typed into the Home address's Street and Main Road into the Postal address's, the message shows beside the Home address's Street and none beside the Postal address's.",
+          "defect": "The message's place is looked up among the inputs the page's own plan holds, as main looks it up among its own plan's validation rules (Alis.Reactive.Assets/runtime/validation/orchestrator.ts:166-167 at 623dd4a27), so it shows only in the summary; or an input is found by its member in a record keyed by the plan id the two renderings of the template share, so the message shows beside the Home address's Street."
+        },
+        {
+          "for": "M18.X1",
+          "page": "A net10 visit board rendered under the time zone the app chooses for each request (N3.5), America/New_York, in a browser whose zone is UTC. Its Show visit button gets a visit whose Starts the endpoint holds as the DateTimeOffset 2026-01-15T12:00:00Z and sets board-visit from it; its Open Kolkata desk button loads into the slot desk a desk partial whose request the app renders under Asia/Kolkata, whose Show desk visit button gets the same visit and sets desk-visit from it.",
+          "gesture": "Click Open Kolkata desk, click Show desk visit, then click Show visit.",
+          "outcome": "desk-visit shows 2026-01-15T17:30:00+05:30 and board-visit shows 2026-01-15T07:00:00-05:00, each zone's offset on that day (probe:intl-iana-zone-offsets).",
+          "opposite": "With the desk's request rendered under America/New_York, the same clicks show 2026-01-15T07:00:00-05:00 in desk-visit.",
+          "defect": "The page holds one zone, the boot plan's, so desk-visit shows 2026-01-15T07:00:00-05:00; or the desk plan's zone replaces the page's, so board-visit, set after the desk loads, shows 2026-01-15T17:30:00+05:30; or an instant takes the browser clock's offset, as both lines give one (Alis.Reactive.Assets/runtime/grammar/shape.ts:110 at 65fdf118d), so both show 2026-01-15T12:00:00Z."
+        },
+        {
+          "for": "M18.X1",
+          "page": "A net10 dose board rendered under the request culture de-DE, in a browser whose locale is en-US, with a native text box Strength bound to a decimal and a Save button that posts it as form data to an endpoint the app binds under de-DE, which writes the bound Strength in invariant text into board-strength; its Open Boston desk button loads into the slot desk a desk partial the app renders under en-US, with its own decimal Strength text box and a Save desk button that posts it as form data to an endpoint the app binds under en-US, which writes the bound Strength into desk-strength.",
+          "gesture": "Click Open Boston desk, type 1.5 into the desk's Strength and click Save desk, then type 1,5 into the board's Strength and click Save.",
+          "outcome": "desk-strength shows 1.5 and board-strength shows 1.5, each typed number read and sent under its own plan's culture (probe:core-form-decimal-culture-en-us, probe:core-form-decimal-culture).",
+          "opposite": "With the desk partial rendered and bound under de-DE, typing 1,5 into the desk's Strength and clicking Save desk shows 1.5 in desk-strength.",
+          "defect": "The page holds one culture, the boot plan's, so the desk's 1.5 is read under de-DE as 15 and desk-strength shows 15; or the desk plan's culture replaces the page's, so the board's 1,5, typed after the desk loads, is read under en-US as 15 and board-strength shows 15."
+        }
+      ]
+    }
+  ]
+}

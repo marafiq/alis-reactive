@@ -32,12 +32,12 @@ each claimed there: `RegisterPlugin<TPlugin>()` and main's two `RegisterPlugin` 
 `BrowserRules` in M8.F3; `Render<TComponent>` in M12.F2. `Component<TComponent>()`, an app-level object's door, stays
 in M9.F1 until module 25 claims it, and `FormSummary` stays, refused and carried by the container's block (N14.3).
 
-What a release removes from a component and its vendor (D12.5: X12.7, X12.13, X12.16) is module 18's and module 12's; a
-hub or a stream a slot holds (X12.5, X12.6) is module 10's; a `listen` on an object a payload or a method hands over
-(X12.9, X12.10) belongs with N12.1's listening kinds, module 12's; whether a slot's own rule holds the page's save
-(X12.4) is module 8's, since the check that holds a request is its validator's (D16.2); a step that writes over a slot
-across plans (X12.12) is module 5's; an input id two live plans hold (X14.7) and the partial for a member (N14.1) are
-module 7's.
+What a release removes from a component and its vendor (D12.5: X12.7, X12.13, X12.16) is module 12's (M12.F1, M12.F2),
+and what an owner holds module 18's; a hub or a stream a slot holds (X12.5, X12.6) is module 10's; a `listen` on an
+object a payload or a method hands over (X12.9, X12.10) belongs with N12.1's listening kinds, module 12's; whether a
+slot's own rule holds the page's save (X12.4) is module 8's, since the check that holds a request is its validator's
+(D16.2); a step that writes over a slot across plans (X12.12) is module 5's; an input id two live plans hold (X14.7) and
+the partial for a member (N14.1) are module 7's.
 
 ## Doors
 
@@ -64,10 +64,11 @@ The meanings `M9.D1` and `M9.D2` are in `spec/PartialsAndSlots/features.json`, o
   view renders (`Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:50-75` at 65fdf118d); main renders what the plan
   holds when `RenderPlan` runs and refuses neither (`Alis.Reactive/Razor/Extensions/PlanExtensions.cs:110-125` at
   623dd4a27). The block of N14.2 writes the plan at its end, so neither compiles.
-- A load releases what the slot held before it replaces the content (D12.4). Main empties the container and appends
-  the new content before it aborts the slot's old listeners (`Alis.Reactive.Assets/runtime/execution/partials/inject.ts:30-42`
-  at 623dd4a27); the redesign announces the unmount of the old content first
-  (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38` at 65fdf118d), the order the rewrite keeps.
+- A load releases what the slot held before it replaces the content (D12.4). Main empties the container and appends the
+  new content before it aborts the slot's old listeners
+  (`Alis.Reactive.Assets/runtime/execution/partials/inject.ts:30-42` at 623dd4a27); the redesign announces the unmount
+  of the old content first (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38` at 65fdf118d), the order the rewrite
+  keeps.
 - A release that meets a throw releases every owner and stops the step that asked for it (D12.4, X12.15, X12.17). The
   redesign logs each disposer's error and goes on as if the release had been clean
   (`Alis.Reactive.Assets/runtime/objects/owner.ts:32-40` at 65fdf118d).
@@ -85,5 +86,5 @@ The meanings `M9.D1` and `M9.D2` are in `spec/PartialsAndSlots/features.json`, o
   `Alis.Reactive.Assets/runtime/plugins/slot.ts:28-33` at 65fdf118d); D12.4's order starts at the release, so M9.D2
   states the read before it.
 - A slot empties by its own door (`Unload`, D12.9). Main has none: its browser releases a slot's plans when a load
-  brings content with no plan (`Alis.Reactive.Assets/runtime/execution/partials/inject.ts:38-42` at 623dd4a27), so a view
-  empties a slot by loading empty content from the server.
+  brings content with no plan (`Alis.Reactive.Assets/runtime/execution/partials/inject.ts:38-42` at 623dd4a27), so a
+  view empties a slot by loading empty content from the server.

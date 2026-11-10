@@ -686,7 +686,7 @@ CORE_DEFECT = re.compile(r"^X\d+\.\d+$")
 DOOR_ID = re.compile(r"^(?:N\d+\.\d+|M\d+\.N\d+)$")
 VERDICT_KINDS = {"kept", "renamed", "refused"}
 SENTENCE_LINES = {"main": MAIN_SHA, "redesign": BASE_SHA, "proposed": None}
-FEATURE_STATUSES = {"both", "main-only", "redesign-only"}
+FEATURE_STATUSES = {"both", "main-only", "redesign-only", "internal"}
 MAIN_SIDE = {"main-only", "both", "moved"}
 REDESIGN_SIDE = {"redesign-only", "both", "moved"}
 
@@ -698,6 +698,18 @@ def module_names():
     for number, name in re.findall(r"^\| (\d+) \| ([^|]+?) \|", section, re.MULTILINE):
         names["".join(word[:1].upper() + word[1:] for word in re.split(r"[\s-]+", name) if word)] = int(number)
     return names
+
+
+def internal_modules():
+    text = (SPEC / "CLAUDE.md").read_text()
+    section = text[text.index("## Modules"):]
+    return {int(number) for number, seen in re.findall(r"^\| (\d+) \| [^|]+? \| ([^|]+?) \|", section, re.MULTILINE) if seen == "internal"}
+
+
+def expected_status(model, feature_id):
+    owned = status_of(owned_rows(model, feature_id))
+    match = FEATURE_ID.match(feature_id)
+    return owned or ("internal" if match and int(match.group(1)) in internal_modules() else None)
 
 
 def module_doors():
@@ -751,7 +763,7 @@ def tagged_cites_problems(feature, field):
         line = cite.get("line") if isinstance(cite, dict) else None
         if line not in ("main", "redesign") or not cites_resolve([cite.get("cite")], SENTENCE_LINES[line]):
             problems.append(f"{feature['id']}: {field} {cite!r} resolves at no SHA of its line")
-    if feature.get("status") in ("both", "redesign-only") and not any(isinstance(cite, dict) and cite.get("line") == "redesign" for cite in cites):
+    if feature.get("status") in ("both", "redesign-only", "internal") and not any(isinstance(cite, dict) and cite.get("line") == "redesign" for cite in cites):
         problems.append(f"{feature['id']}: {field} cites nothing at the State SHA, the redesign's")
     return problems
 
@@ -940,8 +952,8 @@ def core_problems(model, doors):
         if not is_prose(feature.get("summary")) or not is_prose(feature.get("oracle")):
             problems.append(f"{name}: no summary or no oracle")
         status = feature.get("status")
-        if status not in FEATURE_STATUSES or status != status_of(owned_rows(model, name)):
-            problems.append(f"{name}: status {status!r}, its doors say {status_of(owned_rows(model, name))!r}")
+        if status not in FEATURE_STATUSES or status != expected_status(model, name):
+            problems.append(f"{name}: status {status!r}, its doors say {expected_status(model, name)!r}")
         core = feature.get("core")
         if not isinstance(core, list) or not core or any(question not in sections for question in core):
             problems.append(f"{name}: core {core!r} is no list of answered questions")
