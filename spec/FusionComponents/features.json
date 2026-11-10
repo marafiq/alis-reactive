@@ -646,6 +646,811 @@
    ]
   },
   {
+   "id": "M21.F3",
+   "summary": "FusionAIAssistView: one declaration of the Syncfusion AIAssistView by its JavaScript names, prompt, activeView, executePrompt, addPromptResponse, scrollToBottom and its three events, each EJ2 33.1.47's public member; the payloads nested under EJ2's interface names; a response set whole from the app's endpoint, with no stream in 1.0, and a prompt with its response added through EJ2's PromptModel; and the render helper that renders it under the developer's id. Main spreads the slice over nine files whose methods take literals alone, so no response body reaches the view, and whose CancelRequest writes a cancel EJ2 never reads; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component, with a door that streams a part of a response, which the rewrite leaves.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionAIAssistView",
+    "Alis.Reactive.Fusion:FusionAIAssistViewBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionAIAssistViewEvents",
+    "Alis.Reactive.Fusion:FusionAIAssistViewExtensions",
+    "Alis.Reactive.Fusion:FusionAIAssistViewHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionAIAssistViewPromptChangedArgs",
+    "Alis.Reactive.Fusion:FusionAIAssistViewPromptModel",
+    "Alis.Reactive.Fusion:FusionAIAssistViewPromptRequestArgs",
+    "Alis.Reactive.Fusion:FusionAIAssistViewPromptRequestArgsExtensions",
+    "Alis.Reactive.Fusion:FusionAIAssistViewReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionAIAssistViewStopRespondingClickArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentMethod.Mapped(\"addPromptResponseText\", \"addPromptResponse\").WithArgs<string, bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewExtensions.cs:23"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Mapped(\"addPromptResponseObject\", \"addPromptResponse\").WithArgs<object, bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewExtensions.cs:26"
+    },
+    {
+     "line": "main",
+     "text": "ValueExpression.Literal(response),",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewExtensions.cs:64"
+    },
+    {
+     "line": "main",
+     "text": "public bool Cancel { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/Events/FusionAIAssistViewPromptRequestArgs.cs:13"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().AIAssistView(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewHtmlExtensions.cs:29"
+    },
+    {
+     "line": "redesign",
+     "text": "public void AddPromptResponse(Arg<string> outputResponse, Arg<bool> isFinalUpdate) => Method(outputResponse, isFinalUpdate);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistView.cs:38"
+    },
+    {
+     "line": "redesign",
+     "text": "public void AddPromptResponseModel(Arg<FusionAIAssistViewPromptModel> outputResponse, Arg<bool> isFinalUpdate)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistView.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string[]> PromptSuggestions => ReadOnly<string[]>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistView.cs:82"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionAIAssistView>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistView.cs:133"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionAIAssistView declares the EJ2 AIAssistView of @syncfusion/ej2-interactive-chat by its JavaScript names: prompt as Prompt, a Property<string>; activeView as ActiveView, a Property<int>; executePrompt, addPromptResponse and scrollToBottom as ExecutePrompt(prompt), AddPromptResponse and ScrollToBottom; and promptRequest, promptChanged and stopRespondingClick as PromptRequest, PromptChanged and StopRespondingClick, whose payloads are FusionAIAssistView.PromptRequestEventArgs, FusionAIAssistView.PromptChangedEventArgs and FusionAIAssistView.StopRespondingEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts:480, :538, :940, :950, :959, :728, :734, :741). Each method takes its arguments from any source, a response body's text among them, where main's take literals alone; main's SetPrompt is Set on Prompt.",
+     "doors": [
+      "M21.N3",
+      "N5.4",
+      "N17.1",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionAIAssistView.PromptRequestEventArgs, EJ2's PromptRequestEventArgs nested under its name (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts:335-380), reads Prompt and PromptSuggestions, text and a list of text, each optional as EJ2 marks it. It declares no Cancel: EJ2 sets cancel false and reads it from no listener of promptRequest (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:1337, :1354), so a listener that sets it true leaves the prompt sent and its response waiting (probe:ej2-aiassistview-promptrequest-cancelled; M21.X901), and a view declines a prompt by answering it with AddPromptResponse. responseToolbarItems and attachedFiles, which neither line declares, are not added. FusionAIAssistView.PromptChangedEventArgs (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts:381-413) reads Value and PreviousValue and declares no member for event and element, the DOM's objects; FusionAIAssistView.StopRespondingEventArgs (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts:414-440) reads Prompt and DataIndex, the prompt whose response the user stopped and its place in the view's prompts. They replace the redesign's FusionAIAssistViewPromptRequestArgs, FusionAIAssistViewPromptChangedArgs and FusionAIAssistViewStopRespondingClickArgs and main's three classes.",
+     "doors": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "AddPromptResponse(outputResponse) sets the waiting prompt's whole response (M21.D901): EJ2 takes isFinalUpdate as true when it is left out (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:2172), renders the response once and puts the send button back (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:2222). It declares no isFinalUpdate, where the redesign's AddPromptResponse and main's take one: false hands EJ2 a part of a response and waits for more, a stream, and streaming is out of 1.0 (the owner's decision), carried by this whole-response door.",
+     "doors": [
+      "M21.N3",
+      "N5.4"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "AddPromptResponse(Arg<FusionAIAssistView.PromptModel> outputResponse) adds a prompt with its response: EJ2 types the argument Object (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts:950), its source reads the object's prompt, response, isResponseHelpful and attachedFiles (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:2197-2204), and the browser lists and shows the prompt and the response the object holds (probe:ej2-aiassistview-addpromptresponse-object). FusionAIAssistView.PromptModel is EJ2's PromptModel nested under its name (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview-model.d.ts:8-47), Prompt and Response as text, each named by [JsonPropertyName] (X17.48). It carries main's AddPromptResponse(prompt, response) and the redesign's AddPromptResponseModel under EJ2's one name, an overload C# accepts, so the redesign's name override leaves. The text door does not carry it: text handed with no prompt waiting lists an entry whose prompt is null (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:2190-2192; probe:ej2-aiassistview-addpromptresponse-text-unrequested).",
+     "doors": [
+      "M21.N3",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionAIAssistView(plan, elementId, build => ..) renders the view under the id the developer chose on EJ2's AIAssistViewBuilder, as both lines do, and returns the rendered component in place of main's FusionAIAssistViewBuilder<TModel> and its Reactive extension; its Reactive(a => a.PromptRequest, pipeline) handles its events from the plan's start, and pipeline.Component<FusionAIAssistView>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N3",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/Events/FusionAIAssistViewPromptChangedArgs.cs:6-13"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/Events/FusionAIAssistViewPromptRequestArgs.cs:10-41"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/Events/FusionAIAssistViewStopRespondingClickArgs.cs:6-13"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistView.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewBuilder.cs:14-53"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewEvents.cs:6-25"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewExtensions.cs:11-94"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewHtmlExtensions.cs:16-34"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistViewReactiveExtensions.cs:9-23"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAIAssistView/FusionAIAssistView.cs:23-135"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [
+    {
+     "id": "M21.D901",
+     "meaning": "An AI Assist view's response is set whole and comes from the app. The view's PromptRequest handler sends the payload's Prompt to the app's own endpoint through the HTTP pipeline, and its success scope hands AddPromptResponse the response body's whole text, which EJ2 renders once as the waiting prompt's answer, isFinalUpdate being true when it is left out (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:2172, :2222); its error scope answers with the view's own text, since EJ2 reads no cancel back and a prompt left unanswered keeps its stop button (probe:ej2-aiassistview-promptrequest-cancelled). Nothing streams in 1.0 (the owner's decision): no door takes isFinalUpdate, and the render helper writes enableStreaming false on EJ2's AIAssistViewBuilder after the view's build callback, an option the vendor builder has, its TypeScript does not declare, and EJ2's source reads to stream every response (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:2179, :2180)."
+    }
+   ],
+   "oracle": "Syncfusion EJ2 33.1.47's AIAssistView as its TypeScript declares it (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts, PromptModel in @syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview-model.d.ts), and as its source raises its events and adds a response (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X901",
+     "rung": "behavior",
+     "defect": "Main's CancelRequest writes cancel true on promptRequest's payload (Alis.Reactive.Fusion/Components/FusionAIAssistView/Events/FusionAIAssistViewPromptRequestArgs.cs:36-39 at 623dd4a27), which EJ2 sets false and reads from no listener (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:1337, :1354): the prompt stays sent and listed, its response waits and the stop button shows (probe:ej2-aiassistview-promptrequest-cancelled), so a view that declines a prompt leaves the user waiting on an answer that never comes. The rewrite's FusionAIAssistView.PromptRequestEventArgs in M21.N3 declares no Cancel, so the write does not compile, and a view declines a prompt by answering it with AddPromptResponse."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X901",
+     "page": "A medication assistant page whose FusionAIAssistView's PromptRequest handler answers every prompt with AddPromptResponse(Ask the nurse on duty.).",
+     "gesture": "Type Can Mr Patel have a second dose? in the prompt and click send.",
+     "outcome": "The assistant shows the prompt and the answer Ask the nurse on duty., and the send button shows again.",
+     "opposite": "A handler that answers with its endpoint's text shows that text in place of Ask the nurse on duty.",
+     "defect": "The handler's cancel leaves the prompt waiting for an answer, with the stop button showing."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionAIAssistViewBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewEvents.PromptChanged.get -> TypedEvent<FusionAIAssistViewPromptChangedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewEvents.PromptRequest.get -> TypedEvent<FusionAIAssistViewPromptRequestArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewEvents.StopRespondingClick.get -> TypedEvent<FusionAIAssistViewStopRespondingClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptChangedArgs.PreviousValue.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptChangedArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptChangedArgs.Value.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptChangedArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptRequestArgs.Cancel.get -> bool",
+     "verdict": "refused",
+     "reason": "EJ2 sets promptRequest's cancel false and reads it from no listener (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:1337, :1354), so a listener that sets it true leaves the prompt sent and its response waiting (probe:ej2-aiassistview-promptrequest-cancelled; M21.X901); a view declines a prompt by answering it with AddPromptResponse.",
+     "carriers": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptRequestArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "EJ2 sets promptRequest's cancel false and reads it from no listener (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:1337, :1354), so a listener that sets it true leaves the prompt sent and its response waiting (probe:ej2-aiassistview-promptrequest-cancelled; M21.X901); a view declines a prompt by answering it with AddPromptResponse.",
+     "carriers": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptRequestArgs.Prompt.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptRequestArgs.Prompt.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptRequestArgs.PromptSuggestions.get -> string![]!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptRequestArgs.PromptSuggestions.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewPromptRequestArgsExtensions",
+     "verdict": "refused",
+     "reason": "EJ2 sets promptRequest's cancel false and reads it from no listener (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:1337, :1354), so a listener that sets it true leaves the prompt sent and its response waiting (probe:ej2-aiassistview-promptrequest-cancelled; M21.X901); a view declines a prompt by answering it with AddPromptResponse.",
+     "carriers": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewStopRespondingClickArgs.DataIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewStopRespondingClickArgs.DataIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewStopRespondingClickArgs.Prompt.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "FusionAIAssistViewStopRespondingClickArgs.Prompt.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N3",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewExtensions.ActiveView<TModel>(this ComponentRef<FusionAIAssistView!, TModel!>! self) -> TypedComponentSource<int>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewExtensions.AddPromptResponse<TModel>(this ComponentRef<FusionAIAssistView!, TModel!>! self, string! prompt, string! response, bool isFinalUpdate = true) -> ComponentRef<FusionAIAssistView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewExtensions.AddPromptResponse<TModel>(this ComponentRef<FusionAIAssistView!, TModel!>! self, string! response, bool isFinalUpdate = true) -> ComponentRef<FusionAIAssistView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewExtensions.ExecutePrompt<TModel>(this ComponentRef<FusionAIAssistView!, TModel!>! self, string! prompt) -> ComponentRef<FusionAIAssistView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewExtensions.Prompt<TModel>(this ComponentRef<FusionAIAssistView!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewExtensions.ScrollToBottom<TModel>(this ComponentRef<FusionAIAssistView!, TModel!>! self) -> ComponentRef<FusionAIAssistView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewExtensions.SetPrompt<TModel>(this ComponentRef<FusionAIAssistView!, TModel!>! self, string! prompt) -> ComponentRef<FusionAIAssistView!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewHtmlExtensions.FusionAIAssistView<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.InteractiveChat.AIAssistViewBuilder!>! build) -> FusionAIAssistViewBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewHtmlExtensions.FusionAIAssistView<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.InteractiveChat.AIAssistViewBuilder!>! build) -> FusionAIAssistViewBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewPromptRequestArgsExtensions.CancelRequest(this FusionAIAssistViewPromptRequestArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "refused",
+     "reason": "EJ2 sets promptRequest's cancel false and reads it from no listener (@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:1337, :1354), so a listener that sets it true leaves the prompt sent and its response waiting (probe:ej2-aiassistview-promptrequest-cancelled; M21.X901); a view declines a prompt by answering it with AddPromptResponse.",
+     "carriers": [
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "static FusionAIAssistViewReactiveExtensions.Reactive<TModel, TArgs>(this FusionAIAssistViewBuilder<TModel!>! builder, System.Func<FusionAIAssistViewEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionAIAssistViewBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N3"
+     ]
+    },
+    {
+     "door": "static readonly FusionAIAssistViewEvents.Instance -> FusionAIAssistViewEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N3"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F4",
+   "summary": "FusionAccordion: one declaration of the Syncfusion Accordion by its JavaScript names, expandItem, enableItem and expanded, each EJ2 33.1.47's public member; expanded's payload, nested under EJ2's interface name; and the render helper that renders it under the developer's id. Main spreads the slice over seven files whose calls name members by strings over ComponentRef and take literals alone, a payload class with setters and a builder class of its own whose Reactive extension wires the event; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionAccordion",
+    "Alis.Reactive.Fusion:FusionAccordionBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionAccordionEvents",
+    "Alis.Reactive.Fusion:FusionAccordionExpandedArgs",
+    "Alis.Reactive.Fusion:FusionAccordionExtensions",
+    "Alis.Reactive.Fusion:FusionAccordionHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionAccordionReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"expandItem\").WithArgs<bool, int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionExtensions.cs:20"
+    },
+    {
+     "line": "main",
+     "text": "this ComponentRef<FusionAccordion, TModel> self, int index, bool isEnable = true)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionExtensions.cs:37"
+    },
+    {
+     "line": "main",
+     "text": "\"expanded\", new FusionAccordionExpandedArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionEvents.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Accordion(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public void ExpandItem(Arg<bool> isExpand, Arg<int> index) => Method(isExpand, index);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs:28"
+    },
+    {
+     "line": "redesign",
+     "text": "public void EnableItem(Arg<int> index, Arg<bool> isEnable) => Method(index, isEnable);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs:33"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<bool> IsExpanded => ReadOnly<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs:47"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionAccordion>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs:77"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionAccordion declares the EJ2 Accordion by its JavaScript names: expandItem as ExpandItem(isExpand, index), enableItem as EnableItem(index, isEnable) and expanded as Expanded, whose payload is FusionAccordion.ExpandedEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/accordion/accordion.d.ts:441, :432, :311). ExpandItem takes the item's index, as both lines do, and declares no form without one, which EJ2 reads as every item (@syncfusion/ej2-navigations/src/accordion/accordion.js:1124); EnableItem takes isEnable, which main defaults to true.",
+     "doors": [
+      "M21.N4",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionAccordion.ExpandedEventArgs, EJ2's ExpandedEventArgs nested under its name (@syncfusion/ej2-navigations/src/accordion/accordion.d.ts:45-56), reads Index and IsExpanded, each optional as EJ2 marks it; EJ2 raises expanded when an item has opened and when it has closed, IsExpanded telling which (@syncfusion/ej2-navigations/src/accordion/accordion.js:825, :947). It declares no member for item, the item's model, which neither line declares, nor for element and content, the DOM's objects; it replaces the redesign's FusionAccordionExpandedArgs and main's.",
+     "doors": [
+      "M21.N4",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionAccordion(plan, elementId, build => ..) renders the accordion under the id the developer chose on EJ2's AccordionBuilder, as both lines do, and returns the rendered component in place of main's FusionAccordionBuilder<TModel> and its Reactive extension; its Reactive(a => a.Expanded, pipeline) handles its events from the plan's start, and pipeline.Component<FusionAccordion>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N4",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/Events/FusionAccordionOnExpanded.cs:9-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionBuilder.cs:14-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionExtensions.cs:17-40"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionReactiveExtensions.cs:9-32"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs:23-79"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Accordion as its TypeScript declares it (@syncfusion/ej2-navigations/src/accordion/accordion.d.ts, ExpandedEventArgs there), and as its source raises expanded (@syncfusion/ej2-navigations/src/accordion/accordion.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionAccordionBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionAccordionBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionAccordionBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionAccordionEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4"
+     ]
+    },
+    {
+     "door": "FusionAccordionEvents.Expanded.get -> TypedEvent<FusionAccordionExpandedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4"
+     ]
+    },
+    {
+     "door": "FusionAccordionExpandedArgs.Index.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4"
+     ]
+    },
+    {
+     "door": "FusionAccordionExpandedArgs.Index.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N4",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAccordionExpandedArgs.IsExpanded.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4"
+     ]
+    },
+    {
+     "door": "FusionAccordionExpandedArgs.IsExpanded.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N4",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionAccordionExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionAccordionReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N4"
+     ]
+    },
+    {
+     "door": "static FusionAccordionExtensions.EnableItem<TModel>(this ComponentRef<FusionAccordion!, TModel!>! self, int index, bool isEnable = true) -> ComponentRef<FusionAccordion!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionAccordionExtensions.ExpandItem<TModel>(this ComponentRef<FusionAccordion!, TModel!>! self, bool isExpand, int index) -> ComponentRef<FusionAccordion!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionAccordionHtmlExtensions.FusionAccordion<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.AccordionBuilder!>! build) -> FusionAccordionBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionAccordionHtmlExtensions.FusionAccordion<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.AccordionBuilder!>! build) -> FusionAccordionBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionAccordionReactiveExtensions.Reactive<TModel, TArgs>(this FusionAccordionBuilder<TModel!>! builder, System.Func<FusionAccordionEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionAccordionBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N4"
+     ]
+    },
+    {
+     "door": "static readonly FusionAccordionEvents.Instance -> FusionAccordionEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N4"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F5",
    "summary": "FusionAutoComplete: one declaration of the Syncfusion AutoComplete by its JavaScript names, value, dataSource, enabled, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change and filtering, each EJ2 33.1.47's public member; the payloads of change and filtering; the input it is, generic over the member it binds, its value that member's own type and committed by change; and the render helper that renders it bound to a model member and names its fields. Main spreads the slice over seven files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed by the bound member, which admits null as the vendor's value holds null until a choice (M21.X501), the @private text left out (gate 2), and its data named as every framework read names it (M21.D1).",
    "status": "both",
@@ -1411,6 +2216,442 @@
    ]
   },
   {
+   "id": "M21.F7",
+   "summary": "FusionBulletChart: one declaration of the Syncfusion BulletChart by its JavaScript names, dataSource, tooltipRender and bulletChartMouseClick, each EJ2 33.1.47's public member; the chart's items as the app's typed data, handed by M21.D1 with typed fields; the payloads nested under EJ2's interface names, the tooltip's value and targets the formatted text the browser hands and its text and template written back; and the render helper that renders it under the developer's id. Main spreads the slice over eight files whose events and reads name members by strings over ComponentRef, a read of a private member, payload classes with setters and a builder class of its own; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component, with the same private read and a template no view can write.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionBulletChart",
+    "Alis.Reactive.Fusion:FusionBulletChartBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionBulletChartEvents",
+    "Alis.Reactive.Fusion:FusionBulletChartExtensions",
+    "Alis.Reactive.Fusion:FusionBulletChartHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionBulletChartMouseClickArgs",
+    "Alis.Reactive.Fusion:FusionBulletChartReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionBulletChartTooltipRenderArgs",
+    "Alis.Reactive.Fusion:FusionBulletChartTooltipRenderArgsExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"getActualIndex\").WithArgs<int, int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartExtensions.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "public string[] Target { get; set; } = System.Array.Empty<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/Events/FusionBulletChartTooltipRenderArgs.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "public string? Template { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/Events/FusionBulletChartTooltipRenderArgs.cs:21"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().BulletChart(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public TypedSource<int> GetActualIndex(Arg<int> index, Arg<int> totalLength) => Method<int>(index, totalLength);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:29"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> Template => ReadOnly<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:54"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> Text => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:57"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionBulletChart>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:100"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionBulletChart declares the EJ2 BulletChart by its JavaScript names: dataSource as DataSource<TItem>(), TItem the type of the chart's items, which EJ2 types Object and the view chooses; and tooltipRender and bulletChartMouseClick as TooltipRender and BulletChartMouseClick, whose payloads are FusionBulletChart.IBulletchartTooltipEventArgs and FusionBulletChart.IBulletMouseEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:236, :284, :302). It declares no GetActualIndex, a read of getActualIndex, which EJ2 marks @private (M21.X902).",
+     "doors": [
+      "M21.N7",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionBulletChart.IBulletchartTooltipEventArgs, EJ2's IBulletchartTooltipEventArgs nested under its name (@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts:132-143), reads Value, a ReadOnly<string>, and Target, a ReadOnly<string[]>: EJ2's TypeScript types value string | number and target string[] | number[] | string, and its source hands the value as the axis's formatted text and the targets as a list of it (@syncfusion/ej2-charts/src/bullet-chart/user-interaction/tooltip.js:86, :91, :100; probe:ej2-payload-bulletchart-tooltiprender, probe:ej2-bulletchart-tooltiprender-value-target), so the union holds EJ2's text, not the app's data, and no type parameter types it. It reads Name, and Text and Template, each an optional Property<string> EJ2 reads back as the tooltip's HTML, Template when the tooltip has a template and Text otherwise (@syncfusion/ej2-charts/src/bullet-chart/user-interaction/tooltip.js:118, :128), so what a view sets there is markup (M21.X903). FusionBulletChart.IBulletMouseEventArgs (@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts:169-176) reads Target, the id of the element clicked, and X and Y, the pointer's place in the chart, each a ReadOnly<double> (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.js:962); EJ2 hands it no cancel and reads none back, so none is declared. They replace the redesign's FusionBulletChartTooltipRenderArgs and FusionBulletChartMouseClickArgs and main's two classes.",
+     "doors": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The chart's items are the app's data: Html.FusionBulletChart(plan, elementId, items, build => ..) hands EJ2 the items by M21.D1, TItem the type of the items, the door neither line has; Fields<TItem>(value, target) and Fields<TItem>(value, target, category) on EJ2's BulletChartBuilder name valueField, targetField and categoryField (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:260, :266, :248) as every framework read names each member, so the chart reads the members M21.D1 writes; and DataSource<TItem>().Set(source) replaces the chart's items from any source, a response body's among them.",
+     "doors": [
+      "M21.N7",
+      "N5.3",
+      "M12.N2",
+      "M12.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionBulletChart(plan, elementId, build => ..) renders the chart under the id the developer chose on EJ2's BulletChartBuilder, as both lines do, and returns the rendered component in place of main's FusionBulletChartBuilder<TModel> and its Reactive extension; its Reactive(c => c.TooltipRender, pipeline) handles its events from the plan's start, and pipeline.Component<FusionBulletChart>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N7",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/Events/FusionBulletChartMouseClickArgs.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/Events/FusionBulletChartTooltipRenderArgs.cs:9-43"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartBuilder.cs:14-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartEvents.cs:6-22"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartExtensions.cs:9-29"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartReactiveExtensions.cs:9-25"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:23-102"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's BulletChart as its TypeScript declares it (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts, IBulletchartTooltipEventArgs and IBulletMouseEventArgs in @syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts), and as its source raises its events and reads the tooltip back (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.js, @syncfusion/ej2-charts/src/bullet-chart/user-interaction/tooltip.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X902",
+     "rung": "analyzer",
+     "defect": "Both lines read the chart's getActualIndex (Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartExtensions.cs:12 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:29 at 65fdf118d), which EJ2 marks @private (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:669-671). The vendor contract analyzer (N17.2) refuses a member its type does not make public by ALIS016 (D17.5); the rewrite's FusionBulletChart in M21.N7 declares none."
+    },
+    {
+     "id": "M21.X903",
+     "rung": "type",
+     "defect": "Both lines leave the tooltip's template unwritable: the redesign declares Template a ReadOnly<string> (Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:54 at 65fdf118d) and main's setter runs in no browser (Alis.Reactive.Fusion/Components/FusionBulletChart/Events/FusionBulletChartTooltipRenderArgs.cs:21 at 623dd4a27), where EJ2 reads it back from tooltipRender's listener as the tooltip's HTML (@syncfusion/ej2-charts/src/bullet-chart/user-interaction/tooltip.js:118), so no view can change what a templated tooltip shows. The rewrite's FusionBulletChart.IBulletchartTooltipEventArgs in M21.N7 declares Template a Property<string>, so the write compiles and EJ2 reads it."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionBulletChartBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionBulletChartBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionBulletChartBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionBulletChartEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartEvents.BulletChartMouseClick.get -> TypedEvent<FusionBulletChartMouseClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartEvents.TooltipRender.get -> TypedEvent<FusionBulletChartTooltipRenderArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionBulletChartMouseClickArgs.Target.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartMouseClickArgs.Target.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBulletChartMouseClickArgs.X.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartMouseClickArgs.X.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBulletChartMouseClickArgs.Y.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartMouseClickArgs.Y.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBulletChartReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Name.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Target.get -> string![]!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Target.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Template.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Template.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Text.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Text.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Value.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N7",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBulletChartTooltipRenderArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "static FusionBulletChartExtensions.GetActualIndex<TModel>(this ComponentRef<FusionBulletChart!, TModel!>! self, int index, int totalLength) -> TypedComponentSource<int>!",
+     "verdict": "refused",
+     "reason": "EJ2 marks getActualIndex @private (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:669-671), the wrapped position its legend's keyboard navigation computes (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.js:1034), so the vendor contract analyzer refuses the read (ALIS016, N17.2, M21.X902); a view that needs a wrapped position computes it from the values it holds.",
+     "carriers": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "static FusionBulletChartHtmlExtensions.FusionBulletChart<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Charts.BulletChartBuilder!>! build) -> FusionBulletChartBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionBulletChartHtmlExtensions.FusionBulletChart<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Charts.BulletChartBuilder!>! build) -> FusionBulletChartBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionBulletChartReactiveExtensions.Reactive<TModel, TArgs>(this FusionBulletChartBuilder<TModel!>! builder, System.Func<FusionBulletChartEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionBulletChartBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "static FusionBulletChartTooltipRenderArgsExtensions.SetText(this FusionBulletChartTooltipRenderArgs! args, IReactionEmitter! pipeline, string! text) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    },
+    {
+     "door": "static readonly FusionBulletChartEvents.Instance -> FusionBulletChartEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N7"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F8",
    "summary": "FusionButton: one declaration of the Syncfusion Button by its JavaScript names, content, iconCss, iconPosition, cssClass, disabled, isPrimary, isToggle, dataBind, click and focusIn, each EJ2 33.1.47's public member; the icon position EJ2's enum holds, written by its names; and the render helper that renders it under the developer's id. Main spreads the slice over five files whose writes and reads name members by strings over ComponentRef, each write followed by dataBind, and a builder class of its own; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component, with an icon position the live form writes as a number EJ2 cannot read, which the rewrite writes by name.",
    "status": "both",
@@ -1732,6 +2973,473 @@
      "to": [
       "M21.N8",
       "M12.N3"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F9",
+   "summary": "FusionCarousel: one declaration of the Syncfusion Carousel by its JavaScript names, selectedIndex, next, prev, slideChanging and slideChanged, each EJ2 33.1.47's public member; the payloads nested under EJ2's interface names, Cancel read back where EJ2 reads it and the slide direction EJ2's two names; and the render helper that renders it under the developer's id. Main spreads the slice over eight files whose reads and calls name members by strings over ComponentRef, payload classes with setters, a direction read as any text and a builder class of its own; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionCarousel",
+    "Alis.Reactive.Fusion:FusionCarouselBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionCarouselEvents",
+    "Alis.Reactive.Fusion:FusionCarouselExtensions",
+    "Alis.Reactive.Fusion:FusionCarouselHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionCarouselReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionCarouselSlideChangedArgs",
+    "Alis.Reactive.Fusion:FusionCarouselSlideChangingArgs",
+    "Alis.Reactive.Fusion:FusionCarouselSlideChangingArgsExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"prev\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselExtensions.cs:19"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<int>.Named(\"selectedIndex\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselExtensions.cs:13"
+    },
+    {
+     "line": "main",
+     "text": "public string SlideDirection { get; set; } = string.Empty;",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanging.cs:21"
+    },
+    {
+     "line": "main",
+     "text": "pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), \"cancel\", ValueExpression.Literal(true)));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanging.cs:37"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Carousel(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Prev() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:33"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> SlideDirection => ReadOnly<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:76"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Cancel => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:60"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionCarousel>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:106"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionCarousel declares the EJ2 Carousel by its JavaScript names: selectedIndex as SelectedIndex, a Property<int>; next and prev as Next and Prev, where main names prev Previous; and slideChanging and slideChanged as SlideChanging and SlideChanged, whose payloads are FusionCarousel.SlideChangingEventArgs and FusionCarousel.SlideChangedEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:215, :405, :399, :330, :336).",
+     "doors": [
+      "M21.N9",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionCarousel.SlideChangingEventArgs, EJ2's SlideChangingEventArgs nested under its name (@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:56-71), reads CurrentIndex, NextIndex, IsSwiped and SlideDirection, and Cancel, a Property<bool> EJ2 reads back to keep the slide (@syncfusion/ej2-navigations/src/carousel/carousel.js:677-679), which carries main's PreventTransition; FusionCarousel.SlideChangedEventArgs (@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:73-86) reads CurrentIndex, PreviousIndex, IsSwiped and SlideDirection. Neither declares currentSlide, nextSlide or previousSlide, the DOM's elements. They replace the redesign's FusionCarouselSlideChangingArgs and FusionCarouselSlideChangedArgs and main's two classes.",
+     "doors": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "SlideDirection is a FusionCarousel.CarouselSlideDirection, EJ2's CarouselSlideDirection, Previous or Next (@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:12, :68, :85), nested under its name with System.Text.Json's JsonStringEnumConverter<FusionCarousel.CarouselSlideDirection>, integer values refused, so the payload's text reads as one of EJ2's two names and a condition compares it with one of them and with no other text (M21.X904); X17.46 names its own converter alone, so the type check's reading of a converter by the names it writes is a gate 2 item.",
+     "doors": [
+      "M21.N9",
+      "N5.6",
+      "N17.2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionCarousel(plan, elementId, build => ..) renders the carousel under the id the developer chose on EJ2's CarouselBuilder, as both lines do, and returns the rendered component in place of main's FusionCarouselBuilder<TModel> and its Reactive extension; its Reactive(c => c.SlideChanging, pipeline) handles its events from the plan's start, and pipeline.Component<FusionCarousel>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N9",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanged.cs:6-19"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanging.cs:9-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselBuilder.cs:14-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselEvents.cs:6-21"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselExtensions.cs:8-44"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselReactiveExtensions.cs:9-25"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:24-108"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Carousel as its TypeScript declares it (@syncfusion/ej2-navigations/src/carousel/carousel.d.ts, SlideChangingEventArgs, SlideChangedEventArgs and CarouselSlideDirection there), and as its source raises its events and reads cancel back (@syncfusion/ej2-navigations/src/carousel/carousel.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X904",
+     "rung": "type",
+     "defect": "Both lines read the slide direction as text: the redesign's SlideDirection is a ReadOnly<string> on both payloads (Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:57, :76 at 65fdf118d) and main's a string (Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanging.cs:21, Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanged.cs:18 at 623dd4a27), where EJ2's is CarouselSlideDirection, Previous or Next (@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:12, :68, :85), so a condition that compares it with next or Forward compiles and never holds. The rewrite's FusionCarousel.CarouselSlideDirection in M21.N9 holds EJ2's two names, so no other compiles."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionCarouselBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionCarouselBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionCarouselBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionCarouselEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselEvents.SlideChanged.get -> TypedEvent<FusionCarouselSlideChangedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselEvents.SlideChanging.get -> TypedEvent<FusionCarouselSlideChangingArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionCarouselReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangedArgs.CurrentIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangedArgs.CurrentIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangedArgs.IsSwiped.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangedArgs.IsSwiped.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangedArgs.PreviousIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangedArgs.PreviousIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangedArgs.SlideDirection.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangedArgs.SlideDirection.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.CurrentIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.CurrentIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.IsSwiped.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.IsSwiped.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.NextIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.NextIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.SlideDirection.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgs.SlideDirection.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N9",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionCarouselSlideChangingArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "static FusionCarouselExtensions.Next<TModel>(this ComponentRef<FusionCarousel!, TModel!>! self) -> ComponentRef<FusionCarousel!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCarouselExtensions.Previous<TModel>(this ComponentRef<FusionCarousel!, TModel!>! self) -> ComponentRef<FusionCarousel!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCarouselExtensions.SelectedIndex<TModel>(this ComponentRef<FusionCarousel!, TModel!>! self) -> TypedComponentSource<int>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionCarouselHtmlExtensions.FusionCarousel<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.CarouselBuilder!>! build) -> FusionCarouselBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionCarouselHtmlExtensions.FusionCarousel<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.CarouselBuilder!>! build) -> FusionCarouselBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionCarouselReactiveExtensions.Reactive<TModel, TArgs>(this FusionCarouselBuilder<TModel!>! builder, System.Func<FusionCarouselEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionCarouselBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "static FusionCarouselSlideChangingArgsExtensions.PreventTransition(this FusionCarouselSlideChangingArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
+     ]
+    },
+    {
+     "door": "static readonly FusionCarouselEvents.Instance -> FusionCarouselEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N9"
      ]
     }
    ]
@@ -16568,6 +18276,308 @@
    ]
   },
   {
+   "id": "M21.F40",
+   "summary": "FusionSidebar: one declaration of the Syncfusion Sidebar by its JavaScript names, isOpen, show, hide, toggle, open and close, each EJ2 33.1.47's public member; the payload of open and close, nested under EJ2's interface name, with the Cancel EJ2 reads back, which neither line declares; and the render helper that renders it under the developer's id. Main spreads the slice over seven files whose reads, calls and events name members by strings over ComponentRef, a payload class with a setter and a builder class of its own; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionSidebar",
+    "Alis.Reactive.Fusion:FusionSidebarBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionSidebarEvents",
+    "Alis.Reactive.Fusion:FusionSidebarExtensions",
+    "Alis.Reactive.Fusion:FusionSidebarHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionSidebarReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionSidebarTransitionArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "new TypedEvent<FusionSidebarTransitionArgs>(\"open\", new FusionSidebarTransitionArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarEvents.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<bool>.Named(\"isOpen\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarExtensions.cs:13"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Sidebar(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> IsOpen => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "public Event<FusionSidebarTransitionArgs> Open",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs:35"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<bool> IsInteracted => ReadOnly<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs:47"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionSidebar>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs:77"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSidebar declares the EJ2 Sidebar by its JavaScript names: isOpen as IsOpen, a Property<bool>; show, hide and toggle as Show, Hide and Toggle; and open and close as Open and Close, whose payload is FusionSidebar.EventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts:106, :246, :238, :265, :202, :196). Open and Close carry main's Opened and Closed, which listen to the same two events.",
+     "doors": [
+      "M21.N40",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSidebar.EventArgs, EJ2's EventArgs nested under its name (@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts:316-337), reads IsInteracted, an optional ReadOnly<bool>, true when the user opened or closed the sidebar and false when a method did (@syncfusion/ej2-navigations/src/sidebar/sidebar.js:228, :293), and Cancel, an optional Property<bool> EJ2 reads back to keep the sidebar as it is (@syncfusion/ej2-navigations/src/sidebar/sidebar.js:232, :297), which neither line declares. It declares no member for model and element, the component and its element, nor for event, the DOM's event; it replaces the redesign's FusionSidebarTransitionArgs and main's.",
+     "doors": [
+      "M21.N40",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionSidebar(plan, elementId, build => ..) renders the sidebar under the id the developer chose on EJ2's SidebarBuilder, as both lines do, and returns the rendered component in place of main's FusionSidebarBuilder<TModel> and its Reactive extension; its Reactive(b => b.Close, pipeline) handles its events from the plan's start, and pipeline.Component<FusionSidebar>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N40",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/Events/FusionSidebarTransitionArgs.cs:6-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs:8-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarBuilder.cs:14-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarEvents.cs:6-21"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarExtensions.cs:8-55"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarReactiveExtensions.cs:9-31"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs:20-79"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Sidebar as its TypeScript declares it (@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts, EventArgs there), and as its source raises open and close and reads cancel back (@syncfusion/ej2-navigations/src/sidebar/sidebar.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionSidebarBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionSidebarBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionSidebarBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionSidebarEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40"
+     ]
+    },
+    {
+     "door": "FusionSidebarEvents.Closed.get -> TypedEvent<FusionSidebarTransitionArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40"
+     ]
+    },
+    {
+     "door": "FusionSidebarEvents.Opened.get -> TypedEvent<FusionSidebarTransitionArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40"
+     ]
+    },
+    {
+     "door": "FusionSidebarExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionSidebarReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N40"
+     ]
+    },
+    {
+     "door": "FusionSidebarTransitionArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40"
+     ]
+    },
+    {
+     "door": "FusionSidebarTransitionArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N40",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionSidebarExtensions.Hide<TModel>(this ComponentRef<FusionSidebar!, TModel!>! self) -> ComponentRef<FusionSidebar!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSidebarExtensions.IsOpen<TModel>(this ComponentRef<FusionSidebar!, TModel!>! self) -> TypedComponentSource<bool>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSidebarExtensions.Show<TModel>(this ComponentRef<FusionSidebar!, TModel!>! self) -> ComponentRef<FusionSidebar!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSidebarExtensions.Toggle<TModel>(this ComponentRef<FusionSidebar!, TModel!>! self) -> ComponentRef<FusionSidebar!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSidebarHtmlExtensions.FusionSidebar<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.SidebarBuilder!>! build) -> FusionSidebarBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionSidebarHtmlExtensions.FusionSidebar<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.SidebarBuilder!>! build) -> FusionSidebarBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionSidebarReactiveExtensions.Reactive<TModel, TArgs>(this FusionSidebarBuilder<TModel!>! builder, System.Func<FusionSidebarEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionSidebarBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N40"
+     ]
+    },
+    {
+     "door": "static readonly FusionSidebarEvents.Instance -> FusionSidebarEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N40"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F41",
    "summary": "FusionSlider: one declaration of the Syncfusion Slider by its JavaScript names, value typed by the member it binds, a number for one handle and a list for a range, dataBind, change and changed, each EJ2 33.1.47's public member; the payload of its two events, read as the bound member's type, a number or a list as the browser hands them; the input it is, its value committed by changed; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, generic in the value's type as EJ2 marks it, one value typed by the member and nullable as EJ2 documents it, a range's payload read as lists, and the slider started at the member's value.",
    "status": "both",
@@ -17990,6 +20000,490 @@
    ]
   },
   {
+   "id": "M21.F45",
+   "summary": "FusionStepper: one declaration of the Syncfusion Stepper by its JavaScript names, activeStep, nextStep, previousStep, reset, refreshProgressbar and its three events, each EJ2 33.1.47's public member; the payloads nested under EJ2's interface names, Cancel read back where EJ2 reads it; and the render helper that renders it under the developer's id. Main spreads the slice over nine files whose reads, writes and calls name members by strings over ComponentRef, payload classes with setters and a builder class of its own whose Reactive extension wires the events; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionStepper",
+    "Alis.Reactive.Fusion:FusionStepperBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionStepperChangedArgs",
+    "Alis.Reactive.Fusion:FusionStepperChangingArgs",
+    "Alis.Reactive.Fusion:FusionStepperChangingArgsExtensions",
+    "Alis.Reactive.Fusion:FusionStepperClickArgs",
+    "Alis.Reactive.Fusion:FusionStepperEvents",
+    "Alis.Reactive.Fusion:FusionStepperExtensions",
+    "Alis.Reactive.Fusion:FusionStepperHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionStepperReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentProperty<int>.Named(\"activeStep\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperExtensions.cs:24"
+    },
+    {
+     "line": "main",
+     "text": "new TypedEvent<FusionStepperChangingArgs>(\"stepChanging\", new FusionStepperChangingArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperEvents.cs:20"
+    },
+    {
+     "line": "main",
+     "text": "public bool Cancel { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/Events/FusionStepperChangingArgs.cs:21"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Stepper(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<int> ActiveStep => Property<int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "public void RefreshProgressbar() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs:35"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Cancel => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs:76"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionStepper>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs:116"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionStepper declares the EJ2 Stepper by its JavaScript names: activeStep as ActiveStep, a Property<int>; nextStep, previousStep, reset and refreshProgressbar as NextStep, PreviousStep, Reset and RefreshProgressbar; and stepChanged, stepChanging and stepClick as StepChanged, StepChanging and StepClick, whose payloads are FusionStepper.StepperChangedEventArgs, FusionStepper.StepperChangingEventArgs and FusionStepper.StepperClickEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/stepper/stepper.d.ts:158, :340, :346, :352, :358, :238, :244, :250). Main's SetActiveStep is Set on ActiveStep.",
+     "doors": [
+      "M21.N45",
+      "N5.4",
+      "N17.1",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionStepper.StepperChangedEventArgs, EJ2's StepperChangedEventArgs nested under its name (@syncfusion/ej2-navigations/src/stepper/stepper.d.ts:71-92), reads PreviousStep, ActiveStep and IsInteracted; FusionStepper.StepperChangingEventArgs (@syncfusion/ej2-navigations/src/stepper/stepper.d.ts:96-101) reads the same three, which EJ2's interface takes from StepperChangedEventArgs, and Cancel, a Property<bool> EJ2 reads back to keep the step (@syncfusion/ej2-navigations/src/stepper/stepper.js:797-799), which carries main's PreventDefault; FusionStepper.StepperClickEventArgs (@syncfusion/ej2-navigations/src/stepper/stepper.d.ts:105-122) reads PreviousStep and ActiveStep. None declares event or element, the DOM's objects. They replace the redesign's FusionStepperChangedArgs, FusionStepperChangingArgs and FusionStepperClickArgs and main's three classes.",
+     "doors": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionStepper(plan, elementId, build => ..) renders the stepper under the id the developer chose on EJ2's StepperBuilder, as both lines do, and returns the rendered component in place of main's FusionStepperBuilder<TModel> and its Reactive extension; its Reactive(t => t.StepChanging, pipeline) handles its events from the plan's start, and pipeline.Component<FusionStepper>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N45",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/Events/FusionStepperChangedArgs.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/Events/FusionStepperChangingArgs.cs:9-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/Events/FusionStepperClickArgs.cs:6-13"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperBuilder.cs:14-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperEvents.cs:6-25"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperExtensions.cs:9-74"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperReactiveExtensions.cs:9-25"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs:20-118"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Stepper as its TypeScript declares it (@syncfusion/ej2-navigations/src/stepper/stepper.d.ts, StepperChangedEventArgs, StepperChangingEventArgs and StepperClickEventArgs there), and as its source raises its events and reads cancel back (@syncfusion/ej2-navigations/src/stepper/stepper.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionStepperBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionStepperBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionStepperBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionStepperChangedArgs.ActiveStep.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperChangedArgs.ActiveStep.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperChangedArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperChangedArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperChangedArgs.PreviousStep.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperChangedArgs.PreviousStep.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgs.ActiveStep.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgs.ActiveStep.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgs.PreviousStep.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgs.PreviousStep.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperChangingArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperClickArgs.ActiveStep.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperClickArgs.ActiveStep.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperClickArgs.PreviousStep.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperClickArgs.PreviousStep.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N45",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionStepperEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperEvents.StepChanged.get -> TypedEvent<FusionStepperChangedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperEvents.StepChanging.get -> TypedEvent<FusionStepperChangingArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperEvents.StepClick.get -> TypedEvent<FusionStepperClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "FusionStepperExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionStepperReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "static FusionStepperChangingArgsExtensions.PreventDefault(this FusionStepperChangingArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "static FusionStepperExtensions.ActiveStep<TModel>(this ComponentRef<FusionStepper!, TModel!>! self) -> TypedComponentSource<int>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionStepperExtensions.NextStep<TModel>(this ComponentRef<FusionStepper!, TModel!>! self) -> ComponentRef<FusionStepper!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionStepperExtensions.PreviousStep<TModel>(this ComponentRef<FusionStepper!, TModel!>! self) -> ComponentRef<FusionStepper!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionStepperExtensions.RefreshProgressbar<TModel>(this ComponentRef<FusionStepper!, TModel!>! self) -> ComponentRef<FusionStepper!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionStepperExtensions.Reset<TModel>(this ComponentRef<FusionStepper!, TModel!>! self) -> ComponentRef<FusionStepper!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionStepperExtensions.SetActiveStep<TModel>(this ComponentRef<FusionStepper!, TModel!>! self, int activeStep) -> ComponentRef<FusionStepper!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionStepperHtmlExtensions.FusionStepper<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.StepperBuilder!>! build) -> FusionStepperBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionStepperHtmlExtensions.FusionStepper<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.StepperBuilder!>! build) -> FusionStepperBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionStepperReactiveExtensions.Reactive<TModel, TArgs>(this FusionStepperBuilder<TModel!>! builder, System.Func<FusionStepperEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionStepperBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N45"
+     ]
+    },
+    {
+     "door": "static readonly FusionStepperEvents.Instance -> FusionStepperEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N45"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F46",
    "summary": "FusionSwitch: one declaration of the Syncfusion Switch by its JavaScript names, checked and change, each EJ2 33.1.47's public member; the payload of change, read as the browser hands it, with no member the browser lacks; the input it is, its state committed by change; and the render helpers that render it bound to a member of bool. Main spreads the slice over six files whose events, writes and reads name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name and stripped of the IsInteracted no switch hands.",
    "status": "both",
@@ -18269,6 +20763,326 @@
      "verdict": "renamed",
      "to": [
       "M21.N46"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F47",
+   "summary": "FusionTab: one declaration of the Syncfusion Tab by its JavaScript names, selectedItem, select, hideTab and selected, each EJ2 33.1.47's public member; selected's payload, nested under EJ2's interface name; and the render helper that renders it under the developer's id. Main spreads the slice over seven files whose writes and calls name members by strings over ComponentRef and take literals alone, a payload class with setters and a builder class of its own whose Reactive extension wires the event; the redesign declares it in one file, the shape the rewrite keeps, its helper returning the rendered component.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionTab",
+    "Alis.Reactive.Fusion:FusionTabBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionTabEvents",
+    "Alis.Reactive.Fusion:FusionTabExtensions",
+    "Alis.Reactive.Fusion:FusionTabHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionTabReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionTabSelectedArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"hideTab\").WithArgs<int, bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabExtensions.cs:23"
+    },
+    {
+     "line": "main",
+     "text": "this ComponentRef<FusionTab, TModel> self, int index, bool isHidden = true)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabExtensions.cs:39"
+    },
+    {
+     "line": "main",
+     "text": "\"selected\", new FusionTabSelectedArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabEvents.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Tab(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<int> SelectedItem => Property<int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTab.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "public void HideTab(Arg<int> index, Arg<bool> value) => Method(index, value);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTab.cs:32"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionTab>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTab.cs:79"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTab declares the EJ2 Tab by its JavaScript names: selectedItem as SelectedItem, a Property<int>; select as Select(index), the number of EJ2's number | HTEle, an element being no value a plan carries; hideTab as HideTab(index, value), value true to hide the tab and false to show it, where main names it isHidden and defaults it to true, as EJ2 does when it is left out (@syncfusion/ej2-navigations/src/tab/tab.js:2065); and selected as Selected, whose payload is FusionTab.SelectEventArgs; each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/tab/tab.d.ts:351, :662, :653, :483). Main's SetSelectedItem is Set on SelectedItem.",
+     "doors": [
+      "M21.N47",
+      "N5.4",
+      "N17.1",
+      "M12.N2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTab.SelectEventArgs, EJ2's SelectEventArgs nested under its name (@syncfusion/ej2-navigations/src/tab/tab.d.ts:46-65), reads SelectedIndex, PreviousIndex and IsSwiped. It declares no member for previousItem, selectedItem and selectedContent, the DOM's elements; cancel, isInteracted and preventFocus, which neither line declares, are not added. It replaces the redesign's FusionTabSelectedArgs and main's.",
+     "doors": [
+      "M21.N47",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionTab(plan, elementId, build => ..) renders the tabs under the id the developer chose on EJ2's TabBuilder, as both lines do, and returns the rendered component in place of main's FusionTabBuilder<TModel> and its Reactive extension; its Reactive(t => t.Selected, pipeline) handles its events from the plan's start, and pipeline.Component<FusionTab>(elementId) reaches it from any block.",
+     "doors": [
+      "M21.N47",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/Events/FusionTabOnSelected.cs:11-21"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTab.cs:7-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabBuilder.cs:15-53"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabExtensions.cs:17-49"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabHtmlExtensions.cs:15-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTabReactiveExtensions.cs:9-32"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTab/FusionTab.cs:20-81"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Tab as its TypeScript declares it (@syncfusion/ej2-navigations/src/tab/tab.d.ts, SelectEventArgs there), and as its source raises selected (@syncfusion/ej2-navigations/src/tab/tab.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the facts named and the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionTabBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionTabBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionTabBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionTabEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47"
+     ]
+    },
+    {
+     "door": "FusionTabEvents.Selected.get -> TypedEvent<FusionTabSelectedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47"
+     ]
+    },
+    {
+     "door": "FusionTabExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionTabReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N47"
+     ]
+    },
+    {
+     "door": "FusionTabSelectedArgs.IsSwiped.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47"
+     ]
+    },
+    {
+     "door": "FusionTabSelectedArgs.IsSwiped.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N47",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTabSelectedArgs.PreviousIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47"
+     ]
+    },
+    {
+     "door": "FusionTabSelectedArgs.PreviousIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N47",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTabSelectedArgs.SelectedIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47"
+     ]
+    },
+    {
+     "door": "FusionTabSelectedArgs.SelectedIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N47",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionTabExtensions.HideTab<TModel>(this ComponentRef<FusionTab!, TModel!>! self, int index, bool isHidden = true) -> ComponentRef<FusionTab!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTabExtensions.Select<TModel>(this ComponentRef<FusionTab!, TModel!>! self, int index) -> ComponentRef<FusionTab!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTabExtensions.SetSelectedItem<TModel>(this ComponentRef<FusionTab!, TModel!>! self, int index) -> ComponentRef<FusionTab!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTabHtmlExtensions.FusionTab<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.TabBuilder!>! build) -> FusionTabBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionTabHtmlExtensions.FusionTab<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.TabBuilder!>! build) -> FusionTabBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionTabReactiveExtensions.Reactive<TModel, TArgs>(this FusionTabBuilder<TModel!>! builder, System.Func<FusionTabEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionTabBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N47"
+     ]
+    },
+    {
+     "door": "static readonly FusionTabEvents.Instance -> FusionTabEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N47"
      ]
     }
    ]

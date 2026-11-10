@@ -63,6 +63,25 @@ Each name is gate 2's; each door is the capability it carries.
   each data member of it named by `[JsonPropertyName]` with EJ2's name (X17.48); and types a value of the app's own data
   that EJ2 types as a union by a type parameter, the bound member's for an input, which the vendor contract analyzer
   checks at each type argument against one type of the union (ALIS037, gate 2).
+- `M21.N3` kept: `FusionAIAssistView`: `Prompt` as `Property<string>`, `ActiveView` as `Property<int>`,
+  `ExecutePrompt(prompt)`, `AddPromptResponse(outputResponse)`, the whole response (M21.D901), and
+  `AddPromptResponse(Arg<FusionAIAssistView.PromptModel>)`, a prompt with its response, `ScrollToBottom`,
+  `PromptRequest`, `PromptChanged` and `StopRespondingClick`; the payloads `FusionAIAssistView.PromptRequestEventArgs`
+  (`Prompt`, `PromptSuggestions`, no `Cancel`, M21.X901), `FusionAIAssistView.PromptChangedEventArgs` (`Value`,
+  `PreviousValue`) and `FusionAIAssistView.StopRespondingEventArgs` (`Prompt`, `DataIndex`), and
+  `FusionAIAssistView.PromptModel` (`Prompt`, `Response`); and the render helper
+  `Html.FusionAIAssistView(plan, elementId, build => ..)`, which writes `enableStreaming` false after `build` and
+  returns the rendered component in place of main's `FusionAIAssistViewBuilder<TModel>`. It replaces main's nine files
+  (`Alis.Reactive.Fusion/Components/FusionAIAssistView/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.d.ts:480`, `:538`, `:940`, `:950`, `:959`, `:728`,
+  `:734`, `:741`, `@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview-model.d.ts:8`).
+- `M21.N4` kept: `FusionAccordion`: `ExpandItem(isExpand, index)`, `EnableItem(index, isEnable)` and `Expanded`; the
+  payload `FusionAccordion.ExpandedEventArgs` (`Index`, `IsExpanded`); and the render helper
+  `Html.FusionAccordion(plan, elementId, build => ..)`, which returns the rendered component in place of main's
+  `FusionAccordionBuilder<TModel>`. It replaces main's seven files (`Alis.Reactive.Fusion/Components/FusionAccordion/`
+  at 623dd4a27), whose doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2
+  33.1.47's public member (`@syncfusion/ej2-navigations/src/accordion/accordion.d.ts:441`, `:432`, `:311`, `:45`).
 - `M21.N5` kept: `FusionAutoComplete<TValue>`, TValue the type of the member it binds, as EJ2 marks the value
   AutoComplete inherits from ComboBox a generic type (`@syncfusion/ej2-dropdowns/src/combo-box/combo-box.d.ts:228`):
   `Value`, a `Property<TValue>` whose type argument admits null (M21.X501), `DataSource<TItem>()`, `Enabled`,
@@ -85,6 +104,18 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionBreadcrumb/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts:144`, `:223`).
+- `M21.N7` kept: `FusionBulletChart`: `DataSource<TItem>()`, `TooltipRender` and `BulletChartMouseClick`, and no
+  `GetActualIndex` (M21.X902); the payloads `FusionBulletChart.IBulletchartTooltipEventArgs` (`Value` and `Target` as
+  the formatted text the browser hands, `Name`, `Text` and `Template` as `Property<string>`, M21.X903) and
+  `FusionBulletChart.IBulletMouseEventArgs` (`Target`, `X`, `Y`); and the render helpers
+  `Html.FusionBulletChart(plan, elementId, build => ..)` and
+  `Html.FusionBulletChart(plan, elementId, items, build => ..)`, which hands EJ2 the items by M21.D1, with
+  `Fields<TItem>(value, target)` and `Fields<TItem>(value, target, category)`, each returning the rendered component in
+  place of main's `FusionBulletChartBuilder<TModel>`. It replaces main's eight files
+  (`Alis.Reactive.Fusion/Components/FusionBulletChart/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:236`, `:260`, `:266`, `:248`, `:284`, `:302`,
+  `@syncfusion/ej2-charts/src/bullet-chart/model/bullet-interface.d.ts:132`, `:169`).
 - `M21.N8` kept: `FusionButton`: `Content`, `IconCss` and `CssClass` as `Property<string>`, `Disabled`, `IsPrimary` and
   `IsToggle` as `Property<bool>`, `IconPosition` as `Property<FusionButtonIconPosition>`, `DataBind`, `Click` and
   `FocusIn`; the enum `FusionButtonIconPosition`, EJ2's `IconPosition` under the redesign's name beside the class, as a
@@ -95,6 +126,15 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-buttons/src/button/button.d.ts:86`, `:58`, `:79`, `:64`, `:70`, `:92`, `:51`, `:8`, `:176`, `:184`,
   `@syncfusion/ej2-base/src/component.d.ts:129`).
+- `M21.N9` kept: `FusionCarousel`: `SelectedIndex` as `Property<int>`, `Next`, `Prev`, `SlideChanging` and
+  `SlideChanged`; the payloads `FusionCarousel.SlideChangingEventArgs` (`CurrentIndex`, `NextIndex`, `IsSwiped`,
+  `SlideDirection`, `Cancel`) and `FusionCarousel.SlideChangedEventArgs` (`CurrentIndex`, `PreviousIndex`, `IsSwiped`,
+  `SlideDirection`), the direction a `FusionCarousel.CarouselSlideDirection` written by its names through a string enum
+  converter (M21.X904); and the render helper `Html.FusionCarousel(plan, elementId, build => ..)`, which returns the
+  rendered component in place of main's `FusionCarouselBuilder<TModel>`. It replaces main's eight files
+  (`Alis.Reactive.Fusion/Components/FusionCarousel/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:215`, `:405`, `:399`, `:330`, `:336`, `:12`).
 - `M21.N10` kept: `FusionCheckBox`: `Checked`, `Indeterminate` and `Disabled` as `Property<bool>`, `DataBind`, `Click`,
   `FocusIn` and `Change`, with `IInputComponent.Input` committed by `Change` (M7.N3); the payload
   `FusionCheckBox.ChangeEventArgs` (`Checked`, `probe:ej2-payload-checkbox-change`); and the render helpers
@@ -395,6 +435,13 @@ Each name is gate 2's; each door is the capability it carries.
   fifteen files (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:250`, `:274`, `:707`, `:867`, `:1716`, `:1726`, `:1878`).
+- `M21.N40` kept: `FusionSidebar`: `IsOpen` as `Property<bool>`, `Show`, `Hide`, `Toggle`, `Open` and `Close`; the
+  payload `FusionSidebar.EventArgs` (`IsInteracted`, and `Cancel`, which EJ2 reads back and neither line declares); and
+  the render helper `Html.FusionSidebar(plan, elementId, build => ..)`, which returns the rendered component in place of
+  main's `FusionSidebarBuilder<TModel>`. It replaces main's seven files
+  (`Alis.Reactive.Fusion/Components/FusionSidebar/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts:106`, `:246`, `:238`, `:265`, `:202`, `:196`, `:320`, `:332`).
 - `M21.N41` kept: `FusionSlider<TValue>`, `TValue` the bound member's type as EJ2 marks the value generic: one `Value`
   as `Property<TValue>`, one number for a slider of one handle and a list of numbers for a range (M21.X614); `DataBind`,
   `Change` and `Changed`, with `IInputComponent.Input` committed by `Changed` (M7.N3); the payload
@@ -443,6 +490,15 @@ Each name is gate 2's; each door is the capability it carries.
   `:120`, `@syncfusion/ej2-splitbuttons/src/common/common.d.ts:72`,
   `@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:21`, `:35`, `:14`, `:42`, `:28`, `:49`,
   `@syncfusion/ej2-base/src/component.d.ts:129`).
+- `M21.N45` kept: `FusionStepper`: `ActiveStep` as `Property<int>`, `NextStep`, `PreviousStep`, `Reset`,
+  `RefreshProgressbar`, `StepChanged`, `StepChanging` and `StepClick`; the payloads
+  `FusionStepper.StepperChangedEventArgs` (`PreviousStep`, `ActiveStep`, `IsInteracted`),
+  `FusionStepper.StepperChangingEventArgs` (the same and `Cancel`) and `FusionStepper.StepperClickEventArgs`
+  (`PreviousStep`, `ActiveStep`); and the render helper `Html.FusionStepper(plan, elementId, build => ..)`, which
+  returns the rendered component in place of main's `FusionStepperBuilder<TModel>`. It replaces main's nine files
+  (`Alis.Reactive.Fusion/Components/FusionStepper/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-navigations/src/stepper/stepper.d.ts:158`, `:340`, `:346`, `:352`, `:358`, `:238`, `:244`, `:250`).
 - `M21.N46` kept: `FusionSwitch`: `Checked` as `Property<bool>` and `Change`, with `IInputComponent.Input` committed by
   `Change` (M7.N3); the payload `FusionSwitch.ChangeEventArgs` (`Checked`), with no `IsInteracted`, which the browser
   does not hand (M21.X711, `probe:ej2-payload-switch-change`); and the render helpers `field.FusionSwitch()` and
@@ -450,6 +506,12 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionSwitch/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-buttons/src/switch/switch.d.ts:51`, `:38`, `@syncfusion/ej2-buttons/src/common/common.d.ts:93`).
+- `M21.N47` kept: `FusionTab`: `SelectedItem` as `Property<int>`, `Select(index)`, `HideTab(index, value)` and
+  `Selected`; the payload `FusionTab.SelectEventArgs` (`SelectedIndex`, `PreviousIndex`, `IsSwiped`); and the render
+  helper `Html.FusionTab(plan, elementId, build => ..)`, which returns the rendered component in place of main's
+  `FusionTabBuilder<TModel>`. It replaces main's seven files (`Alis.Reactive.Fusion/Components/FusionTab/` at
+  623dd4a27), whose doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2
+  33.1.47's public member (`@syncfusion/ej2-navigations/src/tab/tab.d.ts:351`, `:662`, `:653`, `:483`).
 - `M21.N48` kept: `FusionTextArea`: `Value` as `Property<string?>` (M21.X603), `DataBind`, `FocusIn`, `FocusOut`,
   `Input`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3); the payloads
   `FusionTextArea.InputEventArgs` (`Value`, `PreviousValue`), `FusionTextArea.ChangedEventArgs` (`Value`,
@@ -695,3 +757,17 @@ features they give.
   that waits for DOMContentLoaded, and both read the text of any status as an answer. The rewrite sends EJ2's
   ChatOptions as JSON with the page's request token in the header `RequestVerificationToken`, hands EJ2 the whole text
   of a 200 to 299 response and nothing otherwise, never a stream, and builds the button when it mounts.
+- An AI Assist view answers from the app's endpoint, whole (M21.D901, M21.X901). Main's methods take literals alone, so
+  no response body reaches the view, and its `CancelRequest` writes a cancel EJ2 never reads
+  (`@syncfusion/ej2-interactive-chat/src/ai-assistview/ai-assistview.js:1354`), which leaves a declined prompt waiting
+  with its stop button showing. The rewrite's `AddPromptResponse` takes any source and sets the response whole, a prompt
+  with its response goes in through EJ2's `PromptModel`, no door takes a cancel, and the render helper keeps streaming
+  off in 1.0.
+- A bullet chart's items are the app's typed data, and its tooltip reads what the browser hands (M21.X902, M21.X903).
+  Neither line has a door of its own for the chart's items or their fields, which both leave to the vendor builder's
+  object data and text field names; the rewrite hands the items by M21.D1 with typed `Fields<TItem>`,
+  `DataSource<TItem>()` replaces them, the tooltip's value and targets are the formatted text a real hover pins, its
+  template is writable as EJ2 reads it back, and the read of the private `getActualIndex` leaves.
+- A carousel's slide direction is EJ2's two names, and a sidebar can be kept open or closed (M21.X904). Both lines read
+  the direction as any text (`@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:12`); the rewrite reads
+  `FusionCarousel.CarouselSlideDirection`, and its sidebar payload adds the `Cancel` EJ2 reads back on open and close.

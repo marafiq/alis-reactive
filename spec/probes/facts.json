@@ -3661,6 +3661,81 @@
         "gesture": "Type Discharge Ada? into the question input, click Discharge, then press Escape.",
         "outcome": "The dialog is gone, and outcome reads Kept."
       }
+    },
+    {
+      "id": "ej2-aiassistview-promptrequest-cancelled",
+      "statement": "EJ2 33.1.47's AIAssistView reads no cancel back from promptRequest's listener: after a listener sets it true, the typed prompt stays listed and the stop button still shows.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys, a pointer resting on the chart and public method calls",
+      "probe": "ej2-payloads-u9.mjs",
+      "expect": "ej2-aiassistview-promptrequest-cancelled: prompts:1,prompt:Can Mr Patel have a second dose?,stop:true",
+      "source": "spec/probes/ej2-payloads-u9.mjs",
+      "proof": {
+        "feature": "M21.F3",
+        "page": "A medication assistant page whose FusionAIAssistView's PromptRequest handler answers every prompt with AddPromptResponse(Ask the nurse on duty.).",
+        "gesture": "Type Can Mr Patel have a second dose? in the prompt and click send.",
+        "outcome": "The assistant shows the prompt and the answer Ask the nurse on duty."
+      }
+    },
+    {
+      "id": "ej2-aiassistview-addpromptresponse-object",
+      "statement": "EJ2 33.1.47's AIAssistView, whose addPromptResponse its TypeScript types string | Object, lists and shows a prompt and its response when handed an object of prompt and response text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys, a pointer resting on the chart and public method calls",
+      "probe": "ej2-payloads-u9.mjs",
+      "expect": "ej2-aiassistview-addpromptresponse-object: prompts:1,prompt:string,response:string,shown:true",
+      "source": "spec/probes/ej2-payloads-u9.mjs",
+      "proof": {
+        "feature": "M21.F3",
+        "page": "A ward assistant page whose load handler calls AddPromptResponse with a FusionAIAssistView.PromptModel whose Prompt is Which ward is Mrs Khan in? and whose Response is Ward B, bed 4.",
+        "gesture": "Open the page.",
+        "outcome": "The assistant shows Which ward is Mrs Khan in? and the answer Ward B, bed 4."
+      }
+    },
+    {
+      "id": "ej2-aiassistview-addpromptresponse-text-unrequested",
+      "statement": "EJ2 33.1.47's AIAssistView, handed text by addPromptResponse while no prompt waits, lists an entry whose prompt is null and shows the text alone.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys, a pointer resting on the chart and public method calls",
+      "probe": "ej2-payloads-u9.mjs",
+      "expect": "ej2-aiassistview-addpromptresponse-text-unrequested: prompts:1,prompt:null,shown:true",
+      "source": "spec/probes/ej2-payloads-u9.mjs",
+      "proof": {
+        "feature": "M21.F3",
+        "page": "A ward assistant page whose load handler calls AddPromptResponse(Rounds start at 8:00.).",
+        "gesture": "Open the page.",
+        "outcome": "The assistant shows Rounds start at 8:00. with no prompt above it."
+      }
+    },
+    {
+      "id": "ej2-payload-bulletchart-tooltiprender",
+      "statement": "EJ2 33.1.47's BulletChart hands tooltipRender's listener these members by kind when the pointer rests on its feature bar: value and text as text and target a list.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys, a pointer resting on the chart and public method calls",
+      "probe": "ej2-payloads-u9.mjs",
+      "expect": "ej2-payload-bulletchart-tooltiprender: name:string,target:Array,text:string,value:string",
+      "source": "spec/probes/ej2-payloads-u9.mjs",
+      "proof": {
+        "feature": "M21.F7",
+        "page": "A dose chart page whose FusionBulletChart shows Ward B's 6 doses given against a goal of 8, its labels formatted {value} doses, with a TooltipRender handler that sets dose-given's text to the payload's Value.",
+        "gesture": "Rest the pointer on the chart's feature bar.",
+        "outcome": "dose-given shows 6 doses."
+      }
+    },
+    {
+      "id": "ej2-bulletchart-tooltiprender-value-target",
+      "statement": "EJ2 33.1.47's BulletChart hands tooltipRender's value as text and its target as a list of text, each the axis's value written by its label format, where its TypeScript types value string | number and target string[] | number[] | string.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks, keys, a pointer resting on the chart and public method calls",
+      "probe": "ej2-payloads-u9.mjs",
+      "expect": "ej2-bulletchart-tooltiprender-value-target: string,Array(string),6 doses,8 doses",
+      "source": "spec/probes/ej2-payloads-u9.mjs",
+      "proof": {
+        "feature": "M21.F7",
+        "page": "A dose chart page whose FusionBulletChart shows Ward B's 6 doses given against a goal of 8, its labels formatted {value} doses, with a TooltipRender handler that sets dose-goals's text to the count of the payload's Target.",
+        "gesture": "Rest the pointer on the chart's feature bar.",
+        "outcome": "dose-goals shows 1."
+      }
     }
   ]
 }
