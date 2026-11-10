@@ -2369,10 +2369,10 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends Parallel GETs to the items endpoint, setting conformance.Text to its summary, and to the code endpoint, setting conformance.Value to its code; the test releases the code endpoint first.",
-        "gesture": "Click Load.",
-        "outcome": "Once the code endpoint answers the value line reads a-2 while the heading keeps Alpha; once the items endpoint answers the heading reads 3 items.",
-        "opposite": "A refused code request leaves a-1 while the items branch still sets 3 items.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends Parallel GETs to the items endpoint, setting conformance.Text to its summary, and to the code endpoint, setting conformance.Value to its code. The harness gates both GETs (Lanes.tla's Respond).",
+        "gesture": "Click Load; once the harness reports both GETs held, release the code endpoint's GET and wait until the value line reads a-2; then release the items endpoint's GET.",
+        "outcome": "While the items GET is held the value line reads a-2 and the heading keeps Alpha; after its release the heading reads 3 items.",
+        "opposite": "With the code endpoint seeded to answer 500, the value line keeps a-1 while the items branch still sets 3 items.",
         "defect": "The branches' routes run only after both answer, so a-2 shows only with 3 items.",
         "observes": "Lanes.tla:AllSettled"
       }
@@ -2411,8 +2411,8 @@
       ],
       "version": "current",
       "promise": {
-        "page": "On net10, a page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, subscribed to the test stream whose Renamed message sets conformance.Text to the message's Text, and an Announce button that posts to the test app's rename endpoint, which pushes Renamed with Beta.",
-        "gesture": "Click Announce.",
+        "page": "On net10, a page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, subscribed to the test stream whose Renamed message sets conformance.Text to the message's Text. The harness pushes Renamed with the text the test names.",
+        "gesture": "Wait until the harness reports the test stream open, then push Renamed with Beta through the harness.",
         "outcome": "The component's heading reads Beta.",
         "opposite": "Before the push it reads Alpha.",
         "defect": "The message's member is read by its C# name Text, so conformance.Text is set to nothing and the heading empties.",

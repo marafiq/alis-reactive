@@ -168,10 +168,10 @@
         },
         {
           "for": "X11.6",
-          "page": "A ward list whose change handler, under replace, loads the ward's rooms into a room list; the server answers the first ward after the second.",
-          "gesture": "Pick ward East, then ward West before East answers, then release East's answer.",
-          "outcome": "The room list shows West's rooms after both answers.",
-          "opposite": "Under overlap, the room list shows East's rooms after its late answer.",
+          "page": "A ward list whose change handler, under replace, loads the ward's rooms into a room list. The harness gates East's rooms GET (Lanes.tla's Respond).",
+          "gesture": "Pick ward East; once the harness reports East's GET held, pick ward West and wait until the room list shows West's rooms; then release East's GET.",
+          "outcome": "The room list still shows West's rooms after East's release.",
+          "opposite": "Under overlap, the room list shows East's rooms after East's release.",
           "defect": "The first run is not cut, so East's late answer overwrites West's rooms.",
           "observes": "Lanes.tla:Route"
         },
