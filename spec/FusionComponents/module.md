@@ -57,6 +57,27 @@ Each name is gate 2's; each door is the capability it carries.
   writes the C# values it hands EJ2 by M21.D1, so `AddReactiveFusion` leaves (gate 2). Every Fusion declaration marks
   `optional: true` on each member EJ2's TypeScript marks `?` (D5.3, N5.4), which ALIS022 checks both ways; neither line
   has the mark.
+- `M21.N6` kept: `FusionBreadcrumb`: `ActiveItem` (`activeItem`), `DataBind` and `ItemClick`, whose payload
+  `FusionBreadcrumbItemClickArgs` reads its `item`; and the render helper `Html.FusionBreadcrumb(plan, id, build =>
+  ..)`. It replaces main's seven files (`Alis.Reactive.Fusion/Components/FusionBreadcrumb/` at 623dd4a27), whose doors
+  carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts:144`, `:223`).
+- `M21.N11` kept: `FusionChipList`: `Add`, `SelectByIndex`, `SelectByIndexes` and `SelectByText` (`select`),
+  `RemoveByIndex` and `RemoveByIndexes` (`remove`), `Find` returning a `FusionChipData`, `GetSelectedChip()` and
+  `GetSelectedChips()` (`getSelectedChips`), `DataBind`, and `SelectedChipValue`, `SelectedChipIndex`,
+  `SelectedChipValues` and `SelectedChipIndexes` (`selectedChips`); `Click` and `Deleted` and their payloads;
+  `FusionSelectedChips` with `Texts`, `Data` and `Indexes`, the last by `[JsonPropertyName("Indexes")]`; and the
+  render helper `Html.FusionChipList(plan, id, build => ..)`. It replaces main's eleven files
+  (`Alis.Reactive.Fusion/Components/FusionChipList/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-buttons/src/chips/chip-list.d.ts:287`, `:428`, `:439`, `:449`, `:461`, `:468`).
+- `M21.N14` kept: `FusionContextMenu`: `Open(top, left)` and `Close`; `BeforeItemRender`, `BeforeOpen`, `OnOpen`,
+  `BeforeClose`, `OnClose` and `Select` and their payloads, `FusionContextMenuBeforeOpenArgs` with `IsFocused`
+  (optional, `isFocused`); and the render helper `Html.FusionContextMenu(plan, id, build => ..)`. It replaces main's
+  twelve files (`Alis.Reactive.Fusion/Components/FusionContextMenu/` at 623dd4a27), whose doors carry their verdicts
+  in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-navigations/src/context-menu/context-menu.d.ts:77`, `:84`;
+  `@syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242`, `:552`).
 - `M21.N23` kept: `FusionGrid`: `Rows<TRow>()` and `Page<TRow>()` (`dataSource`), `Refresh`, the paging, sorting,
   filtering, searching and grouping methods, the column methods (`ShowColumn` and `HideColumn` by `showColumns` and
   `hideColumns` with `"field"`, `AutoFitColumns`, `AutoFitColumn` by `autoFitColumns`, `ReorderColumns`,
@@ -72,6 +93,16 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-grids/src/grid/base/grid.d.ts:1558`, `:3067`, `:3076`, `:3479`, `:3687`, `:3849`, `:3859`,
   `:3870`).
+- `M21.N24` kept: `FusionInPlaceEditor`: `Value` (`value`), a `Property<string?>` read as text by M21.X404's default,
+  the member's typed read being `pipeline.Input(m => m.Member)` (N14.4); `Disabled` and `EnableEditMode`, a
+  `Property<bool>` each; `Save`; `Element.ClassList.Add` and `Remove`; `BeginEdit`, `EndEdit`, `Change`,
+  `ActionBegin`, `ActionSuccess`, `SubmitClick` and `CancelClick` and their payloads; `IInputComponent.Input`
+  committed by `EndEdit` (M7.N3); and the render helpers `field.FusionInPlaceEditor()` and
+  `field.FusionInPlaceEditor(build => ..)`, which start the editor at the member's value by M21.D1. It replaces main's
+  twelve files (`Alis.Reactive.Fusion/Components/FusionInPlaceEditor/` at 623dd4a27), whose doors carry their verdicts
+  in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:187`, `:320`, `:336`, `:408`, `:415`,
+  `:435`, `:441`, `:449`, `:456`, `:463`, `:587`).
 - `M21.N26` kept: `FusionKanban`: `Cards<TCard>()` (`dataSource`), `GetColumnData<TCard>`, `GetSwimlaneData<TCard>`,
   `DataBind`, `AddCard`, `UpdateCard`, `DeleteCard` (a card, a list or a key, M21.X302), `AddColumn`, `DeleteColumn`,
   `ShowColumn`, `HideColumn`, `ShowSpinner`, `HideSpinner`, `OpenDialog` with `FusionKanbanDialogAction` (M21.X301)
@@ -81,6 +112,13 @@ Each name is gate 2's; each door is the capability it carries.
   main's seven files (`Alis.Reactive.Fusion/Components/FusionKanban/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:112`, `:234`, `:429`, `:468`, `:484`, `:502`, `:511`, `:527`).
+- `M21.N30` kept: `FusionMenu`: `Open` and `Close`; `BeforeItemRender`, `BeforeOpen`, `OnOpen`, `BeforeClose`,
+  `OnClose` and `Select` and their payloads, `FusionMenuBeforeOpenArgs` with `IsFocused` (optional, `isFocused`); and
+  the render helper `Html.FusionMenu(plan, id, build => ..)`. It replaces main's twelve files
+  (`Alis.Reactive.Fusion/Components/FusionMenu/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-navigations/src/menu/menu.d.ts:119`, `:126`;
+  `@syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242`, `:552`).
 - `M21.N34` kept: `FusionPivotView`: `CurrentView` (`currentView`, which EJ2 marks `@hidden`, a gate 2 item),
   `DataSourceSettings` as `LiveObject<FusionPivotViewDataSourceSettings>()` with `Rows<TRow>()` (`dataSource`),
   `DisplayOption` as `LiveObject<FusionPivotViewDisplayOption>()` with `View` and `Primary` (M21.D301), `Refresh`,
@@ -99,6 +137,11 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:250`, `:274`, `:707`, `:867`, `:1716`, `:1726`, `:1878`).
+- `M21.N51` kept: `FusionToolbar`: `Disable` and `Clicked`, whose payload `FusionToolbarClickedArgs` reads its `item`;
+  and the render helper `Html.FusionToolbar(plan, id, build => ..)`. It replaces main's seven files
+  (`Alis.Reactive.Fusion/Components/FusionToolbar/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts:344`, `:414`).
 
 The meaning `M21.D1` and the defects `M21.X1` to `M21.X3` are in `spec/FusionComponents/features.json`, on the
 features they give.
@@ -165,3 +208,12 @@ features they give.
 - A pivot's shown view is read from public members (M21.D301). Both lines read `currentView`, which EJ2 marks
   `@hidden` (`@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1037-1038`); the public `displayOption`
   carries the same view.
+- A multiple selection's indexes read as EJ2 writes them (M21.X401). Main names them `indexes` and the redesign drops
+  them, while `getSelectedChips` writes `Indexes` (`@syncfusion/ej2-buttons/src/chips/chip-list.d.ts:56`); the rewrite
+  declares `[JsonPropertyName("Indexes")]`.
+- An in-place editor calls only public members (M21.X402). Both lines call EJ2's private `disable` and `setFocus`
+  (`@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:541`, `:525`); the rewrite declares the
+  public `disabled` and `enableEditMode`. Its starting value is read with no compile (M21.X403), and its value reads
+  typed by its member through `pipeline.Input` (M21.X404).
+- A context menu's and a menu's `beforeOpen` payload keeps `isFocused`, which main reads and the redesign dropped
+  (`@syncfusion/ej2-navigations/src/common/menu-base.d.ts:552`), declared optional as EJ2 marks it.

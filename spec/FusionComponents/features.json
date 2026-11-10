@@ -619,6 +619,1319 @@
    ]
   },
   {
+   "id": "M21.F6",
+   "summary": "FusionBreadcrumb: one declaration of the Syncfusion Breadcrumb by its JavaScript names, activeItem, dataBind and itemClick, each EJ2 33.1.47's public member; itemClick's payload and its item; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over seven files whose calls name members by strings over ComponentRef, a payload class with a setter, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionBreadcrumb",
+    "Alis.Reactive.Fusion:FusionBreadcrumbBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionBreadcrumbEvents",
+    "Alis.Reactive.Fusion:FusionBreadcrumbExtensions",
+    "Alis.Reactive.Fusion:FusionBreadcrumbHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionBreadcrumbItem",
+    "Alis.Reactive.Fusion:FusionBreadcrumbItemClickArgs",
+    "Alis.Reactive.Fusion:FusionBreadcrumbReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public sealed class FusionBreadcrumb : FusionComponent",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:7"
+    },
+    {
+     "line": "main",
+     "text": "new TypedEvent<FusionBreadcrumbItemClickArgs>(\"itemClick\", new FusionBreadcrumbItemClickArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbEvents.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(\"activeItem\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbExtensions.cs:14"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Breadcrumb(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> ActiveItem => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:28"
+    },
+    {
+     "line": "redesign",
+     "text": "public void DataBind() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<FusionBreadcrumbItem> Item => ReadOnly<FusionBreadcrumbItem>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:42"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionBreadcrumb>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:91"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionBreadcrumb declares the EJ2 Breadcrumb by its JavaScript names: activeItem as ActiveItem, a Property<string> a step writes to move the active item, dataBind as DataBind, and itemClick as ItemClick, whose payload's item is read with Read, each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts:144, :223; @syncfusion/ej2-base/src/component.d.ts:129).",
+     "doors": [
+      "M21.N6",
+      "N5.3",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionBreadcrumb(plan, id, build => ..) renders the breadcrumb on the vendor's builder, the rendered breadcrumb's Reactive(b => b.ItemClick, pipeline) handles its events from the plan's start, and pipeline.Component<FusionBreadcrumb>(id) reaches it from any block.",
+     "doors": [
+      "M21.N6",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/Events/FusionBreadcrumbOnItemClick.cs:6-32"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:7-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbBuilder.cs:14-52"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbEvents.cs:6-18"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbExtensions.cs:9-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbHtmlExtensions.cs:15-40"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbReactiveExtensions.cs:9-26"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:25-94"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Breadcrumb as its TypeScript declares it (@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts, BreadcrumbClickEventArgs at :69, dataBind in @syncfusion/ej2-base/src/component.d.ts), checked member by member by scratchpad m21/tools/dts.py with the slice's own package preferred; and the browser.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionBreadcrumbBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionBreadcrumbBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionBreadcrumbBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionBreadcrumbEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6"
+     ]
+    },
+    {
+     "door": "FusionBreadcrumbEvents.ItemClick.get -> TypedEvent<FusionBreadcrumbItemClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6"
+     ]
+    },
+    {
+     "door": "FusionBreadcrumbExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionBreadcrumbItemClickArgs.Item.get -> FusionBreadcrumbItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6"
+     ]
+    },
+    {
+     "door": "FusionBreadcrumbItemClickArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N6",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionBreadcrumbReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N6"
+     ]
+    },
+    {
+     "door": "static FusionBreadcrumbExtensions.ActiveItem<TModel>(this ComponentRef<FusionBreadcrumb!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionBreadcrumbExtensions.SetActiveItem<TModel>(this ComponentRef<FusionBreadcrumb!, TModel!>! self, string! activeItem) -> ComponentRef<FusionBreadcrumb!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionBreadcrumbHtmlExtensions.FusionBreadcrumb<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.BreadcrumbBuilder!>! build) -> FusionBreadcrumbBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionBreadcrumbHtmlExtensions.FusionBreadcrumb<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.BreadcrumbBuilder!>! build) -> FusionBreadcrumbBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionBreadcrumbReactiveExtensions.Reactive<TModel, TArgs>(this FusionBreadcrumbBuilder<TModel!>! builder, System.Func<FusionBreadcrumbEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionBreadcrumbBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N6"
+     ]
+    },
+    {
+     "door": "static readonly FusionBreadcrumbEvents.Instance -> FusionBreadcrumbEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N6"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F11",
+   "summary": "FusionChipList: one declaration of the Syncfusion ChipList by its JavaScript names, add, select, remove, find, getSelectedChips, dataBind and selectedChips, each EJ2 33.1.47's public member; the payloads of click and deleted; the chip data find and getSelectedChips return, a multiple selection's indexes read as EJ2 writes them (M21.X401); and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over eleven files whose calls name members by strings over ComponentRef, payload classes with setters, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, with Indexes declared again.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionChipData",
+    "Alis.Reactive.Fusion:FusionChipItem",
+    "Alis.Reactive.Fusion:FusionChipList",
+    "Alis.Reactive.Fusion:FusionChipListBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionChipListClickArgs",
+    "Alis.Reactive.Fusion:FusionChipListDeletedArgs",
+    "Alis.Reactive.Fusion:FusionChipListEvents",
+    "Alis.Reactive.Fusion:FusionChipListExtensions",
+    "Alis.Reactive.Fusion:FusionChipListHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionChipListReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionSelectedChip",
+    "Alis.Reactive.Fusion:FusionSelectedChips"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public sealed class FusionChipList : FusionComponent",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs:7"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Mapped(\"selectByIndex\", \"select\").WithArgs<int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListExtensions.cs:13"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<int[]>.Mapped(\"selectedChipIndexes\", \"selectedChips\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListExtensions.cs:40"
+    },
+    {
+     "line": "main",
+     "text": "public int[] Indexes { get; set; } = Array.Empty<int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionSelectedChips.cs:29"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().ChipList(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListHtmlExtensions.cs:25"
+    },
+    {
+     "line": "redesign",
+     "text": "public void SelectByText(Arg<string[]> texts) => Method(texts, Fixed(\"text\"), name: \"select\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs:51"
+    },
+    {
+     "line": "redesign",
+     "text": "public FusionSelectedChip GetSelectedChip() => Object<FusionSelectedChip>(name: \"getSelectedChips\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs:67"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> SelectedChipValue => ReadOnly<string>(\"selectedChips\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs:80"
+    },
+    {
+     "line": "redesign",
+     "text": "public sealed class FusionSelectedChips",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs:164"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSelectedChips declares Texts, Data and Indexes, the last by [JsonPropertyName(\"Indexes\")] as getSelectedChips writes it (@syncfusion/ej2-buttons/src/chips/chip-list.d.ts:56, @syncfusion/ej2-buttons/src/chips/chip-list.js:745), so a multiple selection's indexes read as EJ2 holds them (M21.X401).",
+     "doors": [
+      "M21.N11"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionChipList declares the EJ2 ChipList by its JavaScript names: add as Add; select as SelectByIndex, SelectByIndexes and SelectByText, the last with \"text\"; remove as RemoveByIndex and RemoveByIndexes; find as Find, returning the chip's FusionChipData; getSelectedChips as GetSelectedChip() for a single selection and GetSelectedChips() for a multiple one; dataBind as DataBind; and selectedChips as SelectedChipValue and SelectedChipIndex for a single selection and SelectedChipValues and SelectedChipIndexes for a multiple one, so writing SelectedChipIndexes and calling DataBind selects those chips at once; each EJ2 33.1.47's public member (@syncfusion/ej2-buttons/src/chips/chip-list.d.ts:287, :428, :439, :449, :461, :468).",
+     "doors": [
+      "M21.N11",
+      "N5.3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Click and Deleted hand payloads read with Read: click's text, index and selected, index and selected optional as @syncfusion/ej2-buttons/src/chips/chip-list.d.ts:92 and :104 mark them, and deleted's text and index (:140).",
+     "doors": [
+      "M21.N11",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionChipList(plan, id, build => ..) renders the chip list on the vendor's builder, the rendered chip list's Reactive(c => c.Click, pipeline) handles its events from the plan's start, and pipeline.Component<FusionChipList>(id) reaches it from any block.",
+     "doors": [
+      "M21.N11",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method",
+    "returned"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipData.cs:3-8"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipItem.cs:9-17"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipListClickArgs.cs:3-9"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionChipListDeletedArgs.cs:3-8"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionSelectedChips.cs:11-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs:7-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListBuilder.cs:11-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListEvents.cs:3-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListExtensions.cs:7-133"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListHtmlExtensions.cs:12-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipListReactiveExtensions.cs:6-21"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs:35-203"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's ChipList as its TypeScript declares it (@syncfusion/ej2-buttons/src/chips/chip-list.d.ts, SelectedItems at :48, SelectedItem at :66, ClickEventArgs at :84, ChipDeletedEventArgs at :140), getSelectedChips' object as chip-list.js:745 builds it, checked member by member by scratchpad m21/tools/dts.py with the slice's own package preferred and the returned objects' members by hand; and the browser, by the promise.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X401",
+     "rung": "behavior",
+     "defect": "Main declares FusionSelectedChips.Indexes with no JsonPropertyName (Alis.Reactive.Fusion/Components/FusionChipList/Events/FusionSelectedChips.cs:29 at 623dd4a27), so its read names indexes, while getSelectedChips returns a multiple selection's indexes as Indexes (@syncfusion/ej2-buttons/src/chips/chip-list.d.ts:56, @syncfusion/ej2-buttons/src/chips/chip-list.js:745): the read holds nothing with chips selected. The redesign's FusionSelectedChips declares no Indexes (Alis.Reactive.Fusion/Components/FusionChipList/FusionChipList.cs:164-171 at 65fdf118d), so the capability is gone. The rewrite declares it by [JsonPropertyName(\"Indexes\")], as the app's naming is the name EJ2 writes (D2.9)."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X401",
+     "page": "An allergies chip list with Selection.Multiple over Penicillin, Latex and Peanuts, whose Show selected button sets the status text to Indexes held when GetSelectedChips()'s Indexes is not empty, and to No indexes otherwise.",
+     "gesture": "Click Penicillin and Peanuts, then click Show selected.",
+     "outcome": "The status reads Indexes held.",
+     "opposite": "Clicking Show selected with no chip selected sets the status to No indexes.",
+     "defect": "Main reads indexes, which getSelectedChips' object does not hold, so the status reads No indexes with two chips selected."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionChipListBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionChipListBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionChipListBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionChipListClickArgs.Index.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionChipListClickArgs.Index.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N11",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionChipListClickArgs.Selected.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionChipListClickArgs.Selected.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N11",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionChipListClickArgs.Text.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionChipListClickArgs.Text.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N11",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionChipListDeletedArgs.Index.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionChipListDeletedArgs.Index.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N11",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionChipListDeletedArgs.Text.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionChipListDeletedArgs.Text.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N11",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionChipListEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionChipListEvents.Clicked.get -> TypedEvent<FusionChipListClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionChipListEvents.Deleted.get -> TypedEvent<FusionChipListDeletedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionChipListExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionChipListReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionSelectedChips.Indexes.get -> int[]!",
+     "verdict": "kept",
+     "as": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "FusionSelectedChips.Indexes.set -> void",
+     "verdict": "kept",
+     "as": [
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.Add<TModel>(this ComponentRef<FusionChipList!, TModel!>! self, string! text) -> ComponentRef<FusionChipList!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.Find<TModel>(this ComponentRef<FusionChipList!, TModel!>! self, int index) -> TypedComponentSource<FusionChipData!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.RemoveByIndex<TModel>(this ComponentRef<FusionChipList!, TModel!>! self, int index) -> ComponentRef<FusionChipList!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.RemoveByIndexes<TModel>(this ComponentRef<FusionChipList!, TModel!>! self, params int[]! indexes) -> ComponentRef<FusionChipList!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.SelectByIndex<TModel>(this ComponentRef<FusionChipList!, TModel!>! self, int index) -> ComponentRef<FusionChipList!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.SelectByIndexes<TModel>(this ComponentRef<FusionChipList!, TModel!>! self, params int[]! indexes) -> ComponentRef<FusionChipList!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.SelectByText<TModel>(this ComponentRef<FusionChipList!, TModel!>! self, params string![]! text) -> ComponentRef<FusionChipList!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.SelectedChipIndexes<TModel>(this ComponentRef<FusionChipList!, TModel!>! self) -> TypedComponentSource<int[]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.SelectedChipValues<TModel>(this ComponentRef<FusionChipList!, TModel!>! self) -> TypedComponentSource<string![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.SelectedChips<TModel>(this ComponentRef<FusionChipList!, TModel!>! self) -> TypedComponentSource<FusionSelectedChips!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListExtensions.SetSelectedChipIndexes<TModel>(this ComponentRef<FusionChipList!, TModel!>! self, params int[]! indexes) -> ComponentRef<FusionChipList!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionChipListHtmlExtensions.FusionChipList<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.ChipListBuilder!>! build) -> FusionChipListBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionChipListHtmlExtensions.FusionChipList<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.ChipListBuilder!>! build) -> FusionChipListBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionChipListReactiveExtensions.Reactive<TModel, TArgs>(this FusionChipListBuilder<TModel!>! builder, System.Func<FusionChipListEvents!, TypedEvent<TArgs>!>! on, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionChipListBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N11"
+     ]
+    },
+    {
+     "door": "static readonly FusionChipListEvents.Instance -> FusionChipListEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N11"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F14",
+   "summary": "FusionContextMenu: one declaration of the Syncfusion ContextMenu by its JavaScript names, open, close and its six events, each EJ2 33.1.47's public member; the payloads of those events, beforeOpen's isFocused kept from main; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over twelve files whose calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, with IsFocused declared again.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionContextMenu",
+    "Alis.Reactive.Fusion:FusionContextMenuBeforeCloseArgs",
+    "Alis.Reactive.Fusion:FusionContextMenuBeforeCloseArgsExtensions",
+    "Alis.Reactive.Fusion:FusionContextMenuBeforeItemRenderArgs",
+    "Alis.Reactive.Fusion:FusionContextMenuBeforeOpenArgs",
+    "Alis.Reactive.Fusion:FusionContextMenuBeforeOpenArgsExtensions",
+    "Alis.Reactive.Fusion:FusionContextMenuBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionContextMenuEvents",
+    "Alis.Reactive.Fusion:FusionContextMenuExtensions",
+    "Alis.Reactive.Fusion:FusionContextMenuHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionContextMenuItem",
+    "Alis.Reactive.Fusion:FusionContextMenuOpenCloseArgs",
+    "Alis.Reactive.Fusion:FusionContextMenuReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionContextMenuSelectArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public sealed class FusionContextMenu : FusionComponent",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenu.cs:7"
+    },
+    {
+     "line": "main",
+     "text": "new TypedEvent<FusionContextMenuOpenCloseArgs>(\"onOpen\", new FusionContextMenuOpenCloseArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuEvents.cs:24"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"open\").WithArgs<double, double>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuExtensions.cs:11"
+    },
+    {
+     "line": "main",
+     "text": "public bool? IsFocused { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuBeforeOpenArgs.cs:20"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().ContextMenu(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Open(Arg<double> top, Arg<double> left) => Method(top, left);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenu.cs:29"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionContextMenu>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenu.cs:164"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionContextMenuBeforeOpenArgs declares Items, ParentItem, Top, Left and IsFocused, beforeOpen's isFocused that says whether the menu opens with focus, Top, Left and IsFocused optional as @syncfusion/ej2-navigations/src/common/menu-base.d.ts:550-552 marks them, and Cancel, its Property<bool> (:549).",
+     "doors": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionContextMenu declares the EJ2 ContextMenu by its JavaScript names: open as Open and close as Close; beforeItemRender, beforeOpen, onOpen, beforeClose, onClose and select as BeforeItemRender, BeforeOpen, OnOpen, BeforeClose, OnClose and Select, whose payloads are read with Read and whose beforeOpen and beforeClose cancel is a Property<bool>; each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/context-menu/context-menu.d.ts:77, :84, @syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242).",
+     "doors": [
+      "M21.N14",
+      "N5.3",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionContextMenu(plan, id, build => ..) renders the context menu on the vendor's builder, the rendered context menu's Reactive(m => m.Select, pipeline) handles its events from the plan's start, and pipeline.Component<FusionContextMenu>(id) reaches it from any block.",
+     "doors": [
+      "M21.N14",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuBeforeCloseArgs.cs:10-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuBeforeItemRenderArgs.cs:6-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuBeforeOpenArgs.cs:10-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuItem.cs:8-22"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuOpenCloseArgs.cs:8-14"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/Events/FusionContextMenuSelectArgs.cs:6-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenu.cs:7-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuBuilder.cs:14-52"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuEvents.cs:6-38"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuExtensions.cs:8-38"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuHtmlExtensions.cs:15-40"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenuReactiveExtensions.cs:9-26"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionContextMenu/FusionContextMenu.cs:24-167"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's ContextMenu as its TypeScript declares it (@syncfusion/ej2-navigations/src/context-menu/context-menu.d.ts, its events and payloads in @syncfusion/ej2-navigations/src/common/menu-base.d.ts, BeforeOpenCloseMenuEventArgs at :544), checked member by member by scratchpad m21/tools/dts.py with the slice's own package preferred; and the browser.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionContextMenuBeforeCloseArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeCloseArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeCloseArgs.Items.get -> System.Collections.Generic.List<FusionContextMenuItem!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeCloseArgs.Items.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeCloseArgs.ParentItem.get -> FusionContextMenuItem?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeCloseArgs.ParentItem.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeCloseArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeItemRenderArgs.Item.get -> FusionContextMenuItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeItemRenderArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.IsFocused.get -> bool?",
+     "verdict": "kept",
+     "as": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.IsFocused.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.Items.get -> System.Collections.Generic.List<FusionContextMenuItem!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.Items.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.Left.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.Left.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.ParentItem.get -> FusionContextMenuItem?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.ParentItem.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.Top.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgs.Top.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBeforeOpenArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionContextMenuBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionContextMenuEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuEvents.BeforeClose.get -> TypedEvent<FusionContextMenuBeforeCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuEvents.BeforeItemRender.get -> TypedEvent<FusionContextMenuBeforeItemRenderArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuEvents.BeforeOpen.get -> TypedEvent<FusionContextMenuBeforeOpenArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuEvents.Closed.get -> TypedEvent<FusionContextMenuOpenCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuEvents.Opened.get -> TypedEvent<FusionContextMenuOpenCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuEvents.Select.get -> TypedEvent<FusionContextMenuSelectArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionContextMenuOpenCloseArgs.Items.get -> System.Collections.Generic.List<FusionContextMenuItem!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuOpenCloseArgs.Items.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuOpenCloseArgs.ParentItem.get -> FusionContextMenuItem?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuOpenCloseArgs.ParentItem.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionContextMenuReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuSelectArgs.Item.get -> FusionContextMenuItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "FusionContextMenuSelectArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N14",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionContextMenuBeforeCloseArgsExtensions.PreventClose(this FusionContextMenuBeforeCloseArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "static FusionContextMenuBeforeOpenArgsExtensions.PreventOpen(this FusionContextMenuBeforeOpenArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "static FusionContextMenuExtensions.Close<TModel>(this ComponentRef<FusionContextMenu!, TModel!>! self) -> ComponentRef<FusionContextMenu!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionContextMenuExtensions.Open<TModel>(this ComponentRef<FusionContextMenu!, TModel!>! self, double top, double left) -> ComponentRef<FusionContextMenu!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionContextMenuHtmlExtensions.FusionContextMenu<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.ContextMenuBuilder!>! build) -> FusionContextMenuBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionContextMenuHtmlExtensions.FusionContextMenu<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.ContextMenuBuilder!>! build) -> FusionContextMenuBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionContextMenuReactiveExtensions.Reactive<TModel, TArgs>(this FusionContextMenuBuilder<TModel!>! builder, System.Func<FusionContextMenuEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionContextMenuBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N14"
+     ]
+    },
+    {
+     "door": "static readonly FusionContextMenuEvents.Instance -> FusionContextMenuEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N14"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F23",
    "summary": "FusionGrid: one declaration of the Syncfusion Grid by its JavaScript names, its data, paging, sorting, filtering, searching, grouping, columns, selection, editing, exports and print, each EJ2 33.1.47's public member; the payloads of its ten events; the render helper that renders it with an element id the view gives and a plan; the column field names, edit templates and edit dialog it writes; and the column rules it gives the grid from the validator. Main spreads the slice over twenty-two files whose calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, a builder of its own and a Reactive extension on it; the redesign declares it in five files, the shape the rewrite keeps, with its exports awaited, its enums written as EJ2 reads them, its rows named as every framework read names them (M21.D1), and every column rule either checked by the column's editor or refused where the view renders.",
    "status": "both",
@@ -2515,6 +3828,731 @@
    ]
   },
   {
+   "id": "M21.F24",
+   "summary": "FusionInPlaceEditor: one declaration of the Syncfusion InPlaceEditor by its JavaScript names, value, disabled, enableEditMode, save and its element's classList, each EJ2 33.1.47's public member; the payloads of its seven events; the input it is, its value committed by endEdit and read typed by the member it binds through pipeline.Input (N14.4); and the render helper that renders it bound to a model member. Main spreads the slice over twelve files whose calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with no call of a private member (M21.X402), a starting value read with no compile (M21.X403) and a value of more than one kind read by M21.X404's default.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionInPlaceEditor",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorActionBeginArgs",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorActionBeginArgsExtensions",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorActionSuccessArgs",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorBeginEditArgs",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorBeginEditArgsExtensions",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorCancelClickArgs",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorChangeArgs",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorClassList",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorElement",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorEndEditArgs",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorEndEditArgsExtensions",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorEvents",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorExtensions",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorSubmission",
+    "Alis.Reactive.Fusion:FusionInPlaceEditorSubmitClickArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public sealed class FusionInPlaceEditor : FusionComponent, IInputComponent",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:10"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"disable\").WithArgs<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:21"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Mapped(\"classAdd\", \"element.classList.add\").WithArgs<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:27"
+    },
+    {
+     "line": "main",
+     "text": "var registeredShape = registration.RequireValueContract(valueRead.ValueMember).Shape;",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:113"
+    },
+    {
+     "line": "main",
+     "text": "var compiled = expression.Compile();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorHtmlExtensions.cs:62"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string?> Value => Property<string?>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public void SetFocus() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:29"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: EndEdit);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:46"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<TResponse> Data<TResponse>() where TResponse : class => ReadOnly<TResponse>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:157"
+    },
+    {
+     "line": "proposed",
+     "text": "pipeline.Input(m => m.Member) reads the editor's value typed by the member it binds, a BoundInput of the member's type (N14.4), as main reads it by the member the field registers (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:111-114 at 623dd4a27), so a date editor's value reads as a date and a list editor's as its items. The declaration's Value, a Property<string?>, reads it as text, a number as JavaScript's own text and a date as its local day, by M21.X404's designed default, EJ2's value being string | number | Date | string[] | Date[] | number[] (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:187).",
+     "doors": [
+      "M21.N24",
+      "N14.4"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionInPlaceEditor declares the EJ2 InPlaceEditor by its JavaScript names: value as Value; disabled as Disabled and enableEditMode as EnableEditMode, a Property<bool> each; save as Save; and its element's classList add and remove as Element.ClassList.Add and Remove; each EJ2 33.1.47's public member (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:187, :320, :336, :587; @syncfusion/ej2-base/src/component.d.ts:17). EJ2's private disable and setFocus (inplace-editor.d.ts:541, :525) are declared by no door: Disabled disables and enables the editor, and EnableEditMode set true opens it and focuses its input unless beginEdit's cancelFocus is set (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.js:1319-1320, :799-803, :1046-1053) (M21.X402).",
+     "doors": [
+      "M21.N24",
+      "N5.3",
+      "N17.2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "BeginEdit, EndEdit, Change, ActionBegin, ActionSuccess, SubmitClick and CancelClick hand payloads read with Read: beginEdit's cancel, cancelFocus and mode, and endEdit's action, cancel and mode, each optional as @syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts:86-107 marks it; change's value and previousValue, read as text by M21.X404's designed default; actionBegin's data, the submission's name, primaryKey and value, and its cancel, optional (:47-57); actionSuccess's data as Data<TResponse>() and its value (:58-68); and the name of beginEdit's, endEdit's, change's, actionSuccess's, submitClick's and cancelClick's, which EJ2's observer sets on every payload it hands a listener (@syncfusion/ej2-base/src/observer.js:92).",
+     "doors": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.InputField(plan, m => m.Member).FusionInPlaceEditor(build => ..) renders the editor bound to the member, its starting value the member's value read through MVC with no compile and written by M21.D1 (D17.13, N17.10, M21.X403), and its input committed by EndEdit (M7.N3); the rendered editor's Reactive(e => e.ActionBegin, pipeline) handles its events from the plan's start, and pipeline.Component<FusionInPlaceEditor>(id) reaches it from any block.",
+     "doors": [
+      "M21.N24",
+      "M7.N2",
+      "M7.N3",
+      "M21.N2",
+      "N17.10",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorActionBeginArgs.cs:15-42"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorActionSuccessArgs.cs:8-19"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorBeginEditArgs.cs:7-34"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorCancelClickArgs.cs:9-14"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorChangeArgs.cs:8-19"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorEndEditArgs.cs:7-34"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorSubmitClickArgs.cs:10-15"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:10-18"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorEvents.cs:11-52"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:15-119"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorHtmlExtensions.cs:20-97"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorReactiveExtensions.cs:11-39"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:16-273"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's InPlaceEditor as its TypeScript declares it (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts, its payloads in @syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts, element in @syncfusion/ej2-base/src/component.d.ts), checked member by member by scratchpad m21/tools/dts.py with the slice's own package preferred and the element's classList by hand; enableEditMode's open and focus as inplace-editor.js runs them; main's registered value read as Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:111-114 at 623dd4a27 writes it; and the browser, by the lead's payload probe for each payload member.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X402",
+     "rung": "analyzer",
+     "defect": "Both lines call the editor's private disable and setFocus: main's Disable, Enable and Focus (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:21, :25 at 623dd4a27) and the redesign's Disable and SetFocus (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:23, :29 at 65fdf118d), which EJ2 declares private (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:541, :525). The vendor contract analyzer (N17.2) refuses each by ALIS016 (X17.2); the rewrite declares EJ2's public disabled and enableEditMode (:320, :336) as Disabled and EnableEditMode, a Property<bool> each."
+    },
+    {
+     "id": "M21.X403",
+     "rung": "analyzer",
+     "defect": "Both lines' render helper reads the bound member's starting value by compiling the view's expression and catching every exception it throws (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorHtmlExtensions.cs:62, :68 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:238, :244 at 65fdf118d): Expression.Compile is a run-time reflection call the reflection analyzer refuses in a shipped package outside validation, the one place D18.1 lists (N18.1, D18.4), and the catch hides an exception the member's getter throws. The rewrite reads the starting value through MVC with no compile, as every render helper does (D17.13, N17.10), and writes it by M21.D1."
+    },
+    {
+     "id": "M21.X404",
+     "rung": "analyzer",
+     "defect": "Both lines read the editor's value and change's value and previousValue as string (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:19, Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorChangeArgs.cs:11, :14 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:19, :120, :123 at 65fdf118d), where EJ2 types the value string | number | Date | string[] | Date[] | number[] and change's string | string[] | number | number[] | boolean[] | Date | Date[] | DateRange (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:187, @syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts:108): a read fits every kind the API holds, so ALIS037 refuses each as a value of more than one kind, a gap D17.5 names. The designed default, gate 2's beside M21.X303's since it amends D17.5 the same way and reaches further: a read whose kinds include text, numbers or dates is declared string and fits every kind of its union; it reads a number as JavaScript's own text, a date as its local day and a list as JavaScript's own text of it, its items joined by commas, and its cost is that a number held there orders as text, 10 before 9. An object kind, change's DateRange (@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts:23), reads as JavaScript's own text of an object, [object Object], so a view reads a DateRange or MultiSelect editor's value typed by the member it binds, pipeline.Input(m => m.Member) (N14.4), as main reads the value by the member the field registers (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:111-114 at 623dd4a27)."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionInPlaceEditor.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionBeginArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionBeginArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionBeginArgs.Data.get -> System.Collections.Generic.IDictionary<string!, object!>?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionBeginArgs.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionBeginArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionSuccessArgs.Data.get -> object?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionSuccessArgs.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionSuccessArgs.Name.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionSuccessArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionSuccessArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorActionSuccessArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgs.CancelFocus.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgs.CancelFocus.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgs.Mode.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgs.Mode.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgs.Name.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorBeginEditArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorCancelClickArgs.Name.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorCancelClickArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorChangeArgs.Name.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorChangeArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorChangeArgs.PreviousValue.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorChangeArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorChangeArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgs.Action.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgs.Action.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgs.Mode.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgs.Mode.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgs.Name.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEndEditArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEvents.ActionBegin.get -> TypedEvent<FusionInPlaceEditorActionBeginArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEvents.ActionSuccess.get -> TypedEvent<FusionInPlaceEditorActionSuccessArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEvents.BeginEdit.get -> TypedEvent<FusionInPlaceEditorBeginEditArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEvents.CancelClick.get -> TypedEvent<FusionInPlaceEditorCancelClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEvents.Changed.get -> TypedEvent<FusionInPlaceEditorChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEvents.EndEdit.get -> TypedEvent<FusionInPlaceEditorEndEditArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorEvents.SubmitClick.get -> TypedEvent<FusionInPlaceEditorSubmitClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorSubmitClickArgs.Name.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "FusionInPlaceEditorSubmitClickArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N24",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorActionBeginArgsExtensions.PreventDefault(this FusionInPlaceEditorActionBeginArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorBeginEditArgsExtensions.PreventDefault(this FusionInPlaceEditorBeginEditArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorEndEditArgsExtensions.PreventDefault(this FusionInPlaceEditorEndEditArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorExtensions.AddClass<TModel>(this ComponentRef<FusionInPlaceEditor!, TModel!>! self, string! className) -> ComponentRef<FusionInPlaceEditor!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorExtensions.Disable<TModel>(this ComponentRef<FusionInPlaceEditor!, TModel!>! self) -> ComponentRef<FusionInPlaceEditor!, TModel!>!",
+     "verdict": "refused",
+     "reason": "Main calls the editor's disable, which EJ2 declares private (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:541), so the vendor contract analyzer refuses the call (ALIS016, N17.2, M21.X402). The declaration's Disabled, EJ2's public disabled (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:320), a Property<bool>, disables the editor when set true and enables it when set false.",
+     "carriers": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorExtensions.Enable<TModel>(this ComponentRef<FusionInPlaceEditor!, TModel!>! self) -> ComponentRef<FusionInPlaceEditor!, TModel!>!",
+     "verdict": "refused",
+     "reason": "Main calls the editor's disable, which EJ2 declares private (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:541), so the vendor contract analyzer refuses the call (ALIS016, N17.2, M21.X402). The declaration's Disabled, EJ2's public disabled (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:320), a Property<bool>, disables the editor when set true and enables it when set false.",
+     "carriers": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorExtensions.Focus<TModel>(this ComponentRef<FusionInPlaceEditor!, TModel!>! self) -> ComponentRef<FusionInPlaceEditor!, TModel!>!",
+     "verdict": "refused",
+     "reason": "Main calls the editor's setFocus, which EJ2 declares private (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:525), so the vendor contract analyzer refuses the call (ALIS016, N17.2, M21.X402). The declaration's EnableEditMode, EJ2's public enableEditMode (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:336), a Property<bool>, opens the editor with focus in its input when set true (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.js:1046-1053).",
+     "carriers": [
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorExtensions.RemoveClass<TModel>(this ComponentRef<FusionInPlaceEditor!, TModel!>! self, string! className) -> ComponentRef<FusionInPlaceEditor!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorExtensions.Save<TModel>(this ComponentRef<FusionInPlaceEditor!, TModel!>! self) -> ComponentRef<FusionInPlaceEditor!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorExtensions.SetValue<TModel>(this ComponentRef<FusionInPlaceEditor!, TModel!>! self, string? value) -> ComponentRef<FusionInPlaceEditor!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorExtensions.Value<TModel>(this ComponentRef<FusionInPlaceEditor!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24",
+      "N14.4"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorHtmlExtensions.FusionInPlaceEditor<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.InPlaceEditor.InPlaceEditorBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionInPlaceEditorReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.InPlaceEditor.InPlaceEditorBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionInPlaceEditorEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.InPlaceEditor.InPlaceEditorBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N24"
+     ]
+    },
+    {
+     "door": "static readonly FusionInPlaceEditorEvents.Instance -> FusionInPlaceEditorEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N24"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F26",
    "summary": "FusionKanban: one declaration of the Syncfusion Kanban by its JavaScript names, its cards, columns, swimlanes, spinner and card dialog, each EJ2 33.1.47's public member; the payloads of its fourteen events; the column and header data it writes and reads; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over seven files whose calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, a builder of its own and a Reactive extension on it, and deletes a card by its key; the redesign declares it in one file, the shape the rewrite keeps, with the dialog's action typed as EJ2 reads it, a card deleted by its key again, and its data named as the vendor names it.",
    "status": "both",
@@ -3540,6 +5578,562 @@
      "verdict": "renamed",
      "to": [
       "M21.N26"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F30",
+   "summary": "FusionMenu: one declaration of the Syncfusion Menu by its JavaScript names, open, close and its six events, each EJ2 33.1.47's public member; the payloads of those events, beforeOpen's isFocused kept from main; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over twelve files whose calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, with IsFocused declared again.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionMenu",
+    "Alis.Reactive.Fusion:FusionMenuBeforeCloseArgs",
+    "Alis.Reactive.Fusion:FusionMenuBeforeCloseArgsExtensions",
+    "Alis.Reactive.Fusion:FusionMenuBeforeItemRenderArgs",
+    "Alis.Reactive.Fusion:FusionMenuBeforeOpenArgs",
+    "Alis.Reactive.Fusion:FusionMenuBeforeOpenArgsExtensions",
+    "Alis.Reactive.Fusion:FusionMenuBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionMenuEvents",
+    "Alis.Reactive.Fusion:FusionMenuExtensions",
+    "Alis.Reactive.Fusion:FusionMenuHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionMenuItem",
+    "Alis.Reactive.Fusion:FusionMenuOpenCloseArgs",
+    "Alis.Reactive.Fusion:FusionMenuReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionMenuSelectArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public sealed class FusionMenu : FusionComponent",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenu.cs:7"
+    },
+    {
+     "line": "main",
+     "text": "new TypedEvent<FusionMenuOpenCloseArgs>(\"onOpen\", new FusionMenuOpenCloseArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuEvents.cs:24"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"open\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuExtensions.cs:9"
+    },
+    {
+     "line": "main",
+     "text": "public bool? IsFocused { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuBeforeOpenArgs.cs:20"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Menu(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Open() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenu.cs:24"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionMenu>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenu.cs:159"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionMenuBeforeOpenArgs declares Items, ParentItem, Top, Left and IsFocused, beforeOpen's isFocused that says whether the menu opens with focus, Top, Left and IsFocused optional as @syncfusion/ej2-navigations/src/common/menu-base.d.ts:550-552 marks them, and Cancel, its Property<bool> (:549).",
+     "doors": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionMenu declares the EJ2 Menu by its JavaScript names: open as Open and close as Close; beforeItemRender, beforeOpen, onOpen, beforeClose, onClose and select as BeforeItemRender, BeforeOpen, OnOpen, BeforeClose, OnClose and Select, whose payloads are read with Read and whose beforeOpen and beforeClose cancel is a Property<bool>; each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/menu/menu.d.ts:119, :126, @syncfusion/ej2-navigations/src/common/menu-base.d.ts:207-242).",
+     "doors": [
+      "M21.N30",
+      "N5.3",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionMenu(plan, id, build => ..) renders the menu on the vendor's builder, the rendered menu's Reactive(m => m.Select, pipeline) handles its events from the plan's start, and pipeline.Component<FusionMenu>(id) reaches it from any block.",
+     "doors": [
+      "M21.N30",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuBeforeCloseArgs.cs:10-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuBeforeItemRenderArgs.cs:6-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuBeforeOpenArgs.cs:10-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuItem.cs:8-22"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuOpenCloseArgs.cs:8-14"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/Events/FusionMenuSelectArgs.cs:6-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenu.cs:7-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuBuilder.cs:14-52"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuEvents.cs:6-38"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuExtensions.cs:6-30"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuHtmlExtensions.cs:15-40"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenuReactiveExtensions.cs:9-26"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMenu/FusionMenu.cs:21-162"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Menu as its TypeScript declares it (@syncfusion/ej2-navigations/src/menu/menu.d.ts, its events and payloads in @syncfusion/ej2-navigations/src/common/menu-base.d.ts, BeforeOpenCloseMenuEventArgs at :544), checked member by member by scratchpad m21/tools/dts.py with the slice's own package preferred; and the browser.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionMenuBeforeCloseArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeCloseArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeCloseArgs.Items.get -> System.Collections.Generic.List<FusionMenuItem!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeCloseArgs.Items.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeCloseArgs.ParentItem.get -> FusionMenuItem?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeCloseArgs.ParentItem.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeCloseArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeItemRenderArgs.Item.get -> FusionMenuItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeItemRenderArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.IsFocused.get -> bool?",
+     "verdict": "kept",
+     "as": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.IsFocused.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.Items.get -> System.Collections.Generic.List<FusionMenuItem!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.Items.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.Left.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.Left.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.ParentItem.get -> FusionMenuItem?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.ParentItem.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.Top.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgs.Top.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuBeforeOpenArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionMenuBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionMenuBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionMenuEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuEvents.BeforeClose.get -> TypedEvent<FusionMenuBeforeCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuEvents.BeforeItemRender.get -> TypedEvent<FusionMenuBeforeItemRenderArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuEvents.BeforeOpen.get -> TypedEvent<FusionMenuBeforeOpenArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuEvents.Closed.get -> TypedEvent<FusionMenuOpenCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuEvents.Opened.get -> TypedEvent<FusionMenuOpenCloseArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuEvents.Select.get -> TypedEvent<FusionMenuSelectArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionMenuOpenCloseArgs.Items.get -> System.Collections.Generic.List<FusionMenuItem!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuOpenCloseArgs.Items.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuOpenCloseArgs.ParentItem.get -> FusionMenuItem?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuOpenCloseArgs.ParentItem.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMenuReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuSelectArgs.Item.get -> FusionMenuItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "FusionMenuSelectArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N30",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionMenuBeforeCloseArgsExtensions.PreventClose(this FusionMenuBeforeCloseArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "static FusionMenuBeforeOpenArgsExtensions.PreventOpen(this FusionMenuBeforeOpenArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "static FusionMenuExtensions.Close<TModel>(this ComponentRef<FusionMenu!, TModel!>! self) -> ComponentRef<FusionMenu!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMenuExtensions.Open<TModel>(this ComponentRef<FusionMenu!, TModel!>! self) -> ComponentRef<FusionMenu!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMenuHtmlExtensions.FusionMenu<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.MenuBuilder!>! build) -> FusionMenuBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionMenuHtmlExtensions.FusionMenu<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.MenuBuilder!>! build) -> FusionMenuBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionMenuReactiveExtensions.Reactive<TModel, TArgs>(this FusionMenuBuilder<TModel!>! builder, System.Func<FusionMenuEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionMenuBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N30"
+     ]
+    },
+    {
+     "door": "static readonly FusionMenuEvents.Instance -> FusionMenuEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N30"
      ]
     }
    ]
@@ -5094,6 +7688,264 @@
      "verdict": "renamed",
      "to": [
       "M21.N39"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F51",
+   "summary": "FusionToolbar: one declaration of the Syncfusion Toolbar by its JavaScript names, disable and clicked, each EJ2 33.1.47's public member; clicked's payload and its item; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over seven files whose calls name members by strings over ComponentRef, a payload class with a setter, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionToolbar",
+    "Alis.Reactive.Fusion:FusionToolbarBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionToolbarClickedArgs",
+    "Alis.Reactive.Fusion:FusionToolbarEvents",
+    "Alis.Reactive.Fusion:FusionToolbarExtensions",
+    "Alis.Reactive.Fusion:FusionToolbarHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionToolbarItem",
+    "Alis.Reactive.Fusion:FusionToolbarReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public sealed class FusionToolbar : FusionComponent",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs:7"
+    },
+    {
+     "line": "main",
+     "text": "new TypedEvent<FusionToolbarClickedArgs>(\"clicked\", new FusionToolbarClickedArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarEvents.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"disable\").WithArgs<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarExtensions.cs:13"
+    },
+    {
+     "line": "main",
+     "text": "var builder = html.EJS().Toolbar(elementId);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Disable(Arg<bool> value) => Method(value);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs:24"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<FusionToolbarItem> Item => ReadOnly<FusionToolbarItem>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs:36"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionToolbar>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs:79"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionToolbar declares the EJ2 Toolbar by its JavaScript names: disable as Disable, which disables every item when true and enables them when false, and clicked as Clicked, whose payload's item is read with Read, each EJ2 33.1.47's public member (@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts:344, :414).",
+     "doors": [
+      "M21.N51",
+      "N5.3",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionToolbar(plan, id, build => ..) renders the toolbar on the vendor's builder, the rendered toolbar's Reactive(t => t.Clicked, pipeline) handles its events from the plan's start, and pipeline.Component<FusionToolbar>(id) reaches it from any block.",
+     "doors": [
+      "M21.N51",
+      "M12.N3",
+      "M12.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "do",
+    "call",
+    "lit",
+    "on"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/Events/FusionToolbarClickedArgs.cs:6-26"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs:7-10"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarBuilder.cs:14-52"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarEvents.cs:6-18"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarExtensions.cs:8-27"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarHtmlExtensions.cs:15-40"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarReactiveExtensions.cs:9-26"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs:20-82"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Toolbar as its TypeScript declares it (@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts, class Toolbar at :250, ClickEventArgs at :52), checked member by member by scratchpad m21/tools/dts.py with the slice's own package preferred, since a first match took pivotview's popup toolbar; and the browser.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionToolbarBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionToolbarBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionToolbarBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionToolbarClickedArgs.Item.get -> FusionToolbarItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51"
+     ]
+    },
+    {
+     "door": "FusionToolbarClickedArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N51",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionToolbarEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51"
+     ]
+    },
+    {
+     "door": "FusionToolbarEvents.Clicked.get -> TypedEvent<FusionToolbarClickedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51"
+     ]
+    },
+    {
+     "door": "FusionToolbarExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionToolbarReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N51"
+     ]
+    },
+    {
+     "door": "static FusionToolbarExtensions.Disable<TModel>(this ComponentRef<FusionToolbar!, TModel!>! self, bool value) -> ComponentRef<FusionToolbar!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionToolbarHtmlExtensions.FusionToolbar<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.ToolbarBuilder!>! build) -> FusionToolbarBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionToolbarHtmlExtensions.FusionToolbar<TModel>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.ToolbarBuilder!>! build) -> FusionToolbarBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionToolbarReactiveExtensions.Reactive<TModel, TArgs>(this FusionToolbarBuilder<TModel!>! builder, System.Func<FusionToolbarEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionToolbarBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N51"
+     ]
+    },
+    {
+     "door": "static readonly FusionToolbarEvents.Instance -> FusionToolbarEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N51"
      ]
     }
    ]
