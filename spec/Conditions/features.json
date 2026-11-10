@@ -270,6 +270,10 @@
           "rung": "type"
         },
         {
+          "id": "X8.2",
+          "rung": "analyzer"
+        },
+        {
           "id": "X8.4",
           "rung": "behavior"
         },

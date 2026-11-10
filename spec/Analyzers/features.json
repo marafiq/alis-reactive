@@ -1,0 +1,215 @@
+{
+  "module": "Analyzers",
+  "features": [
+    {
+      "id": "M20.F1",
+      "summary": "Analyzers: the build's rules, the C# compiler's rung of D18.6 below the type stage and above the render. The analyzer package ships inside the core package on both lines and runs in every compilation that references it. Every analyzer of both lines carries its verdict in D18.6: ALIS001, ALIS004 and ALIS008 kept and retargeted to every block of Pipeline<TModel> in every file, ALIS002 kept as ALIS008 on an action's block, ALIS003 refused, ALIS005 kept, ALIS006 kept as an error, ALIS007 carried by ALIS030's single use, ALIS009 kept, and the slice tree's ALIS010 to ALIS013 kept for each package built on the core. The rewrite adds the reflection analyzer (N18.1), the declaration analyzer (ALIS023, ALIS024), the override analyzer (ALIS025), the vendor contract analyzer (ALIS014 to ALIS022, ALIS037), the suppressors ALIS026, ALIS027 and ALIS036, and the families ALIS028 to ALIS035, ALIS038 and ALIS039. ALIS009's exemption is the redesign's public TypedDslExemptionAttribute, which an app's own component carries as Fusion's does, and no analyzer names a package built on the core. Main's exemption is internal and its ALIS009 checks only Fusion's and Native's Components namespaces; the redesign names Fusion, Native and NativeTagHelpers by assembly name and exempts a member whatever its reason says.",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:TypedDslExemptionAttribute"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "internal sealed class TypedDslExemptionAttribute : Attribute",
+          "cite": "Alis.Reactive/Components/TypedDslExemptionAttribute.cs:13"
+        },
+        {
+          "line": "main",
+          "text": "public const string DiagnosticId = \"ALIS009\";",
+          "cite": "Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:19"
+        },
+        {
+          "line": "main",
+          "text": "== \"Alis.Reactive.Components.TypedDslExemptionAttribute\")",
+          "cite": "Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:80"
+        },
+        {
+          "line": "main",
+          "text": "&& (ns.StartsWith(\"Alis.Reactive.Fusion.Components\", StringComparison.Ordinal)",
+          "cite": "Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:91"
+        },
+        {
+          "line": "main",
+          "text": "public const string DiagnosticId = \"ALIS002\";",
+          "cite": "Alis.Reactive.Analyzers/NativeActionLink/NativeActionLinkSingleRequestAnalyzer.cs:13"
+        },
+        {
+          "line": "main",
+          "text": "public const string DiagnosticId = \"ALIS006\";",
+          "cite": "Alis.Reactive.Analyzers/Validation/ServerOnlyConditionAnalyzer.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "defaultSeverity: DiagnosticSeverity.Warning,",
+          "cite": "Alis.Reactive.Analyzers/Validation/ServerOnlyConditionAnalyzer.cs:24"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class TypedDslExemptionAttribute : Attribute",
+          "cite": "Alis.Reactive/Vendors/TypedDslExemptionAttribute.cs:13"
+        },
+        {
+          "line": "redesign",
+          "text": "private const string ExemptionAttribute = \"Alis.Reactive.TypedDslExemptionAttribute\";",
+          "cite": "Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:33"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static readonly ImmutableHashSet<string> ShippedAssemblies =",
+          "cite": "Alis.Reactive.Analyzers/AnalyzerHelpers.cs:13"
+        },
+        {
+          "line": "redesign",
+          "text": "\"Alis.Reactive.Fusion\",",
+          "cite": "Alis.Reactive.Analyzers/AnalyzerHelpers.cs:17"
+        },
+        {
+          "line": "redesign",
+          "text": "public const string EdgeId = \"ALIS010\";",
+          "cite": "Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs:17"
+        },
+        {
+          "line": "redesign",
+          "text": "if (!AnalyzerHelpers.IsRazorGeneratedFile(lambda.SyntaxTree))",
+          "cite": "Alis.Reactive.Analyzers/ControlFlow/ControlFlowInReactiveCallbackAnalyzer.cs:98"
+        },
+        {
+          "line": "redesign",
+          "text": "<None Include=\"$(OutputPath)\\$(AssemblyName).dll\" Pack=\"true\" PackagePath=\"analyzers/dotnet/cs\" Visible=\"false\" />",
+          "cite": "Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj:21"
+        },
+        {
+          "line": "proposed",
+          "text": "The core's build fails on a reflection call in a shipped package outside the owner's list, read as an operation, so new T() over a type parameter is an Activator read.",
+          "doors": [
+            "N18.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Every block of Pipeline<TModel>, an expression or a {} lambda in any file, keeps ALIS004's allowed statements and refuses the rest.",
+          "doors": [
+            "N18.6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A request's constant URL, headers, statuses, busy targets and staged values are refused at build by ALIS030, and ShowErrors outside a route by ALIS031.",
+          "doors": [
+            "N18.7",
+            "N18.8"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A validator condition with no browser form outside WhenOnServer and UnlessOnServer is an error at build, ALIS006.",
+          "doors": [
+            "N18.11"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A NativeActionLink whose block's one request at its own level is no GET, whose route or query value is neither a C# value nor Row.Read(..) of its payload, or that sends Form, Inputs, Input or a header, is refused at build by ALIS035.",
+          "doors": [
+            "N18.13"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "[TypedDslExemption(\"The vendor boundary: a library is described by the JavaScript names it uses.\")] on a member of any package exempts it from ALIS009, and its reason is never empty.",
+          "doors": [
+            "M20.N1"
+          ]
+        }
+      ],
+      "nodes": [
+        "request",
+        "if",
+        "each",
+        "op",
+        "fn",
+        "lit",
+        "call",
+        "method",
+        "listen",
+        "on",
+        "do"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Components/TypedDslExemptionAttribute.cs:12-22"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/Alis.Reactive.csproj:62-64"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Vendors/TypedDslExemptionAttribute.cs:12-24"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj:1-24"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Analyzers/AnalyzerHelpers.cs:13-19"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:75-93"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Analyzers/Validation/ServerOnlyConditionAnalyzer.cs:17-24"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:93-133"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs:86-98"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Analyzers/ControlFlow/ControlFlowInReactiveCallbackAnalyzer.cs:98"
+        }
+      ],
+      "core": [
+        "Q18",
+        "Q17"
+      ],
+      "meanings": [
+        {
+          "id": "M20.D1",
+          "meaning": "No analyzer names a package built on the core. ALIS009 checks the whole public surface of a compilation that carries a slice table, the table ALIS013 reads, and a component declaration and a render helper in every compilation, shipped or brought; a member a type takes from an assembly that references no Alis.Reactive is the vendor's shape and outside it. A shipped package's table is held by the repo's architecture test, which names the packages, since a test is not the core. An exemption, TypedDslExemptionAttribute, exempts its member only with a reason that is not empty or white space."
+        }
+      ],
+      "oracle": "The C# compiler's analyzer and suppressor rung as Roslyn runs it in each compilation that references the analyzer package; the repo's analyzer tests (tests/Alis.Reactive.AnalyzerTests at 65fdf118d) and the POC's analyzer builds, whose planted diagnostics NOTES records per unit (13a to 13h, 16a, 17c); RS0030 over poc/BannedSymbols.txt for the namespace ban of D18.4; and the spec itself where the framework is the authority: D18.6's rungs and its verdict per analyzer.",
+      "checker": [
+        "core:Q18",
+        "core:Q17"
+      ],
+      "defects": [
+        {
+          "id": "M20.X1",
+          "rung": "analyzer",
+          "defect": "A public method of an app's own component package that carries a slice table takes object and builds, since ALIS009 checks the whole surface only of the packages it names (Alis.Reactive.Analyzers/AnalyzerHelpers.cs:13-19 at 65fdf118d), and main's only of Fusion's and Native's Components namespaces (Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:87-93 at 623dd4a27): ALIS009 refuses it, keyed on the table, naming no package (M20.D1)."
+        },
+        {
+          "id": "M20.X2",
+          "rung": "analyzer",
+          "defect": "[TypedDslExemption(\"\")], or one whose reason is white space, exempts its member, since ALIS009 reads only the attribute's name (Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:124-133 at 65fdf118d): ALIS009 refuses the exemption, \"An exemption from ALIS009 says why; give TypedDslExemption its reason.\", so every exemption is auditable by its text (M20.D1, M20.N1)."
+        }
+      ],
+      "promises": [],
+      "verdicts": []
+    }
+  ]
+}
