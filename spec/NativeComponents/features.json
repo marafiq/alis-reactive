@@ -1,0 +1,2407 @@
+{
+  "module": "NativeComponents",
+  "features": [
+    {
+      "id": "M24.F1",
+      "summary": "The Native package: NativeComponent, the base every Native declaration names, whose vendor is the DOM itself, the element the framework rendered, listened to by addEventListener and removeEventListener; and main's gather shorthand, which sends a member's input by an object-typed lambda and reads it by the name value whatever component the member binds. The rewrite keeps the base, sealed to ComponentVendor.Native, states once what a native event hands its listener, and sends a member by the input its bound component declares (N9.3, N14.4).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeComponent",
+        "Alis.Reactive.Native:NativeGatherExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public string Vendor => \"native\";",
+          "cite": "Alis.Reactive.Native/NativeComponent.cs:14"
+        },
+        {
+          "line": "main",
+          "text": "private static readonly NativeTextBox DefaultComponent = new NativeTextBox();",
+          "cite": "Alis.Reactive.Native/Extensions/NativeGatherExtensions.cs:28"
+        },
+        {
+          "line": "main",
+          "text": "return self.Include(elementId, DefaultComponent.Vendor, bodyField, DefaultComponent.ValueMember, shape);",
+          "cite": "Alis.Reactive.Native/Extensions/NativeGatherExtensions.cs:46"
+        },
+        {
+          "line": "redesign",
+          "text": "public abstract class NativeComponent : Component",
+          "cite": "Alis.Reactive.Native/NativeComponent.cs:25"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed override ComponentVendor Vendor => ComponentVendor.Native;",
+          "cite": "Alis.Reactive.Native/NativeComponent.cs:28"
+        },
+        {
+          "line": "redesign",
+          "text": "public static ComponentVendor Native { get; } = new ComponentVendor(",
+          "cite": "Alis.Reactive/Vendors/ComponentVendor.cs:59"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeComponent is a Component (M12.N1) whose vendor is sealed to ComponentVendor.Native: the object is the element the render helper rendered, an empty path from it, and a listener subscribes by addEventListener and unsubscribes by removeEventListener, each a member lib.dom's EventTarget makes public (D17.3, D17.5).",
+          "doors": [
+            "M24.N1",
+            "M12.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A Native event hands its listener lib.dom's event object, an Event for change and a PointerEvent for click, whose target and currentTarget lib.dom types EventTarget | null; so each Native slice declares its event's payload as a class nested in the component that mirrors that lib.dom type with the members lib.dom types concretely, and no Target; a handler reads the component's own value through the component (M24.D1, probe:dom-change-listener-event, probe:dom-click-listener-event).",
+          "doors": [
+            "M24.N1",
+            "N17.1",
+            "N14.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Each Native declaration mirrors the lib.dom interface of the element its render helper renders, HTMLInputElement, HTMLSelectElement, HTMLTextAreaElement or HTMLButtonElement, and names each member as that interface names it, so ALIS014 to ALIS020 check it as any declaration (N17.2); the check list mirrors the type its own browser code declares (M24.D2).",
+          "doors": [
+            "M24.N1",
+            "N17.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A request sends a member a Native input binds by the input its bound component declares, Input(r => r.Member, pipeline.Input(m => m.Member)), so a check box sends its Checked and a text box its Value, typed by the member (N9.3, N14.4, M7.N3).",
+          "doors": [
+            "N9.3",
+            "N14.4",
+            "M7.N3"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "on",
+        "request"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/NativeComponent.cs:11-16"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Extensions/NativeGatherExtensions.cs:26-49"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/NativeComponent.cs:25-30"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/gather.ts:79-100"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q9",
+        "Q14",
+        "Q5"
+      ],
+      "meanings": [
+        {
+          "id": "M24.D1",
+          "meaning": "A Native event hands its listener the lib.dom event object HTMLElementEventMap names for it, an Event for change and a PointerEvent for click (probe:dom-change-listener-event, probe:dom-click-listener-event), and the payload's declaration reads it at [0] (D17.4). Each Native slice declares that payload as a class nested in its component, named for the event (Changed, Clicked), which mirrors the lib.dom type, so ALIS016 checks each member against it (N17.2), as the owner's walk of the native text box built it (spec/NOTES.md:515, items 1 and 7). It declares the members lib.dom types concretely: Event's Type, IsTrusted and TimeStamp, and, on a click, each member PointerEvent, MouseEvent and UIEvent declare with a concrete type and no deprecation; it declares no Target, CurrentTarget, RelatedTarget or View, which lib.dom types EventTarget | null or Window | null (item 2). The event holds no value, so a handler reads the component's value from the component, through the rendered component or pipeline.Input(m => m.Member).Component<TComponent>() (N14.4, item 4); the DOM raises change after the value is committed, so the component holds what both lines' payload read. The input an Event<Changed> commits is ComponentInput.Of(value, committedBy: Change) as M7.N3 states it. A change the Native package's own code raises (the hidden field's, the radio group's) is a script's Event, whose IsTrusted reads false; a script's write raises no change on any Native input but the hidden field (M24.D3), as the DOM raises none."
+        }
+      ],
+      "oracle": "lib.dom.d.ts of TypeScript 5.9.3 (node_modules/typescript/lib/lib.dom.d.ts in the main checkout): EventTarget's addEventListener and removeEventListener, Event's target and currentTarget typed EventTarget | null, and HTMLElementEventMap's change and click; and the browser, by the fact named (probe:dom-change-listener-event).",
+      "checker": [
+        "core:Q17",
+        "core:Q9"
+      ],
+      "defects": [
+        {
+          "id": "M24.X1",
+          "rung": "type",
+          "defect": "Main's Include(m => m.Member) names the member by an object-typed lambda, which ALIS009 refuses on the public surface, and reads the member's input by the name value whatever component it binds (Alis.Reactive.Native/Extensions/NativeGatherExtensions.cs:46 at 623dd4a27, its read written at Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:279-282 at 623dd4a27). A NativeCheckBox declares checked and value as a second name for it (Alis.Reactive/PlanModel/BrowserObjects/BrowserObject.cs:198-204 at 623dd4a27), so the shorthand's value at the path value meets it in ObjectProperty.Merge, which throws where the view renders, \"Property 'value' registered with path 'checked' but re-registered with path 'value'.\" (Alis.Reactive/PlanModel/BrowserObjects/BrowserObjectContract.cs:343-346 at 623dd4a27). The rewrite sends a member by the input its bound component declares, typed by the member (N9.3, N14.4, M7.N3): the check box's Checked, and an object-typed lambda does not compile."
+        }
+      ],
+      "promises": [],
+      "verdicts": [
+        {
+          "door": "NativeComponent.Vendor.get -> string!",
+          "verdict": "refused",
+          "reason": "A vendor named by a string the runtime picks a driver by, native or fusion (Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89-90 at 623dd4a27), so the runtime names each vendor it serves. The rewrite carries the vendor as data the one driver follows (D17.3): ComponentVendor.Native, the element itself listened to by addEventListener and removeEventListener, which NativeComponent seals (M24.N1).",
+          "carriers": [
+            "M12.N1",
+            "M24.N1"
+          ]
+        },
+        {
+          "door": "NativeGatherExtensions",
+          "verdict": "renamed",
+          "to": [
+            "N9.3",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "static NativeGatherExtensions.Include<TModel>(this GatherBuilder<TModel!>! self, System.Linq.Expressions.Expression<System.Func<TModel!, object?>!>! expr) -> GatherBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "N9.3",
+            "N14.4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M24.F2",
+      "summary": "NativeButton: a <button> under the id the developer chose, its text as textContent, focus and click, each lib.dom's HTMLButtonElement member by its name. Main spreads it over an events class, a payload class with no member, extensions that name textContent and focus by strings over ComponentRef, and a Reactive extension on the builder; the redesign declares it in one file with a click payload that holds no member. The rewrite keeps the redesign's members, mirrors lib.dom's HTMLButtonElement, and declares Click's payload as Clicked, nested in the component and mirroring lib.dom's PointerEvent, the type HTMLElementEventMap gives click (M24.D1, probe:dom-click-listener-event).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeButton",
+        "Alis.Reactive.Native:NativeButtonBuilder<TModel>",
+        "Alis.Reactive.Native:NativeButtonClickArgs",
+        "Alis.Reactive.Native:NativeButtonEvents",
+        "Alis.Reactive.Native:NativeButtonExtensions",
+        "Alis.Reactive.Native:NativeButtonHtmlExtensions",
+        "Alis.Reactive.Native:NativeButtonReactiveExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "ComponentProperty<string>.Named(\"textContent\");",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonExtensions.cs:11"
+        },
+        {
+          "line": "main",
+          "text": "\"click\", new NativeButtonClickArgs());",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonEvents.cs:19"
+        },
+        {
+          "line": "main",
+          "text": "ComponentEventOnboarding.Wire(plan, builder.ElementId, \"native\", typedEvent, pipeline);",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonReactiveExtensions.cs:30"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> TextContent => Property<string>();",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButton.cs:25"
+        },
+        {
+          "line": "redesign",
+          "text": "public Event<NativeButtonClickArgs> Click",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButton.cs:31"
+        },
+        {
+          "line": "redesign",
+          "text": "return new NativeButtonBuilder<TModel>(elementId, text);",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButton.cs:61"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeButton mirrors lib.dom's HTMLButtonElement and declares TextContent as Property<string>, Element's textContent, which reads a string and takes null; Focus() as a method, HTMLElement's focus; and Click as Event<Clicked>, Clicked a class nested in it that mirrors lib.dom's PointerEvent, the type HTMLElementEventMap gives click, with Event's Type, IsTrusted and TimeStamp and each member PointerEvent, MouseEvent and UIEvent declare with a concrete type and no deprecation, AltKey, CtrlKey, ShiftKey and MetaKey, Button, Buttons, Detail, ClientX and the other coordinates, PointerId, PointerType and IsPrimary among them, never RelatedTarget or View, which lib.dom types EventTarget | null and Window | null (M24.D1, probe:dom-click-listener-event); each named as lib.dom names its public member.",
+          "doors": [
+            "M24.N2",
+            "N17.2",
+            "N17.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Html.NativeButton(id, text) renders a <button> with the text under the id the developer chose, its type button unless Type says otherwise (N18.4); a button is no input, so no field renders it, and it binds no member.",
+          "doors": [
+            "M24.N2",
+            "N18.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The rendered NativeButton's Reactive(plan, b => b.Click, pipeline) handles its click from the plan's start, and pipeline.Component<NativeButton>(id) reaches it in any block by the id the developer chose.",
+          "doors": [
+            "M12.N3",
+            "M12.N2",
+            "M24.N2"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "on",
+        "method",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonExtensions.cs:8-37"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonEvents.cs:6-21"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonHtmlExtensions.cs:12-31"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonReactiveExtensions.cs:12-35"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButton.cs:22-64"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeButton/NativeButtonBuilder.cs:19-106"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q5"
+      ],
+      "meanings": [],
+      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLButtonElement, Element's textContent (a string getter and a setter that takes null), HTMLElement's focus, and HTMLElementEventMap's click, a PointerEvent, with PointerEvent's, MouseEvent's, UIEvent's and Event's members; each JavaScript name read there by hand; and the browser, by the fact named (probe:dom-click-listener-event).",
+      "checker": [
+        "core:Q17",
+        "core:Q5"
+      ],
+      "defects": [],
+      "promises": [],
+      "verdicts": [
+        {
+          "door": "NativeButtonEvents",
+          "verdict": "renamed",
+          "to": [
+            "M24.N2"
+          ]
+        },
+        {
+          "door": "NativeButtonEvents.Click.get -> TypedEvent<NativeButtonClickArgs!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N2"
+          ]
+        },
+        {
+          "door": "NativeButtonExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M24.N2",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeButtonReactiveExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N2"
+          ]
+        },
+        {
+          "door": "static NativeButtonExtensions.FocusIn<TModel>(this ComponentRef<NativeButton!, TModel!>! self) -> ComponentRef<NativeButton!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N2",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeButtonExtensions.SetText<TModel>(this ComponentRef<NativeButton!, TModel!>! self, string! text) -> ComponentRef<NativeButton!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N2",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeButtonReactiveExtensions.Reactive<TModel, TArgs>(this NativeButtonBuilder<TModel!>! builder, ReactivePlan<TModel!>! plan, System.Func<NativeButtonEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> NativeButtonBuilder<TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N2"
+          ]
+        },
+        {
+          "door": "static readonly NativeButtonEvents.Instance -> NativeButtonEvents!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M24.F3",
+      "summary": "NativeCheckBox: one declaration of a check box by lib.dom's names, checked, focus and change; the input it is, its checked state committed by change; and the render helpers that render it through MVC's CheckBoxFor bound to a member of bool. Main spreads it over six files whose writes and reads name checked by strings over ComponentRef, a payload class with a setter and a Reactive extension on the builder; the redesign declares it in one file. The rewrite keeps the redesign's members, mirrors the lib.dom interface of the element it renders, and declares Change's payload as Changed, nested in the component and mirroring lib.dom's Event (M24.D1).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeCheckBox",
+        "Alis.Reactive.Native:NativeCheckBoxBuilder<TModel, TProp>",
+        "Alis.Reactive.Native:NativeCheckBoxChangeArgs",
+        "Alis.Reactive.Native:NativeCheckBoxEvents",
+        "Alis.Reactive.Native:NativeCheckBoxExtensions",
+        "Alis.Reactive.Native:NativeCheckBoxHtmlExtensions",
+        "Alis.Reactive.Native:NativeCheckBoxReactiveExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public string ValueMember => \"checked\";",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBox.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "ComponentProperty<bool>.Named(\"checked\");",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxExtensions.cs:16"
+        },
+        {
+          "line": "main",
+          "text": "public bool? Checked { get; set; }",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/Events/NativeCheckBoxOnChanged.cs:15"
+        },
+        {
+          "line": "main",
+          "text": "var checkboxHtml = _html.CheckBoxFor(_expression, checkboxAttributes);",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxBuilder.cs:95"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<bool> Checked => Property<bool>();",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBox.cs:20"
+        },
+        {
+          "line": "redesign",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Checked, committedBy: Change);",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBox.cs:29"
+        },
+        {
+          "line": "redesign",
+          "text": "public ReadOnly<bool?> Checked => ReadOnly<bool?>();",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBox.cs:36"
+        },
+        {
+          "line": "redesign",
+          "text": "var checkboxHtml = _html.CheckBoxFor(_expression, checkboxAttributes);",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxBuilder.cs:87"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeCheckBox mirrors lib.dom's HTMLInputElement and declares Checked as Property<bool>, HTMLInputElement's checked, a boolean; Focus() as a method, HTMLElement's focus; and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp (M24.D1); each named as lib.dom names its public member.",
+          "doors": [
+            "M24.N3",
+            "N17.2",
+            "N17.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A NativeCheckBox bound to a member of bool is an input: its Checked, committed by Change, is what a form sends and a check reads, and a Change handler reads the box's own Checked, the state after the click.",
+          "doors": [
+            "M24.N3",
+            "M7.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "field.NativeCheckBox() and field.NativeCheckBox(build => ..), over a member of bool, render MVC's CheckBoxFor under the field's id and binding name, checked as the member is, with the hidden false input MVC writes for a box left unchecked, and CssClass the one option.",
+          "doors": [
+            "M24.N3",
+            "M7.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The rendered NativeCheckBox's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.PhotoConsent).Component<NativeCheckBox>() reaches it in any block (N14.4).",
+          "doors": [
+            "M12.N3",
+            "N14.4",
+            "M24.N3"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "on",
+        "method",
+        "boolean"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxExtensions.cs:13-52"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxEvents.cs:10-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxHtmlExtensions.cs:9-33"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxReactiveExtensions.cs:12-37"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBox.cs:17-67"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxBuilder.cs:26-95"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q5",
+        "Q14",
+        "Q7"
+      ],
+      "meanings": [],
+      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLInputElement's checked, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's CheckBoxFor on both hosts; each JavaScript name read there by hand.",
+      "checker": [
+        "core:Q17",
+        "core:Q14"
+      ],
+      "defects": [],
+      "promises": [],
+      "verdicts": [
+        {
+          "door": "NativeCheckBox.ValueMember.get -> string!",
+          "verdict": "refused",
+          "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+          "carriers": [
+            "M7.N3",
+            "M24.N3"
+          ]
+        },
+        {
+          "door": "NativeCheckBoxChangeArgs.Checked.get -> bool?",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "NativeCheckBoxChangeArgs.Checked.set -> void",
+          "verdict": "refused",
+          "reason": "Main's payload is a C# class whose setter no view runs in the browser; the state it names is the component's own Checked, which a step writes as any property.",
+          "carriers": [
+            "M24.N3",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeCheckBoxEvents",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3"
+          ]
+        },
+        {
+          "door": "NativeCheckBoxEvents.Changed.get -> TypedEvent<NativeCheckBoxChangeArgs!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3"
+          ]
+        },
+        {
+          "door": "NativeCheckBoxExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeCheckBoxReactiveExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N3"
+          ]
+        },
+        {
+          "door": "static NativeCheckBoxExtensions.FocusIn<TModel>(this ComponentRef<NativeCheckBox!, TModel!>! self) -> ComponentRef<NativeCheckBox!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeCheckBoxExtensions.SetChecked<TModel>(this ComponentRef<NativeCheckBox!, TModel!>! self, bool isChecked) -> ComponentRef<NativeCheckBox!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeCheckBoxExtensions.Value<TModel>(this ComponentRef<NativeCheckBox!, TModel!>! self) -> TypedComponentSource<bool>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeCheckBoxHtmlExtensions.NativeCheckBox<TModel>(this InputBoundField<TModel!, bool>! setup, System.Action<NativeCheckBoxBuilder<TModel!, bool>!>! build) -> void",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "static NativeCheckBoxReactiveExtensions.Reactive<TModel, TProp, TArgs>(this NativeCheckBoxBuilder<TModel!, TProp>! builder, ReactivePlan<TModel!>! plan, System.Func<NativeCheckBoxEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> NativeCheckBoxBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N3"
+          ]
+        },
+        {
+          "door": "static readonly NativeCheckBoxEvents.Instance -> NativeCheckBoxEvents!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M24.F4",
+      "summary": "NativeCheckList: a list of check boxes bound to one member, its value the checked boxes' values, written, read and committed as one input, with options from CheckListItem or Option. Main renders an inline script that keeps a plain array on the container and a hidden comma list beside the boxes, so a write checks no box, and takes the radio group's item type; the redesign moves the value into the Native package's check list code, which checks the boxes a write names, and gives the list its own item. Both lines render the hidden comma list and name every box by the binding name, so a form's own submission sends each checked value twice. The rewrite keeps the redesign's members and its code's value and focus, declares the type that code defines, declares Change's payload as Changed, nested in the component and mirroring lib.dom's Event (M24.D1), and renders one carrier of the value by the member's kind, the code writing the joined text only where the list renders the hidden input (M24.D2).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeCheckList",
+        "Alis.Reactive.Native:NativeCheckListBuilder<TModel, TProp>",
+        "Alis.Reactive.Native:NativeCheckListChangeArgs",
+        "Alis.Reactive.Native:NativeCheckListEvents",
+        "Alis.Reactive.Native:NativeCheckListExtensions",
+        "Alis.Reactive.Native:NativeCheckListHtmlExtensions",
+        "Alis.Reactive.Native:NativeCheckListReactiveExtensions",
+        "Alis.Reactive.Native:CheckListItem"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "return self.EmitSet(ValueProperty, ValueExpression.Array(items));",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListExtensions.cs:34"
+        },
+        {
+          "line": "main",
+          "text": "private readonly List<RadioButtonItem> _options = new List<RadioButtonItem>();",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:45"
+        },
+        {
+          "line": "main",
+          "text": "writer.Write($\"<input type=\\\"hidden\\\" name=\\\"{encoder.Encode(_bindingPath)}\\\" value=\\\"{encoder.Encode(modelValue)}\\\" />\");",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:169"
+        },
+        {
+          "line": "main",
+          "text": "writer.Write($@\"<script>(function(){{var c=document.getElementById(\"\"{encodedId}\"\");var h=c.querySelector(\"\"input[type=hidden]\"\");var init=h.value.split(\"\",\"\").filter(Boolean);c.value=init;c.isInteracted=false;c.addEventListener(\"\"change\"\",function(e){{if(e.target.type!==\"\"checkbox\"\")return;var v=[];var cbs=c.querySelectorAll(\"\"input[type=checkbox]\"\");for(var i=0;i<cbs.length;i++)if(cbs[i].checked)v.push(cbs[i].value);c.value=v;h.value=v.join(\"\",\"\");c.isInteracted=true;}});}})();</script>\");",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:200"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string[]> Value => Property<string[]>();",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckList.cs:18"
+        },
+        {
+          "line": "redesign",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckList.cs:27"
+        },
+        {
+          "line": "redesign",
+          "text": "private readonly List<CheckListItem> _options = new List<CheckListItem>();",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:45"
+        },
+        {
+          "line": "redesign",
+          "text": "writer.Write($\"<input type=\\\"hidden\\\" name=\\\"{encoder.Encode(_bindingPath)}\\\" value=\\\"{encoder.Encode(modelValue)}\\\" />\");",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:160"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeCheckList mirrors NativeCheckListElement, the type the Native package's check list code declares, an HTMLDivElement whose value is the checked boxes' values in the boxes' order, a list of text, and whose focus focuses the first box (M24.D2); it declares Value as Property<string[]>, Focus() and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp (M24.D1), which each box raises and the list hears.",
+          "doors": [
+            "M24.N4",
+            "N17.2",
+            "N17.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A NativeCheckList bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads; a write of Value checks exactly the boxes whose values it holds, and a write of nothing checks none (M24.D2).",
+          "doors": [
+            "M24.N4",
+            "M7.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "field.NativeCheckList() and field.NativeCheckList(build => ..) render the list under the field's id, a box per option from Items(IEnumerable<CheckListItem>) or Option(value), Option(value, text) and Option(value, text, description), each box checked as the member holds its value; a member whose JSON contract is a collection (D18.2) is sent by the boxes under its binding name, one entry per checked box, and a member of string by one hidden input that holds the checked values joined by commas, the boxes then nameless (M24.D2).",
+          "doors": [
+            "M24.N4",
+            "M7.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "CheckListItem is the check list's own option, a value, a text and a description that is null when none is given; it is the check list's alone, and the radio group declares its own (M24.N7).",
+          "doors": [
+            "M24.N4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The rendered NativeCheckList's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.VisitDays).Component<NativeCheckList>() reaches it in any block (N14.4).",
+          "doors": [
+            "M12.N3",
+            "N14.4",
+            "M24.N4"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "on",
+        "method",
+        "list",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListExtensions.cs:15-72"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListEvents.cs:10-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListHtmlExtensions.cs:9-35"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListReactiveExtensions.cs:12-39"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:32-216"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckList.cs:12-67"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:32-203"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:198-200"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/native/check-list.ts:3-24"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q5",
+        "Q14",
+        "Q7"
+      ],
+      "meanings": [
+        {
+          "id": "M24.D2",
+          "meaning": "A check list's value is the checked boxes' values in the boxes' order. The Native package's check list code defines value and focus on the list's element on alis:mount and declares their type, NativeCheckListElement, an HTMLDivElement with value: string[], which the declaration mirrors (D17.5). A write checks exactly the boxes whose values it holds and unchecks the rest; a write of nothing checks none; a write raises no change, as a script's write to a box raises none. The render helper renders one carrier of the value for a form's own submission: a member whose JSON contract is a collection (D18.2) by the boxes, each under the binding name, so a submission holds one entry per checked box and none when none is checked; a member of string by one hidden input under the binding name that holds the checked values joined by commas, with the boxes nameless; the code writes the joined text on each change and write where the list renders that input, and writes none where it renders none. A request the framework sends writes the list's Value in its wire form either way (D9.15)."
+        }
+      ],
+      "oracle": "The Native package's check list code as the redesign writes it (Alis.Reactive.Assets/components/native/check-list.ts at 65fdf118d), which defines the list's value and focus; lib.dom.d.ts of TypeScript 5.9.3 for HTMLDivElement, HTMLInputElement's checked and value and HTMLElementEventMap's change; the HTML standard's form submission, pinned in Chromium (probe:dom-check-list-form-data); and the browser, by the promises.",
+      "checker": [
+        "core:Q17",
+        "core:Q14"
+      ],
+      "defects": [
+        {
+          "id": "M24.X4",
+          "rung": "behavior",
+          "defect": "Main's check list keeps its value as a plain array its inline script assigns to the container (Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:200 at 623dd4a27), and SetValue writes a new array there (Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListExtensions.cs:34 at 623dd4a27): no box is checked or unchecked and the hidden comma list keeps its text, so the page shows the old days and a form's own submission sends them, while the plan reads the new ones. The rewrite's write checks the boxes it names (M24.D2), as the redesign's code does (Alis.Reactive.Assets/components/native/check-list.ts:9-16 at 65fdf118d)."
+        },
+        {
+          "id": "M24.X5",
+          "rung": "behavior",
+          "defect": "Both lines render the hidden comma list under the binding name beside a box of that name per option (Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:169 and :180 at 623dd4a27, Alis.Reactive.Native/Components/NativeCheckList/NativeCheckListBuilder.cs:160 and :171 at 65fdf118d), so a form's own submission sends the joined text and each checked box (probe:dom-check-list-form-data): a member that holds a list binds three days for two checked boxes. The rewrite renders one carrier by the member's kind (M24.D2)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M24.X4",
+          "page": "A visit schedule with a NativeCheckList over the model's VisitDays, a List<string>, options Mon, Tue and Wed, Mon checked from the model, and a Tue and Wed button whose click sets the list's Value to Tue and Wed, reached by pipeline.Input(m => m.VisitDays).Component<NativeCheckList>().",
+          "gesture": "Click Tue and Wed.",
+          "outcome": "The Tue and Wed boxes are checked and the Mon box is not.",
+          "opposite": "Open the page and click nothing: the Mon box alone is checked, as the model starts it.",
+          "defect": "On main the click writes a new array to the container alone: the Mon box stays checked and Tue and Wed stay unchecked."
+        },
+        {
+          "for": "M24.X5",
+          "page": "A visit schedule form with a NativeCheckList over the model's VisitDays, a List<string>, options Mon, Tue and Wed, none checked, posted by the browser's own submission to an action that renders how many days it bound and which.",
+          "gesture": "Check Mon and Wed and click Save.",
+          "outcome": "The page reads 2 days: Mon, Wed.",
+          "opposite": "Check nothing and click Save: the page reads 0 days.",
+          "defect": "On both lines the form sends Mon,Wed, Mon and Wed under VisitDays, and the page reads 3 days: Mon,Wed, Mon, Wed."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "NativeCheckList.ValueMember.get -> string!",
+          "verdict": "refused",
+          "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+          "carriers": [
+            "M7.N3",
+            "M24.N4"
+          ]
+        },
+        {
+          "door": "NativeCheckListBuilder<TModel, TProp>.Items(System.Collections.Generic.IEnumerable<RadioButtonItem!>! items) -> NativeCheckListBuilder<TModel, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4"
+          ]
+        },
+        {
+          "door": "NativeCheckListChangeArgs.Value.get -> string![]?",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "NativeCheckListChangeArgs.Value.set -> void",
+          "verdict": "refused",
+          "reason": "Main's payload is a C# class whose setter no view runs in the browser; the state it names is the component's own Value, which a step writes as any property.",
+          "carriers": [
+            "M24.N4",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeCheckListEvents",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4"
+          ]
+        },
+        {
+          "door": "NativeCheckListEvents.Changed.get -> TypedEvent<NativeCheckListChangeArgs!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4"
+          ]
+        },
+        {
+          "door": "NativeCheckListExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeCheckListReactiveExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N4"
+          ]
+        },
+        {
+          "door": "static NativeCheckListExtensions.FocusIn<TModel>(this ComponentRef<NativeCheckList!, TModel!>! self) -> ComponentRef<NativeCheckList!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeCheckListExtensions.SetValue<TModel, TSource>(this ComponentRef<NativeCheckList!, TModel!>! self, TSource source, System.Linq.Expressions.Expression<System.Func<TSource, object?>!>! path) -> ComponentRef<NativeCheckList!, TModel!>!",
+          "verdict": "refused",
+          "reason": "An object-typed lambda names a member of an event's payload, which ALIS009 refuses on the public surface; the declaration's Value takes any source, a payload's member read by its typed Read among them.",
+          "carriers": [
+            "M24.N4",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "static NativeCheckListExtensions.SetValue<TModel>(this ComponentRef<NativeCheckList!, TModel!>! self, string![]! value) -> ComponentRef<NativeCheckList!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeCheckListExtensions.Value<TModel>(this ComponentRef<NativeCheckList!, TModel!>! self) -> TypedComponentSource<string![]!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeCheckListHtmlExtensions.NativeCheckList<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<NativeCheckListBuilder<TModel!, TProp>!>! build) -> void",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "static NativeCheckListReactiveExtensions.Reactive<TModel, TProp, TArgs>(this NativeCheckListBuilder<TModel!, TProp>! builder, ReactivePlan<TModel!>! plan, System.Func<NativeCheckListEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> NativeCheckListBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N4"
+          ]
+        },
+        {
+          "door": "static readonly NativeCheckListEvents.Instance -> NativeCheckListEvents!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N4"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M24.F5",
+      "summary": "NativeDropDown: a select bound to one member by MVC's DropDownListFor, its value, focus and change by lib.dom's HTMLSelectElement names, its options from MVC's own SelectListItem with an optional placeholder. Main spreads it over six files whose writes and reads name value by strings over ComponentRef, a payload class with a setter and a Reactive extension on the builder; the redesign declares it in one file. The rewrite keeps the redesign's members, mirrors the lib.dom interface of the element it renders, and declares Change's payload as Changed, nested in the component and mirroring lib.dom's Event (M24.D1).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeDropDown",
+        "Alis.Reactive.Native:NativeDropDownBuilder<TModel, TProp>",
+        "Alis.Reactive.Native:NativeDropDownChangeArgs",
+        "Alis.Reactive.Native:NativeDropDownEvents",
+        "Alis.Reactive.Native:NativeDropDownExtensions",
+        "Alis.Reactive.Native:NativeDropDownHtmlExtensions",
+        "Alis.Reactive.Native:NativeDropDownReactiveExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public string ValueMember => \"value\";",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDown.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "ComponentProperty<string>.Named(\"value\");",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownExtensions.cs:16"
+        },
+        {
+          "line": "main",
+          "text": "var dropdownHtml = _html.DropDownListFor(",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownBuilder.cs:124"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> Value => Property<string>();",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDown.cs:20"
+        },
+        {
+          "line": "redesign",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDown.cs:29"
+        },
+        {
+          "line": "redesign",
+          "text": "public NativeDropDownBuilder<TModel, TProp> Items(IEnumerable<SelectListItem> items)",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownBuilder.cs:63"
+        },
+        {
+          "line": "redesign",
+          "text": "var dropdownHtml = _html.DropDownListFor(",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownBuilder.cs:116"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeDropDown mirrors lib.dom's HTMLSelectElement and declares Value as Property<string>, HTMLSelectElement's value, the selected option's value as text, empty when none is selected; Focus() as a method; and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp (M24.D1); each named as lib.dom names its public member.",
+          "doors": [
+            "M24.N5",
+            "N17.2",
+            "N17.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A NativeDropDown bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads, as text the endpoint binds to the member's type.",
+          "doors": [
+            "M24.N5",
+            "M7.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "field.NativeDropDown() and field.NativeDropDown(build => ..) render MVC's DropDownListFor under the field's id and binding name, its options from Items(IEnumerable<SelectListItem>), MVC's own option type on each host, Placeholder(optionLabel) the empty first option, Enabled(bool) and CssClass, the option the member holds selected.",
+          "doors": [
+            "M24.N5",
+            "M7.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The rendered NativeDropDown's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.Wing).Component<NativeDropDown>() reaches it in any block (N14.4).",
+          "doors": [
+            "M12.N3",
+            "N14.4",
+            "M24.N5"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "on",
+        "method",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownExtensions.cs:13-52"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownEvents.cs:10-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownHtmlExtensions.cs:9-34"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownReactiveExtensions.cs:12-37"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDown.cs:17-69"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownBuilder.cs:27-128"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q5",
+        "Q14",
+        "Q7"
+      ],
+      "meanings": [],
+      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLSelectElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's DropDownListFor and SelectListItem on both hosts; each JavaScript name read there by hand.",
+      "checker": [
+        "core:Q17",
+        "core:Q14"
+      ],
+      "defects": [],
+      "promises": [],
+      "verdicts": [
+        {
+          "door": "NativeDropDown.ValueMember.get -> string!",
+          "verdict": "refused",
+          "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+          "carriers": [
+            "M7.N3",
+            "M24.N5"
+          ]
+        },
+        {
+          "door": "NativeDropDownChangeArgs.Value.get -> string?",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "NativeDropDownChangeArgs.Value.set -> void",
+          "verdict": "refused",
+          "reason": "Main's payload is a C# class whose setter no view runs in the browser; the state it names is the component's own Value, which a step writes as any property.",
+          "carriers": [
+            "M24.N5",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeDropDownEvents",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5"
+          ]
+        },
+        {
+          "door": "NativeDropDownEvents.Changed.get -> TypedEvent<NativeDropDownChangeArgs!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5"
+          ]
+        },
+        {
+          "door": "NativeDropDownExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeDropDownReactiveExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N5"
+          ]
+        },
+        {
+          "door": "static NativeDropDownExtensions.FocusIn<TModel>(this ComponentRef<NativeDropDown!, TModel!>! self) -> ComponentRef<NativeDropDown!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeDropDownExtensions.SetValue<TModel>(this ComponentRef<NativeDropDown!, TModel!>! self, string! value) -> ComponentRef<NativeDropDown!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeDropDownExtensions.Value<TModel>(this ComponentRef<NativeDropDown!, TModel!>! self) -> TypedComponentSource<string!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeDropDownHtmlExtensions.NativeDropDown<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<NativeDropDownBuilder<TModel!, TProp>!>! build) -> void",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "static NativeDropDownReactiveExtensions.Reactive<TModel, TProp, TArgs>(this NativeDropDownBuilder<TModel!, TProp>! builder, ReactivePlan<TModel!>! plan, System.Func<NativeDropDownEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> NativeDropDownBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N5"
+          ]
+        },
+        {
+          "door": "static readonly NativeDropDownEvents.Instance -> NativeDropDownEvents!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N5"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M24.F6",
+      "summary": "NativeHiddenField: a hidden input bound to one member by MVC's HiddenFor, its value and change, an input like any other that a request sends and a check reads. Main renders it through HiddenFieldFor with a public builder and gives it no browser code, so its Changed never runs, since the DOM raises no change on a script's write; the redesign renders it through the field and its Native code raises change when a write changes the value. The rewrite keeps the redesign's members and code, mirrors lib.dom's HTMLInputElement and declares Change's payload as Changed, nested in the component and mirroring lib.dom's Event (M24.D1, M24.D3).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeHiddenField",
+        "Alis.Reactive.Native:NativeHiddenFieldBuilder<TModel, TProp>",
+        "Alis.Reactive.Native:NativeHiddenFieldChangeArgs",
+        "Alis.Reactive.Native:NativeHiddenFieldEvents",
+        "Alis.Reactive.Native:NativeHiddenFieldExtensions",
+        "Alis.Reactive.Native:NativeHiddenFieldHtmlExtensions",
+        "Alis.Reactive.Native:NativeHiddenFieldReactiveExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public static NativeHiddenFieldBuilder<TModel, TProp> HiddenFieldFor<TModel, TProp>(",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldHtmlExtensions.cs:32"
+        },
+        {
+          "line": "main",
+          "text": "return self.EmitSet(ValueProperty, ValueExpression.Literal(value));",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldExtensions.cs:27"
+        },
+        {
+          "line": "main",
+          "text": "var hiddenInputHtml = _html.HiddenFor(_expression, hiddenInputAttributes);",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldBuilder.cs:77"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> Value => Property<string>();",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenField.cs:27"
+        },
+        {
+          "line": "redesign",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenField.cs:37"
+        },
+        {
+          "line": "redesign",
+          "text": "var field = html.InputField(plan, expression, o => o.Hidden());",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenField.cs:75"
+        },
+        {
+          "line": "redesign",
+          "text": "internal sealed class NativeHiddenFieldBuilder<TModel, TProp> :",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldBuilder.cs:17"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeHiddenField mirrors lib.dom's HTMLInputElement and declares Value as Property<string>, HTMLInputElement's value, and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp (M24.D1), which the Native package's hidden field code raises, as a script's Event whose IsTrusted reads false, when a write changes the value (M24.D3); a hidden input takes no focus, so it declares none.",
+          "doors": [
+            "M24.N6",
+            "N17.2",
+            "N17.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A NativeHiddenField bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads (D9.14).",
+          "doors": [
+            "M24.N6",
+            "M7.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Html.NativeHiddenField(plan, m => m.Member) renders MVC's HiddenFor under the field's id and binding name, through Html.InputField(plan, m => m.Member, o => o.Hidden()), and returns the rendered component; its builder is an implementation detail.",
+          "doors": [
+            "M24.N6",
+            "M7.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The rendered NativeHiddenField's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.AssignedBed).Component<NativeHiddenField>() reaches it in any block (N14.4).",
+          "doors": [
+            "M12.N3",
+            "N14.4",
+            "M24.N6"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "on",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldExtensions.cs:14-67"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldEvents.cs:10-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldHtmlExtensions.cs:22-61"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldReactiveExtensions.cs:13-38"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldBuilder.cs:26-85"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenField.cs:24-80"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldBuilder.cs:17-69"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/native/hidden-field.ts:5-18"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q5",
+        "Q14",
+        "Q7"
+      ],
+      "meanings": [
+        {
+          "id": "M24.D3",
+          "meaning": "A hidden field's Change runs when a write changes its value. A hidden input has no user to commit it, and the DOM raises no change on a script's write (probe:dom-hidden-write-no-change), so the Native package's hidden field code, on alis:mount, raises change, bubbling, after a write that leaves the value different from what it held, and none after a write of the same text. It is the one Native input whose script write raises change; every other raises none, as the DOM does (M24.D1)."
+        }
+      ],
+      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLInputElement's value and HTMLElementEventMap's change; the Native package's hidden field code as the redesign writes it (Alis.Reactive.Assets/components/native/hidden-field.ts at 65fdf118d); MVC's HiddenFor on both hosts; and the browser, by the fact named (probe:dom-hidden-write-no-change) and the promise.",
+      "checker": [
+        "core:Q17",
+        "core:Q14"
+      ],
+      "defects": [
+        {
+          "id": "M24.X2",
+          "rung": "behavior",
+          "defect": "Main's hidden field has no browser code: its Changed listens for the DOM's change on the hidden input (Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldEvents.cs:21-23 at 623dd4a27), which a script's write never raises (probe:dom-hidden-write-no-change), and nothing else writes a hidden input, so a handler on it never runs. The rewrite's hidden field code raises change on a write that changes the value (M24.D3), as the redesign's does (Alis.Reactive.Assets/components/native/hidden-field.ts:9-16 at 65fdf118d)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M24.X2",
+          "page": "A bed board whose model's AssignedBed renders through Html.NativeHiddenField(plan, m => m.AssignedBed), whose Change handler sets bed-echo's text to the field's Value, reached by pipeline.Input(m => m.AssignedBed).Component<NativeHiddenField>(), and an Assign B-12 button whose click sets that Value to B-12.",
+          "gesture": "Click Assign B-12.",
+          "outcome": "bed-echo shows B-12.",
+          "opposite": "Open the page and click nothing: bed-echo is empty, since the field's starting value raises no change.",
+          "defect": "On main the write raises no change, so the Changed handler never runs and bed-echo stays empty."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "NativeHiddenField.ValueMember.get -> string!",
+          "verdict": "refused",
+          "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+          "carriers": [
+            "M7.N3",
+            "M24.N6"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldBuilder<TModel, TProp>",
+          "verdict": "refused",
+          "reason": "Main's public builder is the markup HiddenFieldFor returns, with no option of its own; the redesign makes it internal (Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldBuilder.cs:17 at 65fdf118d) and its render helper returns the rendered component, which writes the same MVC HiddenFor markup.",
+          "carriers": [
+            "M24.N6",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldBuilder<TModel, TProp>.ToHtmlString() -> string!",
+          "verdict": "refused",
+          "reason": "Main's public builder is the markup HiddenFieldFor returns, with no option of its own; the redesign makes it internal (Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldBuilder.cs:17 at 65fdf118d) and its render helper returns the rendered component, which writes the same MVC HiddenFor markup.",
+          "carriers": [
+            "M24.N6",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldBuilder<TModel, TProp>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+          "verdict": "refused",
+          "reason": "Main's public builder is the markup HiddenFieldFor returns, with no option of its own; the redesign makes it internal (Alis.Reactive.Native/Components/NativeHiddenField/NativeHiddenFieldBuilder.cs:17 at 65fdf118d) and its render helper returns the rendered component, which writes the same MVC HiddenFor markup.",
+          "carriers": [
+            "M24.N6",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldChangeArgs.Value.get -> string?",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldChangeArgs.Value.set -> void",
+          "verdict": "refused",
+          "reason": "Main's payload is a C# class whose setter no view runs in the browser; the state it names is the component's own Value, which a step writes as any property.",
+          "carriers": [
+            "M24.N6",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldEvents",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldEvents.Changed.get -> TypedEvent<NativeHiddenFieldChangeArgs!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeHiddenFieldReactiveExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N6"
+          ]
+        },
+        {
+          "door": "static NativeHiddenFieldExtensions.SetValue<TModel, TResponse>(this ComponentRef<NativeHiddenField!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> ComponentRef<NativeHiddenField!, TModel!>!",
+          "verdict": "refused",
+          "reason": "An object-typed lambda names a member of the response body, which ALIS009 refuses on the public surface; the declaration's Value takes any source, the response body's member read by its typed Read among them.",
+          "carriers": [
+            "M24.N6",
+            "N10.7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "static NativeHiddenFieldExtensions.SetValue<TModel>(this ComponentRef<NativeHiddenField!, TModel!>! self, TypedComponentSource<string!>! source) -> ComponentRef<NativeHiddenField!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeHiddenFieldExtensions.SetValue<TModel>(this ComponentRef<NativeHiddenField!, TModel!>! self, string! value) -> ComponentRef<NativeHiddenField!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeHiddenFieldExtensions.Value<TModel>(this ComponentRef<NativeHiddenField!, TModel!>! self) -> TypedComponentSource<string!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeHiddenFieldHtmlExtensions.HiddenFieldFor<TModel, TProp>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, System.Linq.Expressions.Expression<System.Func<TModel!, TProp>!>! expression) -> NativeHiddenFieldBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "static NativeHiddenFieldHtmlExtensions.HiddenFieldFor<TModel, TProp>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, System.Linq.Expressions.Expression<System.Func<TModel!, TProp>!>! expression) -> NativeHiddenFieldBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "static NativeHiddenFieldReactiveExtensions.Reactive<TModel, TProp, TArgs>(this NativeHiddenFieldBuilder<TModel!, TProp>! builder, ReactivePlan<TModel!>! plan, System.Func<NativeHiddenFieldEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> NativeHiddenFieldBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N6"
+          ]
+        },
+        {
+          "door": "static readonly NativeHiddenFieldEvents.Instance -> NativeHiddenFieldEvents!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N6"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M24.F7",
+      "summary": "NativeRadioGroup: radios bound to one member by MVC's RadioButtonFor, and one input under the field's id that holds the chosen value, written, read and committed as one input, with options from RadioButtonItem or Option. Main keeps the value in an unnamed hidden input its inline script fills on a click, so a write checks no radio; the redesign moves it into the Native package's radio group code, which checks the radio a write names and raises change on the group when a person picks one. The rewrite keeps the redesign's members and code, mirrors lib.dom's HTMLInputElement and declares Change's payload as Changed, nested in the component and mirroring lib.dom's Event (M24.D1, M24.D4).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeRadioGroup",
+        "Alis.Reactive.Native:NativeRadioGroupBuilder<TModel, TProp>",
+        "Alis.Reactive.Native:NativeRadioGroupChangeArgs",
+        "Alis.Reactive.Native:NativeRadioGroupEvents",
+        "Alis.Reactive.Native:NativeRadioGroupExtensions",
+        "Alis.Reactive.Native:NativeRadioGroupHtmlExtensions",
+        "Alis.Reactive.Native:NativeRadioGroupReactiveExtensions",
+        "Alis.Reactive.Native:RadioButtonItem"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "return self.EmitSet(ValueProperty, ValueExpression.Literal(value));",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupExtensions.cs:31"
+        },
+        {
+          "line": "main",
+          "text": "writer.Write($\"<input type=\\\"hidden\\\" id=\\\"{encodedId}\\\" value=\\\"{encoder.Encode(selectedValue)}\\\" />\");",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:162"
+        },
+        {
+          "line": "main",
+          "text": "var radioHtml = _html.RadioButtonFor(_expression, option.Value, radioAttributes);",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:174"
+        },
+        {
+          "line": "main",
+          "text": "writer.Write($@\"<script>(function(){{var h=document.getElementById(\"\"{encodedId}\"\");h.isInteracted=false;h.parentElement.addEventListener(\"\"change\"\",function(e){{if(e.target.type!==\"\"radio\"\")return;h.value=e.target.value;h.isInteracted=true;h.dispatchEvent(new Event(\"\"change\"\",{{bubbles:true}}));}});}})();</script>\");",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:196"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> Value => Property<string>();",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroup.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroup.cs:28"
+        },
+        {
+          "line": "redesign",
+          "text": "writer.Write($\"<input type=\\\"hidden\\\" id=\\\"{encodedId}\\\" value=\\\"{encoder.Encode(selectedValue)}\\\" data-alis-radio-group />\");",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:148"
+        },
+        {
+          "line": "redesign",
+          "text": "public RadioButtonItem(string value, string text, string description)",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/RadioButtonItem.cs:39"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeRadioGroup mirrors lib.dom's HTMLInputElement, the group's input under the field's id, and declares Value as Property<string>, that input's value, which the Native package's radio group code keeps as the chosen radio's value (M24.D4); Focus() as a method, which focuses the chosen radio, else the first; and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp (M24.D1), which the code raises on the group, as a script's Event whose IsTrusted reads false, when a person picks a radio (M24.D4).",
+          "doors": [
+            "M24.N7",
+            "N17.2",
+            "N17.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A NativeRadioGroup bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads; a write of Value checks the radio of that value and no other (M24.D4).",
+          "doors": [
+            "M24.N7",
+            "M7.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "field.NativeRadioGroup() and field.NativeRadioGroup(build => ..) render the group's input under the field's id and a radio per option by MVC's RadioButtonFor under the binding name, from Items(IEnumerable<RadioButtonItem>) or Option(value), Option(value, text) and Option(value, text, description), the radio of the member's value checked; CssClass and OptionCssClass style the group and each option.",
+          "doors": [
+            "M24.N7",
+            "M7.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "RadioButtonItem is the radio group's own option, a value, a text and a description that is null when none is given; the check list declares its own (M24.N4).",
+          "doors": [
+            "M24.N7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The rendered NativeRadioGroup's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.Wing).Component<NativeRadioGroup>() reaches it in any block (N14.4).",
+          "doors": [
+            "M12.N3",
+            "N14.4",
+            "M24.N7"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "on",
+        "method",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupExtensions.cs:15-69"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupEvents.cs:10-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupHtmlExtensions.cs:9-34"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupReactiveExtensions.cs:16-45"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:30-199"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/RadioButtonItem.cs:11-89"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroup.cs:12-68"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:30-181"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:195-196"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/components/native/radio-group.ts:5-31"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q5",
+        "Q14",
+        "Q7"
+      ],
+      "meanings": [
+        {
+          "id": "M24.D4",
+          "meaning": "A radio group's value is the chosen radio's value, held by the group's input under the field's id, which carries no name, while the radios carry the binding name for a form's own submission. The Native package's radio group code, on alis:mount, defines the input's value and focus: a write sets the value and checks the radio whose value it is and no other, so a value no radio holds, or the empty text, checks none; a person's pick sets the value to the picked radio's and raises change, bubbling, on the group's input, which Change hears; a write raises no change (M24.D1); focus focuses the checked radio, else the first."
+        }
+      ],
+      "oracle": "The Native package's radio group code as the redesign writes it (Alis.Reactive.Assets/components/native/radio-group.ts at 65fdf118d); lib.dom.d.ts of TypeScript 5.9.3 for HTMLInputElement's value and checked, HTMLElement's focus and HTMLElementEventMap's change; MVC's RadioButtonFor on both hosts; and the browser, by the promise.",
+      "checker": [
+        "core:Q17",
+        "core:Q14"
+      ],
+      "defects": [
+        {
+          "id": "M24.X3",
+          "rung": "behavior",
+          "defect": "Main's radio group holds its value in a hidden input with no name (Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:162 at 623dd4a27), which SetValue writes (Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupExtensions.cs:31 at 623dd4a27), and only a click on a radio fills it (Alis.Reactive.Native/Components/NativeRadioGroup/NativeRadioGroupBuilder.cs:196 at 623dd4a27): a write checks no radio, so the page shows the old choice and a form's own submission sends it, through the named radios, while the plan reads the new one. The rewrite's write checks the radio it names (M24.D4), as the redesign's code does (Alis.Reactive.Assets/components/native/radio-group.ts:10-18 at 65fdf118d)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M24.X3",
+          "page": "A move-in page with a NativeRadioGroup over the model's Wing, options Rose, Lily and Oak, Rose chosen from the model, and a Move to Oak button whose click sets the group's Value to Oak, reached by pipeline.Input(m => m.Wing).Component<NativeRadioGroup>().",
+          "gesture": "Click Move to Oak.",
+          "outcome": "The Oak radio is checked and the Rose radio is not.",
+          "opposite": "Click the Lily radio: the group's Change handler sets wing-echo's text to the group's Value, Lily, and Lily alone is checked.",
+          "defect": "On main the write fills the unnamed hidden input alone: the Rose radio stays checked while the plan reads Oak."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "NativeRadioGroup.ValueMember.get -> string!",
+          "verdict": "refused",
+          "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+          "carriers": [
+            "M7.N3",
+            "M24.N7"
+          ]
+        },
+        {
+          "door": "NativeRadioGroupChangeArgs.Value.get -> string?",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "NativeRadioGroupChangeArgs.Value.set -> void",
+          "verdict": "refused",
+          "reason": "Main's payload is a C# class whose setter no view runs in the browser; the state it names is the component's own Value, which a step writes as any property.",
+          "carriers": [
+            "M24.N7",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeRadioGroupEvents",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7"
+          ]
+        },
+        {
+          "door": "NativeRadioGroupEvents.Changed.get -> TypedEvent<NativeRadioGroupChangeArgs!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7"
+          ]
+        },
+        {
+          "door": "NativeRadioGroupExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeRadioGroupReactiveExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N7"
+          ]
+        },
+        {
+          "door": "static NativeRadioGroupExtensions.FocusIn<TModel>(this ComponentRef<NativeRadioGroup!, TModel!>! self) -> ComponentRef<NativeRadioGroup!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeRadioGroupExtensions.SetValue<TModel, TSource>(this ComponentRef<NativeRadioGroup!, TModel!>! self, TSource source, System.Linq.Expressions.Expression<System.Func<TSource, object?>!>! path) -> ComponentRef<NativeRadioGroup!, TModel!>!",
+          "verdict": "refused",
+          "reason": "An object-typed lambda names a member of an event's payload, which ALIS009 refuses on the public surface; the declaration's Value takes any source, a payload's member read by its typed Read among them.",
+          "carriers": [
+            "M24.N7",
+            "N5.6"
+          ]
+        },
+        {
+          "door": "static NativeRadioGroupExtensions.SetValue<TModel>(this ComponentRef<NativeRadioGroup!, TModel!>! self, string! value) -> ComponentRef<NativeRadioGroup!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeRadioGroupExtensions.Value<TModel>(this ComponentRef<NativeRadioGroup!, TModel!>! self) -> TypedComponentSource<string!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeRadioGroupHtmlExtensions.NativeRadioGroup<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<NativeRadioGroupBuilder<TModel!, TProp>!>! build) -> void",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "static NativeRadioGroupReactiveExtensions.Reactive<TModel, TProp, TArgs>(this NativeRadioGroupBuilder<TModel!, TProp>! builder, ReactivePlan<TModel!>! plan, System.Func<NativeRadioGroupEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> NativeRadioGroupBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N7"
+          ]
+        },
+        {
+          "door": "static readonly NativeRadioGroupEvents.Instance -> NativeRadioGroupEvents!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N7"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M24.F8",
+      "summary": "NativeTextArea: a text area bound to one member by MVC's TextAreaFor, its value, focus and change by lib.dom's HTMLTextAreaElement names, with Rows, Placeholder and CssClass. Main spreads it over six files whose writes and reads name value by strings over ComponentRef, a payload class with a setter and a Reactive extension on the builder; the redesign declares it in one file. The rewrite keeps the redesign's members, mirrors the lib.dom interface of the element it renders, and declares Change's payload as Changed, nested in the component and mirroring lib.dom's Event (M24.D1).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeTextArea",
+        "Alis.Reactive.Native:NativeTextAreaBuilder<TModel, TProp>",
+        "Alis.Reactive.Native:NativeTextAreaChangeArgs",
+        "Alis.Reactive.Native:NativeTextAreaEvents",
+        "Alis.Reactive.Native:NativeTextAreaExtensions",
+        "Alis.Reactive.Native:NativeTextAreaHtmlExtensions",
+        "Alis.Reactive.Native:NativeTextAreaReactiveExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public string ValueMember => \"value\";",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextArea.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "ComponentProperty<string>.Named(\"value\");",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaExtensions.cs:16"
+        },
+        {
+          "line": "main",
+          "text": "var textAreaHtml = _html.TextAreaFor(_expression, textAreaAttributes);",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaBuilder.cs:118"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> Value => Property<string>();",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextArea.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextArea.cs:28"
+        },
+        {
+          "line": "redesign",
+          "text": "public NativeTextAreaBuilder<TModel, TProp> Rows(int rows)",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaBuilder.cs:63"
+        },
+        {
+          "line": "redesign",
+          "text": "var textAreaHtml = _html.TextAreaFor(_expression, textAreaAttributes);",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaBuilder.cs:110"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeTextArea mirrors lib.dom's HTMLTextAreaElement and declares Value as Property<string>, HTMLTextAreaElement's value, the text with its line breaks; Focus() as a method; and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp (M24.D1); each named as lib.dom names its public member.",
+          "doors": [
+            "M24.N8",
+            "N17.2",
+            "N17.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A NativeTextArea bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+          "doors": [
+            "M24.N8",
+            "M7.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "field.NativeTextArea() and field.NativeTextArea(build => ..) render MVC's TextAreaFor under the field's id and binding name, holding the member's text, with Rows(int), Placeholder and CssClass.",
+          "doors": [
+            "M24.N8",
+            "M7.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The rendered NativeTextArea's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.CareNotes).Component<NativeTextArea>() reaches it in any block (N14.4).",
+          "doors": [
+            "M12.N3",
+            "N14.4",
+            "M24.N8"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "on",
+        "method",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaExtensions.cs:13-51"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaEvents.cs:10-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaHtmlExtensions.cs:9-34"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaReactiveExtensions.cs:12-37"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextArea.cs:16-68"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaBuilder.cs:25-118"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q5",
+        "Q14",
+        "Q7"
+      ],
+      "meanings": [],
+      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLTextAreaElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's TextAreaFor on both hosts; each JavaScript name read there by hand.",
+      "checker": [
+        "core:Q17",
+        "core:Q14"
+      ],
+      "defects": [],
+      "promises": [],
+      "verdicts": [
+        {
+          "door": "NativeTextArea.ValueMember.get -> string!",
+          "verdict": "refused",
+          "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+          "carriers": [
+            "M7.N3",
+            "M24.N8"
+          ]
+        },
+        {
+          "door": "NativeTextAreaChangeArgs.Value.get -> string?",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "NativeTextAreaChangeArgs.Value.set -> void",
+          "verdict": "refused",
+          "reason": "Main's payload is a C# class whose setter no view runs in the browser; the state it names is the component's own Value, which a step writes as any property.",
+          "carriers": [
+            "M24.N8",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeTextAreaEvents",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8"
+          ]
+        },
+        {
+          "door": "NativeTextAreaEvents.Changed.get -> TypedEvent<NativeTextAreaChangeArgs!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8"
+          ]
+        },
+        {
+          "door": "NativeTextAreaExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeTextAreaReactiveExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N8"
+          ]
+        },
+        {
+          "door": "static NativeTextAreaExtensions.FocusIn<TModel>(this ComponentRef<NativeTextArea!, TModel!>! self) -> ComponentRef<NativeTextArea!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeTextAreaExtensions.SetValue<TModel>(this ComponentRef<NativeTextArea!, TModel!>! self, string! value) -> ComponentRef<NativeTextArea!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeTextAreaExtensions.Value<TModel>(this ComponentRef<NativeTextArea!, TModel!>! self) -> TypedComponentSource<string!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeTextAreaHtmlExtensions.NativeTextArea<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<NativeTextAreaBuilder<TModel!, TProp>!>! build) -> void",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "static NativeTextAreaReactiveExtensions.Reactive<TModel, TProp, TArgs>(this NativeTextAreaBuilder<TModel!, TProp>! builder, ReactivePlan<TModel!>! plan, System.Func<NativeTextAreaEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> NativeTextAreaBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N8"
+          ]
+        },
+        {
+          "door": "static readonly NativeTextAreaEvents.Instance -> NativeTextAreaEvents!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N8"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M24.F9",
+      "summary": "NativeTextBox: a text input bound to one member by MVC's TextBoxFor, its value, focus and change by lib.dom's HTMLInputElement names, with Placeholder and CssClass. Main spreads it over six files whose writes and reads name value by strings over ComponentRef, a payload class with a setter and a Reactive extension on the builder; the redesign declares it in one file. The rewrite keeps the redesign's members, mirrors lib.dom's HTMLInputElement, and declares Change's payload as Changed, nested in the component and mirroring lib.dom's Event, a handler reading the box's own Value (M24.D1, probe:dom-change-listener-event).",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Native:NativeTextBox",
+        "Alis.Reactive.Native:NativeTextBoxBuilder<TModel, TProp>",
+        "Alis.Reactive.Native:NativeTextBoxChangeArgs",
+        "Alis.Reactive.Native:NativeTextBoxEvents",
+        "Alis.Reactive.Native:NativeTextBoxExtensions",
+        "Alis.Reactive.Native:NativeTextBoxHtmlExtensions",
+        "Alis.Reactive.Native:NativeTextBoxReactiveExtensions"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public string ValueMember => \"value\";",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBox.cs:17"
+        },
+        {
+          "line": "main",
+          "text": "ComponentProperty<string>.Named(\"value\");",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxExtensions.cs:16"
+        },
+        {
+          "line": "main",
+          "text": "public string? Value { get; set; }",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/Events/NativeTextBoxOnChanged.cs:15"
+        },
+        {
+          "line": "main",
+          "text": "setup.RegisterInputComponent(registration);",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxHtmlExtensions.cs:24"
+        },
+        {
+          "line": "redesign",
+          "text": "public Property<string> Value => Property<string>();",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBox.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBox.cs:28"
+        },
+        {
+          "line": "redesign",
+          "text": "public ReadOnly<string> Value => ReadOnly<string>();",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBox.cs:35"
+        },
+        {
+          "line": "redesign",
+          "text": "var textBoxHtml = _html.TextBoxFor(_expression, inputAttributes);",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxBuilder.cs:111"
+        },
+        {
+          "line": "proposed",
+          "text": "NativeTextBox mirrors lib.dom's HTMLInputElement and declares Value as Property<string>, HTMLInputElement's value; Focus() as a method; and Change as Event<Changed>, Changed a class nested in it that mirrors lib.dom's Event, the type HTMLElementEventMap gives change, with Type, IsTrusted and TimeStamp, an Event that holds no value (M24.D1, probe:dom-change-listener-event); each named as lib.dom names its public member.",
+          "doors": [
+            "M24.N9",
+            "N17.2",
+            "N17.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A NativeTextBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads, and a Change handler reads the box's own Value, the committed text.",
+          "doors": [
+            "M24.N9",
+            "M7.N3",
+            "N14.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "field.NativeTextBox() and field.NativeTextBox(build => ..) render MVC's TextBoxFor under the field's id and binding name, holding the member's text or MVC's attempted text after a failed post (D17.13), with Placeholder and CssClass; its Type is module 16's typed door (N18.4).",
+          "doors": [
+            "M24.N9",
+            "M7.N2",
+            "N18.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The rendered NativeTextBox's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.ResidentName).Component<NativeTextBox>() reaches it in any block (N14.4).",
+          "doors": [
+            "M12.N3",
+            "N14.4",
+            "M24.N9"
+          ]
+        }
+      ],
+      "nodes": [
+        "obj",
+        "element",
+        "get",
+        "set",
+        "call",
+        "on",
+        "method",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxExtensions.cs:13-51"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxEvents.cs:10-25"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxHtmlExtensions.cs:9-34"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxReactiveExtensions.cs:17-42"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBox.cs:16-68"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxBuilder.cs:26-119"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:74-77"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-33"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+        }
+      ],
+      "core": [
+        "Q17",
+        "Q5",
+        "Q14",
+        "Q7"
+      ],
+      "meanings": [],
+      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLInputElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's TextBoxFor on both hosts; and the browser, by the fact named (probe:dom-change-listener-event).",
+      "checker": [
+        "core:Q17",
+        "core:Q14"
+      ],
+      "defects": [],
+      "promises": [],
+      "verdicts": [
+        {
+          "door": "NativeTextBox.ValueMember.get -> string!",
+          "verdict": "refused",
+          "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+          "carriers": [
+            "M7.N3",
+            "M24.N9"
+          ]
+        },
+        {
+          "door": "NativeTextBoxChangeArgs.Value.get -> string?",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9",
+            "N14.4"
+          ]
+        },
+        {
+          "door": "NativeTextBoxChangeArgs.Value.set -> void",
+          "verdict": "refused",
+          "reason": "Main's payload is a C# class whose setter no view runs in the browser; the state it names is the component's own Value, which a step writes as any property.",
+          "carriers": [
+            "M24.N9",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeTextBoxEvents",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9"
+          ]
+        },
+        {
+          "door": "NativeTextBoxEvents.Changed.get -> TypedEvent<NativeTextBoxChangeArgs!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9"
+          ]
+        },
+        {
+          "door": "NativeTextBoxExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "NativeTextBoxReactiveExtensions",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N9"
+          ]
+        },
+        {
+          "door": "static NativeTextBoxExtensions.FocusIn<TModel>(this ComponentRef<NativeTextBox!, TModel!>! self) -> ComponentRef<NativeTextBox!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeTextBoxExtensions.SetValue<TModel>(this ComponentRef<NativeTextBox!, TModel!>! self, string! value) -> ComponentRef<NativeTextBox!, TModel!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeTextBoxExtensions.Value<TModel>(this ComponentRef<NativeTextBox!, TModel!>! self) -> TypedComponentSource<string!>!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "static NativeTextBoxHtmlExtensions.NativeTextBox<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<NativeTextBoxBuilder<TModel!, TProp>!>! build) -> void",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9",
+            "M7.N2"
+          ]
+        },
+        {
+          "door": "static NativeTextBoxReactiveExtensions.Reactive<TModel, TProp, TArgs>(this NativeTextBoxBuilder<TModel!, TProp>! builder, ReactivePlan<TModel!>! plan, System.Func<NativeTextBoxEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> NativeTextBoxBuilder<TModel!, TProp>!",
+          "verdict": "renamed",
+          "to": [
+            "M12.N3",
+            "M24.N9"
+          ]
+        },
+        {
+          "door": "static readonly NativeTextBoxEvents.Instance -> NativeTextBoxEvents!",
+          "verdict": "renamed",
+          "to": [
+            "M24.N9"
+          ]
+        }
+      ]
+    }
+  ]
+}

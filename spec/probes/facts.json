@@ -3736,6 +3736,66 @@
         "gesture": "Rest the pointer on the chart's feature bar.",
         "outcome": "dose-goals shows 1."
       }
+    },
+    {
+      "id": "dom-change-listener-event",
+      "statement": "Chromium hands a text input's change listener one argument, an Event whose type is change, isTrusted true after a person's edit and timeStamp a number, which holds no value; its currentTarget is the input during the dispatch and null after it, as lib.dom types it EventTarget | null.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "dom-native-m24.mjs",
+      "expect": "dom-change-listener-event: 1 argument,Event,type:change,isTrusted:true,timeStamp:number,value:undefined,currentTarget:input,after:null",
+      "source": "spec/probes/dom-native-m24.mjs",
+      "proof": {
+        "feature": "M24.F9",
+        "page": "An intake page whose NativeTextBox over ResidentName has a Change handler that sets name-echo's text to the text box's own Value, reached by pipeline.Input(m => m.ResidentName).Component<NativeTextBox>(), and name-event's text to the payload's Type.",
+        "gesture": "Type Ada Lovelace into the name and press Tab.",
+        "outcome": "name-echo shows Ada Lovelace and name-event shows change."
+      }
+    },
+    {
+      "id": "dom-click-listener-event",
+      "statement": "Chromium hands a button's click listener a PointerEvent, as lib.dom's HTMLElementEventMap types click: after a person's mouse click its type is click, isTrusted true, pointerType mouse, detail 1, altKey false and clientX a number.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "dom-native-m24.mjs",
+      "expect": "dom-click-listener-event: PointerEvent,type:click,isTrusted:true,pointerType:mouse,detail:1,clientX:number,altKey:false",
+      "source": "spec/probes/dom-native-m24.mjs",
+      "proof": {
+        "feature": "M24.F2",
+        "page": "A dose round page whose Record NativeButton has a Click handler that sets click-pointer's text to the payload's PointerType and click-count's text to its Detail.",
+        "gesture": "Click Record with the mouse.",
+        "outcome": "click-pointer shows mouse and click-count shows 1."
+      }
+    },
+    {
+      "id": "dom-hidden-write-no-change",
+      "statement": "A script's write to a hidden input's value raises neither change nor input.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0",
+      "probe": "dom-native-m24.mjs",
+      "expect": "dom-hidden-write-no-change: 0 events, value B-12",
+      "source": "spec/probes/dom-native-m24.mjs",
+      "proof": {
+        "feature": "M24.F6",
+        "page": "A bed board whose AssignedBed renders through Html.NativeHiddenField(plan, m => m.AssignedBed), whose Change handler sets bed-echo's text to the field's Value, and an Assign B-12 button whose click sets that Value to B-12.",
+        "gesture": "Click Assign B-12.",
+        "outcome": "bed-echo shows B-12."
+      }
+    },
+    {
+      "id": "dom-check-list-form-data",
+      "statement": "A form that holds the check list markup both lines render, a hidden input under the binding name holding the checked values joined by commas beside a box of that name per option, submits the joined text and each checked box: three entries for two checked boxes.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "dom-native-m24.mjs",
+      "expect": "dom-check-list-form-data: [\"Mon,Wed\",\"Mon\",\"Wed\"]",
+      "source": "spec/probes/dom-native-m24.mjs",
+      "proof": {
+        "feature": "M24.F4",
+        "page": "A visit schedule form with a NativeCheckList over the model's VisitDays, a List<string>, options Mon, Tue and Wed, posted by the browser's own submission to an action that renders how many days it bound and which.",
+        "gesture": "Check Mon and Wed and click Save.",
+        "outcome": "The page reads 2 days: Mon, Wed."
+      }
     }
   ]
 }
