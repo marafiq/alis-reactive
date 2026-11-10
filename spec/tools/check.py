@@ -1218,7 +1218,7 @@ def check_promises():
     counts["promises"] = sum(len(feature.get("promises", [])) for feature in model["features"])
     cells, counts["matrix_runs"], counts["matrix_promised"] = matrix_promise_problems()
     return feature_result(model["problems"] + promise_problems(model, tests) + cells, counts, counts["unmapped"] == 0,
-                          "every refusal and behavior defect, and every cell each reference component runs, has a promise")
+                          "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise")
 
 
 MATRIX_ASYNC_KINDS = {"request", "hub"}
@@ -1249,8 +1249,14 @@ def matrix_promise_problems():
         path = SPEC / "Reference" / name
         if not path.exists():
             return [f"not started: spec/Reference/{name} absent"], 0, 0
-        for cell, entry in json.loads(path.read_text())["cells"].items():
+        reference = json.loads(path.read_text())
+        own = reference.get("own")
+        for cell, entry in reference["cells"].items():
             if field not in entry or cell in compiled:
+                continue
+            if own is not None and cell not in own:
+                problems += [f"spec/Reference/{name} {cell} holds a promise that re-proves a cell ConformanceComponent runs, "
+                             "where MultiSelect tests only its own (spec/CLAUDE.md, 2026-11-10)"] if "promise" in entry else []
                 continue
             runs += 1
             promise = entry.get("promise")
@@ -1802,6 +1808,10 @@ def syncfusion_problems(syncfusion, matrix):
             problems += syncfusion_cite_problems(name, entry["member"], entry.get("cites", []))
         else:
             problems += ([f"{name} lacks a reason or its scan"] if not is_prose(entry.get("lacks")) or not is_prose(entry.get("scan")) else [])
+    for name, reason in syncfusion.get("own", {}).items():
+        entry = syncfusion["cells"].get(name, {})
+        problems += ([f"own {name} is no cell MultiSelect covers"] if "member" not in entry else [])
+        problems += ([f"own {name} gives no reason Syncfusion's onboarding needs its test"] if not is_prose(reason) else [])
     door = m21_n1_text()
     for kept in syncfusion["kept"]:
         problems += syncfusion_cite_problems(f"kept {kept['js']}", kept["js"], [kept["cite"]])
@@ -1822,10 +1832,11 @@ def check_matrix():
     total = len(matrix["cells"])
     covered = sum(1 for entry in syncfusion["cells"].values() if "member" in entry)
     carried = sum(1 for entry in native["cells"].values() if "carriedBy" in entry)
-    detail = (f"MultiSelect covers {covered} of {total} cells from its .d.ts; WardRound runs {total - carried} of {total}, "
-              f"and FusionMultiSelect carries the other {carried}")
+    own = len(syncfusion.get("own", {}))
+    detail = (f"MultiSelect covers {covered} of {total} cells from its .d.ts and tests {own} of them as its own; "
+              f"WardRound runs {total - carried} of {total}, and FusionMultiSelect carries the other {carried}")
     return result(not problems, "; ".join(problems[:6]) or detail, cells=total, bullets=len(matrix["bullets"]),
-                  syncfusion=covered, native=total - carried, carried=carried, problems=len(problems))
+                  syncfusion=covered, own=own, native=total - carried, carried=carried, problems=len(problems))
 
 
 def check_rewrite():
@@ -1939,7 +1950,7 @@ CHECKS = [
     ("gate2", "owner gate 2: the fluent API", check_gate(2)),
     ("matrix", "the conformance matrix, every cell run by FusionMultiSelect's or WardRound's declaration", check_matrix),
     ("defects", "every defect on its highest rung, every core defect in a feature; no test for a type or analyzer defect", check_defects),
-    ("promises", "every refusal and behavior defect, and every cell each reference component runs, has a promise", check_promises),
+    ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
     ("hedges", "zero hedge words", check_hedges),
