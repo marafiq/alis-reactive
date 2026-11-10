@@ -4,7 +4,7 @@ EXTENDS Naturals, FiniteSets
 CONSTANT Mutant
 
 Mutants == {"none", "RecordsWhenOff", "ReplacedRunLeftOpen", "DisposeEndsRunFirst", "AttemptHeaderFromRun",
-            "HeaderToEveryOrigin", "SinkErrorStopsRun", "RetryUntracedWhenOff", "ResendCountMissing"}
+            "HeaderToEveryOrigin", "SinkErrorStopsRun", "HeaderNeedsSink", "RetryUntracedWhenOff", "ResendCountMissing"}
 
 ASSUME Mutant \in Mutants
 
@@ -33,17 +33,15 @@ Init ==
 
 Records == traceOn \/ Mutant = "RecordsWhenOff"
 
-Recording == Records /\ ~sinkFails
-
-Started(s) == IF Recording THEN [spans EXCEPT ![s] = "open"] ELSE spans
+Started(s) == IF Records THEN [spans EXCEPT ![s] = "open"] ELSE spans
 
 Ended(s) == IF spans[s] = "open" THEN [spans EXCEPT ![s] = "ended"] ELSE spans
 
 EndAll == [s \in SpanNames |-> IF spans[s] = "open" THEN "ended" ELSE spans[s]]
 
-Header(n) ==
+Header(n, failing) ==
     IF origin = "other" /\ Mutant # "HeaderToEveryOrigin" THEN "none"
-    ELSE IF Recording THEN (IF Mutant = "AttemptHeaderFromRun" THEN "run" ELSE AttemptName(n))
+    ELSE IF Records /\ (Mutant # "HeaderNeedsSink" \/ ~failing) THEN (IF Mutant = "AttemptHeaderFromRun" THEN "run" ELSE AttemptName(n))
     ELSE IF n >= 2 /\ Mutant # "RetryUntracedWhenOff" THEN "minted"
     ELSE "none"
 
@@ -70,7 +68,7 @@ Attempt ==
     /\ LET n == attempts + 1 IN
         /\ attempts' = n
         /\ spans' = Started(AttemptName(n))
-        /\ sent' = sent \cup {[n |-> n, to |-> origin, parent |-> Header(n), resend |-> Resend(n)]}
+        /\ sent' = sent \cup {[n |-> n, to |-> origin, parent |-> Header(n, sinkFails), resend |-> Resend(n)]}
     /\ status' = "waiting"
     /\ UNCHANGED <<traceOn, origin, sinkFails, pc, outcome>>
 
@@ -130,6 +128,8 @@ AttemptsJoinTheTrace == \A r \in sent : (traceOn /\ ~sinkFails /\ r.to = "own") 
 TraceHeadersStayHome == \A r \in sent : r.to = "other" => r.parent = "none"
 
 SinkFailureChangesNothing == outcome # "sinkError"
+
+SinkFailureKeepsHeaders == \A r \in sent : r.parent = Header(r.n, FALSE)
 
 RetriesAlwaysTraced == \A r \in sent : (r.n >= 2 /\ r.to = "own") => r.parent # "none"
 

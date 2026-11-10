@@ -4809,6 +4809,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
 - `Tracing.tla:AttemptsJoinTheTrace`
 - `Tracing.tla:TraceHeadersStayHome`
 - `Tracing.tla:SinkFailureChangesNothing`
+- `Tracing.tla:SinkFailureKeepsHeaders`
 - `Tracing.tla:RetriesAlwaysTraced`
 - `Tracing.tla:ResendCountSent`
 - `probe:core-caller-line-follows-line-directive`
