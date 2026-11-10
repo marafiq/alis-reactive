@@ -194,6 +194,7 @@ try
     Console.WriteLine("core-contract-kind-declarers: " + DeclarerKinds());
     await HttpProbes.Run(new Uri(app.Urls.First()));
     await DateProbes.Run(new Uri(app.Urls.First()));
+    FluentDateProbes.Run();
 }
 finally
 {

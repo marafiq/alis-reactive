@@ -2222,6 +2222,14 @@
       "probe": "spec/probes/referencesource/DateTimeOffsetConverter.cs.txt",
       "expect": "return DateTimeOffset.Parse(text, formatInfo);",
       "source": "spec/probes/referencesource/DateTimeOffsetConverter.cs.txt:76"
+    },
+    {
+      "id": "fv-date-comparisons",
+      "statement": "FluentValidation's comparison checks pass a null member in an ordering and a range, fail it in Equal and pass it in NotEqual, and compare a TimeOnly, a TimeSpan and a DateTime by their ticks, a DateTime whatever its Kind, and a DateTimeOffset by its instant, to the tick.",
+      "host": "net10",
+      "oracle": "FluentValidation 12.1.1",
+      "probe": "AspNetCoreBinding",
+      "expect": "fv-date-comparisons: FluentValidation 12.1.1 over null members: GreaterThanOrEqualTo, LessThanOrEqualTo and InclusiveBetween pass True, Equal fails True, NotEqual passes True; a TimeOnly of 06:30 fails GreaterThanOrEqualTo 07:00 True, a TimeSpan of 1.02:00:00 fails LessThanOrEqualTo 23:00:00 True, 07:00 and 23:00:00 pass True; a DateTimeOffset one tick past the upper bound fails InclusiveBetween True, the bound written at -08:00 passes True; a DateTime one second before its peer fails GreaterThanOrEqualTo True, a Utc and a Local DateTime of one wall time pass it True"
     }
   ]
 }
