@@ -465,6 +465,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   (`spec/probes/ej2-payloads.mjs`) pins what the browser hands or takes where that TypeScript says `any`, `Object` or a
   loose union. Any other member is refused with its reason, carried by the doors an app onboards it with (M21.N2,
   M12.N1), and the probes rerun on every vendor upgrade.
+- The owner, 2026-11-09, on a Fusion slice's class name: "I prefixed with Fusion*" "to avoid name collision", and
+  chose Syncfusion's name after the prefix. A slice's class is `Fusion` and the EJ2 class it renders, so an app that
+  imports Syncfusion's own C# types (its MaskedTextBox in Syncfusion.EJ2.Inputs) meets no ambiguous name, and Syncfusion's
+  documentation names the same component: FusionInputMask becomes FusionMaskedTextBox, and FusionFileUpload becomes
+  FusionUploader; the other 48 slices already follow it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
