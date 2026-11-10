@@ -3233,7 +3233,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - It replaces the idiom of copying `ViewData` and setting `TemplateInfo.HtmlFieldPrefix` (16 view lines at
     65fdf118d). On net48 that idiom moves the view's own prefix, since a copy shares `TemplateInfo`
     (`probe:mvc5-viewdata-copy-shares-template-info`); on net10 a copy has its own
-    (`probe:core-viewdata-copy-template-info`).
+    (`probe:core-viewdata-copy-template-info`). Inside a plan's block on net48 the idiom is refused where the block
+    ends (R14.2, X14.16).
 - D14.5 A dictionary entry keyed by a number has no JSON form, since JSON reads a number in the prefix as a list
   position. A JSON request whose body carries a member under such a prefix is refused where the view renders,
   and form data sends it.
@@ -3246,7 +3247,9 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     - R14.1 an input or a partial whose lambda MVC's name does not name step by step from the model (a call that
       is no indexer, a value the view holds), an input whose lambda names no member, a member an interface declares,
       or a member of a type the app's JSON contract writes as one value or a list (D14.3);
-    - R14.2 an input, or a pipeline's read of one, under a prefix its view took after its plan started;
+    - R14.2 an input, or a pipeline's read of one, under a prefix its view took after its plan started, and a plan's
+      block that ends under such a prefix, since MVC's own doors after the move (`EditorFor` for the next member)
+      render under it while no input of the view need follow (`Partials.tla:PageReadFindsEachAttachedInput`);
     - R14.3 an element id the plan renders twice;
     - R14.4 a step that sets the text or HTML of an element the same plan loads or unloads as a slot;
     - R14.5 a JSON request over a number-keyed dictionary entry (D14.5).
@@ -3287,6 +3290,11 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `probe:core-type-array-generic-arguments`
 - `probe:core-contract-kind-declarers`
 - `Ownership.tla:BootContentBelongsToItsSlot`
+- `Partials.tla:OneIdPerMember`
+- `Partials.tla:PageReadFindsEachAttachedInput`
+- `Partials.tla:AttachedInputBindsItsMember`
+- `Partials.tla:ReadNeverFindsAnotherMember`
+- `Partials.tla:EverySentValueIsTheOneBound`
 
 **Doors.**
 - kept: `Html.ReactivePlan`, `Html.InputField` (M7.N2), `IdGenerator.For<TModel, TProp>` (M7.N1), and MVC's own
@@ -3343,6 +3351,21 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `EditorFor` renders nothing for a model already rendered up its template chain, or for a null of a type the chain
   rendered as null, on both hosts (`probe:core-template-visited`, `probe:mvc5-template-visited`); `PartialFor` has no
   such guard.
+- `spec/Core/Partials.tla` renders a family's next of kin and guardian, two members of one type, each by one of MVC's
+  doors (`EditorFor`, `PartialFor`, `<partial for>` on net10, the `ViewData` copy, a slot under the member's prefix, a
+  partial with a model, a slot with none), each kin's address inside it by `EditorFor`, `PartialFor` or a partial with
+  a model, on each host as its probes and sources state, slots loaded in either order. On every door that gives a member
+  its prefix, the page's read finds the member's input, the post binds it to its member, and two members of one type
+  keep two ids. At d3d91fc87 R14.2 checked inputs and reads alone, and TLC found its hole on net48: the next of kin
+  rendered by the `ViewData` copy, then `Html.EditorFor(m => m.Guardian)`, with no input of the page after them,
+  renders the guardian under `NextOfKin.Guardian`, so the page's read of `Guardian.Name` stops and the post binds
+  nothing; R14.2 now refuses where the block ends (X14.16).
+- The prefix design leaves a view rendered with a model and no prefix to MVC: inside another model's container its
+  inputs post as MVC names them, and TLC reaches a kin's `Name` bound as the family's own `Name`
+  (`Partials.violates.ReachOwnPlansValueLandsInAnotherMember.cfg`). A container's send that stops on an input of a plan
+  that started with no prefix and another model closes that case (`Partials.holds.OwnPlanStops.cfg`) and leaves net10's
+  partial rendered with a model inside a template, which inherits the template's prefix
+  (`Partials.violates.ReachInheritedPrefixMisnames.cfg`). That stop is the owner's to take.
 
 **Defects.**
 - `X14.1` type: an input outside its plan's block does not compile: new:N14.2.
@@ -3383,6 +3406,9 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `X14.15` refusal (D14.3, R14.1): an input of `m => m.Items.Count` is refused with "Input 'm => m.Items.Count' binds
   Count, which {List<Item>} declares, and the app's JSON options write {List<Item>} as {a list | one value}, so the
   input has no body path: bind a member of a class they write as an object."
+- `X14.16` refusal (R14.2): a plan's block that ends with its view's prefix moved is refused with "The field prefix of
+  {view} changed from {old} to {new} inside its plan, so what the view renders after the change posts under names its
+  plan does not send or check: render a member's view with Html.PartialFor, which leaves the view's prefix as it is."
 
 ## Q15. Templates
 

@@ -225,7 +225,9 @@
         "Ownership.tla:EveryLoadedFieldRegistered",
         "Ownership.tla:FailureReachesSummary",
         "Ownership.tla:InlineOnlyAtTheSentInput",
-        "Validation.tla:UnsentInputsUnread"
+        "Validation.tla:UnsentInputsUnread",
+        "Partials.tla:PageReadFindsEachAttachedInput",
+        "Partials.tla:AttachedInputBindsItsMember"
       ],
       "defects": [
         {
@@ -266,6 +268,10 @@
         },
         {
           "id": "X14.15",
+          "rung": "refusal"
+        },
+        {
+          "id": "X14.16",
           "rung": "refusal"
         },
         {
@@ -332,6 +338,14 @@
           "outcome": "The page is refused where the view renders with \"Input 'm => m.Items.Count' binds Count, which List<Item> declares, and the app's JSON options write List<Item> as a list, so the input has no body path: bind a member of a class they write as an object.\"",
           "opposite": "An input of m => m.Items[0].Name renders, and its save posts Items[0].Name, which the endpoint binds.",
           "defect": "The input renders and posts Items.Count, which binds nothing, so the number typed into it is lost with no word."
+        },
+        {
+          "for": "X14.16",
+          "page": "A family view whose plan starts, then whose code sets ViewData.TemplateInfo.HtmlFieldPrefix to NextOfKin, as the ViewData copy does on net48, then renders Html.EditorFor(m => m.Guardian), with no input of the view after it.",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with \"The field prefix of\" the view's path \"changed from none to 'NextOfKin' inside its plan, so what the view renders after the change posts under names its plan does not send or check: render a member's view with Html.PartialFor, which leaves the view's prefix as it is.\"",
+          "opposite": "With the prefix left as the plan started, the page renders, and its save posts Guardian.Name, which the endpoint binds and shows.",
+          "defect": "The guardian's template renders under NextOfKin.Guardian, so the save posts NextOfKin.Guardian.Name, which binds nothing, and the page's read of the guardian's name stops at its id."
         },
         {
           "for": "M7.X1",

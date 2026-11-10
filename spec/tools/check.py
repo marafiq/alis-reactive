@@ -53,6 +53,7 @@ TLC_SPECS = {
     "Tracing": {"question": "Q20", "step": 5, "expect": "green"},
     "Composition": {"question": "Q10 with Q11 and Q12", "step": 5, "expect": "green"},
     "Realtime": {"question": "Q21 with Q10 and Q12", "step": 5, "expect": "green"},
+    "Partials": {"question": "Q14 with Q13 and Q16", "step": 5, "expect": "green"},
 }
 PLUGIN_DATA_DISPATCH = "pluginNamed(locator.name).contribute"
 HEDGES = [
@@ -425,7 +426,8 @@ def tlc_configs(name):
     folder = SPEC / "Core"
     main = folder / f"{name}.cfg"
     violating = {match.group(1): path for path in sorted(folder.glob(f"{name}.violates.*.cfg")) for match in [re.match(rf"{name}\.violates\.(\w+)\.cfg$", path.name)] if match}
-    return main, violating
+    holding = sorted(folder.glob(f"{name}.holds.*.cfg"))
+    return main, violating, holding
 
 
 def check_tlc(brief, previous, step):
@@ -436,11 +438,11 @@ def check_tlc(brief, previous, step):
     met = 0
     for name, expectation in specs.items():
         tla = SPEC / "Core" / f"{name}.tla"
-        main, violating = tlc_configs(name)
+        main, violating, holding = tlc_configs(name)
         if not tla.exists():
             problems.append(f"{name} not started")
             continue
-        planned = ([main] if expectation["expect"] == "green" else []) + list(violating.values())
+        planned = ([main] if expectation["expect"] == "green" else []) + list(violating.values()) + holding
         spec_runs = {}
         stale = False
         for cfg in planned:
@@ -475,6 +477,9 @@ def check_tlc(brief, previous, step):
         for invariant, cfg in violating.items():
             if spec_runs[cfg.name]["violated"] != [invariant]:
                 own.append(f"{cfg.name}: expected {invariant} violated, saw {spec_runs[cfg.name]['line']}")
+        for cfg in holding:
+            if not spec_runs[cfg.name]["green"]:
+                own.append(f"{cfg.name}: expected green, saw {spec_runs[cfg.name]['line']}")
         if own:
             problems.append(f"{name}: " + "; ".join(own[:3]))
         else:
