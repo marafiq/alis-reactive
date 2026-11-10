@@ -1322,9 +1322,9 @@
     "fluent": {
       "counts": {
         "F1": "pass",
-        "F1_names": 141,
-        "F1_rows": 141,
-        "F1_synonym_groups": 26,
+        "F1_names": 140,
+        "F1_rows": 140,
+        "F1_synonym_groups": 25,
         "F2": "fail",
         "F2_cells": 240,
         "F2_compiling": 116,
@@ -1338,10 +1338,10 @@
         "F2_source_gaps": 5,
         "F2_sources": 16,
         "F3": "pass",
-        "F3_differ": 21,
+        "F3_differ": 22,
         "F3_kept": 6,
-        "F3_names": 35,
-        "F3_same_under_rules": 15,
+        "F3_names": 36,
+        "F3_same_under_rules": 16,
         "F3_stale_kept": 0,
         "F4": "pass",
         "F4_data": 143,
@@ -3431,7 +3431,7 @@
     }
   },
   "passed": 22,
-  "read_at_head": "8c52b7939d84a91e3ca45a8e98e4a6ff1d9c5ebc",
+  "read_at_head": "02f43fa182d30061d9b44d926e189c5e7751bfac",
   "step": {
     "failing": [
       "fluent"
