@@ -2,23 +2,37 @@
   "checks": {
     "actions": {
       "counts": {
-        "actions": 76,
-        "named": 11,
-        "promises": 78,
-        "unnamed": 65
+        "actions": 73,
+        "named": 73,
+        "promises": 122,
+        "unnamed": 0
       },
-      "detail": "65 of 76 actions named by no promise: CallbackProperty.tla:Freeze, CallbackProperty.tla:LoadA, CallbackProperty.tla:LoadB, CallbackProperty.tla:Raise, CallbackProperty.tla:Restart, CallbackProperty.tla:Script, CallbackProperty.tla:Step, CallbackProperty.tla:UnloadA, CallbackProperty.tla:UnloadB, Composition.tla:Answer, Composition.tla:Begin, Composition.tla:DefaultFinally",
-      "pass": false
+      "detail": "every action of the async lanes' specs is named by a promise, and every promise's action is its spec's",
+      "pass": true
+    },
+    "app": {
+      "counts": {
+        "cells": 118,
+        "hosts": 18,
+        "placed": 404,
+        "problems": 0,
+        "rewrite": 0,
+        "screens": 12
+      },
+      "detail": "404 feature tests and 118 cell tests on 12 screens under 18 hosts; no core test loads Syncfusion, and a placed test reaches every D17.3 vendor kind on a conformance declaration",
+      "pass": true
     },
     "claude_md": {
-      "counts": {},
-      "detail": "not started: step 12 replaces the five lines and adds the spec-first order",
-      "pass": false
+      "counts": {
+        "problems": 0
+      },
+      "detail": "root CLAUDE.md is spec-first: the six lines replaced, and the thesis, principles, stability rules, unit order and modules named",
+      "pass": true
     },
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 363,
+        "defects": 365,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1061,223 +1075,223 @@
         "Run": {
           "Run.cfg": {
             "green": true,
-            "hash": "4297abcf2fb769824d41784b4c5075af6bd33eb8f344d64d13bce1146a95be31",
+            "hash": "3bb065b242861f95fb3ca77726f14aa7885b45dbd5aaf8d109cf9bf0350a8e76",
             "line": "Model checking completed. No error has been found.",
             "states": "108476496 states generated, 91555328 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Run.violates.DisposedRunNeverWaits.cfg": {
             "green": false,
-            "hash": "e8e82ccc4b647f1252760e845e56153a951e8f233ae2a0daebacfb13bcb05482",
+            "hash": "fac75db456eca501f9e269762a03b00974e7f6e4669542e494b6d29ac220c1be",
             "line": "violated: DisposedRunNeverWaits",
-            "states": "4383708 states generated, 4005560 distinct states found, 750122 states left on queue.",
+            "states": "4383925 states generated, 4005760 distinct states found, 750153 states left on queue.",
             "violated": [
               "DisposedRunNeverWaits"
             ]
           },
           "Run.violates.FinallyOnlyWhenLoaded.cfg": {
             "green": false,
-            "hash": "06ffe8ddcb0d55854a0f1c31746bfb2a94bce71a892ba4b498204c1842fbf8df",
+            "hash": "c5aa5ad4e269488e04860e6babce0402721e5b18a43902290da15a3726c0b5f2",
             "line": "violated: FinallyOnlyWhenLoaded",
-            "states": "1925255 states generated, 1732883 distinct states found, 571100 states left on queue.",
+            "states": "1925274 states generated, 1732898 distinct states found, 571098 states left on queue.",
             "violated": [
               "FinallyOnlyWhenLoaded"
             ]
           },
           "Run.violates.FinallyRunsOnce.cfg": {
             "green": false,
-            "hash": "434f3d08ba57df208995767b1b5a7dabcc20438fc7e117b915ac987e01972107",
+            "hash": "268a856d53709af40399de1a7b37824fd33993ad984f4c7d61803f50ca5426ff",
             "line": "violated: FinallyRunsOnce",
-            "states": "5172929 states generated, 4723419 distinct states found, 718342 states left on queue.",
+            "states": "5173154 states generated, 4723621 distinct states found, 718381 states left on queue.",
             "violated": [
               "FinallyRunsOnce"
             ]
           },
           "Run.violates.FinallyRunsWhenLoaded.cfg": {
             "green": false,
-            "hash": "c97fd5f15ea57f071729916dea62e4652c3f95e532d25e73a5daede512d1449a",
+            "hash": "cecedf54d904b03faa1f890b5d8797461572c894e13e79793ab91f5add0893cd",
             "line": "violated: FinallyRunsWhenLoaded",
-            "states": "4123428 states generated, 3802761 distinct states found, 796121 states left on queue.",
+            "states": "4123417 states generated, 3802750 distinct states found, 796119 states left on queue.",
             "violated": [
               "FinallyRunsWhenLoaded"
             ]
           },
           "Run.violates.InnerFinallyFirst.cfg": {
             "green": false,
-            "hash": "614e1fc3052989772cb17140609cebf6117c0860300097ce0dfa3f3c6fee0834",
+            "hash": "f40d5899c72889e0aae6911c35056da0398555d2ba8eb286e1063b7a0d6703d3",
             "line": "violated: InnerFinallyFirst",
-            "states": "7394895 states generated, 6689639 distinct states found, 1005298 states left on queue.",
+            "states": "7394922 states generated, 6689664 distinct states found, 1005310 states left on queue.",
             "violated": [
               "InnerFinallyFirst"
             ]
           },
           "Run.violates.NothingRunsAfterAStop.cfg": {
             "green": false,
-            "hash": "1767af032c931cec9b3cb43fbcf0611149e74b88fdbb85c258b5d0f94d9b8aba",
+            "hash": "e56b8f56908d78a17e053f0e85564a701462e623c4bcd426ab9757af737a58aa",
             "line": "violated: NothingRunsAfterAStop",
-            "states": "1150617 states generated, 1108751 distinct states found, 419006 states left on queue.",
+            "states": "1150607 states generated, 1108745 distinct states found, 419004 states left on queue.",
             "violated": [
               "NothingRunsAfterAStop"
             ]
           },
           "Run.violates.NothingRunsAfterAnAbort.cfg": {
             "green": false,
-            "hash": "c4d2266b929157a52703eb1d98b0f57fdd3505c962ff5f365c905556b054f739",
+            "hash": "34501feda7e12658d3e8e7cd3d06f0cb9d6db93868bf72fcaf095b04c2c7cefb",
             "line": "violated: NothingRunsAfterAnAbort",
-            "states": "1840319 states generated, 1663481 distinct states found, 554778 states left on queue.",
+            "states": "1840311 states generated, 1663473 distinct states found, 554776 states left on queue.",
             "violated": [
               "NothingRunsAfterAnAbort"
             ]
           },
           "Run.violates.NothingRunsWhileItWaits.cfg": {
             "green": false,
-            "hash": "ba62176695eee6b981a2f8c4cee16d24c4978edc60d314366a9d7195f3cb1cf4",
+            "hash": "ff01145512972c6dc18b2421d97824572a548bbb4ace339b89b68e088bfc4bde",
             "line": "violated: NothingRunsWhileItWaits",
-            "states": "1150498 states generated, 1108628 distinct states found, 418936 states left on queue.",
+            "states": "1150501 states generated, 1108633 distinct states found, 418938 states left on queue.",
             "violated": [
               "NothingRunsWhileItWaits"
             ]
           },
           "Run.violates.ReachAbortInAnInnerRequest.cfg": {
             "green": false,
-            "hash": "e5af045dcb116a372c28850fec035466db1e311194c84805ff554950eae70479",
+            "hash": "4a36b8759af1fc0e97b16bdf2b2ec2582a656f2b40be205c5ed693f027f513df",
             "line": "violated: ReachAbortInAnInnerRequest",
-            "states": "55786048 states generated, 47667404 distinct states found, 2834338 states left on queue.",
+            "states": "55787206 states generated, 47668365 distinct states found, 2834337 states left on queue.",
             "violated": [
               "ReachAbortInAnInnerRequest"
             ]
           },
           "Run.violates.ReachAwaitDeepInARoute.cfg": {
             "green": false,
-            "hash": "da3112496ceb6b82b5fa040a4e4b2bd057cb1115c1e2bde889e801a0c5b7deb6",
+            "hash": "296495999edc906265aa9f7ec8a39c8bb49af45453bfd3d16e4e85b6c7c0e9bc",
             "line": "violated: ReachAwaitDeepInARoute",
-            "states": "1151158 states generated, 1109093 distinct states found, 419061 states left on queue.",
+            "states": "1151147 states generated, 1109075 distinct states found, 419050 states left on queue.",
             "violated": [
               "ReachAwaitDeepInARoute"
             ]
           },
           "Run.violates.ReachCutInItsOwnStep.cfg": {
             "green": false,
-            "hash": "ff9b18157ef17b25ef92ec734a9d069e374124bedb03012ff91cf4d74f19290a",
+            "hash": "18f5a773c65c58b4ae46d4b1ac81c64af9ad0d6d5c0a6481ed6d900a24bc4e57",
             "line": "violated: ReachCutInItsOwnStep",
-            "states": "6187303 states generated, 5640890 distinct states found, 917296 states left on queue.",
+            "states": "6187332 states generated, 5640917 distinct states found, 917302 states left on queue.",
             "violated": [
               "ReachCutInItsOwnStep"
             ]
           },
           "Run.violates.ReachDisposeAfterAReplace.cfg": {
             "green": false,
-            "hash": "e8d6f99ecaba56cbbe78a7fac8f5eb75fd499a9ddfa835f77e23b43dd1eaddd9",
+            "hash": "3fda72bafe6c1c4421e84345b3427a38006a552451eb80a57c807428d55bdca4",
             "line": "violated: ReachDisposeAfterAReplace",
-            "states": "7353429 states generated, 6649634 distinct states found, 1009037 states left on queue.",
+            "states": "7353521 states generated, 6649718 distinct states found, 1009050 states left on queue.",
             "violated": [
               "ReachDisposeAfterAReplace"
             ]
           },
           "Run.violates.ReachDisposeCutsAFinallysBranch.cfg": {
             "green": false,
-            "hash": "47f8e50b0b429d69e1dd1a84495586c5fcbfe7227facac6ab93ece61d55c8a69",
+            "hash": "57b8865af13be2cedf1ef8929dd62825581bee0f3e4df76e94c69f408478d2bc",
             "line": "violated: ReachDisposeCutsAFinallysBranch",
-            "states": "7354915 states generated, 6650938 distinct states found, 1009256 states left on queue.",
+            "states": "7354945 states generated, 6650965 distinct states found, 1009255 states left on queue.",
             "violated": [
               "ReachDisposeCutsAFinallysBranch"
             ]
           },
           "Run.violates.ReachDisposedAttemptCut.cfg": {
             "green": false,
-            "hash": "56236253ed4412276a0c9e37f7e7fe7a27187fe8a76d68f1df36139c741a23c3",
+            "hash": "c4104b3558a347aef7256a8569126ade381eee6cdb695596273ee81858487300",
             "line": "violated: ReachDisposedAttemptCut",
-            "states": "18586905 states generated, 15827056 distinct states found, 1903026 states left on queue.",
+            "states": "18586825 states generated, 15827015 distinct states found, 1903049 states left on queue.",
             "violated": [
               "ReachDisposedAttemptCut"
             ]
           },
           "Run.violates.ReachFinallysRequestRoutesUnderReplace.cfg": {
             "green": false,
-            "hash": "c15c1a2f5f9451e90168249d51414abc1b337854209503546938f9a636bd1c34",
+            "hash": "537054668d8d5c624191770935890db22c9d9169a57607a4466e20ad17726eea",
             "line": "violated: ReachFinallysRequestRoutesUnderReplace",
-            "states": "46048806 states generated, 39318318 distinct states found, 2598416 states left on queue.",
+            "states": "46049135 states generated, 39318568 distinct states found, 2598384 states left on queue.",
             "violated": [
               "ReachFinallysRequestRoutesUnderReplace"
             ]
           },
           "Run.violates.ReachLoadingWriteAfterTheDefaultsAwait.cfg": {
             "green": false,
-            "hash": "c083d666fdc4f60089b59ce9dd898a8eac52814b79f78e38ec0c95f25f9a84da",
+            "hash": "1a91ea0329ff1d8098805273a656145825530485657f57ea48e012501b406d8b",
             "line": "violated: ReachLoadingWriteAfterTheDefaultsAwait",
-            "states": "9150055 states generated, 8191515 distinct states found, 1215723 states left on queue.",
+            "states": "9149863 states generated, 8191346 distinct states found, 1215708 states left on queue.",
             "violated": [
               "ReachLoadingWriteAfterTheDefaultsAwait"
             ]
           },
           "Run.violates.ReachReleaseAfterACut.cfg": {
             "green": false,
-            "hash": "d9d2e59cf6eeb3cd10272fcb42d0779824a35ca18bea9c6190ec6419027d1fbc",
+            "hash": "b16779845bc73970af3d26e8c75e568aec95264d2a4e69718ec16d5b7aa8fa69",
             "line": "violated: ReachReleaseAfterACut",
-            "states": "6187280 states generated, 5640877 distinct states found, 917292 states left on queue.",
+            "states": "6187341 states generated, 5640928 distinct states found, 917291 states left on queue.",
             "violated": [
               "ReachReleaseAfterACut"
             ]
           },
           "Run.violates.ReachReplaceInAFinallysBranch.cfg": {
             "green": false,
-            "hash": "c07e93344eb66e0615fb3ce6c98ce3d84dbe519508e89e396c013f791ff4ad11",
+            "hash": "ac0bbc53396d3760d39bee08807e4515ab21c1e3e70ff97877d6f962a5004407",
             "line": "violated: ReachReplaceInAFinallysBranch",
-            "states": "24001938 states generated, 20421994 distinct states found, 2279014 states left on queue.",
+            "states": "24000813 states generated, 20421033 distinct states found, 2278871 states left on queue.",
             "violated": [
               "ReachReplaceInAFinallysBranch"
             ]
           },
           "Run.violates.ReachStopInAnInnerRoute.cfg": {
             "green": false,
-            "hash": "53dea23f2867edc44bd8a27ac59091f088fb542cd196111c96eeec26342cabd6",
+            "hash": "c73a29b96e0e0dea8d3cf129e6fcdef1461676be41fbb4641c1327728fa132a1",
             "line": "violated: ReachStopInAnInnerRoute",
-            "states": "65892332 states generated, 56216609 distinct states found, 2803361 states left on queue.",
+            "states": "65892300 states generated, 56216594 distinct states found, 2803382 states left on queue.",
             "violated": [
               "ReachStopInAnInnerRoute"
             ]
           },
           "Run.violates.ReleasedWhenEnded.cfg": {
             "green": false,
-            "hash": "30aeafa887911352c5db16726ad3d9a1ae411d4d8c396e287163c44c3e48fe0d",
+            "hash": "57d090ec7e61310a836aa505bac8f089cc1d8ae929fe73744c4b5b26d262e076",
             "line": "violated: ReleasedWhenEnded",
-            "states": "10227281 states generated, 9108422 distinct states found, 1306634 states left on queue.",
+            "states": "10227911 states generated, 9108910 distinct states found, 1306714 states left on queue.",
             "violated": [
               "ReleasedWhenEnded"
             ]
           },
           "Run.violates.ReplacedFinallyGoesOn.cfg": {
             "green": false,
-            "hash": "f6adaf1027d1ed1da0ec4d759aab9b8290896c16127f64a1a21fecfcde7d5d08",
+            "hash": "b13ea0c4d2b626a6fc5846aea9de602b1a31c55b0fec42b3d866daa6da5a921d",
             "line": "violated: ReplacedFinallyGoesOn",
-            "states": "19194823 states generated, 16399727 distinct states found, 1995224 states left on queue.",
+            "states": "19225917 states generated, 16425617 distinct states found, 1997256 states left on queue.",
             "violated": [
               "ReplacedFinallyGoesOn"
             ]
           },
           "Run.violates.SecondHandlerStartsInTheTurn.cfg": {
             "green": false,
-            "hash": "42094843efc41c0d857b9ff3017c62c6f3666c5c7bbf96c5acd256ce0511fd88",
+            "hash": "f903b5bfcb5da48538f4c654e6362e01c5126ad7381a4c58ace8fd22973f452a",
             "line": "violated: SecondHandlerStartsInTheTurn",
-            "states": "1150500 states generated, 1108650 distinct states found, 418954 states left on queue.",
+            "states": "1150506 states generated, 1108650 distinct states found, 418954 states left on queue.",
             "violated": [
               "SecondHandlerStartsInTheTurn"
             ]
           },
           "Run.violates.SyncRunEndsInItsTurn.cfg": {
             "green": false,
-            "hash": "649c473f1131352ef2de7e8665a4844ef94c4c72a6fae2b48de13d5a95401529",
+            "hash": "047740176f68d227b07a6cbb95de0cccac862037aa513044413f4b0d75304b1f",
             "line": "violated: SyncRunEndsInItsTurn",
-            "states": "2089672 states generated, 2068776 distinct states found, 689556 states left on queue.",
+            "states": "2089652 states generated, 2068756 distinct states found, 689556 states left on queue.",
             "violated": [
               "SyncRunEndsInItsTurn"
             ]
           },
           "Run.violates.WritesAfterTheTurnAreRefused.cfg": {
             "green": false,
-            "hash": "760cb54899ba722fce348dbadfe67c83cead3841acfd684e86b1f697978e8756",
+            "hash": "e35223c91abd2774df7b30632e9f431e96c76301e660f9a113582d9d6f7473a6",
             "line": "violated: WritesAfterTheTurnAreRefused",
-            "states": "6089748 states generated, 5554055 distinct states found, 916747 states left on queue.",
+            "states": "6089878 states generated, 5554182 distinct states found, 916706 states left on queue.",
             "violated": [
               "WritesAfterTheTurnAreRefused"
             ]
@@ -1288,7 +1302,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 552,
+        "defects": 555,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1395,7 +1409,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 60,
+        "files": 62,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1458,10 +1472,11 @@
         "carried": 2,
         "cells": 103,
         "native": 101,
+        "own": 19,
         "problems": 0,
         "syncfusion": 60
       },
-      "detail": "MultiSelect covers 60 of 103 cells from its .d.ts; WardRound runs 101 of 103, and FusionMultiSelect carries the other 2",
+      "detail": "MultiSelect covers 60 of 103 cells from its .d.ts and tests 19 of them as its own; ConformanceComponent runs 101 of 103, and FusionMultiSelect carries the other 2",
       "pass": true
     },
     "module_cites": {
@@ -1495,34 +1510,49 @@
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
-        "matrix_promised": 159,
-        "matrix_runs": 159,
-        "promises": 392,
+        "matrix_promised": 118,
+        "matrix_runs": 118,
+        "promises": 404,
         "rows": 8909,
         "unmapped": 0
       },
-      "detail": "every refusal and behavior defect, and every cell each reference component runs, has a promise",
+      "detail": "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise",
       "pass": true
     },
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 386,
+        "defects": 389,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
       "pass": true
     },
     "rewrite_units": {
-      "counts": {},
-      "detail": "not started: spec/REWRITE.md absent",
-      "pass": false
+      "counts": {
+        "features": 112,
+        "problems": 0,
+        "tests": 522,
+        "units": 26
+      },
+      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 3, U4 2, U5 4, U6 2, U7 13, U8 12, U9 155, U10 6, U11 62, U12 4, U13 24, U14 19, U15 48, U16 22, U17 3, U18 4, U19 14, U20 3, U21 25, U22 6, U23 21, U24 31, U25 36, U26 3",
+      "pass": true
     },
     "survival": {
       "counts": {
         "files": 4
       },
       "detail": "brief, notes, map, check, hook and branch in place",
+      "pass": true
+    },
+    "test_rules": {
+      "counts": {
+        "ids": 13,
+        "problems": 0,
+        "rules": 10,
+        "smells": 13
+      },
+      "detail": "tests.md's 10 rules and 13 smells each held in REWRITE.md by test rules TEST001 to TEST013 or a named check, every test rule holding one",
       "pass": true
     },
     "tlc": {
@@ -2884,223 +2914,223 @@
         "Run": {
           "Run.cfg": {
             "green": true,
-            "hash": "4297abcf2fb769824d41784b4c5075af6bd33eb8f344d64d13bce1146a95be31",
+            "hash": "3bb065b242861f95fb3ca77726f14aa7885b45dbd5aaf8d109cf9bf0350a8e76",
             "line": "Model checking completed. No error has been found.",
             "states": "108476496 states generated, 91555328 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Run.violates.DisposedRunNeverWaits.cfg": {
             "green": false,
-            "hash": "e8e82ccc4b647f1252760e845e56153a951e8f233ae2a0daebacfb13bcb05482",
+            "hash": "fac75db456eca501f9e269762a03b00974e7f6e4669542e494b6d29ac220c1be",
             "line": "violated: DisposedRunNeverWaits",
-            "states": "4383708 states generated, 4005560 distinct states found, 750122 states left on queue.",
+            "states": "4383925 states generated, 4005760 distinct states found, 750153 states left on queue.",
             "violated": [
               "DisposedRunNeverWaits"
             ]
           },
           "Run.violates.FinallyOnlyWhenLoaded.cfg": {
             "green": false,
-            "hash": "06ffe8ddcb0d55854a0f1c31746bfb2a94bce71a892ba4b498204c1842fbf8df",
+            "hash": "c5aa5ad4e269488e04860e6babce0402721e5b18a43902290da15a3726c0b5f2",
             "line": "violated: FinallyOnlyWhenLoaded",
-            "states": "1925255 states generated, 1732883 distinct states found, 571100 states left on queue.",
+            "states": "1925274 states generated, 1732898 distinct states found, 571098 states left on queue.",
             "violated": [
               "FinallyOnlyWhenLoaded"
             ]
           },
           "Run.violates.FinallyRunsOnce.cfg": {
             "green": false,
-            "hash": "434f3d08ba57df208995767b1b5a7dabcc20438fc7e117b915ac987e01972107",
+            "hash": "268a856d53709af40399de1a7b37824fd33993ad984f4c7d61803f50ca5426ff",
             "line": "violated: FinallyRunsOnce",
-            "states": "5172929 states generated, 4723419 distinct states found, 718342 states left on queue.",
+            "states": "5173154 states generated, 4723621 distinct states found, 718381 states left on queue.",
             "violated": [
               "FinallyRunsOnce"
             ]
           },
           "Run.violates.FinallyRunsWhenLoaded.cfg": {
             "green": false,
-            "hash": "c97fd5f15ea57f071729916dea62e4652c3f95e532d25e73a5daede512d1449a",
+            "hash": "cecedf54d904b03faa1f890b5d8797461572c894e13e79793ab91f5add0893cd",
             "line": "violated: FinallyRunsWhenLoaded",
-            "states": "4123428 states generated, 3802761 distinct states found, 796121 states left on queue.",
+            "states": "4123417 states generated, 3802750 distinct states found, 796119 states left on queue.",
             "violated": [
               "FinallyRunsWhenLoaded"
             ]
           },
           "Run.violates.InnerFinallyFirst.cfg": {
             "green": false,
-            "hash": "614e1fc3052989772cb17140609cebf6117c0860300097ce0dfa3f3c6fee0834",
+            "hash": "f40d5899c72889e0aae6911c35056da0398555d2ba8eb286e1063b7a0d6703d3",
             "line": "violated: InnerFinallyFirst",
-            "states": "7394895 states generated, 6689639 distinct states found, 1005298 states left on queue.",
+            "states": "7394922 states generated, 6689664 distinct states found, 1005310 states left on queue.",
             "violated": [
               "InnerFinallyFirst"
             ]
           },
           "Run.violates.NothingRunsAfterAStop.cfg": {
             "green": false,
-            "hash": "1767af032c931cec9b3cb43fbcf0611149e74b88fdbb85c258b5d0f94d9b8aba",
+            "hash": "e56b8f56908d78a17e053f0e85564a701462e623c4bcd426ab9757af737a58aa",
             "line": "violated: NothingRunsAfterAStop",
-            "states": "1150617 states generated, 1108751 distinct states found, 419006 states left on queue.",
+            "states": "1150607 states generated, 1108745 distinct states found, 419004 states left on queue.",
             "violated": [
               "NothingRunsAfterAStop"
             ]
           },
           "Run.violates.NothingRunsAfterAnAbort.cfg": {
             "green": false,
-            "hash": "c4d2266b929157a52703eb1d98b0f57fdd3505c962ff5f365c905556b054f739",
+            "hash": "34501feda7e12658d3e8e7cd3d06f0cb9d6db93868bf72fcaf095b04c2c7cefb",
             "line": "violated: NothingRunsAfterAnAbort",
-            "states": "1840319 states generated, 1663481 distinct states found, 554778 states left on queue.",
+            "states": "1840311 states generated, 1663473 distinct states found, 554776 states left on queue.",
             "violated": [
               "NothingRunsAfterAnAbort"
             ]
           },
           "Run.violates.NothingRunsWhileItWaits.cfg": {
             "green": false,
-            "hash": "ba62176695eee6b981a2f8c4cee16d24c4978edc60d314366a9d7195f3cb1cf4",
+            "hash": "ff01145512972c6dc18b2421d97824572a548bbb4ace339b89b68e088bfc4bde",
             "line": "violated: NothingRunsWhileItWaits",
-            "states": "1150498 states generated, 1108628 distinct states found, 418936 states left on queue.",
+            "states": "1150501 states generated, 1108633 distinct states found, 418938 states left on queue.",
             "violated": [
               "NothingRunsWhileItWaits"
             ]
           },
           "Run.violates.ReachAbortInAnInnerRequest.cfg": {
             "green": false,
-            "hash": "e5af045dcb116a372c28850fec035466db1e311194c84805ff554950eae70479",
+            "hash": "4a36b8759af1fc0e97b16bdf2b2ec2582a656f2b40be205c5ed693f027f513df",
             "line": "violated: ReachAbortInAnInnerRequest",
-            "states": "55786048 states generated, 47667404 distinct states found, 2834338 states left on queue.",
+            "states": "55787206 states generated, 47668365 distinct states found, 2834337 states left on queue.",
             "violated": [
               "ReachAbortInAnInnerRequest"
             ]
           },
           "Run.violates.ReachAwaitDeepInARoute.cfg": {
             "green": false,
-            "hash": "da3112496ceb6b82b5fa040a4e4b2bd057cb1115c1e2bde889e801a0c5b7deb6",
+            "hash": "296495999edc906265aa9f7ec8a39c8bb49af45453bfd3d16e4e85b6c7c0e9bc",
             "line": "violated: ReachAwaitDeepInARoute",
-            "states": "1151158 states generated, 1109093 distinct states found, 419061 states left on queue.",
+            "states": "1151147 states generated, 1109075 distinct states found, 419050 states left on queue.",
             "violated": [
               "ReachAwaitDeepInARoute"
             ]
           },
           "Run.violates.ReachCutInItsOwnStep.cfg": {
             "green": false,
-            "hash": "ff9b18157ef17b25ef92ec734a9d069e374124bedb03012ff91cf4d74f19290a",
+            "hash": "18f5a773c65c58b4ae46d4b1ac81c64af9ad0d6d5c0a6481ed6d900a24bc4e57",
             "line": "violated: ReachCutInItsOwnStep",
-            "states": "6187303 states generated, 5640890 distinct states found, 917296 states left on queue.",
+            "states": "6187332 states generated, 5640917 distinct states found, 917302 states left on queue.",
             "violated": [
               "ReachCutInItsOwnStep"
             ]
           },
           "Run.violates.ReachDisposeAfterAReplace.cfg": {
             "green": false,
-            "hash": "e8d6f99ecaba56cbbe78a7fac8f5eb75fd499a9ddfa835f77e23b43dd1eaddd9",
+            "hash": "3fda72bafe6c1c4421e84345b3427a38006a552451eb80a57c807428d55bdca4",
             "line": "violated: ReachDisposeAfterAReplace",
-            "states": "7353429 states generated, 6649634 distinct states found, 1009037 states left on queue.",
+            "states": "7353521 states generated, 6649718 distinct states found, 1009050 states left on queue.",
             "violated": [
               "ReachDisposeAfterAReplace"
             ]
           },
           "Run.violates.ReachDisposeCutsAFinallysBranch.cfg": {
             "green": false,
-            "hash": "47f8e50b0b429d69e1dd1a84495586c5fcbfe7227facac6ab93ece61d55c8a69",
+            "hash": "57b8865af13be2cedf1ef8929dd62825581bee0f3e4df76e94c69f408478d2bc",
             "line": "violated: ReachDisposeCutsAFinallysBranch",
-            "states": "7354915 states generated, 6650938 distinct states found, 1009256 states left on queue.",
+            "states": "7354945 states generated, 6650965 distinct states found, 1009255 states left on queue.",
             "violated": [
               "ReachDisposeCutsAFinallysBranch"
             ]
           },
           "Run.violates.ReachDisposedAttemptCut.cfg": {
             "green": false,
-            "hash": "56236253ed4412276a0c9e37f7e7fe7a27187fe8a76d68f1df36139c741a23c3",
+            "hash": "c4104b3558a347aef7256a8569126ade381eee6cdb695596273ee81858487300",
             "line": "violated: ReachDisposedAttemptCut",
-            "states": "18586905 states generated, 15827056 distinct states found, 1903026 states left on queue.",
+            "states": "18586825 states generated, 15827015 distinct states found, 1903049 states left on queue.",
             "violated": [
               "ReachDisposedAttemptCut"
             ]
           },
           "Run.violates.ReachFinallysRequestRoutesUnderReplace.cfg": {
             "green": false,
-            "hash": "c15c1a2f5f9451e90168249d51414abc1b337854209503546938f9a636bd1c34",
+            "hash": "537054668d8d5c624191770935890db22c9d9169a57607a4466e20ad17726eea",
             "line": "violated: ReachFinallysRequestRoutesUnderReplace",
-            "states": "46048806 states generated, 39318318 distinct states found, 2598416 states left on queue.",
+            "states": "46049135 states generated, 39318568 distinct states found, 2598384 states left on queue.",
             "violated": [
               "ReachFinallysRequestRoutesUnderReplace"
             ]
           },
           "Run.violates.ReachLoadingWriteAfterTheDefaultsAwait.cfg": {
             "green": false,
-            "hash": "c083d666fdc4f60089b59ce9dd898a8eac52814b79f78e38ec0c95f25f9a84da",
+            "hash": "1a91ea0329ff1d8098805273a656145825530485657f57ea48e012501b406d8b",
             "line": "violated: ReachLoadingWriteAfterTheDefaultsAwait",
-            "states": "9150055 states generated, 8191515 distinct states found, 1215723 states left on queue.",
+            "states": "9149863 states generated, 8191346 distinct states found, 1215708 states left on queue.",
             "violated": [
               "ReachLoadingWriteAfterTheDefaultsAwait"
             ]
           },
           "Run.violates.ReachReleaseAfterACut.cfg": {
             "green": false,
-            "hash": "d9d2e59cf6eeb3cd10272fcb42d0779824a35ca18bea9c6190ec6419027d1fbc",
+            "hash": "b16779845bc73970af3d26e8c75e568aec95264d2a4e69718ec16d5b7aa8fa69",
             "line": "violated: ReachReleaseAfterACut",
-            "states": "6187280 states generated, 5640877 distinct states found, 917292 states left on queue.",
+            "states": "6187341 states generated, 5640928 distinct states found, 917291 states left on queue.",
             "violated": [
               "ReachReleaseAfterACut"
             ]
           },
           "Run.violates.ReachReplaceInAFinallysBranch.cfg": {
             "green": false,
-            "hash": "c07e93344eb66e0615fb3ce6c98ce3d84dbe519508e89e396c013f791ff4ad11",
+            "hash": "ac0bbc53396d3760d39bee08807e4515ab21c1e3e70ff97877d6f962a5004407",
             "line": "violated: ReachReplaceInAFinallysBranch",
-            "states": "24001938 states generated, 20421994 distinct states found, 2279014 states left on queue.",
+            "states": "24000813 states generated, 20421033 distinct states found, 2278871 states left on queue.",
             "violated": [
               "ReachReplaceInAFinallysBranch"
             ]
           },
           "Run.violates.ReachStopInAnInnerRoute.cfg": {
             "green": false,
-            "hash": "53dea23f2867edc44bd8a27ac59091f088fb542cd196111c96eeec26342cabd6",
+            "hash": "c73a29b96e0e0dea8d3cf129e6fcdef1461676be41fbb4641c1327728fa132a1",
             "line": "violated: ReachStopInAnInnerRoute",
-            "states": "65892332 states generated, 56216609 distinct states found, 2803361 states left on queue.",
+            "states": "65892300 states generated, 56216594 distinct states found, 2803382 states left on queue.",
             "violated": [
               "ReachStopInAnInnerRoute"
             ]
           },
           "Run.violates.ReleasedWhenEnded.cfg": {
             "green": false,
-            "hash": "30aeafa887911352c5db16726ad3d9a1ae411d4d8c396e287163c44c3e48fe0d",
+            "hash": "57d090ec7e61310a836aa505bac8f089cc1d8ae929fe73744c4b5b26d262e076",
             "line": "violated: ReleasedWhenEnded",
-            "states": "10227281 states generated, 9108422 distinct states found, 1306634 states left on queue.",
+            "states": "10227911 states generated, 9108910 distinct states found, 1306714 states left on queue.",
             "violated": [
               "ReleasedWhenEnded"
             ]
           },
           "Run.violates.ReplacedFinallyGoesOn.cfg": {
             "green": false,
-            "hash": "f6adaf1027d1ed1da0ec4d759aab9b8290896c16127f64a1a21fecfcde7d5d08",
+            "hash": "b13ea0c4d2b626a6fc5846aea9de602b1a31c55b0fec42b3d866daa6da5a921d",
             "line": "violated: ReplacedFinallyGoesOn",
-            "states": "19194823 states generated, 16399727 distinct states found, 1995224 states left on queue.",
+            "states": "19225917 states generated, 16425617 distinct states found, 1997256 states left on queue.",
             "violated": [
               "ReplacedFinallyGoesOn"
             ]
           },
           "Run.violates.SecondHandlerStartsInTheTurn.cfg": {
             "green": false,
-            "hash": "42094843efc41c0d857b9ff3017c62c6f3666c5c7bbf96c5acd256ce0511fd88",
+            "hash": "f903b5bfcb5da48538f4c654e6362e01c5126ad7381a4c58ace8fd22973f452a",
             "line": "violated: SecondHandlerStartsInTheTurn",
-            "states": "1150500 states generated, 1108650 distinct states found, 418954 states left on queue.",
+            "states": "1150506 states generated, 1108650 distinct states found, 418954 states left on queue.",
             "violated": [
               "SecondHandlerStartsInTheTurn"
             ]
           },
           "Run.violates.SyncRunEndsInItsTurn.cfg": {
             "green": false,
-            "hash": "649c473f1131352ef2de7e8665a4844ef94c4c72a6fae2b48de13d5a95401529",
+            "hash": "047740176f68d227b07a6cbb95de0cccac862037aa513044413f4b0d75304b1f",
             "line": "violated: SyncRunEndsInItsTurn",
-            "states": "2089672 states generated, 2068776 distinct states found, 689556 states left on queue.",
+            "states": "2089652 states generated, 2068756 distinct states found, 689556 states left on queue.",
             "violated": [
               "SyncRunEndsInItsTurn"
             ]
           },
           "Run.violates.WritesAfterTheTurnAreRefused.cfg": {
             "green": false,
-            "hash": "760cb54899ba722fce348dbadfe67c83cead3841acfd684e86b1f697978e8756",
+            "hash": "e35223c91abd2774df7b30632e9f431e96c76301e660f9a113582d9d6f7473a6",
             "line": "violated: WritesAfterTheTurnAreRefused",
-            "states": "6089748 states generated, 5554055 distinct states found, 916747 states left on queue.",
+            "states": "6089878 states generated, 5554182 distinct states found, 916706 states left on queue.",
             "violated": [
               "WritesAfterTheTurnAreRefused"
             ]
@@ -3289,115 +3319,115 @@
         "Tracing": {
           "Tracing.cfg": {
             "green": true,
-            "hash": "8bbe99e02cad970a46ae96126a4e9588ecf387d7f68426c25187e6db8529c5cc",
+            "hash": "48f226af7756e55c2eeeb5101eee8aa8a1f9bbc28a2ac59d3996443f63d46274",
             "line": "Model checking completed. No error has been found.",
-            "states": "208 states generated, 152 distinct states found, 0 states left on queue.",
+            "states": "184 states generated, 136 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "Tracing.violates.AttemptsJoinTheTrace.cfg": {
             "green": false,
-            "hash": "d40a25992c8efb6d343ef92d957180a0ad6a9e8877ea6cb4d1a4aaea8d5e5a17",
+            "hash": "67bc889b49ccd93fbf287622c4da0c737514c0401a35ad6085395883824eb82c",
             "line": "violated: AttemptsJoinTheTrace",
-            "states": "188 states generated, 138 distinct states found, 5 states left on queue.",
+            "states": "164 states generated, 122 distinct states found, 0 states left on queue.",
             "violated": [
               "AttemptsJoinTheTrace"
             ]
           },
           "Tracing.violates.ChildEndsBeforeParent.cfg": {
             "green": false,
-            "hash": "d4abea48d73dc9bba375a4bcc511927e03468b678cd53efeb1dfe907be2a5a38",
+            "hash": "3d63aa89450392885f0ab32c9bed574457108065a42b64b2e5e225e8075e904c",
             "line": "violated: ChildEndsBeforeParent",
-            "states": "125 states generated, 109 distinct states found, 36 states left on queue.",
+            "states": "149 states generated, 125 distinct states found, 21 states left on queue.",
             "violated": [
               "ChildEndsBeforeParent"
             ]
           },
           "Tracing.violates.EveryStartedSpanEnds.cfg": {
             "green": false,
-            "hash": "bb754ef0df6feaf91aa585abaa8bdc0f5e0673828d3c88013e7b27a2c777b2a0",
+            "hash": "8a7745e81e231c5457fb4d906f55d42aece84615f9ba923c818502eb6302b6e3",
             "line": "violated: EveryStartedSpanEnds",
-            "states": "80 states generated, 72 distinct states found, 21 states left on queue.",
+            "states": "75 states generated, 73 distinct states found, 27 states left on queue.",
             "violated": [
               "EveryStartedSpanEnds"
             ]
           },
           "Tracing.violates.NothingRecordedWhenOff.cfg": {
             "green": false,
-            "hash": "d447f1b0520c051621901f2344dfcb654d5f552066a17c4986ad20e5f4625745",
+            "hash": "c122241004cb5d18f6b4a912fbb16647be4c2e669f5be1e3022b5c7bf7582dd9",
             "line": "violated: NothingRecordedWhenOff",
-            "states": "48 states generated, 48 distinct states found, 18 states left on queue.",
+            "states": "56 states generated, 50 distinct states found, 19 states left on queue.",
             "violated": [
               "NothingRecordedWhenOff"
             ]
           },
           "Tracing.violates.ReachDisposedInFlight.cfg": {
             "green": false,
-            "hash": "774f824889a683d955c57663895b0317ced159958f24f298aa292ce88d0a57ea",
+            "hash": "748bd19dacbe7a0b3c85449c1b5bd858f930b1f0d30ef21d3b00aefd03514369",
             "line": "violated: ReachDisposedInFlight",
-            "states": "208 states generated, 152 distinct states found, 3 states left on queue.",
+            "states": "184 states generated, 136 distinct states found, 0 states left on queue.",
             "violated": [
               "ReachDisposedInFlight"
             ]
           },
           "Tracing.violates.ReachRetriedAttemptTraced.cfg": {
             "green": false,
-            "hash": "0fd010adbd40eb0db68d8cf01df5ab5b38686a6a1382ef231c76465ab48513af",
+            "hash": "035a04b3c9bf00239ddbf8635f615643446cfe2dc8754724851fc1846a899071",
             "line": "violated: ReachRetriedAttemptTraced",
-            "states": "202 states generated, 150 distinct states found, 0 states left on queue.",
+            "states": "178 states generated, 134 distinct states found, 0 states left on queue.",
             "violated": [
               "ReachRetriedAttemptTraced"
             ]
           },
           "Tracing.violates.ReachRetryTracedWhileOff.cfg": {
             "green": false,
-            "hash": "73fb35c5d63799c69f533aa1c228d9f72df5f7dd19dfb9fad068ee3f55c027b6",
+            "hash": "c9cbae6c86c225886b9641e60976e2ce26482afc129c426ff779f19e41c13b67",
             "line": "violated: ReachRetryTracedWhileOff",
-            "states": "190 states generated, 142 distinct states found, 0 states left on queue.",
+            "states": "166 states generated, 126 distinct states found, 0 states left on queue.",
             "violated": [
               "ReachRetryTracedWhileOff"
             ]
           },
           "Tracing.violates.ResendCountSent.cfg": {
             "green": false,
-            "hash": "2068e81a2b51fa3e5504481dfdde1859333767bf81155e3ea48d656c2a995144",
+            "hash": "d8b4c4cce18abefdfff3e3af0675b01cf04fa652f5ac21b03ff604378d32c978",
             "line": "violated: ResendCountSent",
-            "states": "172 states generated, 132 distinct states found, 0 states left on queue.",
+            "states": "148 states generated, 116 distinct states found, 3 states left on queue.",
             "violated": [
               "ResendCountSent"
             ]
           },
           "Tracing.violates.RetriesAlwaysTraced.cfg": {
             "green": false,
-            "hash": "33d1e391b40bcb4e228ed09df27b1f31f0d70cb3821159f4a214c936eff55153",
+            "hash": "33fb68037484f08473b728cf0ff9b4a91ac13d945ee0b7ab71db492b93645470",
             "line": "violated: RetriesAlwaysTraced",
-            "states": "190 states generated, 142 distinct states found, 0 states left on queue.",
+            "states": "166 states generated, 126 distinct states found, 4 states left on queue.",
             "violated": [
               "RetriesAlwaysTraced"
             ]
           },
           "Tracing.violates.SinkFailureChangesNothing.cfg": {
             "green": false,
-            "hash": "a2c27e9152ea39ac36cda1fe5f049fe82e3356e1d15ef0c35aced86b39dec6bf",
+            "hash": "7790a3c823e2caf3e656567be286b826622b6def86401ce2acbd6bfe2bc5e6a3",
             "line": "violated: SinkFailureChangesNothing",
-            "states": "146 states generated, 108 distinct states found, 14 states left on queue.",
+            "states": "142 states generated, 106 distinct states found, 25 states left on queue.",
             "violated": [
               "SinkFailureChangesNothing"
             ]
           },
           "Tracing.violates.SinkFailureKeepsHeaders.cfg": {
             "green": false,
-            "hash": "74d45b8559b2a62382813cf71b0069f035475ed8a637efa440e51b2a12947996",
+            "hash": "34ed5396fb5d07845f6d0eb9cc43f0d764d3394559ea41f4143fe09b31bef30a",
             "line": "violated: SinkFailureKeepsHeaders",
-            "states": "188 states generated, 138 distinct states found, 0 states left on queue.",
+            "states": "164 states generated, 122 distinct states found, 20 states left on queue.",
             "violated": [
               "SinkFailureKeepsHeaders"
             ]
           },
           "Tracing.violates.TraceHeadersStayHome.cfg": {
             "green": false,
-            "hash": "ad204c58ea9b1f7134729ec9f9398119dea9ec9ee3978ad877e1747010988e0b",
+            "hash": "9ef192e270bba43e36ffe24e2a7f71ba8017a38afc0f6974333f1cad590f69f3",
             "line": "violated: TraceHeadersStayHome",
-            "states": "150 states generated, 114 distinct states found, 0 states left on queue.",
+            "states": "126 states generated, 98 distinct states found, 0 states left on queue.",
             "violated": [
               "TraceHeadersStayHome"
             ]
@@ -3574,16 +3604,14 @@
       "pass": true
     }
   },
-  "passed": 24,
-  "read_at_head": "922f21b3dea1c8379ea70a4a8da509725c52ae96",
+  "passed": 29,
+  "read_at_head": "8abc057a40464fa447ce75de9f67ad9357fd892c",
   "step": {
-    "failing": [
-      "actions"
-    ],
-    "name": "check.py complete",
-    "next": "Finish every check and make each pass.",
-    "number": 10,
+    "failing": [],
+    "name": "End of session",
+    "next": "Write the report and copy the handoff with pbcopy.",
+    "number": 13,
     "phase": "E"
   },
-  "total": 27
+  "total": 29
 }
