@@ -2311,6 +2311,78 @@
       "probe": "AspNetCoreBinding",
       "expect": "fusion-ej2-script-text-escaped: EJ2 writes the label </script><b>Ada</b> into the page's script element with < and > as \\u003c and \\u003e, and as is False",
       "source": "spec/probes/AspNetCoreBinding/FusionProbes.cs"
+    },
+    {
+      "id": "ej2-payload-grid-rowSelected",
+      "statement": "EJ2 33.1.47's Grid hands rowSelected's listener these members by kind, name among them, and rowIndexes as a number for one row where its TypeScript declares number[].",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-grid-rowSelected: data:object,foreignKeyData:object,isHeaderCheckBoxClicked:boolean,isInteracted:boolean,name:string,previousRow:undefined,previousRowIndex:undefined,row:Element,rowIndex:number,rowIndexes:number,target:Element",
+      "source": "spec/probes/ej2-payloads.mjs"
+    },
+    {
+      "id": "ej2-payload-grid-recordClick",
+      "statement": "EJ2 33.1.47's Grid hands recordClick's listener these members by kind, name among them.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-grid-recordClick: cancel:boolean,cell:Element,cellIndex:number,column:object,event:object,name:string,row:Element,rowData:object,rowIndex:number,target:Element",
+      "source": "spec/probes/ej2-payloads.mjs"
+    },
+    {
+      "id": "ej2-payload-grid-toolbarClick",
+      "statement": "EJ2 33.1.47's Grid hands toolbarClick's listener these members by kind, name among them.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-grid-toolbarClick: cancel:boolean,item:object,name:string,originalEvent:object",
+      "source": "spec/probes/ej2-payloads.mjs"
+    },
+    {
+      "id": "ej2-payload-grid-actionBegin",
+      "statement": "EJ2 33.1.47's Grid hands actionBegin's listener, on a sort, these members by kind, name among them, though no type of its union declares name.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-grid-actionBegin: cancel:boolean,columnName:string,direction:string,name:string,requestType:string,target:Element,type:string",
+      "source": "spec/probes/ej2-payloads.mjs"
+    },
+    {
+      "id": "ej2-payload-grid-actionComplete",
+      "statement": "EJ2 33.1.47's Grid hands actionComplete's listener, on a sort, these members by kind, name among them.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-grid-actionComplete: cancel:boolean,columnName:string,direction:string,name:string,promise:undefined,requestType:string,rows:Array,target:Element,type:string",
+      "source": "spec/probes/ej2-payloads.mjs"
+    },
+    {
+      "id": "ej2-payload-grid-dataStateChange",
+      "statement": "EJ2 33.1.47's Grid hands dataStateChange's listener, on a sort of custom-bound data, these members by kind, name on the payload and on its action, though its TypeScript declares neither.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-grid-dataStateChange: action:object,name:string,requiresCounts:boolean,sorted:Array | action cancel:boolean,columnName:string,direction:string,name:string,requestType:string,target:Element,type:string",
+      "source": "spec/probes/ej2-payloads.mjs"
+    },
+    {
+      "id": "ej2-payload-schedule-navigating",
+      "statement": "EJ2 33.1.47's Schedule hands navigating's listener currentDate and previousDate as Dates, name among its members.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-payload-schedule-navigating: action:string,cancel:boolean,currentDate:Date,name:string,previousDate:Date",
+      "source": "spec/probes/ej2-payloads.mjs"
+    },
+    {
+      "id": "ej2-schedule-save-event-action",
+      "statement": "EJ2 33.1.47's Schedule saveEvent leaves an event as it was given the action 1, and saves it given 'Save'.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks",
+      "probe": "ej2-payloads.mjs",
+      "expect": "ej2-schedule-save-event-action: saveEvent with 1 the subject is Round; with 'Save' it is Rounds by text",
+      "source": "spec/probes/ej2-payloads.mjs"
     }
   ]
 }

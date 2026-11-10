@@ -2,6 +2,8 @@
 import hashlib
 import io
 import json
+import os
+import platform
 import tokenize
 import re
 import subprocess
@@ -497,6 +499,15 @@ def check_probes():
             if fact["expect"] not in outputs[script]:
                 problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
             continue
+        if fact["host"] == "browser":
+            script = SPEC / "probes" / fact["probe"]
+            if script not in outputs:
+                command, environment = browser_probe(script)
+                completed = subprocess.run(command, capture_output=True, text=True, cwd=REPO, env=environment)
+                outputs[script] = completed.stdout.splitlines() if completed.returncode == 0 else ["exit " + str(completed.returncode) + ": " + completed.stderr[-300:]]
+            if fact["expect"] not in outputs[script]:
+                problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
+            continue
         if fact["host"] == "net48":
             source, _, number = fact["source"].rpartition(":")
             lines = (REPO / source).read_text().splitlines() if (REPO / source).is_file() else []
@@ -510,7 +521,20 @@ def check_probes():
         if fact["expect"] not in outputs[probe]:
             problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
     return result(not problems, "; ".join(problems[:6]) or "every fact printed by its probe or found at its source line",
-                  facts=len(facts), net10=sum(1 for fact in facts if fact["host"] == "net10"), net48=sum(1 for fact in facts if fact["host"] == "net48"), node=sum(1 for fact in facts if fact["host"] == "node"))
+                  facts=len(facts), net10=sum(1 for fact in facts if fact["host"] == "net10"), net48=sum(1 for fact in facts if fact["host"] == "net48"), node=sum(1 for fact in facts if fact["host"] == "node"), browser=sum(1 for fact in facts if fact["host"] == "browser"))
+
+
+PLAYWRIGHT_PIN = re.compile(r'Include="Microsoft\.Playwright" Version="([0-9.]+)"')
+PLAYWRIGHT_SYSTEMS = {"Darwin": "darwin", "Linux": "linux"}
+PLAYWRIGHT_MACHINES = {"arm64": "arm64", "aarch64": "arm64", "x86_64": "x64"}
+
+
+def browser_probe(script):
+    host = REPO / "tests" / "Alis.Reactive.Playwright.TestHost" / "Alis.Reactive.Playwright.TestHost.csproj"
+    bundled = Path.home() / ".nuget" / "packages" / "microsoft.playwright" / PLAYWRIGHT_PIN.search(host.read_text()).group(1) / ".playwright"
+    node = bundled / "node" / f"{PLAYWRIGHT_SYSTEMS[platform.system()]}-{PLAYWRIGHT_MACHINES[platform.machine()]}" / "node"
+    environment = {**os.environ, "PLAYWRIGHT_PACKAGE": str(bundled / "package"), "NODE_PATH": str(checkout_root() / "node_modules")}
+    return [str(node), str(script)], environment
 
 
 def regression_shas():
@@ -1079,9 +1103,12 @@ def prose_cites(text):
     return found + [(cite, None, line) for cite, line in pending]
 
 
+def checkout_root():
+    return Path(git("rev-parse", "--path-format=absolute", "--git-common-dir")).parent
+
+
 def installed_package_lines(path):
-    checkout = Path(git("rev-parse", "--path-format=absolute", "--git-common-dir")).parent
-    for folder in [REPO, *REPO.parents, checkout]:
+    for folder in [REPO, *REPO.parents, checkout_root()]:
         candidate = folder / "node_modules" / path
         if candidate.is_file():
             return len(candidate.read_text().splitlines())

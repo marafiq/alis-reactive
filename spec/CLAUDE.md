@@ -456,6 +456,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `spec/Core/Request.tla`'s state machine, and a pipeline is one run, `spec/Core/Run.tla`'s, whose driver alone touches a
   promise (D10.23, D11.11, D11.12). The bar the owner set with it: the machines simplify the runtime's mix of sync and
   async, and an async call in a stack that started sync is proven by TLA+ and then in the browser.
+- The owner, 2026-11-09: "the synfusion TS is loose ... for event payload, hook up in the code with javascript in
+  browser, and see what they are - I would not go after fullest chain of dom calls there but only public props and
+  methods or promises", and "focus on stable high quality framework, since depenancy is inverted and component can be
+  onbarded, for the featuers where there is low confidence, developers can request it and onboard, but I would love to
+  make it automated but with high confidence." A shipped declaration holds a vendor member only with high confidence:
+  the vendor's TypeScript declares it public (neither `@private` nor `@hidden`) with a concrete type, or a browser probe
+  (`spec/probes/ej2-payloads.mjs`) pins what the browser hands or takes where that TypeScript says `any`, `Object` or a
+  loose union. Any other member is refused with its reason, carried by the doors an app onboards it with (M21.N2,
+  M12.N1), and the probes rerun on every vendor upgrade.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
