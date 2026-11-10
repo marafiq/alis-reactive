@@ -1868,6 +1868,309 @@
    ]
   },
   {
+   "id": "M21.F12",
+   "summary": "FusionColorPicker: one declaration of the Syncfusion ColorPicker by its JavaScript names, value, disabled, toggle and change, each EJ2 33.1.47's public member; the payload of change; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with a setter and a Reactive extension on the vendor's builder, and writes null to a value EJ2 holds as a color; the redesign declares it in one file, the shape the rewrite keeps, its change payload nested under EJ2's interface name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionColorPicker",
+    "Alis.Reactive.Fusion:FusionColorPickerChangeArgs",
+    "Alis.Reactive.Fusion:FusionColorPickerEvents",
+    "Alis.Reactive.Fusion:FusionColorPickerExtensions",
+    "Alis.Reactive.Fusion:FusionColorPickerHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionColorPickerReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs:18"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<bool>.Named(\"disabled\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs:21"
+    },
+    {
+     "line": "main",
+     "text": "=> self.EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs:31"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().ColorPickerFor(setup.Expression, attrs);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerHtmlExtensions.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> Value => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Disabled => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:26"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Toggle() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:29"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:35"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> Value => ReadOnly<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().ColorPickerFor(field.Expression, attributes);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:72"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionColorPicker declares Value as Property<string>, since EJ2's value is a color that starts at #008000ff and holds no null (M21.X611); Disabled as Property<bool>; Toggle as a method; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N12",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionColorPicker.ColorPickerEventArgs, EJ2's change payload, reads Value, the color after the change as text.",
+     "doors": [
+      "M21.N12",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionColorPicker bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N12",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionColorPicker() and field.FusionColorPicker(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it.",
+     "doors": [
+      "M21.N12",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionColorPicker's Reactive(c => c.Change, pipeline) handles its change from the plan's start; p.Component<FusionColorPicker>(m => m.RoomAccentColor) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N12"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs:13-55"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerHtmlExtensions.cs:18-47"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerReactiveExtensions.cs:11-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:20-76"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's ColorPicker as its TypeScript declares it (@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts, ColorPickerEventArgs there) and as its source reads a value it is given (@syncfusion/ej2-inputs/src/color-picker/color-picker.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X611",
+     "rung": "analyzer",
+     "defect": "Main's SetValue takes null (Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs:28-31 at 623dd4a27) where EJ2's value is a color, typed string and documented to start at #008000ff (@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts:41-46), and hexToRgb answers a null with no color (@syncfusion/ej2-inputs/src/color-picker/color-picker.js:1631-1634): the vendor contract analyzer (N17.2) refuses a T? write of a member whose type and documentation both hold no null by ALIS019 (D17.5). The redesign declares Property<string> (Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:23 at 65fdf118d), whose doc still says null clears it (Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:22 at 65fdf118d); the rewrite keeps Property<string> and drops the null."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionColorPicker.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N12"
+     ]
+    },
+    {
+     "door": "FusionColorPickerChangeArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12"
+     ]
+    },
+    {
+     "door": "FusionColorPickerChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N12",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionColorPickerEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12"
+     ]
+    },
+    {
+     "door": "FusionColorPickerEvents.Changed.get -> TypedEvent<FusionColorPickerChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12"
+     ]
+    },
+    {
+     "door": "FusionColorPickerExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionColorPickerReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N12"
+     ]
+    },
+    {
+     "door": "static FusionColorPickerExtensions.Disable<TModel>(this ComponentRef<FusionColorPicker!, TModel!>! self, bool disabled = true) -> ComponentRef<FusionColorPicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionColorPickerExtensions.SetValue<TModel>(this ComponentRef<FusionColorPicker!, TModel!>! self, string? value) -> ComponentRef<FusionColorPicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionColorPickerExtensions.Toggle<TModel>(this ComponentRef<FusionColorPicker!, TModel!>! self) -> ComponentRef<FusionColorPicker!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionColorPickerExtensions.Value<TModel>(this ComponentRef<FusionColorPicker!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionColorPickerHtmlExtensions.FusionColorPicker<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Inputs.ColorPickerBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionColorPickerReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.ColorPickerBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionColorPickerEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.ColorPickerBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N12"
+     ]
+    },
+    {
+     "door": "static readonly FusionColorPickerEvents.Instance -> FusionColorPickerEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N12"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F13",
    "summary": "FusionComboBox: one declaration of the Syncfusion ComboBox by its JavaScript names, value, text, index, dataBind, focusIn, focusOut, showPopup, hidePopup, clear, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, its value committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder, and names no field; the redesign declares it in one file, the shape the rewrite keeps, with its value and text typed nullable as main and the vendor hold them, and items handed by the plan's writer so its fields name each member as every framework read names it (M21.D1).",
    "status": "both",
@@ -6237,6 +6540,314 @@
    ]
   },
   {
+   "id": "M21.F25",
+   "summary": "FusionMaskedTextBox, both lines' FusionInputMask renamed to Fusion and EJ2's class name: one declaration of the Syncfusion MaskedTextBox by its JavaScript names, value, focusIn and change, each EJ2 33.1.47's public member; the payload of change; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and its change payload nested under EJ2's interface name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionInputMask",
+    "Alis.Reactive.Fusion:FusionInputMaskChangeArgs",
+    "Alis.Reactive.Fusion:FusionInputMaskEvents",
+    "Alis.Reactive.Fusion:FusionInputMaskExtensions",
+    "Alis.Reactive.Fusion:FusionInputMaskHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionInputMaskReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskExtensions.cs:18"
+    },
+    {
+     "line": "main",
+     "text": "return self.EmitSet(ValueProperty, ValueExpression.Literal(value));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskExtensions.cs:28"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().MaskedTextBoxFor(setup.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskHtmlExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> Value => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public void FocusIn() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:22"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:28"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<bool> IsInteracted => ReadOnly<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:39"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().MaskedTextBoxFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:67"
+    },
+    {
+     "line": "proposed",
+     "text": "The declaration takes EJ2's class name, FusionMaskedTextBox, Fusion and EJ2's MaskedTextBox (@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:16), the prefix keeping it apart from Syncfusion's own C# names beside it, as MaskedTextBoxBuilder in Syncfusion.EJ2.Inputs (the owner, 2026-11-09: \"to avoid name collision\"); both lines' FusionInputMask and its render helpers are renamed to it.",
+     "doors": [
+      "M21.N25"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionMaskedTextBox declares Value as Property<string?>, since EJ2 documents it null until a value is set (M21.X609); FocusIn as a method; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N25",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionMaskedTextBox.MaskChangeEventArgs, EJ2's change payload, reads Value, the text without the mask's literals, and IsInteracted.",
+     "doors": [
+      "M21.N25",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionMaskedTextBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N25",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionMaskedTextBox() and field.FusionMaskedTextBox(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it.",
+     "doors": [
+      "M21.N25",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionMaskedTextBox's Reactive(m => m.Change, pipeline) handles its change from the plan's start; p.Component<FusionMaskedTextBox>(m => m.EmergencyPhone) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N25"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskExtensions.cs:13-46"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskHtmlExtensions.cs:18-39"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskReactiveExtensions.cs:11-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:16-72"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's MaskedTextBox as its TypeScript declares it (@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts, MaskChangeEventArgs there), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X609",
+     "rung": "analyzer",
+     "defect": "Both lines declare MaskedTextBox's value as non-null text: the redesign's Value is Property<string> (Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:19 at 65fdf118d), whose doc says it is null when empty (Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:18 at 65fdf118d), and main's SetValue takes a string with no null (Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskExtensions.cs:24-28 at 623dd4a27), where EJ2 documents the value null until one is set (@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:137-144): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite's Value is Property<string?>, so a view clears the box with Value.Set(null)."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionInputMask.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N25"
+     ]
+    },
+    {
+     "door": "FusionInputMaskChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25"
+     ]
+    },
+    {
+     "door": "FusionInputMaskChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N25",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInputMaskChangeArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25"
+     ]
+    },
+    {
+     "door": "FusionInputMaskChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N25",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionInputMaskEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25"
+     ]
+    },
+    {
+     "door": "FusionInputMaskEvents.Changed.get -> TypedEvent<FusionInputMaskChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25"
+     ]
+    },
+    {
+     "door": "FusionInputMaskExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionInputMaskReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N25"
+     ]
+    },
+    {
+     "door": "static FusionInputMaskExtensions.FocusIn<TModel>(this ComponentRef<FusionInputMask!, TModel!>! self) -> ComponentRef<FusionInputMask!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionInputMaskExtensions.SetValue<TModel>(this ComponentRef<FusionInputMask!, TModel!>! self, string! value) -> ComponentRef<FusionInputMask!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionInputMaskExtensions.Value<TModel>(this ComponentRef<FusionInputMask!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionInputMaskHtmlExtensions.FusionInputMask<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Inputs.MaskedTextBoxBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionInputMaskReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.MaskedTextBoxBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionInputMaskEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.MaskedTextBoxBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N25"
+     ]
+    },
+    {
+     "door": "static readonly FusionInputMaskEvents.Instance -> FusionInputMaskEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N25"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F26",
    "summary": "FusionKanban: one declaration of the Syncfusion Kanban by its JavaScript names, its cards, columns, swimlanes, spinner and card dialog, each EJ2 33.1.47's public member; the payloads of its fourteen events; the column and header data it writes and reads; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over seven files whose calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, a builder of its own and a Reactive extension on it, and deletes a card by its key; the redesign declares it in one file, the shape the rewrite keeps, with the dialog's action typed as EJ2 reads it, a card deleted by its key again, and its data named as the vendor names it.",
    "status": "both",
@@ -9335,6 +9946,888 @@
    ]
   },
   {
+   "id": "M21.F32",
+   "summary": "FusionNumericTextBox: one declaration of the Syncfusion NumericTextBox by its JavaScript names, value, min, focusIn, focusOut, increment, decrement, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, its value committed by change; and the render helper that renders it bound to a model member. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value, its min and its change payload's values typed nullable as EJ2 documents them and the browser hands them.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionNumericTextBox",
+    "Alis.Reactive.Fusion:FusionNumericTextBoxBlurArgs",
+    "Alis.Reactive.Fusion:FusionNumericTextBoxChangeArgs",
+    "Alis.Reactive.Fusion:FusionNumericTextBoxEvents",
+    "Alis.Reactive.Fusion:FusionNumericTextBoxExtensions",
+    "Alis.Reactive.Fusion:FusionNumericTextBoxFocusArgs",
+    "Alis.Reactive.Fusion:FusionNumericTextBoxHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionNumericTextBoxReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<decimal>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:14"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<decimal>.Named(\"min\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:17"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().NumericTextBoxFor(setup.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<decimal> Value => Property<decimal>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<decimal> Min => Property<decimal>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:22"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Increment() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:40"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<decimal> Value => ReadOnly<decimal>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:56"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().NumericTextBoxFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:92"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionNumericTextBox declares Value and Min as Property<decimal?>, since EJ2 documents each null until set (M21.X607); FocusIn, FocusOut, Increment and Decrement as methods; and Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N32",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionNumericTextBox.ChangeEventArgs, EJ2's change payload, reads Value and PreviousValue as decimal?, since the browser hands null for a cleared box (M21.X608), and IsInteracted; Focus and Blur hand FusionNumericTextBox.NumericFocusEventArgs and FusionNumericTextBox.NumericBlurEventArgs, of which the declaration reads no member.",
+     "doors": [
+      "M21.N32",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionNumericTextBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N32",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionNumericTextBox(build => ..) renders the element under the field's id and binding name, starting at the member's value as M21.D1 writes it.",
+     "doors": [
+      "M21.N32",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionNumericTextBox's Reactive(n => n.Change, pipeline), Reactive(n => n.Focus, pipeline) and Reactive(n => n.Blur, pipeline) handle its events from the plan's start; p.Component<FusionNumericTextBox>(m => m.DoseMilligrams) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N32"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:9-76"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxEvents.cs:6-26"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxHtmlExtensions.cs:14-32"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxReactiveExtensions.cs:11-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:16-97"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's NumericTextBox as its TypeScript declares it (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts, ChangeEventArgs, NumericFocusEventArgs and NumericBlurEventArgs there), and its change payload as the browser hands it (probe:ej2-payload-numerictextbox-change-cleared, probe:ej2-payload-numerictextbox-change-after-cleared), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X607",
+     "rung": "analyzer",
+     "defect": "Both lines declare value and min as a decimal with no null: the redesign's Value and Min are Property<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:19, :22 at 65fdf118d) and main's are ComponentProperty<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:13-17 at 623dd4a27), where EJ2 documents each null until set (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:64-71, :73-82; probe:ej2-numerictextbox-value-default-null): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, as D17.5 states of this member, and the rewrite declares Property<decimal?> for both, so Value.Set(null) clears the dose."
+    },
+    {
+     "id": "M21.X608",
+     "rung": "type",
+     "defect": "Both lines read the change payload's value and previous value as a decimal with no null: the redesign's are ReadOnly<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:56, :59 at 65fdf118d) and main's payload class holds decimal, while the browser hands null for a box the user clears and for the change after it (probe:ej2-payload-numerictextbox-change-cleared, probe:ej2-payload-numerictextbox-change-after-cleared), which EJ2's TypeScript types value?: number (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:435-445) and the vendor contract cannot see. The rewrite's M21.N32 reads both as ReadOnly<decimal?>, so a condition on a cleared dose compiles only with its null case."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionNumericTextBox.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N32",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxChangeArgs.PreviousValue.get -> decimal",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxChangeArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N32",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxChangeArgs.Value.get -> decimal",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N32",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxEvents.Blur.get -> TypedEvent<FusionNumericTextBoxBlurArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxEvents.Changed.get -> TypedEvent<FusionNumericTextBoxChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxEvents.Focus.get -> TypedEvent<FusionNumericTextBoxFocusArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionNumericTextBoxReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxExtensions.Decrement<TModel>(this ComponentRef<FusionNumericTextBox!, TModel!>! self) -> ComponentRef<FusionNumericTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxExtensions.FocusIn<TModel>(this ComponentRef<FusionNumericTextBox!, TModel!>! self) -> ComponentRef<FusionNumericTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxExtensions.FocusOut<TModel>(this ComponentRef<FusionNumericTextBox!, TModel!>! self) -> ComponentRef<FusionNumericTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxExtensions.Increment<TModel>(this ComponentRef<FusionNumericTextBox!, TModel!>! self) -> ComponentRef<FusionNumericTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxExtensions.SetMin<TModel>(this ComponentRef<FusionNumericTextBox!, TModel!>! self, decimal min) -> ComponentRef<FusionNumericTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxExtensions.SetValue<TModel>(this ComponentRef<FusionNumericTextBox!, TModel!>! self, decimal value) -> ComponentRef<FusionNumericTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxExtensions.Value<TModel>(this ComponentRef<FusionNumericTextBox!, TModel!>! self) -> TypedComponentSource<decimal>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxHtmlExtensions.FusionNumericTextBox<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Inputs.NumericTextBoxBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionNumericTextBoxReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.NumericTextBoxBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionNumericTextBoxEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.NumericTextBoxBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N32"
+     ]
+    },
+    {
+     "door": "static readonly FusionNumericTextBoxEvents.Instance -> FusionNumericTextBoxEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N32"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F33",
+   "summary": "FusionOtpInput: one declaration of the Syncfusion OtpInput by its JavaScript names, value, dataBind, focusIn, focusOut, input, valueChanged, focus and blur, each EJ2 33.1.47's public member; the payloads of its four events, the value of each read as the text the browser hands; the input it is, its value committed by valueChanged; and the render helpers that render it bound to a member of text. Main spreads the slice over nine files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its payloads nested under EJ2's interface names, one for focus and blur as EJ2 has, and the box started at the member's value.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionOtpInput",
+    "Alis.Reactive.Fusion:FusionOtpInputBlurArgs",
+    "Alis.Reactive.Fusion:FusionOtpInputEvents",
+    "Alis.Reactive.Fusion:FusionOtpInputExtensions",
+    "Alis.Reactive.Fusion:FusionOtpInputFocusArgs",
+    "Alis.Reactive.Fusion:FusionOtpInputHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionOtpInputInputArgs",
+    "Alis.Reactive.Fusion:FusionOtpInputReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionOtpInputValueChangedArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputExtensions.cs:14"
+    },
+    {
+     "line": "main",
+     "text": ".EmitCall(DataBindMethod);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputExtensions.cs:32"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().OtpInput(setup.ElementId)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> Value => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public void DataBind() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:22"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:38"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<int> Index => ReadOnly<int>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:59"
+    },
+    {
+     "line": "redesign",
+     "text": "this InputBoundField<TModel, string?> field)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:107"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().OtpInput(field.ElementId)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:124"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionOtpInput declares Value as Property<string>: EJ2's TypeScript declares string | number and starts it at '' (@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts:160-163), EJ2 keeps the kind a value starts with (@syncfusion/ej2-inputs/src/otp-input/otp-input.js:412), and the browser holds text after typed digits (probe:ej2-otpinput-value-after-typing); DataBind, FocusIn and FocusOut as methods; and Input, ValueChanged, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N33",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionOtpInput.OtpInputEventArgs reads Value, PreviousValue and Index; FusionOtpInput.OtpChangedEventArgs reads Value, PreviousValue and IsInteracted; and FusionOtpInput.OtpFocusEventArgs, the payload of Focus and Blur, reads Value, Index and IsInteracted; each value is text, as the browser hands it (probe:ej2-payload-otpinput-input, probe:ej2-payload-otpinput-valueChanged, probe:ej2-payload-otpinput-focus, probe:ej2-payload-otpinput-blur).",
+     "doors": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionOtpInput bound to a member of text is an input: its Value, committed by ValueChanged once every box holds a digit, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N33",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionOtpInput() and field.FusionOtpInput(build => ..), over a member of text, render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it, which neither line does (M21.X612).",
+     "doors": [
+      "M21.N33",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionOtpInput's Reactive(o => o.ValueChanged, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; p.Component<FusionOtpInput>(m => m.UnlockCode) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N33"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputExtensions.cs:9-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputEvents.cs:6-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputHtmlExtensions.cs:14-32"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputReactiveExtensions.cs:11-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:16-129"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's OtpInput as its TypeScript declares it (@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts, OtpInputEventArgs, OtpChangedEventArgs and OtpFocusEventArgs there), as its source keeps a value's kind (@syncfusion/ej2-inputs/src/otp-input/otp-input.js), and its payloads as the browser hands them (probe:ej2-payload-otpinput-input, probe:ej2-payload-otpinput-valueChanged, probe:ej2-payload-otpinput-focus, probe:ej2-payload-otpinput-blur, probe:ej2-otpinput-value-after-typing), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X612",
+     "rung": "behavior",
+     "defect": "Both lines render the OtpInput by EJ2's builder that binds no member, EJS().OtpInput(id) (Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInputHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionOtpInput/FusionOtpInput.cs:124 at 65fdf118d), since EJ2 33.1.47's ASP.NET Core package has no OtpInputFor, so the boxes start empty whatever the member holds, against D17.13. The rewrite's render helper starts the OtpInput at the member's value, written by M21.D1."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X612",
+     "page": "A medication cabinet page shown again after a failed post, whose unlock code FusionOtpInput of four boxes is rendered by field.FusionOtpInput() for a model whose UnlockCode is 4821.",
+     "gesture": "Open the page.",
+     "outcome": "The four code boxes show 4, 8, 2 and 1.",
+     "opposite": "A model whose UnlockCode is null shows four empty boxes.",
+     "defect": "The OtpInput is rendered with no starting value, so the four boxes show empty though the model holds 4821."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionOtpInput.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputBlurArgs.Index.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputBlurArgs.Index.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputBlurArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputBlurArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputBlurArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputBlurArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputEvents.Blur.get -> TypedEvent<FusionOtpInputBlurArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputEvents.Focus.get -> TypedEvent<FusionOtpInputFocusArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputEvents.Input.get -> TypedEvent<FusionOtpInputInputArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputEvents.ValueChanged.get -> TypedEvent<FusionOtpInputValueChangedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionOtpInputFocusArgs.Index.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputFocusArgs.Index.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputFocusArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputFocusArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputFocusArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputFocusArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputInputArgs.Index.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputInputArgs.Index.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputInputArgs.PreviousValue.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputInputArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputInputArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputInputArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputValueChangedArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputValueChangedArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputValueChangedArgs.PreviousValue.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputValueChangedArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionOtpInputValueChangedArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "FusionOtpInputValueChangedArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N33",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionOtpInputExtensions.FocusIn<TModel>(this ComponentRef<FusionOtpInput!, TModel!>! self) -> ComponentRef<FusionOtpInput!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionOtpInputExtensions.FocusOut<TModel>(this ComponentRef<FusionOtpInput!, TModel!>! self) -> ComponentRef<FusionOtpInput!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionOtpInputExtensions.SetValue<TModel>(this ComponentRef<FusionOtpInput!, TModel!>! self, string! value) -> ComponentRef<FusionOtpInput!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionOtpInputExtensions.Value<TModel>(this ComponentRef<FusionOtpInput!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionOtpInputHtmlExtensions.FusionOtpInput<TModel>(this InputBoundField<TModel!, string?>! setup, System.Action<Syncfusion.EJ2.Inputs.OtpInputBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionOtpInputReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.OtpInputBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionOtpInputEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.OtpInputBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N33"
+     ]
+    },
+    {
+     "door": "static readonly FusionOtpInputEvents.Instance -> FusionOtpInputEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N33"
+     ]
+    }
+   ]
+  },
+  {
    "id": "M21.F34",
    "summary": "FusionPivotView: one declaration of the Syncfusion PivotView by its JavaScript names, its rows through dataSourceSettings, its display options, refresh, its saved layout and its two dialogs, each EJ2 33.1.47's public member but currentView, which EJ2 marks @hidden; the payloads of dataBound and cellSelecting and the cell data cellSelecting hands; and the render helper that renders it with an element id the view gives and a plan. Main spreads the slice over eight files whose calls name members by strings over ComponentRef, payload classes with setters, a builder of its own and a Reactive extension on it; the redesign declares it in one file, the shape the rewrite keeps, with the shown view readable from the public displayOption (M21.D301) and its cell data named as the vendor names it.",
    "status": "both",
@@ -9721,6 +11214,633 @@
      "verdict": "renamed",
      "to": [
       "M21.N34"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F37",
+   "summary": "FusionRating: one declaration of the Syncfusion Rating by its JavaScript names, value, dataBind, reset and valueChanged, each EJ2 33.1.47's public member; the payload of valueChanged; the input it is, its value committed by valueChanged; and the render helpers that render it bound to a member of double. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its payload nested under EJ2's interface name and the rating started at the member's value.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionRating",
+    "Alis.Reactive.Fusion:FusionRatingEvents",
+    "Alis.Reactive.Fusion:FusionRatingExtensions",
+    "Alis.Reactive.Fusion:FusionRatingHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionRatingReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionRatingValueChangedArgs"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<double>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingExtensions.cs:14"
+    },
+    {
+     "line": "main",
+     "text": ".EmitCall(DataBindMethod);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingExtensions.cs:30"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().Rating(setup.ElementId)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingHtmlExtensions.cs:29"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<double> Value => Property<double>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public void Reset() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs:25"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: ValueChanged);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "this InputBoundField<TModel, double> field)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs:53"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().Rating(field.ElementId)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs:70"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionRating declares Value as Property<double>, since EJ2's value is a number that starts at 0; DataBind and Reset as methods; and ValueChanged as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N37",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionRating.RatingChangedEventArgs, EJ2's valueChanged payload, reads Value, PreviousValue and IsInteracted.",
+     "doors": [
+      "M21.N37",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionRating bound to a member of double is an input: its Value, committed by ValueChanged, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N37",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionRating() and field.FusionRating(build => ..), over a member of double, render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it, which neither line does (M21.X613).",
+     "doors": [
+      "M21.N37",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionRating's Reactive(r => r.ValueChanged, pipeline) handles its change from the plan's start; p.Component<FusionRating>(m => m.LunchRating) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N37"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingExtensions.cs:9-43"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingHtmlExtensions.cs:14-34"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRatingReactiveExtensions.cs:11-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs:16-75"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Rating as its TypeScript declares it (@syncfusion/ej2-inputs/src/rating/rating.d.ts, RatingChangedEventArgs there), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X613",
+     "rung": "behavior",
+     "defect": "Both lines render the Rating by EJ2's builder that binds no member, EJS().Rating(id) (Alis.Reactive.Fusion/Components/FusionRating/FusionRatingHtmlExtensions.cs:29 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionRating/FusionRating.cs:70 at 65fdf118d), though the field binds a member of double, so the rating starts at EJ2's 0 (@syncfusion/ej2-inputs/src/rating/rating.d.ts:276-281) whatever the member holds, against D17.13. The rewrite's render helper starts the Rating at the member's value, written by M21.D1."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X613",
+     "page": "A meal feedback page whose lunch FusionRating of five stars is rendered by field.FusionRating() for a model whose LunchRating is 4.",
+     "gesture": "Open the page.",
+     "outcome": "Four of the five stars show filled.",
+     "opposite": "A model whose LunchRating is 2 shows two stars filled.",
+     "defect": "The Rating is rendered with no starting value, so no star shows filled though the model holds 4."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionRating.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N37"
+     ]
+    },
+    {
+     "door": "FusionRatingEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37"
+     ]
+    },
+    {
+     "door": "FusionRatingEvents.ValueChanged.get -> TypedEvent<FusionRatingValueChangedArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37"
+     ]
+    },
+    {
+     "door": "FusionRatingExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionRatingReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N37"
+     ]
+    },
+    {
+     "door": "FusionRatingValueChangedArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37"
+     ]
+    },
+    {
+     "door": "FusionRatingValueChangedArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N37",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionRatingValueChangedArgs.PreviousValue.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37"
+     ]
+    },
+    {
+     "door": "FusionRatingValueChangedArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N37",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionRatingValueChangedArgs.Value.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37"
+     ]
+    },
+    {
+     "door": "FusionRatingValueChangedArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N37",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "static FusionRatingExtensions.Reset<TModel>(this ComponentRef<FusionRating!, TModel!>! self) -> ComponentRef<FusionRating!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRatingExtensions.SetValue<TModel>(this ComponentRef<FusionRating!, TModel!>! self, double value) -> ComponentRef<FusionRating!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRatingExtensions.Value<TModel>(this ComponentRef<FusionRating!, TModel!>! self) -> TypedComponentSource<double>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRatingHtmlExtensions.FusionRating<TModel>(this InputBoundField<TModel!, double>! setup, System.Action<Syncfusion.EJ2.Inputs.RatingBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionRatingReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.RatingBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionRatingEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.RatingBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N37"
+     ]
+    },
+    {
+     "door": "static readonly FusionRatingEvents.Instance -> FusionRatingEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N37"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F38",
+   "summary": "FusionRichTextEditor: one declaration of the Syncfusion RichTextEditor by its JavaScript names, value, focusIn and change, each EJ2 33.1.47's public member; the payload of change; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and its change payload nested under EJ2's interface name.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionRichTextEditor",
+    "Alis.Reactive.Fusion:FusionRichTextEditorChangeArgs",
+    "Alis.Reactive.Fusion:FusionRichTextEditorEvents",
+    "Alis.Reactive.Fusion:FusionRichTextEditorExtensions",
+    "Alis.Reactive.Fusion:FusionRichTextEditorHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionRichTextEditorReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorExtensions.cs:18"
+    },
+    {
+     "line": "main",
+     "text": "return self.EmitSet(ValueProperty, ValueExpression.Literal(value));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorExtensions.cs:29"
+    },
+    {
+     "line": "main",
+     "text": "builder.model.Id = setup.ElementId;",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorHtmlExtensions.cs:42"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> Value => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public void FocusIn() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:22"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:31"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().RichTextEditorFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:70"
+    },
+    {
+     "line": "redesign",
+     "text": "builder.model.Id = field.ElementId;",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:73"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionRichTextEditor declares Value as Property<string?>, since EJ2 documents the editor's content null until set (M21.X610); FocusIn as a method; and Change as an event whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N38",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionRichTextEditor.ChangeEventArgs, EJ2's change payload, reads Value, the editor's content, and IsInteracted.",
+     "doors": [
+      "M21.N38",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionRichTextEditor bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N38",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionRichTextEditor() and field.FusionRichTextEditor(build => ..) render the editor under the field's id and binding name, starting at the member's value as M21.D1 writes it.",
+     "doors": [
+      "M21.N38",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionRichTextEditor's Reactive(e => e.Change, pipeline) handles its change from the plan's start; p.Component<FusionRichTextEditor>(m => m.CarePlanNotes) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N38"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorExtensions.cs:13-47"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorEvents.cs:6-16"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorHtmlExtensions.cs:18-50"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorReactiveExtensions.cs:10-39"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:16-82"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's RichTextEditor as its TypeScript declares it (@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts, ChangeEventArgs in @syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X610",
+     "rung": "analyzer",
+     "defect": "Both lines declare the editor's value as non-null text: the redesign's Value is Property<string> (Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:19 at 65fdf118d) and main's SetValue takes a string with no null (Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorExtensions.cs:25-29 at 623dd4a27), where EJ2 documents the content null until set (@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts:744-750): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite's Value is Property<string?>."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionRichTextEditor.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N38"
+     ]
+    },
+    {
+     "door": "FusionRichTextEditorChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38"
+     ]
+    },
+    {
+     "door": "FusionRichTextEditorChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N38",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionRichTextEditorChangeArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38"
+     ]
+    },
+    {
+     "door": "FusionRichTextEditorChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N38",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionRichTextEditorEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38"
+     ]
+    },
+    {
+     "door": "FusionRichTextEditorEvents.Changed.get -> TypedEvent<FusionRichTextEditorChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38"
+     ]
+    },
+    {
+     "door": "FusionRichTextEditorExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionRichTextEditorReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N38"
+     ]
+    },
+    {
+     "door": "static FusionRichTextEditorExtensions.FocusIn<TModel>(this ComponentRef<FusionRichTextEditor!, TModel!>! self) -> ComponentRef<FusionRichTextEditor!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRichTextEditorExtensions.SetValue<TModel>(this ComponentRef<FusionRichTextEditor!, TModel!>! self, string! value) -> ComponentRef<FusionRichTextEditor!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRichTextEditorExtensions.Value<TModel>(this ComponentRef<FusionRichTextEditor!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionRichTextEditorHtmlExtensions.FusionRichTextEditor<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.RichTextEditor.RichTextEditorBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionRichTextEditorReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.RichTextEditor.RichTextEditorBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionRichTextEditorEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.RichTextEditor.RichTextEditorBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N38"
+     ]
+    },
+    {
+     "door": "static readonly FusionRichTextEditorEvents.Instance -> FusionRichTextEditorEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N38"
      ]
     }
    ]
@@ -10884,6 +13004,1620 @@
      "verdict": "renamed",
      "to": [
       "M21.N39"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F41",
+   "summary": "FusionSlider: one declaration of the Syncfusion Slider by its JavaScript names, value as one number and as a range, dataBind, change and changed, each EJ2 33.1.47's public member; the payload of its two events, read as a number or a list as the browser hands them; the input it is, its value committed by changed; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its values typed nullable as EJ2 documents them, a range's payload read as lists, and the slider started at the member's value.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionSlider",
+    "Alis.Reactive.Fusion:FusionSliderChangeArgs",
+    "Alis.Reactive.Fusion:FusionSliderEvents",
+    "Alis.Reactive.Fusion:FusionSliderExtensions",
+    "Alis.Reactive.Fusion:FusionSliderHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionSliderReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<double>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderExtensions.cs:14"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<double[]>.Mapped(\"rangeValue\", Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderExtensions.cs:17"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().Slider(setup.ElementId)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderHtmlExtensions.cs:30"
+    },
+    {
+     "line": "main",
+     "text": "public double Value { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/Events/FusionSliderOnChanged.cs:9"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<double> Value => Property<double>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:20"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<double[]> RangeValue => Property<double[]>(\"value\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Changed);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:36"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<double> Value => ReadOnly<double>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = setup.Helper.EJS().Slider(setup.ElementId)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:83"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSlider declares Value as Property<double?> for a slider of one handle and RangeValue as Property<double[]?> for a range, each reading value, which EJ2 types number | number[] and documents null until set (M21.X614), the second named by name: since the compiler refuses two members called Value; DataBind as a method; and Change and Changed as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N41",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSlider.SliderChangeEventArgs, the payload of Change and Changed, reads Value and PreviousValue as numbers, the browser's kind for a slider of one handle (probe:ej2-payload-slider-pain-change, probe:ej2-payload-slider-pain-changed), and RangeValue and PreviousRangeValue as lists, the kind for a range (probe:ej2-payload-slider-rest-change, probe:ej2-payload-slider-rest-changed; M21.X616), with Text, Action and IsInteracted.",
+     "doors": [
+      "M21.N41",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionSlider bound to a member is an input: its Value, committed by Changed when the handle settles, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N41",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionSlider() and field.FusionSlider(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it, which neither line does (M21.X615).",
+     "doors": [
+      "M21.N41",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionSlider's Reactive(s => s.Change, pipeline) follows the handle as it moves and Reactive(s => s.Changed, pipeline) runs when it settles, each from the plan's start; p.Component<FusionSlider>(m => m.RoomTemperature) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N41"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderExtensions.cs:9-57"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderEvents.cs:6-21"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderHtmlExtensions.cs:14-35"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderReactiveExtensions.cs:11-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:17-88"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Slider as its TypeScript declares it (@syncfusion/ej2-inputs/src/slider/slider.d.ts, SliderChangeEventArgs there), as its source starts a slider with no value (@syncfusion/ej2-inputs/src/slider/slider.js), and its payloads as the browser hands them (probe:ej2-payload-slider-pain-change, probe:ej2-payload-slider-rest-change), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X614",
+     "rung": "analyzer",
+     "defect": "Both lines declare the slider's value with no null: the redesign's Value is Property<double> and RangeValue Property<double[]> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:20, :23 at 65fdf118d), and main's are ComponentProperty<double> and ComponentProperty<double[]> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderExtensions.cs:13-17 at 623dd4a27), where EJ2 documents value null until set (@syncfusion/ej2-inputs/src/slider/slider.d.ts:355-366): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite declares Property<double?> and Property<double[]?>."
+    },
+    {
+     "id": "M21.X615",
+     "rung": "behavior",
+     "defect": "Both lines render the Slider by EJ2's builder that binds no member, EJS().Slider(id) (Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderHtmlExtensions.cs:30 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:83 at 65fdf118d), since EJ2 33.1.47's ASP.NET Core package has no SliderFor, so a slider starts at its minimum (@syncfusion/ej2-inputs/src/slider/slider.js:403-404) whatever the member holds, against D17.13, and the redesign's sandbox writes the member's value again in the build callback (Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Slider/Index.cshtml:30 at 65fdf118d). The rewrite's render helper starts the Slider at the member's value, written by M21.D1."
+    },
+    {
+     "id": "M21.X616",
+     "rung": "type",
+     "defect": "Both lines read the change payload's value and previous value as one number: the redesign's are ReadOnly<double> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:43, :46 at 65fdf118d) and main's payload holds double (Alis.Reactive.Fusion/Components/FusionSlider/Events/FusionSliderOnChanged.cs:9 at 623dd4a27), where EJ2 types each number | number[] (@syncfusion/ej2-inputs/src/slider/slider.d.ts:64-76) and a range slider hands lists (probe:ej2-payload-slider-rest-change), so a range slider's handles have no typed read in a handler. The rewrite's payload in M21.N41 adds RangeValue and PreviousRangeValue as ReadOnly<double[]>, reading value and previousValue, as the component's RangeValue reads its value."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X615",
+     "page": "A comfort page whose room temperature FusionSlider is rendered by field.FusionSlider(b => b.Min(60).Max(80)) for a model whose RoomTemperature is 72, with a Check button whose handler sets temperature-reading's text to the slider's Value.",
+     "gesture": "Click Check.",
+     "outcome": "The reading shows 72.",
+     "opposite": "Pressing the right arrow on the slider's handle and clicking Check again shows 73.",
+     "defect": "The Slider is rendered with no starting value and starts at its minimum, so the reading shows 60."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionSlider.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.Action.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.Action.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N41",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N41",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.PreviousValue.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N41",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.Text.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.Text.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N41",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.Value.get -> double",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N41",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSliderEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderEvents.Change.get -> TypedEvent<FusionSliderChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderEvents.Changed.get -> TypedEvent<FusionSliderChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "FusionSliderExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionSliderReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "static FusionSliderExtensions.RangeValue<TModel>(this ComponentRef<FusionSlider!, TModel!>! self) -> TypedComponentSource<double[]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSliderExtensions.SetRangeValue<TModel>(this ComponentRef<FusionSlider!, TModel!>! self, double start, double end) -> ComponentRef<FusionSlider!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSliderExtensions.SetValue<TModel>(this ComponentRef<FusionSlider!, TModel!>! self, double value) -> ComponentRef<FusionSlider!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSliderExtensions.Value<TModel>(this ComponentRef<FusionSlider!, TModel!>! self) -> TypedComponentSource<double>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSliderHtmlExtensions.FusionSlider<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Inputs.SliderBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionSliderReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.SliderBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionSliderEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.SliderBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N41"
+     ]
+    },
+    {
+     "door": "static readonly FusionSliderEvents.Instance -> FusionSliderEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N41"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F43",
+   "summary": "FusionSmartTextArea: one declaration of the Syncfusion SmartTextArea by its JavaScript names, value, focusIn, change, beforeSuggestionInsert and afterSuggestionInsert, each EJ2 33.1.47's public member or, for the inserted text, the member its JavaScript hands; the payloads of its three events; the input it is, its value committed by change; and the render helpers that render it bound to a model member with its suggestion options. Main spreads the slice over eight files whose writes and calls name members by strings over ComponentRef, payload classes with setters, Reactive extensions on the plan and a render helper that writes a script into the view; the redesign declares it in one file and builds the component in the framework's own component code, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and the area started at the member's value.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionSmartSuggestionMode",
+    "Alis.Reactive.Fusion:FusionSmartTextArea",
+    "Alis.Reactive.Fusion:FusionSmartTextAreaAfterSuggestionInsertArgs",
+    "Alis.Reactive.Fusion:FusionSmartTextAreaBeforeSuggestionInsertArgs",
+    "Alis.Reactive.Fusion:FusionSmartTextAreaChangeArgs",
+    "Alis.Reactive.Fusion:FusionSmartTextAreaEvents",
+    "Alis.Reactive.Fusion:FusionSmartTextAreaExtensions",
+    "Alis.Reactive.Fusion:FusionSmartTextAreaHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionSmartTextAreaOptions",
+    "Alis.Reactive.Fusion:FusionSmartTextAreaReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaExtensions.cs:11"
+    },
+    {
+     "line": "main",
+     "text": "public string InsertedText { get; set; } = \"\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/Events/FusionSmartTextAreaAfterSuggestionInsertArgs.cs:5"
+    },
+    {
+     "line": "main",
+     "text": "value = options.Value,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaHtmlExtensions.cs:72"
+    },
+    {
+     "line": "main",
+     "text": "return \"<script>(function(){document.addEventListener('DOMContentLoaded',function(){\"",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaHtmlExtensions.cs:82"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> Value => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:24"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:33"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> Cancel => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:64"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> InsertedText => ReadOnly<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:71"
+    },
+    {
+     "line": "redesign",
+     "text": "attributes[\"data-alis-smart-text-area\"] = ConstructionOptions(options);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:113"
+    },
+    {
+     "line": "redesign",
+     "text": "value = options.Value,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:144"
+    },
+    {
+     "line": "redesign",
+     "text": "new (window as unknown as SyncfusionWindow).ej.inputs.SmartTextArea(options).appendTo(element);",
+     "cite": "Alis.Reactive.Assets/components/fusion/smart-text-area.ts:29"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSmartTextArea declares Value as Property<string?>, since EJ2 documents a TextArea's value null until set (M21.X604); FocusIn as a method; and Change, BeforeSuggestionInsert and AfterSuggestionInsert as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N43",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionSmartTextArea.ChangedEventArgs reads Value, PreviousValue and IsInteracted; FusionSmartTextArea.BeforeSuggestionInsertArgs reads Text and writes Cancel, which keeps the suggestion out; and FusionSmartTextArea.AfterSuggestionInsertArgs reads InsertedText, the member the browser hands (M21.D601).",
+     "doors": [
+      "M21.N43",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionSmartTextArea bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N43",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionSmartTextArea() and field.FusionSmartTextArea(configure => ..) render the text area under the field's id and binding name, starting at the member's value as M21.D1 writes it (M21.X605), with FusionSmartTextAreaOptions' role, phrases, suggestion endpoint, mode, class and rows; the framework's own component code builds the component from them, so the view carries no script.",
+     "doors": [
+      "M21.N43",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionSmartTextArea's Reactive(a => a.Change, pipeline), and its BeforeSuggestionInsert and AfterSuggestionInsert the same way, handle its events from the plan's start; p.Component<FusionSmartTextArea>(m => m.ShiftNote) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N43"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaExtensions.cs:6-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaEvents.cs:3-15"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaHtmlExtensions.cs:16-104"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaOptions.cs:5-21"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaReactiveExtensions.cs:7-32"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:21-166"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaOptions.cs:6-44"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/components/fusion/smart-text-area.ts:26-30"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [
+    {
+     "id": "M21.D601",
+     "meaning": "A payload member EJ2's JavaScript hands under a name its TypeScript does not declare is declared by the JavaScript's name once a browser fact pins it, and the vendor contract analyzer's ALIS016 refusal of it (N17.2) carries SuppressMessage whose justification names the fact, the drift form D17.5 gives a browser test: SmartTextArea's afterSuggestionInsert hands insertedText (@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.js:420, :508; probe:ej2-payload-smarttextarea-afterSuggestionInsert) where its TypeScript declares text (@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.d.ts:48-53), so FusionSmartTextArea.AfterSuggestionInsertArgs reads InsertedText, as both lines do, and declares no Text. The form of the suppression is gate 2's."
+    }
+   ],
+   "oracle": "Syncfusion EJ2 33.1.47's SmartTextArea as its TypeScript declares it (@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.d.ts, the TextArea members it inherits in @syncfusion/ej2-inputs/src/textarea/textarea.d.ts, ChangedEventArgs in @syncfusion/ej2-inputs/src/textbox/textbox.d.ts), as its source raises its suggestion events (@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.js), and its suggestion payloads as the browser hands them (probe:ej2-payload-smarttextarea-beforeSuggestionInsert, probe:ej2-payload-smarttextarea-afterSuggestionInsert), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X604",
+     "rung": "analyzer",
+     "defect": "Both lines declare the text area's value as non-null text: the redesign's Value is Property<string> (Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:24 at 65fdf118d) and main's is ComponentProperty<string> with a SetValue that takes no null (Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaExtensions.cs:10-11, :16-20 at 623dd4a27), where SmartTextArea extends TextArea (@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.d.ts:58), whose value EJ2 documents null until set (@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:34-39): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite's Value is Property<string?>."
+    },
+    {
+     "id": "M21.X605",
+     "rung": "behavior",
+     "defect": "Both lines start the text area at FusionSmartTextAreaOptions.Value, empty unless the view sets it, and never at the bound member's value: main writes options.Value into the textarea and the component's options (Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaHtmlExtensions.cs:41, :72 at 623dd4a27), and the redesign the same (Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:115, :144 at 65fdf118d), against D17.13. The rewrite's render helper starts the text area at the member's value, written by M21.D1; the option's leaving is gate 2's."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X605",
+     "page": "A shift handover page whose note FusionSmartTextArea is rendered by field.FusionSmartTextArea() for a model whose ShiftNote is Resident slept through the night.",
+     "gesture": "Open the page.",
+     "outcome": "The note area shows Resident slept through the night.",
+     "opposite": "A model whose ShiftNote is empty shows an empty note area.",
+     "defect": "The text area starts at the options' empty value, so the note area shows nothing though the model holds the note."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionSmartTextArea.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaAfterSuggestionInsertArgs.InsertedText.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaAfterSuggestionInsertArgs.InsertedText.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N43",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaBeforeSuggestionInsertArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaBeforeSuggestionInsertArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N43",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaBeforeSuggestionInsertArgs.Text.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaBeforeSuggestionInsertArgs.Text.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N43",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaEvents.AfterSuggestionInsert.get -> TypedEvent<FusionSmartTextAreaAfterSuggestionInsertArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaEvents.BeforeSuggestionInsert.get -> TypedEvent<FusionSmartTextAreaBeforeSuggestionInsertArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionSmartTextAreaReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "static FusionSmartTextAreaExtensions.FocusIn<TModel>(this ComponentRef<FusionSmartTextArea!, TModel!>! self) -> ComponentRef<FusionSmartTextArea!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSmartTextAreaExtensions.SetValue<TModel>(this ComponentRef<FusionSmartTextArea!, TModel!>! self, string! value) -> ComponentRef<FusionSmartTextArea!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSmartTextAreaExtensions.Value<TModel>(this ComponentRef<FusionSmartTextArea!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionSmartTextAreaHtmlExtensions.FusionSmartTextArea<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<FusionSmartTextAreaOptions!>! configure) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionSmartTextAreaReactiveExtensions.Reactive<TModel, TArgs>(this ReactivePlan<TModel!>! plan, string! componentId, System.Func<FusionSmartTextAreaEvents!, TypedEvent<TArgs>!>! on, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "static FusionSmartTextAreaReactiveExtensions.Reactive<TModel, TProp, TArgs>(this ReactivePlan<TModel!>! plan, System.Linq.Expressions.Expression<System.Func<TModel!, TProp>!>! component, System.Func<FusionSmartTextAreaEvents!, TypedEvent<TArgs>!>! on, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N43"
+     ]
+    },
+    {
+     "door": "static readonly FusionSmartTextAreaEvents.Instance -> FusionSmartTextAreaEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N43"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F48",
+   "summary": "FusionTextArea: one declaration of the Syncfusion TextArea by its JavaScript names, value, dataBind, focusIn, focusOut, input, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its four events; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over nine files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it and its payloads nested under EJ2's interface names.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionTextArea",
+    "Alis.Reactive.Fusion:FusionTextAreaBlurArgs",
+    "Alis.Reactive.Fusion:FusionTextAreaChangeArgs",
+    "Alis.Reactive.Fusion:FusionTextAreaEvents",
+    "Alis.Reactive.Fusion:FusionTextAreaExtensions",
+    "Alis.Reactive.Fusion:FusionTextAreaFocusArgs",
+    "Alis.Reactive.Fusion:FusionTextAreaHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionTextAreaInputArgs",
+    "Alis.Reactive.Fusion:FusionTextAreaReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaExtensions.cs:14"
+    },
+    {
+     "line": "main",
+     "text": ".EmitSet(ValueProperty, ValueExpression.LiteralRaw(value, Shape.String))",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaExtensions.cs:31"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().TextAreaFor(setup.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> Value => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public void DataBind() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:22"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:38"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> PreviousValue => ReadOnly<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:66"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().TextAreaFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:111"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTextArea declares Value as Property<string?>, since EJ2 documents it null until set (M21.X603); DataBind, FocusIn and FocusOut as methods; and Input, Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N48",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTextArea.InputEventArgs reads Value and PreviousValue; FusionTextArea.ChangedEventArgs reads Value, PreviousValue and IsInteracted; and FusionTextArea.FocusInEventArgs and FusionTextArea.FocusOutEventArgs, the payloads of Focus and Blur, read Value.",
+     "doors": [
+      "M21.N48",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionTextArea bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N48",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionTextArea() and field.FusionTextArea(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it.",
+     "doors": [
+      "M21.N48",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionTextArea's Reactive(a => a.Change, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; p.Component<FusionTextArea>(m => m.DischargeSummary) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N48"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaExtensions.cs:9-51"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaEvents.cs:6-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaHtmlExtensions.cs:14-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaReactiveExtensions.cs:11-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:16-116"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's TextArea as its TypeScript declares it (@syncfusion/ej2-inputs/src/textarea/textarea.d.ts, the payload interfaces it imports from @syncfusion/ej2-inputs/src/textbox/textbox.d.ts), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X603",
+     "rung": "analyzer",
+     "defect": "The redesign declares Value as Property<string> (Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:19 at 65fdf118d) where EJ2 documents a TextArea's value null until set (@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:34-39), so main's clear, SetValue(null) (Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaExtensions.cs:27-32 at 623dd4a27), is a nullable warning: the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite's Value is Property<string?>."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionTextArea.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaBlurArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaBlurArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N48",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextAreaChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N48",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextAreaChangeArgs.PreviousValue.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaChangeArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N48",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextAreaChangeArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N48",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextAreaEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaEvents.Blur.get -> TypedEvent<FusionTextAreaBlurArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaEvents.Changed.get -> TypedEvent<FusionTextAreaChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaEvents.Focus.get -> TypedEvent<FusionTextAreaFocusArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaEvents.Input.get -> TypedEvent<FusionTextAreaInputArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionTextAreaFocusArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaFocusArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N48",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextAreaInputArgs.PreviousValue.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaInputArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N48",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextAreaInputArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "FusionTextAreaInputArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N48",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextAreaReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "static FusionTextAreaExtensions.FocusIn<TModel>(this ComponentRef<FusionTextArea!, TModel!>! self) -> ComponentRef<FusionTextArea!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextAreaExtensions.FocusOut<TModel>(this ComponentRef<FusionTextArea!, TModel!>! self) -> ComponentRef<FusionTextArea!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextAreaExtensions.SetValue<TModel>(this ComponentRef<FusionTextArea!, TModel!>! self, string? value) -> ComponentRef<FusionTextArea!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextAreaExtensions.Value<TModel>(this ComponentRef<FusionTextArea!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextAreaHtmlExtensions.FusionTextArea<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Inputs.TextAreaBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextAreaReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.TextAreaBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionTextAreaEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.TextAreaBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N48"
+     ]
+    },
+    {
+     "door": "static readonly FusionTextAreaEvents.Instance -> FusionTextAreaEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N48"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F49",
+   "summary": "FusionTextBox: one declaration of the Syncfusion TextBox by its JavaScript names, value, dataBind, focusIn, focusOut, addIcon, input, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its four events; the input it is, its value committed by change; and the render helpers that render it bound to a model member. Main spreads the slice over nine files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters, an append-only icon door and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as EJ2 documents it, an icon's place typed, and its payloads nested under EJ2's interface names.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionTextBox",
+    "Alis.Reactive.Fusion:FusionTextBoxBlurArgs",
+    "Alis.Reactive.Fusion:FusionTextBoxChangeArgs",
+    "Alis.Reactive.Fusion:FusionTextBoxEvents",
+    "Alis.Reactive.Fusion:FusionTextBoxExtensions",
+    "Alis.Reactive.Fusion:FusionTextBoxFocusArgs",
+    "Alis.Reactive.Fusion:FusionTextBoxHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionTextBoxInputArgs",
+    "Alis.Reactive.Fusion:FusionTextBoxReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<string>.Named(Component.ValueMember);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Mapped(\"addAppendIcon\", \"addIcon\").WithArgs<string, string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs:27"
+    },
+    {
+     "line": "main",
+     "text": "ValueExpression.Literal(\"append\"),",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs:60"
+    },
+    {
+     "line": "main",
+     "text": "var builder = setup.Helper.EJS().TextBoxFor(setup.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxHtmlExtensions.cs:27"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string> Value => Property<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public void DataBind() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:22"
+    },
+    {
+     "line": "redesign",
+     "text": "public void AddIcon(Arg<string> position, Arg<string> icons) => Method(position, icons);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:33"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:43"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().TextBoxFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:116"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTextBox declares Value as Property<string?>, since EJ2 documents it null until set (M21.X601); DataBind, FocusIn and FocusOut as methods; AddIcon with its place typed as one of append and prepend, the two EJ2 documents, written as EJ2 reads them, and its icons as text of class names that EJ2 splits at commas (M21.X602); and Input, Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "doors": [
+      "M21.N49",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionTextBox.InputEventArgs reads Value and PreviousValue; FusionTextBox.ChangedEventArgs reads Value, PreviousValue and IsInteracted; and FusionTextBox.FocusInEventArgs and FusionTextBox.FocusOutEventArgs, the payloads of Focus and Blur, read Value.",
+     "doors": [
+      "M21.N49",
+      "N5.6"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionTextBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N49",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionTextBox() and field.FusionTextBox(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it.",
+     "doors": [
+      "M21.N49",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionTextBox's Reactive(t => t.Change, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; p.Component<FusionTextBox>(m => m.PreferredName) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N49"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs:10-69"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxEvents.cs:6-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxHtmlExtensions.cs:14-36"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxReactiveExtensions.cs:11-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:16-121"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's TextBox as its TypeScript declares it (@syncfusion/ej2-inputs/src/textbox/textbox.d.ts, its payload interfaces there, dataBind in @syncfusion/ej2-base/src/component.d.ts), and as its source places an icon (@syncfusion/ej2-inputs/src/input/input.js), each JavaScript name read there by hand, scratchpad m21/tools/dts.py's flags taken as leads; and the browser, by the promises where a defect has them.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X601",
+     "rung": "analyzer",
+     "defect": "The redesign declares Value as Property<string> (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:19 at 65fdf118d) where EJ2 documents a TextBox's value null until set (@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:76-81), so main's clear, SetValue(null) (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs:31-36 at 623dd4a27), is a nullable warning: the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite's Value is Property<string?>."
+    },
+    {
+     "id": "M21.X602",
+     "rung": "type",
+     "defect": "The redesign takes AddIcon's place as text (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:33 at 65fdf118d) where EJ2 documents two places, append and prepend (@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:281), and appends only for append, prepending for any other text (@syncfusion/ej2-inputs/src/input/input.js:997-1007), so a misspelled place compiles and puts the icon on the other side; main fixes the place at append (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs:52-62 at 623dd4a27) and cannot prepend. The rewrite's M21.N49 types the place as one of the two, written as EJ2 reads it (its name gate 2's), so AddIcon carries main's append and adds prepend."
+    }
+   ],
+   "promises": [],
+   "verdicts": [
+    {
+     "door": "FusionTextBox.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxBlurArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxBlurArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N49",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextBoxChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N49",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextBoxChangeArgs.PreviousValue.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxChangeArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N49",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextBoxChangeArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N49",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextBoxEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxEvents.Blur.get -> TypedEvent<FusionTextBoxBlurArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxEvents.Changed.get -> TypedEvent<FusionTextBoxChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxEvents.Focus.get -> TypedEvent<FusionTextBoxFocusArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxEvents.Input.get -> TypedEvent<FusionTextBoxInputArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionTextBoxFocusArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxFocusArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N49",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextBoxInputArgs.PreviousValue.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxInputArgs.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N49",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextBoxInputArgs.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "FusionTextBoxInputArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N49",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionTextBoxReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "static FusionTextBoxExtensions.AddAppendIcon<TModel>(this ComponentRef<FusionTextBox!, TModel!>! self, string! iconCssClass) -> ComponentRef<FusionTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextBoxExtensions.FocusIn<TModel>(this ComponentRef<FusionTextBox!, TModel!>! self) -> ComponentRef<FusionTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextBoxExtensions.FocusOut<TModel>(this ComponentRef<FusionTextBox!, TModel!>! self) -> ComponentRef<FusionTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextBoxExtensions.SetValue<TModel>(this ComponentRef<FusionTextBox!, TModel!>! self, string? value) -> ComponentRef<FusionTextBox!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextBoxExtensions.Value<TModel>(this ComponentRef<FusionTextBox!, TModel!>! self) -> TypedComponentSource<string!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextBoxHtmlExtensions.FusionTextBox<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.Inputs.TextBoxBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionTextBoxReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.Inputs.TextBoxBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionTextBoxEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.Inputs.TextBoxBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N49"
+     ]
+    },
+    {
+     "door": "static readonly FusionTextBoxEvents.Instance -> FusionTextBoxEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N49"
      ]
     }
    ]

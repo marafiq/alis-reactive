@@ -85,6 +85,13 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionChipList/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-buttons/src/chips/chip-list.d.ts:287`, `:428`, `:439`, `:449`, `:461`, `:468`).
+- `M21.N12` kept: `FusionColorPicker`: `Value` as `Property<string>`, since EJ2's value is a color that starts at
+  `#008000ff` (M21.X611), `Disabled`, `Toggle` and `Change`, with `IInputComponent.Input` committed by `Change` (M7.N3);
+  the payload `FusionColorPicker.ColorPickerEventArgs` (`Value`); and the render helpers `field.FusionColorPicker()` and
+  `field.FusionColorPicker(build => ..)`. It replaces main's six files
+  (`Alis.Reactive.Fusion/Components/FusionColorPicker/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts:46`, `:59`, `:146`, `:268`, `:368`).
 - `M21.N13` kept: `FusionComboBox`: `Value`, typed by the items' value member as M21.N1's items overload types
   MultiSelect's (gate 2) and admitting null, `Text` as `Property<string?>` (M21.X504), `Index` as `Property<int?>`,
   `DataBind`, `FocusIn`, `FocusOut`, `ShowPopup`, `HidePopup`, `Clear`, `Change`, `Focus` and `Blur`, with
@@ -149,6 +156,14 @@ Each name is gate 2's; each door is the capability it carries.
   in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:187`, `:320`, `:336`, `:408`, `:415`,
   `:435`, `:441`, `:449`, `:456`, `:463`, `:587`).
+- `M21.N25` kept: `FusionMaskedTextBox`, Fusion and EJ2's class name
+  (`@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:16`), which both lines' `FusionInputMask`
+  is renamed to (the owner, 2026-11-09): `Value` as `Property<string?>` (M21.X609), `FocusIn` and `Change`, with
+  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionMaskedTextBox.MaskChangeEventArgs` (`Value`,
+  `IsInteracted`); and the render helpers `field.FusionMaskedTextBox()` and `field.FusionMaskedTextBox(build => ..)`. It
+  replaces main's six files (`Alis.Reactive.Fusion/Components/FusionInputMask/` at 623dd4a27), whose doors carry their
+  verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:144`, `:198`, `:284`, `:308`, `:315`).
 - `M21.N26` kept: `FusionKanban`: `Cards<TCard>()` (`dataSource`), `GetColumnData<TCard>`, `GetSwimlaneData<TCard>`,
   `DataBind`, `AddCard`, `UpdateCard`, `DeleteCard` (a card, a list or a key, M21.X302), `AddColumn`, `DeleteColumn`,
   `ShowColumn`, `HideColumn`, `ShowSpinner`, `HideSpinner`, `OpenDialog` with `FusionKanbanDialogAction` (M21.X301)
@@ -201,6 +216,27 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts:361`, `:389`, `:437`,
   `:443`, `:451`, `:757`, `:898`, `:905`, `:913`, `:920`).
+- `M21.N32` kept: `FusionNumericTextBox`: `Value` and `Min` as `Property<decimal?>` (M21.X607), `FocusIn`, `FocusOut`,
+  `Increment`, `Decrement`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3);
+  the payloads `FusionNumericTextBox.ChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<decimal?>`, M21.X608,
+  and `IsInteracted`), `FusionNumericTextBox.NumericFocusEventArgs` and `FusionNumericTextBox.NumericBlurEventArgs`, of
+  which the declaration reads no member; and the render helper `field.FusionNumericTextBox(build => ..)`. It replaces
+  main's eight files (`Alis.Reactive.Fusion/Components/FusionNumericTextBox/` at 623dd4a27), whose doors carry their
+  verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:71`, `:82`, `:272`, `:278`, `:284`, `:373`, `:381`,
+  `:401`, `:407`, `:440`, `:445`, `:454`).
+- `M21.N33` kept: `FusionOtpInput`: `Value` as `Property<string>`, the text the browser holds
+  (`probe:ej2-otpinput-value-after-typing`), `DataBind`, `FocusIn`, `FocusOut`, `Input`, `ValueChanged`, `Focus` and
+  `Blur`, with `IInputComponent.Input` committed by `ValueChanged` (M7.N3); the payloads
+  `FusionOtpInput.OtpInputEventArgs` (`Value`, `PreviousValue`, `Index`), `FusionOtpInput.OtpChangedEventArgs` (`Value`,
+  `PreviousValue`, `IsInteracted`) and `FusionOtpInput.OtpFocusEventArgs` of `Focus` and `Blur` (`Value`, `Index`,
+  `IsInteracted`), each value read as the text the browser hands where EJ2's TypeScript declares `string | number`; and
+  the render helpers `field.FusionOtpInput()` and `field.FusionOtpInput(build => ..)` over a member of text, which start
+  at the member's value (M21.X612). It replaces main's nine files (`Alis.Reactive.Fusion/Components/FusionOtpInput/` at
+  623dd4a27), whose doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2
+  33.1.47's public member (`@syncfusion/ej2-inputs/src/otp-input/otp-input.d.ts:163`, `:266`, `:272`, `:278`, `:284`,
+  `:349`, `:355`, `:72`, `:76`, `:80`, `:97`, `:101`, `:105`, `:122`, `:126`, `:130`,
+  `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N34` kept: `FusionPivotView`: `CurrentView` (`currentView`, which EJ2 marks `@hidden`, a gate 2 item),
   `DataSourceSettings` as `LiveObject<FusionPivotViewDataSourceSettings>()` with `Rows<TRow>()` (`dataSource`),
   `DisplayOption` as `LiveObject<FusionPivotViewDisplayOption>()` with `View` and `Primary` (M21.D301), `Refresh`,
@@ -210,6 +246,21 @@ Each name is gate 2's; each door is the capability it carries.
   main's eight files (`Alis.Reactive.Fusion/Components/FusionPivotView/` at 623dd4a27), whose doors carry their verdicts
   in `spec/FusionComponents/features.json`. Each JavaScript name but `currentView` is EJ2 33.1.47's public member
   (`@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1447`, `:1476`, `:2244`, `:2460`, `:2467`, `:2816`).
+- `M21.N37` kept: `FusionRating`: `Value` as `Property<double>`, since EJ2's value starts at 0, `DataBind`, `Reset` and
+  `ValueChanged`, with `IInputComponent.Input` committed by `ValueChanged` (M7.N3); the payload
+  `FusionRating.RatingChangedEventArgs` (`Value`, `PreviousValue`, `IsInteracted`); and the render helpers
+  `field.FusionRating()` and `field.FusionRating(build => ..)` over a member of `double`, which start at the member's
+  value (M21.X613). It replaces main's six files (`Alis.Reactive.Fusion/Components/FusionRating/` at 623dd4a27), whose
+  doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public
+  member (`@syncfusion/ej2-inputs/src/rating/rating.d.ts:281`, `:318`, `:381`, `:57`, `:61`, `:65`,
+  `@syncfusion/ej2-base/src/component.d.ts:129`).
+- `M21.N38` kept: `FusionRichTextEditor`: `Value` as `Property<string?>` (M21.X610), `FocusIn` and `Change`, with
+  `IInputComponent.Input` committed by `Change` (M7.N3); the payload `FusionRichTextEditor.ChangeEventArgs` (`Value`,
+  `IsInteracted`); and the render helpers `field.FusionRichTextEditor()` and `field.FusionRichTextEditor(build => ..)`.
+  It replaces main's six files (`Alis.Reactive.Fusion/Components/FusionRichTextEditor/` at 623dd4a27), whose doors carry
+  their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts:750`, `:1249`, `:1432`,
+  `@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/interface.d.ts:557`, `:561`).
 - `M21.N39` kept: `FusionSchedule`: `CurrentView`, `SelectedDate`, `EventSettings` as
   `LiveObject<FusionScheduleEventSettings>()` with `Events<TEvent>()` (`dataSource`), `DataBind`, `GetEvents<TEvent>`,
   `AddEvent`, `SaveEvent`, `DeleteEvent<TKey>`, `OpenEditor`, `CloseEditor`, `RefreshEvents`, `Print` and `ScrollTo`;
@@ -219,6 +270,50 @@ Each name is gate 2's; each door is the capability it carries.
   (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:250`, `:274`, `:707`, `:867`, `:1716`, `:1726`, `:1878`).
+- `M21.N41` kept: `FusionSlider`: `Value` as `Property<double?>` for a slider of one handle and `RangeValue` as
+  `Property<double[]?>` for a range, each reading `value` (M21.X614), the second by a `name:` since the compiler refuses
+  two members named `Value`; `DataBind`, `Change` and `Changed`, with `IInputComponent.Input` committed by `Changed`
+  (M7.N3); the payload `FusionSlider.SliderChangeEventArgs` (`Value` and `PreviousValue` as numbers, `RangeValue` and
+  `PreviousRangeValue` as lists, M21.X616, `Text`, `Action`, `IsInteracted`); and the render helpers
+  `field.FusionSlider()` and `field.FusionSlider(build => ..)`, which start at the member's value (M21.X615). It
+  replaces main's six files (`Alis.Reactive.Fusion/Components/FusionSlider/` at 623dd4a27), whose doors carry their
+  verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-inputs/src/slider/slider.d.ts:366`, `:514`, `:521`, `:70`, `:76`, `:80`, `:84`, `:88`,
+  `@syncfusion/ej2-base/src/component.d.ts:129`).
+- `M21.N43` kept: `FusionSmartTextArea`: `Value` as `Property<string?>` (M21.X604), `FocusIn`, `Change`,
+  `BeforeSuggestionInsert` and `AfterSuggestionInsert`, with `IInputComponent.Input` committed by `Change` (M7.N3); the
+  payloads `FusionSmartTextArea.ChangedEventArgs` (`Value`, `PreviousValue`, `IsInteracted`),
+  `FusionSmartTextArea.BeforeSuggestionInsertArgs` (`Text`, `Cancel`) and
+  `FusionSmartTextArea.AfterSuggestionInsertArgs` (`InsertedText`, by M21.D601); `FusionSmartTextAreaOptions` and
+  `FusionSmartSuggestionMode` (EJ2's `SuggestionMode`, its names gate 2's); and the render helpers
+  `field.FusionSmartTextArea()` and `field.FusionSmartTextArea(configure => ..)`, which start at the member's value
+  (M21.X605), the component built by the framework's own component code
+  (`Alis.Reactive.Assets/components/fusion/smart-text-area.ts:26-30` at 65fdf118d). It replaces main's eight files
+  (`Alis.Reactive.Fusion/Components/FusionSmartTextArea/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.d.ts:39`, `:43`, `:65`, `:71`, `:78`, `:85`, `:101`,
+  `@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:39`, `:186`, `:281`,
+  `@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:11`, `:23`, `:27`), and `insertedText` the member its JavaScript
+  hands (`@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.js:420`, `:508`).
+- `M21.N48` kept: `FusionTextArea`: `Value` as `Property<string?>` (M21.X603), `DataBind`, `FocusIn`, `FocusOut`,
+  `Input`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3); the payloads
+  `FusionTextArea.InputEventArgs` (`Value`, `PreviousValue`), `FusionTextArea.ChangedEventArgs` (`Value`,
+  `PreviousValue`, `IsInteracted`), `FusionTextArea.FocusInEventArgs` and `FusionTextArea.FocusOutEventArgs` (`Value`);
+  and the render helpers `field.FusionTextArea()` and `field.FusionTextArea(build => ..)`. It replaces main's nine files
+  (`Alis.Reactive.Fusion/Components/FusionTextArea/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:39`, `:186`, `:192`, `:198`, `:204`, `:281`, `:287`,
+  `@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:11`, `:19`, `:23`, `:27`, `:31`,
+  `@syncfusion/ej2-base/src/component.d.ts:129`).
+- `M21.N49` kept: `FusionTextBox`: `Value` as `Property<string?>` (M21.X601), `DataBind`, `FocusIn`, `FocusOut`,
+  `AddIcon` with its place typed (M21.X602), `Input`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input`
+  committed by `Change` (M7.N3); the payloads `FusionTextBox.InputEventArgs` (`Value`, `PreviousValue`),
+  `FusionTextBox.ChangedEventArgs` (`Value`, `PreviousValue`, `IsInteracted`), `FusionTextBox.FocusInEventArgs` and
+  `FusionTextBox.FocusOutEventArgs` (`Value`); and the render helpers `field.FusionTextBox()` and
+  `field.FusionTextBox(build => ..)`. It replaces main's nine files (`Alis.Reactive.Fusion/Components/FusionTextBox/` at
+  623dd4a27), whose doors carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2
+  33.1.47's public member (`@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:81`, `:195`, `:201`, `:207`, `:213`, `:286`,
+  `:314`, `:320`, `:11`, `:19`, `:23`, `:27`, `:31`, `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N51` kept: `FusionToolbar`: `Disable` and `Clicked`, whose payload `FusionToolbarClickedArgs` reads its `item`;
   and the render helper `Html.FusionToolbar(plan, id, build => ..)`. It replaces main's seven files
   (`Alis.Reactive.Fusion/Components/FusionToolbar/` at 623dd4a27), whose doors carry their verdicts in
@@ -321,3 +416,41 @@ features they give.
 - A ListBox method takes every argument EJ2 takes. Main gives `selectItems`, `selectAll` and `enableItems` six C# names
   with the state and `isValue` fixed (`Alis.Reactive.Fusion/Components/FusionListBox/FusionListBoxExtensions.cs:19-35`
   at 623dd4a27); the redesign takes each as an `Arg`, which the rewrite keeps.
+- A field's value holds null as the vendor's does (M21.X601, M21.X603, M21.X604, M21.X607, M21.X609, M21.X610,
+  M21.X614). The redesign declares the value of TextBox, TextArea, SmartTextArea, NumericTextBox, MaskedTextBox,
+  RichTextEditor and Slider non-null (`Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:19` at 65fdf118d)
+  where EJ2 documents each null until a value is set (`@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:76-81`); ALIS019
+  refuses the declarations, and a value that admits null keeps main's clears.
+- A cleared number reads as nothing (M21.X608). Both lines read NumericTextBox's change value as a number
+  (`Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:56` at 65fdf118d), while the browser
+  hands null for a cleared box and for the change after it (`probe:ej2-payload-numerictextbox-change-cleared`,
+  `probe:ej2-payload-numerictextbox-change-after-cleared`); the rewrite reads `decimal?`, so a view can check a cleared
+  dose.
+- A component starts at the member's value (M21.X605, M21.X612, M21.X613, M21.X615). Both lines render Slider, Rating
+  and OtpInput by the vendor's builder that binds no member
+  (`Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:83` at 65fdf118d) and SmartTextArea at its options'
+  value (`Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextArea.cs:144` at 65fdf118d), so each starts
+  empty or where the vendor starts one, whatever the model holds, and the redesign's sandbox repeats the value in the
+  build callback (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Slider/Index.cshtml:30` at 65fdf118d);
+  the rewrite starts each at the member's value by M21.D1.
+- A range slider reads its handles (M21.X616). Both lines read a slider's change value as one number
+  (`Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:43` at 65fdf118d), while a range slider hands a list
+  (`probe:ej2-payload-slider-rest-change`); the rewrite's payload reads `RangeValue` and `PreviousRangeValue` as lists,
+  as the component's `RangeValue` reads its value.
+- An icon's place is typed (M21.X602). The redesign takes `AddIcon`'s place as text
+  (`Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:33` at 65fdf118d), and EJ2 prepends the icon for any
+  text but `append` (`@syncfusion/ej2-inputs/src/input/input.js:997-1007`); the rewrite takes one of the two places EJ2
+  documents (`@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:281`).
+- A payload is read by the names the browser hands (M21.D601). EJ2's TypeScript names SmartTextArea's inserted
+  suggestion `text` (`@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.d.ts:48-53`), and its JavaScript hands
+  `insertedText` (`@syncfusion/ej2-inputs/src/smart-textarea/smart-textarea.js:420`,
+  `probe:ej2-payload-smarttextarea-afterSuggestionInsert`); both lines read `insertedText`, and the rewrite keeps it,
+  pinned by the browser fact against the vendor contract's refusal.
+- A SmartTextArea renders with no script in the view. Main's render helper writes a script that builds the component
+  when the page loads (`Alis.Reactive.Fusion/Components/FusionSmartTextArea/FusionSmartTextAreaHtmlExtensions.cs:82-89`
+  at 623dd4a27); the redesign builds it in the framework's own component code
+  (`Alis.Reactive.Assets/components/fusion/smart-text-area.ts:26-30` at 65fdf118d), which the rewrite keeps.
+- A color is never written as null (M21.X611). Main's `SetValue` takes null
+  (`Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs:29` at 623dd4a27) where EJ2's value
+  is a color that starts at `#008000ff` (`@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts:41-46`); the
+  rewrite's `Value` is `Property<string>`, as the redesign's.

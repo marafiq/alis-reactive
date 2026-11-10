@@ -2383,6 +2383,216 @@
       "probe": "ej2-payloads.mjs",
       "expect": "ej2-schedule-save-event-action: saveEvent with 1 the subject is Round; with 'Save' it is Rounds by text",
       "source": "spec/probes/ej2-payloads.mjs"
+    },
+    {
+      "id": "ej2-payload-otpinput-focus",
+      "statement": "EJ2 33.1.47's OtpInput hands focus's listener these members by kind, its value as text, where its TypeScript declares string | number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-otpinput-focus: element:Element,event:object,index:number,isInteracted:boolean,name:string,value:string",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F33",
+        "page": "An unlock page whose code FusionOtpInput's Focus handler sets code-focus's text to the payload's Index.",
+        "gesture": "Click the first code box.",
+        "outcome": "code-focus shows 0."
+      }
+    },
+    {
+      "id": "ej2-payload-otpinput-input",
+      "statement": "EJ2 33.1.47's OtpInput hands input's listener these members by kind, its value and previous value as text after four digits are typed, where its TypeScript declares string | number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-otpinput-input: element:Element,event:object,index:number,name:string,previousValue:string,value:string",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F33",
+        "page": "An unlock page whose code FusionOtpInput's Input handler sets code-typed's text to the payload's Value.",
+        "gesture": "Type 4821 into the code boxes.",
+        "outcome": "code-typed shows 4821."
+      }
+    },
+    {
+      "id": "ej2-payload-otpinput-valueChanged",
+      "statement": "EJ2 33.1.47's OtpInput hands valueChanged's listener these members by kind once four digits are typed, its value and previous value as text, where its TypeScript declares string | number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-otpinput-valueChanged: element:Element,event:object,isInteracted:boolean,name:string,previousValue:string,value:string",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F33",
+        "page": "An unlock page whose code FusionOtpInput's ValueChanged handler sets code-entered's text to the payload's Value.",
+        "gesture": "Type 4821 into the code boxes.",
+        "outcome": "code-entered shows 4821."
+      }
+    },
+    {
+      "id": "ej2-payload-otpinput-blur",
+      "statement": "EJ2 33.1.47's OtpInput hands blur's listener these members by kind, its value as text, where its TypeScript declares string | number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-otpinput-blur: element:Element,event:object,index:number,isInteracted:boolean,name:string,value:string",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F33",
+        "page": "An unlock page whose code FusionOtpInput's Blur handler sets code-left's text to the payload's Value.",
+        "gesture": "Type 4821 into the code boxes, then click the page's heading.",
+        "outcome": "code-left shows 4821."
+      }
+    },
+    {
+      "id": "ej2-otpinput-value-after-typing",
+      "statement": "EJ2 33.1.47's OtpInput of the default number type holds its value as text after four digits are typed, where its TypeScript declares string | number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-otpinput-value-after-typing: string",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F33",
+        "page": "An unlock page whose Read code button sets code-read's text to the code FusionOtpInput's Value.",
+        "gesture": "Type 4821 into the code boxes, then click Read code.",
+        "outcome": "code-read shows 4821."
+      }
+    },
+    {
+      "id": "ej2-payload-slider-pain-change",
+      "statement": "EJ2 33.1.47's Slider of the default type hands change's listener these members by kind, value and previousValue each a number, where its TypeScript declares number | number[].",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-slider-pain-change: action:string,isInteracted:boolean,name:string,previousValue:number,text:string,value:number",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F41",
+        "page": "A pain score page whose FusionSlider, from 0 to 10 at 3, has a Change handler that sets pain-reading's text to the payload's Value.",
+        "gesture": "Click the slider's handle and press the right arrow.",
+        "outcome": "pain-reading shows 4."
+      }
+    },
+    {
+      "id": "ej2-payload-slider-pain-changed",
+      "statement": "EJ2 33.1.47's Slider of the default type hands changed's listener these members by kind, value and previousValue each a number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-slider-pain-changed: action:string,isInteracted:boolean,name:string,previousValue:number,text:string,value:number",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F41",
+        "page": "A pain score page whose FusionSlider, from 0 to 10 at 3, has a Changed handler that sets pain-settled's text to the payload's PreviousValue.",
+        "gesture": "Click the slider's handle and press the right arrow.",
+        "outcome": "pain-settled shows 3."
+      }
+    },
+    {
+      "id": "ej2-payload-slider-rest-change",
+      "statement": "EJ2 33.1.47's Slider of the Range type hands change's listener these members by kind, value and previousValue each a list, where its TypeScript declares number | number[].",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-slider-rest-change: action:string,isInteracted:boolean,name:string,previousValue:Array,text:string,value:Array",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F41",
+        "page": "A rest window page whose range FusionSlider, from 12 to 18 at 13 and 15, has a Change handler that sets rest-reading's text to the payload's RangeValue.",
+        "gesture": "Click the first handle and press the right arrow.",
+        "outcome": "rest-reading shows 14 and 15."
+      }
+    },
+    {
+      "id": "ej2-payload-slider-rest-changed",
+      "statement": "EJ2 33.1.47's Slider of the Range type hands changed's listener these members by kind, value and previousValue each a list.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-slider-rest-changed: action:string,isInteracted:boolean,name:string,previousValue:Array,text:string,value:Array",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F41",
+        "page": "A rest window page whose range FusionSlider, from 12 to 18 at 13 and 15, has a Changed handler that sets rest-before's text to the payload's PreviousRangeValue.",
+        "gesture": "Click the first handle and press the right arrow.",
+        "outcome": "rest-before shows 13 and 15."
+      }
+    },
+    {
+      "id": "ej2-payload-numerictextbox-change-cleared",
+      "statement": "EJ2 33.1.47's NumericTextBox hands change's listener a null value when the box is cleared, where its TypeScript declares value?: number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-numerictextbox-change-cleared: event:object,isInteracted:boolean,isInteraction:boolean,name:string,previousValue:number,value:null",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F32",
+        "page": "A dose page whose FusionNumericTextBox at 5 has a Change handler that sets dose-state's text to cleared when the payload's Value is null and to entered otherwise.",
+        "gesture": "Select the dose box's text, press Backspace, then press Tab.",
+        "outcome": "dose-state shows cleared."
+      }
+    },
+    {
+      "id": "ej2-numerictextbox-value-cleared",
+      "statement": "EJ2 33.1.47's NumericTextBox holds null as its value once the box is cleared.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-numerictextbox-value-cleared: null",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F32",
+        "page": "A dose page whose Check dose button sets dose-check's text to no dose when the FusionNumericTextBox's Value is null and to its Value otherwise.",
+        "gesture": "Select the dose box's text, press Backspace, press Tab, then click Check dose.",
+        "outcome": "dose-check shows no dose."
+      }
+    },
+    {
+      "id": "ej2-payload-numerictextbox-change-after-cleared",
+      "statement": "EJ2 33.1.47's NumericTextBox hands the change after a cleared box a null previousValue, where its TypeScript declares previousValue?: number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-numerictextbox-change-after-cleared: event:object,isInteracted:boolean,isInteraction:boolean,name:string,previousValue:null,value:number",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F32",
+        "page": "A dose page whose FusionNumericTextBox at 5 has a Change handler that sets dose-before's text to was empty when the payload's PreviousValue is null and to its PreviousValue otherwise.",
+        "gesture": "Select the dose box's text, press Backspace, press Tab, type 7 into the dose box, then press Tab.",
+        "outcome": "dose-before shows was empty."
+      }
+    },
+    {
+      "id": "ej2-payload-smarttextarea-beforeSuggestionInsert",
+      "statement": "EJ2 33.1.47's SmartTextArea hands beforeSuggestionInsert's listener text and cancel, as its TypeScript declares.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-smarttextarea-beforeSuggestionInsert: cancel:boolean,name:string,text:string",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F43",
+        "page": "A care note page whose inline FusionSmartTextArea suggests from an endpoint that answers OK:[ two glasses of water], with a BeforeSuggestionInsert handler that sets suggestion-offered's text to the payload's Text.",
+        "gesture": "Type Resident drank into the note and pause.",
+        "outcome": "suggestion-offered shows two glasses of water."
+      }
+    },
+    {
+      "id": "ej2-payload-smarttextarea-afterSuggestionInsert",
+      "statement": "EJ2 33.1.47's SmartTextArea hands afterSuggestionInsert's listener insertedText, where its TypeScript declares text (smart-textarea.d.ts:48-53).",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, driven by Playwright 1.63.0 with real clicks and keys",
+      "probe": "ej2-payloads-u6.mjs",
+      "expect": "ej2-payload-smarttextarea-afterSuggestionInsert: insertedText:string,name:string",
+      "source": "spec/probes/ej2-payloads-u6.mjs",
+      "proof": {
+        "feature": "M21.F43",
+        "page": "A care note page whose inline FusionSmartTextArea suggests from an endpoint that answers OK:[ two glasses of water], with an AfterSuggestionInsert handler that sets suggestion-taken's text to the payload's InsertedText.",
+        "gesture": "Type Resident drank into the note, pause, then press Tab.",
+        "outcome": "suggestion-taken shows two glasses of water."
+      }
     }
   ]
 }
