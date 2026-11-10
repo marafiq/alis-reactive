@@ -826,3 +826,5 @@
   Evidence: DESIGN:1298-1333; Conditions/module.md:13, ValuesAndSources/module.md:25-26, Declarations/module.md:47.
 - 2026-11-09 probes, for module 21: EJ2 33.1.47's builder writes C# data through Newtonsoft's JsonConvert.DefaultSettings (PascalCase unset, camel case under AddReactiveFusion), never by a JsonPropertyName, so `Field.Of(x => x.DisplayLabel)` names `label` while the data holds `displayLabel`; a JRaw of System.Text.Json's text passes through as written; EJ2 escapes < and >.
   Evidence: fusion-ej2-builder-newtonsoft-defaults, fusion-ej2-builder-raw-json and fusion-ej2-script-text-escaped in spec/probes/facts.json, printed by spec/probes/AspNetCoreBinding/FusionProbes.cs.
+- 2026-11-09 check, by the lead, closing module 19's gap: module_cites resolves every module.md cite at the SHA its sentence names, or at HEAD, the redesign or main when none, a bare `:24` at the path before it and a bare file name at its last full path; 375 of 375 resolve; CITE reads `.targets` too.
+  Evidence: check_module_cites at spec/tools/check.py; plants of a long range, a wrong SHA and an unknown file name, each listed.

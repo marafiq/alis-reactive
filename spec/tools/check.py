@@ -208,7 +208,9 @@ def check_inventory():
 
 
 RUNGS = {"type", "analyzer", "refusal", "behavior"}
-CITE = re.compile(r"([A-Za-z0-9_.\-/]+\.(?:cs|ts|tla|cfg|json|md|txt|mjs|csproj|props|cshtml|js|sh|yml)):(\d+)(?:-(\d+))?")
+CITE_EXTENSIONS = "cs|ts|tla|cfg|json|md|txt|mjs|csproj|props|targets|cshtml|js|sh|yml"
+CITE = re.compile(rf"([A-Za-z0-9_.\-/]+\.(?:{CITE_EXTENSIONS})):(\d+)(?:-(\d+))?")
+PROSE_CITE_TOKEN = re.compile(rf"(?P<path>[A-Za-z0-9_.\-/]+\.(?:{CITE_EXTENSIONS}))?:(?P<first>\d+)(?:-(?P<last>\d+))?|\bat\s+(?P<sha>[0-9a-f]{{7,40}})\b|(?P<stop>[.;]\s|\n\n)")
 CHECKER = re.compile(r"`(?:([A-Za-z]+)\.tla:(\w+)|probe:([\w.\-]+)|check:(\w+))`")
 DEFECT = re.compile(r"^- `?(X\d+\.\d+)`? (type|analyzer|refusal|behavior)(?: \([^)]*\))?: (.+)$")
 NEW_DOOR = re.compile(r"`?(N\d+\.\d+)`?")
@@ -1044,6 +1046,49 @@ def defect_problems(model, core_rungs, doors, analyzer_ids):
     return problems
 
 
+def check_module_cites():
+    modules = sorted(SPEC.glob("*/module.md"))
+    if not modules:
+        return result(False, "not started: no spec/<Module>/module.md")
+    problems, cites = [], 0
+    for path in modules:
+        for cite, sha, line in prose_cites(path.read_text()):
+            cites += 1
+            if not prose_cite_resolves(cite, sha):
+                problems.append(f"{path.relative_to(REPO)}:{line}: {written_cite(cite)} resolves at none of {sha or 'HEAD, the redesign and main'}")
+    return result(not problems, "; ".join(problems[:8]) or "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main", cites=cites, unresolved=len(problems))
+
+
+def prose_cites(text):
+    found, pending, last_path, full_paths = [], [], None, {}
+    for match in PROSE_CITE_TOKEN.finditer(text):
+        if match.group("sha") or match.group("stop"):
+            found += [(cite, match.group("sha"), line) for cite, line in pending]
+            pending = []
+            continue
+        written = match.group("path")
+        if written is None and (last_path is None or text[match.start() - 1:match.start()] not in (" ", "(", "`", ",")):
+            continue
+        path = written or last_path
+        path = path if "/" in path else full_paths.get(path, path)
+        last_path = path
+        if "/" in path:
+            full_paths[path.rsplit("/", 1)[1]] = path
+        pending.append(((path, int(match.group("first")), int(match.group("last")) if match.group("last") else None), text.count("\n", 0, match.start()) + 1))
+    return found + [(cite, None, line) for cite, line in pending]
+
+
+def written_cite(cite):
+    path, first, last = cite
+    return f"{path}:{first}-{last}" if last else f"{path}:{first}"
+
+
+def prose_cite_resolves(cite, sha):
+    path, first, last = cite
+    needed = max(first, last or first)
+    return any(line_count(source, path) >= needed for source in ([sha] if sha else [None, BASE_SHA, MAIN_SHA]))
+
+
 def check_defects():
     if not feature_files():
         return result(False, "not started: no spec/<Module>/features.json")
@@ -1182,6 +1227,7 @@ CHECKS = [
     ("verdicts", "every main-only door has a verdict; a refusal names its carriers", check_verdicts),
     ("features_core", "every feature mapped to the core", check_features_core),
     ("features_lost", "every module and feature on either line carried: features lost 0", check_features_lost),
+    ("module_cites", "every module.md cite resolves at the SHA it names", check_module_cites),
     ("fluent", "every module's sentences consistent", check_fluent),
     ("gate2", "owner gate 2: the fluent API", check_gate(2)),
     ("matrix", "every conformance cell promised for both reference components", check_matrix),
@@ -1199,7 +1245,7 @@ STEPS = [
     (3, "B", "Inventory", ["inventory"], "Write spec/tools/inventory.py and the TSVs."),
     (4, "C", "Q1 to Q18, TLA+ specs, probes, history", ["core_questions", "core_tlc", "probes", "history"], "Answer Q1 to Q18 in spec/Core/DESIGN.md with their TLA+ specs and probes; write spec/history.tsv."),
     (5, "C", "Q19, the schema, Q20, tracing, Q21, realtime, the validation spec, gate 1", ["questions", "evidence", "tlc", "kinds", "gate1"], "Write Schema.tla, schema.md and the validation specs; present gate 1."),
-    (6, "D", "Feature rows", ["doors_mapped", "verdicts", "features_core", "features_lost"], "Write spec/<Module>/features.json and module.md for each module."),
+    (6, "D", "Feature rows", ["doors_mapped", "verdicts", "features_core", "features_lost", "module_cites"], "Write spec/<Module>/features.json and module.md for each module."),
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
