@@ -21,7 +21,8 @@ The plan grammar: its closed node set, how C# writes it and the TypeScript contr
 ## Boundaries
 
 What a node means belongs to the module whose feature writes it: a statement's, an expression's and an operator's
-meaning is the module of the door that writes it, a shape's and the number text's module 2's (Q3), the path step
+meaning is the module of the door that writes it, the conversion `as` module 2's (N3.1), a shape's forms and the
+number text module 15's (D3.1, D3.7), the path step
 `each` module 15's (Q1), the listening and release kinds module 12's, the form's registration module 8's, a
 container's block N14.3's, which module 7's rows carry, the `request` statement and its contracts module 6's, the time
 zone kinds module 15's, with dates per host, and the trace kinds module 26's. This module owns the set and its

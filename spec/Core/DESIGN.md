@@ -330,8 +330,9 @@ Terms used throughout:
 - `X3.1` type: a second conversion cannot be written: new:N3.1.
 - `X3.2` type: a file cannot be read as text or sent as JSON by accident: new:N3.2 gives it its own shape, and
   the request argument (Q9) accepts a `file` member only in form data.
-- `X3.3` behavior: the text `abc` in an input bound to an `int` reads nothing, so `GreaterThan(0)` fails in the
-  browser as it fails on the server.
+- `X3.3` behavior: the text `abc` in an input bound to an `int` member that starts at 5 reads 5 wherever the input is
+  a source, never `abc` or `NaN`, and its check fails the member with the binder's message before `GreaterThan(0)`
+  runs (N3.3, D16.7).
 - `X3.4` behavior: a blank input bound to an `int` member initialized to 5 sends 5 and validates as 5.
 - `X3.5` behavior: a decimal sent as form data from a view rendered under `de-DE` binds `1,5` on the endpoint.
 - `X3.6` behavior: under `de-DE`, `1,5` typed in a decimal input passes `GreaterThan(1)` in the browser, as the

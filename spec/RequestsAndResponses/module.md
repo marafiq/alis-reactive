@@ -32,7 +32,8 @@ each host sends. Module 6 of `spec/CLAUDE.md`.
 
 A validator, its rules and its rule sets are module 8's, and so are `ValidationResult` and `ValidationFailure`; the
 request's `Validate` names the validator and is here (D16.2). What `Into` does to the slot it loads is module 9's
-(Q12). The page's URL as a source is module 2's (N10.7's `PageUrl<TPage>()`). Native's `NativeGatherExtensions` and
+(Q12). The page's URL as a source is module 2's (N10.7's `PageUrl<TPage>()`), and a file the person chose, N10.7's
+`BrowserFile`, module 15's (D3.1, N3.2). Native's `NativeGatherExtensions` and
 the action link's `NativeActionLinkRequest<TModel>` are modules 24 and 25's, which onboard on these doors (D17.15).
 
 ## Doors
@@ -61,9 +62,9 @@ Module 6 adds no door of its own: Q9 and Q10 give every capability its door, N10
 - `Parallel`: main's `Parallel(params Action<HttpRequestBuilder<TModel>>[])`, the redesign's `Parallel` over
   `RequestStart<TModel>` and both lines' `OnAllSettled` go to `Parallel(params Action<Pipeline<TModel>>[] branches)`,
   each branch a pipeline and the steps after it the all-settled block (D10.10).
-- Kept: `WhileLoading`, `Finally` and `Into(elementId)` (D10.3, D10.11). Both lines' `Validate<TValidationSource>(formId)`
-  goes to `Validate<TValidator>()` over the body the request sends (D16.1, D16.2), and both lines' `ValidationErrors(formId)`
-  to `ShowErrors(problem)` (D16.13).
+- Kept: `WhileLoading`, `Finally` and `Into(elementId)` (D10.3, D10.11). Both lines'
+  `Validate<TValidationSource>(formId)` goes to `Validate<TValidator>()` over the body the request sends (D16.1,
+  D16.2), and both lines' `ValidationErrors(formId)` to `ShowErrors(problem)` (D16.13).
 - Added on the evidence of both lines: `ValidationResult.ToErrorResponse()` on each host (N10.1), the net48 JSON
   result door (N10.6), the defaults (N9.6, N10.3), `Busy`, `NoBusy`, `NoDefaults`, `Download` and `Notice` (N10.7), and
   net48's `[ValidateAntiForgeryHeader]` (D9.22).
@@ -71,8 +72,9 @@ Module 6 adds no door of its own: Q9 and Q10 give every capability its door, N10
 ## Improvements
 
 - A request names what it sends. Main's `IncludeAll` sends every input registered on the page
-  (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:31-35` at 623dd4a27), and the redesign's `Form()` the inputs of
-  the form the request is taken to check (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:129` at 65fdf118d);
+  (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:31-35` at 623dd4a27), and the redesign's `Form()` the
+  inputs of the form the request is taken to check (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:129` at
+  65fdf118d);
   `Form(form)`, `Inputs(container)` and `Input` each name it, on a page with many forms or none (D9.15).
 - A sent member is typed by the request class. Main names it by a string and takes its value as an object
   (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:40` at 623dd4a27), a placeholder by a string

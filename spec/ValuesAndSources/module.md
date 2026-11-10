@@ -6,8 +6,9 @@ the page's own URL read as a source. Module 2 of `spec/CLAUDE.md`.
 ## Core questions
 
 - Q2: every value is read by the one read, its path named from a typed lambda, never from text (D2.1, D2.3).
-- Q3: the one conversion, `as` with a shape, carries a value held in another form to the position's type (D3.13), and
-  a second conversion cannot be written (N3.1).
+- Q3: the one conversion, `as` with a shape, carries a value held in another form to the position's type by one table
+  (D3.3, D3.4), and a second conversion cannot be written (N3.1). Each shape's forms per host, a date's at a live
+  member among them (D3.13), are module 15's.
 - Q7: the positions and the sources are closed sets (D7.1, D7.2); every position takes every source, a literal
   included, typed by `where TSource : TValue` (X7.1); a source in the app's form meets a live object as held,
   converted, mapped or refused (D7.7, gate 1's P8).
@@ -40,9 +41,12 @@ The page's URL needs no door of its own: N10.7's `PageUrl<TPage>()` carries it, 
   Main's `FromUrl("tab")` names it as text (`Alis.Reactive/PlanAuthoring/Pipelines/PipelineBuilder.cs:147-159` at
   623dd4a27), which ALIS009 refuses on the public surface.
 - One source type. Main keeps a class per kind of source
-  (`Alis.Reactive/PlanAuthoring/Conditions/TypedComponentSource.cs:6`, `Alis.Reactive/PlanAuthoring/Conditions/TypedPluginSource.cs:11`,
-  `Alis.Reactive/PlanAuthoring/Conditions/TypedPluginSource.cs:32`, `Alis.Reactive/PlanAuthoring/Conditions/PayloadTypedSource.cs:11`,
+  (`Alis.Reactive/PlanAuthoring/Conditions/TypedComponentSource.cs:6`,
+  `Alis.Reactive/PlanAuthoring/Conditions/TypedPluginSource.cs:11`,
+  `Alis.Reactive/PlanAuthoring/Conditions/TypedPluginSource.cs:32`,
+  `Alis.Reactive/PlanAuthoring/Conditions/PayloadTypedSource.cs:11`,
   `Alis.Reactive/PlanAuthoring/Conditions/TypedUrlSource.cs:11` at 623dd4a27); the redesign and the POC make a declared
-  member a source itself (`Alis.Reactive/Components/JsMembers.cs:17` at 65fdf118d, `poc/Alis.Reactive.Poc/Components/Members.cs:9`).
+  member a source itself (`Alis.Reactive/Components/JsMembers.cs:17` at 65fdf118d,
+  `poc/Alis.Reactive.Poc/Components/Members.cs:9`).
 - D7.2 and D9.18 named the redesign's `p.Url<TQuery>()` and `p.Bound`, which N10.7's `PageUrl<TPage>()` and N13.1's
   container read replaced; this unit aligns both lines with those doors.

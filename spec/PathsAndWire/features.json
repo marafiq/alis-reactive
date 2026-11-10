@@ -1,0 +1,473 @@
+{
+  "module": "PathsAndWire",
+  "features": [
+    {
+      "id": "M15.F1",
+      "summary": "Paths and wire: how a value is named and written where it crosses a boundary. A path is typed steps, a member, an index or each, so no member name is a marker, and a dictionary entry is named as System.Text.Json writes its key, a key it writes no name for refused where the view renders. One derivation gives a member's binding name, body path, data name and element id under the view's prefix; a body names a member as the endpoint's host binds it, form and query keys are binding names, and data names follow the app's JSON options. A number is a JSON number, text under the view's culture in form data and invariant text in a query; a DateTime is its wall fields with no offset, a DateTimeOffset its wall time and offset in the view's time zone, and DateOnly and TimeOnly their own texts on net10; a file is the file itself, sent only in form data or as the whole body; and a date a step writes into a live member reaches it as a Date, through a shape that ends. The one public type of either line here is the redesign's BrowserFile, the file shape's value, kept as N10.7's live object. Main camel-cases every data name, reads a dictionary key as a number, sends every date with the browser clock's offset and parses and shows numbers as JavaScript does; the redesign reads JsonPropertyName, writes body paths by CLR name, passes a failed conversion's raw value on, gives an instant the browser clock's offset and shapes a type that holds itself as any past its first level.",
+      "status": "redesign-only",
+      "types": [
+        "Alis.Reactive:BrowserFile"
+      ],
+      "claims": [],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "internal static string Of(string memberName) => JsonNamingPolicy.CamelCase.ConvertName(memberName);",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9"
+        },
+        {
+          "line": "main",
+          "text": "private static List<string> ExtractRuntimeMemberChain(Expression expr) => ExtractMemberChain(expr, JsonMemberName.Of);",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/ExpressionPathHelper.cs:43"
+        },
+        {
+          "line": "main",
+          "text": "return Convert.ToInt32(value);",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/ExpressionPathHelper.cs:234"
+        },
+        {
+          "line": "main",
+          "text": "A date leaves the browser as the clock the user picked with that clock's offset",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-wire-format.ts:1"
+        },
+        {
+          "line": "main",
+          "text": "const minutesEastOfUtc = -Math.round(date.getTimezoneOffset());",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-wire-format.ts:37"
+        },
+        {
+          "line": "main",
+          "text": "if (value instanceof Date) return ok(value.toISOString());",
+          "cite": "Alis.Reactive.Assets/runtime/shared/shape-convert.ts:155"
+        },
+        {
+          "line": "main",
+          "text": "if (isMissingInput(value)) return ok(0);",
+          "cite": "Alis.Reactive.Assets/runtime/shared/shape-convert.ts:161"
+        },
+        {
+          "line": "main",
+          "text": "const parsed = Number(value);",
+          "cite": "Alis.Reactive.Assets/runtime/shared/shape-convert.ts:250"
+        },
+        {
+          "line": "main",
+          "text": "if (arrayContainsFile(inputItems)) throw new Error(\"[alis] File objects require form-data body format\");",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:133"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class BrowserFile",
+          "cite": "Alis.Reactive/Components/BrowserFile.cs:7"
+        },
+        {
+          "line": "redesign",
+          "text": "public long LastModified { get; set; }",
+          "cite": "Alis.Reactive/Components/BrowserFile.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static string Of(MemberInfo member) => member.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? Of(member.Name);",
+          "cite": "Alis.Reactive/Members/JsonMemberName.cs:11"
+        },
+        {
+          "line": "redesign",
+          "text": ": path.Then(step.IsKey ? step.Key : JsonMemberName.Of(step.Access!.Member)));",
+          "cite": "Alis.Reactive/Members/ExpressionPathHelper.cs:100"
+        },
+        {
+          "line": "redesign",
+          "text": ": path.Then(step.IsKey ? step.Key : step.Name));",
+          "cite": "Alis.Reactive/Members/ExpressionPathHelper.cs:105"
+        },
+        {
+          "line": "redesign",
+          "text": "=> Convert.ToInt32(Expressions.Evaluate(expression), CultureInfo.InvariantCulture);",
+          "cite": "Alis.Reactive/Members/ExpressionPathHelper.cs:204"
+        },
+        {
+          "line": "redesign",
+          "text": "const EACH_ITEM = \"[]\";",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/paths.ts:5"
+        },
+        {
+          "line": "redesign",
+          "text": "case \"number\":   return asNumber(value) ?? value;",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/shape.ts:18"
+        },
+        {
+          "line": "redesign",
+          "text": "case \"number\":  return nothingBound ? 0 : converted;",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/shape.ts:36"
+        },
+        {
+          "line": "redesign",
+          "text": "const parsed = new Date(value);",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/shape.ts:93"
+        },
+        {
+          "line": "redesign",
+          "text": "return date === undefined ? undefined : new Instant(date.getTime(), -Math.round(date.getTimezoneOffset()));",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/shape.ts:110"
+        },
+        {
+          "line": "redesign",
+          "text": "IsDataClass(candidate) && enclosingRecords.Add(candidate) ? RecordOf(candidate, enclosingRecords) : Shape.Any);",
+          "cite": "Alis.Reactive/Components/ArgumentShape.cs:14"
+        },
+        {
+          "line": "redesign",
+          "text": "if (fileOf(value) !== undefined) throw new Error(\"[alis] File objects cannot be sent via GET\");",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:100"
+        },
+        {
+          "line": "redesign",
+          "text": "if (file !== undefined) data.append(name, file, file.name);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:123"
+        },
+        {
+          "line": "proposed",
+          "text": "A path step is a member, an index or each, written as a JSON string, a non-negative integer or {\"kind\":\"each\"}, so a member named [] is a member.",
+          "doors": [
+            "N1.1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A member's binding name, body path, data name and element id come from one MemberPath, built from the typed lambda and the view's HtmlFieldPrefix, its binding name by BindingName.",
+          "doors": [
+            "N2.1",
+            "N1.2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A request body names each member as the endpoint's host binds it, and a data read as the app's JSON options name it, through WireNames for the host the view renders on.",
+          "doors": [
+            "N2.2",
+            "N10.6"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A file is the shape file, a BrowserFile the page reads as a live object, which a request sends only in form data or as the whole body.",
+          "doors": [
+            "N3.2",
+            "N10.7"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The view's culture and its time zone, the app's choice per request, are written into the plan once where the view renders, the zone as an IANA id on both hosts.",
+          "doors": [
+            "N3.4",
+            "N3.5",
+            "N19.3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A dictionary of dates written into a live member, and a member lambda that names the model, are refused at build by ALIS033.",
+          "doors": [
+            "N18.10"
+          ]
+        }
+      ],
+      "nodes": [
+        "get",
+        "call",
+        "set",
+        "each",
+        "request",
+        "data",
+        "lit",
+        "op",
+        "as",
+        "string",
+        "number",
+        "boolean",
+        "date",
+        "instant",
+        "file",
+        "any",
+        "array",
+        "nullable",
+        "object",
+        "zone"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/ExpressionPathHelper.cs:40-108"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/ExpressionPathHelper.cs:196-235"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:5-10"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Members/ExpressionPathHelper.cs:97-124"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Members/JsonMemberName.cs:7-12"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/BrowserFile.cs:7-20"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive/Components/ArgumentShape.cs:8-26"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/shared/shape-convert.ts:151-196"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-wire-format.ts:7-43"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:111-142"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/shape.ts:10-137"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/grammar/paths.ts:5-20"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/http.ts:115-136"
+        }
+      ],
+      "core": [
+        "Q1",
+        "Q2",
+        "Q3"
+      ],
+      "meanings": [],
+      "oracle": "The spec itself where the framework is the authority: D1.2's step form, D2.3's one derivation, spec/Core/conversions.md's table and spec/Core/DateWire.tla; the endpoint's binder on each host, read from MVC 5.3.0's source and run on ASP.NET Core 10 in spec/probes; System.Text.Json 10's writer; ECMA-402's Intl for a zone's offsets; ISO 8601-1:2019 and RFC 3339 for date text; and CLDR's windowsZones for net48's zone ids.",
+      "checker": [
+        "core:Q1",
+        "core:Q2",
+        "core:Q3",
+        "DateWire.tla:DateTimeCarriesNoOffset",
+        "DateWire.tla:DateShowsItsDayAtMidnight",
+        "DateWire.tla:InstantCarriesItsClockOffset",
+        "DateWire.tla:NothingWritesNoText",
+        "DateWire.tla:DayIsItsDayAlone",
+        "DateWire.tla:TimeIsItsTimeAlone",
+        "Absence.tla:FailedConversionReadsNothing",
+        "Request.tla:FileOnlyInFormData"
+      ],
+      "defects": [
+        {
+          "id": "X1.1",
+          "rung": "type"
+        },
+        {
+          "id": "X1.2",
+          "rung": "type"
+        },
+        {
+          "id": "X1.3",
+          "rung": "type"
+        },
+        {
+          "id": "X1.4",
+          "rung": "refusal"
+        },
+        {
+          "id": "X2.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X2.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X2.5",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X3.2",
+          "rung": "type"
+        },
+        {
+          "id": "X3.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.4",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.10",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.11",
+          "rung": "analyzer"
+        },
+        {
+          "id": "X3.12",
+          "rung": "refusal"
+        },
+        {
+          "id": "X3.13",
+          "rung": "behavior"
+        },
+        {
+          "id": "X3.14",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X1.4",
+          "page": "A ward board with the link Open the bed board, to a bed board view with a number box occupied and a Save button that posts the occupied beds of room East 4 through Set(r => r.Beds[east4], occupied), where Beds is a Dictionary<RoomKey, int> on the request, RoomKey a class of the app that holds a ward and a room, and east4 a RoomKey the view holds; the endpoint answers each entry it binds as its key, a colon and its count, into beds-saved.",
+          "gesture": "On the ward board, click Open the bed board.",
+          "outcome": "The bed board is refused where the view renders with \"A dictionary keyed by RoomKey cannot be sent: System.Text.Json writes no property name for its keys; key it by text or a number.\"",
+          "opposite": "With Beds a Dictionary<string, int> set through r => r.Beds[\"E4\"], the bed board renders, and typing 2 into occupied and clicking Save shows E4: 2 in beds-saved.",
+          "defect": "The key read as a number, as both lines read one with Convert.ToInt32 (Alis.Reactive/Members/ExpressionPathHelper.cs:204 at 65fdf118d), so the view fails with a conversion's exception that names neither Beds nor a cure; or the key's ToString written as the member step, so the bed board renders and Save sends a key the endpoint binds no entry for."
+        },
+        {
+          "for": "X2.3",
+          "page": "A net10 next-of-kin form with a text box given-name bound to IntakeName.GivenName, a string? declared [JsonPropertyName(\"given\")], and a Save button that posts IntakeName as a JSON body to an endpoint whose [FromBody] IntakeName parameter it answers into saved-name: the bound GivenName, or (none) when it binds none.",
+          "gesture": "Type Ada into given-name and click Save.",
+          "outcome": "saved-name shows Ada.",
+          "opposite": "With given-name left empty, Save shows (none) in saved-name.",
+          "defect": "The body names the member by its CLR name, GivenName, as the redesign writes a body path (Alis.Reactive/Members/ExpressionPathHelper.cs:105 at 65fdf118d), which a [FromBody] member declared given does not bind from (probe:core-frombody-ignores-clr-name), so saved-name shows (none)."
+        },
+        {
+          "for": "X2.4",
+          "page": "A move-in view with a text box for the resident's own Name and the next-of-kin partial, rendered by Html.PartialFor(m => m.Kin, \"_NextOfKin\") under the prefix Kin, whose text box binds its model's Name; each box has its message element beside it. Save posts the move-in to an endpoint that answers 400 with the error key Kin.Name and the message \"Ada Lee lives here; name another next of kin.\" when the kin's name is Ada Lee, and otherwise answers Saved into move-in-status, which reads Not saved until then.",
+          "gesture": "Type Sam Lee into the resident's Name, type Ada Lee into the next of kin's Name, and click Save.",
+          "outcome": "\"Ada Lee lives here; name another next of kin.\" shows beside the next of kin's Name, the resident's Name shows no message, and move-in-status keeps Not saved.",
+          "opposite": "With the next of kin named Ben Lee, Save shows Saved in move-in-status and no message beside either box.",
+          "defect": "The four names drift under the prefix, as D2.3's evidence P1 records: the kin's box posts under Name, so the endpoint sees no Ada Lee under Kin.Name and answers Saved; or its id or message element lacks Kin, so the message for Kin.Name shows beside the resident's Name or at no input."
+        },
+        {
+          "for": "X3.3",
+          "page": "A dose order view whose model starts Doses, an int, at 5, shown in a native text box under RuleFor(o => o.Doses).GreaterThan(0); a Show button that writes the input's value into dose-echo; and a Save button that posts the order to an endpoint that answers Saved and the bound count into order-status, which reads Not saved until then.",
+          "gesture": "Select the 5 in Doses, type abc, click Show, then click Save.",
+          "outcome": "dose-echo shows 5, \"The value 'abc' is not valid for Doses.\" shows beside Doses, and order-status keeps Not saved.",
+          "opposite": "With 3 typed into Doses, Show writes 3 into dose-echo, and Save shows Saved 3 in order-status with no message.",
+          "defect": "The failed conversion passes the raw text on, as the redesign's number conversion does (Alis.Reactive.Assets/runtime/grammar/shape.ts:18 at 65fdf118d), so dose-echo shows abc; the text reads NaN or nothing, so dose-echo shows NaN or stays empty; or the start is checked and sent in its place, so order-status shows Saved 5."
+        },
+        {
+          "for": "X3.4",
+          "page": "A dose order view whose model starts Doses, an int, at 5, shown in a native text box, whose rule is GreaterThan(4) with the message \"Give more than 4 doses.\", and a Save button that posts the order as form data to an endpoint that answers Saved and the bound count into order-status, which reads Not saved until then.",
+          "gesture": "Select the 5 in Doses, press Delete, and click Save.",
+          "outcome": "No message shows beside Doses, and order-status shows Saved 5.",
+          "opposite": "With 2 typed into Doses, Save shows \"Give more than 4 doses.\" and order-status keeps Not saved.",
+          "defect": "The blank reads 0, as main reads a missing number (Alis.Reactive.Assets/runtime/shared/shape-convert.ts:161 at 623dd4a27) and the redesign binds a blank one (Alis.Reactive.Assets/runtime/grammar/shape.ts:36 at 65fdf118d), so \"Give more than 4 doses.\" shows; or the blank is sent as an empty field, which net10 refuses for an int (probe:core-form-empty-field), so order-status shows no Saved."
+        },
+        {
+          "for": "X3.5",
+          "page": "A net10 intake view rendered under the request culture de-DE, in a browser whose locale is en-US, with a native text box Strength bound to a decimal and a Save button that posts the intake as form data to an endpoint that writes the bound Strength in invariant text into saved-strength; beside it, a plain HTML form with a hidden field Strength=1.5 and a Send button that posts to the same endpoint and shows its answer in sent-strength.",
+          "gesture": "Type 1,5 into Strength and click Save.",
+          "outcome": "saved-strength shows 1.5.",
+          "opposite": "Clicking the plain form's Send shows 15 in sent-strength (probe:core-form-decimal-culture).",
+          "defect": "The number written as JavaScript writes it, 1.5, which de-DE binds as 15 (probe:core-form-decimal-culture), so saved-strength shows 15; or 1,5 parsed with Number, as the redesign parses text (Alis.Reactive.Assets/runtime/grammar/shape.ts:59 at 65fdf118d), which reads nothing, so no strength is bound."
+        },
+        {
+          "for": "X3.6",
+          "page": "A net10 intake view rendered under de-DE, in a browser whose locale is en-US, whose native text box Strength binds a decimal with the rule GreaterThan(1) and the message \"Give a strength above 1.\", and a Save button that posts the intake to an endpoint that answers Saved into intake-status, which reads Not saved until then.",
+          "gesture": "Type 1,5 into Strength and click Save.",
+          "outcome": "No message shows beside Strength, and intake-status shows Saved.",
+          "opposite": "With 0,5 typed into Strength, Save shows \"Give a strength above 1.\" and intake-status keeps Not saved.",
+          "defect": "1,5 read under the browser's en-US locale or by Number, as main reads text (Alis.Reactive.Assets/runtime/shared/shape-convert.ts:250 at 623dd4a27), so it reads 1 or nothing, the rule fails in the browser while the server passes 1,5, and \"Give a strength above 1.\" shows."
+        },
+        {
+          "for": "X3.7",
+          "page": "A net48 resident card in a browser whose zone is America/New_York, on a test host whose clock is at UTC: its Load button gets resident 7 from an endpoint that answers through N10.6, the body's DateOfBirth an Unspecified DateTime of 1990-07-14, and sets dob's text from it.",
+          "gesture": "Click Load.",
+          "outcome": "dob shows 1990-07-14.",
+          "opposite": "With the endpoint answering through MVC 5's own JsonResult, Load leaves dob empty, since its \\/Date(ms)\\/ text is in no row of spec/Core/conversions.md.",
+          "defect": "The body written by MVC 5's JsonResult as \\/Date(ms)\\/ after ToUniversalTime (probe:mvc5-json-result-date-form, probe:mvc5-json-result-date-utc), so dob shows nothing."
+        },
+        {
+          "for": "X3.8",
+          "page": "A net10 resident account view rendered under de-DE, in a browser whose locale is en-US, with server-balance, the view's own text of its model's balance 1234.5m, and a Show the balance button that gets the account from an endpoint answering the JSON number 1234.5 and sets balance's text from the body's Balance, a decimal.",
+          "gesture": "Click Show the balance.",
+          "outcome": "balance shows 1234,5, as server-balance shows (probe:core-number-text-culture).",
+          "opposite": "Rendered under en-US, balance and server-balance both show 1234.5.",
+          "defect": "The number shown as JavaScript writes it, as main shows one (Alis.Reactive.Assets/runtime/shared/shape-convert.ts:154 at 623dd4a27), so balance shows 1234.5; or in the browser's locale, 1,234.5."
+        },
+        {
+          "for": "X3.9",
+          "page": "A net10 visit book rendered under the time zone the app chooses for the request (N3.5), America/New_York, in a browser whose zone is Asia/Kolkata: a Show the visits button that gets two visits and sets first-visit and second-visit from their Starts, DateTimeOffsets the endpoint holds as 2026-01-15T12:00:00Z and 2026-07-15T12:00:00Z; a native date-and-time box Starts bound to a DateTimeOffset; and a Book button that posts it to an endpoint that writes the bound value as yyyy-MM-ddTHH:mm:sszzz into booked.",
+          "gesture": "Click Show the visits, type 2026-07-15T09:30 into Starts, and click Book.",
+          "outcome": "first-visit shows 2026-01-15T07:00:00-05:00, second-visit 2026-07-15T08:00:00-04:00, and booked 2026-07-15T09:30:00-04:00, New York's offsets on those days (probe:intl-iana-zone-offsets).",
+          "opposite": "With the app's zone Asia/Kolkata, first-visit shows 2026-01-15T17:30:00+05:30.",
+          "defect": "An instant at the browser clock's offset, as the redesign gives one (Alis.Reactive.Assets/runtime/grammar/shape.ts:110 at 65fdf118d) and main sends one (Alis.Reactive.Assets/runtime/execution/requests/request-wire-format.ts:37 at 623dd4a27), so first-visit shows 2026-01-15T17:30:00+05:30; or every instant at the offset of the day the page renders, so January's or July's visit shows an offset an hour off."
+        },
+        {
+          "for": "X3.10",
+          "page": "A rounds page with a visit planner the test app brings, declared with Plan(DateTime day), PlanVisit(VisitSlot slot), whose VisitSlot holds a Starts DateTime and a Room text, PlanDays(IReadOnlyList<DateTime> days), At(DateTimeOffset moment), Until(DateTime? until), a Property<DateTime> Next, a method Suggest() that returns its own Suggestion class instance, Take(Suggestion suggestion), and an event Proposed whose payload's When, a DateTime, the planner raises as the text 2026-11-12T10:00:00 when its own Propose button is clicked. The planner writes a line into its log for each value it receives: Date and the value's local yyyy-MM-dd HH:mm, or for At its toISOString, or null, or same suggestion when Take receives the object Suggest returned, or text and the text; its own Log text button logs the text 2026-11-09T09:00:00. The page's Plan the week button calls Plan, PlanVisit, PlanDays with two days, Until with null and sets Next, each at 2026-11-09 09:00, calls At with 2026-11-09T09:00:00-05:00, then calls Take(Suggest()); its handler of Proposed calls Plan with the payload's When.",
+          "gesture": "Click Plan the week, then click Propose.",
+          "outcome": "The log reads Date 2026-11-09 09:00 for Plan, for PlanVisit's Starts, for both of PlanDays' days and for Next, Date 2026-11-09T14:00:00.000Z for At, null for Until, same suggestion for Take, and Date 2026-11-12 10:00 for Propose.",
+          "opposite": "Clicking the planner's Log text logs text 2026-11-09T09:00:00, so a value that reaches it as text shows as text.",
+          "defect": "The dates written as their wire text with no as, so the log reads text for each date; or the suggestion copied as a plain object, so Take logs no same suggestion; or the null converted, so Until logs a Date."
+        },
+        {
+          "for": "X3.12",
+          "page": "A ward board with the link Open the planner, to a rounds view with a visit planner the test app brings, declared with PlanStay(CarePlan plan) and PlanDays(IReadOnlyList<DateTime> days), where CarePlan holds a Starts DateTime and a Previous CarePlan?; the planner writes a line into its log for each value it receives, Date and the value's local yyyy-MM-dd HH:mm, or text and the text. The view's Plan the stay button calls PlanStay with the resident's care plan, whose previous plan holds a plan of its own.",
+          "gesture": "On the ward board, click Open the planner.",
+          "outcome": "The rounds view is refused where the view renders with \"A value written into a live member holds its own type and a date in it. A date reaches a live member through a shape that ends: pass the dates as a list of their own.\"",
+          "opposite": "With the step passing the plan's dates as an IReadOnlyList<DateTime> to PlanDays, the view renders, and Plan the stay logs a Date for each.",
+          "defect": "The shape cut at the second level, as the redesign shapes a type that holds itself (Alis.Reactive/Components/ArgumentShape.cs:14 at 65fdf118d), so the view renders and the previous plan's Starts reaches the planner as text; or a shape that does not end, so the view fails with a stack overflow."
+        },
+        {
+          "for": "X3.13",
+          "page": "A net10 shift log on a test host whose clock is in America/New_York, in a browser whose zone is Asia/Kolkata. The view holds now, DateTime.UtcNow, and local, DateTime.Now, each cut to whole seconds with its Kind kept, and writes each in DateWire's form, its day with its time when not midnight, into server-utc and server-local. Its Show the times button sets utc-shown from now and local-shown from local; its Stamp button posts form data whose At the literal now fills and whose Seen the literal local fills, to an endpoint that writes each bound value in the same form and its Kind into stamped-at and stamped-seen.",
+          "gesture": "Click Show the times, then click Stamp.",
+          "outcome": "utc-shown reads server-utc's text and local-shown server-local's; stamped-at reads server-utc's text and Unspecified, and stamped-seen server-local's text and Unspecified (probe:core-form-date-kind).",
+          "opposite": "With Stamp's At filled by local, stamped-at reads server-local's text and Unspecified.",
+          "defect": "The literals written as System.Text.Json writes their Kinds, now with Z and local with the server's offset (probe:core-stj-datetime-kind), and read as moments (probe:js-date-utc-text-as-moment), so utc-shown and local-shown show Kolkata's wall time; and form data binds Seen's offset text as that instant's UTC wall time (probe:core-bound-offset-into-datetime), so stamped-seen reads server-utc's text."
+        },
+        {
+          "for": "X3.14",
+          "page": "A net10 rounds page in a browser whose zone is America/New_York, whose Find the round button gets /Rounds/Find with Query(r => r.Day, new DateOnly(2026, 11, 9)) and Query(r => r.At, new TimeOnly(13, 30)), then sets day-text and time-text from the same two literals; the endpoint answers Round on, the bound Day as yyyy-MM-dd, at, and the bound At as HH:mm:ss into round-found.",
+          "gesture": "Click Find the round.",
+          "outcome": "round-found shows Round on 2026-11-09 at 13:30:00, day-text shows 2026-11-09 and time-text 13:30:00 (probe:core-query-day-time).",
+          "opposite": "With the literals new DateOnly(2026, 12, 1) and new TimeOnly(7, 5), round-found shows Round on 2026-12-01 at 07:05:00.",
+          "defect": "The day written with a time or the time with a day, as DateWire's mutants DayWritesTime and TimeWritesDay write them, or each read as a JavaScript Date and sent with the browser clock's offset, as main sends a Date (Alis.Reactive.Assets/runtime/execution/requests/request-wire-format.ts:8 at 623dd4a27), so day-text or time-text shows a date and time, and round-found shows another day, no time or no round."
+        }
+      ],
+      "verdicts": []
+    }
+  ]
+}
