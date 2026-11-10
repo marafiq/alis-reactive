@@ -121,7 +121,7 @@
         {
           "js": "days",
           "kind": "property",
-          "ts": "days: string | number",
+          "ts": "days: number",
           "door": "Property<CareDays>",
           "csharp": "Days"
         },
@@ -611,7 +611,7 @@
           ]
         },
         {
-          "behavior": "The render helper takes the items and records the component holds, an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
+          "behavior": "The render helper takes the items and records the component holds, its Days in the live form (D7.7), an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
           "tests": [
             "M4.X4",
             "M4.X6",
@@ -620,7 +620,8 @@
             "M4.X9",
             "X5.3",
             "M11.X3",
-            "X5.12"
+            "X5.12",
+            "X9.24 #2"
           ]
         },
         {

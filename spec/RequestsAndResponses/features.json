@@ -533,19 +533,27 @@
         },
         {
           "for": "X9.24",
-          "page": "The care panel, the resident record's ConformanceComponent, whose Days, a Property<CareDays>, its render helper starts at the model's Mon | Sat | Sun, held as Weekend, Mon under the app's string enum converter, sets r => r.Care, a flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
-          "gesture": "Click Send care.",
+          "page": "A care plan whose Load button GETs the resident's plan, whose body's Care, a CareDays, the app's string enum converter writes as Weekend, Mon, and whose Send care button sets r => r.Care of a GET from that Care, a flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "gesture": "Click Load, then Send care.",
           "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
-          "opposite": "With Mon alone held, the URL holds Care=Mon.",
+          "opposite": "With Mon alone in the body, the URL holds Care=Mon.",
           "defect": "The held text sent as it is, so the URL holds Care=Weekend%2C+Mon."
         },
         {
           "for": "X9.24",
-          "page": "The same care panel in an app whose JSON options write enums as numbers, its Days started at the same model value and held as 97, sets r => r.Care, the flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "page": "The same care plan in an app whose JSON options write enums as numbers, its body holding 97 for the same Care, sets r => r.Care, the flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "gesture": "Click Load, then Send care.",
+          "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
+          "opposite": "With 1 in the body, the URL holds Care=Mon.",
+          "defect": "97 sent as its number, so the echo reads 97."
+        },
+        {
+          "for": "X9.24",
+          "page": "The care panel, the resident record's ConformanceComponent, whose Days, a Property<CareDays>, its render helper starts at the model's Mon | Sat | Sun, held as 97 in the live form, in the app whose JSON options write enums by name, and whose Send care button sets r => r.Care from the panel's Days; the GET's endpoint echoes the Care it bound.",
           "gesture": "Click Send care.",
           "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
-          "opposite": "Holding 1, the URL holds Care=Mon.",
-          "defect": "97 sent as its number, so the echo reads 97."
+          "opposite": "A model whose Care is Mon alone sends Care=Mon.",
+          "defect": "The held 97 read under the app's rows, held as text, stops the request, so the network log holds none; or it is sent as its number, Care=97."
         },
         {
           "for": "X9.25",

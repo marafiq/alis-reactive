@@ -5743,8 +5743,7 @@
       ],
       "parts": [
         "notes",
-        "recordEndpoint",
-        "carePanel"
+        "recordEndpoint"
       ],
       "harness": [
         "seed"
@@ -5757,6 +5756,22 @@
       "screen": "record",
       "hosts": [
         "enumsAsNumbers"
+      ],
+      "parts": [
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
+      "for": "X9.24",
+      "index": 2,
+      "screen": "record",
+      "hosts": [
+        "net10"
       ],
       "parts": [
         "notes",

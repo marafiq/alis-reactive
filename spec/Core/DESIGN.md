@@ -1971,9 +1971,11 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   its enum names." At build by ALIS030 for a constant: new:N18.7.
 - `X9.23` behavior: a `List<Shift?>` member whose source holds an item that reads nothing sends an empty field there,
   and the endpoint binds a null item (D9.10).
-- `X9.24` behavior: a component holding "Weekend, Mon", the held form of `Mon | Sat | Sun` under the app's string
+- `X9.24` behavior: a response body holding "Weekend, Mon", the held form of `Mon | Sat | Sun` under the app's string
   converter, sets a request member whose enum the app names as flags; the URL holds `Care=Mon%2C+Weekend` and the
-  endpoint reads Mon, Weekend. Under the app's numbers a component holding 97 sends the same.
+  endpoint reads Mon, Weekend. Under the app's numbers a body holding 97 sends the same, and so does a component's
+  member under either, since the live form holds a flags enum as its number whatever the app's options (D7.7,
+  `probe:core-json-flags-forms`).
 - `X9.25` behavior: a component holding 129, `Mon` with the bit 128 that no value of its flags enum names, sets a request
   member; the request sends nothing, no later step runs, and the console names the member and the value it holds.
 - `X9.26` refusal (D9.22): a POST, PUT or DELETE rendered in an app whose `AddReactiveRequests` makes no antiforgery
