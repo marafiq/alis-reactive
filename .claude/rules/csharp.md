@@ -48,7 +48,8 @@ parameter hides an enclosing name, since nested callbacks read the replies aroun
 ## Fail-Fast, Not Fallback
 
 Default thinking is throw, not fallback. Fallbacks hide bugs for hours because wrong
-values propagate silently. A fallback is a rare, deliberate, justified exception.
+values propagate silently. A fallback exists only where the C# states it and the plan carries it, each the owner's
+decision with its reason; none is an agent's.
 
 - No silent fallbacks or default values for missing data — throw immediately.
 - No string matching on type names (`GetType().Name.Contains(...)`) — create proper interfaces.

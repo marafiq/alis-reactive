@@ -83,8 +83,8 @@ Each means a test proves less than its name claims; the number is the rule it br
 The system under test is the whole framework (the C# builders, the plan, the runtime and the browser
 together) for the core package, its validation included, and the runtime. Their components are plain-DOM
 declarations the test app brings through the extension point an app uses (`Component`, `ComponentVendor`):
-no component library appears on a framework test's page, so a Fusion change cannot fail one and a framework
-defect cannot hide behind one.
+the conformance library's components (spec/Reference/native.json) are the components on a framework test's page and
+no Syncfusion component appears on one, so a Fusion change cannot fail one and a framework defect cannot hide behind one.
 
 `tests/Alis.Reactive.PlanTests` arrange through the public surface but assert recorded plans (4, 7), and
 the runtime's vitest suites run in jsdom with stubs (3). They are feedback while coding, not proof.

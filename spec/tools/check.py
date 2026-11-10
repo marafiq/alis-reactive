@@ -1950,8 +1950,24 @@ def check_rewrite():
                   tests=sum(landed.values()), problems=len(problems))
 
 
+CLAUDE_REPLACED = [
+    ("CLAUDE.md", "(rare: the grammar is closed)"),
+    (".claude/rules/csharp.md", "A fallback is a rare, deliberate, justified exception"),
+    ("CLAUDE.md", "Do not build other gates, coverage maps, checklists or proof artifacts"),
+    ("CLAUDE.md", "never by analogy or an upfront grid"),
+    (".claude/rules/tests.md", "no component library appears on a framework test's page"),
+]
+CLAUDE_ADDED = ["## Spec-first", "`spec/BRIEF.md`", "`spec/REWRITE.md`", "`spec/CLAUDE.md`", "TLC green", "stability rules"]
+
+
 def check_claude_md():
-    return result(False, "not started: step 12 replaces the five lines and adds the spec-first order")
+    root = SPEC.parent
+    problems = [f"{name} still holds {phrase!r}" for name, phrase in CLAUDE_REPLACED
+                if " ".join(phrase.split()) in " ".join((root / name).read_text().split())]
+    text = (root / "CLAUDE.md").read_text()
+    problems += [f"CLAUDE.md lacks {needed!r}" for needed in CLAUDE_ADDED if needed not in text]
+    detail = "root CLAUDE.md is spec-first: the five lines replaced, and the thesis, principles, stability rules, unit order and modules named"
+    return result(not problems, "; ".join(problems) or detail, problems=len(problems))
 
 
 ACTION_SPECS = ["Request", "Run", "Composition", "Ownership", "Lanes", "Realtime", "Tracing", "CallbackProperty"]
