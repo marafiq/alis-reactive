@@ -667,6 +667,33 @@
       "source": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt:301"
     },
     {
+      "id": "mvc5-uihint-template-hint",
+      "statement": "On net48 a member's [UIHint] sets its metadata's template hint.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/DataAnnotationsModelMetadataProvider.cs.txt",
+      "expect": "result.TemplateHint = uiHintAttribute.UIHint;",
+      "source": "spec/probes/aspnetwebstack/DataAnnotationsModelMetadataProvider.cs.txt:33"
+    },
+    {
+      "id": "mvc5-template-name-order",
+      "statement": "On net48 a template is found by the name the call gives, then the member's template hint, then its data type, then its type's name.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt",
+      "expect": "foreach (string viewName in getViewNames(viewData.ModelMetadata, templateName, viewData.ModelMetadata.TemplateHint, viewData.ModelMetadata.DataTypeName))",
+      "source": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt:89"
+    },
+    {
+      "id": "mvc5-editor-templates-folder",
+      "statement": "On net48 EditorFor finds its templates in an EditorTemplates folder.",
+      "host": "net48",
+      "oracle": "MVC 5.3.0 source, AspNetWebStack v3.3.0",
+      "probe": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt",
+      "expect": "{ DataBoundControlMode.Edit, \"EditorTemplates\" }",
+      "source": "spec/probes/aspnetwebstack/TemplateHelpers.cs.txt:24"
+    },
+    {
       "id": "mvc5-sections-checked-in-layouts-only",
       "statement": "MVC 5 checks that defined sections render only in a layout page, so a partial's section is dropped without a word.",
       "host": "net48",
