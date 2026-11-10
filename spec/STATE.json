@@ -1407,8 +1407,8 @@
     },
     "probes": {
       "counts": {
-        "facts": 254,
-        "net10": 115,
+        "facts": 257,
+        "net10": 118,
         "net48": 77,
         "node": 62
       },
@@ -3374,7 +3374,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "af608d3c5ad93556871d1d06aa1a97a3535d88dd",
+  "read_at_head": "160bc588653488800a0f41b9e9091cb53e52e8f5",
   "step": {
     "failing": [
       "doors_mapped",
