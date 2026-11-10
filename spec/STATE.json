@@ -1465,9 +1465,9 @@
     "probes": {
       "counts": {
         "browser": 111,
-        "facts": 375,
+        "facts": 378,
         "net10": 120,
-        "net48": 82,
+        "net48": 85,
         "node": 62
       },
       "detail": "every fact printed by its probe or found at its source line, every browser fact with the proof the rewrite ships",
@@ -3450,7 +3450,7 @@
     }
   },
   "passed": 23,
-  "read_at_head": "9a9a6b579017432c3a76bd3f7220aedfee89d0cd",
+  "read_at_head": "ebfd57c6f3d1ddca95defa6ca307e41515f6dc2d",
   "step": {
     "failing": [
       "matrix"
