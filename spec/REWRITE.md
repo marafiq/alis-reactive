@@ -181,8 +181,9 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   page's own weak hold.
 - **Bindings.** `Promises.g.cs` is generated from app.json and the features: a test carries `[FailsFor(...)]` naming its
   feature, defect and index, or its cell. The bindings check fails when the generated files differ from what the spec
-  writes, when a test names no test of the spec or a test of the spec has no test, and when a test never reached the
-  gate its held steps name.
+  writes, when a test names no test of the spec or a test of the spec has no test, when a test never reached the
+  gate its held steps name, and when a screen's view uses a module namespace that neither the test's feature nor a
+  part it lists belongs to, since check.py lands each test in the latest unit of those modules.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
   host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
   "Now listening on:" line; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
