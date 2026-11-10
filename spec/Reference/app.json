@@ -28,6 +28,16 @@
     "hub": "a SignalR hub (net10)",
     "endpoint": "a server endpoint the screen's requests reach"
   },
+  "partModules": {
+    "form": "RequestsAndResponses",
+    "endpoint": "RequestsAndResponses",
+    "slot": "PartialsAndSlots",
+    "stream": "Realtime",
+    "hub": "Realtime",
+    "plugin": "Plugins",
+    "conformance": "Vendors",
+    "fusion": "FusionComponents"
+  },
   "hosts": [
     {
       "id": "net10",
@@ -130,22 +140,26 @@
         {
           "id": "search",
           "kind": "native",
-          "role": "the search box that finds residents as you type"
+          "role": "the search box that finds residents as you type",
+          "module": "InputsAndIds"
         },
         {
           "id": "filters",
           "kind": "native",
-          "role": "the wing select, status checkboxes and sort order"
+          "role": "the wing select, status checkboxes and sort order",
+          "module": "InputsAndIds"
         },
         {
           "id": "list",
           "kind": "native",
-          "role": "the resident list and its counts, written from the data the server sends"
+          "role": "the resident list and its counts, written from the data the server sends",
+          "module": "Elements"
         },
         {
           "id": "rows",
           "kind": "nativeSlice",
-          "role": "each row's actions, NativeActionLink and NativeActionButton"
+          "role": "each row's actions, NativeActionLink and NativeActionButton",
+          "module": "NativeAppLevelObjects"
         },
         {
           "id": "listSlot",
@@ -203,12 +217,14 @@
         {
           "id": "inputs",
           "kind": "native",
-          "role": "the intake's inputs: name, dates and times, room, doses, contact and address fields"
+          "role": "the intake's inputs: name, dates and times, room, doses, contact and address fields",
+          "module": "InputsAndIds"
         },
         {
           "id": "nextOfKin",
           "kind": "native",
-          "role": "the next-of-kin section rendered by PartialFor under its prefix"
+          "role": "the next-of-kin section rendered by PartialFor under its prefix",
+          "module": "InputsAndIds"
         },
         {
           "id": "sectionSlot",
@@ -229,12 +245,14 @@
         {
           "id": "nativeInputs",
           "kind": "nativeSlice",
-          "role": "NativeCheckList visit days, NativeRadioGroup wing and NativeHiddenField assigned bed"
+          "role": "NativeCheckList visit days, NativeRadioGroup wing and NativeHiddenField assigned bed",
+          "module": "NativeComponents"
         },
         {
           "id": "documents",
           "kind": "native",
-          "role": "the intake form's document rows, each a file and its caption"
+          "role": "the intake form's document rows, each a file and its caption",
+          "module": "InputsAndIds"
         }
       ]
     },
@@ -321,7 +339,8 @@
         {
           "id": "notes",
           "kind": "native",
-          "role": "the notes list, note box and the record's texts"
+          "role": "the notes list, note box and the record's texts",
+          "module": "InputsAndIds"
         },
         {
           "id": "recordEndpoint",
@@ -389,7 +408,8 @@
         {
           "id": "doses",
           "kind": "native",
-          "role": "the due doses with Give buttons, order forms and the round's texts"
+          "role": "the due doses with Give buttons, order forms and the round's texts",
+          "module": "InputsAndIds"
         },
         {
           "id": "cardSlot",
@@ -452,27 +472,32 @@
         {
           "id": "drawer",
           "kind": "nativeSlice",
-          "role": "NativeDrawer"
+          "role": "NativeDrawer",
+          "module": "NativeAppLevelObjects"
         },
         {
           "id": "toast",
           "kind": "nativeSlice",
-          "role": "NativeToast"
+          "role": "NativeToast",
+          "module": "NativeAppLevelObjects"
         },
         {
           "id": "confirm",
           "kind": "nativeSlice",
-          "role": "NativeConfirm"
+          "role": "NativeConfirm",
+          "module": "NativeAppLevelObjects"
         },
         {
           "id": "loader",
           "kind": "nativeSlice",
-          "role": "NativeLoader"
+          "role": "NativeLoader",
+          "module": "NativeAppLevelObjects"
         },
         {
           "id": "layout",
           "kind": "native",
-          "role": "the layout: the runtime's asset links, cached fragments and plans that compose by id"
+          "role": "the layout: the runtime's asset links, cached fragments and plans that compose by id",
+          "module": "RenderingAndDelivery"
         }
       ]
     },

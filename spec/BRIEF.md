@@ -847,8 +847,8 @@ Wait for the owner's yes.
 - hedge words 0.
 
 **11. `spec/REWRITE.md`.**
-- Units go in `SliceTree.txt` order, first line first. The first line is the foundation; ALIS010 refuses a use of a later row (`Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs:308-311`).
-- Each unit lists its feature ids, its core answers, its schema nodes, its sentences, the counterexamples it closes and its promises.
+- Units go in the order pages need doors, after a walking skeleton that gives every `SliceTree.txt` row its folder and its thinnest door; ALIS010 refuses a use of a later row at every commit (`Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs:308-311`). The lead's decision of 2026-11-10 (spec/CLAUDE.md): a unit for the first row alone has no page to prove it on.
+- Each unit lists its feature ids; each feature names its core answers, schema nodes, sentences, counterexamples and tests, and `check.py` prints the tests each unit lands.
 - `check.py` checks that every feature id is in exactly one unit.
 
 **12. Root CLAUDE.md on spec-first.**

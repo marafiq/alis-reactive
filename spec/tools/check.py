@@ -1880,11 +1880,69 @@ def check_matrix():
                   syncfusion=covered, own=own, native=total - carried, carried=carried, problems=len(problems))
 
 
+REWRITE_UNIT = re.compile(r"^### (U(\d+))\. (.+)$")
+REWRITE_FEATURES = re.compile(r"^Features: (.+)$")
+
+
+def rewrite_units(text):
+    units, current = [], None
+    for line in text.splitlines():
+        heading = REWRITE_UNIT.match(line)
+        if heading:
+            current = {"id": heading.group(1), "number": int(heading.group(2)), "features": None}
+            units.append(current)
+            continue
+        listed = REWRITE_FEATURES.match(line)
+        if listed and current is not None:
+            current["features"] = [] if listed.group(1) == "none" else [name.strip() for name in listed.group(1).split(",")]
+    return units
+
+
+def part_module(app, part):
+    return part.get("module") or app.get("partModules", {}).get(part["kind"])
+
+
+def rewrite_landing(app, module_unit, start, entry):
+    parts = {part["id"]: part for part in next(screen for screen in app["screens"] if screen["id"] == entry["screen"])["parts"]}
+    needed = [module_unit[module] for module in (part_module(app, parts[name]) for name in entry["parts"] if name in parts) if module in module_unit]
+    return max([start] + needed)
+
+
 def check_rewrite():
     path = SPEC / "REWRITE.md"
     if not path.exists():
         return not_started(path)
-    return not_built("the rewrite units")
+    units = rewrite_units(path.read_text())
+    modules = {feature["id"]: feature_path.parent.name for feature_path in feature_files()
+               for feature in json.loads(feature_path.read_text()).get("features", [])}
+    problems = [f"{unit['id']} stands at place {place}" for place, unit in enumerate(units, 1) if unit["number"] != place]
+    problems += [f"{unit['id']} lists no Features line" for unit in units if unit["features"] is None]
+    home = {}
+    for place, unit in enumerate(units):
+        for feature in unit["features"] or []:
+            problems += [f"{unit['id']} lists {feature}, no feature of spec/*/features.json"] if feature not in modules else []
+            problems += [f"{feature} is in {units[home[feature]]['id']} and {unit['id']}"] if feature in home else []
+            home.setdefault(feature, place)
+    problems += [f"{feature} is in no unit" for feature in sorted(modules) if feature not in home]
+    module_unit = {}
+    for feature, place in home.items():
+        if feature in modules:
+            module_unit[modules[feature]] = min(place, module_unit.get(modules[feature], place))
+    app = json.loads((SPEC / "Reference" / "app.json").read_text())
+    problems += [f"{screen['id']}'s {part['id']} needs {part_module(app, part)!r}, the module of no unit"
+                 for screen in app["screens"] for part in screen["parts"] if part_module(app, part) not in module_unit]
+    landed = Counter()
+    for entry in app["placements"]:
+        if entry["feature"] in home:
+            landed[rewrite_landing(app, module_unit, home[entry["feature"]], entry)] += 1
+    for entry in app["cells"]:
+        owner = module_unit.get("Vendors" if "cell" in entry else "FusionComponents")
+        if owner is not None:
+            landed[rewrite_landing(app, module_unit, owner, entry)] += 1
+    detail = (f"{len(units)} units hold {len(home)} features once; the browser tests land "
+              + ", ".join(f"{unit['id']} {landed[place]}" for place, unit in enumerate(units)))
+    return result(not problems, "; ".join(problems[:6]) or detail, units=len(units), features=len(home),
+                  tests=sum(landed.values()), problems=len(problems))
 
 
 def check_claude_md():

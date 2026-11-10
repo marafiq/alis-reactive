@@ -1,0 +1,417 @@
+# The rewrite
+
+What the rewrite builds and the order it builds it in. The decisions behind each line are in `spec/CLAUDE.md`; the
+meanings are in `spec/Core/DESIGN.md` and each module's folder. Two designs fed this file, one for finding a feature
+in the fewest hops and one for the fastest honest feedback loop; where they disagreed, the choice and its reason are
+in the line.
+
+## 1. The view from above
+
+- **Five packages, one version.** AlisReactive (the core, its analyzers inside), AlisReactive.Native and
+  AlisReactive.Fusion ship code; AlisReactive.DesignSystem and AlisReactive.NativeTagHelpers ship empty, so their ids
+  stay, and nothing in the tree is kept for them.
+- **One app proves the framework.** The care home conformance app (`spec/Reference/app.json`): care screens a care
+  home's staff use, the component bench with the conformance library's six declarations, and the refusal routes, run
+  under 18 hosts. Every browser test runs on one of its screens. No core test loads Syncfusion.
+- **Each layer proves one thing, once.**
+
+  | Layer | Proves | Runs |
+  |---|---|---|
+  | TLA+ (`spec/Core/*.tla`) | the design: every ordering of the async lanes | TLC, on a changed spec and nightly |
+  | Probes (`spec/probes/`) | a fact of a browser, a host or a vendor the design rests on | on a changed probe or pin, nightly |
+  | The compiler | the type stages and the ALIS analyzers: what a view, a validator or a declaration cannot write | every build |
+  | The render | a refusal the compiler cannot see, on the refusal routes | Playwright |
+  | Playwright | behavior: a gesture and its visible outcome, in Chromium | every pull request |
+  | verify-net48 | the same tests on MVC 5, and the packed packages on a fresh MVC 5 app | every pull request |
+  | Vitest, PlanTests | feedback while coding (BRIEF.md, Principles 10); never counted as proof | the inner loop |
+
+- **A feature is one path through the spec to the code.** `spec/<Module>/features.json` names its question, its
+  sentences, its nodes, its TLA+ invariants, its defects and its tests; each test names its screen, hosts, parts and
+  held steps in `spec/Reference/app.json`. A new feature runs: spec line, TLC green, code, its tests failing on the
+  planted defect then passing, commit.
+
+## 2. The repository
+
+### 2.1 The tree
+
+```
+Alis.Reactive.slnx                    the shipped projects, the generator and the net10 test projects
+Directory.Build.props                 LangVersion 14.0, warnings as errors, AlisSliceTree off by default
+Directory.Packages.props              central package management: one exact version per package and framework
+global.json                           SDK 10.0.101, rollForward disable
+.node-version .python-version .java-version
+package.json  eslint.config.js        npm workspaces; the lint, its import order generated from each SliceTree.txt
+tools/PlanContractGenerator/          writes Alis.Reactive.Assets/runtime/Schema/plan.ts and plan.schema.json
+
+Alis.Reactive/                        net48;net10.0, PackageId AlisReactive, AlisSliceTree on
+  SliceTree.txt BannedSymbols.txt PublicAPI/net48/ PublicAPI/net10.0/
+  Schema/ TypeKnowledge/ PathsAndWire/ OwnershipAndState/ Tracing/ Execution/ ValuesAndSources/ Conditions/
+  ArrayLambdas/ Declarations/ Vendors/ Plugins/ Elements/ InputsAndIds/ Validation/ RequestsAndResponses/
+  Realtime/ TriggersAndPipelines/ PartialsAndSlots/ RenderingAndDelivery/
+Alis.Reactive.Assets/                 NoTargets, not packed: the core's browser code
+  runtime/SliceTree.txt runtime/index.ts runtime/<Module>/ (with its *.test.ts beside it)
+Alis.Reactive.Analyzers/              netstandard2.0, packed inside AlisReactive
+  <Module>/                           the rules that enforce that module's lines, its generators and build files
+  Analyzers/                          module 20's own rules, ALIS010 to ALIS013
+Alis.Reactive.Native/                 net48;net10.0, PackageId AlisReactive.Native, on the core alone
+  SliceTree.txt PublicAPI/ native.ts
+  NativeComponents/ NativeComponents/<Slice>/ NativeAppLevelObjects/<Slice>/   declaration, render helper, its .ts
+Alis.Reactive.Fusion/                 net48;net10.0, PackageId AlisReactive.Fusion, Syncfusion [33.1.47] per host
+  SliceTree.txt PublicAPI/ fusion.ts
+  FusionComponents/ FusionComponents/<Slice>/ FusionTemplates/ FusionAppLevelObjects/<Slice>/
+build/EmptyPackage.proj  build/EmptyPackage.md   packed once per empty id
+
+tests/
+  Alis.Reactive.Conformance.App/              net10 MVC: Care/<Screen>/, Bench/, Refusals/<Module>/, Shared/,
+                                              Components/<Declaration>/, HostVariants/, World/
+  Alis.Reactive.Conformance.App.Net48/        the MVC 5 twin: links the app's files, consumes the packed packages
+  Alis.Reactive.Conformance.PlaywrightTests/  Harness/, <Module>/<Screen>/When*.cs, <Module>/Hosts/<Host>/,
+                                              <Slice module>/<Slice>/ for a slice's own tests
+  Alis.Reactive.Consumer.Net10/               a fresh net10 app on the packed packages, outside the slnx
+  Alis.Reactive.Consumer.Net48/               a fresh MVC 5 app on the packed packages, outside the slnx
+  Alis.Reactive.PlanTests/<Module>/           feedback
+  Alis.Reactive.AnalyzerTests/<Module>/       each analyzer's cases
+  Alis.Reactive.ArchitectureTests/            WhenCodeIsWritten, WhenARuleNamesTheCode, WhenTheCoreIsCompiled
+spec/                                         the design source: this file, CLAUDE.md, NOTES.md, Core/, probes/,
+                                              Reference/, tools/, one folder per module
+```
+
+The Playwright project keeps the `PlaywrightTests` suffix, so the deny rule on a raw `dotnet test` of a Playwright
+project holds. The consumer apps and the twin each hold an empty `Directory.Build.props` and a
+`Directory.Packages.props` that turns central management off, so their builds see what a fresh app sees.
+
+### 2.2 One name in five places
+
+| Tree | Folder | Holds |
+|---|---|---|
+| C# | `Alis.Reactive/<Module>/` | its builders, objects and sources, the plan nodes it writes, its render-time refusals; namespace `Alis.Reactive.<Module>` |
+| Browser | `Alis.Reactive.Assets/runtime/<Module>/` | the code that executes its nodes, and its vitest feedback |
+| Analyzer | `Alis.Reactive.Analyzers/<Module>/` | each rule that enforces one of its lines, the rule's id in the file name |
+| Tests | `tests/Alis.Reactive.Conformance.PlaywrightTests/<Module>/`, `tests/Alis.Reactive.AnalyzerTests/<Module>/` | its browser tests, its analyzer cases |
+| Spec | `spec/<Module>/` | `module.md` and `features.json`; the TLA+ it owns (section 2.6) |
+
+Four rules move a type out of its module's folder, each forced by a fact, and the feature row's `writes` field cites
+the file it moved to:
+- P1. A type lives in the folder of the module whose meaning it carries.
+- P2. `Pipeline<TModel>` and each type that hands a pipeline back live in `TriggersAndPipelines`: a call that names only
+  its own type argument binds only to an instance member (DESIGN.md:2301-2310), so the request verbs, the stage types,
+  `RequestDefaults` and `NoModel` are members or types of the pipeline's module.
+- P3. Every core door on `HtmlHelper<TModel>` and every startup call lives in `RenderingAndDelivery`: `Html.InputField`
+  takes the plan, which holds handlers.
+- P4. A type whose module sits below a type it needs moves to the lowest module that can hold it: `PageUrl` and
+  `BrowserFile` to `RequestsAndResponses`, `IAppLevelComponent` to `Vendors`.
+
+The folder and namespace names are the module table's (spec/CLAUDE.md). DESIGN.md's `Pipelines`, `Requests` and
+`Hosting` read `TriggersAndPipelines`, `RequestsAndResponses` and `RenderingAndDelivery`. The block writer, the POC's
+`Writing/PlanBuild.cs`, goes to `Execution/` and reads no module above it: the view's name prefix is text it holds.
+Realtime's files are wrapped whole in `#if NET10_0_OR_GREATER`, so the net48 build keeps the folder its row names.
+
+### 2.3 The SliceTree
+
+`Alis.Reactive/SliceTree.txt`, first row the foundation, each slice using only rows above it (ALIS010):
+
+| Row | Slices | Why here |
+|---:|---|---|
+| 1 | Schema | the grammar depends on nothing |
+| 2 | TypeKnowledge | reads the shape nodes |
+| 3 | PathsAndWire | a member's four names take the JSON name type knowledge gives |
+| 4 | OwnershipAndState Tracing | where culture and time zone live; the trace field the doors above record through |
+| 5 | Execution | the block writer writes into the plan ownership holds |
+| 6 | ValuesAndSources | the one read writes through the block writer |
+| 7 | Conditions | a condition is a typed source of bool |
+| 8 | ArrayLambdas | a list's predicate is built by the comparisons |
+| 9 | Declarations | a declared member is a source, a declared list takes the operations |
+| 10 | Vendors Plugins | live objects of row 9's vocabulary |
+| 11 | Elements InputsAndIds | an element is a declaration whose vendor is the DOM; an input is built from a declared property and its commit event |
+| 12 | Validation | a rule's condition reads the lambda terms and binds to row 11's ids |
+| 13 | RequestsAndResponses Realtime | every part of a request takes every source; a reply is a live object; the hub and stream are plugins |
+| 14 | TriggersAndPipelines | P2 |
+| 15 | PartialsAndSlots | a plan holds handlers and names the pipeline |
+| 16 | RenderingAndDelivery | P3 |
+
+Native's table is `NativeComponents` over `NativeAppLevelObjects/* NativeComponents/*`; Fusion's is
+`FusionComponents FusionTemplates` over `FusionAppLevelObjects/* FusionComponents/*`. The runtime has its own table,
+`Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top. The test app
+holds `Components/*` over `World HostVariants` over `Care/* Bench/* Refusals/*`, so no screen reaches into another's
+model, and the Playwright project holds one row of module folders, so no module's tests use another's helpers.
+ALIS011 expects `<assembly>.<first folder>` for every file; ALIS013 reads the `AlisSliceTree` build property in place
+of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-restricted-imports` from each table.
+
+### 2.4 Naming
+
+1. A module's folder is its module-table name, the same in every tree; a folder exists only where its module has code.
+2. A core module's folder is flat, and a file's namespace is its project's root namespace and its first folder.
+3. A component's folder is its class name and holds its declaration, its render helper and its TypeScript.
+4. A Fusion class is `Fusion` and the EJ2 class; a Native class is `Native` and what it renders.
+5. C# files are PascalCase after their type; TypeScript files are kebab-case, a component's after its class.
+6. A shipped project is `Alis.Reactive[.<Package>]` with PackageId `AlisReactive[.<Package>]`; a test project is
+   `Alis.Reactive.<Subject>.<Kind>`; the net48 twin adds `.Net48`.
+7. A test class is `When<Situation>`, a method the test as a sentence; it sits in the folder of the module whose test
+   it is, under the app.json screen it runs on.
+8. A browser asset is `alis-reactive[-<package>][-<part>].js`, linked at `_content/<PackageId>/js/` on net10 and
+   `Content/<PackageId>/js/` on net48.
+9. No folder is named Shared, Common, Utils, Helpers, Support or Core, except MVC's `Shared/` for layouts and the
+   spec's `Core/`.
+
+### 2.5 The test harness
+
+- **The world.** Each test makes a key and sets it as the cookie `world` on its own browser context before it opens a
+  page; every request, stream and hub negotiation carries it. The app's world middleware, in Development only, scopes
+  data, gates, hub groups, stream filters and caches to the key; a document request with none gets a new world, so a
+  person can run the app. Teardown ends the world and fails any gate still parked.
+- **The verbs** are app.json's: seed, gate, push, drop, refuse, reopen, restart, clock, gc. A placement lists its
+  verbs and its held steps, each held step with the TLA+ action it holds, and check_app refuses a verb with no step.
+  Gates are generated from the `Next` of the eight async specs (`Gates.g.cs`, one enum per spec): the test arms a gate
+  before its gesture, waits until the harness reports it held, asserts the held state, then releases it by its own
+  request; a release before the gate is reached fails the test. Restart is the test app's host script on the harness's
+  word. Clock is `Page.Clock`, installed only by a test that names it. Gc is `Page.RequestGCAsync`, confirmed by the
+  page's own weak hold.
+- **Bindings.** `Promises.g.cs` is generated from app.json and the features: a test carries `[FailsFor(...)]` naming its
+  feature, defect and index, or its cell. The living check fails when the generated files differ from what the spec
+  writes, when a test names no test of the spec or a test of the spec has no test, and when a test never reached the
+  gate its held steps name.
+- **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
+  host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
+  "Now listening on:" line; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
+  server alive fails. The net10 clock is America/New_York, the twin's UTC; the browser context is en-US in
+  America/Los_Angeles, so a date read in the wrong zone shows.
+- **A run proves it ran.** Each test process ends with
+  `[playwright:result] <pool> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s> <name>` and
+  fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive. No
+  retries, anywhere.
+- **Waits and budget.** Action waits, navigation waits and the per-test budget are set from measurement, never chosen:
+  unit U2 runs the suite 20 times on ubuntu-latest and sets the budget at four times the slowest test it measured, the
+  waits at four times the slowest step, and writes both into the harness with the run that measured them.
+- **Syncfusion.** Only the Fusion pool's job receives the licence key; the app registers it at startup when its host
+  serves a Fusion screen, and a Fusion screen refuses to render without it. A core test also fails at run time if its
+  page requests the EJ2 script.
+
+### 2.6 TLA+
+
+Each spec has one owning module, the module whose unit changes it; a feature in any module names the invariants it
+rests on in its `checker` field, and a test names the action it observes.
+
+| Spec | Owner | Models |
+|---|---|---|
+| `Schema.tla` | Schema | the closed node set and its handlers |
+| `DateWire.tla` | PathsAndWire | a date's text on each host |
+| `Absence.tla` | ValuesAndSources | what a missing member, holder or value reads |
+| `Ownership.tla` | OwnershipAndState | page, plan and slot holds, listens, destroys and collection |
+| `Run.tla` | Execution | a handler run's awaits, settles and stops |
+| `Lanes.tla` | Execution | the async lanes and their policies |
+| `Tracing.tla` | Tracing | spans, attempts and propagation |
+| `CallbackProperty.tla` | Vendors | the callback property's listener chain |
+| `Validation.tla`, `ValidationToday.tla` | Validation | the rewrite's checks, and the redesign's for contrast |
+| `Request.tla` | RequestsAndResponses | a request's loading, guard, routes and finally |
+| `Composition.tla` | RequestsAndResponses | chained and parallel requests and their counts |
+| `Realtime.tla` | Realtime | connections, drops, give-ups and the reconnect offer |
+| `Partials.tla` | PartialsAndSlots | slot loads and unloads |
+
+A feature a month later starts here: its module's `module.md` and `features.json`, the specs its owner holds, the
+actions its tests will observe. A change to an async lane is a spec change first, TLC green with each mutant's
+`.violates` config failing on its invariant, then code.
+
+### 2.7 Tools and pins
+
+| Tool | Pin | One job |
+|---|---|---|
+| .NET SDK | 10.0.101 (`global.json`, rollForward disable) | compile, test, pack |
+| NuGet | `Directory.Packages.props`, lock files restored locked in CI | restore; the DI abstractions exact per framework, beside System.Text.Json 10.0.12 |
+| Node | 24.19.0 (`.node-version`) | esbuild, tsc, eslint, node probes |
+| TypeScript | 5.9.3 | `tsc -b`, no emit, the strictest options (strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature) |
+| esbuild | 0.28.2 | one root `build.mjs`, one bundle per package |
+| ESLint | eslint 9.39.4, typescript-eslint 8.70.1 | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, `--max-warnings 0`; `switch-exhaustiveness-check`, `no-floating-promises`, `no-unnecessary-condition`, and `no-restricted-syntax` on wide DOM queries |
+| Vitest | 3.2.7, node environment, no jsdom | feedback beside the runtime's code |
+| @microsoft/signalr | 10.0.11 | the hub's own asset |
+| Roslyn | Microsoft.CodeAnalysis.CSharp 4.12.0 | the analyzers |
+| PublicApi and BannedApi analyzers | 5.6.0 | the surface text; no run-time reflection |
+| NUnit, adapter, test SDK | 4.6.1, 5.2.0, 17.14.1 | tests |
+| Playwright | Microsoft.Playwright 1.63.0, CI's image `mcr.microsoft.com/playwright/dotnet:v1.63.0-noble` by digest | every browser test and probe |
+| Java, TLC | OpenJDK 27.0.1, tla2tools 2.19 by SHA-256 in `spec/tools/tla2tools.lock` | model checking |
+| Python | 3.14.7, standard library | `spec/tools/check.py` |
+| Syncfusion | 33.1.47, npm and NuGet together | `node scripts/pin-syncfusion.mjs <version>` moves both |
+| Actions | by SHA with Dependabot's version comment | CI |
+
+Scripts: `scripts/check.sh` (the contract regenerated and diffed, `tsc -b`, eslint, `dotnet build -c Release`, the
+architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (build, then run, with the selectors below,
+the result line and the leftover-server check); `scripts/test.sh` (both); `build.sh`, `run.sh`, `pack.sh`,
+`doctor.sh` (every pin), `plant-defect.sh`, `verify-release-tag.sh`, `pin-syncfusion.mjs`, `install-git-hooks.sh`.
+MSBuild never runs npm; an app whose bundle is missing refuses to start.
+
+`scripts/playwright.sh` selects a module (`RequestsAndResponses`), a screen (`--screen Residents`), a feature
+(`--feature M6.F1`), one test (`--test M3_F1_X8_27_2`), one fixture, one host (`--host snakeCase`), a pool's shard
+(`--pool core --shard 1/2`) or everything (`--all`).
+
+### 2.8 Shards and CI
+
+- **The shard unit** is a module folder; the net10 host-variant fixtures form one unit, so each variant's server starts
+  once per run; FusionComponents splits by slice. Pools: core, hosts and fusion. Shards are balanced longest-first
+  from the TRX-measured weights in `shard-weights.json`, so a stale weight unbalances and never drops a test. Unit U2
+  measures one test at a time against 2, 4 and 8 per process, 20 runs each, and keeps parallelism only when every run
+  is green and the wall time falls by at least 1.6 times.
+- **`ci.yml`** on every pull request and push to main: `checks` (`scripts/check.sh` without check.py); `spec`
+  (`check.py --ci`, TLC only for a spec whose hash CI has not checked); `playwright` per pool and shard in the
+  Playwright image; `verify-net48` on Windows (pack, the twin and the fresh MVC 5 app built against the packs with
+  warnings as errors, the net48 tests under IIS Express); `delivery-net10` (pack, the fresh net10 app restored from the
+  packs, its delivery tests); `proof`, the one required status: every shard has a TRX with tests, none failed, none
+  over budget, and the executed names equal the full list, each once.
+- **`nightly.yml`**: everything, every TLC config uncached, every probe; an issue on failure.
+- **`syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
+  fusion pool.
+- **`nuget-publish.yml`**, on a `v*` tag: `verify-release-tag.sh`; ci on the tag; one pack job; verify-net48 and
+  delivery-net10 restore those exact packages; publish pushes the same files by trusted publishing.
+
+### 2.9 Packages and delivery
+
+| Package | lib | analyzers | build | browser files | dependencies |
+|---|---|---|---|---|---|
+| AlisReactive | net48, net10.0 | the ALIS analyzers and the validator generator, packed from the analyzer project's own output path | `build/net48` copies the browser files; the vendor contract target, opt-in | `alis-reactive.js`; `alis-reactive-hub.js` on net10 | net48: System.Text.Json 10.0.12, the DI abstractions exact, Microsoft.AspNet.Mvc 5.3.0; net10: the framework reference |
+| AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |
+| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion [33.1.47] |
+| AlisReactive.DesignSystem | `lib/net48/_._`, `lib/net10.0/_._` | none | none | none | none |
+| AlisReactive.NativeTagHelpers | `lib/net10.0/_._` | none | none | none | none |
+
+- Each package carries its own bundle; the core's bundle holds no component code. No CSS ships: an app names its own
+  field classes (M7.N4), the Native components carry no stylesheet (NativeAppLevelObjects/module.md), and Fusion's
+  stylesheet takes its verdict in Fusion's unit.
+- Every link carries the SHA-256 of the bytes served: `asp-append-version` on net10, `Url.AppendVersion` on net48 over
+  the files the package's build target copies into `Content\<PackageId>\` beside a `.gitignore` of `*`.
+- Script order in a layout, on both hosts: `ej2.min.js` (Fusion only), the Fusion templates script, each package's
+  script, then `alis-reactive.js` last, every one a classic script without `async`.
+- A fresh net10 app: `dotnet add package`, the startup calls, a `@using` per module namespace a view uses, the links.
+  A fresh MVC 5 app: PackageReference (packages.config unsupported, the docs say to migrate), the startup calls and
+  the resolver in `Application_Start`, the namespaces in `Views/Web.config`, the links.
+- The delivery tests run on both fresh apps: each link's version equals the hash of the bytes served, the plan boots, a
+  gesture shows its outcome, a validator refuses in the browser and the server saves a valid post, two time zones each
+  show their own day, and git lists no file the build wrote into the app.
+- Native and Fusion depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U3's delivery job reads it
+  back from each nuspec.
+
+## 3. What retires
+
+Each retirement waits for `features_lost` at 0 and the rule files that name the item rewritten; "nothing references it"
+is never the reason.
+- `Alis.Reactive.SandboxApp` with `tests/Alis.Reactive.PlaywrightTests`; `tests/Alis.Reactive.Framework.App` with its
+  16 components and `Framework.PlaywrightTests`; `ClassNames.App` and its tests, now the host `classNames`;
+  `tests/Alis.Reactive.Playwright.TestHost`, merged into the Playwright project's `Harness/`;
+  `scripts/framework-coverage.*`, `vstest-filter.mjs`, every `playwright.project.sh`, `check_ci_shard_matrix`.
+- `poc/` and the `Poc` test projects, last: each proof ported by its unit, the POC analyzers moved to their modules'
+  folders, `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
+  `spec/api/HttpSurface` retargeted to the core, and every cite of `poc/` pinned to a SHA.
+- The sources of DesignSystem and NativeTagHelpers, their workspaces and asset lines; `examples/net48-mvc-smoke`, which
+  becomes `tests/Alis.Reactive.Consumer.Net48`; `build/AlisReactiveBrowserAssets.targets`; `Alis.Reactive.Assets/components/`,
+  whose code moves into its package; jsdom and Tailwind.
+- `.claude/rules/docs.md`'s worked examples move from the sandbox to the conformance app with the sandbox's retirement.
+
+## 4. Units
+
+A unit ends when every test check.py assigns it passes on `scripts/playwright.sh`, each having failed first on its
+planted defect, the specs its module owns are green under TLC with each mutant failing, and its analyzer cases pass;
+the commit names the run and its result line.
+
+The order is the order pages need doors, not the SliceTree's. A unit for Schema alone has no page to prove it on, so
+U3 is a walking skeleton that gives every row its folder and the thinnest door, and each unit after it widens the
+rows its features need; ALIS010 holds at every commit. A test lands in the unit that brings the last door its page
+uses: its feature's unit, or a later unit that holds the module of one of its screen parts (check.py prints each
+unit's tests).
+
+### U1. Tools, pins and tables
+Features: M20.F1
+
+The pins of section 2.7, central package management, the SliceTree tables, the analyzers project with ALIS010 to
+ALIS013 and module 20's rules, the lint at its strictest, `scripts/check.sh` green on an empty core.
+
+### U2. The harness, the conformance app's shell and CI
+Features: none
+
+The app's areas, hosts, world, verbs, generated gates and bindings; the Playwright project's harness, result line and
+leftover-server check; the CI workflows. Its own tests prove the harness: two worlds isolated, a gate held then
+released, a release before reached failing, a zero-test run failing. It measures and writes the waits, the budget and
+the parallelism (section 2.5, 2.8).
+
+### U3. The walking skeleton, the packs and delivery
+Features: M19.F1
+
+One plan with a load trigger that sets an element's text, through every row, rendered by `Html.RenderPlan` on both
+hosts; the five packages packed; the delivery tests green on both fresh apps; the twin built.
+
+### U4. Triggers and pipelines
+Features: M1.F1, M1.F2
+
+### U5. Values and sources
+Features: M2.F1, M2.F2
+
+### U6. Elements
+Features: M5.F1
+
+### U7. Inputs and ids
+Features: M7.F1, M7.F2, M7.F3
+
+### U8. Conditions
+Features: M3.F1, M3.F2
+
+### U9. Declarations and vendors
+Features: M11.F1, M11.F2, M11.F3, M12.F1, M12.F2
+
+The conformance library's six declarations land here with the doors that reach them; the bench's cells run from here on.
+
+### U10. Plugins
+Features: M13.F1, M13.F2
+
+### U11. Requests and responses
+Features: M6.F1, M6.F2
+
+### U12. Native components
+Features: M24.F1, M24.F2, M24.F3, M24.F4, M24.F5, M24.F6, M24.F7, M24.F8, M24.F9
+
+Written to the highest bar: a component-writing expert's review of each slice before its commit, and the strictest
+lint and TypeScript options of section 2.7 with no exemption.
+
+### U13. Partials and slots
+Features: M9.F1, M9.F2
+
+### U14. Native app-level objects
+Features: M25.F1, M25.F2, M25.F3, M25.F4, M25.F5, M25.F6, M25.F7
+
+NativeDrawer, NativeToast, NativeConfirm, NativeLoader, the reconnect offer and the action link, each rendered into
+the target a legacy layout holds by the helper the layout calls once; the same review and lint as U13.
+
+### U15. Array lambdas
+Features: M4.F1, M4.F2
+
+### U16. Validation
+Features: M8.F1, M8.F2, M8.F3, M8.F4
+
+### U17. Schema
+Features: M14.F1
+
+### U18. Type knowledge
+Features: M16.F1
+
+### U19. Paths and wire
+Features: M15.F1
+
+### U20. Ownership and state
+Features: M18.F1
+
+### U21. Execution
+Features: M17.F1
+
+### U22. Tracing
+Features: M26.F1, M26.F2, M26.F3
+
+### U23. Realtime
+Features: M10.F1, M10.F2
+
+### U24. Fusion's package, its reference and templates
+Features: M21.F1, M21.F2, M22.F1, M22.F2, M22.F3
+
+FusionMultiSelect's 19 own tests, the templates, and Fusion's stylesheet's verdict.
+
+### U25. The Fusion slices
+Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14, M21.F15, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27, M21.F28, M21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37, M21.F38, M21.F39, M21.F40, M21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46, M21.F47, M21.F48, M21.F49, M21.F50, M21.F51, M21.F52
+
+One commit per slice, each with its own tests.
+
+### U26. Fusion's app-level objects
+Features: M23.F1, M23.F2
