@@ -1335,7 +1335,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 66,
+        "files": 70,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1406,10 +1406,10 @@
     },
     "probes": {
       "counts": {
-        "facts": 251,
-        "net10": 113,
+        "facts": 254,
+        "net10": 115,
         "net48": 77,
-        "node": 61
+        "node": 62
       },
       "detail": "every fact printed by its probe or found at its source line",
       "pass": true
@@ -3373,7 +3373,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "c6d06b6393a5646e7b8412702fb6e7860144dac6",
+  "read_at_head": "f33d132a46a5b4f999233efc0318bb08ed65b61f",
   "step": {
     "failing": [
       "doors_mapped",
