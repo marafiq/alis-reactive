@@ -472,6 +472,12 @@
           "id": "roundValidator",
           "kind": "validator",
           "role": "the round's validator: the doses and their strengths"
+        },
+        {
+          "id": "reconnect",
+          "kind": "nativeSlice",
+          "role": "NativeReconnectOffer, the offer the layout shows when the round's live connections give up",
+          "module": "NativeAppLevelObjects"
         }
       ]
     },
@@ -4718,7 +4724,8 @@
         "board",
         "doses",
         "cardSlot",
-        "roundEndpoint"
+        "roundEndpoint",
+        "reconnect"
       ],
       "harness": [
         "seed",
@@ -4749,7 +4756,8 @@
       "parts": [
         "board",
         "doses",
-        "roundEndpoint"
+        "roundEndpoint",
+        "reconnect"
       ],
       "harness": [
         "seed",
@@ -7773,7 +7781,8 @@
         "net10"
       ],
       "parts": [
-        "nurseLine"
+        "nurseLine",
+        "reconnect"
       ],
       "harness": [
         "seed",
