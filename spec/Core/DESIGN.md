@@ -1184,7 +1184,8 @@ Terms used throughout:
   `Matches`'s `Positions.MatchesPattern`), a request member (which Q9 places in the route, the query, the body or a
   header, `Positions.RequestMember`), a header (`Positions.Header`), a dispatch payload member
   (`Positions.DispatchPayloadMember`), and a method's, plugin's or hub's argument (`Positions.MethodArgument`,
-  `Positions.PluginArgument`, `Positions.HubArgument`).
+  `Positions.PluginArgument`, `Positions.HubArgument`). A default header's value, `RequestDefaults.Header(value)`, is a
+  header that takes a literal only: the defaults are configured at startup, before any page exists (D9.12).
 - D7.2 The sources are closed, each a `TypedSource<T>`: a component's or plugin's member
   (`Sources.ComponentMember`, `Sources.PluginMember`), a method's result (`Method<T>`'s `Sources.MethodResult`,
   `MethodAsync<T>`'s `Sources.MethodAsyncResult`, a hub's `Invoke<T>`'s `Sources.HubInvokeResult`), a page URL member

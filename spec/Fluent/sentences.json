@@ -44,7 +44,8 @@
     "ReturnedUnsubscriber(subscribe)": "js-name",
     "Rows(rowsId)": "element-id",
     "Unload(elementId)": "element-id",
-    "WriteOnly(name)": "js-name"
+    "WriteOnly(name)": "js-name",
+    "RequestDefaults.Header(value)": "literal"
   },
   "concepts": {
     "Add": [
@@ -611,5 +612,13 @@
         ]
       }
     ]
+  },
+  "kept": {
+    "Get": "N10.7: `reply.Headers.Get(name)` is the Fetch API's own `Headers.get`, and `pipeline.Get(url)` is HTTP's GET.",
+    "Input": "N9.3, N14.4: the input bound to a member; a pipeline hands it and a request sends it (the owner, 2026-11-08).",
+    "Json": "N10.7, N17.10: the JSON media type, a reply decoded as JSON, a body sent as JSON, a value written as JSON text.",
+    "Plugin": "N17.11: the plugin of a type; the plan listens to its events and a pipeline reaches its members.",
+    "Render": "N17.12, M7.N2: markup the view writes, a field, an element by id, and a row action's control for one row.",
+    "Set": "D7.3, N17.9: a member's value; a callback member's value is the function that answers it."
   }
 }

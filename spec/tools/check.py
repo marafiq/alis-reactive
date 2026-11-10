@@ -1232,7 +1232,7 @@ def check_fluent(plant=None):
     sentences = json.loads(path.read_text())
     rows = sentences.get("strings", {})
     concepts, concept_counts = fluent_concept_problems(surface, sentences.get("concepts", {}))
-    shapes, shape_counts = fluent_shape_problems(surface, rows)
+    shapes, shape_counts = fluent_shape_problems(surface, rows, sentences.get("kept", {}))
     callbacks, callback_counts = fluent_callback_problems(surface, fluent_callback_table())
     strings, string_counts = fluent_string_problems(surface, rows)
     judged = {"F1": concepts}
@@ -1303,27 +1303,87 @@ def fluent_shape(member, rows):
         kind = parameter["kind"]
         if kind in ("string", "string[]"):
             key = fluent_string_key(member, parameter, rows)
-            kind = kind.replace("string", "string:" + (rows[key] if key else "?"), 1)
+            kind = "literal" if key and rows[key] == "literal" else kind.replace("string", "string:" + (rows[key] if key else "?"), 1)
         kinds.append(kind)
     if len(kinds) > 1 and kinds[0] == "path":
         kinds = kinds[1:]
     return "(" + ",".join(kinds) + ")>" + member["result"]
 
 
-def fluent_shape_problems(surface, rows):
+def fluent_shape_problems(surface, rows, kept):
+    stages = fluent_stage_arguments(surface)
     receivers_by_name = {}
     for member in surface["members"]:
         if member["memberKind"] == "method":
             receivers_by_name.setdefault(member["member"], {}).setdefault(member["receiver"], set()).add(fluent_shape(member, rows))
     shared = {name: receivers for name, receivers in sorted(receivers_by_name.items()) if len(receivers) > 1}
-    problems = []
+    problems, differ, ruled, held = [], 0, 0, set()
     for name, receivers in shared.items():
         groups = {}
         for receiver, shapes in receivers.items():
             groups.setdefault(" | ".join(sorted(shapes)), []).append(fluent_type_name(receiver))
-        if len(groups) > 1:
+        if len(groups) == 1:
+            continue
+        differ += 1
+        members = [member for member in surface["members"] if member["member"] == name and member["memberKind"] == "method"]
+        if fluent_one_shape_under_rules(members, rows, stages):
+            ruled += 1
+        elif name in kept:
+            held.add(name)
+        else:
             problems.append(f"F3 {name}: " + "; ".join(f"{shapes} on {', '.join(sorted(names))}" for shapes, names in sorted(groups.items())))
-    return problems, {"F3_names": len(shared), "F3_differ": len(problems)}
+    stale = sorted(set(kept) - held)
+    problems += [f"F3 kept row '{name}' names no name that takes two shapes" for name in stale]
+    return problems, {"F3_names": len(shared), "F3_differ": differ, "F3_same_under_rules": ruled, "F3_kept": len(held), "F3_stale_kept": len(stale)}
+
+
+def fluent_stage_arguments(surface):
+    arguments = {}
+    for member in surface["members"]:
+        arguments.setdefault(member["receiverName"], set()).add(fluent_type_arguments(member["receiver"]))
+    return arguments
+
+
+def fluent_type_arguments(receiver):
+    return receiver.partition("<")[2].rstrip(">")
+
+
+def fluent_split_kinds(text):
+    kinds, depth, current = [], 0, ""
+    for character in text:
+        depth += character == "<"
+        depth -= character == ">"
+        if character == "," and depth == 0:
+            kinds.append(current)
+            current = ""
+        else:
+            current += character
+    return kinds + [current] if current else kinds
+
+
+def fluent_ruled_shape(member, rows, stages):
+    kinds_text, result = fluent_shape(member, rows)[1:].split(")>", 1)
+    kinds = fluent_split_kinds(kinds_text)
+    if member["receiverName"] == "LiveObjects":
+        kinds = ["path" if kind == "callback1" else kind for kind in kinds]
+        result = "source" if result == "chain" else result
+    own = fluent_type_arguments(member["receiver"])
+    stage = result != member["receiverName"] and bool(own) and own in stages.get(result, set())
+    return tuple(kinds), "continues" if result in ("void", "chain") or stage else result
+
+
+def fluent_one_shape_under_rules(members, rows, stages):
+    by_receiver = {}
+    for member in members:
+        by_receiver.setdefault(member["receiver"], set()).add(fluent_ruled_shape(member, rows, stages))
+    every = [shape for shapes in by_receiver.values() for shape in shapes]
+    return any(all(any(shape[1] == full[1] and fluent_within(shape[0], full[0]) for full in fullest) for shape in every)
+               for fullest in by_receiver.values())
+
+
+def fluent_within(small, large):
+    remaining = iter(large)
+    return all(kind in remaining for kind in small)
 
 
 def fluent_callback_table():
@@ -1364,6 +1424,7 @@ def fluent_callback_problems(surface, table):
 
 
 def fluent_string_problems(surface, rows):
+    literal_positions = next(item for item in bullets("\n".join(design_sections()["Q7"])) if item.startswith("- D7.1 "))
     problems, used, judged, untyped = [], set(), 0, 0
     for member in surface["members"]:
         for parameter in member["parameters"]:
@@ -1380,7 +1441,9 @@ def fluent_string_problems(surface, rows):
                 problems.append(f"F5 {qualified}: no string kind")
                 continue
             used.add(key)
-            if rows[key] not in FLUENT_STRING_KINDS:
+            if rows[key] == "literal" and f"`{qualified}`" not in literal_positions:
+                problems.append(f"F5 {key}: 'literal' and D7.1 names no such position")
+            elif rows[key] not in FLUENT_STRING_KINDS | {"literal"}:
                 problems.append(f"F5 {key}: '{rows[key]}' is no string kind")
     stale = sorted(set(rows) - used)
     problems = list(dict.fromkeys(problems)) + [f"F5 row '{key}' names no string parameter" for key in stale]
