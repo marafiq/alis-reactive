@@ -488,6 +488,7 @@ def check_probes():
     if not path.exists():
         return not_started(path)
     facts = json.loads(path.read_text())["facts"]
+    feature_ids = {feature["id"] for path in feature_files() for feature in json.loads(path.read_text()).get("features", [])}
     outputs = {}
     problems = []
     for fact in facts:
@@ -507,6 +508,7 @@ def check_probes():
                 outputs[script] = completed.stdout.splitlines() if completed.returncode == 0 else ["exit " + str(completed.returncode) + ": " + completed.stderr[-300:]]
             if fact["expect"] not in outputs[script]:
                 problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
+            problems += browser_proof_problems(fact, feature_ids)
             continue
         if fact["host"] == "net48":
             source, _, number = fact["source"].rpartition(":")
@@ -520,8 +522,17 @@ def check_probes():
             outputs[probe] = completed.stdout.splitlines() if completed.returncode == 0 else ["exit " + str(completed.returncode) + ": " + completed.stderr[-300:]]
         if fact["expect"] not in outputs[probe]:
             problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
-    return result(not problems, "; ".join(problems[:6]) or "every fact printed by its probe or found at its source line",
+    return result(not problems, "; ".join(problems[:6]) or "every fact printed by its probe or found at its source line, every browser fact with the proof the rewrite ships",
                   facts=len(facts), net10=sum(1 for fact in facts if fact["host"] == "net10"), net48=sum(1 for fact in facts if fact["host"] == "net48"), node=sum(1 for fact in facts if fact["host"] == "node"), browser=sum(1 for fact in facts if fact["host"] == "browser"))
+
+
+def browser_proof_problems(fact, feature_ids):
+    proof = fact.get("proof") or {}
+    missing = [field for field in ("page", "gesture", "outcome") if not is_prose(proof.get(field))]
+    problems = [f"{fact['id']}: its proof lacks {', '.join(missing)}"] if missing else []
+    if proof.get("feature") not in feature_ids:
+        problems.append(f"{fact['id']}: its proof names {proof.get('feature')!r}, no feature")
+    return problems
 
 
 PLAYWRIGHT_PIN = re.compile(r'Include="Microsoft\.Playwright" Version="([0-9.]+)"')
@@ -1258,7 +1269,7 @@ CHECKS = [
     ("questions", "every core design question answered", check_questions(QUESTIONS)),
     ("evidence", "every G, B and P evidence item placed in a section's Evidence", check_evidence),
     ("tlc", "every TLC spec meets its expectation", None),
-    ("probes", "every server fact a spec assumes is pinned by a probe", check_probes),
+    ("probes", "every server fact a spec assumes is pinned by a probe, and every browser fact names the proof the rewrite ships", check_probes),
     ("history", "every regression SHA tied to a spec line", check_history),
     ("kinds", "grammar, schema and spec node sets equal; one handler per kind", check_kinds),
     ("gate1", "owner gate 1: the core design", check_gate(1)),

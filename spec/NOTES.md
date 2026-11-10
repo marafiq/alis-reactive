@@ -876,3 +876,5 @@
   Evidence: @syncfusion/ej2-navigations/src/common/menu-base.js:711 and :820, @syncfusion/ej2-kanban/src/kanban/base/layout-render.js:140, FusionInPlaceEditorExtensions.cs:111-115 at 623dd4a27, read by the lead.
 - 2026-11-09 next, a small sweep of unit 5's eight dropdowns: their Value is written "as M21.N1's items overload types MultiSelect's", another slice's terms and the pre-sweep form; each states its own value type, by its bound member as FusionMultiSelect<TValue> now does, on its own terms
   Evidence: M21.F5, F13, F20, F21, F27, F28, F29, F31 at HEAD; the sweep's report.
+- 2026-11-09 check_probes now refuses a browser fact whose proof lacks a page, a gesture or an outcome, or names no feature, the owner's decision that a browser fact names the proof the rewrite ships; all 47 at HEAD carry one
+  Evidence: spec/tools/check.py browser_proof_problems; plants: a proof removed ("its proof lacks page, gesture, outcome"), a proof naming M21.F999 ("no feature").
