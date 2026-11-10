@@ -2328,7 +2328,37 @@ def app_placement_problems(app, where, entry, screens, hosts, module, rung):
     elif not refused:
         held = {part["kind"] for part in screen["parts"]}
         problems += [f"{where}, a {module} test, runs on {screen['id']}, which holds no {slice_kind} part"] if slice_kind not in held else []
+    problems += [f"{where}, a behavior of InputsAndIds, lists no component that renders its field: Html.InputField builds on a "
+                 "consumer's render helper (M7.N2), a conformance declaration, a Native input or a Fusion one"
+                 ] if module == "InputsAndIds" and rung == "behavior" and not kinds & APP_FIELD_RENDERERS else []
     return problems
+
+
+APP_FIELD_RENDERERS = {"conformance", "nativeSlice", "fusion"}
+SLICE_MODULES = ("NativeComponents", "FusionComponents", "NativeAppLevelObjects", "FusionAppLevelObjects")
+RENDER_HELPER_TYPE = re.compile(r"(?:HtmlExtensions|Builder)(?:<|$)")
+
+
+def slice_renders(feature):
+    return feature["status"] == "new" or any(RENDER_HELPER_TYPE.search(name) for name in feature["types"])
+
+
+def check_slice_tests():
+    tests = app_tests()
+    app = json.loads((SPEC / "Reference" / "app.json").read_text())
+    placed = Counter(entry["feature"] for entry in app["placements"]
+                     if tests.get((entry["feature"], entry["for"], entry["index"]), {}).get("rung") == "behavior")
+    slices = [feature for path in feature_files() if path.parent.name in SLICE_MODULES
+              for feature in json.loads(path.read_text()).get("features", [])]
+    rendered = [feature for feature in slices if slice_renders(feature)]
+    unrendered = [feature for feature in slices if not slice_renders(feature)]
+    problems = [f"{feature['id']} {feature['types'][0].split(':')[-1] if feature['types'] else feature['summary'].split(':')[0]} has no "
+                "placed behavior test: its render helper's start and the vendor finding it at its id run in no browser (D17.13)"
+                for feature in rendered if not placed[feature["id"]]]
+    shown = "; ".join(problems[:6]) + (f"; and {len(problems) - 6} more" if len(problems) > 6 else "")
+    detail = (f"{len(rendered)} rendered slices each with a placed behavior test; "
+              f"{', '.join(feature['id'] for feature in unrendered)} are the bases slices declare on and render nothing")
+    return result(not problems, shown or detail, slices=len(rendered), unrendered=len(unrendered), problems=len(problems))
 
 
 APP_ACTION_VERBS = {"gate", "push", "drop", "refuse", "reopen", "restart"}
@@ -2495,6 +2525,7 @@ CHECKS = [
     ("no_comments", "no comment in the spec's Python or TLA+", check_no_comments),
     ("actions", "every action of the async lanes' specs named by one promise, the test app's endpoint holding it", check_actions),
     ("app", "every test placed on the care home app, no core test loading Syncfusion, no environment on a care screen", check_app),
+    ("slice_tests", "every rendered slice of Native, Fusion and their app-level objects with a placed behavior test of its own", check_slice_tests),
 ]
 
 STEPS = [
@@ -2507,7 +2538,7 @@ STEPS = [
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
-    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta"], "Finish every check and make each pass."),
+    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests"], "Finish every check and make each pass."),
     (11, "E", "REWRITE.md", ["rewrite_units"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]

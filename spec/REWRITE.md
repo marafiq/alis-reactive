@@ -455,9 +455,9 @@ The conformance library's six declarations land here with the doors that reach t
 ### U8. Inputs and ids
 Features: M7.F1, M7.F2, M7.F3
 
-The core renders no input: `Html.InputField` builds on a component's render helper (M7.N2), so no test of this unit's
-features lands before U9, whose Native inputs render the fields those tests type into, and most land with the requests,
-partials or validation their pages also use. U8 ends on its analyzer cases; its module owns no spec.
+The core renders no input: `Html.InputField` builds on a component's render helper (M7.N2), so each behavior test of
+this unit's features lists the component that renders its field, a conformance declaration of U7 or a Native input of
+U9 (check_app), and lands with the last door its page uses.
 
 ### U9. Native components
 Features: M24.F1, M24.F2, M24.F3, M24.F4, M24.F5, M24.F6, M24.F7, M24.F8, M24.F9
@@ -518,7 +518,7 @@ FusionMultiSelect's 19 own tests, the templates, and Fusion's stylesheet's verdi
 ### U25. The Fusion slices
 Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14, M21.F15, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27, M21.F28, M21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37, M21.F38, M21.F39, M21.F40, M21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46, M21.F47, M21.F48, M21.F49, M21.F50, M21.F51, M21.F52
 
-One commit per slice, each with its own tests.
+One commit per slice, each with its own tests, which `slice_tests` holds.
 
 ### U26. Fusion's app-level objects
 Features: M23.F1, M23.F2
