@@ -106,14 +106,7 @@ Abort ==
            ELSE spans' = EndAll /\ status' = "ended"
     /\ UNCHANGED <<traceOn, origin, sinkFails, attempts, sent>>
 
-Finish ==
-    /\ status = "running"
-    /\ pc = "done"
-    /\ spans' = EndAll
-    /\ status' = "ended"
-    /\ UNCHANGED <<traceOn, origin, sinkFails, pc, attempts, sent, outcome>>
-
-Next == Trigger \/ Send \/ Attempt \/ Respond \/ Route \/ Abort \/ Finish
+Next == Trigger \/ Send \/ Attempt \/ Respond \/ Route \/ Abort
 
 Spec == Init /\ [][Next]_vars
 
