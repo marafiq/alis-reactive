@@ -205,6 +205,26 @@
           "id": "bedMenu",
           "kind": "fusion",
           "role": "the bed area's FusionContextMenu"
+        },
+        {
+          "id": "wardTour",
+          "kind": "fusion",
+          "role": "the ward tour slides, FusionCarousel"
+        },
+        {
+          "id": "bandColor",
+          "kind": "fusion",
+          "role": "the resident's wristband color, FusionColorPicker"
+        },
+        {
+          "id": "wardTree",
+          "kind": "fusion",
+          "role": "the wing and ward picker, FusionDropDownTree"
+        },
+        {
+          "id": "census",
+          "kind": "fusion",
+          "role": "the ward census, FusionPivotView"
         }
       ]
     },
@@ -332,6 +352,41 @@
           "id": "clinicalEndpoint",
           "kind": "endpoint",
           "role": "the clinical step's endpoints"
+        },
+        {
+          "id": "consent",
+          "kind": "fusion",
+          "role": "the photo consent box, FusionCheckBox"
+        },
+        {
+          "id": "arrival",
+          "kind": "fusion",
+          "role": "the arrival day, FusionDatePicker"
+        },
+        {
+          "id": "respite",
+          "kind": "fusion",
+          "role": "the respite stay, FusionDateRangePicker"
+        },
+        {
+          "id": "firstVisit",
+          "kind": "fusion",
+          "role": "the first visit's day and time, FusionDateTimePicker"
+        },
+        {
+          "id": "carePlanUpload",
+          "kind": "fusion",
+          "role": "the care plan document, FusionUploader"
+        },
+        {
+          "id": "roomType",
+          "kind": "fusion",
+          "role": "the room type, two FusionRadioButton of one group"
+        },
+        {
+          "id": "admissionSteps",
+          "kind": "fusion",
+          "role": "the admission steps, FusionStepper"
         }
       ]
     },
@@ -389,6 +444,12 @@
           "id": "radio",
           "kind": "plugin",
           "role": "the ward radio plugin the record's cards listen to"
+        },
+        {
+          "id": "recordButton",
+          "kind": "nativeSlice",
+          "role": "the record's Call the nurse NativeButton",
+          "module": "NativeComponents"
         }
       ]
     },
@@ -428,6 +489,51 @@
           "id": "contactsValidator",
           "kind": "validator",
           "role": "the contacts grid's validators, their email and address rules"
+        },
+        {
+          "id": "careSections",
+          "kind": "fusion",
+          "role": "the resident's care sections, FusionAccordion"
+        },
+        {
+          "id": "intakeChart",
+          "kind": "fusion",
+          "role": "the day's fluid intake against its target, FusionBulletChart"
+        },
+        {
+          "id": "roomName",
+          "kind": "fusion",
+          "role": "the resident's room name, FusionInPlaceEditor"
+        },
+        {
+          "id": "kinPhone",
+          "kind": "fusion",
+          "role": "the next of kin's phone, FusionMaskedTextBox"
+        },
+        {
+          "id": "companions",
+          "kind": "fusion",
+          "role": "the dining companions, FusionListBox"
+        },
+        {
+          "id": "visitActions",
+          "kind": "fusion",
+          "role": "the visit actions, FusionSplitButton"
+        },
+        {
+          "id": "profile",
+          "kind": "fusion",
+          "role": "the resident's profile fields: the preferred name FusionTextBox, the care note FusionTextArea and the bed rails FusionSwitch"
+        },
+        {
+          "id": "careTabs",
+          "kind": "fusion",
+          "role": "the care tabs, FusionTab"
+        },
+        {
+          "id": "allergyTip",
+          "kind": "fusion",
+          "role": "the allergy tip, FusionTooltip"
         }
       ]
     },
@@ -524,6 +630,41 @@
           "id": "handoverEndpoint",
           "kind": "endpoint",
           "role": "the handover endpoints: the assistant's answers"
+        },
+        {
+          "id": "doseButton",
+          "kind": "fusion",
+          "role": "the give-dose button, FusionButton"
+        },
+        {
+          "id": "checklist",
+          "kind": "fusion",
+          "role": "the discharge checklist, FusionDialog"
+        },
+        {
+          "id": "doseActions",
+          "kind": "fusion",
+          "role": "the dose row's actions, FusionDropDownButton"
+        },
+        {
+          "id": "doseBoard",
+          "kind": "fusion",
+          "role": "the round's doses by status, FusionKanban"
+        },
+        {
+          "id": "doseEntry",
+          "kind": "fusion",
+          "role": "the dose given and the next dose's time, FusionNumericTextBox and FusionTimePicker"
+        },
+        {
+          "id": "sendReport",
+          "kind": "fusion",
+          "role": "the send report button, FusionProgressButton"
+        },
+        {
+          "id": "handoverSummary",
+          "kind": "fusion",
+          "role": "the handover summary, FusionRichTextEditor"
         }
       ]
     },
@@ -591,6 +732,21 @@
           "id": "fusionObjects",
           "kind": "fusion",
           "role": "FusionToast and FusionConfirm, in the layout of the fusionShell host"
+        },
+        {
+          "id": "trail",
+          "kind": "fusion",
+          "role": "the layout's trail of pages, FusionBreadcrumb"
+        },
+        {
+          "id": "residentSidebar",
+          "kind": "fusion",
+          "role": "the resident sidebar, FusionSidebar"
+        },
+        {
+          "id": "careToolbar",
+          "kind": "fusion",
+          "role": "the care toolbar, FusionToolbar"
         }
       ],
       "hosts": [
@@ -7931,6 +8087,603 @@
         "nurseLine",
         "doses",
         "collector"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F2",
+      "for": "M24.X6",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "recordButton"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F3",
+      "for": "M24.X7",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "noteInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F5",
+      "for": "M24.X8",
+      "index": 0,
+      "screen": "residents",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "filters"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F8",
+      "for": "M24.X9",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "noteInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M24.F9",
+      "for": "M24.X10",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10",
+        "net48"
+      ],
+      "parts": [
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M25.F7",
+      "for": "M25.X11",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "board",
+        "reconnect"
+      ],
+      "harness": [
+        "seed",
+        "refuse"
+      ],
+      "held": [
+        {
+          "verb": "refuse",
+          "action": "Realtime.tla:GiveUp",
+          "on": "WardBoard"
+        }
+      ]
+    },
+    {
+      "feature": "M21.F4",
+      "for": "M21.X1001",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "careSections"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F6",
+      "for": "M21.X1002",
+      "index": 0,
+      "screen": "fusion-layout",
+      "hosts": [
+        "fusionShell"
+      ],
+      "parts": [
+        "trail"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F7",
+      "for": "M21.X1003",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeChart"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F8",
+      "for": "M21.X1004",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doseButton"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F9",
+      "for": "M21.X1005",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "wardTour"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F10",
+      "for": "M21.X1006",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "consent"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F12",
+      "for": "M21.X1007",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "bandColor"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F15",
+      "for": "M21.X1008",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "arrival"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F16",
+      "for": "M21.X1009",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "respite"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F17",
+      "for": "M21.X1010",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "firstVisit"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F18",
+      "for": "M21.X1011",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "checklist"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F19",
+      "for": "M21.X1012",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doseActions"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F21",
+      "for": "M21.X1013",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "wardTree"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F22",
+      "for": "M21.X1014",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "carePlanUpload",
+        "clinicalForm",
+        "clinicalEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F24",
+      "for": "M21.X1015",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "roomName"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F25",
+      "for": "M21.X1016",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "kinPhone"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F26",
+      "for": "M21.X1017",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doseBoard"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F27",
+      "for": "M21.X1018",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "companions"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F32",
+      "for": "M21.X1019",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doseEntry"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F34",
+      "for": "M21.X1020",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "census"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F35",
+      "for": "M21.X1021",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "sendReport"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F36",
+      "for": "M21.X1022",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "roomType"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F38",
+      "for": "M21.X1023",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "handoverSummary"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F40",
+      "for": "M21.X1024",
+      "index": 0,
+      "screen": "fusion-layout",
+      "hosts": [
+        "fusionShell"
+      ],
+      "parts": [
+        "residentSidebar"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F44",
+      "for": "M21.X1025",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "visitActions"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F45",
+      "for": "M21.X1026",
+      "index": 0,
+      "screen": "admission-clinical",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "admissionSteps"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F46",
+      "for": "M21.X1027",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "profile"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F47",
+      "for": "M21.X1028",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "careTabs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F48",
+      "for": "M21.X1029",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "profile"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F49",
+      "for": "M21.X1030",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "profile"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F50",
+      "for": "M21.X1031",
+      "index": 0,
+      "screen": "handover",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doseEntry"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F51",
+      "for": "M21.X1032",
+      "index": 0,
+      "screen": "fusion-layout",
+      "hosts": [
+        "fusionShell"
+      ],
+      "parts": [
+        "careToolbar"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M21.F52",
+      "for": "M21.X1033",
+      "index": 0,
+      "screen": "record-contacts",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "allergyTip"
       ],
       "harness": [
         "seed"

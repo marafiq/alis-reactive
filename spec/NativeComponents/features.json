@@ -308,8 +308,23 @@
         "core:Q17",
         "core:Q5"
       ],
-      "defects": [],
-      "promises": [],
+      "defects": [
+        {
+          "id": "M24.X6",
+          "rung": "behavior",
+          "defect": "Both lines write the button by hand under the id the developer chose (Alis.Reactive.Native/Components/NativeButton/NativeButtonBuilder.cs:71-73 at 623dd4a27; Alis.Reactive.Native/Components/NativeButton/NativeButtonBuilder.cs:88-90 at 65fdf118d), the id its plan's click listener reaches it by. A helper that writes another id, or none, renders a button its listener does not find, so its click runs nothing."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M24.X6",
+          "page": "A resident record whose Call the nurse button Html.NativeButton(\"call-nurse\", \"Call the nurse\") renders, and whose Reactive(plan, b => b.Click, ..) sets call-status's text from Waiting to Called.",
+          "gesture": "Click Call the nurse.",
+          "outcome": "call-status reads Called.",
+          "opposite": "Open the record and click nothing: call-status reads Waiting.",
+          "defect": "The button is rendered under an id the listener does not reach, so the click runs nothing and call-status stays Waiting."
+        }
+      ],
       "verdicts": [
         {
           "door": "NativeButtonEvents",
@@ -530,8 +545,23 @@
         "core:Q17",
         "core:Q14"
       ],
-      "defects": [],
-      "promises": [],
+      "defects": [
+        {
+          "id": "M24.X7",
+          "rung": "behavior",
+          "defect": "Both lines render the box by MVC's CheckBoxFor (Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxBuilder.cs:95 at 623dd4a27; Alis.Reactive.Native/Components/NativeCheckBox/NativeCheckBoxBuilder.cs:87 at 65fdf118d), checked as the member is. A helper that writes no checked state shows the box clear over a member that holds true, against D17.13."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M24.X7",
+          "page": "A resident record whose room-free NativeCheckBox field.NativeCheckBox() renders for a model whose RoomFree is true.",
+          "gesture": "Open the record.",
+          "outcome": "The room-free box shows ticked.",
+          "opposite": "A model whose RoomFree is false shows the box clear.",
+          "defect": "The box is rendered with no checked state, so it shows clear though the model holds true."
+        }
+      ],
       "verdicts": [
         {
           "door": "NativeCheckBox.ValueMember.get -> string!",
@@ -1123,8 +1153,23 @@
         "core:Q17",
         "core:Q14"
       ],
-      "defects": [],
-      "promises": [],
+      "defects": [
+        {
+          "id": "M24.X8",
+          "rung": "behavior",
+          "defect": "Both lines render the select by MVC's DropDownListFor (Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownBuilder.cs:124 at 623dd4a27; Alis.Reactive.Native/Components/NativeDropDown/NativeDropDownBuilder.cs:116 at 65fdf118d), the option the member holds selected. A helper that selects nothing shows the first option over a member that holds another, against D17.13."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M24.X8",
+          "page": "The residents page whose wing NativeDropDown field.NativeDropDown(build => build.Items(..)) renders over North, East and West for a model whose Wing is East.",
+          "gesture": "Open the residents page.",
+          "outcome": "The wing box shows East.",
+          "opposite": "A model whose Wing is West shows West.",
+          "defect": "The select is rendered with no option selected, so it shows North, the first, though the model holds East."
+        }
+      ],
       "verdicts": [
         {
           "door": "NativeDropDown.ValueMember.get -> string!",
@@ -2029,8 +2074,23 @@
         "core:Q17",
         "core:Q14"
       ],
-      "defects": [],
-      "promises": [],
+      "defects": [
+        {
+          "id": "M24.X9",
+          "rung": "behavior",
+          "defect": "Both lines render the text area by MVC's TextAreaFor (Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaBuilder.cs:118 at 623dd4a27; Alis.Reactive.Native/Components/NativeTextArea/NativeTextAreaBuilder.cs:110 at 65fdf118d), holding the member's text. A helper that writes no text shows an empty area over a member that holds a note, against D17.13."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M24.X9",
+          "page": "A resident record whose note NativeTextArea field.NativeTextArea() renders for a model whose CareNotes is Prefers tea at seven.",
+          "gesture": "Open the record.",
+          "outcome": "The note area shows Prefers tea at seven.",
+          "opposite": "A model whose CareNotes is null shows an empty area.",
+          "defect": "The area is rendered with no text, so it shows empty though the model holds the note."
+        }
+      ],
       "verdicts": [
         {
           "door": "NativeTextArea.ValueMember.get -> string!",
@@ -2295,8 +2355,23 @@
         "core:Q17",
         "core:Q14"
       ],
-      "defects": [],
-      "promises": [],
+      "defects": [
+        {
+          "id": "M24.X10",
+          "rung": "behavior",
+          "defect": "Both lines render the box by MVC's TextBoxFor (Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxBuilder.cs:119 at 623dd4a27; Alis.Reactive.Native/Components/NativeTextBox/NativeTextBoxBuilder.cs:111 at 65fdf118d), which holds the member's text and, after a failed post, MVC's attempted text, as D17.13 states for a text box. A helper that writes the member's value in its place shows the model's 0 and drops the 2a the person typed; one that writes no value shows an empty box over a member that holds one."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M24.X10",
+          "page": "An intake form whose room NativeTextBox field.NativeTextBox() renders for the model's Room, an int, posted by the browser's own submission to an action that renders the page again when the room does not bind.",
+          "gesture": "Type 2a in the room and click Save.",
+          "outcome": "The intake page shows again with 2a in the room box.",
+          "opposite": "Opened for a model whose Room is 12, the room box shows 12.",
+          "defect": "The box shows 0, the model's value, so the person's 2a is lost; or it shows empty on a model whose Room is 12."
+        }
+      ],
       "verdicts": [
         {
           "door": "NativeTextBox.ValueMember.get -> string!",

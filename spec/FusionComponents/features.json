@@ -1317,8 +1317,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1001",
+     "rung": "behavior",
+     "defect": "Both lines render the Accordion by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().Accordion(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordionHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs:74-75 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, starts every panel closed, EJ2's expandedIndices [] (@syncfusion/ej2-navigations/src/accordion/accordion.d.ts:268-270), and the plan's ExpandItem (Alis.Reactive.Fusion/Components/FusionAccordion/FusionAccordion.cs:28 at 65fdf118d; @syncfusion/ej2-navigations/src/accordion/accordion.d.ts:441) finds no component, against D17.13."
+    }
+   ],
+   "promises": [
+    {
+     "page": "A resident's care sections page whose Html.FusionAccordion(plan, \"care-sections\", build => ..) holds the panels Medications, Allergies and Diet with ExpandedIndices set to the second, and whose Open diet button calls the accordion's ExpandItem(true, 2).",
+     "gesture": "Open the page, then click Open diet.",
+     "outcome": "At open the Allergies panel shows its text and the other two show closed; after the click the Diet panel shows its text too.",
+     "opposite": "Built with ExpandedIndices set to the first, the Medications panel shows open and Allergies closed.",
+     "defect": "The accordion is rendered without the view's options, so every panel shows closed at open; or at another id, so Open diet opens nothing.",
+     "for": "M21.X1001"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionAccordionBuilder<TModel>",
@@ -2098,8 +2113,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1002",
+     "rung": "behavior",
+     "defect": "Both lines render the Breadcrumb by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().Breadcrumb(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumbHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:88-89 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, leaves the active item EJ2's '' (@syncfusion/ej2-navigations/src/breadcrumb/breadcrumb.d.ts:142-144), and the plan's read of ActiveItem (Alis.Reactive.Fusion/Components/FusionBreadcrumb/FusionBreadcrumb.cs:28 at 65fdf118d) finds no component, against D17.13."
+    }
+   ],
+   "promises": [
+    {
+     "page": "The layout's trail, Html.FusionBreadcrumb(plan, \"trail\", build => ..) over Home at /, Wards at /wards and North wing at /wards/north with ActiveItem /wards, and a Where am I button that sets the element place's text to the breadcrumb's ActiveItem; place starts as a dash.",
+     "gesture": "Click Where am I.",
+     "outcome": "place reads /wards.",
+     "opposite": "Built with ActiveItem /wards/north, place reads /wards/north.",
+     "defect": "The breadcrumb is rendered without the view's options, so place reads nothing; or at another id, so the read stops and place keeps its dash.",
+     "for": "M21.X1002"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionBreadcrumbBuilder<TModel>",
@@ -2408,9 +2438,23 @@
      "id": "M21.X903",
      "rung": "type",
      "defect": "Both lines leave the tooltip's template unwritable: the redesign declares Template a ReadOnly<string> (Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:54 at 65fdf118d) and main's setter runs in no browser (Alis.Reactive.Fusion/Components/FusionBulletChart/Events/FusionBulletChartTooltipRenderArgs.cs:21 at 623dd4a27), where EJ2 reads it back from tooltipRender's listener as the tooltip's HTML (@syncfusion/ej2-charts/src/bullet-chart/user-interaction/tooltip.js:118), so no view can change what a templated tooltip shows. The rewrite's FusionBulletChart.IBulletchartTooltipEventArgs in M21.N7 declares Template a Property<string>, so the write compiles and EJ2 reads it."
+    },
+    {
+     "id": "M21.X1003",
+     "rung": "behavior",
+     "defect": "Both lines render the BulletChart by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().BulletChart(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChartHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:97-98 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, draws the chart with EJ2's title '' (@syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:113-115), and the plan's BulletChartMouseClick handler (Alis.Reactive.Fusion/Components/FusionBulletChart/FusionBulletChart.cs:36 at 65fdf118d; @syncfusion/ej2-charts/src/bullet-chart/bullet-chart.d.ts:302) listens to no component, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A resident's fluid chart, Html.FusionBulletChart(plan, \"fluid-chart\", intake, build => build.Title(\"Fluid intake\")) over today's intake, 1200 ml taken against a 1500 ml target by Fields(i => i.Taken, i => i.Target), whose BulletChartMouseClick handler sets the element chart-note's text to Chart read; chart-note starts as a dash.",
+     "gesture": "Open the page, then click the chart.",
+     "outcome": "The chart shows the title Fluid intake, and chart-note reads Chart read.",
+     "opposite": "Built with the title Weight, the chart shows Weight.",
+     "defect": "The chart is rendered without the view's options, so it shows no title; or at another id, so the click leaves chart-note at its dash.",
+     "for": "M21.X1003"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionBulletChartBuilder<TModel>",
@@ -2824,9 +2868,23 @@
      "id": "M21.X801",
      "rung": "analyzer",
      "defect": "The redesign declares IconPosition as Property<FusionButtonIconPosition> (Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:37 at 65fdf118d) over an enum that carries no converter (Alis.Reactive.Fusion/Components/FusionButton/FusionButtonIconPosition.cs:6 at 65fdf118d), so the live form writes Right as the number 1 (spec/Core/DESIGN.md:1221), where EJ2's iconPosition holds the names of its IconPosition (@syncfusion/ej2-buttons/src/button/button.d.ts:51) and calls toLowerCase on it to place the icon (@syncfusion/ej2-buttons/src/button/button.js:124); on a change it removes the icon and places it again (@syncfusion/ej2-buttons/src/button/button.js:262-268), so on a button with text and an icon the write throws and leaves it with no icon. Main writes the name by its own map (Alis.Reactive.Fusion/Components/FusionButton/FusionButtonExtensions.cs:139 at 623dd4a27). The type check refuses an enum written as its number against the vendor's enum by ALIS037 (X17.46); the rewrite's FusionButtonIconPosition in M21.N8 carries a string enum converter, and the declaration passes when the type check reads that converter by the names it writes, a gate 2 item beside X17.46."
+    },
+    {
+     "id": "M21.X1004",
+     "rung": "behavior",
+     "defect": "Both lines render the Button by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().Button(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionButton/FusionButtonHtmlExtensions.cs:35-36 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:83-84 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, shows EJ2's content \"\" (@syncfusion/ej2-buttons/src/button/button.d.ts:84-86), and the plan's read of Content (Alis.Reactive.Fusion/Components/FusionButton/FusionButton.cs:28 at 65fdf118d) finds no component, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A dose card whose Html.FusionButton(plan, \"give-dose\", build => build.Content(\"Give dose\")) renders the give-dose button, and a Read label button that sets the element dose-label's text to the button's Content; dose-label starts as a dash.",
+     "gesture": "Click Read label.",
+     "outcome": "The give-dose button shows Give dose, and dose-label reads Give dose.",
+     "opposite": "Built with the content Skip dose, the button shows Skip dose and dose-label reads Skip dose.",
+     "defect": "The button is rendered without the view's options, so it shows no text and dose-label reads nothing; or at another id, so dose-label keeps its dash.",
+     "for": "M21.X1004"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionButtonBuilder<TModel>",
@@ -3169,9 +3227,23 @@
      "id": "M21.X904",
      "rung": "type",
      "defect": "Both lines read the slide direction as text: the redesign's SlideDirection is a ReadOnly<string> on both payloads (Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:57, :76 at 65fdf118d) and main's a string (Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanging.cs:21, Alis.Reactive.Fusion/Components/FusionCarousel/Events/FusionCarouselOnSlideChanged.cs:18 at 623dd4a27), where EJ2's is CarouselSlideDirection, Previous or Next (@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:12, :68, :85), so a condition that compares it with next or Forward compiles and never holds. The rewrite's FusionCarousel.CarouselSlideDirection in M21.N9 holds EJ2's two names, so no other compiles."
+    },
+    {
+     "id": "M21.X1005",
+     "rung": "behavior",
+     "defect": "Both lines render the Carousel by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().Carousel(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarouselHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:103-104 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, shows the first slide, EJ2's selectedIndex 0 (@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:213-215), and the plan's read of SelectedIndex (Alis.Reactive.Fusion/Components/FusionCarousel/FusionCarousel.cs:27 at 65fdf118d) finds no component, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A ward tour, Html.FusionCarousel(plan, \"ward-tour\", build => ..) whose slides read Ward A, Ward B and Ward C with SelectedIndex 2, and a Which ward button that sets the element ward-shown's text to the carousel's SelectedIndex; ward-shown starts as a dash.",
+     "gesture": "Open the page, then click Which ward.",
+     "outcome": "The carousel shows the slide Ward C, and ward-shown reads 2.",
+     "opposite": "Built with SelectedIndex 1, the carousel shows Ward B and ward-shown reads 1.",
+     "defect": "The carousel is rendered without the view's options, so it shows Ward A and ward-shown reads 0; or at another id, so ward-shown keeps its dash.",
+     "for": "M21.X1005"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionCarouselBuilder<TModel>",
@@ -3620,8 +3692,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1006",
+     "rung": "behavior",
+     "defect": "Both lines render the CheckBox by EJ2's CheckBoxFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBoxHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionCheckBox/FusionCheckBox.cs:78 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the CheckBox at the member's value, written by M21.D1; a helper that drops it shows the box unticked, EJ2's checked false (@syncfusion/ej2-buttons/src/check-box/check-box.d.ts:50-52), though the member holds true, against D17.13."
+    }
+   ],
+   "promises": [
+    {
+     "page": "An admission's consent box, rendered by field.FusionCheckBox() for a model whose PhotoConsent is true.",
+     "gesture": "Open the page.",
+     "outcome": "The consent box shows ticked.",
+     "opposite": "A model whose PhotoConsent is false shows the box unticked.",
+     "defect": "The CheckBox is rendered with no starting value, so the box shows unticked though the model holds true.",
+     "for": "M21.X1006"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionCheckBox.ValueMember.get -> string!",
@@ -4448,9 +4535,23 @@
      "id": "M21.X611",
      "rung": "analyzer",
      "defect": "Main's SetValue takes null (Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerExtensions.cs:28-31 at 623dd4a27) where EJ2's value is a color, typed string and documented to start at #008000ff (@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts:41-46), and hexToRgb answers a null with no color (@syncfusion/ej2-inputs/src/color-picker/color-picker.js:1631-1634): the vendor contract analyzer (N17.2) refuses a T? write of a member whose type and documentation both hold no null by ALIS019 (D17.5). The redesign declares Property<string> (Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:23 at 65fdf118d), whose doc still says null clears it (Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:22 at 65fdf118d); the rewrite keeps Property<string> and drops the null."
+    },
+    {
+     "id": "M21.X1007",
+     "rung": "behavior",
+     "defect": "Both lines render the ColorPicker by EJ2's ColorPickerFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPickerHtmlExtensions.cs:43 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionColorPicker/FusionColorPicker.cs:72 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the ColorPicker at the member's value, written by M21.D1; a helper that drops it starts the picker at EJ2's #008000ff (@syncfusion/ej2-inputs/src/color-picker/color-picker.d.ts:44-46), though the member holds another color, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A resident's wristband color, rendered by field.FusionColorPicker() for a model whose BandColor is #ff0000ff, and a Show band button that sets the element band-shown's text to the picker's Value; band-shown starts as a dash.",
+     "gesture": "Click Show band.",
+     "outcome": "band-shown reads #ff0000ff.",
+     "opposite": "A model whose BandColor is #0000ffff makes band-shown read #0000ffff.",
+     "defect": "The ColorPicker is rendered with no starting value, so band-shown reads EJ2's #008000ff though the model holds #ff0000ff.",
+     "for": "M21.X1007"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionColorPicker.ValueMember.get -> string!",
@@ -5732,9 +5833,23 @@
      "id": "M21.X702",
      "rung": "analyzer",
      "defect": "Both lines render the DatePicker over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:70 at 65fdf118d), while the input reads its value as a DateTime, so a picker bound to a member of text or a number compiles and the form sends a date where the endpoint binds that member. The rewrite renders FusionDatePicker<TProp>, and the vendor contract analyzer (N17.2) refuses a TProp that is no date by ALIS037, whose closed set holds DateTime and DateTimeOffset (D17.5)."
+    },
+    {
+     "id": "M21.X1008",
+     "rung": "behavior",
+     "defect": "Both lines render the DatePicker by EJ2's DatePickerFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePickerHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDatePicker/FusionDatePicker.cs:74 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the DatePicker at the member's value, written by M21.D1; a helper that drops it shows an empty box, EJ2's value null (@syncfusion/ej2-calendars/src/datepicker/datepicker.d.ts:83-87), though the member holds a date, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "An admission's arrival day, rendered by field.FusionDatePicker(build => build.Format(\"yyyy-MM-dd\")) for a model whose ArrivesOn is 2026-07-14.",
+     "gesture": "Open the page.",
+     "outcome": "The arrival box shows 2026-07-14.",
+     "opposite": "A model whose ArrivesOn is null shows an empty box.",
+     "defect": "The DatePicker is rendered with no starting value, so the box shows empty though the model holds 2026-07-14.",
+     "for": "M21.X1008"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionDatePicker.ValueMember.get -> string!",
@@ -6056,9 +6171,23 @@
      "id": "M21.X704",
      "rung": "type",
      "defect": "Both lines render the DateRangePicker over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:75 at 65fdf118d), while the input sends a list of two dates, the redesign's own page binding a DateTime[]? (Alis.Reactive.SandboxApp/Areas/Sandbox/Models/Components/Fusion/DateRangePicker/DateRangePickerModel.cs:15 at 65fdf118d), so a picker bound to a single date or to text compiles and the endpoint binds a list into it. The rewrite's helpers take a member of DateTime[] or DateTime[]? alone."
+    },
+    {
+     "id": "M21.X1009",
+     "rung": "behavior",
+     "defect": "Both lines render the DateRangePicker by EJ2's DateRangePickerFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePickerHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDateRangePicker/FusionDateRangePicker.cs:79 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the DateRangePicker at the member's value, written by M21.D1; a helper that drops it shows an empty box, EJ2's startDate and endDate null (@syncfusion/ej2-calendars/src/daterangepicker/daterangepicker.d.ts:287-289, :293-295), though the member holds two days, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A respite stay, rendered by field.FusionDateRangePicker(build => build.Format(\"yyyy-MM-dd\")) for a model whose Stay holds 2026-07-14 and 2026-07-20.",
+     "gesture": "Open the page.",
+     "outcome": "The stay box shows 2026-07-14 - 2026-07-20.",
+     "opposite": "A model whose Stay is null shows an empty box.",
+     "defect": "The DateRangePicker is rendered with no starting value, so the box shows empty though the model holds the two days.",
+     "for": "M21.X1009"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionDateRangePicker.ValueMember.get -> string!",
@@ -6394,9 +6523,23 @@
      "id": "M21.X706",
      "rung": "type",
      "defect": "Both lines render the DateTimePicker over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:70 at 65fdf118d), while the input reads its value as a DateTime (Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:23 at 65fdf118d): a picker bound to text compiles, and one bound to a DateTimeOffset member sends the picked moment as a DateTime, with no offset (D3.9), so the endpoint receives a wall time with no instant where the member holds one. The rewrite's FusionDateTimePicker<TProp> takes the bound member's type, so a DateTimeOffset? member's Value is written and read as an instant, sent as the browser's clock with its offset for its day (D3.9, D3.13), and the vendor contract analyzer (N17.2) refuses a TProp that is no date by ALIS037 (D17.5)."
+    },
+    {
+     "id": "M21.X1010",
+     "rung": "behavior",
+     "defect": "Both lines render the DateTimePicker by EJ2's DateTimePickerFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePickerHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDateTimePicker/FusionDateTimePicker.cs:74 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the DateTimePicker at the member's value, written by M21.D1; a helper that drops it shows an empty box, EJ2's value null (@syncfusion/ej2-calendars/src/datetimepicker/datetimepicker.d.ts:90-93), though the member holds a time, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A first visit, rendered by field.FusionDateTimePicker(build => build.Format(\"yyyy-MM-dd HH:mm\")) for a model whose FirstVisit is 2026-07-14 09:30, a DateTime.",
+     "gesture": "Open the page.",
+     "outcome": "The visit box shows 2026-07-14 09:30.",
+     "opposite": "A model whose FirstVisit is null shows an empty box.",
+     "defect": "The DateTimePicker is rendered with no starting value, so the box shows empty though the model holds 2026-07-14 09:30.",
+     "for": "M21.X1010"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionDateTimePicker.ValueMember.get -> string!",
@@ -6726,8 +6869,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1011",
+     "rung": "behavior",
+     "defect": "Both lines render the Dialog by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().Dialog(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionDialog/FusionDialogHtmlExtensions.cs:34-35 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs:111-112 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, shows the dialog at open with no header, EJ2's visible true and header '' (@syncfusion/ej2-popups/src/dialog/dialog.d.ts:425-427, :417-421), and the plan's Show (Alis.Reactive.Fusion/Components/FusionDialog/FusionDialog.cs:26 at 65fdf118d; @syncfusion/ej2-popups/src/dialog/dialog.d.ts:813) finds no component, against D17.13."
+    }
+   ],
+   "promises": [
+    {
+     "page": "A discharge page whose Html.FusionDialog(plan, \"checklist\", build => ..) holds the header Discharge checklist with Visible false, and an Open checklist button that calls the dialog's Show().",
+     "gesture": "Open the page, then click Open checklist.",
+     "outcome": "No dialog shows at open; after the click the dialog shows with the header Discharge checklist.",
+     "opposite": "Built with Visible true, the dialog shows at open.",
+     "defect": "The dialog is rendered without the view's options, so it shows at open with no header; or at another id, so Open checklist shows nothing.",
+     "for": "M21.X1011"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionDialogBeforeCloseArgs.Cancel.get -> bool",
@@ -7123,9 +7281,23 @@
      "id": "M21.X807",
      "rung": "analyzer",
      "defect": "FusionDropDownButtonItem carries no [JsonPropertyName] on either line (Alis.Reactive.Fusion/Components/FusionDropDownButton/Events/FusionDropDownButtonOnSelected.cs:15-25 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:63-73 at 65fdf118d), while select's item is EJ2's ItemModel (@syncfusion/ej2-splitbuttons/src/common/common.d.ts:72), which names id, text and disabled (@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:21, :35, :49): the vendor contract analyzer's type check (N17.2) refuses each member by ALIS037 (X17.48), and the rewrite's FusionDropDownButton.ItemModel in M21.N19 names each by [JsonPropertyName]."
+    },
+    {
+     "id": "M21.X1012",
+     "rung": "behavior",
+     "defect": "Both lines render the DropDownButton by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().DropDownButton(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButtonHtmlExtensions.cs:31-32 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:99-100 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, shows EJ2's content \"\" over EJ2's items [] (@syncfusion/ej2-splitbuttons/src/drop-down-button/drop-down-button.d.ts:66-68, :107-109), and the plan's Select handler (Alis.Reactive.Fusion/Components/FusionDropDownButton/FusionDropDownButton.cs:51 at 65fdf118d; @syncfusion/ej2-splitbuttons/src/drop-down-button/drop-down-button.d.ts:188) listens to no component, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A dose row whose Html.FusionDropDownButton(plan, \"dose-actions\", build => ..) shows Dose actions over the items Give dose and Skip dose, and whose Select handler sets the element dose-choice's text to the chosen item's Text; dose-choice starts as a dash.",
+     "gesture": "Click Dose actions, then Skip dose.",
+     "outcome": "The button shows Dose actions, and dose-choice reads Skip dose.",
+     "opposite": "Choosing Give dose, dose-choice reads Give dose.",
+     "defect": "The button is rendered without the view's options, so it shows no text and opens no items; or at another id, so dose-choice keeps its dash.",
+     "for": "M21.X1012"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionDropDownButtonBuilder<TModel>",
@@ -7910,9 +8082,23 @@
      "id": "M21.X508",
      "rung": "analyzer",
      "defect": "The redesign declares Value as Property<string[]> and Text as Property<string> (Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTree.cs:23, :26 at 65fdf118d) where EJ2 documents value and text null by default (@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts:623-627, :641-646), which D17.5 reads as null added to each type, so an untouched tree types as a list and main's clear, SetValue(null), which writes null (Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeExtensions.cs:37-42 at 623dd4a27) over a property main declares string[] (Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeExtensions.cs:17-18 at 623dd4a27), is a nullable warning: the vendor contract analyzer (N17.2) refuses the nullability by ALIS019, and the rewrite declares Property<string[]?> and Property<string?>."
+    },
+    {
+     "id": "M21.X1013",
+     "rung": "behavior",
+     "defect": "Both lines render the DropDownTree by EJ2's DropDownTreeFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTreeHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionDropDownTree/FusionDropDownTree.cs:89 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the DropDownTree at the member's value, written by M21.D1; a helper that drops it shows an empty box, EJ2's value null (@syncfusion/ej2-dropdowns/src/drop-down-tree/drop-down-tree.d.ts:643-646), though the member holds a ward, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A bed move whose ward picker is rendered by field.FusionDropDownTree(build => ..) over North wing, holding North 1 and North 2, and South wing, holding South 1, for a model whose Ward holds north-2.",
+     "gesture": "Open the page.",
+     "outcome": "The ward box shows North 2.",
+     "opposite": "A model whose Ward is null shows an empty box.",
+     "defect": "The DropDownTree is rendered with no starting value, so the box shows empty though the model holds north-2.",
+     "for": "M21.X1013"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionDropDownTree.ValueMember.get -> string!",
@@ -8313,9 +8499,23 @@
      "id": "M21.X710",
      "rung": "type",
      "defect": "Both lines render the Uploader over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:102 at 65fdf118d), while the input sends files, so an uploader bound to text compiles and the endpoint binds no file into it. The rewrite's helpers in M21.N22 take a file member alone, IFormFile or a list of it on net10 and MVC 5's posted-file base or a list of it on net48, the file members D10.23 names (spec/Core/DESIGN.md:2313-2314)."
+    },
+    {
+     "id": "M21.X1014",
+     "rung": "behavior",
+     "defect": "Both lines render the Uploader by EJ2's Uploader(id), which binds no member, with automatic upload off and the input named by the member's path, .AutoUpload(false) and [\"name\"] = setup.BindingPath (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUploadHtmlExtensions.cs:34-36 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:106-110 at 65fdf118d), since a browser starts a file input with no file. A helper that drops AutoUpload(false) sends each file the moment it is chosen, EJ2's autoUpload true (@syncfusion/ej2-inputs/src/uploader/uploader.d.ts:600-602), one that drops the name sends the file under no member, and one at another id leaves the plan's FilesChanged (Alis.Reactive.Fusion/Components/FusionFileUpload/FusionFileUpload.cs:37 at 65fdf118d) listening to no component, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "An admission's care plan document, rendered by field.FusionUploader() for a model whose CarePlan is an IFormFile, whose FilesChanged handler sets the element chosen's text to the count of the uploader's Files, and whose Save button posts the form as form data to an endpoint that echoes the file name of the CarePlan it bound; chosen starts as 0.",
+     "gesture": "Choose care-plan.pdf in the uploader, then click Save.",
+     "outcome": "chosen reads 1 at once, the network log holds no request until Save, and the echo reads care-plan.pdf.",
+     "opposite": "Clicking Save with no file chosen, the echo reads no file.",
+     "defect": "The uploader sends the file the moment it is chosen, so the network log holds a request before Save; or the input carries no name, so the echo reads no file; or it is rendered at another id, so chosen stays 0.",
+     "for": "M21.X1014"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionFileUpload.ValueMember.get -> string!",
@@ -10543,9 +10743,23 @@
      "id": "M21.X404",
      "rung": "analyzer",
      "defect": "Both lines read the editor's value and change's value and previousValue as string (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:19, Alis.Reactive.Fusion/Components/FusionInPlaceEditor/Events/FusionInPlaceEditorChangeArgs.cs:11, :14 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:19, :120, :123 at 65fdf118d), where EJ2 types the value string | number | Date | string[] | Date[] | number[] and change's string | string[] | number | number[] | boolean[] | Date | Date[] | DateRange (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:187, @syncfusion/ej2-inplace-editor/src/inplace-editor/base/interface.d.ts:108), and each editor type hands its own kind: text for Text, a number for Numeric, a Date for Date, a list of two Dates for DateRange, not the DateRange object the TypeScript lists, and a list of the items' values for MultiSelect (probe:ej2-inplaceeditor-change-Text, probe:ej2-inplaceeditor-change-Numeric, probe:ej2-inplaceeditor-change-Date, probe:ej2-inplaceeditor-change-DateRange, probe:ej2-inplaceeditor-change-MultiSelect). A read of one kind fits no union of several, which ALIS037 refuses (D17.5). The rewrite's FusionInPlaceEditor<TValue> is generic over the bound member's type, which its render helper gives it, so Value, the input and change's Value and PreviousValue read the member's own type, as main reads the value by the member the field registers (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:111-115 at 623dd4a27), and the vendor contract analyzer (N17.2) checks that type against one type the union holds (ALIS037) and, since EJ2 documents the value null until set (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:184), holds it to a type whose read admits null (ALIS019, D17.5), so a string? or decimal? member binds and a decimal member is refused, where main's ComponentProperty<string> states the value with no null (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorExtensions.cs:18-19 at 623dd4a27)."
+    },
+    {
+     "id": "M21.X1015",
+     "rung": "behavior",
+     "defect": "Both lines start the editor by compiling the view's expression against the model and handing EJ2 the object it reads, builder.Value(_value) (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorHtmlExtensions.cs:62-63, :95 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:238-239, :271 at 65fdf118d), a catch turning any failure into no start (Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditorHtmlExtensions.cs:68-71 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionInPlaceEditor/FusionInPlaceEditor.cs:244-247 at 65fdf118d). The rewrite's render helper starts the editor at the member's value, written by M21.D1; a helper that drops it shows EJ2's emptyText, Empty (@syncfusion/ej2-inplace-editor/src/inplace-editor/base/inplace-editor.d.ts:230-232), though the member holds a value, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A resident's room name, rendered by field.FusionInPlaceEditor() for a model whose Room is North 12.",
+     "gesture": "Open the page.",
+     "outcome": "The editor shows North 12.",
+     "opposite": "A model whose Room is null shows Empty.",
+     "defect": "The InPlaceEditor is rendered with no starting value, so it shows Empty though the model holds North 12.",
+     "for": "M21.X1015"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionInPlaceEditor.ValueMember.get -> string!",
@@ -11232,9 +11446,23 @@
      "id": "M21.X609",
      "rung": "analyzer",
      "defect": "Both lines declare MaskedTextBox's value as non-null text: the redesign's Value is Property<string> (Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:19 at 65fdf118d), whose doc says it is null when empty (Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:18 at 65fdf118d), and main's SetValue takes a string with no null (Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskExtensions.cs:24-28 at 623dd4a27), where EJ2 documents the value null until one is set (@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:137-144): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite's Value is Property<string?>, so a view clears the box with Value.Set(null)."
+    },
+    {
+     "id": "M21.X1016",
+     "rung": "behavior",
+     "defect": "Both lines render the MaskedTextBox by EJ2's MaskedTextBoxFor(expression), the builder that binds the member (Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMaskHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionInputMask/FusionInputMask.cs:67 at 65fdf118d), so it starts at the member's value as EJ2's binding writes it. The rewrite's render helper starts the MaskedTextBox at the member's value, written by M21.D1; a helper that drops it shows no digits, EJ2's value null (@syncfusion/ej2-inputs/src/maskedtextbox/maskedtextbox/maskedtextbox.d.ts:142-144), though the member holds them, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "A next of kin's phone, rendered by field.FusionMaskedTextBox(build => build.Mask(\"000-000-0000\")) for a model whose Phone is 5551234567.",
+     "gesture": "Open the page.",
+     "outcome": "The phone box shows 555-123-4567.",
+     "opposite": "A model whose Phone is 5559876543 shows 555-987-6543.",
+     "defect": "The MaskedTextBox is rendered with no starting value, so the box shows no digits though the model holds 5551234567.",
+     "for": "M21.X1016"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionInputMask.ValueMember.get -> string!",
@@ -11612,9 +11840,23 @@
      "id": "M21.X303",
      "rung": "analyzer",
      "defect": "FusionKanbanColumn and FusionKanbanHeaderArgs carry no [JsonPropertyName] on either line (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanExtensions.cs:216-222 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:254-264, :317-330 at 65fdf118d), while addColumn's ColumnsModel and QueryCellInfo's HeaderArgs name keyField, headerText, allowToggle, isExpanded, textField and count (@syncfusion/ej2-kanban/src/kanban/models/columns-model.d.ts:15-44, @syncfusion/ej2-kanban/src/kanban/base/interface.d.ts:177-184): the vendor contract analyzer's type check (N17.2) refuses each member by ALIS037 (X17.48), and the rewrite names each by [JsonPropertyName]. A column's key is string | number wherever the board takes or hands one (@syncfusion/ej2-kanban/src/kanban/models/columns-model.d.ts:15, @syncfusion/ej2-kanban/src/kanban/base/interface.d.ts:179, @syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:429, :527, :535), and a header hands it as the app gave it, text for a board of text keys and a number for one of number keys (probe:ej2-payload-kanban-queryCellInfo-text, probe:ej2-payload-kanban-queryCellInfo-number, @syncfusion/ej2-kanban/src/kanban/base/layout-render.js:140, :308), where the redesign reads and writes it as string (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:34, :71, :75, :257, :323 at 65fdf118d): a read of one kind fits no union of two, which ALIS037 refuses (D17.5). The rewrite types a column's key by TKey, the key type of the cards the board is rendered with, in ColumnsModel<TKey>, HeaderArgs<TKey> through QueryCellInfo<TKey>(), ShowColumn<TKey>, HideColumn<TKey> and GetColumnData<TCard, TKey>, and the analyzer checks TKey against one type the union holds."
+    },
+    {
+     "id": "M21.X1017",
+     "rung": "behavior",
+     "defect": "Both lines render the Kanban by EJ2's own builder at the view's id and hand it to the view's build, html.EJS().Kanban(elementId) then build(builder) (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanbanHtmlExtensions.cs:29-30 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:358-359 at 65fdf118d), so the options the view sets start it. A helper that renders before build, or at another id, draws no column and no card, EJ2's columns [] and dataSource [] (@syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:144-146, :109-112), and the plan's CardClick handler (Alis.Reactive.Fusion/Components/FusionKanban/FusionKanban.cs:113 at 65fdf118d; @syncfusion/ej2-kanban/src/kanban/base/kanban.d.ts:270) listens to no component, against D17.13."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "page": "The round's dose board, Html.FusionKanban(plan, \"dose-board\", build => ..) keyed on Status with the columns To give (Due) and Given (Given), each card headed by its Medicine over Aspirin, Due, and Paracetamol, Given; its CardClick<DoseCard>() handler sets the element dose-picked's text to the card's Medicine; dose-picked starts as a dash.",
+     "gesture": "Open the page, then click the Aspirin card.",
+     "outcome": "The To give column shows Aspirin and the Given column shows Paracetamol; dose-picked reads Aspirin.",
+     "opposite": "Clicking the Paracetamol card, dose-picked reads Paracetamol.",
+     "defect": "The board is rendered without the view's options, so it shows no column and no card; or at another id, so dose-picked keeps its dash.",
+     "for": "M21.X1017"
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionKanbanActionArgs<TCard>.AddedRecords.get -> System.Collections.Generic.List<TCard!>!",
@@ -12554,8 +12796,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1018",
+     "rung": "behavior",
+     "defect": "Both lines render the ListBox by EJ2's builder under the view's id with the view's options, EJS().ListBox(elementId) (Alis.Reactive.Fusion/Components/FusionListBox/FusionListBoxHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionListBox/FusionListBox.cs:80 at 65fdf118d): a helper that drops the view's options starts it at EJ2's empty selection (@syncfusion/ej2-dropdowns/src/list-box/list-box.d.ts:152-156), and one that renders an id the plan does not name leaves the plan's SelectItems (Alis.Reactive.Fusion/Components/FusionListBox/FusionListBox.cs:32 at 65fdf118d; @syncfusion/ej2-dropdowns/src/list-box/list-box.d.ts:418) nothing to reach, against D17.13. The rewrite's render helper renders the ListBox under the plan's id with the options the view sets."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X1018",
+     "page": "A dining page whose companions FusionListBox is rendered by Html.FusionListBox(plan, \"dining-companions\", b => b.DataSource(new[] { \"Carey\", \"Dev\", \"Ann\" }).Value(new[] { \"Dev\" })), and a Seat with Carey button whose click calls the list box's SelectItems(new[] { \"Carey\" }, true, false).",
+     "gesture": "Open the page, then click Seat with Carey.",
+     "outcome": "Dev shows selected at open; after the click Carey and Dev show selected and Ann does not.",
+     "opposite": "A Seat everyone button whose click calls SelectAll(true) shows Carey, Dev and Ann selected.",
+     "defect": "The helper drops the view's options, so the list shows no companion and none selected; or it renders the list box at an id the plan does not name, so the click's step stops and Carey stays unselected."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionListBoxBuilder<TModel>",
@@ -14660,9 +14917,23 @@
      "id": "M21.X608",
      "rung": "type",
      "defect": "Both lines read the change payload's value and previous value as a decimal with no null: the redesign's are ReadOnly<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:56, :59 at 65fdf118d) and main's payload class holds decimal, while the browser hands null for a box the user clears and for the change after it (probe:ej2-payload-numerictextbox-change-cleared, probe:ej2-payload-numerictextbox-change-after-cleared), which EJ2's TypeScript types value?: number, a generic type (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:435-445), and the vendor contract cannot see. The rewrite's payload in M21.N32 reads both as TValue, the bound member's type, which admits null by ALIS019, so a condition on a cleared dose compiles only with its null case."
+    },
+    {
+     "id": "M21.X1019",
+     "rung": "behavior",
+     "defect": "Both lines start the NumericTextBox at the bound member through EJ2's own builder, EJS().NumericTextBoxFor(expr) (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:92 at 65fdf118d); a helper that drops the start shows the box empty, EJ2's null (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:67-71) whatever the member holds, against D17.13. The rewrite's render helper starts the NumericTextBox at the member's value, written by M21.D1."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1019",
+     "page": "A dose record page shown again after a failed post, whose dose given FusionNumericTextBox is rendered by field.FusionNumericTextBox() for a model whose DoseMg is 12.5.",
+     "gesture": "Open the page.",
+     "outcome": "The dose box shows 12.50, EJ2's n2 format (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:163-165).",
+     "opposite": "A model whose DoseMg is null shows an empty box.",
+     "defect": "The box is rendered with no starting value, so it shows empty though the model holds 12.5."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionNumericTextBox.ValueMember.get -> string!",
@@ -15561,9 +15832,23 @@
      "id": "M21.X304",
      "rung": "analyzer",
      "defect": "FusionPivotViewCellData carries no [JsonPropertyName] on either line (Alis.Reactive.Fusion/Components/FusionPivotView/Events/FusionPivotViewCellSelectingArgs.cs:15-28 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:69-103 at 65fdf118d), while cellSelecting's data is an IAxisSet (@syncfusion/ej2-pivotview/src/common/base/interface.d.ts:440), which names axis, formattedText, actualText and the rest (@syncfusion/ej2-pivotview/src/base/engine.d.ts:1481-1632): the vendor contract analyzer's type check (N17.2) refuses each member by ALIS037 (X17.48), and the rewrite names each by [JsonPropertyName]. IAxisSet's actualText holds number | string and its rowHeaders and columnHeaders string | number | Date (@syncfusion/ej2-pivotview/src/base/engine.d.ts:1489, :1557, :1561), which both lines read as string and the redesign's sandbox shows and compares as text (Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/PivotView/Index.cshtml:102, :112 at 65fdf118d): a read of one kind fits no union of several, which ALIS037 refuses (D17.5), and the kind each holds follows the cell's axis and the pivot's own fields, which no browser fact pins. The rewrite declares the three by no door, by the owner's confidence rule (spec/CLAUDE.md, 2026-11-09): formattedText, typed string (@syncfusion/ej2-pivotview/src/base/engine.d.ts:1485), carries none of their uses, so an app reads them through a payload class of its own on the core's surface (M21.N2, M12.N1)."
+    },
+    {
+     "id": "M21.X1020",
+     "rung": "behavior",
+     "defect": "Both lines render the PivotView by EJ2's builder under the view's id with the view's options, EJS().PivotView(elementId) (Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotViewHtmlExtensions.cs:28 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionPivotView/FusionPivotView.cs:135 at 65fdf118d): a helper that drops the view's options starts it at EJ2's Table view (@syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:960-963), and one that renders an id the plan does not name leaves the rewrite's DisplayOption.View (M21.N34, M21.D301; @syncfusion/ej2-pivotview/src/pivotview/base/pivotview.d.ts:1476) nothing to reach, against D17.13. The rewrite's render helper renders the PivotView under the plan's id with the options the view sets."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1020",
+     "page": "A ward census page whose FusionPivotView of the residents by ward is rendered by Html.FusionPivotView(plan, \"ward-census\", b => b.DisplayOption(new PivotViewDisplayOption { View = View.Chart }) ..), and a Which view button whose click sets the element view-name's text to the pivot's DisplayOption.View; view-name starts as No view.",
+     "gesture": "Click Which view.",
+     "outcome": "The census shows as a chart and view-name reads Chart.",
+     "opposite": "Rendered with View = View.Table, the census shows as a table and view-name reads Table.",
+     "defect": "The helper drops the view's options, so the census shows as a table and view-name reads Table; or it renders the pivot at an id the plan does not name, so the read stops and view-name keeps No view."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionPivotViewBuilder<TModel>",
@@ -15918,9 +16203,23 @@
      "id": "M21.X802",
      "rung": "type",
      "defect": "The redesign declares the progress payload's Percent and Step read-only (Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:68, :74 at 65fdf118d), and main's setters run in no browser (Alis.Reactive.Fusion/Components/FusionProgressButton/Events/FusionProgressButtonOnProgress.cs:9 at 623dd4a27), where EJ2 reads both back from the listener and runs the progress on from them (@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.js:277, :280), so no view can set the interval or the percent a progress moves on from. The rewrite's FusionProgressButton.ProgressEventArgs in M21.N35 declares both as Property<double>, so the write compiles and EJ2 reads it."
+    },
+    {
+     "id": "M21.X1021",
+     "rung": "behavior",
+     "defect": "Both lines render the ProgressButton by EJ2's builder under the view's id with the view's options, EJS().ProgressButton(elementId) (Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButtonHtmlExtensions.cs:31 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:101 at 65fdf118d): a helper that drops the view's options starts it at EJ2's empty content (@syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts:138-140), and one that renders an id the plan does not name leaves the plan's read of Content (Alis.Reactive.Fusion/Components/FusionProgressButton/FusionProgressButton.cs:24 at 65fdf118d; @syncfusion/ej2-splitbuttons/src/progress-button/progress-button.d.ts:140) nothing to reach, against D17.13. The rewrite's render helper renders the ProgressButton under the plan's id with the options the view sets."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1021",
+     "page": "A handover page whose send report FusionProgressButton is rendered by Html.FusionProgressButton(plan, \"send-report\", b => b.Content(\"Send the report\")), and a Show label button whose click sets the element report-label's text to the button's Content; report-label starts as No label.",
+     "gesture": "Click Show label.",
+     "outcome": "The progress button reads Send the report, and report-label reads Send the report.",
+     "opposite": "Rendered with Content(\"Send the night report\"), the button and report-label read Send the night report.",
+     "defect": "The helper drops the view's options, so the button shows no text and report-label reads nothing; or it renders the button at an id the plan does not name, so the read stops and report-label keeps No label."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionProgressButtonBuilder<TModel>",
@@ -16326,8 +16625,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1022",
+     "rung": "behavior",
+     "defect": "Both lines render the RadioButton by EJ2's builder under the view's id with the view's options, EJS().RadioButton(elementId) (Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButtonHtmlExtensions.cs:31 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:77 at 65fdf118d): a helper that drops the view's options starts it at EJ2's empty value (@syncfusion/ej2-buttons/src/radio-button/radio-button.d.ts:90-92), and one that renders an id the plan does not name leaves the plan's GetSelectedValue (Alis.Reactive.Fusion/Components/FusionRadioButton/FusionRadioButton.cs:33 at 65fdf118d; @syncfusion/ej2-buttons/src/radio-button/radio-button.d.ts:134) nothing to reach, against D17.13. The rewrite's render helper renders the RadioButton under the plan's id with the options the view sets."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X1022",
+     "page": "An admission page whose room type is two FusionRadioButtons of the group room, rendered by Html.FusionRadioButton(plan, \"room-companion\", b => b.Label(\"Companion suite\").Name(\"room\").Value(\"companion\")) and Html.FusionRadioButton(plan, \"room-single\", b => b.Label(\"Single room\").Name(\"room\").Value(\"single\")), and a Show room button whose click sets the element room-choice's text to room-companion's GetSelectedValue(); room-choice starts as No room.",
+     "gesture": "Click Companion suite, then click Show room.",
+     "outcome": "room-choice reads companion.",
+     "opposite": "Clicking Single room, then Show room, room-choice reads single.",
+     "defect": "The helper drops the view's options, so the radio carries no value and room-choice reads nothing; or it renders the radio at an id the plan does not name, so the read stops and room-choice keeps No room."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionRadioButtonBuilder<TModel>",
@@ -16993,9 +17307,23 @@
      "id": "M21.X610",
      "rung": "analyzer",
      "defect": "Both lines declare the editor's value as non-null text: the redesign's Value is Property<string> (Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:19 at 65fdf118d) and main's SetValue takes a string with no null (Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorExtensions.cs:25-29 at 623dd4a27), where EJ2 documents the content null until set (@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts:744-750): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite's Value is Property<string?>."
+    },
+    {
+     "id": "M21.X1023",
+     "rung": "behavior",
+     "defect": "Both lines start the RichTextEditor at the bound member through EJ2's own builder, EJS().RichTextEditorFor(expr) (Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditorHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionRichTextEditor/FusionRichTextEditor.cs:70 at 65fdf118d); a helper that drops the start shows the editor empty, EJ2's null (@syncfusion/ej2-richtexteditor/src/rich-text-editor/base/rich-text-editor.d.ts:748-750) whatever the member holds, against D17.13. The rewrite's render helper starts the RichTextEditor at the member's value, written by M21.D1."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1023",
+     "page": "A handover page shown again after a failed post, whose summary FusionRichTextEditor is rendered by field.FusionRichTextEditor() for a model whose Summary is <p>Ate a full lunch.</p>.",
+     "gesture": "Open the page.",
+     "outcome": "The editor shows Ate a full lunch.",
+     "opposite": "A model whose Summary is null shows an empty editor.",
+     "defect": "The editor is rendered with no starting value, so it shows empty though the model holds the summary."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionRichTextEditor.ValueMember.get -> string!",
@@ -18502,8 +18830,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1024",
+     "rung": "behavior",
+     "defect": "Both lines render the Sidebar by EJ2's builder under the view's id with the view's options, EJS().Sidebar(elementId) (Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebarHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs:74 at 65fdf118d): a helper that drops the view's options starts it at EJ2's closed panel (@syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts:104-106), and one that renders an id the plan does not name leaves the plan's Hide (Alis.Reactive.Fusion/Components/FusionSidebar/FusionSidebar.cs:29 at 65fdf118d; @syncfusion/ej2-navigations/src/sidebar/sidebar.d.ts:238) nothing to reach, against D17.13. The rewrite's render helper renders the Sidebar under the plan's id with the options the view sets."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X1024",
+     "page": "A layout whose resident FusionSidebar is rendered by Html.FusionSidebar(plan, \"resident-sidebar\", b => b.IsOpen(true)), and a Hide residents button whose click calls the sidebar's Hide().",
+     "gesture": "Open the page, then click Hide residents.",
+     "outcome": "The resident sidebar shows at open and hides after the click.",
+     "opposite": "Rendered with IsOpen(false), the resident sidebar is hidden at open.",
+     "defect": "The helper drops the view's options, so the sidebar is hidden at open; or it renders the sidebar at an id the plan does not name, so the click's step stops and the sidebar stays shown."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionSidebarBuilder<TModel>",
@@ -19875,9 +20218,23 @@
      "id": "M21.X808",
      "rung": "analyzer",
      "defect": "FusionSplitButtonItem carries no [JsonPropertyName] on either line (Alis.Reactive.Fusion/Components/FusionSplitButton/Events/FusionSplitButtonOnSelected.cs:15-25 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:68-78 at 65fdf118d), while select's item is EJ2's ItemModel (@syncfusion/ej2-splitbuttons/src/common/common.d.ts:72), which names id, text and disabled (@syncfusion/ej2-splitbuttons/src/common/common-model.d.ts:21, :35, :49): the vendor contract analyzer's type check (N17.2) refuses each member by ALIS037 (X17.48), and the rewrite's FusionSplitButton.ItemModel in M21.N44 names each by [JsonPropertyName]."
+    },
+    {
+     "id": "M21.X1025",
+     "rung": "behavior",
+     "defect": "Both lines render the SplitButton by EJ2's builder under the view's id with the view's options, EJS().SplitButton(elementId) (Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButtonHtmlExtensions.cs:31 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:104 at 65fdf118d): a helper that drops the view's options starts it at EJ2's empty content (@syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts:30-32), and one that renders an id the plan does not name leaves the plan's read of Content (Alis.Reactive.Fusion/Components/FusionSplitButton/FusionSplitButton.cs:24 at 65fdf118d; @syncfusion/ej2-splitbuttons/src/split-button/split-button.d.ts:32) nothing to reach, against D17.13. The rewrite's render helper renders the SplitButton under the plan's id with the options the view sets."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1025",
+     "page": "A visits page whose FusionSplitButton is rendered by Html.FusionSplitButton(plan, \"visit-actions\", b => b.Content(\"Book a visit\")), and a Show action button whose click sets the element visit-action's text to the split button's Content; visit-action starts as No action.",
+     "gesture": "Click Show action.",
+     "outcome": "The split button reads Book a visit, and visit-action reads Book a visit.",
+     "opposite": "Rendered with Content(\"Cancel a visit\"), the split button and visit-action read Cancel a visit.",
+     "defect": "The helper drops the view's options, so the split button shows no text and visit-action reads nothing; or it renders the split button at an id the plan does not name, so the read stops and visit-action keeps No action."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionSplitButtonBuilder<TModel>",
@@ -20243,8 +20600,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1026",
+     "rung": "behavior",
+     "defect": "Both lines render the Stepper by EJ2's builder under the view's id with the view's options, EJS().Stepper(elementId) (Alis.Reactive.Fusion/Components/FusionStepper/FusionStepperHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs:113 at 65fdf118d): a helper that drops the view's options starts it at EJ2's first step (@syncfusion/ej2-navigations/src/stepper/stepper.d.ts:155-158), and one that renders an id the plan does not name leaves the plan's read of ActiveStep (Alis.Reactive.Fusion/Components/FusionStepper/FusionStepper.cs:23 at 65fdf118d; @syncfusion/ej2-navigations/src/stepper/stepper.d.ts:158) nothing to reach, against D17.13. The rewrite's render helper renders the Stepper under the plan's id with the options the view sets."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X1026",
+     "page": "An admission page whose FusionStepper of three steps, Details, Medications and Room, is rendered by Html.FusionStepper(plan, \"admission-steps\", b => b.Steps(..).ActiveStep(1)), and a Which step button whose click sets the element step-shown's text to the stepper's ActiveStep; step-shown starts as No step.",
+     "gesture": "Click Which step.",
+     "outcome": "step-shown reads 1.",
+     "opposite": "Rendered with ActiveStep(2), step-shown reads 2.",
+     "defect": "The helper drops the view's options, so step-shown reads 0; or it renders the stepper at an id the plan does not name, so the read stops and step-shown keeps No step."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionStepperBuilder<TModel>",
@@ -20719,9 +21091,23 @@
      "id": "M21.X711",
      "rung": "type",
      "defect": "Both lines declare IsInteracted on the Switch's change payload (Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:34 at 65fdf118d; Alis.Reactive.Fusion/Components/FusionSwitch/Events/FusionSwitchOnChanged.cs:15 at 623dd4a27), a member the browser does not hand: EJ2 triggers change with checked and event (@syncfusion/ej2-buttons/src/switch/switch.js:97-98), ej2-base adds the name alone (@syncfusion/ej2-base/src/observer.js:92), and a real click hands checked, event and name (probe:ej2-payload-switch-change). A condition on it reads nothing and never holds, so a handler meant for the user's flip never runs. The rewrite's FusionSwitch.ChangeEventArgs in M21.N46 declares no IsInteracted, so such a read does not compile."
+    },
+    {
+     "id": "M21.X1027",
+     "rung": "behavior",
+     "defect": "Both lines start the Switch at the bound member through EJ2's own builder, EJS().SwitchFor(expr) (Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitchHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionSwitch/FusionSwitch.cs:60 at 65fdf118d); a helper that drops the start shows the switch off, EJ2's false (@syncfusion/ej2-buttons/src/switch/switch.d.ts:49-51) whatever the member holds, against D17.13. The rewrite's render helper starts the Switch at the member's value, written by M21.D1."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1027",
+     "page": "A resident profile page shown again after a failed post, whose bed rails FusionSwitch is rendered by field.FusionSwitch() for a model whose BedRailsUp is true.",
+     "gesture": "Open the page.",
+     "outcome": "The bed rails switch shows on.",
+     "opposite": "A model whose BedRailsUp is false shows the switch off.",
+     "defect": "The switch is rendered with no starting value, so it shows off though the model holds true."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionSwitch.ValueMember.get -> string!",
@@ -20995,8 +21381,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1028",
+     "rung": "behavior",
+     "defect": "Both lines render the Tab by EJ2's builder under the view's id with the view's options, EJS().Tab(elementId) (Alis.Reactive.Fusion/Components/FusionTab/FusionTabHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTab/FusionTab.cs:76 at 65fdf118d): a helper that drops the view's options starts it at EJ2's first tab (@syncfusion/ej2-navigations/src/tab/tab.d.ts:349-351), and one that renders an id the plan does not name leaves the plan's read of SelectedItem (Alis.Reactive.Fusion/Components/FusionTab/FusionTab.cs:23 at 65fdf118d; @syncfusion/ej2-navigations/src/tab/tab.d.ts:351) nothing to reach, against D17.13. The rewrite's render helper renders the Tab under the plan's id with the options the view sets."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X1028",
+     "page": "A care record page whose FusionTab of three tabs, Contacts, Visits and Medications, is rendered by Html.FusionTab(plan, \"care-tabs\", b => b.Items(..).SelectedItem(2)), and a Which tab button whose click sets the element tab-shown's text to the tab's SelectedItem; tab-shown starts as No tab.",
+     "gesture": "Click Which tab.",
+     "outcome": "tab-shown reads 2.",
+     "opposite": "Rendered with SelectedItem(1), tab-shown reads 1.",
+     "defect": "The helper drops the view's options, so tab-shown reads 0; or it renders the tab at an id the plan does not name, so the read stops and tab-shown keeps No tab."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionTabBuilder<TModel>",
@@ -21338,9 +21739,23 @@
      "id": "M21.X603",
      "rung": "analyzer",
      "defect": "The redesign declares Value as Property<string> (Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:19 at 65fdf118d) where EJ2 documents a TextArea's value null until set (@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:34-39), so main's clear, SetValue(null) (Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaExtensions.cs:27-32 at 623dd4a27), is a nullable warning: the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite's Value is Property<string?>."
+    },
+    {
+     "id": "M21.X1029",
+     "rung": "behavior",
+     "defect": "Both lines start the TextArea at the bound member through EJ2's own builder, EJS().TextAreaFor(expr) (Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextAreaHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTextArea/FusionTextArea.cs:111 at 65fdf118d); a helper that drops the start shows the area empty, EJ2's null (@syncfusion/ej2-inputs/src/textarea/textarea.d.ts:37-39) whatever the member holds, against D17.13. The rewrite's render helper starts the TextArea at the member's value, written by M21.D1."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1029",
+     "page": "A resident profile page shown again after a failed post, whose care note FusionTextArea is rendered by field.FusionTextArea() for a model whose CareNote is Prefers tea at seven.",
+     "gesture": "Open the page.",
+     "outcome": "The care note shows Prefers tea at seven.",
+     "opposite": "A model whose CareNote is null shows an empty care note.",
+     "defect": "The area is rendered with no starting value, so it shows empty though the model holds the note."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionTextArea.ValueMember.get -> string!",
@@ -21762,9 +22177,23 @@
      "id": "M21.X602",
      "rung": "type",
      "defect": "The redesign takes AddIcon's place as text (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:33 at 65fdf118d) where EJ2 documents two places, append and prepend (@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:281), and appends only for append, prepending for any other text (@syncfusion/ej2-inputs/src/input/input.js:997-1007), so a misspelled place compiles and puts the icon on the other side; main fixes the place at append (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxExtensions.cs:52-62 at 623dd4a27) and cannot prepend. The rewrite's M21.N49 types the place as one of the two, written as EJ2 reads it (its name gate 2's), so AddIcon carries main's append and adds prepend."
+    },
+    {
+     "id": "M21.X1030",
+     "rung": "behavior",
+     "defect": "Both lines start the TextBox at the bound member through EJ2's own builder, EJS().TextBoxFor(expr) (Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBoxHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:116 at 65fdf118d); a helper that drops the start shows the box empty, EJ2's null (@syncfusion/ej2-inputs/src/textbox/textbox.d.ts:79-81) whatever the member holds, against D17.13. The rewrite's render helper starts the TextBox at the member's value, written by M21.D1."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1030",
+     "page": "A resident profile page shown again after a failed post, whose preferred name FusionTextBox is rendered by field.FusionTextBox() for a model whose PreferredName is Nell.",
+     "gesture": "Open the page.",
+     "outcome": "The preferred name box shows Nell.",
+     "opposite": "A model whose PreferredName is null shows an empty box.",
+     "defect": "The box is rendered with no starting value, so it shows empty though the model holds Nell."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionTextBox.ValueMember.get -> string!",
@@ -22185,9 +22614,23 @@
      "id": "M21.X713",
      "rung": "analyzer",
      "defect": "Both lines render the TimePicker over a member of any type, InputBoundField<TModel, TProp> with no constraint on TProp (Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerHtmlExtensions.cs:27 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:67 at 65fdf118d), while the input reads its value as a DateTime, so a picker bound to text or a number compiles and the form sends a date where the endpoint binds that member. The rewrite renders FusionTimePicker<TProp>, and the vendor contract analyzer (N17.2) refuses a TProp that is no date by ALIS037, whose closed set holds DateTime and DateTimeOffset (D17.5)."
+    },
+    {
+     "id": "M21.X1031",
+     "rung": "behavior",
+     "defect": "Both lines start the TimePicker at the bound member through EJ2's own builder, EJS().TimePickerFor(expr) (Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePickerHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTimePicker/FusionTimePicker.cs:71 at 65fdf118d); a helper that drops the start shows the box empty, EJ2's null (@syncfusion/ej2-calendars/src/timepicker/timepicker.d.ts:373-376) whatever the member holds, against D17.13. The rewrite's render helper starts the TimePicker at the member's value, written by M21.D1."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1031",
+     "page": "A dose record page shown again after a failed post, whose next dose FusionTimePicker is rendered by field.FusionTimePicker() for a model whose NextDoseAt is 2026-11-10 14:30.",
+     "gesture": "Open the page.",
+     "outcome": "The next dose box shows 2:30 PM.",
+     "opposite": "A model whose NextDoseAt is null shows an empty box.",
+     "defect": "The picker is rendered with no starting value, so it shows empty though the model holds 14:30."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionTimePicker.ValueMember.get -> string!",
@@ -22461,8 +22904,23 @@
     "core:Q17",
     "core:Q5"
    ],
-   "defects": [],
-   "promises": [],
+   "defects": [
+    {
+     "id": "M21.X1032",
+     "rung": "behavior",
+     "defect": "Both lines render the Toolbar by EJ2's builder under the view's id with the view's options, EJS().Toolbar(elementId) (Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbarHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs:76 at 65fdf118d): a helper that drops the view's options starts it at EJ2's toolbar of no items (@syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts:280-282), and one that renders an id the plan does not name leaves the plan's Clicked handler (Alis.Reactive.Fusion/Components/FusionToolbar/FusionToolbar.cs:27 at 65fdf118d; @syncfusion/ej2-navigations/src/toolbar/toolbar.d.ts:344) nothing to reach, against D17.13. The rewrite's render helper renders the Toolbar under the plan's id with the options the view sets."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X1032",
+     "page": "A layout whose care FusionToolbar of two items, Admit and Discharge, is rendered by Html.FusionToolbar(plan, \"care-toolbar\", b => b.Items(..)), whose Clicked handler sets the element toolbar-clicked's text to the payload's Item text; toolbar-clicked starts as Nothing clicked.",
+     "gesture": "Click Discharge on the toolbar.",
+     "outcome": "toolbar-clicked reads Discharge.",
+     "opposite": "Clicking Admit, toolbar-clicked reads Admit.",
+     "defect": "The helper drops the view's options, so the toolbar shows no items to click; or it renders the toolbar at an id the plan does not name, so the handler never runs and toolbar-clicked keeps Nothing clicked."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionToolbarBuilder<TModel>",
@@ -22765,9 +23223,23 @@
      "id": "M21.X806",
      "rung": "analyzer",
      "defect": "Main's Opened and Closed listen to open and close (Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipEvents.cs:25, :30 at 623dd4a27), which EJ2's Tooltip declares as methods (@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:541, :548) and never raises: it raises afterOpen and afterClose (@syncfusion/ej2-popups/src/tooltip/tooltip.js:196, :210), so a pipeline on Opened or Closed never runs. The vendor contract analyzer (N17.2) refuses an event declared over a member of another kind by ALIS018 (D17.5); the rewrite's AfterOpen and AfterClose in M21.N52 name EJ2's events, as the redesign's do."
+    },
+    {
+     "id": "M21.X1033",
+     "rung": "behavior",
+     "defect": "Both lines render the Tooltip by EJ2's builder under the view's id with the view's options, EJS().Tooltip(elementId) (Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltipHtmlExtensions.cs:34 at 623dd4a27; Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:107 at 65fdf118d): a helper that drops the view's options starts it at EJ2's tooltip with no content (@syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:183), and one that renders an id the plan does not name leaves the plan's Open (Alis.Reactive.Fusion/Components/FusionTooltip/FusionTooltip.cs:23 at 65fdf118d; @syncfusion/ej2-popups/src/tooltip/tooltip.d.ts:541) nothing to reach, against D17.13. The rewrite's render helper renders the Tooltip under the plan's id with the options the view sets."
     }
    ],
-   "promises": [],
+   "promises": [
+    {
+     "for": "M21.X1033",
+     "page": "A resident page whose allergy FusionTooltip is rendered by Html.FusionTooltip(plan, \"allergy-tip\", b => b.Content(\"Allergic to penicillin\")), and a Show the tip button whose click calls the tooltip's Open().",
+     "gesture": "Click Show the tip.",
+     "outcome": "A tip reading Allergic to penicillin shows.",
+     "opposite": "Rendered with Content(\"No known allergies\"), the tip reads No known allergies.",
+     "defect": "The helper drops the view's options, so the tip opens with no text; or it renders the tooltip at an id the plan does not name, so the click's step stops and no tip shows."
+    }
+   ],
    "verdicts": [
     {
      "door": "FusionTooltipBeforeCloseArgs.Cancel.get -> bool",

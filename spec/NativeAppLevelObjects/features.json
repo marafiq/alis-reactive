@@ -1464,8 +1464,23 @@
         "Realtime.tla:OfferNeverHidesEarly",
         "Realtime.tla:OfferNeverStaysShown"
       ],
-      "defects": [],
-      "promises": [],
+      "defects": [
+        {
+          "id": "M25.X11",
+          "rung": "behavior",
+          "defect": "Html.NativeReconnectOffer(text, retry) renders the region the reconnect plugin shows, holding the app's texts (M25.D7). A helper that writes the framework's own words, or a region the plugin does not find, shows other words than the app's, or no offer, when a connection gives up."
+        }
+      ],
+      "promises": [
+        {
+          "for": "M25.X11",
+          "page": "The medication round under ShowReconnect(), whose layout renders Html.NativeReconnectOffer(\"Live updates stopped.\", retry: \"Reconnect\") once, and whose stream WardBoard the harness refuses until it gives up (Realtime.tla's GiveUp).",
+          "gesture": "Open the round. Refuse WardBoard through the harness and wait for the reconnect offer.",
+          "outcome": "The offer shows Live updates stopped. beside a Reconnect button.",
+          "opposite": "With WardBoard open, the offer stays hidden.",
+          "defect": "The offer shows the framework's words, not the app's, or never shows."
+        }
+      ],
       "verdicts": []
     }
   ]
