@@ -89,6 +89,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   independent (loaded where a condition holds, its own thing), and both work. Partials nest: inside a plan a
   view renders another, entirely different view with its own plan and its own children. Main merged plans by
   an algorithm on purpose; the rewrite improves on it from the framework's core.
+- The owner, 2026-11-10, after MVC's rendering forms were tried: "I am fine with prefix as long as MVC permitives work",
+  and a partial needs to know only whether it is its own plan or attached to another plan. The prefix design stays
+  (D14.3): every MVC door that renders a member's view under its prefix attaches it (D16.3); a view rendered with a
+  model and no prefix is its own plan, named as MVC names it.
 - The owner, 2026-11-06, said several times: never just agree. An example the owner gives is an example, not the
   rule ("my 500 was an example"). Think each piece of advice and each gap through against the evidence, and
   disagree with the reason where it does not hold: that is the job. This feedback is never lost.

@@ -3465,7 +3465,10 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     default rule set, whatever it sends, a container or none, with its failures placed by D16.13. Naming a rule set,
     or no check (`NoValidation()`), overrides it; the form of the sentence goes to gate 2.
 - D16.3 A partial is attached or independent, and both nest (the owner, 2026-11-06).
-  - Attached: a partial rendered for a member (`Html.PartialFor`, D14.4) has its own model and its own validator,
+  - Attached: a partial rendered for a member under MVC's prefix, by any of MVC's own doors (`EditorFor` by the
+    member's type, by a template it names or the model's `[UIHint]` names, and for each item of a list; `<partial
+    for>`; a controller that sets the prefix before its partial renders) or by `Html.PartialFor` (D14.4), has its
+    own model and its own validator,
     and the parent's validator holds it with `SetValidator` or `ChildRules` on that member. One model has as many
     associations as its members, at any depth, and each partial's rules are written once and read by both sides.
   - Independent: a partial loaded into a slot where a condition holds (a state whose form needs 10 fields,
