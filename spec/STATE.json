@@ -8,7 +8,7 @@
     "core_questions": {
       "counts": {
         "answered": 18,
-        "defects": 362,
+        "defects": 363,
         "total": 18
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1278,7 +1278,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 551,
+        "defects": 552,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1478,7 +1478,7 @@
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
-        "promises": 391,
+        "promises": 392,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1488,7 +1488,7 @@
     "questions": {
       "counts": {
         "answered": 21,
-        "defects": 385,
+        "defects": 386,
         "total": 21
       },
       "detail": "every question answered with resolving evidence, checker and rungs",
@@ -1508,8 +1508,8 @@
     },
     "tlc": {
       "counts": {
-        "met": 13,
-        "specs": 13
+        "met": 14,
+        "specs": 14
       },
       "detail": "every spec green, every invariant killed by its mutant, every witness reached",
       "pass": true,
@@ -2420,6 +2420,112 @@
             "states": "1798 states generated, 691 distinct states found, 560 states left on queue.",
             "violated": [
               "ThrownListenerRunsNothing"
+            ]
+          }
+        },
+        "Partials": {
+          "Partials.cfg": {
+            "green": true,
+            "hash": "50bfd2f3cfad0f6ed037cc359d970edc43206fa42b3167e659ad1200199c375d",
+            "line": "Model checking completed. No error has been found.",
+            "states": "2106 states generated, 2106 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "Partials.holds.OwnPlanStops.cfg": {
+            "green": true,
+            "hash": "816b82564c99b3f375a19b88b3caf6b8b5547bf1c090ed607afafb8e59ccb278",
+            "line": "Model checking completed. No error has been found.",
+            "states": "2106 states generated, 2106 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "Partials.violates.AttachedInputBindsItsMember.cfg": {
+            "green": false,
+            "hash": "9f005ad42d34c5c5437eca306ab33369a9eb4b6c58640ca9236c3705a091803a",
+            "line": "violated: AttachedInputBindsItsMember",
+            "states": "803 states generated, 803 distinct states found, 764 states left on queue.",
+            "violated": [
+              "AttachedInputBindsItsMember"
+            ]
+          },
+          "Partials.violates.EverySentValueIsTheOneBound.cfg": {
+            "green": false,
+            "hash": "da1d39ef2988c4c2efbff176e6578e77a60433bb34b4047752999ad9432a15a5",
+            "line": "violated: EverySentValueIsTheOneBound",
+            "states": "820 states generated, 820 distinct states found, 759 states left on queue.",
+            "violated": [
+              "EverySentValueIsTheOneBound"
+            ]
+          },
+          "Partials.violates.OneIdPerMember.cfg": {
+            "green": false,
+            "hash": "8c5a71b5cc0268bfcc2eb49780f6dd46262d9cd380ddc32e5f58c277e4ff08c8",
+            "line": "violated: OneIdPerMember",
+            "states": "",
+            "violated": [
+              "OneIdPerMember"
+            ]
+          },
+          "Partials.violates.PageReadFindsEachAttachedInput.cfg": {
+            "green": false,
+            "hash": "2682fbf9d7929adcdbf1ee9e2be13d7fbf101e3ea9e701ae365ea6011bb38354",
+            "line": "violated: PageReadFindsEachAttachedInput",
+            "states": "1236 states generated, 1236 distinct states found, 762 states left on queue.",
+            "violated": [
+              "PageReadFindsEachAttachedInput"
+            ]
+          },
+          "Partials.violates.ReachInheritedPrefixMisnames.cfg": {
+            "green": false,
+            "hash": "be08a0ac05c7d451748f6c4777c2d2c8fc848f635daca350f73fee21d2c5e3fd",
+            "line": "violated: ReachInheritedPrefixMisnames",
+            "states": "784 states generated, 784 distinct states found, 759 states left on queue.",
+            "violated": [
+              "ReachInheritedPrefixMisnames"
+            ]
+          },
+          "Partials.violates.ReachNestedChainBoundOnNet48.cfg": {
+            "green": false,
+            "hash": "71fffc38366a56e68dafcc5d190e841f7072ca978755e52718e10af6f6185703",
+            "line": "violated: ReachNestedChainBoundOnNet48",
+            "states": "1221 states generated, 1221 distinct states found, 753 states left on queue.",
+            "violated": [
+              "ReachNestedChainBoundOnNet48"
+            ]
+          },
+          "Partials.violates.ReachNet48CopyRefused.cfg": {
+            "green": false,
+            "hash": "9b11a2e4726b62d5aee621f7b84a738fb1913307e40ebf7b1e81122886d6a1b0",
+            "line": "violated: ReachNet48CopyRefused",
+            "states": "1267 states generated, 1267 distinct states found, 756 states left on queue.",
+            "violated": [
+              "ReachNet48CopyRefused"
+            ]
+          },
+          "Partials.violates.ReachOwnPlansValueLandsInAnotherMember.cfg": {
+            "green": false,
+            "hash": "3c15ea726158f8798303eb1fd841a8e0adab8ca2d31d85d558b4262b87811c02",
+            "line": "violated: ReachOwnPlansValueLandsInAnotherMember",
+            "states": "834 states generated, 834 distinct states found, 762 states left on queue.",
+            "violated": [
+              "ReachOwnPlansValueLandsInAnotherMember"
+            ]
+          },
+          "Partials.violates.ReachSlotUnderItsPrefixBound.cfg": {
+            "green": false,
+            "hash": "030c56de027296e1e13e40be1940520a4ef27f5df49458dce3d1c610a1fac4d7",
+            "line": "violated: ReachSlotUnderItsPrefixBound",
+            "states": "1551 states generated, 1551 distinct states found, 674 states left on queue.",
+            "violated": [
+              "ReachSlotUnderItsPrefixBound"
+            ]
+          },
+          "Partials.violates.ReadNeverFindsAnotherMember.cfg": {
+            "green": false,
+            "hash": "0b687d2cff8432babdfd441ee2b2c469dd7180d23bde47718302a5327b3c8a72",
+            "line": "violated: ReadNeverFindsAnotherMember",
+            "states": "1135 states generated, 1135 distinct states found, 756 states left on queue.",
+            "violated": [
+              "ReadNeverFindsAnotherMember"
             ]
           }
         },
@@ -3450,7 +3556,7 @@
     }
   },
   "passed": 23,
-  "read_at_head": "ebfd57c6f3d1ddca95defa6ca307e41515f6dc2d",
+  "read_at_head": "7208f1e6cdcdc00c6cbb5bd52ca5d46045b66362",
   "step": {
     "failing": [
       "matrix"
