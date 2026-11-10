@@ -3203,8 +3203,11 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     input a rule, a message or a read means, and views of different partials that share an id conflict.
   - Reading the declaring class of the member the expression tree names is a type's identity, within the
     no-reflection rule, and the same read D18.3 names a member by (D18.1).
-- D14.4 A partial is rendered for a member by one typed door, `Html.PartialFor(m => m.Member, view)` (N14.1), on
-  both hosts.
+- D14.4 A partial is rendered for a member by one typed door, `Html.PartialFor(m => m.Member)` (N14.1), on both
+  hosts. It renders the view named after the member's type, found where MVC finds a view by that name on each host,
+  as `EditorFor` finds a template by type; `Html.PartialFor(m => m.Member, view)` names the view, for a type with
+  several views or a generic type, which names none. A view name is a string kind, MVC's own locator (gate 2's G6),
+  and a name no view answers fails where the view renders, with MVC's own error.
   - The member's value is the partial's model, and a new `TemplateInfo` carries the member's full binding
     name as the prefix.
   - A list item, `m => m.Members[i]`, takes `Members[i]`, a position (Q1). A dictionary entry,
@@ -3271,7 +3274,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - kept: `Html.ReactivePlan`, `Html.InputField` (M7.N2), `IdGenerator.For<TModel, TProp>` (M7.N1), and MVC's own
   `Html.EditorFor`; the object-typed `IdGenerator.For<TModel>` both lines have leaves, since ALIS009 refuses `object` on
   the public surface.
-- `N14.1` new: `Html.PartialFor(m => m.Member, view)`, the typed partial for a member, on both hosts.
+- `N14.1` new: `Html.PartialFor(m => m.Member)` and `Html.PartialFor(m => m.Member, view)`, the typed partial for a
+  member, on both hosts; the first renders the view named after the member's type (D14.4).
 - `N14.2` new: the plan as a block of its view, whose end renders it; it replaces `Html.RenderPlan` on both lines;
   its form goes to gate 2.
 - `N14.3` new: the request container as a block of its view, which renders the container's element and its summary

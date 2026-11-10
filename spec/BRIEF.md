@@ -113,7 +113,7 @@ The owner tested the redesign on net48 and it works flawlessly there. The compil
    - Each exception is the owner's decision, listed by file:line with its reason in `spec/CLAUDE.md`.
    - The rewrite adds an analyzer that fails the build on any other use.
    - Today's sites are in evidence B11, and Q18 settles each one.
-5. **Typed.** No `object`, no `System.Type`, no string that names a member (ALIS009). Strings appear only for text, URLs, developer-chosen ids, header names, CSS classes, and JavaScript names at the vendor and plugin boundary.
+5. **Typed.** No `object`, no `System.Type`, no string that names a member (ALIS009). Strings appear only for text, URLs, developer-chosen ids, header names, CSS classes, view names (the owner, gate 2's G6), and JavaScript names at the vendor and plugin boundary.
 6. **The schema is designed once.** This session designs the schema the rewrite needs, and the owner approves it as one decision. After that, a unit never changes the grammar: a behavior the nodes cannot express stops the unit and goes to the owner with its use case.
 7. **One of each concept:** one read, one path type, one conversion, one encoding per value per host, one item-type finder, and one name per concept in the fluent API.
 8. **No fallbacks and no guessing, in C# or in the runtime. They breed bugs.**

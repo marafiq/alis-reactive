@@ -1214,7 +1214,7 @@ def check_promises():
     return feature_result(model["problems"] + promise_problems(model, tests), counts, counts["unmapped"] == 0, "every refusal and behavior defect has a promise")
 
 
-FLUENT_STRING_KINDS = {"text", "url", "element-id", "header-name", "css-class", "js-name"}
+FLUENT_STRING_KINDS = {"text", "url", "element-id", "header-name", "css-class", "js-name", "view-name"}
 FLUENT_UNTYPED_KINDS = {"object", "type", "object[]", "type[]"}
 FLUENT_TABLE_TITLE = "Callback parameter naming convention (locked):"
 FLUENT_CONCEPT_ID = re.compile(r"^(?:D\d+\.\d+|N\d+\.\d+|M\d+\.[DN]\d+)$")

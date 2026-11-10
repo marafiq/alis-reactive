@@ -64,6 +64,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   bundle always holds and no server dependency. The owner, 2026-11-10, raised a core template engine at gate 2 and
   reversed it the same hour, so the rewrite proceeds (verbatim in `spec/NOTES.md`): Syncfusion's engine stays through
   the rewrite, and a core engine returns only as the owner's own decision.
+- The owner, 2026-11-10, choosing G6's default plus a view name (verbatim in `spec/NOTES.md`): MVC's design of its
+  views must not fall apart, and a view name beats the boilerplate of a type per view. A door keeps MVC's own design
+  of its views working: `Html.PartialFor(m => m.Member)` names the view by the member's type, and a view name, a
+  string kind, names it when a type has several.
 - The owner, 2026-11-10: "u made it look like serval time that it was easy and SF will work without any issues". A
   new direction is put to the owner with its cost and its risks beside its evidence, never with the evidence alone.
 - The owner, 2026-11-10, at gate 2: "run few experiments with software devs about their authoring experience and

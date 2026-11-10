@@ -45,7 +45,8 @@
     "Rows(rowsId)": "element-id",
     "Unload(elementId)": "element-id",
     "WriteOnly(name)": "js-name",
-    "RequestDefaults.Header(value)": "literal"
+    "RequestDefaults.Header(value)": "literal",
+    "PartialFor(viewName)": "view-name"
   },
   "concepts": {
     "Add": [
