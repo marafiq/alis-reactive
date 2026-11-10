@@ -1,5 +1,15 @@
 {
   "checks": {
+    "actions": {
+      "counts": {
+        "actions": 76,
+        "named": 11,
+        "promises": 78,
+        "unnamed": 65
+      },
+      "detail": "65 of 76 actions named by no promise: CallbackProperty.tla:Freeze, CallbackProperty.tla:LoadA, CallbackProperty.tla:LoadB, CallbackProperty.tla:Raise, CallbackProperty.tla:Restart, CallbackProperty.tla:Script, CallbackProperty.tla:Step, CallbackProperty.tla:UnloadA, CallbackProperty.tla:UnloadB, Composition.tla:Answer, Composition.tla:Begin, Composition.tla:DefaultFinally",
+      "pass": false
+    },
     "claude_md": {
       "counts": {},
       "detail": "not started: step 12 replaces the five lines and adds the spec-first order",
@@ -3565,15 +3575,15 @@
     }
   },
   "passed": 24,
-  "read_at_head": "be84927c0b9ea00091bdb18a474f02a62c3b2713",
+  "read_at_head": "922f21b3dea1c8379ea70a4a8da509725c52ae96",
   "step": {
     "failing": [
-      "rewrite_units"
+      "actions"
     ],
-    "name": "REWRITE.md",
-    "next": "Write spec/REWRITE.md in SliceTree order.",
-    "number": 11,
+    "name": "check.py complete",
+    "next": "Finish every check and make each pass.",
+    "number": 10,
     "phase": "E"
   },
-  "total": 26
+  "total": 27
 }
