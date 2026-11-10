@@ -17250,7 +17250,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionSchedule declares the EJ2 Schedule by its JavaScript names, each as EJ2 names it: currentView and selectedDate as CurrentView and SelectedDate; eventSettings as EventSettings, a LiveObject<FusionSchedule.EventSettingsModel>(nullable: true), since EJ2 documents it null until set (@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:705-707) and D17.5 declares nullable a live object such a member holds (M21.X307), whose dataSource is DataSource<TEvent>(); dataBind, getEvents, addEvent, saveEvent, deleteEvent, openEditor, closeEditor, refreshEvents, print and scrollTo as DataBind, GetEvents, AddEvent, SaveEvent, DeleteEvent, OpenEditor, CloseEditor, RefreshEvents, Print and ScrollTo; each EJ2 33.1.47's public member, and each argument taking any source of its type.",
+     "text": "FusionSchedule declares the EJ2 Schedule by its JavaScript names, each as EJ2 names it: currentView and selectedDate as CurrentView and SelectedDate; eventSettings as EventSettings, a LiveObject<FusionSchedule.EventSettingsModel>(nullable: true), since EJ2 documents it null until set (@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:705-707) and D17.5 declares nullable a live object such a member holds (M21.X307), whose dataSource is DataSource<TEvent>(); dataBind, getEvents, addEvent, saveEvent, deleteEvent, openEditor, closeEditor, refreshEvents, print, scrollTo, getCurrentViewDates, closeQuickInfoPopup and closeTooltip as DataBind, GetEvents, AddEvent, SaveEvent, DeleteEvent, OpenEditor, CloseEditor, RefreshEvents, Print, ScrollTo, GetCurrentViewDates, CloseQuickInfoPopup and CloseTooltip; each EJ2 33.1.47's public member, and each argument taking any source of its type.",
      "doors": [
       "M21.N39",
       "N5.5",
@@ -17307,6 +17307,30 @@
       "M12.N2",
       "M21.N39"
      ]
+    },
+    {
+     "line": "main",
+     "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+     "text": "public static ComponentRef<FusionSchedule, TModel> SetSelectedDate<TModel>(",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:124"
+    },
+    {
+     "line": "main",
+     "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+     "text": "public static TypedComponentSource<DateTime[]> GetCurrentViewDates<TModel>(",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:136"
+    },
+    {
+     "line": "main",
+     "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+     "text": "public static ComponentRef<FusionSchedule, TModel> CloseQuickInfoPopup<TModel>(",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:257"
+    },
+    {
+     "line": "main",
+     "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+     "text": "public static ComponentRef<FusionSchedule, TModel> CloseTooltip<TModel>(",
+     "cite": "Alis.Reactive.Fusion/Components/FusionSchedule/FusionScheduleExtensions.cs:269"
     }
    ],
    "nodes": [
@@ -18281,6 +18305,42 @@
      "verdict": "renamed",
      "to": [
       "M21.N39"
+     ]
+    },
+    {
+     "door": "FusionScheduleExtensions.SetSelectedDate<TModel>(TypedSource<DateTime> date)",
+     "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionScheduleExtensions.GetCurrentViewDates<TModel>()",
+     "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionScheduleExtensions.CloseQuickInfoPopup<TModel>()",
+     "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionScheduleExtensions.CloseTooltip<TModel>()",
+     "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+     "verdict": "renamed",
+     "to": [
+      "M21.N39",
+      "M12.N2"
      ]
     }
    ]

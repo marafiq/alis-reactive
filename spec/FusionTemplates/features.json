@@ -506,6 +506,18 @@
           "doors": [
             "M22.N2"
           ]
+        },
+        {
+          "line": "main",
+          "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+          "text": "UnaryExpression unary when unary.NodeType == ExpressionType.Not => $\"!{ConvertNegated(unary.Operand)}\",",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:85"
+        },
+        {
+          "line": "main",
+          "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+          "text": "return $\"{left}{op}{right}\";",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:108"
         }
       ],
       "nodes": [
@@ -557,7 +569,7 @@
       "meanings": [
         {
           "id": "M22.D4",
-          "meaning": "A template's condition is code the engine runs, and the engine rewrites what it reads in it word by word (template.js:127-131): it prefixes a bare word with the item, data., keeps a word that holds a quote, and keeps a run of digits as a number only when the global regular expression that tests it starts from the run's first character, which a number tested just before, in the same condition or in one compiled earlier, prevents (template.js:13, template.js:209-211). The builder therefore writes each comparison with its member first, so a member's word is tested before each constant (probe:ej2-grid-template-member-first, probe:ej2-grid-template-constant-first), and each constant only in a form the engine is pinned to read back: true and false, a whole number of decimal digits (probe:ej2-grid-template-condition-integers), and text holding only ASCII letters, digits, single spaces, _, - and . between single quotes (probe:ej2-grid-template-condition-text, probe:ej2-grid-template-condition-plain-text). The comparisons ==, !=, <, <=, >, >=, &&, || and ! read as written (probe:ej2-grid-template-operators), and so does * or / of two members; + and - of two members, which the engine reads as one word with the prefix on its first member only, and arithmetic with a constant, whose two numbers in a row the engine reads as a number and a member, are refused where the view renders, naming a member the server computes (probe:ej2-grid-template-arithmetic). An enum constant is the value the app's options write for it, held to the same forms. Any other constant, null, a decimal, a negative number, text with an apostrophe or any other character, is refused where the view renders, naming a boolean member of the item the server computes: the engine fails to compile a decimal and an apostrophe (probe:ej2-grid-template-decimal-constant, probe:ej2-grid-template-apostrophe-constant), and reads text with two escapes as other text though one escape reads back (probe:ej2-grid-template-two-escapes, probe:ej2-grid-template-escaped-constant). A view value the lambda captures is read when the view renders by its chain of fields and properties as D6.7 reads one, with no expression compiled, and is held to the same forms; a captured value that calls a method, indexes or computes is refused as D6.7 refuses it, naming a local computed before the lambda."
+          "meaning": "A template's condition is code the engine runs, and the engine rewrites what it reads in it word by word (template.js:127-131): it prefixes a bare word with the item, data., keeps a word that holds a quote, and keeps a run of digits as a number only when the global regular expression that tests it starts from the run's first character, which a number tested just before, in the same condition or in one compiled earlier, prevents (template.js:13, template.js:209-211). The builder therefore writes each comparison with its member first, so a member's word is tested before each constant (probe:ej2-grid-template-member-first, probe:ej2-grid-template-constant-first), and each constant only in a form the engine is pinned to read back: true and false, a whole number of decimal digits (probe:ej2-grid-template-condition-integers), and text holding only ASCII letters, digits, single spaces, _, - and . between single quotes (probe:ej2-grid-template-condition-text, probe:ej2-grid-template-condition-plain-text). The comparisons ==, !=, <, <=, >, >=, &&, || and ! read as written (probe:ej2-grid-template-operators), and so does * or / of two members; + and - of two members, which the engine reads as one word with the prefix on its first member only, and arithmetic with a constant, whose two numbers in a row the engine reads as a number and a member, are refused where the view renders, naming a member the server computes (probe:ej2-grid-template-arithmetic). An enum constant is the value the app's options write for it, held to the same forms. Any other constant, null, a decimal, a negative number, text with an apostrophe or any other character, is refused where the view renders, naming a boolean member of the item the server computes: the engine fails to compile a decimal and an apostrophe (probe:ej2-grid-template-decimal-constant, probe:ej2-grid-template-apostrophe-constant), and reads text with two escapes as other text though one escape reads back (probe:ej2-grid-template-two-escapes, probe:ej2-grid-template-escaped-constant). A view value the lambda captures is read when the view renders by its chain of fields and properties as D6.7 reads one, with no expression compiled, and is held to the same forms; a captured value that calls a method, indexes or computes is refused as D6.7 refuses it, naming a local computed before the lambda. The builder writes ! over a comparison or a group in parentheses, since ! binds before a comparison and !status==='Active' reads every row as false, and writes no space between tokens, since the engine prefixes a run of spaces standing alone, as between ) and &&, with data. and fails the compile with a SyntaxError (probe:ej2-grid-template-grouping)."
         }
       ],
       "oracle": "Syncfusion EJ2 33.1.47's string template engine (@syncfusion/ej2-base/src/template.js), which compiles a component's template once into a function of each item and runs it per item, observed in Chromium in a real Grid's column templates by spec/probes/ej2-template-m22.mjs: a condition on text, on two whole numbers and on a member written first renders each branch per item, a constant written first after a template whose condition ends on a number, a decimal and an apostrophe fail the compile with a SyntaxError, and text with two escapes reads as other text; ==, !=, <=, >=, || and ! read as written, * and / of two members read, and + or - of two members throws a ReferenceError; and D6.7's read of a view value.",
@@ -585,6 +597,11 @@
           "id": "M22.X2",
           "rung": "behavior",
           "defect": "Both lines write a comparison in its authored order (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:97 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:69 at 65fdf118d), so a condition written constant first, m => 2 < m.Beds, compiled after a template whose condition ends on a number, is read by the engine with its constant as a member: the compile fails with a SyntaxError and the component renders no row (probe:ej2-grid-template-constant-first). The rewrite writes the member first (M22.D4)."
+        },
+        {
+          "id": "M22.X5",
+          "rung": "behavior",
+          "defect": "Both lines write a negation as ! before the condition it negates and each operator between spaces (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:85 and :97 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:57 and :69 at 65fdf118d), so !(m.Status == \"Active\") reads every row as false, and a negated comparison beside && or || leaves a run of spaces between ) and &&, which the engine reads as data. and fails to compile (probe:ej2-grid-template-grouping); main fixed both at 7b9e987cc (#242). The rewrite writes ! over a comparison in parentheses and no space between tokens (M22.D4)."
         }
       ],
       "promises": [
@@ -619,6 +636,14 @@
           "outcome": "Both grids show their rows; the Rooms grid's room of 3 beds shows spare and the room of 1 bed shows full.",
           "opposite": "The Rooms grid's condition written m => m.Beds > 2: the same cells.",
           "defect": "A writer that keeps the authored order writes 2 < beds after the Residents grid's condition ends on 90, so the Rooms grid renders no row (probe:ej2-grid-template-constant-first)."
+        },
+        {
+          "for": "M22.X5",
+          "page": "A bed board whose grid's Spare column is When(m => !(m.Status == \"Active\") && m.Beds > 2, then: t => t.Span(\"away with spare beds\"), @else: e => e.Span(\"other\")), over Ann, active with 3 beds, and Bo, away with 3 beds.",
+          "gesture": "Open the page.",
+          "outcome": "Ann's Spare cell shows other and Bo's shows away with spare beds.",
+          "opposite": "Bo made active on the server: both cells show other.",
+          "defect": "A writer that puts ! before the comparison with no parentheses shows other on both rows, and one that spaces the operators renders no row (probe:ej2-grid-template-grouping)."
         }
       ],
       "verdicts": [

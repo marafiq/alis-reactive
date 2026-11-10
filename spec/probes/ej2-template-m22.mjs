@@ -118,6 +118,16 @@ const attributes = async page => {
   console.log(`ej2-grid-template-link-href: hrefs read ${read.hrefs}`);
 };
 
+const grouping = async page => {
+  const pair = [{ status: "Active", beds: 3, a: 3 }, { status: "Away", beds: 1, a: 1 }];
+  const outcomes = [];
+  for (const [id, condition] of [["negated-grouped", "!(status==='Active')"], ["negated-bare", "!status==='Active'"],
+    ["grouped-tight", "(beds>2)&&(a>2)"], ["grouped-spaced", "(beds > 2) && (a > 2)"]]) {
+    outcomes.push(`${condition} gives ${column(await renderGrid(page, id, pair, ["${if(" + condition + ")}yes${else}no${/if}"]), 0)}`);
+  }
+  console.log(`ej2-grid-template-grouping: ${outcomes.join(", ")}`);
+};
+
 (async () => {
   const browser = await chromium.launch();
   const context = await browser.newContext({ timezoneId: "America/Los_Angeles" });
@@ -136,5 +146,6 @@ const attributes = async page => {
   await holders(page);
   await conditions(page);
   await attributes(page);
+  await grouping(page);
   await browser.close();
 })();

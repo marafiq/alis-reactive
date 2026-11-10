@@ -153,6 +153,12 @@
             "N17.3",
             "N11.2"
           ]
+        },
+        {
+          "line": "main",
+          "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+          "text": "unloadPartialSlot(CONTENT_ID);",
+          "cite": "Alis.Reactive.Assets/runtime/components/native/drawer.ts:26"
         }
       ],
       "nodes": [

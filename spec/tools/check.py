@@ -18,6 +18,7 @@ REPO = SPEC.parent
 STATE = SPEC / "STATE.json"
 MAIN_SHA = "623dd4a272f8134fb692985fd04ae7151954c9f0"
 BASE_SHA = "65fdf118d1498a8285db84a43c4da81dfaa0ea3e"
+MAIN_TIP = "7b9e987cc3b9991c1107aa782bc3f6e8486968f9"
 SPEC_BRANCH = "feature/spec-first"
 JAVA = "/opt/homebrew/opt/openjdk/bin/java"
 TLA_JAR = Path.home() / ".local/share/tlaplus/tla2tools.jar"
@@ -952,6 +953,51 @@ def door_target_problems(feature, verdict, field, doors):
     return [f"{feature['id']}: {verdict.get('door')} {field} {target} is no core or module door" for target in targets if not (DOOR_ID.match(target) and target in doors)]
 
 
+TIP_MEMBER = re.compile(r"\.(\w+)(?:<[^>]*>)?\(")
+DELTA_ROOTS = ("Alis.Reactive/", "Alis.Reactive.Analyzers/", "Alis.Reactive.Assets/", "Alis.Reactive.Fusion/", "Alis.Reactive.FluentValidator/", "Alis.Reactive.Native/")
+DELTA_MEMBER = {".cs": re.compile(r"^\+\s*public static [^=;]*?\b(\w+)(?:<[^>(]*>)?\("), ".ts": re.compile(r"^\+export (?:async )?(?:function|const|class) (\w+)")}
+
+
+def tip_member(door):
+    found = TIP_MEMBER.search(door) if isinstance(door, str) else None
+    return found.group(1) if found else None
+
+
+def tip_sentences(feature):
+    return [sentence for sentence in feature.get("sentences", []) if sentence.get("line") == "main" and sentence.get("sha") == MAIN_TIP]
+
+
+def tip_verdict(feature, verdict):
+    member = tip_member(verdict.get("door"))
+    return verdict.get("sha") == MAIN_TIP and member is not None and any(re.search(rf"\b{member}\b", sentence.get("text", "")) for sentence in tip_sentences(feature))
+
+
+def main_delta_files():
+    changed = git("diff", "--name-only", MAIN_SHA, MAIN_TIP).splitlines()
+    return [path for path in changed if path.startswith(DELTA_ROOTS) and "/__tests__/" not in path and not path.endswith(".test.ts")]
+
+
+def check_main_delta():
+    features = [feature for path in feature_files() for feature in json.loads(path.read_text()).get("features", [])]
+    cited = {sentence["cite"].split(":")[0] for feature in features for sentence in tip_sentences(feature) if isinstance(sentence.get("cite"), str)}
+    given = {tip_member(verdict.get("door")) for feature in features for verdict in feature.get("verdicts", []) if verdict.get("sha") == MAIN_TIP}
+    files = main_delta_files()
+    problems = []
+    members = []
+    for path in files:
+        if path not in cited:
+            problems.append(f"{path} changed on main from {MAIN_SHA[:9]} to {MAIN_TIP[:9]} and no sentence cites it there")
+        pattern = DELTA_MEMBER.get(Path(path).suffix)
+        for line in git("diff", "-U0", MAIN_SHA, MAIN_TIP, "--", path).splitlines() if pattern else []:
+            found = pattern.match(line)
+            if found:
+                members.append(found.group(1))
+                if found.group(1) not in given:
+                    problems.append(f"{path}: {found.group(1)}, added on main by {MAIN_TIP[:9]}, has no verdict at that SHA")
+    detail = f"each of {len(files)} shipped files main changed from {MAIN_SHA[:9]} to {MAIN_TIP[:9]} is cited there by a feature's sentence, and each of {len(members)} public members it added has a verdict"
+    return result(not problems, "; ".join(problems[:4]) or detail, files=len(files), members=len(members), cited=len(cited))
+
+
 def verdict_problems(model, doors):
     problems = []
     for feature in model["features"]:
@@ -962,7 +1008,7 @@ def verdict_problems(model, doors):
             if door in given:
                 problems.append(f"{feature['id']}: two verdicts for {door}")
             given[door] = verdict
-            if door not in main_only:
+            if door not in main_only and not tip_verdict(feature, verdict):
                 problems.append(f"{feature['id']}: verdict for {door}, no main-only door of this feature")
             kind = verdict.get("verdict")
             if kind not in VERDICT_KINDS:
@@ -1017,15 +1063,18 @@ def sentence_problems(feature, doors):
         return [f"{feature['id']}: no sentence"]
     for sentence in sentences:
         line = sentence.get("line")
+        sha = sentence.get("sha")
         if line not in SENTENCE_LINES or not is_prose(sentence.get("text")):
             problems.append(f"{feature['id']}: sentence {sentence.get('text')!r} has no line of main, redesign or proposed")
+        elif sha is not None and (sha != MAIN_TIP or line != "main"):
+            problems.append(f"{feature['id']}: sentence {sentence['text']!r} names {sha!r}, and a sentence names only main's tip {MAIN_TIP[:9]}")
         elif line == "proposed":
             named = sentence.get("doors")
             if not isinstance(named, list) or not named or any(door not in doors for door in named):
                 problems.append(f"{feature['id']}: proposed sentence {sentence['text']!r} names a door no core or module door")
-        elif not cites_resolve([sentence.get("cite")], SENTENCE_LINES[line]):
+        elif not cites_resolve([sentence.get("cite")], sha or SENTENCE_LINES[line]):
             problems.append(f"{feature['id']}: {line} sentence {sentence['text']!r} cites no line at {line}'s SHA")
-        elif without_space(sentence["text"]) not in without_space(cited_text(SENTENCE_LINES[line], sentence["cite"])):
+        elif without_space(sentence["text"]) not in without_space(cited_text(sha or SENTENCE_LINES[line], sentence["cite"])):
             problems.append(f"{feature['id']}: {line} sentence {sentence['text']!r} is not at {sentence['cite']}")
     return problems
 
@@ -2409,6 +2458,7 @@ CHECKS = [
     ("gate1", "owner gate 1: the core design", check_gate(1)),
     ("doors_mapped", "every public door mapped to one feature", check_doors_mapped),
     ("verdicts", "every main-only door has a verdict; a refusal names its carriers", check_verdicts),
+    ("main_delta", "every shipped file main changed after the spec's main SHA cited at main's tip, every public member it added with a verdict", check_main_delta),
     ("features_core", "every feature mapped to the core", check_features_core),
     ("features_lost", "every module and feature on either line carried: features lost 0", check_features_lost),
     ("module_cites", "every module.md cite resolves at the SHA it names", check_module_cites),
@@ -2438,7 +2488,7 @@ STEPS = [
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
-    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers"], "Finish every check and make each pass."),
+    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta"], "Finish every check and make each pass."),
     (11, "E", "REWRITE.md", ["rewrite_units"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]

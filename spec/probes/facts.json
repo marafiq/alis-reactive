@@ -4135,6 +4135,21 @@
         "gesture": "Click Call nurse; open the collector page.",
         "outcome": "The collector lists the click's run span under the page's trace id and the hub's Call activity under a trace id of its own."
       }
+    },
+    {
+      "id": "ej2-grid-template-grouping",
+      "statement": "In a template condition, ! over a parenthesized comparison negates it, ! before a bare comparison binds to the member first and reads every row as false, and a run of spaces standing alone between ) and && fails the compile with a SyntaxError where the same condition with no spaces compiles.",
+      "host": "browser",
+      "oracle": "Chromium, driven by Playwright 1.63.0, rendering EJ2 33.1.47's Grid with ej2.min.js",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-grouping: !(status==='Active') gives no|yes, !status==='Active' gives no|no, (beds>2)&&(a>2) gives yes|no, (beds > 2) && (a > 2) gives SyntaxError",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "M22.X5's bed board: the Spare column's condition negates a comparison beside &&, over Ann, active with 3 beds, and Bo, away with 3 beds.",
+        "gesture": "Open the page.",
+        "outcome": "Ann's Spare cell shows other and Bo's shows away with spare beds."
+      }
     }
   ]
 }

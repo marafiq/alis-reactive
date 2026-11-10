@@ -149,6 +149,18 @@
             "M23.N1",
             "M12.N2"
           ]
+        },
+        {
+          "line": "main",
+          "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+          "text": "public static ComponentRef<FusionToast, TModel> SetTitle<TModel, TResponse>(",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:62"
+        },
+        {
+          "line": "main",
+          "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+          "text": "public static ComponentRef<FusionToast, TModel> SetContent<TModel, TResponse>(",
+          "cite": "Alis.Reactive.Fusion/AppLevel/FusionToast/FusionToastExtensions.cs:86"
         }
       ],
       "nodes": [
@@ -340,6 +352,24 @@
           "verdict": "renamed",
           "to": [
             "M23.N1"
+          ]
+        },
+        {
+          "door": "FusionToastExtensions.SetTitle<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> title)",
+          "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
+          ]
+        },
+        {
+          "door": "FusionToastExtensions.SetContent<TModel, TResponse>(ResponseBody<TResponse> source, Expression<Func<TResponse, string>> content)",
+          "sha": "7b9e987cc3b9991c1107aa782bc3f6e8486968f9",
+          "verdict": "renamed",
+          "to": [
+            "M23.N1",
+            "M12.N2"
           ]
         }
       ]

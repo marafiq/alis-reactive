@@ -394,13 +394,17 @@ is never the reason.
 
 ## 4. Units
 
-The rewrite runs on `feature/rewrite`, branched from `feature/spec-first`'s tip with `origin/main` merged in, and lands
-on main by pull request. U1's first commit is the cut: it removes both lines' code that section 2.1 does not hold under
+The rewrite runs on `feature/rewrite`, branched from `feature/spec-first`'s tip with main at 7b9e987cc merged in, the
+tip whose delta from 623dd4a27 check.py's `main_delta` holds to verdicts, and lands on main by pull request. A later
+main commit enters only when `MAIN_TIP` moves to it and `main_delta` passes; the redesign's tip is still 65fdf118d, and
+a later commit of it needs the same before it enters. U1's first commit is the cut: it removes both lines' code that section 2.1 does not hold under
 the same path, the shipped projects' sources and every item of section 3 but the `poc/` bullet's, and in the same
 commit rewrites root CLAUDE.md, `.claude/rules/` and the folder CLAUDE.md files for the new tree, the meanings list
 stated from D2.4 to D2.6, D2.9 and D4.2 (D2.8), since `WhenARuleNamesTheCode` fails on a rule that names what the cut
 removed. Each removed line stays readable at 65fdf118d or at main's SHA, which every cite pins, and `features_lost` at
-0 is each removed door's verdict.
+0 is each removed door's verdict. Until the `poc/` bullet's items leave, they keep their own package versions: nine of
+their projects write a version inline, which the central management the cut turns on refuses (NU1008), so the cut
+writes a `Directory.Packages.props` that turns it off in `poc/` and in each of their folders under `tests/`.
 
 A unit ends when every test check.py assigns it passes on `scripts/playwright.sh`, each written from its promise
 before the doors it needs and failing then, and failing again on its planted defect, the specs its module owns are

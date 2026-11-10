@@ -7807,6 +7807,21 @@
           "on": "NurseLine after the third refusal, in the opposite"
         }
       ]
+    },
+    {
+      "feature": "M22.F2",
+      "for": "M22.X5",
+      "index": 0,
+      "screen": "bed-board",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "grid"
+      ],
+      "harness": [
+        "seed"
+      ]
     }
   ],
   "cells": [
