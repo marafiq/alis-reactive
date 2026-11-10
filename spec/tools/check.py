@@ -1025,12 +1025,10 @@ def core_problems(model, doors):
 
 
 NEW_DOOR_BULLET = re.compile(r"^- `(N\d+\.\d+|M\d+\.N\d+)` new\b", re.MULTILINE)
-DOOR_NAMED = re.compile(r"\b(?:N\d+\.\d+|M\d+\.N\d+)\b")
+DOORS_SECTION = re.compile(r"^## Doors\n(.*?)(?=^## |\Z)", re.MULTILINE | re.DOTALL)
 
 
 def new_feature_problems(model):
-    texts = [(SPEC / "Core" / "DESIGN.md").read_text()] + [path.read_text() for path in SPEC.glob("*/module.md")]
-    marked_new = {door for text in texts for door in NEW_DOOR_BULLET.findall(text)}
     folders = {number: name for name, number in module_names().items()}
     problems = []
     for feature in model["features"]:
@@ -1038,10 +1036,11 @@ def new_feature_problems(model):
         if feature.get("status") != "new" or not match:
             continue
         module = SPEC / folders.get(int(match.group(1)), "") / "module.md"
-        named = set(DOOR_NAMED.findall(module.read_text())) if module.is_file() else set()
+        section = DOORS_SECTION.search(module.read_text()) if module.is_file() else None
+        kept_new = set(NEW_DOOR_BULLET.findall(section.group(1))) if section else set()
         proposed = {door for sentence in feature.get("sentences", []) if isinstance(sentence, dict) for door in sentence.get("doors") or []}
-        if not proposed & marked_new & named:
-            problems.append(f"{feature['id']}: a new feature whose proposed sentences name no door its module.md names and marks new")
+        if not proposed & kept_new:
+            problems.append(f"{feature['id']}: a new feature whose proposed sentences name no door its module.md's Doors section marks new")
     return problems
 
 
