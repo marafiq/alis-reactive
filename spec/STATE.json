@@ -1486,12 +1486,12 @@
         "features": 112,
         "mapped": 8909,
         "matrix_promised": 0,
-        "matrix_runs": 161,
+        "matrix_runs": 159,
         "promises": 392,
         "rows": 8909,
         "unmapped": 0
       },
-      "detail": "not started: none of the 161 cells the reference components run has a promise",
+      "detail": "not started: none of the 159 cells the reference components run has a promise",
       "pass": false
     },
     "questions": {
@@ -3565,7 +3565,7 @@
     }
   },
   "passed": 23,
-  "read_at_head": "2b0e48f4f3f6212a18d4ab9e4c23c6adb52798cd",
+  "read_at_head": "5e4732f47c9296799c4c78770ed3ceecde579308",
   "step": {
     "failing": [
       "promises"
