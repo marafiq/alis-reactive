@@ -1839,6 +1839,40 @@ def check_claude_md():
     return result(False, "not started: step 12 replaces the five lines and adds the spec-first order")
 
 
+ACTION_SPECS = ["Request", "Run", "Composition", "Ownership", "Lanes", "Realtime", "Tracing", "CallbackProperty"]
+ACTION_NAME = re.compile(r"([A-Z][A-Za-z]+)(?=\(|\s*\\/|\s*$)", re.M)
+
+
+def spec_actions(spec):
+    text = (SPEC / "Core" / f"{spec}.tla").read_text()
+    start = text.find("\nNext ==")
+    end = text.find("\nSpec ==", start)
+    return list(dict.fromkeys(ACTION_NAME.findall(text[start + len("\nNext =="):end])))
+
+
+def observed_actions():
+    observed = []
+    for path in feature_files():
+        for feature in json.loads(path.read_text()).get("features", []):
+            observed += [(f"{feature['id']} promise for {promise.get('for')}", promise["observes"]) for promise in feature.get("promises", []) if "observes" in promise]
+    for name in ["syncfusion.json", "native.json"]:
+        path = SPEC / "Reference" / name
+        cells = json.loads(path.read_text())["cells"] if path.exists() else {}
+        observed += [(f"spec/Reference/{name} {cell}", entry["promise"]["observes"]) for cell, entry in cells.items() if "observes" in entry.get("promise", {})]
+    return observed
+
+
+def check_actions():
+    actions = {f"{spec}.tla:{action}" for spec in ACTION_SPECS for action in spec_actions(spec)}
+    observed = observed_actions()
+    named = {action for _, action in observed}
+    problems = [f"{where} observes {action!r}, no action of its spec's Next" for where, action in observed if action not in actions]
+    unnamed = sorted(actions - named)
+    detail = "; ".join(problems[:4] + ([f"{len(unnamed)} of {len(actions)} actions named by no promise: {', '.join(unnamed[:12])}"] if unnamed else []))
+    return result(not problems and not unnamed, detail or "every action of the async lanes' specs is named by a promise, and every promise's action is its spec's",
+                  actions=len(actions), named=len(actions & named), unnamed=len(unnamed), promises=len(observed))
+
+
 def check_hedges():
     files = prose_files()
     listed = git("ls-files", "--cached", "--others", "--exclude-standard", "spec").splitlines()
@@ -1910,6 +1944,7 @@ CHECKS = [
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
     ("hedges", "zero hedge words", check_hedges),
     ("no_comments", "no comment in the spec's Python or TLA+", check_no_comments),
+    ("actions", "every action of the async lanes' specs named by one promise, the test app's endpoint holding it", check_actions),
 ]
 
 STEPS = [
@@ -1922,7 +1957,7 @@ STEPS = [
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
-    (10, "E", "check.py complete", ["hedges", "no_comments"], "Finish every check and make each pass."),
+    (10, "E", "check.py complete", ["hedges", "no_comments", "actions"], "Finish every check and make each pass."),
     (11, "E", "REWRITE.md", ["rewrite_units"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]
