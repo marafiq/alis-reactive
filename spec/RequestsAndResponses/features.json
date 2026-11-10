@@ -533,7 +533,7 @@
         },
         {
           "for": "X9.24",
-          "page": "A care plan picker holding Weekend, Mon under the app's string enum converter sets r => r.Care, a flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "page": "The care panel, the resident record's ConformanceComponent, whose Days, a Property<CareDays>, its render helper starts at the model's Mon | Sat | Sun, held as Weekend, Mon under the app's string enum converter, sets r => r.Care, a flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
           "gesture": "Click Send care.",
           "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
           "opposite": "With Mon alone held, the URL holds Care=Mon.",
@@ -541,7 +541,7 @@
         },
         {
           "for": "X9.24",
-          "page": "The same care plan picker in an app whose JSON options write enums as numbers holds 97 and sets r => r.Care, the flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
+          "page": "The same care panel in an app whose JSON options write enums as numbers, its Days started at the same model value and held as 97, sets r => r.Care, the flags enum the startup names with Flags<CareDays>(); the GET's endpoint echoes the Care it bound.",
           "gesture": "Click Send care.",
           "outcome": "The URL holds Care=Mon%2C+Weekend and the echo reads Mon, Weekend.",
           "opposite": "Holding 1, the URL holds Care=Mon.",
@@ -549,8 +549,8 @@
         },
         {
           "for": "X9.25",
-          "page": "A care plan picker that the test sets to hold 129, Mon with the bit 128 that no value of the flags enum names, sets r => r.Care of a GET whose step after writes Sent.",
-          "gesture": "Click Hold 129, then Send care.",
+          "page": "The care panel, the resident record's ConformanceComponent, whose own Hold 129 button sets its Days to 129, Mon with the bit 128 that no value of the flags enum names, and whose Days sets r => r.Care of a GET whose step after writes Sent.",
+          "gesture": "Click the care panel's Hold 129, then Send care.",
           "outcome": "The network log holds no request, the log keeps its dash, and the console names r => r.Care and 129.",
           "opposite": "With 97 held, the URL holds Care=Mon%2C+Weekend and the log reads Sent.",
           "defect": "The value sent as 129 or as Mon alone, so the network log holds the GET; or the pipeline going on, so the log reads Sent."

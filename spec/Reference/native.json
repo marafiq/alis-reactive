@@ -119,6 +119,13 @@
           "csharp": "Choice"
         },
         {
+          "js": "days",
+          "kind": "property",
+          "ts": "days: string | number",
+          "door": "Property<CareDays>",
+          "csharp": "Days"
+        },
+        {
           "js": "nullableCount",
           "kind": "property",
           "ts": "nullableCount: number | null",
@@ -617,7 +624,7 @@
           ]
         },
         {
-          "behavior": "Its own controls: a day field setting Day or NullableDay; a list of none, residential and nursing picked with the arrow keys and Enter, setting Value and raising change; Low, High and Hold medium setting Choice, medium a text no value of Choice is held as; Sort and Edit first over Records; Deactivate last over Items; Paged and Clear over NullableRecords; Free and Busy setting Count to 1 and 0; Destroy; Remove the read-only text.",
+          "behavior": "Its own controls: a day field setting Day or NullableDay; a list of none, residential and nursing picked with the arrow keys and Enter, setting Value and raising change; Low, High and Hold medium setting Choice, medium a text no value of Choice is held as; Hold 129 setting Days to 129, a number no value of CareDays names; Sort and Edit first over Records; Deactivate last over Items; Paged and Clear over NullableRecords; Free and Busy setting Count to 1 and 0; Destroy; Remove the read-only text.",
           "tests": [
             "X8.27 #0",
             "X8.27 #1",
@@ -631,7 +638,8 @@
             "X8.14",
             "X12.7",
             "X17.21",
-            "X17.22"
+            "X17.22",
+            "X9.25"
           ]
         },
         {

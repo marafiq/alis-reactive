@@ -181,8 +181,8 @@
         },
         {
           "for": "X7.14",
-          "page": "An app whose JSON options write numbers as text; a supply search whose found supply's vial count is 5, and the dose scanner, the round's ConformanceComponent, whose Amount holds 1 and whose Add(amount) adds what it is passed to its Amount, which it shows.",
-          "gesture": "Search for the supply, then click Add.",
+          "page": "An app whose JSON options write numbers as text; a Find the supply button that GETs the supply, whose body's VialCount is 5, and the dose scanner, the round's ConformanceComponent, whose Amount holds 1 and whose Add(amount) adds what it is passed to its Amount, which it shows.",
+          "gesture": "Click Find the supply, then click Add.",
           "outcome": "The scanner shows the amount 6.",
           "opposite": "A found supply whose vial count is 0 leaves the scanner's amount at 1.",
           "defect": "The text 5 reaches the method, so the scanner shows 15."
@@ -261,16 +261,16 @@
         },
         {
           "for": "X7.12",
-          "page": "A medication page whose Check button runs When(chart status IfNull DoseStatus.Given equals DoseStatus.Given) to show Given, else Not given, where the status member is written by its own converter as text, over a resident with no chart found and one whose chart says Missed.",
-          "gesture": "Search the resident with no chart found and click Check.",
+          "page": "A medication page whose Check button runs When(chart status IfNull DoseStatus.Given equals DoseStatus.Given) to show Given, else Not given, where the status member is written by its own converter as text, where the chart is the body a Find the chart button GETs, over a resident with no chart found and one whose chart says Missed.",
+          "gesture": "Click Find the chart for the resident with no chart found, then click Check.",
           "outcome": "The badge shows Given.",
           "opposite": "On the resident whose chart says Missed, the badge shows Not given.",
           "defect": "The fallback is written as the enum's number while the found status is the converter's text, so the comparison fails and the badge shows Not given."
         },
         {
           "for": "X7.12",
-          "page": "A medication page whose Check button runs When(Choose(test, DoseStatus.Given, chart status) equals DoseStatus.Given) to show Given, else Not given, beside a found chart whose status its own converter writes as Missed.",
-          "gesture": "Tick the test box and click Check.",
+          "page": "A medication page whose Check button runs When(Choose(test, DoseStatus.Given, chart status) equals DoseStatus.Given) to show Given, else Not given, beside a found chart, the body a Find the chart button GETs, whose status its own converter writes as Missed.",
+          "gesture": "Click Find the chart, tick the test box and click Check.",
           "outcome": "The badge shows Given.",
           "opposite": "With the box cleared, the badge shows Not given, the found chart's Missed.",
           "defect": "The literal arm is written as the enum's number while the found status is the converter's text, so the comparison fails and the badge shows Not given."

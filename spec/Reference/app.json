@@ -5587,7 +5587,8 @@
       ],
       "parts": [
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "carePanel"
       ],
       "harness": [
         "seed"
@@ -5603,7 +5604,8 @@
       ],
       "parts": [
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "carePanel"
       ],
       "harness": [
         "seed"
@@ -5619,7 +5621,8 @@
       ],
       "parts": [
         "notes",
-        "recordEndpoint"
+        "recordEndpoint",
+        "carePanel"
       ],
       "harness": [
         "seed"
@@ -7122,7 +7125,8 @@
       ],
       "parts": [
         "doses",
-        "scanner"
+        "scanner",
+        "roundEndpoint"
       ],
       "harness": [
         "seed"
@@ -7283,7 +7287,8 @@
         "net10"
       ],
       "parts": [
-        "doses"
+        "doses",
+        "roundEndpoint"
       ],
       "harness": [
         "seed"
@@ -7299,7 +7304,8 @@
       ],
       "parts": [
         "doses",
-        "doseInputs"
+        "doseInputs",
+        "roundEndpoint"
       ],
       "harness": [
         "seed"
