@@ -80,6 +80,10 @@ try
     var populate = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web) { PreferredObjectCreationHandling = System.Text.Json.Serialization.JsonObjectCreationHandling.Populate };
     var populated = System.Text.Json.JsonSerializer.Deserialize<Ward>("{\"lead\":{\"phone\":\"1\"},\"leads\":[{\"phone\":\"3\"}]}", populate)!;
     Console.WriteLine("core-stj-populate-start: under Populate Lead.Name=" + populated.Lead.Name + "; Leads=" + string.Join(",", populated.Leads.Select(lead => lead.Name)));
+    string populateParameterized;
+    try { populateParameterized = "binds " + System.Text.Json.JsonSerializer.Deserialize<ProbePopulatedRecord>("{\"name\":\"a\",\"spot\":{}}", web)!.Spot.Place; }
+    catch (NotSupportedException refused) { populateParameterized = "refused: " + refused.Message; }
+    Console.WriteLine("core-stj-populate-parameterized: a record whose constructor takes Name, with a Spot under [JsonObjectCreationHandling(Populate)], is " + populateParameterized);
     using (var api = await client.PostAsync("/api-named", new StringContent("Name=", Encoding.UTF8, "application/x-www-form-urlencoded")))
     {
         Console.WriteLine("core-api-controller-implicit-required: Name= answers " + (int)api.StatusCode + " " + api.Content.Headers.ContentType?.MediaType + (await api.Content.ReadAsStringAsync()).Contains("reached the action") switch { true => " from the action", false => " before the action" });
@@ -403,6 +407,17 @@ static async Task<string> Form(HttpClient client, string path, string body)
 {
     using var response = await client.PostAsync(path, new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded"));
     return await response.Content.ReadAsStringAsync();
+}
+
+public sealed record ProbePopulatedRecord(string Name)
+{
+    [JsonObjectCreationHandling(JsonObjectCreationHandling.Populate)]
+    public ProbeSpot Spot { get; } = new();
+}
+
+public sealed class ProbeSpot
+{
+    public string Place { get; set; } = "start";
 }
 
 public sealed class ProbeHolder<T>

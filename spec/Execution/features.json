@@ -351,10 +351,10 @@
         },
         {
           "for": "X4.7",
-          "page": "The bench page with the ConformanceComponent conformance, whose Binding declares Populated, a Spot it populates ([JsonObjectCreationHandling(Populate)]), GetterOnly, a getter-only Spot, and Replaced, a Spot it replaces, each initialized by Binding to a Spot whose Place is binding start, where Spot's own initializer sets Place to own start; Beta's data holds populated, getterOnly and replaced each as {}. Show Beta's spots writes Beta's Populated.Place, GetterOnly.Place and Replaced.Place into populated-place, getter-place and replaced-place.",
-          "gesture": "Click Show Beta's spots.",
+          "page": "The bench page with the ConformanceComponent conformance, whose Starts, a class whose constructor takes no parameters, declares Populated, a Spot it populates ([JsonObjectCreationHandling(Populate)]), GetterOnly, a getter-only Spot, and Replaced, a Spot it replaces, each initialized by Starts to a Spot whose Place is binding start, where Spot's own initializer sets Place to own start; the component's starts data holds populated, getterOnly and replaced each as {}. Show the spots writes Starts' Populated.Place, GetterOnly.Place and Replaced.Place into populated-place, getter-place and replaced-place.",
+          "gesture": "Click Show the spots.",
           "outcome": "populated-place reads binding start, getter-place reads binding start and replaced-place reads own start.",
-          "opposite": "With each of Beta's three spots holding the place Ward 4, populated-place, getter-place and replaced-place read Ward 4.",
+          "opposite": "With each of the three spots holding the place Ward 4, populated-place, getter-place and replaced-place read Ward 4.",
           "defect": "One start per type, as the redesign builds a start from the type alone (Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:126 at 65fdf118d), so all three read own start; or an absent member reads nothing and the three stay empty."
         },
         {

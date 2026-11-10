@@ -424,7 +424,7 @@
         },
         {
           "for": "M11.X2",
-          "page": "The bench page in an app whose JSON options name members in snake case, with the ConformanceComponent conformance, whose Records hold [{\"name\": \"Ada\", \"multi_word\": 2}, {\"name\": \"Ben\", \"multi_word\": 1}, {\"name\": \"Cy\", \"multi_word\": 3}] as the app writes them, listed Ada, Ben, Cy; its declaration declares SortBy(Field field), which orders its records by the member the field names. Sort by multi-word calls SortBy(Field.Of((Record r) => r.MultiWord)).",
+          "page": "The bench page in an app whose JSON options name members in snake case, with the ConformanceComponent conformance, whose Records hold [{\"name\": \"Ada\", \"multi_word\": 2}, {\"name\": \"Ben\", \"multi_word\": 1}, {\"name\": \"Cy\", \"multi_word\": 3}] as the app writes them, listed Ada, Ben, Cy; its declaration declares SortBy(Arg<Field> field), which orders its records by the member the field names. Sort by multi-word calls SortBy(Field.Of((Record r) => r.MultiWord)).",
           "gesture": "Click Sort by multi-word.",
           "outcome": "The component lists Ben, Ada, Cy.",
           "opposite": "Before the click the component lists Ada, Ben, Cy.",

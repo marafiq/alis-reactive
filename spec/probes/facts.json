@@ -1072,6 +1072,15 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-stj-populate-parameterized",
+      "statement": "System.Text.Json refuses [JsonObjectCreationHandling(Populate)] on a member of a type whose constructor takes parameters, so the conformance library keeps Populate on Starts, apart from the record Binding.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-stj-populate-parameterized: a record whose constructor takes Name, with a Spot under [JsonObjectCreationHandling(Populate)], is refused: JsonObjectCreationHandling.Populate is currently not supported in types with parameterized constructors.",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
       "id": "core-api-controller-implicit-required",
       "statement": "Under [ApiController], net10's implicit required error answers 400 problem+json before the action runs.",
       "host": "net10",

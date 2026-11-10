@@ -14,17 +14,21 @@
     {
       "id": "older",
       "differs": [
-        "ConformanceComponent.readOnlyText"
+        "ConformanceComponent.readOnlyText",
+        "ConformanceComponent.log()",
+        "ConformanceComponent.echo()",
+        "ConformanceComponent.settleRecord()"
       ],
-      "why": "an older build that lacks a declared member (D4.1, X4.2)"
+      "why": "an older build that lacks two declared members, readOnlyText and log(), holds echo as the text Echoed in place of a function, and returns a plain record from settleRecord(), which the declaration declares with MethodAsync (D4.1, D4.3, X4.2, X5.12, X4.11)"
     },
     {
       "id": "promised",
       "differs": [
         "ConformanceComponent.total()",
-        "ConformanceComponent.raised.count"
+        "ConformanceComponent.raised.count",
+        "ConformanceComponent.ping()"
       ],
-      "why": "a build that returns a promise from a method declared with Method<T> and hands a promise in a payload member declared as a value (D4.3), its drift from the declaration suppressed naming the test that arranges it (spec/CLAUDE.md, the vendor contract of 2026-11-07)"
+      "why": "a build that returns a promise from a method declared with Method or Method<T>, ping() resolving once the component shows Pinged and rejecting while Enabled is false, and hands a promise in a payload member declared as a value (D4.3, D4.4, X4.5, X11.3), its drift from the declaration suppressed naming the test that arranges it (spec/CLAUDE.md, the vendor contract of 2026-11-07)"
     }
   ],
   "types": [
@@ -154,6 +158,30 @@
           "type": "Record"
         },
         {
+          "js": "bindings",
+          "kind": "property",
+          "ts": "bindings: Binding[]",
+          "door": "Property<List<Binding>>",
+          "csharp": "Bindings",
+          "type": "Binding"
+        },
+        {
+          "js": "binding",
+          "kind": "property",
+          "ts": "binding: Binding",
+          "door": "Property<Binding>",
+          "csharp": "Binding",
+          "type": "Binding"
+        },
+        {
+          "js": "starts",
+          "kind": "property",
+          "ts": "starts: Starts",
+          "door": "Property<Starts>",
+          "csharp": "Starts",
+          "type": "Starts"
+        },
+        {
           "js": "readOnlyText",
           "kind": "readOnly",
           "ts": "readonly readOnlyText: string",
@@ -230,6 +258,14 @@
           "csharp": "Answer"
         },
         {
+          "js": "pair",
+          "kind": "callback",
+          "ts": "pair: ((key: string, record: Record) => string) | null",
+          "door": "Callback<PairArgs, string>",
+          "csharp": "Pair",
+          "type": "PairArgs"
+        },
+        {
           "js": "ping",
           "kind": "method",
           "ts": "ping(): void",
@@ -242,6 +278,13 @@
           "ts": "total(): number",
           "door": "Method<int>",
           "csharp": "Total()"
+        },
+        {
+          "js": "check",
+          "kind": "methodValue",
+          "ts": "check(): boolean",
+          "door": "Method<bool>",
+          "csharp": "Check()"
         },
         {
           "js": "echo",
@@ -350,6 +393,13 @@
           "csharp": "TakeNullable(Arg<int?> count)"
         },
         {
+          "js": "takeText",
+          "kind": "method",
+          "ts": "takeText(text: string | null): void",
+          "door": "Method",
+          "csharp": "TakeText(Arg<string?> text)"
+        },
+        {
           "js": "takeDay",
           "kind": "method",
           "ts": "takeDay(day: Date): void",
@@ -376,6 +426,34 @@
           "ts": "takeAll(records: Record[]): void",
           "door": "Method",
           "csharp": "TakeAll(Arg<IReadOnlyList<Record>> records)"
+        },
+        {
+          "js": "takeDays",
+          "kind": "method",
+          "ts": "takeDays(days: Date[]): void",
+          "door": "Method",
+          "csharp": "TakeDays(Arg<IReadOnlyList<DateTime>> days)"
+        },
+        {
+          "js": "takeLinked",
+          "kind": "method",
+          "ts": "takeLinked(linked: Linked): void",
+          "door": "Method",
+          "csharp": "TakeLinked(Arg<Linked> linked)"
+        },
+        {
+          "js": "sortBy",
+          "kind": "method",
+          "ts": "sortBy(field: string): void",
+          "door": "Method",
+          "csharp": "SortBy(Arg<Field> field)"
+        },
+        {
+          "js": "sortItems",
+          "kind": "method",
+          "ts": "sortItems(key: (item: Item) => number): void",
+          "door": "Method",
+          "csharp": "SortItems(Answer<Item, int> key)"
         },
         {
           "js": "destroy",
@@ -417,7 +495,165 @@
           "type": "ConformancePeer"
         }
       ],
-      "what": "the first custom component: a TypeScript object its element holds at conformanceComponent, an EventTarget heard by addEventListener and removeEventListener"
+      "what": "the first custom component: a TypeScript object its element holds at conformanceComponent, an EventTarget heard by addEventListener and removeEventListener; its Choice is the app's enum Choice, whose Minimum and Maximum are held as low and high under JsonStringEnumMemberName (D7.7, D9.13)",
+      "behaviors": [
+        {
+          "behavior": "Calls counts the component's method calls, which it shows; Total() answers its Count, and Check() answers its Enabled.",
+          "tests": [
+            "X8.13",
+            "X8.14",
+            "X8.15",
+            "X5.11",
+            "X7.6 #3"
+          ]
+        },
+        {
+          "behavior": "Settle() awaits the test app's settle endpoint, resolves on its success and rejects when it answers a 500 the harness seeds.",
+          "tests": [
+            "X4.11",
+            "X11.4",
+            "X4.5",
+            "X11.3"
+          ]
+        },
+        {
+          "behavior": "After each raise the component shows Raised and its count of raises, Raised 1 and on.",
+          "tests": [
+            "X5.7",
+            "X17.15"
+          ]
+        },
+        {
+          "behavior": "The component shows NullableCount in its nullable count line, none for null.",
+          "tests": [
+            "X7.9 #0",
+            "X7.9 #1",
+            "X7.7 #0"
+          ]
+        },
+        {
+          "behavior": "The component writes a line into its log for each value it receives: Date and the value's local yyyy-MM-dd HH:mm, TakeMoment's toISOString, null, same record when Take receives the object Snapshot() returned, or text and the text, Log's own text among them.",
+          "tests": [
+            "X3.10",
+            "X3.12",
+            "X7.6 #1"
+          ]
+        },
+        {
+          "behavior": "TakeNullable shows Took and the count it receives, Took none before a call; TakeText shows the text it receives as its taken text, (null) for null and (undefined) for undefined.",
+          "tests": [
+            "M11.X1",
+            "X5.12",
+            "X4.11",
+            "X7.7 #2"
+          ]
+        },
+        {
+          "behavior": "Its own Ask button asks Answer for each item and shows the answers in its answer line, each item's position when Answer holds no function; a write that changes Text asks Answer again before the line draws; a throw from Answer leaves the line it drew and shows the message in its error line.",
+          "tests": [
+            "X17.14",
+            "X17.20",
+            "X17.21",
+            "X17.22",
+            "X17.24"
+          ]
+        },
+        {
+          "behavior": "Its own Ask button calls Pair with the key count and each record, and draws each answer in its answer line.",
+          "tests": [
+            "X17.23"
+          ]
+        },
+        {
+          "behavior": "SortItems orders and redraws its items by the key its answer gives for each; SortBy orders its records by the member the field names; the component lists its records' names.",
+          "tests": [
+            "X17.20",
+            "M11.X2",
+            "M4.X3"
+          ]
+        },
+        {
+          "behavior": "Its own box: Raise raises Raised with the box's text as Text and, when the text reads a number, as Count, and on net10 as Time.",
+          "tests": [
+            "X6.58 #1",
+            "X12.14"
+          ]
+        },
+        {
+          "behavior": "The Raise buttons the test's render options name raise Raised with the payload each names: no text, no optional text, a null nullable text, a record or none, Flag true or false, or no argument; the component shows its payload line once its listeners return.",
+          "tests": [
+            "M3.X1",
+            "M5.X3",
+            "X4.3",
+            "X5.7",
+            "X5.8",
+            "X7.5",
+            "X7.6 #0",
+            "X11.11",
+            "X11.12",
+            "X11.13",
+            "X17.15"
+          ]
+        },
+        {
+          "behavior": "Its Raise button hands its peer, the same peer at each click, Raise with a new peer puts a new peer on a new element and hands it, Hand a peer raises Handed with its peer, and Drop the peer removes that peer's element and lets go of it.",
+          "tests": [
+            "X12.9",
+            "X12.10",
+            "X12.18"
+          ]
+        },
+        {
+          "behavior": "The render helper takes the items and records the component holds, an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
+          "tests": [
+            "M4.X4",
+            "M4.X6",
+            "M4.X7",
+            "M4.X8",
+            "M4.X9",
+            "X5.3",
+            "M11.X3",
+            "X5.12"
+          ]
+        },
+        {
+          "behavior": "Its own controls: a day field setting Day or NullableDay; a list of none, residential and nursing picked with the arrow keys and Enter, setting Value and raising change; Low, High and Hold medium setting Choice, medium a text no value of Choice is held as; Sort and Edit first over Records; Deactivate last over Items; Paged and Clear over NullableRecords; Free and Busy setting Count to 1 and 0; Destroy; Remove the read-only text.",
+          "tests": [
+            "X8.27 #0",
+            "X8.27 #1",
+            "X8.27 #3",
+            "M7.X3",
+            "X9.18",
+            "X9.19",
+            "X10.13",
+            "X5.11",
+            "X6.7",
+            "X8.14",
+            "X12.7",
+            "X17.21",
+            "X17.22"
+          ]
+        },
+        {
+          "behavior": "Add adds the amount it is passed to Amount, which the component shows.",
+          "tests": [
+            "X7.14",
+            "X17.4"
+          ]
+        },
+        {
+          "behavior": "On the page that names it, the component's own code sets its Binding's Count to a promise.",
+          "tests": [
+            "X4.9"
+          ]
+        },
+        {
+          "behavior": "A script of the test app builds the component only when the page's Build the component button is clicked.",
+          "tests": [
+            "M12.X4"
+          ]
+        }
+      ]
     },
     {
       "name": "ConformancePeer",
@@ -459,7 +695,16 @@
           "type": "Change"
         }
       ],
-      "what": "the component ConformanceComponent's payloads hand over, on an element of its own, holding that element at element so a listen on it tells when its host destroyed it"
+      "what": "the component ConformanceComponent's payloads hand over, on an element of its own, holding that element at element so a listen on it tells when its host destroyed it",
+      "behaviors": [
+        {
+          "behavior": "Its own Change button raises its Change.",
+          "tests": [
+            "X12.9",
+            "X12.10"
+          ]
+        }
+      ]
     },
     {
       "name": "ConformanceElement",
@@ -493,6 +738,15 @@
           "door": "Event<ElementKey>",
           "csharp": "Keydown",
           "type": "ElementKey"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Its Open with room button dispatches the CustomEvent opened with the detail {\"room\": \"12\"}, and its Open with no room button dispatches opened with no detail.",
+          "tests": [
+            "X17.3",
+            "X19.4"
+          ]
         }
       ]
     },
@@ -595,6 +849,14 @@
           "door": "Event",
           "csharp": "Alarmed"
         }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Its Sound the alarm button raises Alarmed with no argument.",
+          "tests": [
+            "X17.15"
+          ]
+        }
       ]
     },
     {
@@ -620,6 +882,15 @@
           "door": "Event<Posted>",
           "csharp": "Posted",
           "type": "Posted"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Its Post an update button posts the message Bed 4 needs water, and it shows the count of listeners it holds as subscribers: n.",
+          "tests": [
+            "X17.11",
+            "X17.17"
+          ]
         }
       ]
     },
@@ -667,6 +938,18 @@
           "csharp": "OnSearch",
           "type": "SearchArgs"
         }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Its own code assigns onRaised a function that appends own to its log; its Raise room 7 button calls onRaised with the room 7, each call writing a new line; Make it throw makes its own function throw after it appends, and Check shows whether onRaised holds its own function.",
+          "tests": [
+            "X17.17",
+            "X17.49",
+            "X17.50",
+            "X17.51",
+            "X17.52"
+          ]
+        }
       ]
     },
     {
@@ -701,6 +984,29 @@
           "door": "MethodAt",
           "csharp": "Show(Arg<IReadOnlyList<string>> names)",
           "position": 1
+        }
+      ]
+    },
+    {
+      "name": "PairArgs",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "key",
+          "kind": "argument",
+          "ts": "the first argument, key: string",
+          "door": "Argument<string>",
+          "csharp": "Key",
+          "position": 0
+        },
+        {
+          "js": "record",
+          "kind": "argument",
+          "ts": "the second argument, record: Record",
+          "door": "Argument<Record>",
+          "csharp": "Record",
+          "position": 1,
+          "type": "Record"
         }
       ]
     },
@@ -743,6 +1049,14 @@
           "ts": "act(): void",
           "door": "Method",
           "csharp": "Act()"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "The component shows its outer's text as Outer: and the text, and Outer acted once the outer's Act() is called.",
+          "tests": [
+            "X5.10"
+          ]
         }
       ]
     },
@@ -842,6 +1156,14 @@
           "optional": true
         },
         {
+          "js": "optionalScore",
+          "kind": "property",
+          "ts": "optionalScore?: number",
+          "door": "Property<int>",
+          "csharp": "OptionalScore",
+          "optional": true
+        },
+        {
           "js": "act",
           "kind": "method",
           "ts": "act(): void",
@@ -849,11 +1171,27 @@
           "csharp": "Act()"
         },
         {
+          "js": "check",
+          "kind": "methodValue",
+          "ts": "check(): boolean",
+          "door": "Method<bool>",
+          "csharp": "Check()"
+        },
+        {
           "js": "settle",
           "kind": "methodAsyncValue",
           "ts": "settle(): Promise<string>",
           "door": "MethodAsync<string>",
           "csharp": "Settle()"
+        }
+      ],
+      "behaviors": [
+        {
+          "behavior": "Act() shows the item's name and acted; Check() answers Active and adds one to the checks the item shows.",
+          "tests": [
+            "X5.3",
+            "X5.11"
+          ]
         }
       ]
     },
@@ -969,12 +1307,266 @@
           "door": "Detail",
           "csharp": "Detail",
           "type": "Detail"
+        },
+        {
+          "js": "multiWord",
+          "kind": "property",
+          "ts": "multiWord: number",
+          "door": "int",
+          "csharp": "MultiWord"
+        },
+        {
+          "js": "ratio",
+          "kind": "property",
+          "ts": "ratio: number",
+          "door": "double",
+          "csharp": "Ratio"
         }
-      ]
+      ],
+      "what": "the app's C# class Record, whose Code starts at C0, the value a record whose data lacks code reads (D4.2)"
     },
     {
       "name": "Detail",
       "kind": "data",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "Linked",
+      "kind": "data",
+      "what": "a record that holds itself and a date, which a step's value refuses where the view renders (D3.13, X3.12)",
+      "members": [
+        {
+          "js": "day",
+          "kind": "property",
+          "ts": "day: string",
+          "door": "DateTime",
+          "csharp": "Day"
+        },
+        {
+          "js": "previous",
+          "kind": "property",
+          "ts": "previous: Linked | null",
+          "door": "Linked?",
+          "csharp": "Previous",
+          "type": "Linked"
+        }
+      ]
+    },
+    {
+      "name": "Binding",
+      "kind": "data",
+      "what": "the app's C# record Binding(string Name, string Code), deriving from the abstract BindingBase: Started starts at start; Constructor is a string? whose JSON name is constructor; BindingBase declares the abstract Renamed with [JsonPropertyName(\"renamed_member\")], which Binding overrides with the same name, starting empty, and the abstract Ignored, which Binding overrides with [JsonIgnore], ALIS025 suppressed on that member (D4.2, D2.9, D18.3)",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        },
+        {
+          "js": "code",
+          "kind": "property",
+          "ts": "code: string",
+          "door": "string",
+          "csharp": "Code"
+        },
+        {
+          "js": "count",
+          "kind": "property",
+          "ts": "count: number",
+          "door": "int",
+          "csharp": "Count"
+        },
+        {
+          "js": "started",
+          "kind": "property",
+          "ts": "started: string",
+          "door": "string",
+          "csharp": "Started"
+        },
+        {
+          "js": "strict",
+          "kind": "property",
+          "ts": "strict: StrictSpot",
+          "door": "StrictSpot",
+          "csharp": "Strict",
+          "type": "StrictSpot"
+        },
+        {
+          "js": "sealed",
+          "kind": "property",
+          "ts": "sealed: SealedSpot",
+          "door": "SealedSpot",
+          "csharp": "Sealed",
+          "type": "SealedSpot"
+        },
+        {
+          "js": "polymorphic",
+          "kind": "property",
+          "ts": "polymorphic: PolySpot",
+          "door": "PolySpot",
+          "csharp": "Polymorphic",
+          "type": "PolySpot"
+        },
+        {
+          "js": "shaped",
+          "kind": "property",
+          "ts": "shaped: Shape",
+          "door": "Shape",
+          "csharp": "Shaped",
+          "type": "Shape"
+        },
+        {
+          "js": "constructor",
+          "kind": "property",
+          "ts": "constructor: string | null",
+          "door": "string?",
+          "csharp": "Constructor"
+        },
+        {
+          "js": "converted",
+          "kind": "property",
+          "ts": "converted: string",
+          "door": "ConvertedSpot",
+          "csharp": "Converted",
+          "type": "ConvertedSpot"
+        },
+        {
+          "js": "renamed_member",
+          "kind": "property",
+          "ts": "renamed_member: string",
+          "door": "string",
+          "csharp": "Renamed"
+        },
+        {
+          "js": "ignored",
+          "kind": "property",
+          "ts": "ignored: string",
+          "door": "string",
+          "csharp": "Ignored"
+        }
+      ]
+    },
+    {
+      "name": "Starts",
+      "kind": "data",
+      "what": "the app's C# class Starts, whose constructor takes no parameters, since System.Text.Json refuses Populate on a type whose constructor takes them (core-stj-populate-parameterized): Populated, which carries [JsonObjectCreationHandling(Populate)], GetterOnly, which has no setter, and Replaced each start at a Spot whose Place is binding start (D4.2)",
+      "members": [
+        {
+          "js": "populated",
+          "kind": "property",
+          "ts": "populated: Spot",
+          "door": "Spot",
+          "csharp": "Populated",
+          "type": "Spot"
+        },
+        {
+          "js": "getterOnly",
+          "kind": "property",
+          "ts": "getterOnly: Spot",
+          "door": "Spot",
+          "csharp": "GetterOnly",
+          "type": "Spot"
+        },
+        {
+          "js": "replaced",
+          "kind": "property",
+          "ts": "replaced: Spot",
+          "door": "Spot",
+          "csharp": "Replaced",
+          "type": "Spot"
+        }
+      ]
+    },
+    {
+      "name": "Spot",
+      "kind": "data",
+      "what": "the app's C# class Spot, whose own initializer sets Place to own start (D4.2)",
+      "members": [
+        {
+          "js": "place",
+          "kind": "property",
+          "ts": "place: string",
+          "door": "string",
+          "csharp": "Place"
+        }
+      ]
+    },
+    {
+      "name": "StrictSpot",
+      "kind": "data",
+      "what": "the app's C# class StrictSpot, whose Place carries [JsonRequired], so a holder that lacks it stops every read through it (D4.2)",
+      "members": [
+        {
+          "js": "place",
+          "kind": "property",
+          "ts": "place: string",
+          "door": "string",
+          "csharp": "Place"
+        },
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "SealedSpot",
+      "kind": "data",
+      "what": "the app's C# class SealedSpot, with only a private constructor, so the binding cannot create it (D4.2)",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "PolySpot",
+      "kind": "data",
+      "what": "the app's C# class PolySpot, marked [JsonPolymorphic], whose start hangs on the discriminator the data holds (D4.2)",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "string",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "Shape",
+      "kind": "data",
+      "members": [
+        {
+          "js": "number",
+          "kind": "property",
+          "ts": "number: number",
+          "door": "int",
+          "csharp": "Number"
+        }
+      ]
+    },
+    {
+      "name": "ConvertedSpot",
+      "kind": "data",
+      "what": "the app's C# class ConvertedSpot, whose own [JsonConverter] writes it as its Name, a text in the data (D7.7, X4.13)",
       "members": [
         {
           "js": "name",
@@ -1058,6 +1650,13 @@
           "ts": "readonly day: string",
           "door": "ReadOnly<DateTime>",
           "csharp": "Day"
+        },
+        {
+          "js": "time",
+          "kind": "readOnly",
+          "ts": "readonly time: string",
+          "door": "ReadOnly<TimeOnly>",
+          "csharp": "Time"
         },
         {
           "js": "record",
@@ -1156,6 +1755,15 @@
           "ts": "fill(names: string[]): void",
           "door": "Method",
           "csharp": "Fill(Arg<IReadOnlyList<string>> names)"
+        }
+      ],
+      "what": "the payload ConformanceComponent's Raised hands its listeners; Time is declared on net10 alone, where TimeOnly exists (X6.58)",
+      "behaviors": [
+        {
+          "behavior": "Act() makes the component show Payload acted.",
+          "tests": [
+            "X11.11"
+          ]
         }
       ]
     }

@@ -65,7 +65,7 @@ HEDGES = [
 HEDGE = re.compile(r"\b(" + "|".join(re.escape(word).replace(r"\ ", r"\s+") for word in HEDGES) + r")\b", re.IGNORECASE)
 PROSE_KEYS = {
     "meaning", "reason", "decision", "improvement", "page", "gesture", "outcome", "opposite", "defect", "oracle",
-    "summary", "why", "statement", "description", "cell", "lacks", "scan", "what",
+    "summary", "why", "statement", "description", "cell", "lacks", "scan", "what", "behavior",
 }
 
 
@@ -1869,6 +1869,32 @@ def syncfusion_problems(syncfusion, matrix):
     return problems
 
 
+def native_test_names():
+    names = set()
+    for path in feature_files():
+        for feature in json.loads(path.read_text()).get("features", []):
+            seen = Counter()
+            for promise in feature.get("promises", []):
+                names |= {promise["for"], f"{promise['for']} #{seen[promise['for']]}"}
+                seen[promise["for"]] += 1
+    return names | set(json.loads((SPEC / "Reference" / "native.json").read_text())["cells"])
+
+
+def check_native_behaviors():
+    native = json.loads((SPEC / "Reference" / "native.json").read_text())
+    known = native_test_names()
+    problems, count = [], 0
+    for declared in native["types"]:
+        for entry in declared.get("behaviors", []):
+            count += 1
+            problems += [f"{declared['name']} states a behavior with no sentence"] if not is_prose(entry.get("behavior")) else []
+            problems += [f"{declared['name']}'s behavior {entry.get('behavior', '')[:40]!r} names no test"] if not entry.get("tests") else []
+            problems += [f"{declared['name']}'s behavior names {test}, no test of the spec" for test in entry.get("tests", []) if test not in known]
+    holders = sum(1 for declared in native["types"] if declared.get("behaviors"))
+    detail = f"{count} behaviors on {holders} declarations of native.json, each naming tests of the spec"
+    return result(not problems, "; ".join(problems[:6]) or detail, behaviors=count, problems=len(problems))
+
+
 def check_matrix():
     paths = [SPEC / "Reference" / name for name in ["matrix.json", "syncfusion.json", "native.json"]]
     if any(not path.exists() for path in paths):
@@ -2266,6 +2292,7 @@ CHECKS = [
     ("fluent", "every module's sentences consistent", check_fluent),
     ("gate2", "owner gate 2: the fluent API", check_gate(2)),
     ("matrix", "the conformance matrix, every cell run by FusionMultiSelect's or ConformanceComponent's declaration", check_matrix),
+    ("native_behaviors", "every behavior native.json states names tests of the spec", check_native_behaviors),
     ("defects", "every defect on its highest rung, every core defect in a feature; no test for a type or analyzer defect", check_defects),
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
