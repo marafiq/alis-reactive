@@ -1,0 +1,613 @@
+{
+ "module": "FusionComponents",
+ "features": [
+  {
+   "id": "M21.F1",
+   "summary": "FusionMultiSelect, the reference slice (D17.8): one declaration of the Syncfusion MultiSelect by its JavaScript names, value, dataSource, dataBind, showPopup, hidePopup, change and filtering, each EJ2 33.1.47's public member; the payloads of change and filtering; the input it is, its value committed by change; and the render helpers that render it bound to a model member and name its fields. Main spreads the slice over seven files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value typed nullable as the vendor holds it and its data named as every framework read names it (M21.D1).",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionMultiSelect",
+    "Alis.Reactive.Fusion:FusionMultiSelectChangeArgs",
+    "Alis.Reactive.Fusion:FusionMultiSelectEvents",
+    "Alis.Reactive.Fusion:FusionMultiSelectExtensions",
+    "Alis.Reactive.Fusion:FusionMultiSelectFilteringArgs",
+    "Alis.Reactive.Fusion:FusionMultiSelectFilteringArgsExtensions",
+    "Alis.Reactive.Fusion:FusionMultiSelectHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionMultiSelectReactiveExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string ValueMember => \"value\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:16"
+    },
+    {
+     "line": "main",
+     "text": "\"change\", new FusionMultiSelectChangeArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectEvents.cs:15"
+    },
+    {
+     "line": "main",
+     "text": "ComponentProperty<object>.Named(\"dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectExtensions.cs:23"
+    },
+    {
+     "line": "main",
+     "text": "? ValueExpression.Null()",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectExtensions.cs:40"
+    },
+    {
+     "line": "main",
+     "text": "Text = JsonMemberName.Of(GetMemberName(text)),",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectHtmlExtensions.cs:35"
+    },
+    {
+     "line": "main",
+     "text": "internal static string Of(string memberName) => JsonNamingPolicy.CamelCase.ConvertName(memberName);",
+     "cite": "Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9"
+    },
+    {
+     "line": "main",
+     "text": "pipeline.AddStep(ReactionGraph.Set(PayloadSource.Event(), \"preventDefaultAction\", ValueExpression.Literal(true)));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/Events/FusionMultiSelectOnFiltering.cs:50"
+    },
+    {
+     "line": "main",
+     "text": "ComponentEventOnboarding.Wire(plan, componentId, Component.Vendor, typedEvent, pipeline);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectReactiveExtensions.cs:34"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<string[]> Value => Property<string[]>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:19"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<IEnumerable<TItem>> Items<TItem>() where TItem : class => Property<IEnumerable<TItem>>(\"dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:38"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<bool> PreventDefaultAction => Property<bool>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:68"
+    },
+    {
+     "line": "redesign",
+     "text": "=> Method(Pass<IEnumerable<object>, TItems>(items));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:74"
+    },
+    {
+     "line": "redesign",
+     "text": "Text = Field.Of(text).Name,",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:92"
+    },
+    {
+     "line": "redesign",
+     "text": "internal static string Of(MemberInfo member) => member.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name ?? Of(member.Name);",
+     "cite": "Alis.Reactive/Members/JsonMemberName.cs:11"
+    },
+    {
+     "line": "redesign",
+     "text": "var builder = field.Helper.EJS().MultiSelectFor(field.Expression)",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:139"
+    },
+    {
+     "line": "redesign",
+     "text": "return field.Render<global::Alis.Reactive.Fusion.FusionMultiSelect>(builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:142"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionMultiSelect declares value as Property<string[]?>, since EJ2's value holds null until a choice, so Value.Set(null) clears the selection as main's SetValue(null) does; dataSource as Items<TItem>(); dataBind, showPopup and hidePopup as methods; and change and filtering as events whose payload is the listener's first argument.",
+     "doors": [
+      "M21.N1",
+      "N5.4",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Change's payload reads value and isInteracted; Filtering's reads text, writes preventDefaultAction, and calls updateData with any source of a list, a response body's among them.",
+     "doors": [
+      "M21.N1",
+      "N5.6",
+      "N5.3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A FusionMultiSelect bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "doors": [
+      "M21.N1",
+      "M7.N3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "field.FusionMultiSelect(build => ..) renders the element under the field's id and binding name, starting at the member's value as M21.D1 writes it; field.FusionMultiSelect(items, build => ..) hands EJ2 the items the same way; and Fields<TItem>(text, value) and Fields<TItem>(text, value, groupBy) name each field as every framework read names it.",
+     "doors": [
+      "M21.N1",
+      "M7.N2",
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered FusionMultiSelect's Reactive(m => m.Change, pipeline) and Reactive(m => m.Filtering, pipeline) handle its events from the plan's start; p.Component<FusionMultiSelect>(m => m.Allergies) reaches it in any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N1"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectExtensions.cs:19-108"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectEvents.cs:13-20"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/Events/FusionMultiSelectOnFiltering.cs:46-75"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectHtmlExtensions.cs:28-80"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectReactiveExtensions.cs:22-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:16-143"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/requests/request-payload-writer.ts:84-91"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's MultiSelect as its TypeScript declares it (@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts, its FilteringEventArgs in src/drop-down-base/drop-down-base.d.ts, dataBind in @syncfusion/ej2-base/src/component.d.ts), checked member by member by scratchpad m21/tools/dts.py; its ASP.NET Core builder as the probes render it (fusion-ej2-builder-newtonsoft-defaults, fusion-ej2-builder-raw-json); and the browser.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X1",
+     "rung": "analyzer",
+     "defect": "The redesign declares Value as Property<string[]> (Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelect.cs:19 at 65fdf118d) where EJ2's value is number[] | string[] | boolean[] | object[] | null, null by default (@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:416), so an untouched box types as a list and main's clear, SetValue(null) (Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectExtensions.cs:36-41 at 623dd4a27), is a nullable warning: the vendor contract analyzer (N17.2) refuses the nullability by ALIS019, and the rewrite declares Property<string[]?>."
+    },
+    {
+     "id": "M21.X2",
+     "rung": "behavior",
+     "defect": "A text field named by a member that carries [JsonPropertyName(\"label\")] shows no text: in the redesign the field names label (Alis.Reactive/Members/JsonMemberName.cs:11 at 65fdf118d) while EJ2 writes the data handed over with the view through Newtonsoft as displayLabel (probe:fusion-ej2-builder-newtonsoft-defaults); in main the field names displayLabel, the camel case of the C# name (Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9 at 623dd4a27), while an endpoint's body, written by System.Text.Json, holds label. The rewrite names the field and writes the handed data by one writer (M21.D1, probe:fusion-ej2-builder-raw-json)."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X2",
+     "page": "An intake page whose allergy FusionMultiSelect is rendered with the items Penicillin and Latex handed over with the view, of an allergy class whose display label member carries [JsonPropertyName(\"label\")], and Fields(a => a.DisplayLabel, a => a.AllergyCode).",
+     "gesture": "Click the allergy box to open its list.",
+     "outcome": "The list shows Penicillin and Latex.",
+     "opposite": "Choosing Latex shows Latex in the box, and the form sends its code 9.",
+     "defect": "EJ2 writes the handed items through Newtonsoft as displayLabel while the field names label, so the list shows two empty options."
+    },
+    {
+     "for": "M21.X2",
+     "page": "An intake page whose Load allergies button requests the ward's allergies, which the endpoint writes as label and allergyCode, and sets them as the FusionMultiSelect's items, with Fields(a => a.DisplayLabel, a => a.AllergyCode) on the same allergy class.",
+     "gesture": "Click Load allergies, then click the allergy box to open its list.",
+     "outcome": "The list shows Penicillin and Latex.",
+     "opposite": "Before Load allergies is clicked, the list shows no options.",
+     "defect": "The field names displayLabel, the camel case of the C# name, while the body holds label, so the list shows two empty options, as main names fields."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionMultiSelect.ValueMember.get -> string!",
+     "verdict": "refused",
+     "reason": "A string names the component's value member, which ALIS009 refuses on the public surface, and main's browser reads that name as text (gather.ts:168 at 623dd4a27); the declaration names its typed value property and the event that commits it (M7.N3).",
+     "carriers": [
+      "M7.N3",
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectChangeArgs.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectChangeArgs.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N1",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectChangeArgs.Value.get -> string![]?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectChangeArgs.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N1",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectEvents.Changed.get -> TypedEvent<FusionMultiSelectChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectEvents.Filtering.get -> TypedEvent<FusionMultiSelectFilteringArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectFilteringArgs.Text.get -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectFilteringArgs.Text.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N1",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectFilteringArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "FusionMultiSelectReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectExtensions.DataBind<TModel>(this ComponentRef<FusionMultiSelect!, TModel!>! self) -> ComponentRef<FusionMultiSelect!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectExtensions.HidePopup<TModel>(this ComponentRef<FusionMultiSelect!, TModel!>! self) -> ComponentRef<FusionMultiSelect!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectExtensions.SetDataSource<TModel, TElement>(this ComponentRef<FusionMultiSelect!, TModel!>! self, TypedSource<TElement[]!>! source) -> ComponentRef<FusionMultiSelect!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectExtensions.SetDataSource<TModel, TResponse>(this ComponentRef<FusionMultiSelect!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> ComponentRef<FusionMultiSelect!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectExtensions.SetDataSource<TModel, TSource>(this ComponentRef<FusionMultiSelect!, TModel!>! self, TSource source, System.Linq.Expressions.Expression<System.Func<TSource, object?>!>! path) -> ComponentRef<FusionMultiSelect!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectExtensions.SetValue<TModel>(this ComponentRef<FusionMultiSelect!, TModel!>! self, string![]? value) -> ComponentRef<FusionMultiSelect!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectExtensions.ShowPopup<TModel>(this ComponentRef<FusionMultiSelect!, TModel!>! self) -> ComponentRef<FusionMultiSelect!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectExtensions.Value<TModel>(this ComponentRef<FusionMultiSelect!, TModel!>! self) -> TypedComponentSource<string![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectFilteringArgsExtensions.PreventDefault(this FusionMultiSelectFilteringArgs! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectFilteringArgsExtensions.UpdateData<TResponse>(this FusionMultiSelectFilteringArgs! args, IReactionEmitter! pipeline, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, object?>!>! path) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectHtmlExtensions.FusionMultiSelect<TModel, TProp>(this InputBoundField<TModel!, TProp>! setup, System.Action<Syncfusion.EJ2.DropDowns.MultiSelectBuilder!>! build) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1",
+      "M7.N2"
+     ]
+    },
+    {
+     "door": "static FusionMultiSelectReactiveExtensions.Reactive<TModel, TArgs>(this Syncfusion.EJ2.DropDowns.MultiSelectBuilder! builder, ReactivePlan<TModel!>! plan, System.Func<FusionMultiSelectEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> Syncfusion.EJ2.DropDowns.MultiSelectBuilder!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N1"
+     ]
+    },
+    {
+     "door": "static readonly FusionMultiSelectEvents.Instance -> FusionMultiSelectEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N1"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "M21.F2",
+   "summary": "The package: FusionComponent, the base of every Fusion declaration, which carries Syncfusion's vendor as data, its object at ej2_instances.0 on the element and its events heard by addEventListener and removeEventListener, so the one driver follows it as it follows an app's vendor; and the writing every Fusion render helper uses for the C# values it hands EJ2 (M21.D1), by which AddReactiveFusion, a registration that only sets Newtonsoft's process-wide default to camel case on both lines, leaves. Main names its vendor by the string fusion, which its runtime picks a driver by.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionComponent",
+    "Alis.Reactive.Fusion:ReactiveFusionServiceCollectionExtensions"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public string Vendor => \"fusion\";",
+     "cite": "Alis.Reactive.Fusion/FusionComponent.cs:14"
+    },
+    {
+     "line": "main",
+     "text": "JsonConvert.DefaultSettings = () => WithFusionNaming(appSettings());",
+     "cite": "Alis.Reactive.Fusion/ReactiveFusionServiceCollectionExtensions.cs:67"
+    },
+    {
+     "line": "redesign",
+     "text": "objectPath: \"ej2_instances.0\",",
+     "cite": "Alis.Reactive.Fusion/FusionComponent.cs:20"
+    },
+    {
+     "line": "redesign",
+     "text": "payload: VendorEventPayload.Argument);",
+     "cite": "Alis.Reactive.Fusion/FusionComponent.cs:23"
+    },
+    {
+     "line": "redesign",
+     "text": "public sealed override ComponentVendor Vendor => FusionVendor;",
+     "cite": "Alis.Reactive.Fusion/FusionComponent.cs:26"
+    },
+    {
+     "line": "redesign",
+     "text": "public static IServiceCollection AddReactiveFusion(this IServiceCollection services)",
+     "cite": "Alis.Reactive.Fusion/ReactiveFusionServiceCollectionExtensions.cs:49"
+    },
+    {
+     "line": "redesign",
+     "text": "JsonConvert.DefaultSettings = () => WithFusionNaming(appSettings());",
+     "cite": "Alis.Reactive.Fusion/ReactiveFusionServiceCollectionExtensions.cs:63"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionComponent.FusionVendor is ComponentVendor.Define(\"fusion\", objectPath: \"ej2_instances.0\", subscribe: \"addEventListener\", unsubscribe: \"removeEventListener\"), and each Fusion event declares its payload as the listener's first argument.",
+     "doors": [
+      "M21.N2",
+      "M12.N1",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "A Fusion render helper hands EJ2 the component's starting value and the items the view gives it as a JRaw of the text field.ValueJson and field.Json(options) write, so EJ2 writes them with the names and escapes the plan's own writer gives.",
+     "doors": [
+      "M21.N2",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "No Fusion door writes a Newtonsoft setting: an app's own JsonConvert calls keep the app's settings, and AddReactiveFusion leaves.",
+     "doors": [
+      "M21.N2"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "on",
+    "method"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/FusionComponent.cs:11-15"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/ReactiveFusionServiceCollectionExtensions.cs:51-74"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/FusionComponent.cs:12-27"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/ReactiveFusionServiceCollectionExtensions.cs:49-70"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:79-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q2",
+    "Q7"
+   ],
+   "meanings": [
+    {
+     "id": "M21.D1",
+     "meaning": "A Fusion render helper gives EJ2 each C# value it writes into the component's options, its starting value and the items the view hands it, as a Newtonsoft JRaw of the text the plan's one literal writer writes (D17.13, N17.10, D7.7), under the app's System.Text.Json options and escaped as M19.D3 escapes the plan, so the data names each member as every framework read names it (D2.9); EJ2 writes a JRaw as its text (probe:fusion-ej2-builder-raw-json). The vendor builder's own DataSource(object), reached through the build callback, stays the vendor's, named by the app's own Newtonsoft settings, since EJ2 writes C# data through JsonConvert.DefaultSettings (probe:fusion-ej2-builder-newtonsoft-defaults); no Fusion door writes a Newtonsoft setting, and AddReactiveFusion, which only set that default to camel case for the whole process, leaves."
+    }
+   ],
+   "oracle": "Syncfusion.EJ2.AspNet.Core 33.1.47's builder and ScriptManager as ASP.NET Core 10 MVC renders them (spec/probes/AspNetCoreBinding/FusionProbes.cs: fusion-ej2-builder-newtonsoft-defaults, fusion-ej2-builder-raw-json, fusion-ej2-script-text-escaped); Newtonsoft.Json 13.0.3's JsonConvert.DefaultSettings, process-wide by its type; EJ2 33.1.47's Component base as @syncfusion/ej2-base declares it; and the browser.",
+   "checker": [
+    "core:Q17",
+    "core:Q2"
+   ],
+   "defects": [
+    {
+     "id": "M21.X3",
+     "rung": "behavior",
+     "defect": "AddReactiveFusion sets Newtonsoft's JsonConvert.DefaultSettings to camel case for the whole process on both lines (Alis.Reactive.Fusion/ReactiveFusionServiceCollectionExtensions.cs:67 at 623dd4a27, :63 at 65fdf118d), so every JsonConvert call the app makes without settings of its own writes camel case names, a choice the app never made. The rewrite writes no Newtonsoft setting (M21.D1)."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X3",
+     "page": "An app that registers Fusion at startup, whose own preview endpoint returns a resident written by JsonConvert.SerializeObject with no settings of the app's, and a Preview button that loads the endpoint's text into a preview element.",
+     "gesture": "Click Preview.",
+     "outcome": "The preview shows {\"ResidentId\":7,\"GivenName\":\"Rose\"}.",
+     "opposite": "The same endpoint written under the app's own camel-case JsonSerializerSettings shows {\"residentId\":7,\"givenName\":\"Rose\"}: the app's settings decide.",
+     "defect": "Registering Fusion sets Newtonsoft's process-wide default to camel case, so the app's own call writes residentId and givenName although the app chose nothing."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionComponent.Vendor.get -> string!",
+     "verdict": "refused",
+     "reason": "A vendor named by a string the runtime picks a driver by, native or fusion (Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89-90 at 623dd4a27), so the runtime names each vendor it serves. The rewrite carries the vendor as data the one driver follows (D17.3): the ComponentVendor a declaration names (M12.N1).",
+     "carriers": [
+      "M12.N1"
+     ]
+    }
+   ]
+  }
+ ]
+}
