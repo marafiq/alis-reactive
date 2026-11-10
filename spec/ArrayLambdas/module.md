@@ -24,7 +24,8 @@ a list of live objects a declaration declares. Module 4 of `spec/CLAUDE.md`.
 
 ## Doors
 
-Module 4 adds no door of its own: every capability its doors carry is a core door.
+Module 4 adds no door of its own: every capability its doors carry is a core door. The suppressor that lets a data
+lambda read past a holder that holds null with no `!` is N6.3 (D6.14), whose code is module 20's.
 
 - `p.From(source)` leaves, all five overloads: the operations are extension methods on `ITypedSource<IEnumerable<T>>`
   (N6.1, N6.4, D6.10), so they extend the source itself, any list a model declares, and no door starts them. Main's

@@ -849,7 +849,21 @@ def check_doors_mapped():
     problems = list(model["problems"])
     if counts["doubled"]:
         problems.append(f"{counts['doubled']} spec doors in two features")
-    return feature_result(problems, counts, counts["unmapped"] == 0, "every spec door in exactly one feature")
+    homeless = homeless_core_doors(all_new_doors(design_sections() or {}))
+    counts["core_doors_homeless"] = len(homeless)
+    if not problems and homeless:
+        return result(False, f"every feature row valid; {counts['unmapped']} of {counts['rows']} spec doors in no feature; core doors no module names: {', '.join(homeless)}", **counts)
+    return feature_result(problems, counts, counts["unmapped"] == 0, "every spec door in exactly one feature, every core door named by a module")
+
+
+CORE_DOOR_NAMED = re.compile(r"\bN\d+\.\d+\b")
+
+
+def homeless_core_doors(doors):
+    named = set()
+    for path in list(SPEC.glob("*/module.md")) + list(feature_files()):
+        named |= set(CORE_DOOR_NAMED.findall(path.read_text()))
+    return sorted(doors - named, key=lambda door: tuple(int(part) for part in door[1:].split(".")))
 
 
 def door_target_problems(feature, verdict, field, doors):

@@ -21,6 +21,10 @@ the page's own URL read as a source. Module 2 of `spec/CLAUDE.md`.
 
 Each name is gate 2's; each door is the capability it carries.
 
+Kept from the core (Q7): a list built from sources, `p.List<T>([first, second])` (N7.2); `IfNull` on a source of a
+nullable type and `Choose` on a `TypedSource<bool>` (N7.4); and `OrNull()`, a source read as its nullable type at an
+argument or in a comparison, where C# offers no widening overload (N7.5, D7.3).
+
 - `M2.N1` kept: `TypedSource<T>`, the one source type of D7.2, abstract with an internal constructor, so a view reads
   a value only through D7.2's doors. A declared member is a source itself: a property's `ReadOnly<T>` and
   `Property<T>`, a method's `MethodResult<T>`, a payload's or a body's `Data<T>.Read` (N5.6), so no kind of source
