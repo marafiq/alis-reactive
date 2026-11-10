@@ -2284,6 +2284,33 @@
       "probe": "html-script-text.mjs",
       "expect": "html-script-text-ends-at-close-tag: a script whose text holds {\"name\":\"</script><b>Ada</b>\"} ends at its </script>, its text \"{\\\"name\\\":\\\"\", and the rest parses as markup with 1 b element; with <, > and & written as \\u003C, \\u003E and \\u0026 the text is the whole JSON true, no b element parses (0) and JSON.parse reads the name back true",
       "source": "spec/probes/html-script-text.mjs"
+    },
+    {
+      "id": "fusion-ej2-builder-newtonsoft-defaults",
+      "statement": "Syncfusion EJ2 33.1.47's ASP.NET Core builder writes a C# data source through Newtonsoft's JsonConvert.DefaultSettings, so its member names follow that process-wide setting and never a System.Text.Json JsonPropertyName.",
+      "host": "net10",
+      "oracle": "Syncfusion.EJ2.AspNet.Core 33.1.47's MultiSelect builder and ScriptManager, rendered by ASP.NET Core 10 MVC",
+      "probe": "AspNetCoreBinding",
+      "expect": "fusion-ej2-builder-newtonsoft-defaults: EJ2's MultiSelect writes its C# dataSource as [{\"AllergyCode\": 7,\"DisplayLabel\": \"Penicillin\"},{\"AllergyCode\": 9,\"DisplayLabel\": \"\\u003c/script\\u003e\\u003cb\\u003eAda\\u003c/b\\u003e\"}] with no Newtonsoft default settings, and as [{\"allergyCode\": 7,\"displayLabel\": \"Penicillin\"},{\"allergyCode\": 9,\"displayLabel\": \"\\u003c/script\\u003e\\u003cb\\u003eAda\\u003c/b\\u003e\"}] under AddReactiveFusion's camel case; System.Text.Json writes [{\"allergyCode\":7,\"label\":\"Penicillin\"},{\"allergyCode\":9,\"label\":\"\\u003C/script\\u003E\\u003Cb\\u003EAda\\u003C/b\\u003E\"}]",
+      "source": "spec/probes/AspNetCoreBinding/FusionProbes.cs"
+    },
+    {
+      "id": "fusion-ej2-builder-raw-json",
+      "statement": "Syncfusion EJ2 33.1.47's builder writes a Newtonsoft JRaw data source as its text, so data written by System.Text.Json keeps its names and its escapes whatever Newtonsoft's default settings are.",
+      "host": "net10",
+      "oracle": "Syncfusion.EJ2.AspNet.Core 33.1.47's MultiSelect builder and ScriptManager, rendered by ASP.NET Core 10 MVC",
+      "probe": "AspNetCoreBinding",
+      "expect": "fusion-ej2-builder-raw-json: a Newtonsoft JRaw of System.Text.Json's text, under AddReactiveFusion's camel case, is written as [{\"allergyCode\":7,\"label\":\"Penicillin\"},{\"allergyCode\":9,\"label\":\"\\u003C/script\\u003E\\u003Cb\\u003EAda\\u003C/b\\u003E\"}]",
+      "source": "spec/probes/AspNetCoreBinding/FusionProbes.cs"
+    },
+    {
+      "id": "fusion-ej2-script-text-escaped",
+      "statement": "Syncfusion EJ2 33.1.47's builder writes < and > of a C# string as \\u003c and \\u003e into the page's script element, so a value cannot close it.",
+      "host": "net10",
+      "oracle": "Syncfusion.EJ2.AspNet.Core 33.1.47's MultiSelect builder and ScriptManager, rendered by ASP.NET Core 10 MVC",
+      "probe": "AspNetCoreBinding",
+      "expect": "fusion-ej2-script-text-escaped: EJ2 writes the label </script><b>Ada</b> into the page's script element with < and > as \\u003c and \\u003e, and as is False",
+      "source": "spec/probes/AspNetCoreBinding/FusionProbes.cs"
     }
   ]
 }

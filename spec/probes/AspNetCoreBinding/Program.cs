@@ -198,6 +198,7 @@ try
     FluentDateProbes.Run();
     await NamingProbes.Run();
     RenderProbes.Run(app.Services, app.Environment.WebRootPath);
+    await FusionProbes.Run(client);
 }
 finally
 {

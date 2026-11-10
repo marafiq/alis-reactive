@@ -1,0 +1,4 @@
+@using Syncfusion.EJ2
+@model IReadOnlyList<FusionAllergyProbe>
+@Html.EJS().MultiSelect("allergies").DataSource(Model).Render()
+@Html.EJS().ScriptManager()

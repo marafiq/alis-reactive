@@ -824,3 +824,5 @@
   Evidence: check_defects at f9151b5bd passed on a full row set with any core defect unplaced; DESIGN:1298-1329.
 - 2026-11-09 the seven Q7 defects placed: X7.2 and X7.4 (type, N7.3) in M3.F1, which names N7.3; X7.6, X7.7, X7.11 and X7.12 (N7.4, N7.5, D7.7) in M2.F1; X7.9 (N7.6) in M11.F1, which keeps NullableWrites.Set; eleven promises, one per place each line names.
   Evidence: DESIGN:1298-1333; Conditions/module.md:13, ValuesAndSources/module.md:25-26, Declarations/module.md:47.
+- 2026-11-09 probes, for module 21: EJ2 33.1.47's builder writes C# data through Newtonsoft's JsonConvert.DefaultSettings (PascalCase unset, camel case under AddReactiveFusion), never by a JsonPropertyName, so `Field.Of(x => x.DisplayLabel)` names `label` while the data holds `displayLabel`; a JRaw of System.Text.Json's text passes through as written; EJ2 escapes < and >.
+  Evidence: fusion-ej2-builder-newtonsoft-defaults, fusion-ej2-builder-raw-json and fusion-ej2-script-text-escaped in spec/probes/facts.json, printed by spec/probes/AspNetCoreBinding/FusionProbes.cs.
