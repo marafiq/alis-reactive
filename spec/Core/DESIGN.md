@@ -2717,7 +2717,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - A slot announces its unmount before its content is replaced (`Alis.Reactive.Assets/runtime/plugins/slot.ts:24-38`).
 - B15: a declaration drifts from its vendor's return type today: `FusionGrid` declares its exports with `Method()`
   (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:207-213`), while the grid's `.d.ts` declares
-  `excelExport` and `pdfExport` returning a Promise. Under D11.3 each such call stops its pipeline until the
+  `excelExport`, `csvExport` and `pdfExport` returning a Promise (EJ2 33.1.47's `grid.d.ts`, lines 3849, 3859 and
+  3870). Under D11.3 each such call stops its pipeline until the
   declaration says `MethodAsync`.
 - G9: an app event is declared once and shared by its dispatcher and its listener
   (`Alis.Reactive/PlanAuthoring/Events/AppEvent.cs:41-43`), so a dispatch is a trigger like any other (D11.6).

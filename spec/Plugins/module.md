@@ -25,17 +25,17 @@ Module 13 of `spec/CLAUDE.md`.
 
 A vendor's data, its listening kinds and the one driver are module 12's, and so is the bridge: `alis:mount`,
 `alis:unmount` and the page's plugin queue, with its improvement, a push after boot registered at once. A vendor's
-lookup (N17.6) is module 12's door, and the plugin it finds is found as this module finds any plugin, under M13.D1.
-The declaration vocabulary, `JsObject`, its doors and their presence marks, is module 11's. The app-level objects are
-modules 23 and 25's: FusionConfirm and FusionToast, NativeConfirm, NativeToast, NativeDrawer and NativeLoader, and
-the row actions' plugin `native-row-actions` (N17.12). Realtime's plugins `alis.hub` and `alis.stream` and the
-contract `reconnect` are module 10's (D21.6, D21.11); the request's contracts `busy` and `notice` are module 6's
-(D10.21), and `GatherBuilder.Plugin` is M6.F1's. `alis.form` is module 8's, `alis.slot` module 9's, `alis.model`'s
-inputs module 7's and `alis.document`'s events module 1's. `TypedPluginSource` and `TypedPluginPropertySource` are
-M2.F1's, carried by M2.N1. The locator `plugin` and the plugin data `none` are module 14's grammar, boot's order is
-module 17's, and ALIS034's code (N18.12) is module 20's. A page plugin's listener released by a card, X12.15 to
-X12.17, is placed with modules 9 and 12 (M9.F2, M12.F1). X2.2 is here because its subject is a plugin; N2.1, the
-derivation that leaves the core's `alis.model` no text door, is module 15's.
+lookup (N17.6) is module 12's door, and the plugin it finds is found as this module finds any plugin, under M13.D1. The
+declaration vocabulary, `JsObject`, its doors and their presence marks, is module 11's. The app-level objects are
+modules 23 and 25's: FusionConfirm and FusionToast, NativeConfirm, NativeToast, NativeDrawer and NativeLoader, and the
+row actions' plugin `native-row-actions` (N17.12). Realtime's plugins `alis.hub` and `alis.stream` and the contract
+`reconnect` are module 10's (D21.6, D21.11); the request's contracts `busy` and `notice` are module 6's (D10.21), and
+`GatherBuilder.Plugin` is M6.F1's. `alis.form` is module 8's, `alis.slot` module 9's, `alis.model`'s inputs module 7's
+and `alis.document`'s events module 1's. `TypedPluginSource` and `TypedPluginPropertySource` are M2.F1's, carried by
+M2.N1. The locator `plugin` and the plugin data `none` are module 14's grammar, boot's order is module 1's (M1.D1,
+D17.3), which module 17 runs as one pass (D11.12), and ALIS034's code (N18.12) is module 20's. A page plugin's listener
+released by a card, X12.15 to X12.17, is placed with modules 9 and 12 (M9.F2, M12.F1). X2.2 is here because its subject
+is a plugin; N2.1, the derivation that leaves the core's `alis.model` no text door, is module 15's.
 
 ## Doors
 

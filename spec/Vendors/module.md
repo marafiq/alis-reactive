@@ -32,18 +32,19 @@ of a release, the check that the element still holds the object (X12.7, X12.13) 
 its removal (X12.16), is this module's. NativeConfirm and NativeToast (N17.4, X17.6 to X17.9) and the row actions
 (D17.15, N17.12, X17.31 to X17.38) are module 25's; Syncfusion's vendor and the native components are modules 21 and 24.
 The analyzers' code (N17.2, N18.9, N18.12) is module 20's, and the rules they hold a vendor to are this module's
-defects. Boot's order is module 17's, the schema's `vendors` map module 14's with X19.4, and a render helper's starting
-state (D17.13, N17.10) module 7's.
+defects. Boot's order is module 1's (M1.D1, D17.3), which module 17 runs as one pass (D11.12), the schema's `vendors`
+map module 14's with X19.4, and a render helper's starting state (D17.13, N17.10) module 7's.
 
 ## Doors
 
 Each name is gate 2's; each door is the capability it carries.
 
-Kept from the core (Q17): `ComponentVendor.Define`, `ComponentVendor.DefineCallbackProperties`,
-`ComponentVendor.Native` and `ComponentVendor.Name`, a vendor written as text reading as its name; the lookup (N17.6),
-the returned unsubscriber (N17.7), the payload's place (N17.1), `Argument<T>(n)` and `MethodAt(n, ..)` (N17.8),
-`Callback<TArgs, TResult>` and `Answer` (N17.9), the vendor contract (N17.2) and `listen` (N12.1). The redesign's
-`VendorEventPayload`, a payload kind on the vendor, leaves with D17.4: the payload's place is each handler's.
+Kept from the core (Q17): `ComponentVendor.Define`, `ComponentVendor.DefineCallbackProperties`, `ComponentVendor.Native`
+and `ComponentVendor.Name`, a vendor written as text reading as its name; the lookup (N17.6), the returned unsubscriber
+(N17.7), the payload's place (N17.1), `Argument<T>(n)` and `MethodAt(n, ..)` (N17.8), `Callback<TArgs, TResult>` and
+`Answer` (N17.9), the argument kind that carries a block's abort signal (N17.5, D17.11), the vendor contract (N17.2) and
+`listen` (N12.1). The redesign's `VendorEventPayload`, a payload kind on the vendor, leaves with D17.4: the payload's
+place is each handler's.
 
 - `M12.N1` kept: `Component`, the base of a component's declaration, a live object whose listening is its vendor's
   (D12.8), and `IComponent.Vendor`, the `ComponentVendor` a declaration carries (D17.3). It replaces main's
