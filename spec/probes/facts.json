@@ -3543,6 +3543,36 @@
       }
     },
     {
+      "id": "ej2-multiselect-item-template-text",
+      "statement": "EJ2 33.1.47's MultiSelect compiles a string itemTemplate with its template engine for each item of its list, so a helper read writes the item's member as text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its MultiSelect's itemTemplate compiled by its string template engine, driven by Playwright 1.63.0 with a real click",
+      "probe": "ej2-template-multiselect.mjs",
+      "expect": "ej2-multiselect-item-template-text: the list shows 2 items, names Penicillin|<i>Latex</i>, 0 i elements",
+      "source": "spec/probes/ej2-template-multiselect.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "An intake page whose allergy FusionMultiSelect renders its items with the item template FusionTemplate.Create<Allergy>().Span(m => m.Name).Render(plan), over Penicillin and an allergy named <i>Latex</i>.",
+        "gesture": "Click the allergy box to open its list.",
+        "outcome": "The list reads Penicillin and <i>Latex</i> as text, and holds no italic element."
+      }
+    },
+    {
+      "id": "ej2-multiselect-item-template-condition",
+      "statement": "EJ2 33.1.47's MultiSelect evaluates its itemTemplate's own condition on each item of its list.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its MultiSelect's itemTemplate compiled by its string template engine, driven by Playwright 1.63.0 with a real click",
+      "probe": "ej2-template-multiselect.mjs",
+      "expect": "ej2-multiselect-item-template-condition: the items read Severe|Mild",
+      "source": "spec/probes/ej2-template-multiselect.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "An intake page whose allergy FusionMultiSelect renders its items with an item template holding When(m => m.Severity == \"severe\", then: t => t.Badge(\"Severe\"), @else: e => e.Span(\"Mild\")), over Penicillin, severe, and Latex, mild.",
+        "gesture": "Click the allergy box to open its list.",
+        "outcome": "Penicillin's item shows the badge Severe and Latex's shows Mild."
+      }
+    },
+    {
       "id": "ej2-toast-content-markup",
       "statement": "EJ2 33.1.47's Toast writes a content string that parses as no selector as sanitized HTML, so a b element in it renders.",
       "host": "browser",

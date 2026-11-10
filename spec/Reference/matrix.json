@@ -1,0 +1,1888 @@
+{
+  "source": "spec/BRIEF.md section 8, \"The conformance matrix\"",
+  "granularity": "one cell per item a bullet names; the source cells are D7.1's positions, one each; the POC 15 bullet is each of its eight doors on the payload and on an object it holds, before and after an await",
+  "groups": [
+    {
+      "id": "properties",
+      "title": "Properties"
+    },
+    {
+      "id": "methods",
+      "title": "Methods"
+    },
+    {
+      "id": "events",
+      "title": "Events"
+    },
+    {
+      "id": "absence",
+      "title": "Absence"
+    },
+    {
+      "id": "source",
+      "title": "As a source"
+    },
+    {
+      "id": "http",
+      "title": "HTTP"
+    },
+    {
+      "id": "lanes",
+      "title": "Other lanes"
+    },
+    {
+      "id": "templates",
+      "title": "Templates"
+    },
+    {
+      "id": "validation",
+      "title": "Validation"
+    }
+  ],
+  "bullets": [
+    {
+      "group": "properties",
+      "brief": "read and write a scalar",
+      "cells": [
+        "prop.scalar.read",
+        "prop.scalar.write"
+      ]
+    },
+    {
+      "group": "properties",
+      "brief": "read and write a dotted member (`fields.text`, `pageSettings.pageSize`)",
+      "cells": [
+        "prop.dotted.read",
+        "prop.dotted.write"
+      ]
+    },
+    {
+      "group": "properties",
+      "brief": "an object a property holds, its members read and written",
+      "cells": [
+        "prop.object.memberRead",
+        "prop.object.memberWrite"
+      ]
+    },
+    {
+      "group": "properties",
+      "brief": "a list of objects a property holds, its items read through an array lambda",
+      "cells": [
+        "prop.list.lambda"
+      ]
+    },
+    {
+      "group": "properties",
+      "brief": "read-only and write-only",
+      "cells": [
+        "prop.readOnly",
+        "prop.writeOnly"
+      ]
+    },
+    {
+      "group": "methods",
+      "brief": "a call that returns nothing",
+      "cells": [
+        "method.void"
+      ]
+    },
+    {
+      "group": "methods",
+      "brief": "a returned value (`Method<T>`)",
+      "cells": [
+        "method.value"
+      ]
+    },
+    {
+      "group": "methods",
+      "brief": "a returned object, its members read and its methods called (`Object<T>`)",
+      "cells": [
+        "method.object.memberRead",
+        "method.object.methodCall"
+      ]
+    },
+    {
+      "group": "methods",
+      "brief": "a returned promise (`MethodAsync`, `MethodAsync<T>`)",
+      "cells": [
+        "method.async.void",
+        "method.async.value"
+      ]
+    },
+    {
+      "group": "methods",
+      "brief": "arguments that are a scalar, an object or a list",
+      "cells": [
+        "method.arg.scalar",
+        "method.arg.object",
+        "method.arg.list"
+      ]
+    },
+    {
+      "group": "events",
+      "brief": "a scalar payload",
+      "cells": [
+        "event.scalar"
+      ]
+    },
+    {
+      "group": "events",
+      "brief": "a nested-object payload",
+      "cells": [
+        "event.object"
+      ]
+    },
+    {
+      "group": "events",
+      "brief": "a list payload",
+      "cells": [
+        "event.list"
+      ]
+    },
+    {
+      "group": "events",
+      "brief": "a payload that carries a method the pipeline calls",
+      "cells": [
+        "event.method"
+      ]
+    },
+    {
+      "group": "events",
+      "brief": "a payload member that holds a promise, its read stopping the pipeline",
+      "cells": [
+        "event.promise"
+      ]
+    },
+    {
+      "group": "events",
+      "brief": "an async method three objects deep in the payload (`MethodAsync<T>` on an object an object of the payload holds), awaited before the next step, and the payload read again after the await",
+      "cells": [
+        "event.deepAsync"
+      ]
+    },
+    {
+      "group": "events",
+      "brief": "every door POC 15 proved on a payload and on an object it holds, before and after an await: `WriteOnly`, `LiveObjects`, `Method<T>`, `MethodAsync<T>`, `ReturnedObject`, `ReturnedObjects`, `Callback`, and a payload that is a component",
+      "cells": [
+        "event.poc15.writeOnly.payload.before",
+        "event.poc15.writeOnly.payload.after",
+        "event.poc15.writeOnly.held.before",
+        "event.poc15.writeOnly.held.after",
+        "event.poc15.liveObjects.payload.before",
+        "event.poc15.liveObjects.payload.after",
+        "event.poc15.liveObjects.held.before",
+        "event.poc15.liveObjects.held.after",
+        "event.poc15.methodValue.payload.before",
+        "event.poc15.methodValue.payload.after",
+        "event.poc15.methodValue.held.before",
+        "event.poc15.methodValue.held.after",
+        "event.poc15.methodAsyncValue.payload.before",
+        "event.poc15.methodAsyncValue.payload.after",
+        "event.poc15.methodAsyncValue.held.before",
+        "event.poc15.methodAsyncValue.held.after",
+        "event.poc15.returnedObject.payload.before",
+        "event.poc15.returnedObject.payload.after",
+        "event.poc15.returnedObject.held.before",
+        "event.poc15.returnedObject.held.after",
+        "event.poc15.returnedObjects.payload.before",
+        "event.poc15.returnedObjects.payload.after",
+        "event.poc15.returnedObjects.held.before",
+        "event.poc15.returnedObjects.held.after",
+        "event.poc15.callback.payload.before",
+        "event.poc15.callback.payload.after",
+        "event.poc15.callback.held.before",
+        "event.poc15.callback.held.after",
+        "event.poc15.component.payload.before",
+        "event.poc15.component.payload.after",
+        "event.poc15.component.held.before",
+        "event.poc15.component.held.after"
+      ]
+    },
+    {
+      "group": "absence",
+      "brief": "a declared member the object lacks",
+      "cells": [
+        "absence.member"
+      ]
+    },
+    {
+      "group": "absence",
+      "brief": "data past a declared member",
+      "cells": [
+        "absence.past"
+      ]
+    },
+    {
+      "group": "absence",
+      "brief": "a promise where a value was declared",
+      "cells": [
+        "absence.promise"
+      ]
+    },
+    {
+      "group": "source",
+      "brief": "the component's member at every value position of Q7",
+      "cells": [
+        "source.PropertySet",
+        "source.WriteOnlySet",
+        "source.ElementText",
+        "source.ElementHtml",
+        "source.ElementClass",
+        "source.ConditionLeft",
+        "source.ConditionRight",
+        "source.TextTestOperand",
+        "source.MatchesPattern",
+        "source.RequestMember",
+        "source.Header",
+        "source.DispatchPayloadMember",
+        "source.MethodArgument",
+        "source.PluginArgument",
+        "source.HubArgument"
+      ]
+    },
+    {
+      "group": "http",
+      "brief": "Get, Post, Put and Delete gathering from the component",
+      "cells": [
+        "http.get",
+        "http.post",
+        "http.put",
+        "http.delete"
+      ]
+    },
+    {
+      "group": "http",
+      "brief": "route, query, header, static and hidden values beside it",
+      "cells": [
+        "http.beside.route",
+        "http.beside.query",
+        "http.beside.header",
+        "http.beside.static",
+        "http.beside.hidden"
+      ]
+    },
+    {
+      "group": "http",
+      "brief": "`Into`",
+      "cells": [
+        "http.into"
+      ]
+    },
+    {
+      "group": "http",
+      "brief": "`WhileLoading`",
+      "cells": [
+        "http.whileLoading"
+      ]
+    },
+    {
+      "group": "http",
+      "brief": "`Response` success and error, reading the body into the component",
+      "cells": [
+        "http.response.success",
+        "http.response.error"
+      ]
+    },
+    {
+      "group": "http",
+      "brief": "`Chained`",
+      "cells": [
+        "http.chained"
+      ]
+    },
+    {
+      "group": "http",
+      "brief": "`Parallel`",
+      "cells": [
+        "http.parallel"
+      ]
+    },
+    {
+      "group": "http",
+      "brief": "`Finally`",
+      "cells": [
+        "http.finally"
+      ]
+    },
+    {
+      "group": "lanes",
+      "brief": "Confirm before a write",
+      "cells": [
+        "lane.confirm"
+      ]
+    },
+    {
+      "group": "lanes",
+      "brief": "a server push into the component",
+      "cells": [
+        "lane.push"
+      ]
+    },
+    {
+      "group": "lanes",
+      "brief": "the component inside a partial loaded into a slot, and unloaded: its listener removed, unless its host destroyed it",
+      "cells": [
+        "lane.slot.load",
+        "lane.slot.unloadListener",
+        "lane.slot.hostDestroyed"
+      ]
+    },
+    {
+      "group": "templates",
+      "brief": "a template the component renders, with a template conditional",
+      "cells": [
+        "template.render",
+        "template.conditional"
+      ]
+    },
+    {
+      "group": "validation",
+      "brief": "the component as a validated input: a rule, a validator condition on its member, live re-validation on its commit event, and the summary",
+      "cells": [
+        "validation.rule",
+        "validation.condition",
+        "validation.live",
+        "validation.summary"
+      ]
+    },
+    {
+      "group": "validation",
+      "brief": "inside a list item",
+      "cells": [
+        "validation.listItem"
+      ]
+    },
+    {
+      "group": "validation",
+      "brief": "under `HtmlFieldPrefix` in a partial, where its four names agree",
+      "cells": [
+        "validation.prefix"
+      ]
+    }
+  ],
+  "cells": [
+    {
+      "id": "prop.scalar.read",
+      "group": "properties",
+      "cell": "read a scalar property",
+      "meaning": [
+        "D5.1",
+        "D5.3"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "prop.scalar.write",
+      "group": "properties",
+      "cell": "write a scalar property",
+      "meaning": [
+        "D5.1",
+        "D5.3"
+      ],
+      "kinds": [
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "prop.dotted.read",
+      "group": "properties",
+      "cell": "read a member one object down a property, by its dotted path",
+      "meaning": [
+        "D5.4"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "prop.dotted.write",
+      "group": "properties",
+      "cell": "write a member one object down a property, by its dotted path",
+      "meaning": [
+        "D5.4"
+      ],
+      "kinds": [
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "prop.object.memberRead",
+      "group": "properties",
+      "cell": "read a member of the live object a property holds (`LiveObject<T>`)",
+      "meaning": [
+        "D5.1",
+        "D5.8"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "prop.object.memberWrite",
+      "group": "properties",
+      "cell": "write a member of the live object a property holds (`LiveObject<T>`)",
+      "meaning": [
+        "D5.1",
+        "D5.8"
+      ],
+      "kinds": [
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "prop.list.lambda",
+      "group": "properties",
+      "cell": "read the items of a list of objects a property holds through an array lambda",
+      "meaning": [
+        "D6.1",
+        "D6.8"
+      ],
+      "kinds": [
+        "get",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "prop.readOnly",
+      "group": "properties",
+      "cell": "read a read-only property, which no write door takes",
+      "meaning": [
+        "D5.3",
+        "X5.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "prop.writeOnly",
+      "group": "properties",
+      "cell": "write a write-only property, which no read door takes",
+      "meaning": [
+        "D5.3",
+        "D7.1"
+      ],
+      "kinds": [
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.void",
+      "group": "methods",
+      "cell": "call a method that returns nothing",
+      "meaning": [
+        "D5.9"
+      ],
+      "kinds": [
+        "do",
+        "call"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.value",
+      "group": "methods",
+      "cell": "read the value a method returns (`Method<T>`)",
+      "meaning": [
+        "D5.9",
+        "D5.11"
+      ],
+      "kinds": [
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.object.memberRead",
+      "group": "methods",
+      "cell": "read a member of the object a method returns (`ReturnedObject<T>`)",
+      "meaning": [
+        "D5.5",
+        "D5.11"
+      ],
+      "kinds": [
+        "call",
+        "let",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.object.methodCall",
+      "group": "methods",
+      "cell": "call a method of the object a method returns (`ReturnedObject<T>`)",
+      "meaning": [
+        "D5.5",
+        "X5.3"
+      ],
+      "kinds": [
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.async.void",
+      "group": "methods",
+      "cell": "await a method whose promise holds nothing (`MethodAsync`) before the next step",
+      "meaning": [
+        "D11.3",
+        "X4.11"
+      ],
+      "kinds": [
+        "do",
+        "call"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.async.value",
+      "group": "methods",
+      "cell": "await a method's promise and read its value (`MethodAsync<T>`)",
+      "meaning": [
+        "D11.3",
+        "X4.11"
+      ],
+      "kinds": [
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.arg.scalar",
+      "group": "methods",
+      "cell": "call a method with a scalar argument",
+      "meaning": [
+        "D5.9",
+        "D7.1"
+      ],
+      "kinds": [
+        "call",
+        "lit"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.arg.object",
+      "group": "methods",
+      "cell": "call a method with an object argument built from sources",
+      "meaning": [
+        "D5.9",
+        "D7.4"
+      ],
+      "kinds": [
+        "call",
+        "record"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "method.arg.list",
+      "group": "methods",
+      "cell": "call a method with a list argument",
+      "meaning": [
+        "D5.9",
+        "D7.4"
+      ],
+      "kinds": [
+        "call",
+        "list"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.scalar",
+      "group": "events",
+      "cell": "read a scalar member of an event's payload",
+      "meaning": [
+        "D5.6",
+        "D17.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.object",
+      "group": "events",
+      "cell": "read a member of an object an event's payload holds",
+      "meaning": [
+        "D5.4",
+        "D5.6",
+        "D17.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.list",
+      "group": "events",
+      "cell": "read the items of a list an event's payload holds through an array lambda",
+      "meaning": [
+        "D5.6",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.method",
+      "group": "events",
+      "cell": "call a method an event's payload carries",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.promise",
+      "group": "events",
+      "cell": "read a payload member declared as a value that holds a promise, which stops the pipeline",
+      "meaning": [
+        "D4.3",
+        "D5.6"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.deepAsync",
+      "group": "events",
+      "cell": "await a `MethodAsync<T>` on an object an object of the payload holds, then read the payload again",
+      "meaning": [
+        "D5.6",
+        "D11.3",
+        "D11.4",
+        "X4.11"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.writeOnly.payload.before",
+      "group": "events",
+      "cell": "`WriteOnly`, written on the payload before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.writeOnly.payload.after",
+      "group": "events",
+      "cell": "`WriteOnly`, written on the payload after an await, refused where the view renders",
+      "meaning": [
+        "D11.4",
+        "X11.1"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "set"
+      ],
+      "outcome": "refused"
+    },
+    {
+      "id": "event.poc15.writeOnly.held.before",
+      "group": "events",
+      "cell": "`WriteOnly`, written on an object the payload holds before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.writeOnly.held.after",
+      "group": "events",
+      "cell": "`WriteOnly`, written on an object the payload holds after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "X11.9"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.liveObjects.payload.before",
+      "group": "events",
+      "cell": "`LiveObjects`, its items read through an array lambda on the payload before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.liveObjects.payload.after",
+      "group": "events",
+      "cell": "`LiveObjects`, its items read through an array lambda on the payload after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.liveObjects.held.before",
+      "group": "events",
+      "cell": "`LiveObjects`, its items read through an array lambda on an object the payload holds before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.liveObjects.held.after",
+      "group": "events",
+      "cell": "`LiveObjects`, its items read through an array lambda on an object the payload holds after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.methodValue.payload.before",
+      "group": "events",
+      "cell": "`Method<T>`, its value read on the payload before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.methodValue.payload.after",
+      "group": "events",
+      "cell": "`Method<T>`, its value read on the payload after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.methodValue.held.before",
+      "group": "events",
+      "cell": "`Method<T>`, its value read on an object the payload holds before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.methodValue.held.after",
+      "group": "events",
+      "cell": "`Method<T>`, its value read on an object the payload holds after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.methodAsyncValue.payload.before",
+      "group": "events",
+      "cell": "`MethodAsync<T>`, awaited and its value read on the payload before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "D11.3",
+        "X4.11"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.methodAsyncValue.payload.after",
+      "group": "events",
+      "cell": "`MethodAsync<T>`, awaited and its value read on the payload after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "D11.3",
+        "X4.11"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.methodAsyncValue.held.before",
+      "group": "events",
+      "cell": "`MethodAsync<T>`, awaited and its value read on an object the payload holds before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "D11.3",
+        "X4.11"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.methodAsyncValue.held.after",
+      "group": "events",
+      "cell": "`MethodAsync<T>`, awaited and its value read on an object the payload holds after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4",
+        "D11.3",
+        "X4.11"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.returnedObject.payload.before",
+      "group": "events",
+      "cell": "`ReturnedObject`, its member read on the payload before an await",
+      "meaning": [
+        "D5.5",
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.returnedObject.payload.after",
+      "group": "events",
+      "cell": "`ReturnedObject`, its member read on the payload after an await",
+      "meaning": [
+        "D5.5",
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.returnedObject.held.before",
+      "group": "events",
+      "cell": "`ReturnedObject`, its member read on an object the payload holds before an await",
+      "meaning": [
+        "D5.5",
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.returnedObject.held.after",
+      "group": "events",
+      "cell": "`ReturnedObject`, its member read on an object the payload holds after an await",
+      "meaning": [
+        "D5.5",
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.returnedObjects.payload.before",
+      "group": "events",
+      "cell": "`ReturnedObjects`, its items read through an array lambda on the payload before an await",
+      "meaning": [
+        "D5.5",
+        "D5.6",
+        "D11.4",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.returnedObjects.payload.after",
+      "group": "events",
+      "cell": "`ReturnedObjects`, its items read through an array lambda on the payload after an await",
+      "meaning": [
+        "D5.5",
+        "D5.6",
+        "D11.4",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.returnedObjects.held.before",
+      "group": "events",
+      "cell": "`ReturnedObjects`, its items read through an array lambda on an object the payload holds before an await",
+      "meaning": [
+        "D5.5",
+        "D5.6",
+        "D11.4",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.returnedObjects.held.after",
+      "group": "events",
+      "cell": "`ReturnedObjects`, its items read through an array lambda on an object the payload holds after an await",
+      "meaning": [
+        "D5.5",
+        "D5.6",
+        "D11.4",
+        "D6.8"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "call",
+        "let",
+        "fn"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.callback.payload.before",
+      "group": "events",
+      "cell": "`Callback`, set and answering the vendor on the payload before an await",
+      "meaning": [
+        "D5.6",
+        "D17.12",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "set",
+        "answer"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.callback.payload.after",
+      "group": "events",
+      "cell": "`Callback`, set and answering the vendor on the payload after an await, refused where the view renders",
+      "meaning": [
+        "D11.4",
+        "X11.1"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "set",
+        "answer"
+      ],
+      "outcome": "refused"
+    },
+    {
+      "id": "event.poc15.callback.held.before",
+      "group": "events",
+      "cell": "`Callback`, set and answering the vendor on an object the payload holds before an await",
+      "meaning": [
+        "D5.6",
+        "D17.12",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "set",
+        "answer"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.callback.held.after",
+      "group": "events",
+      "cell": "`Callback`, set and answering the vendor on an object the payload holds after an await",
+      "meaning": [
+        "D5.6",
+        "D17.12",
+        "D11.4",
+        "X11.9"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "set",
+        "answer"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.component.payload.before",
+      "group": "events",
+      "cell": "the payload is a component, its member read and written before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.component.payload.after",
+      "group": "events",
+      "cell": "the payload is a component, its member read and written after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.component.held.before",
+      "group": "events",
+      "cell": "the payload holds a component, its member read and written before an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "event.poc15.component.held.after",
+      "group": "events",
+      "cell": "the payload holds a component, its member read and written after an await",
+      "meaning": [
+        "D5.6",
+        "D11.4"
+      ],
+      "kinds": [
+        "method",
+        "ref",
+        "get",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "absence.member",
+      "group": "absence",
+      "cell": "read a declared member an older version of the object lacks, which stops the pipeline",
+      "meaning": [
+        "D4.1",
+        "X4.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "absence.past",
+      "group": "absence",
+      "cell": "read data past a declared member where the data lacks it, which reads its start",
+      "meaning": [
+        "D4.2",
+        "D5.10",
+        "X5.4"
+      ],
+      "kinds": [
+        "get",
+        "data",
+        "start"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "absence.promise",
+      "group": "absence",
+      "cell": "call a method declared with `Method<T>` whose object returns a promise, which stops the pipeline",
+      "meaning": [
+        "D4.3",
+        "X4.5"
+      ],
+      "kinds": [
+        "call",
+        "let"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "source.PropertySet",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.PropertySet`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "PropertySet"
+    },
+    {
+      "id": "source.WriteOnlySet",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.WriteOnlySet`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "WriteOnlySet"
+    },
+    {
+      "id": "source.ElementText",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.ElementText`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "ElementText"
+    },
+    {
+      "id": "source.ElementHtml",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.ElementHtml`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "ElementHtml"
+    },
+    {
+      "id": "source.ElementClass",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.ElementClass`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "ElementClass"
+    },
+    {
+      "id": "source.ConditionLeft",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.ConditionLeft`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "ConditionLeft"
+    },
+    {
+      "id": "source.ConditionRight",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.ConditionRight`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "ConditionRight"
+    },
+    {
+      "id": "source.TextTestOperand",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.TextTestOperand`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "TextTestOperand"
+    },
+    {
+      "id": "source.MatchesPattern",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.MatchesPattern`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "MatchesPattern"
+    },
+    {
+      "id": "source.RequestMember",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.RequestMember`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "RequestMember"
+    },
+    {
+      "id": "source.Header",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.Header`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "Header"
+    },
+    {
+      "id": "source.DispatchPayloadMember",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.DispatchPayloadMember`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "DispatchPayloadMember"
+    },
+    {
+      "id": "source.MethodArgument",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.MethodArgument`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "MethodArgument"
+    },
+    {
+      "id": "source.PluginArgument",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.PluginArgument`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "PluginArgument"
+    },
+    {
+      "id": "source.HubArgument",
+      "group": "source",
+      "cell": "the component's member as the source at `Positions.HubArgument`",
+      "meaning": [
+        "D7.1",
+        "D7.2"
+      ],
+      "kinds": [
+        "get"
+      ],
+      "outcome": "runs",
+      "position": "HubArgument"
+    },
+    {
+      "id": "http.get",
+      "group": "http",
+      "cell": "a GET sending the component's value",
+      "meaning": [
+        "D9.3",
+        "D9.15"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.post",
+      "group": "http",
+      "cell": "a POST sending the component's value",
+      "meaning": [
+        "D9.3",
+        "D9.15"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.put",
+      "group": "http",
+      "cell": "a PUT sending the component's value",
+      "meaning": [
+        "D9.3",
+        "D9.15"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.delete",
+      "group": "http",
+      "cell": "a DELETE sending the component's value",
+      "meaning": [
+        "D9.3",
+        "D9.15"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.beside.route",
+      "group": "http",
+      "cell": "a route value sent beside the component's value",
+      "meaning": [
+        "D9.4"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.beside.query",
+      "group": "http",
+      "cell": "a query value sent beside the component's value",
+      "meaning": [
+        "D9.6"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.beside.header",
+      "group": "http",
+      "cell": "a header sent beside the component's value",
+      "meaning": [
+        "D9.11"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.beside.static",
+      "group": "http",
+      "cell": "a literal member sent beside the component's value",
+      "meaning": [
+        "D9.13"
+      ],
+      "kinds": [
+        "request",
+        "lit"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.beside.hidden",
+      "group": "http",
+      "cell": "a hidden input sent beside the component's value",
+      "meaning": [
+        "D9.14"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.into",
+      "group": "http",
+      "cell": "a success body loaded into a slot that renders the component",
+      "meaning": [
+        "D10.11"
+      ],
+      "kinds": [
+        "request"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.whileLoading",
+      "group": "http",
+      "cell": "a `WhileLoading` block that writes the component while its request is in flight",
+      "meaning": [
+        "D10.3",
+        "D10.21"
+      ],
+      "kinds": [
+        "request",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.response.success",
+      "group": "http",
+      "cell": "a success route that sets the component from the body",
+      "meaning": [
+        "D10.5",
+        "D10.19"
+      ],
+      "kinds": [
+        "request",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.response.error",
+      "group": "http",
+      "cell": "an error route that sets the component from the error body",
+      "meaning": [
+        "D10.5",
+        "D10.8"
+      ],
+      "kinds": [
+        "request",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.chained",
+      "group": "http",
+      "cell": "a chained request that sends what the component holds after the first request's success",
+      "meaning": [
+        "D10.9"
+      ],
+      "kinds": [
+        "request",
+        "get"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.parallel",
+      "group": "http",
+      "cell": "parallel requests, each setting the component when its own response arrives",
+      "meaning": [
+        "D10.10"
+      ],
+      "kinds": [
+        "all",
+        "request",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "http.finally",
+      "group": "http",
+      "cell": "a `Finally` block that writes the component after either route",
+      "meaning": [
+        "D10.3"
+      ],
+      "kinds": [
+        "request",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "lane.confirm",
+      "group": "lanes",
+      "cell": "a write to the component only after the user confirms",
+      "meaning": [
+        "D17.9",
+        "D4.7"
+      ],
+      "kinds": [
+        "call",
+        "if",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "lane.push",
+      "group": "lanes",
+      "cell": "a pushed message's member set into the component, on net10",
+      "meaning": [
+        "D21.2",
+        "D21.4"
+      ],
+      "kinds": [
+        "hub",
+        "set"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "lane.slot.load",
+      "group": "lanes",
+      "cell": "the component inside a partial loaded into a slot, its handler running",
+      "meaning": [
+        "D12.4",
+        "D10.11"
+      ],
+      "kinds": [
+        "request",
+        "method"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "lane.slot.unloadListener",
+      "group": "lanes",
+      "cell": "the slot unloaded, the component's listener removed",
+      "meaning": [
+        "D12.5",
+        "X12.1"
+      ],
+      "kinds": [
+        "method"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "lane.slot.hostDestroyed",
+      "group": "lanes",
+      "cell": "the slot unloaded after the component's host destroyed it, with nothing to remove",
+      "meaning": [
+        "D12.5",
+        "X12.7"
+      ],
+      "kinds": [
+        "method"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "template.render",
+      "group": "templates",
+      "cell": "a template the component renders",
+      "meaning": [
+        "D15.2",
+        "D15.3"
+      ],
+      "kinds": [
+        "lit"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "template.conditional",
+      "group": "templates",
+      "cell": "a template conditional the component's template holds",
+      "meaning": [
+        "D8.4",
+        "D15.2"
+      ],
+      "kinds": [
+        "lit"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "validation.rule",
+      "group": "validation",
+      "cell": "a rule on the member the component binds, checked in the browser as on the server",
+      "meaning": [
+        "D16.1",
+        "D16.5"
+      ],
+      "kinds": [
+        "form"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "validation.condition",
+      "group": "validation",
+      "cell": "a validator condition on the component's member",
+      "meaning": [
+        "D16.8"
+      ],
+      "kinds": [
+        "form"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "validation.live",
+      "group": "validation",
+      "cell": "live re-validation when the component raises its commit event",
+      "meaning": [
+        "D12.7",
+        "D16.15"
+      ],
+      "kinds": [
+        "form"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "validation.summary",
+      "group": "validation",
+      "cell": "the component's failure shown in the summary",
+      "meaning": [
+        "D16.13"
+      ],
+      "kinds": [
+        "form"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "validation.listItem",
+      "group": "validation",
+      "cell": "the component bound to a member of a list item, validated",
+      "meaning": [
+        "D14.3",
+        "D16.5"
+      ],
+      "kinds": [
+        "form"
+      ],
+      "outcome": "runs"
+    },
+    {
+      "id": "validation.prefix",
+      "group": "validation",
+      "cell": "the component under a partial's field prefix, its four names agreeing",
+      "meaning": [
+        "D2.3",
+        "D14.3",
+        "D16.3"
+      ],
+      "kinds": [
+        "form"
+      ],
+      "outcome": "runs"
+    }
+  ]
+}

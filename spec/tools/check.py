@@ -64,7 +64,7 @@ HEDGES = [
 HEDGE = re.compile(r"\b(" + "|".join(re.escape(word).replace(r"\ ", r"\s+") for word in HEDGES) + r")\b", re.IGNORECASE)
 PROSE_KEYS = {
     "meaning", "reason", "decision", "improvement", "page", "gesture", "outcome", "opposite", "defect", "oracle",
-    "summary", "why", "statement", "description",
+    "summary", "why", "statement", "description", "cell", "lacks", "scan", "what",
 }
 
 
@@ -1216,7 +1216,31 @@ def check_promises():
     tests = {f"{row['line']} {row['fixture']}.{row['test']}" for row in table("tests.tsv")}
     counts = mapping_counts(model)
     counts["promises"] = sum(len(feature.get("promises", [])) for feature in model["features"])
-    return feature_result(model["problems"] + promise_problems(model, tests), counts, counts["unmapped"] == 0, "every refusal and behavior defect has a promise")
+    cells, counts["matrix_runs"], counts["matrix_promised"] = matrix_promise_problems()
+    return feature_result(model["problems"] + promise_problems(model, tests) + cells, counts, counts["unmapped"] == 0,
+                          "every refusal and behavior defect, and every cell each reference component runs, has a promise")
+
+
+def matrix_promise_problems():
+    problems, unpromised, runs = [], [], 0
+    for name, field in [("syncfusion.json", "member"), ("native.json", "members")]:
+        path = SPEC / "Reference" / name
+        if not path.exists():
+            return [f"not started: spec/Reference/{name} absent"], 0, 0
+        for cell, entry in json.loads(path.read_text())["cells"].items():
+            if field not in entry:
+                continue
+            runs += 1
+            promise = entry.get("promise")
+            missing = [part for part in ("page", "gesture", "outcome", "opposite", "defect") if not is_prose((promise or {}).get(part))]
+            if promise is None:
+                unpromised.append(f"spec/Reference/{name} {cell} has no promise")
+            elif missing:
+                problems.append(f"spec/Reference/{name} {cell}: its promise lacks {', '.join(missing)}")
+    promised = runs - len(unpromised) - len(problems)
+    if promised == 0 and not problems:
+        return [f"not started: none of the {runs} cells the reference components run has a promise"], runs, promised
+    return problems + unpromised, runs, promised
 
 
 FLUENT_STRING_KINDS = {"text", "url", "element-id", "header-name", "css-class", "js-name", "view-name"}
@@ -1555,11 +1579,212 @@ def fluent_refused_forms():
     return failing, int(summary.group(1)), int(summary.group(2))
 
 
+MATRIX_GROUPS = {
+    "Properties": "properties", "Methods": "methods", "Events": "events", "Absence": "absence", "As a source": "source",
+    "HTTP": "http", "Other lanes": "lanes", "Templates": "templates", "Validation": "validation",
+}
+MATRIX_OUTCOMES = {"runs", "refused"}
+MATRIX_NATIVE_CARRIED = {"templates": "FusionMultiSelect"}
+MATRIX_POC15 = re.compile(r"^event\.poc15\.(\w+)\.(payload|held)\.(before|after)$")
+MATRIX_TYPE_KINDS = {"component", "live", "payload", "data"}
+MATRIX_CALLED = {"method", "methodValue", "methodAsync", "methodAsyncValue", "returnedObject", "returnedObjects"}
+MATRIX_DOORS = {
+    "property": "Property<", "readOnly": "ReadOnly<", "writeOnly": "WriteOnly<", "liveObject": "LiveObject<",
+    "liveObjects": "LiveObjects<", "method": "Method", "methodValue": "Method<", "methodAsync": "MethodAsync",
+    "methodAsyncValue": "MethodAsync<", "returnedObject": "ReturnedObject<", "returnedObjects": "ReturnedObjects<",
+    "callback": "Callback<", "event": "Event<", "component": "LiveObject<",
+}
+
+
+def matrix_brief_bullets():
+    lines = (SPEC / "BRIEF.md").read_text().splitlines()
+    start = next(number for number, line in enumerate(lines) if line.startswith("- **The conformance matrix**"))
+    end = next(number for number, line in enumerate(lines) if number > start and line.startswith("- **A reference component**"))
+    bullets, group = [], None
+    for line in lines[start + 1:end]:
+        header = re.match(r"^  - \*\*(.+?):\*\*(.*)$", line)
+        item = re.match(r"^    - (.*)$", line)
+        if header:
+            group = MATRIX_GROUPS.get(header.group(1), header.group(1))
+            text = header.group(2).strip().rstrip(".;")
+            bullets += [(group, text)] if text else []
+        elif item:
+            bullets.append((group, item.group(1).rstrip(".;")))
+    return bullets
+
+
+def design_ids():
+    text = (SPEC / "Core" / "DESIGN.md").read_text()
+    return set(re.findall(r"^- (D\d+\.\d+) ", text, re.M)) | set(re.findall(r"^- `(X\d+\.\d+)`", text, re.M))
+
+
+def matrix_problems(matrix):
+    written = [(bullet["group"], bullet["brief"]) for bullet in matrix["bullets"]]
+    brief = matrix_brief_bullets()
+    problems = [f"matrix bullet {text!r} ({group}) is not BRIEF.md section 8's" for group, text in written if (group, text) not in brief]
+    problems += [f"BRIEF.md section 8's {text!r} ({group}) has no matrix bullet" for group, text in brief if (group, text) not in written]
+    ids = [cell["id"] for cell in matrix["cells"]]
+    listed = {cell: bullet for bullet in matrix["bullets"] for cell in bullet["cells"]}
+    counted = [cell for bullet in matrix["bullets"] for cell in bullet["cells"]]
+    problems += [f"matrix cell {cell} written twice" for cell in sorted({cell for cell in ids if ids.count(cell) > 1})]
+    problems += [f"matrix cell {cell} is under {counted.count(cell)} bullets" for cell in ids if counted.count(cell) != 1]
+    problems += [f"a matrix bullet names {cell}, no cell" for cell in counted if cell not in ids]
+    positions = [cell.get("position") for cell in matrix["cells"] if cell["group"] == "source"]
+    named = fluent_cell_names()["D7.1"]
+    problems += [f"D7.1 names Positions.{name}, which no source cell runs" for name in named if name not in positions]
+    problems += [f"a source cell runs at Positions.{name}, which D7.1 does not name" for name in positions if name not in named]
+    known, kinds = design_ids(), spec_node_set()
+    for cell in matrix["cells"]:
+        name = cell["id"]
+        problems += ([f"{name} is in group {cell['group']}, its bullet in {listed[name]['group']}"] if name in listed and listed[name]["group"] != cell["group"] else [])
+        problems += ([f"{name} states no meaning or no kind"] if not cell["meaning"] or not cell["kinds"] else [])
+        problems += [f"{name} rests on {meaning}, which spec/Core/DESIGN.md does not state" for meaning in cell["meaning"] if meaning not in known]
+        problems += [f"{name} writes {kind}, no kind of spec/Core/Schema.tla" for kind in cell["kinds"] if kind not in kinds]
+        problems += ([f"{name} has the outcome {cell['outcome']!r}"] if cell["outcome"] not in MATRIX_OUTCOMES else [])
+    return problems
+
+
+def native_declaration_problems(types):
+    problems = []
+    for declared in types.values():
+        names = [member["js"] for member in declared["members"]]
+        problems += ([f"WardRound's {declared['name']} is a {declared['kind']!r} type"] if declared["kind"] not in MATRIX_TYPE_KINDS else [])
+        problems += [f"{declared['name']} declares {name} twice" for name in sorted({name for name in names if names.count(name) > 1})]
+        for member in declared["members"]:
+            label = f"{declared['name']}.{member['js']}"
+            door = MATRIX_DOORS.get(member["kind"])
+            exact = door is not None and not door.endswith("<")
+            fits = door is not None and (member["door"] == door if exact else member["door"].startswith(door))
+            problems += ([f"{label} is a {member['kind']} declared by {member['door']}"] if declared["kind"] != "data" and not fits else [])
+            reached = types.get(member.get("type"))
+            problems += ([f"{label} holds {member['type']}, no declared type"] if "type" in member and reached is None else [])
+            problems += ([f"{label} holds a component, {member.get('type')} is no component"] if member["kind"] == "component" and (reached or {}).get("kind") != "component" else [])
+    return problems
+
+
+def native_resolve(types, path):
+    parts = path.split(".")
+    current, chain = types.get(parts[0]), []
+    for part in parts[1:]:
+        if current is None:
+            return None, chain, f"{path} reaches past a member that holds no declared type"
+        called = part.endswith("()")
+        name = part[:-2] if called else part
+        member = next((member for member in current["members"] if member["js"] == name), None)
+        if member is None:
+            return None, chain, f"{path}: {current['name']} declares no {name}"
+        if called != (member["kind"] in MATRIX_CALLED):
+            return None, chain, f"{path}: {name} is a {member['kind']}"
+        chain.append((current, member))
+        current = types.get(member.get("type"))
+    return (chain[-1][1] if chain else None), chain, None if chain else f"{path} names no member"
+
+
+def native_door_problems(cell, door, holder, member, chain, types):
+    if door == "component" and holder == "payload":
+        fits = member["kind"] == "event" and types[member["type"]]["kind"] == "component"
+    elif door == "component":
+        fits = member["kind"] == "component" and chain[-1][0]["kind"] == "payload"
+    elif holder == "payload":
+        fits = member["kind"] == door and chain[-1][0]["kind"] == "payload"
+    else:
+        fits = member["kind"] == door and chain[-1][0]["kind"] != "payload" and len(chain) > 1 and chain[-2][0]["kind"] == "payload"
+    return [] if fits else [f"{cell}: {member['js']} is not a {door} {'on the payload' if holder == 'payload' else 'an object the payload holds'}"]
+
+
+def native_problems(native, matrix, syncfusion):
+    types = {declared["name"]: declared for declared in native["types"]}
+    versions = {version["id"]: version for version in native["versions"]}
+    cells = {cell["id"]: cell for cell in matrix["cells"]}
+    problems = native_declaration_problems(types)
+    problems += [f"native.json runs {name}, no matrix cell" for name in native["cells"] if name not in cells]
+    problems += [f"native.json lacks {name}" for name in cells if name not in native["cells"]]
+    for version in versions.values():
+        problems += [f"version {version['id']}: {error}" for path in version["differs"] for error in [native_resolve(types, path)[2]] if error]
+    for name, entry in native["cells"].items():
+        if "carriedBy" in entry:
+            carrier = MATRIX_NATIVE_CARRIED.get(cells.get(name, {}).get("group"))
+            problems += ([f"{name} is carried by {entry['carriedBy']}, which no closed group of check.py names"] if carrier != entry["carriedBy"] else [])
+            problems += ([f"{name} is carried by FusionMultiSelect, whose contract lacks it"] if "member" not in syncfusion["cells"].get(name, {}) else [])
+            problems += ([f"{name} is carried with no reason"] if not is_prose(entry.get("reason")) else [])
+            continue
+        version = versions.get(entry["version"])
+        problems += ([f"{name} runs on version {entry['version']!r}, which native.json lacks"] if version is None else [])
+        resolved = [(path, native_resolve(types, path)) for path in entry["members"]]
+        problems += [f"{name}: {error}" for _, (_, _, error) in resolved if error]
+        differs = version is not None and version["id"] != "current"
+        problems += ([f"{name} runs on {entry['version']} through no member that version changes"] if differs and not set(entry["members"]) & set(version["differs"]) else [])
+        door = MATRIX_POC15.match(name)
+        if door and "door" in entry:
+            member, chain, error = native_resolve(types, entry["door"])
+            problems += [f"{name}: {error}"] if error else native_door_problems(name, door.group(1), door.group(2), member, chain, types)
+        problems += ([f"{name} names no door member"] if door and "door" not in entry else [])
+    return problems
+
+
+def installed_package_line(path, number):
+    for folder in [REPO, *REPO.parents, checkout_root()]:
+        candidate = folder / "node_modules" / path
+        if candidate.is_file():
+            lines = candidate.read_text().splitlines()
+            return lines[number - 1] if 0 < number <= len(lines) else None
+    return None
+
+
+def syncfusion_cite_problems(name, member, cites):
+    words = set(re.findall(r"[A-Za-z_$][\w$]*", member))
+    problems = []
+    for cite in cites:
+        path, number = cite.rsplit(":", 1)
+        line = installed_package_line(path, int(number)) if path.startswith("@syncfusion/") and number.isdigit() else None
+        if line is None:
+            problems.append(f"{name}: {cite} resolves to no line of the installed package")
+        elif not words & set(re.findall(r"[A-Za-z_$][\w$]*", line)):
+            problems.append(f"{name}: {cite} reads {line.strip()[:60]!r}, which names none of {member!r}")
+    return problems
+
+
+def m21_n1_text():
+    text = (SPEC / "FusionComponents" / "module.md").read_text()
+    return text.split("- `M21.N1` kept:", 1)[1].split("- `M21.N2`", 1)[0]
+
+
+def syncfusion_problems(syncfusion, matrix):
+    cells = {cell["id"] for cell in matrix["cells"]}
+    facts = {fact["id"] for fact in json.loads((SPEC / "probes" / "facts.json").read_text())["facts"]}
+    problems = [f"syncfusion.json judges {name}, no matrix cell" for name in syncfusion["cells"] if name not in cells]
+    problems += [f"syncfusion.json lacks {name}" for name in sorted(cells) if name not in syncfusion["cells"]]
+    for name, entry in syncfusion["cells"].items():
+        problems += [f"{name} rests on the fact {fact}, which spec/probes/facts.json lacks" for fact in entry.get("facts", []) if fact not in facts]
+        if "member" in entry:
+            problems += ([f"{name} cites nothing"] if not entry.get("cites") else [])
+            problems += syncfusion_cite_problems(name, entry["member"], entry.get("cites", []))
+        else:
+            problems += ([f"{name} lacks a reason or its scan"] if not is_prose(entry.get("lacks")) or not is_prose(entry.get("scan")) else [])
+    door = m21_n1_text()
+    for kept in syncfusion["kept"]:
+        problems += syncfusion_cite_problems(f"kept {kept['js']}", kept["js"], [kept["cite"]])
+        problems += ([f"kept {kept['js']}: M21.N1 does not name `{kept['csharp']}`"] if f"`{kept['csharp']}" not in door else [])
+    for added in syncfusion["added"]:
+        problems += syncfusion_cite_problems(f"added {added['js']}", added["js"], [added["cite"]])
+        name = added["csharp"].split("(", 1)[0]
+        problems += ([f"added {added['js']}: M21.N1 in spec/FusionComponents/module.md does not name `{name}`"] if f"`{name}" not in door else [])
+    return problems
+
+
 def check_matrix():
     paths = [SPEC / "Reference" / name for name in ["matrix.json", "syncfusion.json", "native.json"]]
     if any(not path.exists() for path in paths):
         return not_started(*paths)
-    return not_built("the conformance matrix")
+    matrix, syncfusion, native = (json.loads(path.read_text()) for path in paths)
+    problems = matrix_problems(matrix) + syncfusion_problems(syncfusion, matrix) + native_problems(native, matrix, syncfusion)
+    total = len(matrix["cells"])
+    covered = sum(1 for entry in syncfusion["cells"].values() if "member" in entry)
+    carried = sum(1 for entry in native["cells"].values() if "carriedBy" in entry)
+    detail = (f"MultiSelect covers {covered} of {total} cells from its .d.ts; WardRound runs {total - carried} of {total}, "
+              f"and FusionMultiSelect carries the other {carried}")
+    return result(not problems, "; ".join(problems[:6]) or detail, cells=total, bullets=len(matrix["bullets"]),
+                  syncfusion=covered, native=total - carried, carried=carried, problems=len(problems))
 
 
 def check_rewrite():
@@ -1637,9 +1862,9 @@ CHECKS = [
     ("module_cites", "every module.md cite resolves at the SHA it names", check_module_cites),
     ("fluent", "every module's sentences consistent", check_fluent),
     ("gate2", "owner gate 2: the fluent API", check_gate(2)),
-    ("matrix", "every conformance cell promised for both reference components", check_matrix),
+    ("matrix", "the conformance matrix, every cell run by FusionMultiSelect's or WardRound's declaration", check_matrix),
     ("defects", "every defect on its highest rung, every core defect in a feature; no test for a type or analyzer defect", check_defects),
-    ("promises", "every refusal and behavior defect has a promise", check_promises),
+    ("promises", "every refusal and behavior defect, and every cell each reference component runs, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
     ("hedges", "zero hedge words", check_hedges),

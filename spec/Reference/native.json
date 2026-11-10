@@ -1,0 +1,1266 @@
+{
+  "component": "WardRound",
+  "what": "the native reference: a plain-DOM input the framework's own test app writes in TypeScript and declares in C# as an app brings a component, on the core's public surface only (its own vendor data, alis:mount); a nurse's round of a ward, its value the resident at the bedside",
+  "vendor": {
+    "name": "ward-round",
+    "objectPath": "wardRound",
+    "subscribe": "addEventListener",
+    "unsubscribe": "removeEventListener",
+    "payload": "the listener's first argument (D17.4)"
+  },
+  "input": {
+    "value": "WardRound.value",
+    "commit": "WardRound.change"
+  },
+  "versions": [
+    {
+      "id": "current",
+      "differs": [],
+      "why": "the declaration's own version"
+    },
+    {
+      "id": "older",
+      "differs": [
+        "WardRound.roundId"
+      ],
+      "why": "an older build that lacks a declared member (D4.1, X4.2)"
+    },
+    {
+      "id": "promised",
+      "differs": [
+        "WardRound.dueCount()",
+        "WardRound.doseDue.stock"
+      ],
+      "why": "a build that returns a promise from a method declared with Method<T> and hands a promise in a payload member declared as a value (D4.3), its drift from the declaration suppressed naming the test that arranges it (spec/CLAUDE.md, the vendor contract of 2026-11-07)"
+    }
+  ],
+  "types": [
+    {
+      "name": "WardRound",
+      "kind": "component",
+      "members": [
+        {
+          "js": "value",
+          "kind": "property",
+          "ts": "value: string | null",
+          "door": "Property<string?>",
+          "csharp": "Value"
+        },
+        {
+          "js": "title",
+          "kind": "property",
+          "ts": "title: string",
+          "door": "Property<string>",
+          "csharp": "Title"
+        },
+        {
+          "js": "settings",
+          "kind": "liveObject",
+          "ts": "settings: RoundSettings",
+          "door": "LiveObject<RoundSettings>",
+          "csharp": "Settings",
+          "type": "RoundSettings"
+        },
+        {
+          "js": "ward",
+          "kind": "liveObject",
+          "ts": "ward: RoundWard",
+          "door": "LiveObject<RoundWard>",
+          "csharp": "Ward",
+          "type": "RoundWard"
+        },
+        {
+          "js": "beds",
+          "kind": "liveObjects",
+          "ts": "beds: RoundBed[]",
+          "door": "LiveObjects<RoundBed>",
+          "csharp": "Beds",
+          "type": "RoundBed"
+        },
+        {
+          "js": "chart",
+          "kind": "property",
+          "ts": "chart: RoundChart",
+          "door": "Property<RoundChart>",
+          "csharp": "Chart",
+          "type": "RoundChart"
+        },
+        {
+          "js": "roundId",
+          "kind": "readOnly",
+          "ts": "readonly roundId: string",
+          "door": "ReadOnly<string>",
+          "csharp": "RoundId"
+        },
+        {
+          "js": "signature",
+          "kind": "writeOnly",
+          "ts": "set signature(nurse: string)",
+          "door": "WriteOnly<string>",
+          "csharp": "Signature"
+        },
+        {
+          "js": "isDestroyed",
+          "kind": "readOnly",
+          "ts": "readonly isDestroyed: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "IsDestroyed"
+        },
+        {
+          "js": "refresh",
+          "kind": "method",
+          "ts": "refresh(): void",
+          "door": "Method",
+          "csharp": "Refresh()"
+        },
+        {
+          "js": "dueCount",
+          "kind": "methodValue",
+          "ts": "dueCount(): number",
+          "door": "Method<int>",
+          "csharp": "DueCount()"
+        },
+        {
+          "js": "current",
+          "kind": "returnedObject",
+          "ts": "current(): RoundBed",
+          "door": "ReturnedObject<RoundBed>",
+          "csharp": "Current()",
+          "type": "RoundBed"
+        },
+        {
+          "js": "save",
+          "kind": "methodAsync",
+          "ts": "save(): Promise<void>",
+          "door": "MethodAsync",
+          "csharp": "Save()"
+        },
+        {
+          "js": "fetchDue",
+          "kind": "methodAsyncValue",
+          "ts": "fetchDue(): Promise<number>",
+          "door": "MethodAsync<int>",
+          "csharp": "FetchDue()"
+        },
+        {
+          "js": "note",
+          "kind": "method",
+          "ts": "note(text: string): void",
+          "door": "Method",
+          "csharp": "Note(Arg<string> text)"
+        },
+        {
+          "js": "admit",
+          "kind": "method",
+          "ts": "admit(admission: RoundAdmission): void",
+          "door": "Method",
+          "csharp": "Admit(Arg<RoundAdmission> admission)"
+        },
+        {
+          "js": "admitAll",
+          "kind": "method",
+          "ts": "admitAll(admissions: RoundAdmission[]): void",
+          "door": "Method",
+          "csharp": "AdmitAll(Arg<IReadOnlyList<RoundAdmission>> admissions)"
+        },
+        {
+          "js": "destroy",
+          "kind": "method",
+          "ts": "destroy(): void",
+          "door": "Method",
+          "csharp": "Destroy()"
+        },
+        {
+          "js": "change",
+          "kind": "event",
+          "ts": "change: the listener's first argument, RoundChange",
+          "door": "Event<RoundChange>",
+          "csharp": "Change",
+          "type": "RoundChange"
+        },
+        {
+          "js": "doseDue",
+          "kind": "event",
+          "ts": "doseDue: the listener's first argument, DoseDue",
+          "door": "Event<DoseDue>",
+          "csharp": "DoseDue",
+          "type": "DoseDue"
+        },
+        {
+          "js": "ready",
+          "kind": "event",
+          "ts": "ready: the listener's first argument, the WardRound itself",
+          "door": "Event<WardRound>",
+          "csharp": "Ready",
+          "type": "WardRound"
+        }
+      ]
+    },
+    {
+      "name": "RoundSettings",
+      "kind": "live",
+      "members": [
+        {
+          "js": "pageSize",
+          "kind": "property",
+          "ts": "pageSize: number",
+          "door": "Property<int>",
+          "csharp": "PageSize"
+        }
+      ]
+    },
+    {
+      "name": "RoundWard",
+      "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "property",
+          "ts": "name: string",
+          "door": "Property<string>",
+          "csharp": "Name"
+        }
+      ]
+    },
+    {
+      "name": "RoundBed",
+      "kind": "live",
+      "members": [
+        {
+          "js": "resident",
+          "kind": "readOnly",
+          "ts": "readonly resident: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Resident"
+        },
+        {
+          "js": "occupied",
+          "kind": "readOnly",
+          "ts": "readonly occupied: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "Occupied"
+        },
+        {
+          "js": "markSeen",
+          "kind": "method",
+          "ts": "markSeen(): void",
+          "door": "Method",
+          "csharp": "MarkSeen()"
+        }
+      ]
+    },
+    {
+      "name": "RoundChart",
+      "kind": "data",
+      "members": [
+        {
+          "js": "resident",
+          "kind": "property",
+          "ts": "resident: string",
+          "door": "string",
+          "csharp": "Resident"
+        },
+        {
+          "js": "allergy",
+          "kind": "property",
+          "ts": "allergy: ChartAllergy",
+          "door": "ChartAllergy",
+          "csharp": "Allergy",
+          "type": "ChartAllergy"
+        }
+      ]
+    },
+    {
+      "name": "ChartAllergy",
+      "kind": "data",
+      "members": [
+        {
+          "js": "severity",
+          "kind": "property",
+          "ts": "severity: string",
+          "door": "string",
+          "csharp": "Severity"
+        }
+      ]
+    },
+    {
+      "name": "RoundAdmission",
+      "kind": "data",
+      "members": [
+        {
+          "js": "resident",
+          "kind": "property",
+          "ts": "resident: string",
+          "door": "string",
+          "csharp": "Resident"
+        },
+        {
+          "js": "bed",
+          "kind": "property",
+          "ts": "bed: string",
+          "door": "string",
+          "csharp": "Bed"
+        }
+      ]
+    },
+    {
+      "name": "RoundChange",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "value",
+          "kind": "readOnly",
+          "ts": "readonly value: string | null",
+          "door": "ReadOnly<string?>",
+          "csharp": "Value"
+        },
+        {
+          "js": "previousValue",
+          "kind": "readOnly",
+          "ts": "readonly previousValue: string | null",
+          "door": "ReadOnly<string?>",
+          "csharp": "PreviousValue"
+        },
+        {
+          "js": "isInteracted",
+          "kind": "readOnly",
+          "ts": "readonly isInteracted: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "IsInteracted"
+        }
+      ]
+    },
+    {
+      "name": "DoseDue",
+      "kind": "payload",
+      "members": [
+        {
+          "js": "isUrgent",
+          "kind": "readOnly",
+          "ts": "readonly isUrgent: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "IsUrgent"
+        },
+        {
+          "js": "resident",
+          "kind": "liveObject",
+          "ts": "readonly resident: DueResident",
+          "door": "LiveObject<DueResident>",
+          "csharp": "Resident",
+          "type": "DueResident"
+        },
+        {
+          "js": "doses",
+          "kind": "liveObjects",
+          "ts": "readonly doses: RoundDose[]",
+          "door": "LiveObjects<RoundDose>",
+          "csharp": "Doses",
+          "type": "RoundDose"
+        },
+        {
+          "js": "snooze",
+          "kind": "method",
+          "ts": "snooze(): void",
+          "door": "Method",
+          "csharp": "Snooze()"
+        },
+        {
+          "js": "stock",
+          "kind": "readOnly",
+          "ts": "readonly stock: number",
+          "door": "ReadOnly<int>",
+          "csharp": "Stock"
+        },
+        {
+          "js": "note",
+          "kind": "writeOnly",
+          "ts": "set note(text: string)",
+          "door": "WriteOnly<string>",
+          "csharp": "Note"
+        },
+        {
+          "js": "alarms",
+          "kind": "liveObjects",
+          "ts": "readonly alarms: RoundAlarm[]",
+          "door": "LiveObjects<RoundAlarm>",
+          "csharp": "Alarms",
+          "type": "RoundAlarm"
+        },
+        {
+          "js": "remaining",
+          "kind": "methodValue",
+          "ts": "remaining(): number",
+          "door": "Method<int>",
+          "csharp": "Remaining()"
+        },
+        {
+          "js": "lookup",
+          "kind": "methodAsyncValue",
+          "ts": "lookup(): Promise<string>",
+          "door": "MethodAsync<string>",
+          "csharp": "Lookup()"
+        },
+        {
+          "js": "nextDose",
+          "kind": "returnedObject",
+          "ts": "nextDose(): RoundDose",
+          "door": "ReturnedObject<RoundDose>",
+          "csharp": "NextDose()",
+          "type": "RoundDose"
+        },
+        {
+          "js": "missed",
+          "kind": "returnedObjects",
+          "ts": "missed(): RoundDose[]",
+          "door": "ReturnedObjects<RoundDose>",
+          "csharp": "Missed()",
+          "type": "RoundDose"
+        },
+        {
+          "js": "signature",
+          "kind": "callback",
+          "ts": "signature: ((dose: RoundDose) => string) | null",
+          "door": "Callback<RoundDose, string>",
+          "csharp": "Signature"
+        },
+        {
+          "js": "trolley",
+          "kind": "liveObject",
+          "ts": "readonly trolley: DoseTrolley",
+          "door": "LiveObject<DoseTrolley>",
+          "csharp": "Trolley",
+          "type": "DoseTrolley"
+        },
+        {
+          "js": "round",
+          "kind": "component",
+          "ts": "readonly round: WardRound",
+          "door": "LiveObject<WardRound>",
+          "csharp": "Round",
+          "type": "WardRound"
+        }
+      ]
+    },
+    {
+      "name": "DueResident",
+      "kind": "live",
+      "members": [
+        {
+          "js": "name",
+          "kind": "readOnly",
+          "ts": "readonly name: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Name"
+        },
+        {
+          "js": "room",
+          "kind": "liveObject",
+          "ts": "readonly room: DueRoom",
+          "door": "LiveObject<DueRoom>",
+          "csharp": "Room",
+          "type": "DueRoom"
+        }
+      ]
+    },
+    {
+      "name": "DueRoom",
+      "kind": "live",
+      "members": [
+        {
+          "js": "number",
+          "kind": "readOnly",
+          "ts": "readonly number: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Number"
+        }
+      ]
+    },
+    {
+      "name": "DoseTrolley",
+      "kind": "live",
+      "members": [
+        {
+          "js": "label",
+          "kind": "writeOnly",
+          "ts": "set label(text: string)",
+          "door": "WriteOnly<string>",
+          "csharp": "Label"
+        },
+        {
+          "js": "drawers",
+          "kind": "liveObjects",
+          "ts": "readonly drawers: TrolleyDrawer[]",
+          "door": "LiveObjects<TrolleyDrawer>",
+          "csharp": "Drawers",
+          "type": "TrolleyDrawer"
+        },
+        {
+          "js": "stockCount",
+          "kind": "methodValue",
+          "ts": "stockCount(): number",
+          "door": "Method<int>",
+          "csharp": "StockCount()"
+        },
+        {
+          "js": "weigh",
+          "kind": "methodAsyncValue",
+          "ts": "weigh(): Promise<number>",
+          "door": "MethodAsync<int>",
+          "csharp": "Weigh()"
+        },
+        {
+          "js": "drawerAt",
+          "kind": "returnedObject",
+          "ts": "drawerAt(position: number): TrolleyDrawer",
+          "door": "ReturnedObject<TrolleyDrawer>",
+          "csharp": "DrawerAt(Arg<int> position)",
+          "type": "TrolleyDrawer"
+        },
+        {
+          "js": "emptyDrawers",
+          "kind": "returnedObjects",
+          "ts": "emptyDrawers(): TrolleyDrawer[]",
+          "door": "ReturnedObjects<TrolleyDrawer>",
+          "csharp": "EmptyDrawers()",
+          "type": "TrolleyDrawer"
+        },
+        {
+          "js": "signature",
+          "kind": "callback",
+          "ts": "signature: ((dose: RoundDose) => string) | null",
+          "door": "Callback<RoundDose, string>",
+          "csharp": "Signature"
+        },
+        {
+          "js": "drawer",
+          "kind": "liveObject",
+          "ts": "readonly drawer: TrolleyDrawer",
+          "door": "LiveObject<TrolleyDrawer>",
+          "csharp": "Drawer",
+          "type": "TrolleyDrawer"
+        }
+      ]
+    },
+    {
+      "name": "TrolleyDrawer",
+      "kind": "live",
+      "members": [
+        {
+          "js": "label",
+          "kind": "readOnly",
+          "ts": "readonly label: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Label"
+        },
+        {
+          "js": "unlock",
+          "kind": "methodAsyncValue",
+          "ts": "unlock(): Promise<string>",
+          "door": "MethodAsync<string>",
+          "csharp": "Unlock()"
+        }
+      ]
+    },
+    {
+      "name": "RoundDose",
+      "kind": "live",
+      "members": [
+        {
+          "js": "drug",
+          "kind": "readOnly",
+          "ts": "readonly drug: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Drug"
+        },
+        {
+          "js": "given",
+          "kind": "readOnly",
+          "ts": "readonly given: boolean",
+          "door": "ReadOnly<bool>",
+          "csharp": "Given"
+        },
+        {
+          "js": "give",
+          "kind": "method",
+          "ts": "give(): void",
+          "door": "Method",
+          "csharp": "Give()"
+        }
+      ]
+    },
+    {
+      "name": "RoundAlarm",
+      "kind": "live",
+      "members": [
+        {
+          "js": "reason",
+          "kind": "readOnly",
+          "ts": "readonly reason: string",
+          "door": "ReadOnly<string>",
+          "csharp": "Reason"
+        },
+        {
+          "js": "acknowledge",
+          "kind": "method",
+          "ts": "acknowledge(): void",
+          "door": "Method",
+          "csharp": "Acknowledge()"
+        }
+      ]
+    }
+  ],
+  "cells": {
+    "prop.scalar.read": {
+      "members": [
+        "WardRound.title"
+      ],
+      "version": "current"
+    },
+    "prop.scalar.write": {
+      "members": [
+        "WardRound.title"
+      ],
+      "version": "current"
+    },
+    "prop.dotted.read": {
+      "members": [
+        "WardRound.settings.pageSize"
+      ],
+      "version": "current"
+    },
+    "prop.dotted.write": {
+      "members": [
+        "WardRound.settings.pageSize"
+      ],
+      "version": "current"
+    },
+    "prop.object.memberRead": {
+      "members": [
+        "WardRound.ward.name"
+      ],
+      "version": "current"
+    },
+    "prop.object.memberWrite": {
+      "members": [
+        "WardRound.ward.name"
+      ],
+      "version": "current"
+    },
+    "prop.list.lambda": {
+      "members": [
+        "WardRound.beds.occupied"
+      ],
+      "version": "current"
+    },
+    "prop.readOnly": {
+      "members": [
+        "WardRound.roundId"
+      ],
+      "version": "current"
+    },
+    "prop.writeOnly": {
+      "members": [
+        "WardRound.signature"
+      ],
+      "version": "current"
+    },
+    "method.void": {
+      "members": [
+        "WardRound.refresh()"
+      ],
+      "version": "current"
+    },
+    "method.value": {
+      "members": [
+        "WardRound.dueCount()"
+      ],
+      "version": "current"
+    },
+    "method.object.memberRead": {
+      "members": [
+        "WardRound.current().resident"
+      ],
+      "version": "current"
+    },
+    "method.object.methodCall": {
+      "members": [
+        "WardRound.current().markSeen()"
+      ],
+      "version": "current"
+    },
+    "method.async.void": {
+      "members": [
+        "WardRound.save()"
+      ],
+      "version": "current"
+    },
+    "method.async.value": {
+      "members": [
+        "WardRound.fetchDue()"
+      ],
+      "version": "current"
+    },
+    "method.arg.scalar": {
+      "members": [
+        "WardRound.note()"
+      ],
+      "version": "current"
+    },
+    "method.arg.object": {
+      "members": [
+        "WardRound.admit()"
+      ],
+      "version": "current"
+    },
+    "method.arg.list": {
+      "members": [
+        "WardRound.admitAll()"
+      ],
+      "version": "current"
+    },
+    "event.scalar": {
+      "members": [
+        "WardRound.doseDue.isUrgent"
+      ],
+      "version": "current"
+    },
+    "event.object": {
+      "members": [
+        "WardRound.doseDue.resident.room.number"
+      ],
+      "version": "current"
+    },
+    "event.list": {
+      "members": [
+        "WardRound.doseDue.doses.drug"
+      ],
+      "version": "current"
+    },
+    "event.method": {
+      "members": [
+        "WardRound.doseDue.snooze()"
+      ],
+      "version": "current"
+    },
+    "event.promise": {
+      "members": [
+        "WardRound.doseDue.stock"
+      ],
+      "version": "promised"
+    },
+    "event.deepAsync": {
+      "members": [
+        "WardRound.doseDue.trolley.drawer.unlock()",
+        "WardRound.doseDue.isUrgent"
+      ],
+      "version": "current"
+    },
+    "event.poc15.writeOnly.payload.before": {
+      "members": [
+        "WardRound.doseDue.note"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.note"
+    },
+    "event.poc15.writeOnly.payload.after": {
+      "members": [
+        "WardRound.doseDue.note"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.note"
+    },
+    "event.poc15.writeOnly.held.before": {
+      "members": [
+        "WardRound.doseDue.trolley.label"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.label"
+    },
+    "event.poc15.writeOnly.held.after": {
+      "members": [
+        "WardRound.doseDue.trolley.label"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.label"
+    },
+    "event.poc15.liveObjects.payload.before": {
+      "members": [
+        "WardRound.doseDue.alarms"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.alarms"
+    },
+    "event.poc15.liveObjects.payload.after": {
+      "members": [
+        "WardRound.doseDue.alarms"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.alarms"
+    },
+    "event.poc15.liveObjects.held.before": {
+      "members": [
+        "WardRound.doseDue.trolley.drawers"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.drawers"
+    },
+    "event.poc15.liveObjects.held.after": {
+      "members": [
+        "WardRound.doseDue.trolley.drawers"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.drawers"
+    },
+    "event.poc15.methodValue.payload.before": {
+      "members": [
+        "WardRound.doseDue.remaining()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.remaining()"
+    },
+    "event.poc15.methodValue.payload.after": {
+      "members": [
+        "WardRound.doseDue.remaining()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.remaining()"
+    },
+    "event.poc15.methodValue.held.before": {
+      "members": [
+        "WardRound.doseDue.trolley.stockCount()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.stockCount()"
+    },
+    "event.poc15.methodValue.held.after": {
+      "members": [
+        "WardRound.doseDue.trolley.stockCount()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.stockCount()"
+    },
+    "event.poc15.methodAsyncValue.payload.before": {
+      "members": [
+        "WardRound.doseDue.lookup()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.lookup()"
+    },
+    "event.poc15.methodAsyncValue.payload.after": {
+      "members": [
+        "WardRound.doseDue.lookup()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.lookup()"
+    },
+    "event.poc15.methodAsyncValue.held.before": {
+      "members": [
+        "WardRound.doseDue.trolley.weigh()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.weigh()"
+    },
+    "event.poc15.methodAsyncValue.held.after": {
+      "members": [
+        "WardRound.doseDue.trolley.weigh()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.weigh()"
+    },
+    "event.poc15.returnedObject.payload.before": {
+      "members": [
+        "WardRound.doseDue.nextDose()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.nextDose()"
+    },
+    "event.poc15.returnedObject.payload.after": {
+      "members": [
+        "WardRound.doseDue.nextDose()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.nextDose()"
+    },
+    "event.poc15.returnedObject.held.before": {
+      "members": [
+        "WardRound.doseDue.trolley.drawerAt()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.drawerAt()"
+    },
+    "event.poc15.returnedObject.held.after": {
+      "members": [
+        "WardRound.doseDue.trolley.drawerAt()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.drawerAt()"
+    },
+    "event.poc15.returnedObjects.payload.before": {
+      "members": [
+        "WardRound.doseDue.missed()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.missed()"
+    },
+    "event.poc15.returnedObjects.payload.after": {
+      "members": [
+        "WardRound.doseDue.missed()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.missed()"
+    },
+    "event.poc15.returnedObjects.held.before": {
+      "members": [
+        "WardRound.doseDue.trolley.emptyDrawers()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.emptyDrawers()"
+    },
+    "event.poc15.returnedObjects.held.after": {
+      "members": [
+        "WardRound.doseDue.trolley.emptyDrawers()"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.emptyDrawers()"
+    },
+    "event.poc15.callback.payload.before": {
+      "members": [
+        "WardRound.doseDue.signature"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.signature"
+    },
+    "event.poc15.callback.payload.after": {
+      "members": [
+        "WardRound.doseDue.signature"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.signature"
+    },
+    "event.poc15.callback.held.before": {
+      "members": [
+        "WardRound.doseDue.trolley.signature"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.signature"
+    },
+    "event.poc15.callback.held.after": {
+      "members": [
+        "WardRound.doseDue.trolley.signature"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.trolley.signature"
+    },
+    "event.poc15.component.payload.before": {
+      "members": [
+        "WardRound.ready"
+      ],
+      "version": "current",
+      "door": "WardRound.ready"
+    },
+    "event.poc15.component.payload.after": {
+      "members": [
+        "WardRound.ready"
+      ],
+      "version": "current",
+      "door": "WardRound.ready"
+    },
+    "event.poc15.component.held.before": {
+      "members": [
+        "WardRound.doseDue.round"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.round"
+    },
+    "event.poc15.component.held.after": {
+      "members": [
+        "WardRound.doseDue.round"
+      ],
+      "version": "current",
+      "door": "WardRound.doseDue.round"
+    },
+    "absence.member": {
+      "members": [
+        "WardRound.roundId"
+      ],
+      "version": "older"
+    },
+    "absence.past": {
+      "members": [
+        "WardRound.chart.allergy.severity"
+      ],
+      "version": "current"
+    },
+    "absence.promise": {
+      "members": [
+        "WardRound.dueCount()"
+      ],
+      "version": "promised"
+    },
+    "source.PropertySet": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.WriteOnlySet": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.ElementText": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.ElementHtml": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.ElementClass": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.ConditionLeft": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.ConditionRight": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.TextTestOperand": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.MatchesPattern": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.RequestMember": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.Header": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.DispatchPayloadMember": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.MethodArgument": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.PluginArgument": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "source.HubArgument": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.get": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.post": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.put": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.delete": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.beside.route": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.beside.query": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.beside.header": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.beside.static": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.beside.hidden": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.into": {
+      "members": [
+        "WardRound.change"
+      ],
+      "version": "current"
+    },
+    "http.whileLoading": {
+      "members": [
+        "WardRound.title"
+      ],
+      "version": "current"
+    },
+    "http.response.success": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.response.error": {
+      "members": [
+        "WardRound.title"
+      ],
+      "version": "current"
+    },
+    "http.chained": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.parallel": {
+      "members": [
+        "WardRound.title",
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "http.finally": {
+      "members": [
+        "WardRound.title"
+      ],
+      "version": "current"
+    },
+    "lane.confirm": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "lane.push": {
+      "members": [
+        "WardRound.title"
+      ],
+      "version": "current"
+    },
+    "lane.slot.load": {
+      "members": [
+        "WardRound.change"
+      ],
+      "version": "current"
+    },
+    "lane.slot.unloadListener": {
+      "members": [
+        "WardRound.change"
+      ],
+      "version": "current"
+    },
+    "lane.slot.hostDestroyed": {
+      "members": [
+        "WardRound.destroy()",
+        "WardRound.isDestroyed",
+        "WardRound.change"
+      ],
+      "version": "current"
+    },
+    "template.render": {
+      "carriedBy": "FusionMultiSelect",
+      "reason": "D15.1 and D15.2 put templates in the Fusion module, where Syncfusion's engine compiles them, and give the core no template node, so a native template proves the native component's own code and no path through the framework; FusionMultiSelect's itemTemplate carries the cell"
+    },
+    "template.conditional": {
+      "carriedBy": "FusionMultiSelect",
+      "reason": "D8.4 and D15.2 make a template conditional the Syncfusion engine's, never the core's condition, so the native reference has no engine to hold one; FusionMultiSelect's itemTemplate carries the cell"
+    },
+    "validation.rule": {
+      "members": [
+        "WardRound.value",
+        "WardRound.change"
+      ],
+      "version": "current"
+    },
+    "validation.condition": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "validation.live": {
+      "members": [
+        "WardRound.change"
+      ],
+      "version": "current"
+    },
+    "validation.summary": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    },
+    "validation.listItem": {
+      "members": [
+        "WardRound.value",
+        "WardRound.change"
+      ],
+      "version": "current"
+    },
+    "validation.prefix": {
+      "members": [
+        "WardRound.value"
+      ],
+      "version": "current"
+    }
+  }
+}

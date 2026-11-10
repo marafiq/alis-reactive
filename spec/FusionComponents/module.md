@@ -51,6 +51,13 @@ Each name is gate 2's; each door is the capability it carries.
   public member (`@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:170`, `:416`, `:528`, `:615`, `:945`,
   `:952`). `Value` is a `Property<TValue>` whose type argument admits null, as the vendor's value holds null until a
   choice (M21.X1).
+  As the Syncfusion reference (step 8, `spec/Reference/syncfusion.json`) it also declares `Placeholder`
+  (`Property<string?>`), `Fields` (`LiveObject<FieldSettings>`, whose `Text` and `GroupBy` are optional
+  `Property<string?>`), `SelectAll(Arg<bool>)` and `Destroy` (`Method`), `Tagging` (`Event<TaggingEventArgs>`, whose
+  `ItemData` is read with `Read`) and `Open` (`Event<PopupEventArgs>`, whose `Popup` is a `LiveObject<MultiSelectPopup>`,
+  the slice's own declaration of EJ2's Popup component, with `OffsetY` a `Property<double>`), each EJ2 33.1.47's public
+  member (`@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277`, `:102`, `:962`, `:1018`, `:622`, `:565`,
+  `@syncfusion/ej2-popups/src/popup/popup.d.ts:125`).
 - `M21.N2` kept: the package. `FusionComponent`, the base of every Fusion declaration, carries `FusionVendor`:
   `ComponentVendor.Define("fusion", objectPath: "ej2_instances.0", subscribe: "addEventListener", unsubscribe:
   "removeEventListener")`, with no payload kind, since each event declares its payload's place (N17.1; module 12). It
