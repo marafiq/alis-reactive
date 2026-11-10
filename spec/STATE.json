@@ -1269,26 +1269,26 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 24,
-        "defects": 428,
+        "defects": 431,
         "doubled": 0,
-        "features": 36,
-        "mapped": 1952,
+        "features": 38,
+        "mapped": 2064,
         "rows": 8909,
-        "unmapped": 6957
+        "unmapped": 6845
       },
-      "detail": "every feature row valid; 6957 of 8909 spec doors in no feature; core defects no feature places: X15.1, X15.2, X15.3, X15.4, X15.5, X17.6, X17.7, X17.8, X17.9, X17.31, X17.32, X17.33, X17.34, X17.35, X17.36, X17.37, X17.38, X20.1, X20.2, X20.3, X20.4, X20.5, X20.6, X20.7",
+      "detail": "every feature row valid; 6845 of 8909 spec doors in no feature; core defects no feature places: X15.1, X15.2, X15.3, X15.4, X15.5, X17.6, X17.7, X17.8, X17.9, X17.31, X17.32, X17.33, X17.34, X17.35, X17.36, X17.37, X17.38, X20.1, X20.2, X20.3, X20.4, X20.5, X20.6, X20.7",
       "pass": false
     },
     "doors_mapped": {
       "counts": {
         "core_doors_homeless": 3,
         "doubled": 0,
-        "features": 36,
-        "mapped": 1952,
+        "features": 38,
+        "mapped": 2064,
         "rows": 8909,
-        "unmapped": 6957
+        "unmapped": 6845
       },
-      "detail": "every feature row valid; 6957 of 8909 spec doors in no feature; core doors no module names: N20.1, N20.2, N20.3",
+      "detail": "every feature row valid; 6845 of 8909 spec doors in no feature; core doors no module names: N20.1, N20.2, N20.3",
       "pass": false
     },
     "evidence": {
@@ -1302,21 +1302,21 @@
     "features_core": {
       "counts": {
         "doubled": 0,
-        "features": 36,
-        "mapped": 1952,
+        "features": 38,
+        "mapped": 2064,
         "rows": 8909,
-        "unmapped": 6957
+        "unmapped": 6845
       },
-      "detail": "every feature row valid; 6957 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6845 of 8909 spec doors in no feature",
       "pass": false
     },
     "features_lost": {
       "counts": {
-        "lost": 560,
-        "types_in_no_feature": 560,
+        "lost": 550,
+        "types_in_no_feature": 550,
         "uncarried_doors": 0
       },
-      "detail": "560 declaring types in no feature",
+      "detail": "550 declaring types in no feature",
       "pass": false
     },
     "fluent": {
@@ -1336,7 +1336,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 74,
+        "files": 76,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1400,10 +1400,10 @@
     },
     "module_cites": {
       "counts": {
-        "cites": 375,
+        "cites": 390,
         "unresolved": 0
       },
-      "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main",
+      "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
       "pass": true
     },
     "no_comments": {
@@ -1426,13 +1426,13 @@
     "promises": {
       "counts": {
         "doubled": 0,
-        "features": 36,
-        "mapped": 1952,
-        "promises": 311,
+        "features": 38,
+        "mapped": 2064,
+        "promises": 314,
         "rows": 8909,
-        "unmapped": 6957
+        "unmapped": 6845
       },
-      "detail": "every feature row valid; 6957 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6845 of 8909 spec doors in no feature",
       "pass": false
     },
     "questions": {
@@ -3370,19 +3370,19 @@
     "verdicts": {
       "counts": {
         "doubled": 0,
-        "features": 36,
+        "features": 38,
         "main_only": 4156,
-        "main_only_in_features": 801,
-        "mapped": 1952,
+        "main_only_in_features": 855,
+        "mapped": 2064,
         "rows": 8909,
-        "unmapped": 6957
+        "unmapped": 6845
       },
-      "detail": "every feature row valid; 6957 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6845 of 8909 spec doors in no feature",
       "pass": false
     }
   },
   "passed": 15,
-  "read_at_head": "8b01c945394336dac4bf8e5c5dc2d635f701abbc",
+  "read_at_head": "1aa0399b451fcdb348e90d4ac72209340e6b3f2f",
   "step": {
     "failing": [
       "doors_mapped",
