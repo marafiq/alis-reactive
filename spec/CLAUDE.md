@@ -356,7 +356,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   on roots and reached types, and ALIS016 then points at the private member. The owner can overrule it.
 - Chosen within the owner's yes, 2026-11-07: a date or an instant that reads nothing writes no text, and a request sends
   it by D9.10's table: a `DateTimeOffset` is left out and binds its start, a `DateTimeOffset?` binds `null` (D3.8,
-  `spec/Core/DateWire.tla` NothingWritesNoText). The redesign's earliest moment was the start of a non-nullable member with no
+  `spec/PathsAndWire/DateWire.tla` NothingWritesNoText). The redesign's earliest moment was the start of a non-nullable member with no
   initializer, which leaving it out binds; sent always, it bound a nullable as that moment and overrode an initializer.
   The owner can overrule it.
 - Chosen within the owner's yes, 2026-11-07: a list item that reads nothing is sent as an empty field when its type admits
@@ -434,7 +434,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   owns, a busy indicator and a notice, never on their CSS or markup; an app puts its own component behind either, and
   the full form takes full control. The core counts each target's requests and calls its show at the first and its
   hide at the last, so a component with a plain show and hide is correct under Parallel, two pipelines at once, retry,
-  replace and a slot's unload (`spec/Core/Composition.tla`).
+  replace and a slot's unload (`spec/RequestsAndResponses/Composition.tla`).
 - The owner, 2026-11-08: the default loader shows on the target a request updates, right for parallel requests of 5
   and 1 seconds on one target or on two (verbatim in `spec/NOTES.md`). Busy is a state of a target, as WAI-ARIA's aria-busy is:
   the elements its success route writes outside a condition, the element it loads, the container it sends, or the elements
@@ -464,14 +464,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   branch, each route, `WhileLoading`, `Finally`, the block `Chained` runs, each `Parallel` branch and the defaults' blocks.
   Conditions, the page's URL, every reply's status, headers and body, and the request as sent dot-walk in each, and a
   chained request reads every reply and request around it. A step that waits holds what follows it, a route's tail
-  included (D11.10, D11.5, `spec/Core/Run.tla`).
+  included (D11.10, D11.5, `spec/Execution/Run.tla`).
 - Chosen within the owner's yes, 2026-11-08: a row action is one handler per action and one entry per rendered
   control, and the entry holds only the row members the action's block reads; a button takes any block and a link a
   block whose one request is a GET, its href; the handler's policy spans the action's rows, and a link reads nothing
   another script did with the click (D17.15). Both lines write a whole plan per link. The owner can overrule it.
 - The owner, 2026-11-08, amending G2: "I can give you go ahead for amend, but you have to make sure the quality bar stay
   high, and think through and tell me if this make sense or not." HTTP adds one statement, `request`, whose executor is
-  `spec/Core/Request.tla`'s state machine, and a pipeline is one run, `spec/Core/Run.tla`'s, whose driver alone touches a
+  `spec/RequestsAndResponses/Request.tla`'s state machine, and a pipeline is one run, `spec/Execution/Run.tla`'s, whose driver alone touches a
   promise (D10.23, D11.11, D11.12). The bar the owner set with it: the machines simplify the runtime's mix of sync and
   async, and an async call in a stack that started sync is proven by TLA+ and then in the browser.
 - The owner, 2026-11-09: "the synfusion TS is loose ... for event payload, hook up in the code with javascript in

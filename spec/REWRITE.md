@@ -17,7 +17,7 @@ in the line.
 
   | Layer | Proves | Runs |
   |---|---|---|
-  | TLA+ (`spec/Core/*.tla`) | the design: every ordering of the async lanes | TLC, on a changed spec and nightly |
+  | TLA+ (`spec/<Module>/*.tla`) | the design: every ordering of the async lanes | TLC, on a changed spec and nightly |
   | Probes (`spec/probes/`) | a fact of a browser, a host or a vendor the design rests on | on a changed probe or pin, nightly |
   | The compiler | the type stages and the ALIS analyzers: what a view, a validator or a declaration cannot write | every build |
   | The render | a refusal the compiler cannot see, on the refusal routes | Playwright |
@@ -188,7 +188,8 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
 
 ### 2.6 TLA+
 
-Each spec has one owning module, the module whose unit changes it; a feature in any module names the invariants it
+Each spec lives in its owning module's folder, `spec/<Module>/<Spec>.tla` beside its `.cfg`, `.violates.*.cfg` and
+`.holds.*.cfg` files; the owner is the module whose unit changes it. A feature in any module names the invariants it
 rests on in its `checker` field, and a test names the action it observes.
 
 | Spec | Owner | Models |

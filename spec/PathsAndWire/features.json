@@ -257,7 +257,7 @@
         "Q3"
       ],
       "meanings": [],
-      "oracle": "The spec itself where the framework is the authority: D1.2's step form, D2.3's one derivation, spec/Core/conversions.md's table and spec/Core/DateWire.tla; the endpoint's binder on each host, read from MVC 5.3.0's source and run on ASP.NET Core 10 in spec/probes; System.Text.Json 10's writer; ECMA-402's Intl for a zone's offsets; ISO 8601-1:2019 and RFC 3339 for date text; and CLDR's windowsZones for net48's zone ids.",
+      "oracle": "The spec itself where the framework is the authority: D1.2's step form, D2.3's one derivation, spec/Core/conversions.md's table and spec/PathsAndWire/DateWire.tla; the endpoint's binder on each host, read from MVC 5.3.0's source and run on ASP.NET Core 10 in spec/probes; System.Text.Json 10's writer; ECMA-402's Intl for a zone's offsets; ISO 8601-1:2019 and RFC 3339 for date text; and CLDR's windowsZones for net48's zone ids.",
       "checker": [
         "core:Q1",
         "core:Q2",

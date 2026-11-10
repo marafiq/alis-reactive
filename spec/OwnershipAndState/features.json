@@ -190,7 +190,7 @@
         "Q13"
       ],
       "meanings": [],
-      "oracle": "The spec itself where the framework is the authority: D12.1's closed owners, D12.2 and D12.3's holdings, D13.1's table and spec/Core/Ownership.tla; the DOM Standard's AbortSignal and dispatch; ECMA-402's Intl for a zone's offsets on a day (probe:intl-iana-zone-offsets); and the endpoint's error body, whose keys are binding names (D10.8).",
+      "oracle": "The spec itself where the framework is the authority: D12.1's closed owners, D12.2 and D12.3's holdings, D13.1's table and spec/OwnershipAndState/Ownership.tla; the DOM Standard's AbortSignal and dispatch; ECMA-402's Intl for a zone's offsets on a day (probe:intl-iana-zone-offsets); and the endpoint's error body, whose keys are binding names (D10.8).",
       "checker": [
         "core:Q12",
         "core:Q13",

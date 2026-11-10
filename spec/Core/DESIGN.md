@@ -176,7 +176,7 @@ Terms used throughout:
   separator of the culture the view renders under, which C# writes into the request argument, because both
   hosts bind form values under the request's culture. Into the query and the route it goes as its invariant
   text, because both hosts bind those under the invariant culture.
-- D3.8 A date and an instant are shown and sent as `spec/Core/DateWire.tla` states (`yyyy-MM-dd`, the time
+- D3.8 A date and an instant are shown and sent as `spec/PathsAndWire/DateWire.tla` states (`yyyy-MM-dd`, the time
   when not midnight, an instant's clock offset; in form data a date or a day with its time, D3.9). A date or an
   instant that reads nothing writes no text: a request
   sends it by D9.10's table, so a `DateTimeOffset` is left out and binds its start, and a `DateTimeOffset?` binds
@@ -1580,7 +1580,7 @@ Terms used throughout:
   POST, PUT and DELETE send there the members of a typed query, `Query<TQuery>(q => q.Set(..))`, beside the body.
   A member is static (a literal) or read from a source. The URL's own query text is kept, and C# appends the
   members after it with `?` or `&`. A key is the binding name, a list sends one key per item, a number is its
-  invariant text and a date is the wire form of `spec/Core/DateWire.tla`.
+  invariant text and a date is the wire form of `spec/PathsAndWire/DateWire.tla`.
 - D9.7 A JSON body is one object. Its member names are Q2's, its nesting follows Q1's steps, and a dictionary
   entry is a member named by its key. A JSON request that sets nothing sends `{}`, because on net10 a request
   with no body answers 415 or binds null by the endpoint parameter's nullability (`probe:core-frombody-no-body`).
@@ -2200,8 +2200,8 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   action whose model is bound from the form 200, with nothing of the body bound (`probe:core-json-to-form-bound`). Main's
   default is JSON (`Alis.Reactive/PlanAuthoring/Requests/HttpRequestBuilder.cs:21` at 7b9e987cc); its feature is kept by
   `Json(..)`, which a `[FromBody]` or `[ApiController]` endpoint takes.
-- D10.23 A request is one statement of the plan, `request`, and one state machine, the one `spec/Core/Request.tla`
-  checks and `spec/Core/Run.tla` runs as a frame (the owner, 2026-11-08: "treat request as a unit", "there is implicit
+- D10.23 A request is one statement of the plan, `request`, and one state machine, the one `spec/RequestsAndResponses/Request.tla`
+  checks and `spec/Execution/Run.tla` runs as a frame (the owner, 2026-11-08: "treat request as a unit", "there is implicit
   state machine here"). It is `idle` until its statement runs, then in the states `check`, `defaultLoading`, `loading`,
   `guard`, `attempt`, `route`, `finally`, `defaultFinally`, `chained` and `after`, and `done` however it ended, which
   its completion tells (D11.12). The statement's executor holds the request's state (the argument it
@@ -2639,7 +2639,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     `spec/api/CshtmlStages/Views/Stages/Index.cshtml` writes the same stages and a row action's loop in an ASP.NET Core
     MVC view the Razor SDK compiles at build, and `spec/api/CshtmlStages/Program.cs` the defaults' blocks in a startup
     file; an MVC 5 view is compiled where it first renders, so it stays the verify-net48 run's.
-- D11.11 A pipeline runs as one run, a state machine (`spec/Core/Run.tla`). Its frames are the blocks and requests
+- D11.11 A pipeline runs as one run, a state machine (`spec/Execution/Run.tla`). Its frames are the blocks and requests
   in progress, innermost last, and its status is running, waiting or ended. Only the run's driver continues on a
   promise, in one place, its wait: a step completes, opens a frame, waits on one promise or stops, and the driver runs
   steps in the trigger's turn until one waits. So a run with no awaited step ends in that turn, the second handler of
@@ -2664,16 +2664,16 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     `Finally` does before an await never undoes what the new run's `WhileLoading` shows. What it does after an await
     runs after that `WhileLoading`, since under `replace` it goes on to its end (X11.22): an element an app shows in
     `WhileLoading` and hides in `Finally` after an await is hidden by the old run while the new one loads, and the
-    door for that is the busy indicator, which the core counts per target (D10.21, `spec/Core/Composition.tla`). A
+    door for that is the busy indicator, which the core counts per target (D10.21, `spec/RequestsAndResponses/Composition.tla`). A
     hide before the old `Finally`'s first await runs before the new run starts. Neither TLA+ spec models the second
     run, so the order is X11.24's, a Playwright promise of the rewrite's run unit.
   - `all` ends when each of its blocks ended (D10.10, `Lanes.tla:JoinAfterEveryBranchTail`).
 - D11.12 The core's state machines are closed, each held in one place, its transitions its TLA+ spec's actions:
-  - a run (D11.11, `spec/Core/Run.tla`), under its handler's policy and its owner's dispose (`spec/Core/Lanes.tla`);
-  - a request (D10.23, `spec/Core/Request.tla`), a frame of its run;
-  - an owner and its slot (Q12, `spec/Core/Ownership.tla`);
-  - a connection (Q21, `spec/Core/Realtime.tla`);
-  - a busy target's count (D10.21, `spec/Core/Composition.tla`).
+  - a run (D11.11, `spec/Execution/Run.tla`), under its handler's policy and its owner's dispose (`spec/Execution/Lanes.tla`);
+  - a request (D10.23, `spec/RequestsAndResponses/Request.tla`), a frame of its run;
+  - an owner and its slot (Q12, `spec/OwnershipAndState/Ownership.tla`);
+  - a connection (Q21, `spec/Realtime/Realtime.tla`);
+  - a busy target's count (D10.21, `spec/RequestsAndResponses/Composition.tla`).
   Each machine's states have one set of names, which every spec and the runtime's types use:
   - a run is `idle`, `running`, `waiting` or `ended`, and ends completed, stopped, replaced or disposed (D20.6); a
     trigger the `skip` policy refuses leaves its run `idle` (D11.7);
@@ -2879,7 +2879,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   their first awaited step, the run ends, and then the release runs, so each `Finally` runs before the unmount (D11.8)
   and nothing after the step runs (`Run.tla:NothingRunsAfterAnAbort`, `Lanes.tla:FinallyRunsBeforeRelease`); the
   release's errors are then logged as one error, since the run that asked for the release has ended.
-  `spec/Core/Ownership.tla` checks the release over the interleavings of a nested slot and the slot around it, each
+  `spec/OwnershipAndState/Ownership.tla` checks the release over the interleavings of a nested slot and the slot around it, each
   step issued by the page or by the slot it releases: every owner released past a throw
   (`EveryOwnerReleasedPastAThrow`), a raise running no listener whose removal threw (`ThrownListenerRunsNothing`),
   and the content replaced (`StepReplacesTheContent`). That the step stops after a release that met a throw, and that
@@ -3359,7 +3359,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `EditorFor` renders nothing for a model already rendered up its template chain, or for a null of a type the chain
   rendered as null, on both hosts (`probe:core-template-visited`, `probe:mvc5-template-visited`); `PartialFor` has no
   such guard.
-- `spec/Core/Partials.tla` renders a family's next of kin and guardian, two members of one type, each by one of MVC's
+- `spec/PartialsAndSlots/Partials.tla` renders a family's next of kin and guardian, two members of one type, each by one of MVC's
   doors (`EditorFor`, `PartialFor`, `<partial for>` on net10, the `ViewData` copy, a slot under the member's prefix, a
   partial with a model, a slot with none), each kin's address inside it by `EditorFor`, `PartialFor` or a partial with
   a model, on each host as its probes and sources state, slots loaded in either order. On every door that gives a member
@@ -3906,7 +3906,7 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     subscribe method that returns the function that removes the listener (`const off = store.subscribe(listener)`),
     which release calls. The doors are `ComponentVendor.Define(name, objectPath, subscribe, unsubscribe)`,
     `ComponentVendor.DefineCallbackProperties(name, objectPath)` and `ComponentVendor.DefineReturnedUnsubscriber(name,
-    objectPath, subscribe)` (N17.7). A callback property's listeners chain, gate 1's P4 (`spec/Core/CallbackProperty.tla`):
+    objectPath, subscribe)` (N17.7). A callback property's listeners chain, gate 1's P4 (`spec/Vendors/CallbackProperty.tla`):
     - The first listener of an object's property, a handler's or a `listen` step's (D12.8), assigns the framework's
       function, which keeps the value it replaced; every later listener joins that function's list, and the property
       is not written again. The vendor's call runs the replaced value first, with the vendor's `this` and arguments,
@@ -4761,7 +4761,7 @@ shapes, starts and the payload's path of each event.
   `spec/NOTES.md`).
 - D19.2 The set is closed at 51 kinds: today's 33 but `try`, and `request`, `stop`, `listen`, `data`, `start`,
   `nothing`, `unbound`, `signal`, `answer`, `file`, `each`, `returned`, `living`, `held`, `stream`, `clock`, `zone`,
-  `off` and `on`, the 19 `spec/Core/schema.md` marks added and `spec/Core/Schema.tla` checks. `try` leaves, its
+  `off` and `on`, the 19 `spec/Core/schema.md` marks added and `spec/Schema/Schema.tla` checks. `try` leaves, its
   `finally` carried by a `request`'s layers, since nothing but a request's `Finally` wrote it (the owner's amendment of
   G2, 2026-11-08, D10.23); no other kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
   to the owner with its use case.

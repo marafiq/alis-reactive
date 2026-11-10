@@ -285,9 +285,14 @@ def bullets(text):
 SPEC_PATH = re.compile(r"\bspec/[\w/.\-]+\.(?:md|tla|cfg|json|tsv|txt|py)\b")
 
 
+def tla_file(name):
+    found = sorted(SPEC.glob(f"*/{name}.tla"))
+    return found[0] if len(found) == 1 else SPEC / "Core" / f"{name}.tla"
+
+
 def tla_invariants(spec):
-    tla = SPEC / "Core" / f"{spec}.tla"
-    cfg = SPEC / "Core" / f"{spec}.cfg"
+    tla = tla_file(spec)
+    cfg = tla.with_suffix(".cfg")
     if not tla.exists():
         return None, set()
     defined = set(re.findall(r"^(\w+)\s*==", tla.read_text(), re.MULTILINE))
@@ -424,7 +429,7 @@ def run_tlc(tla, cfg):
 
 
 def tlc_configs(name):
-    folder = SPEC / "Core"
+    folder = tla_file(name).parent
     main = folder / f"{name}.cfg"
     violating = {match.group(1): path for path in sorted(folder.glob(f"{name}.violates.*.cfg")) for match in [re.match(rf"{name}\.violates\.(\w+)\.cfg$", path.name)] if match}
     holding = sorted(folder.glob(f"{name}.holds.*.cfg"))
@@ -438,7 +443,7 @@ def check_tlc(brief, previous, step):
     specs = {name: expectation for name, expectation in TLC_SPECS.items() if expectation["step"] <= step}
     met = 0
     for name, expectation in specs.items():
-        tla = SPEC / "Core" / f"{name}.tla"
+        tla = tla_file(name)
         main, violating, holding = tlc_configs(name)
         if not tla.exists():
             problems.append(f"{name} not started")
@@ -643,7 +648,7 @@ def source_line(sha, cite):
 
 
 def spec_node_set():
-    text = (SPEC / "Core" / "Schema.tla").read_text()
+    text = tla_file("Schema").read_text()
     kinds = set()
     for line in text.splitlines():
         if "Kinds ==" in line and line.split("==", 1)[0].strip().endswith("Kinds") and "{" in line:
@@ -1227,7 +1232,7 @@ MATRIX_ASYNC_KINDS = {"request", "hub"}
 
 def matrix_action_exists(observed):
     spec, _, action = observed.partition(".tla:")
-    path = SPEC / "Core" / f"{spec}.tla"
+    path = tla_file(spec)
     if not action or not path.exists():
         return False
     text = path.read_text()
@@ -1720,7 +1725,7 @@ def matrix_problems(matrix):
         problems += ([f"{name} is refused, and none of {', '.join(cell['meaning'])} is a type, analyzer or refusal defect"] if cell["outcome"] == "refused" and not refusing else [])
         problems += ([f"{name} at Positions.{cell.get('position')} carries the gap {cell.get('gap')!r}, where spec/api/Cells names {gaps.get(cell.get('position'))!r}"] if cell["group"] == "source" and cell.get("gap") != gaps.get(cell.get("position")) else [])
         problems += [f"{name} rests on {meaning}, which spec/Core/DESIGN.md does not state" for meaning in cell["meaning"] if meaning not in known]
-        problems += [f"{name} writes {kind}, no kind of spec/Core/Schema.tla" for kind in cell["kinds"] if kind not in kinds]
+        problems += [f"{name} writes {kind}, no kind of spec/Schema/Schema.tla" for kind in cell["kinds"] if kind not in kinds]
         problems += ([f"{name} has the outcome {cell['outcome']!r}"] if cell["outcome"] not in MATRIX_OUTCOMES else [])
     return problems
 
@@ -1954,7 +1959,7 @@ ACTION_NAME = re.compile(r"([A-Z][A-Za-z]+)(?=\(|\s*\\/|\s*$)", re.M)
 
 
 def spec_actions(spec):
-    text = (SPEC / "Core" / f"{spec}.tla").read_text()
+    text = tla_file(spec).read_text()
     start = text.find("\nNext ==")
     end = text.find("\nSpec ==", start)
     return list(dict.fromkeys(ACTION_NAME.findall(text[start + len("\nNext =="):end])))

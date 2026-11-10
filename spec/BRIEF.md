@@ -633,7 +633,7 @@ Each pilot ran one part of this brief on its own. Their drafts are in `~/.claude
 ## 9. Checkers: assigned, not chosen
 **TLA+, checked by TLC:**
 - Q4, absence and promises;
-- Q9 and Q10 together in `spec/Core/Request.tla`: which part each member goes to (route, query, body or header), the request's flow, and its refusals;
+- Q9 and Q10 together in `spec/RequestsAndResponses/Request.tla`: which part each member goes to (route, query, body or header), the request's flow, and its refusals;
 - Q11, lanes and time;
 - Q12, ownership;
 - Q16, validation agreement on both hosts;
@@ -755,7 +755,7 @@ The schema kinds, `case` labels and analyzer IDs go to their own TSVs. The tests
 
 **5. Answer Q19, the schema**, and the validation spec.
 - **The schema:**
-  - `spec/Core/Schema.tla` and `spec/Core/schema.md`: every node, what it carries, and which nodes it holds.
+  - `spec/Schema/Schema.tla` and `spec/Core/schema.md`: every node, what it carries, and which nodes it holds.
   - `check.py` checks that the kinds in `Alis.Reactive/Grammar`, the kinds in `plan.schema.json` and the spec's node set are equal.
   - Every kind has exactly one handler in the runtime: a `case` label, or, for plugin data (`form`, `hub`, `model`), the plugin the plan names (`runtime/plans/start.ts:36-40`). `none` has no handler by design.
   - The proposed set's difference from today's is the diff.

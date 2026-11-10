@@ -202,7 +202,7 @@
         "Q11"
       ],
       "meanings": [],
-      "oracle": "The spec itself where the framework is the authority: spec/Core/Run.tla, Lanes.tla and Absence.tla, whose invariants TLC checks, and Request.tla's states, which Run.tla runs as frames; ECMA-262's promise jobs for what runs in a turn; the DOM and Fetch Standards' AbortSignal and fetch, pinned in spec/probes (abort-signal-keeps-first-reason, fetch-aborted-signal-sends-nothing); System.Text.Json 10's binding for a data member's start (core-stj-empty-object-start, core-stj-populate-start, core-json-nested-start); and EJ2 33.1.47's declared return types and payloads (ej2-methods-returning-promise, ej2-filtering-args-members).",
+      "oracle": "The spec itself where the framework is the authority: spec/Execution/Run.tla, Lanes.tla and Absence.tla, whose invariants TLC checks, and Request.tla's states, which Run.tla runs as frames; ECMA-262's promise jobs for what runs in a turn; the DOM and Fetch Standards' AbortSignal and fetch, pinned in spec/probes (abort-signal-keeps-first-reason, fetch-aborted-signal-sends-nothing); System.Text.Json 10's binding for a data member's start (core-stj-empty-object-start, core-stj-populate-start, core-json-nested-start); and EJ2 33.1.47's declared return types and payloads (ej2-methods-returning-promise, ej2-filtering-args-members).",
       "checker": [
         "core:Q4",
         "core:Q11",

@@ -15,7 +15,7 @@ file itself, and a date at a live member as a JavaScript `Date`. Module 15 of `s
   app's JSON options (D2.6, D2.9), and a component's member keeps its JavaScript name (D2.7).
 - Q3: the shapes are closed, `file` among them (D3.1); a number goes as a JSON number, as text under the view's
   culture in form data, and as invariant text in a query or route (D3.7); a date and an instant are shown and sent as
-  `spec/Core/DateWire.tla` states, ISO 8601 and RFC 3339 (D3.8, D3.9); a JSON response is System.Text.Json's on both
+  `spec/PathsAndWire/DateWire.tla` states, ISO 8601 and RFC 3339 (D3.8, D3.9); a JSON response is System.Text.Json's on both
   hosts (D3.10); culture is the server's (D3.11) and the time zone the app's (D3.12); a date reaches a live member as a
   `Date` (D3.13).
 

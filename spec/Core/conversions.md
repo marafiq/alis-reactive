@@ -23,7 +23,7 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | text | itself |
 | number, finite | its text as .NET writes it under the view's culture (D3.11): the shortest digits, the culture's decimal separator, no group separator, and below 1E-04 or from 1E+17 up the form `1,234565E+17` |
 | boolean | `"true"` or `"false"` |
-| date | its local day `"yyyy-MM-dd"`, with `"THH:mm:ss"` and `".fff"` when not midnight (`spec/Core/DateWire.tla`) |
+| date | its local day `"yyyy-MM-dd"`, with `"THH:mm:ss"` and `".fff"` when not midnight (`spec/PathsAndWire/DateWire.tla`) |
 | instant | its wall time in the view's time zone with that zone's offset for its own day (D3.12), `"yyyy-MM-ddTHH:mm:ss-08:00"`, `"Z"` at zero |
 | list | each item converted to string, joined by `","` |
 

@@ -3,7 +3,7 @@
 The plan grammar the rewrite writes and executes: Q19 of `spec/Core/DESIGN.md`, derived from Q1 to Q18, Q20 and Q21.
 C# writes these nodes and nothing else; the browser executes these nodes and nothing else. Both sides work
 from this file in parallel: the C# side by the nodes each builder writes, the browser side by each node's
-meaning, and `spec/Core/Schema.tla` checks that what C# accepts is what the browser runs.
+meaning, and `spec/Schema/Schema.tla` checks that what C# accepts is what the browser runs.
 
 ## Rules of the schema
 
@@ -354,8 +354,8 @@ no argument type of its own (D9.1).
   | `text` | nothing | a text, sent as it is |
   | `number` | nothing | a finite number, sent as its invariant text (D9.6) |
   | `boolean` | nothing | `true` or `false` |
-  | `date` | nothing | a date, as `spec/Core/DateWire.tla` writes it with no offset (D3.8) |
-  | `instant` | nothing | an instant, as `spec/Core/DateWire.tla` writes it with the clock's offset (D3.8) |
+  | `date` | nothing | a date, as `spec/PathsAndWire/DateWire.tla` writes it with no offset (D3.8) |
+  | `instant` | nothing | an instant, as `spec/PathsAndWire/DateWire.tla` writes it with the clock's offset (D3.8) |
   | `written` | nothing | a value System.Text.Json writes as one text or number, sent as it is held |
   | `enum` | `values`: a list of `EnumValue` | the `name` of the value whose `held` equals what the source holds; a held form no value lists stops the request (D9.13) |
   | `flags` | `values`: a list of `FlagValue`, the largest `number` first | the names of the values `Enum.ToString`'s split takes from what the source holds, the smallest first, joined by ", "; what the split cannot read stops the request (D9.13, N16.4) |
