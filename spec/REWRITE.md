@@ -9,8 +9,8 @@ in the line.
 
 - **Five packages, one version.** AlisReactive (the core, its analyzers inside), AlisReactive.Native and
   AlisReactive.Fusion ship code; AlisReactive.DesignSystem and AlisReactive.NativeTagHelpers ship empty, so their ids
-  stay, and nothing in the tree is kept for them. Main's sixth, AlisReactive.FluentValidator, is not packed: its doors moved into
-  AlisReactive (spec/CLAUDE.md, 2026-11-10).
+  stay, and nothing in the tree is kept for them. Main's sixth, AlisReactive.FluentValidator, is not packed: the core's validation
+  carries its doors (M8.F1; spec/CLAUDE.md, 2026-11-10).
 - **One app proves the framework.** The care home conformance app (`spec/Reference/app.json`): care screens a care
   home's staff use, the component bench with the conformance library's six declarations, and the refusal routes, run
   under 18 hosts. Every browser test runs on one of its screens. No core test loads Syncfusion.
@@ -392,7 +392,7 @@ is never the reason.
   becomes `tests/Alis.Reactive.Consumer.Net48`; `build/AlisReactiveBrowserAssets.targets`; `Alis.Reactive.Assets/components/`,
   whose code moves into its package; jsdom and Tailwind.
 - Main's `Alis.Reactive.FluentValidator`, its line in `scripts/pack.sh` and its id in `nuget-publish.yml`'s expected
-  list, which the merge of main brings in; its doors are AlisReactive's.
+  list, which the merge of main brings in; M8.F1 holds its doors' verdicts.
 - `.claude/rules/docs.md`'s worked example: the cut removes the sandbox's, and U12 writes the conformance app's.
 
 ## 4. Units

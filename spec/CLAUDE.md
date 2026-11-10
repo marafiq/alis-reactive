@@ -540,8 +540,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the owner's decision.
 - The owner, 2026-11-10, asked what AlisReactive.FluentValidator ships, since the core implements the validation grammar
   without the FluentValidation library: "if not needed remove it that is better". The rewrite packs five ids, not main's
-  six: main's FluentValidator doors moved into AlisReactive (`spec/inventory/doors.tsv`), so an app on main's release
-  candidates drops the reference and keeps its validators.
+  six. Of main's 113 FluentValidator doors on each target, 8 moved into AlisReactive and M8.F1 gives the other 105 their
+  verdicts, 103 refused with their carriers and 2 kept (`spec/inventory/doors.tsv`). Main's `ReactiveValidator<T>` derives
+  from FluentValidation's `AbstractValidator<T>`, so an app on main's release candidates drops the reference and moves
+  each validator onto the core's `ReactiveValidator<T>`, whose `RuleFor` rules reach the browser in place of main's ClientRule calls.
 - The owner, 2026-11-10: the Native components are great consumers and are written for real, with the dependency
   inverted: NativeToast, NativeDrawer (main's panel) and the common components (text box, check box, drop-down, radio
   group, check list, text area, button, hidden field, action link) are production components on the core's public
