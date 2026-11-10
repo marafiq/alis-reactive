@@ -21,6 +21,7 @@ BASE_SHA = "65fdf118d1498a8285db84a43c4da81dfaa0ea3e"
 SPEC_BRANCH = "feature/spec-first"
 JAVA = "/opt/homebrew/opt/openjdk/bin/java"
 TLA_JAR = Path.home() / ".local/share/tlaplus/tla2tools.jar"
+TLA_LOCK = SPEC / "tools" / "tla2tools.lock"
 TLC_GREEN = "Model checking completed. No error has been found."
 LOCAL_SETTINGS = Path("/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.claude/settings.local.json")
 HOOK_COMMAND = (
@@ -436,10 +437,18 @@ def tlc_configs(name):
     return main, violating, holding
 
 
+def tla_jar_problems():
+    pinned = json.loads(TLA_LOCK.read_text())["sha256"]
+    if not TLA_JAR.exists():
+        return [f"{TLA_JAR} missing, the lock pins {pinned}"]
+    found = hashlib.sha256(TLA_JAR.read_bytes()).hexdigest()
+    return [] if found == pinned else [f"{TLA_JAR} has SHA-256 {found}, the lock pins {pinned}"]
+
+
 def check_tlc(brief, previous, step):
     cached = previous.get("checks", {}).get("tlc", {}).get("runs", {})
     runs = {}
-    problems = []
+    problems = tla_jar_problems()
     specs = {name: expectation for name, expectation in TLC_SPECS.items() if expectation["step"] <= step}
     met = 0
     for name, expectation in specs.items():

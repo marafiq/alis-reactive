@@ -242,7 +242,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | PublicApi and BannedApi analyzers | 5.6.0 | the surface text; no run-time reflection |
 | NUnit, adapter, test SDK | 4.6.1, 5.2.0, 17.14.1 | tests |
 | Playwright | Microsoft.Playwright 1.63.0, CI's image `mcr.microsoft.com/playwright/dotnet:v1.63.0-noble` by digest | every browser test and probe |
-| Java, TLC | OpenJDK 27.0.1, tla2tools 2.19 by SHA-256 in `spec/tools/tla2tools.lock` | model checking |
+| Java, TLC | OpenJDK 27.0.1, tla2tools v1.7.4 (TLC 2.19) by SHA-256 in `spec/tools/tla2tools.lock` | model checking |
 | Python | 3.14.7, standard library | `spec/tools/check.py` |
 | Syncfusion | 33.1.47, npm and NuGet together | `node scripts/pin-syncfusion.mjs <version>` moves both |
 | Actions | by SHA with Dependabot's version comment | CI |
@@ -252,6 +252,13 @@ architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (buil
 the result line and the leftover-server check); `scripts/test.sh` (both); `build.sh`, `run.sh`, `pack.sh`,
 `doctor.sh` (every pin), `plant-defect.sh`, `verify-release-tag.sh`, `pin-syncfusion.mjs`, `install-git-hooks.sh`.
 MSBuild never runs npm; an app whose bundle is missing refuses to start.
+
+`check.py --ci`, which U1 adds, runs every check but survival, a spec session's own hook and branch, and probes,
+which run nightly and on a changed probe or pin. It runs a TLC config only when the CI cache holds no result for its
+hash, reads java from `JAVA_HOME` and the jar from `TLA2TOOLS_JAR`, refuses a jar whose SHA-256 is not the lock's,
+writes no `spec/STATE.json`, and exits 1 on any failure. The checks that read code keep reading the SHAs their cites
+pin, except kinds, which from U3 on reads the rewrite's grammar at HEAD: a kind `spec/Core/schema.md` does not list
+fails, and from U26 on so does a kind it lists that HEAD lacks.
 
 `scripts/playwright.sh` selects a module (`RequestsAndResponses`), a screen (`--screen Residents`), a feature
 (`--feature M6.F1`), one test (`--test M3_F1_X8_27_2`), one fixture, one host (`--host snakeCase`), a pool's shard
@@ -375,17 +382,25 @@ Each retirement waits for `features_lost` at 0 and the rule files that name the 
 is never the reason.
 - `Alis.Reactive.SandboxApp` with `tests/Alis.Reactive.PlaywrightTests`; `tests/Alis.Reactive.Framework.App` with its
   16 components and `Framework.PlaywrightTests`; `ClassNames.App` and its tests, now the host `classNames`;
-  `tests/Alis.Reactive.Playwright.TestHost`, merged into the Playwright project's `Harness/`;
   `scripts/framework-coverage.*`, `vstest-filter.mjs`, every `playwright.project.sh`, `check_ci_shard_matrix`.
-- `poc/` and the `Poc` test projects, last: each proof ported by its unit, the POC analyzers moved to their modules'
-  folders, `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
+- `poc/`, the `Poc` test projects and `tests/Alis.Reactive.Playwright.TestHost` they build on, last: each proof ported
+  by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC analyzers moved to their
+  modules' folders, `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
   `spec/api/HttpSurface` retargeted to the core, and every cite of `poc/` pinned to a SHA.
 - The sources of DesignSystem and NativeTagHelpers, their workspaces and asset lines; `examples/net48-mvc-smoke`, which
   becomes `tests/Alis.Reactive.Consumer.Net48`; `build/AlisReactiveBrowserAssets.targets`; `Alis.Reactive.Assets/components/`,
   whose code moves into its package; jsdom and Tailwind.
-- `.claude/rules/docs.md`'s worked examples move from the sandbox to the conformance app with the sandbox's retirement.
+- `.claude/rules/docs.md`'s worked example: the cut removes the sandbox's, and U11 writes the conformance app's.
 
 ## 4. Units
+
+The rewrite runs on `feature/rewrite`, branched from `feature/spec-first`'s tip with `origin/main` merged in, and lands
+on main by pull request. U1's first commit is the cut: it removes both lines' code that section 2.1 does not hold under
+the same path, the shipped projects' sources and every item of section 3 but the `poc/` bullet's, and in the same
+commit rewrites root CLAUDE.md, `.claude/rules/` and the folder CLAUDE.md files for the new tree, the meanings list
+stated from D2.4 to D2.6, D2.9 and D4.2 (D2.8), since `WhenARuleNamesTheCode` fails on a rule that names what the cut
+removed. Each removed line stays readable at 65fdf118d or at main's SHA, which every cite pins, and `features_lost` at
+0 is each removed door's verdict.
 
 A unit ends when every test check.py assigns it passes on `scripts/playwright.sh`, each written from its promise
 before the doors it needs and failing then, and failing again on its planted defect, the specs its module owns are
@@ -400,8 +415,9 @@ unit's tests).
 ### U1. Tools, pins and tables
 Features: M20.F1
 
-The pins of section 2.7, central package management, the SliceTree tables, the analyzers project with ALIS010 to
-ALIS013 and module 20's rules, the lint at its strictest, `scripts/check.sh` green on an empty core.
+The cut and the rewritten rule files (section 4's opening), the pins of section 2.7 with the TLC lock, central package
+management, the SliceTree tables, the analyzers project with ALIS010 to ALIS013 and module 20's rules, the lint at its
+strictest, `check.py --ci`, `scripts/check.sh` green on an empty core.
 
 ### U2. The harness, the conformance app's shell and CI
 Features: none
@@ -457,7 +473,7 @@ Features: M9.F1, M9.F2
 Features: M25.F1, M25.F2, M25.F3, M25.F4, M25.F5, M25.F6, M25.F7
 
 NativeDrawer, NativeToast, NativeConfirm, NativeLoader, the reconnect offer and the action link, each rendered into
-the target a legacy layout holds by the helper the layout calls once; the same review and lint as U13.
+the target a legacy layout holds by the helper the layout calls once; the same review and lint as U12.
 
 ### U15. Array lambdas
 Features: M4.F1, M4.F2
