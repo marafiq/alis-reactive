@@ -237,13 +237,15 @@ Each name is gate 2's; each door is the capability it carries.
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-multicolumn-combobox/src/multicolumn-combobox/multi-column-combo-box.d.ts:361`, `:389`, `:437`,
   `:443`, `:451`, `:757`, `:898`, `:905`, `:913`, `:920`).
-- `M21.N32` kept: `FusionNumericTextBox`: `Value` and `Min` as `Property<decimal?>` (M21.X607), `FocusIn`, `FocusOut`,
-  `Increment`, `Decrement`, `Change`, `Focus` and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3);
-  the payloads `FusionNumericTextBox.ChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<decimal?>`, M21.X608,
-  and `IsInteracted`), `FusionNumericTextBox.NumericFocusEventArgs` and `FusionNumericTextBox.NumericBlurEventArgs`, of
-  which the declaration reads no member; and the render helper `field.FusionNumericTextBox(build => ..)`. It replaces
-  main's eight files (`Alis.Reactive.Fusion/Components/FusionNumericTextBox/` at 623dd4a27), whose doors carry their
-  verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+- `M21.N32` kept: `FusionNumericTextBox<TValue>`, `TValue` the bound member's type as EJ2 marks the value generic:
+  `Value` and `Min` as `Property<TValue>` (M21.X607), `FocusIn`, `FocusOut`, `Increment`, `Decrement`, `Change`, `Focus`
+  and `Blur`, with `IInputComponent.Input` committed by `Change` (M7.N3); the payloads
+  `FusionNumericTextBox<TValue>.ChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<TValue>`, M21.X608, and
+  `IsInteracted`), `FusionNumericTextBox<TValue>.NumericFocusEventArgs` and
+  `FusionNumericTextBox<TValue>.NumericBlurEventArgs`, of which the declaration reads no member; and the render helper
+  `field.FusionNumericTextBox(build => ..)`, which renders `FusionNumericTextBox<TProp>`. It replaces main's eight files
+  (`Alis.Reactive.Fusion/Components/FusionNumericTextBox/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:71`, `:82`, `:272`, `:278`, `:284`, `:373`, `:381`,
   `:401`, `:407`, `:440`, `:445`, `:454`).
 - `M21.N33` kept: `FusionOtpInput`: `Value` as `Property<string>`, the text the browser holds
@@ -292,14 +294,15 @@ Each name is gate 2's; each door is the capability it carries.
   fifteen files (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors carry their verdicts in
   `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-schedule/src/schedule/base/schedule.d.ts:250`, `:274`, `:707`, `:867`, `:1716`, `:1726`, `:1878`).
-- `M21.N41` kept: `FusionSlider`: `Value` as `Property<double?>` for a slider of one handle and `RangeValue` as
-  `Property<double[]?>` for a range, each reading `value` (M21.X614), the second by a `name:` since the compiler refuses
-  two members named `Value`; `DataBind`, `Change` and `Changed`, with `IInputComponent.Input` committed by `Changed`
-  (M7.N3); the payload `FusionSlider.SliderChangeEventArgs` (`Value` and `PreviousValue` as numbers, `RangeValue` and
-  `PreviousRangeValue` as lists, M21.X616, `Text`, `Action`, `IsInteracted`); and the render helpers
-  `field.FusionSlider()` and `field.FusionSlider(build => ..)`, which start at the member's value (M21.X615). It
-  replaces main's six files (`Alis.Reactive.Fusion/Components/FusionSlider/` at 623dd4a27), whose doors carry their
-  verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+- `M21.N41` kept: `FusionSlider<TValue>`, `TValue` the bound member's type as EJ2 marks the value generic: one `Value`
+  as `Property<TValue>`, one number for a slider of one handle and a list of numbers for a range (M21.X614); `DataBind`,
+  `Change` and `Changed`, with `IInputComponent.Input` committed by `Changed` (M7.N3); the payload
+  `FusionSlider<TValue>.SliderChangeEventArgs` (`Value` and `PreviousValue` as `ReadOnly<TValue>`, M21.X616, `Text`,
+  `Action`, `IsInteracted`); and the render helpers `field.FusionSlider()` and `field.FusionSlider(build => ..)`, which
+  render `FusionSlider<TProp>` at the member's value (M21.X615), a list member as EJ2's `Range` type
+  (`@syncfusion/ej2-inputs/src/slider/slider.d.ts:423`). It replaces main's six files
+  (`Alis.Reactive.Fusion/Components/FusionSlider/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
   (`@syncfusion/ej2-inputs/src/slider/slider.d.ts:366`, `:514`, `:521`, `:70`, `:76`, `:80`, `:84`, `:88`,
   `@syncfusion/ej2-base/src/component.d.ts:129`).
 - `M21.N43` kept: `FusionSmartTextArea`: `Value` as `Property<string?>` (M21.X604), `FocusIn`, `Change`,
@@ -469,8 +472,8 @@ features they give.
 - A cleared number reads as nothing (M21.X608). Both lines read NumericTextBox's change value as a number
   (`Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:56` at 65fdf118d), while the browser
   hands null for a cleared box and for the change after it (`probe:ej2-payload-numerictextbox-change-cleared`,
-  `probe:ej2-payload-numerictextbox-change-after-cleared`); the rewrite reads `decimal?`, so a view can check a cleared
-  dose.
+  `probe:ej2-payload-numerictextbox-change-after-cleared`); the rewrite reads the bound member's type, `TValue`, which
+  admits null (`decimal?` for a dose), so a view can check a cleared dose.
 - A component starts at the member's value (M21.X605, M21.X612, M21.X613, M21.X615). Both lines render Slider, Rating
   and OtpInput by the vendor's builder that binds no member
   (`Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:83` at 65fdf118d) and SmartTextArea at its options'
@@ -480,8 +483,8 @@ features they give.
   the rewrite starts each at the member's value by M21.D1.
 - A range slider reads its handles (M21.X616). Both lines read a slider's change value as one number
   (`Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:43` at 65fdf118d), while a range slider hands a list
-  (`probe:ej2-payload-slider-rest-change`); the rewrite's payload reads `RangeValue` and `PreviousRangeValue` as lists,
-  as the component's `RangeValue` reads its value.
+  (`probe:ej2-payload-slider-rest-change`); the rewrite's payload reads `Value` and `PreviousValue` as the bound
+  member's type, a list for a range, as the component's one `Value` reads its value.
 - An icon's place is typed (M21.X602). The redesign takes `AddIcon`'s place as text
   (`Alis.Reactive.Fusion/Components/FusionTextBox/FusionTextBox.cs:33` at 65fdf118d), and EJ2 prepends the icon for any
   text but `append` (`@syncfusion/ej2-inputs/src/input/input.js:997-1007`); the rewrite takes one of the two places EJ2

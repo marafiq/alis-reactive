@@ -2547,7 +2547,7 @@
       "source": "spec/probes/ej2-payloads-u6.mjs",
       "proof": {
         "feature": "M21.F41",
-        "page": "A rest window page whose range FusionSlider, from 12 to 18 at 13 and 15, has a Change handler that sets rest-reading's text to the payload's RangeValue.",
+        "page": "A rest window page whose range FusionSlider, from 12 to 18 at 13 and 15, has a Change handler that sets rest-reading's text to the payload's Value.",
         "gesture": "Click the first handle and press the right arrow.",
         "outcome": "rest-reading shows 14 and 15."
       }
@@ -2562,7 +2562,7 @@
       "source": "spec/probes/ej2-payloads-u6.mjs",
       "proof": {
         "feature": "M21.F41",
-        "page": "A rest window page whose range FusionSlider, from 12 to 18 at 13 and 15, has a Changed handler that sets rest-before's text to the payload's PreviousRangeValue.",
+        "page": "A rest window page whose range FusionSlider, from 12 to 18 at 13 and 15, has a Changed handler that sets rest-before's text to the payload's PreviousValue.",
         "gesture": "Click the first handle and press the right arrow.",
         "outcome": "rest-before shows 13 and 15."
       }

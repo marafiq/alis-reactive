@@ -780,7 +780,8 @@
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N5"
+      "M21.N5",
+      "N14.4"
      ]
     }
    ],
@@ -2008,11 +2009,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionColorPicker's Reactive(c => c.Change, pipeline) handles its change from the plan's start; p.Component<FusionColorPicker>(m => m.RoomAccentColor) reaches it in any block.",
+     "text": "The rendered FusionColorPicker's Reactive(c => c.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.RoomAccentColor).Component<FusionColorPicker>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N12"
+      "M21.N12",
+      "N14.4"
      ]
     }
    ],
@@ -2317,7 +2319,8 @@
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N13"
+      "M21.N13",
+      "N14.4"
      ]
     }
    ],
@@ -3304,7 +3307,8 @@
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N20"
+      "M21.N20",
+      "N14.4"
      ]
     }
    ],
@@ -3711,7 +3715,8 @@
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N21"
+      "M21.N21",
+      "N14.4"
      ]
     }
    ],
@@ -6693,11 +6698,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionMaskedTextBox's Reactive(m => m.Change, pipeline) handles its change from the plan's start; p.Component<FusionMaskedTextBox>(m => m.EmergencyPhone) reaches it in any block.",
+     "text": "The rendered FusionMaskedTextBox's Reactive(m => m.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.EmergencyPhone).Component<FusionMaskedTextBox>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N25"
+      "M21.N25",
+      "N14.4"
      ]
     }
    ],
@@ -9723,7 +9729,8 @@
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N31"
+      "M21.N31",
+      "N14.4"
      ]
     }
    ],
@@ -10013,7 +10020,7 @@
   },
   {
    "id": "M21.F32",
-   "summary": "FusionNumericTextBox: one declaration of the Syncfusion NumericTextBox by its JavaScript names, value, min, focusIn, focusOut, increment, decrement, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, its value committed by change; and the render helper that renders it bound to a model member. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its value, its min and its change payload's values typed nullable as EJ2 documents them and the browser hands them.",
+   "summary": "FusionNumericTextBox: one declaration of the Syncfusion NumericTextBox by its JavaScript names, value, min, focusIn, focusOut, increment, decrement, change, focus and blur, each EJ2 33.1.47's public member; the payloads of its three events; the input it is, its value committed by change; and the render helper that renders it bound to a model member. Main spreads the slice over eight files whose events, writes and calls name members by strings over ComponentRef, payload classes with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, generic in the value's type as EJ2 marks it, with its value, its min and its change payload's values typed by the member it binds, nullable as EJ2 documents them and the browser hands them.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionNumericTextBox",
@@ -10079,7 +10086,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionNumericTextBox declares Value and Min as Property<decimal?>, since EJ2 documents each null until set (M21.X607); FocusIn, FocusOut, Increment and Decrement as methods; and Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionNumericTextBox<TValue> declares the EJ2 NumericTextBox by its JavaScript names, TValue the type of the member it binds, since EJ2 marks NumericTextBox's value and min a generic type (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:64-71, :73-82): value as Value and min as Min, each a Property<TValue> that holds null until set, so the bound member's type admits null (int?, decimal?, double?) (M21.X607); FocusIn, FocusOut, Increment and Decrement as methods; and Change, Focus and Blur as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N32",
       "N5.4",
@@ -10088,7 +10095,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionNumericTextBox.ChangeEventArgs, EJ2's change payload, reads Value and PreviousValue as decimal?, since the browser hands null for a cleared box (M21.X608), and IsInteracted; Focus and Blur hand FusionNumericTextBox.NumericFocusEventArgs and FusionNumericTextBox.NumericBlurEventArgs, of which the declaration reads no member.",
+     "text": "FusionNumericTextBox<TValue>.ChangeEventArgs, EJ2's change payload, reads Value and PreviousValue as TValue, since EJ2 marks each a generic type (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:435-445) and the browser hands null for a cleared box (M21.X608), and IsInteracted; Focus and Blur hand FusionNumericTextBox<TValue>.NumericFocusEventArgs and FusionNumericTextBox<TValue>.NumericBlurEventArgs, of which the declaration reads no member.",
      "doors": [
       "M21.N32",
       "N5.6"
@@ -10096,7 +10103,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionNumericTextBox bound to a member is an input: its Value, committed by Change, is what a form sends and a check reads.",
+     "text": "A FusionNumericTextBox<TValue> bound to a member is an input: its Value, the member's own type, committed by Change, is what a form sends and a check reads.",
      "doors": [
       "M21.N32",
       "M7.N3"
@@ -10104,7 +10111,7 @@
     },
     {
      "line": "proposed",
-     "text": "field.FusionNumericTextBox(build => ..) renders the element under the field's id and binding name, starting at the member's value as M21.D1 writes it.",
+     "text": "field.FusionNumericTextBox(build => ..) renders FusionNumericTextBox<TProp>, TProp the bound member's type, under the field's id and binding name, starting at the member's value as M21.D1 writes it.",
      "doors": [
       "M21.N32",
       "M7.N2",
@@ -10114,11 +10121,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionNumericTextBox's Reactive(n => n.Change, pipeline), Reactive(n => n.Focus, pipeline) and Reactive(n => n.Blur, pipeline) handle its events from the plan's start; p.Component<FusionNumericTextBox>(m => m.DoseMilligrams) reaches it in any block.",
+     "text": "The rendered FusionNumericTextBox<TProp>'s Reactive(n => n.Change, pipeline), Reactive(n => n.Focus, pipeline) and Reactive(n => n.Blur, pipeline) handle its events from the plan's start, the change payload typed by the bound member; pipeline.Input(m => m.DoseMilligrams).Component<FusionNumericTextBox<decimal?>>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N32"
+      "M21.N32",
+      "N14.4"
      ]
     }
    ],
@@ -10194,12 +10202,12 @@
     {
      "id": "M21.X607",
      "rung": "analyzer",
-     "defect": "Both lines declare value and min as a decimal with no null: the redesign's Value and Min are Property<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:19, :22 at 65fdf118d) and main's are ComponentProperty<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:13-17 at 623dd4a27), where EJ2 documents each null until set (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:64-71, :73-82; probe:ej2-numerictextbox-value-default-null): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, as D17.5 states of this member, and the rewrite declares Property<decimal?> for both, so Value.Set(null) clears the dose."
+     "defect": "Both lines declare value and min as a decimal with no null: the redesign's Value and Min are Property<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:19, :22 at 65fdf118d) and main's are ComponentProperty<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBoxExtensions.cs:13-17 at 623dd4a27), where EJ2 documents each null until set (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:64-71, :73-82; probe:ej2-numerictextbox-value-default-null), and marks each a generic type, the type of the member a view binds (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:69, :79). The rewrite's FusionNumericTextBox<TValue> types Value and Min by the member it binds, the app's own data, and the vendor contract analyzer (N17.2) checks each type argument the views give: a kind EJ2's number holds (ALIS037) whose read admits null (ALIS019), as D17.5 reads a member documented @default null, so a decimal? or int? member binds, a decimal member is refused, and Value.Set(null) clears the dose."
     },
     {
      "id": "M21.X608",
      "rung": "type",
-     "defect": "Both lines read the change payload's value and previous value as a decimal with no null: the redesign's are ReadOnly<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:56, :59 at 65fdf118d) and main's payload class holds decimal, while the browser hands null for a box the user clears and for the change after it (probe:ej2-payload-numerictextbox-change-cleared, probe:ej2-payload-numerictextbox-change-after-cleared), which EJ2's TypeScript types value?: number (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:435-445) and the vendor contract cannot see. The rewrite's M21.N32 reads both as ReadOnly<decimal?>, so a condition on a cleared dose compiles only with its null case."
+     "defect": "Both lines read the change payload's value and previous value as a decimal with no null: the redesign's are ReadOnly<decimal> (Alis.Reactive.Fusion/Components/FusionNumericTextBox/FusionNumericTextBox.cs:56, :59 at 65fdf118d) and main's payload class holds decimal, while the browser hands null for a box the user clears and for the change after it (probe:ej2-payload-numerictextbox-change-cleared, probe:ej2-payload-numerictextbox-change-after-cleared), which EJ2's TypeScript types value?: number, a generic type (@syncfusion/ej2-inputs/src/numerictextbox/numerictextbox.d.ts:435-445), and the vendor contract cannot see. The rewrite's payload in M21.N32 reads both as TValue, the bound member's type, which admits null by ALIS019, so a condition on a cleared dose compiles only with its null case."
     }
    ],
    "promises": [],
@@ -10490,11 +10498,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionOtpInput's Reactive(o => o.ValueChanged, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; p.Component<FusionOtpInput>(m => m.UnlockCode) reaches it in any block.",
+     "text": "The rendered FusionOtpInput's Reactive(o => o.ValueChanged, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; pipeline.Input(m => m.UnlockCode).Component<FusionOtpInput>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N33"
+      "M21.N33",
+      "N14.4"
      ]
     }
    ],
@@ -11382,11 +11391,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionRating's Reactive(r => r.ValueChanged, pipeline) handles its change from the plan's start; p.Component<FusionRating>(m => m.LunchRating) reaches it in any block.",
+     "text": "The rendered FusionRating's Reactive(r => r.ValueChanged, pipeline) handles its change from the plan's start; pipeline.Input(m => m.LunchRating).Component<FusionRating>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N37"
+      "M21.N37",
+      "N14.4"
      ]
     }
    ],
@@ -11708,11 +11718,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionRichTextEditor's Reactive(e => e.Change, pipeline) handles its change from the plan's start; p.Component<FusionRichTextEditor>(m => m.CarePlanNotes) reaches it in any block.",
+     "text": "The rendered FusionRichTextEditor's Reactive(e => e.Change, pipeline) handles its change from the plan's start; pipeline.Input(m => m.CarePlanNotes).Component<FusionRichTextEditor>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N38"
+      "M21.N38",
+      "N14.4"
      ]
     }
    ],
@@ -13078,7 +13089,7 @@
   },
   {
    "id": "M21.F41",
-   "summary": "FusionSlider: one declaration of the Syncfusion Slider by its JavaScript names, value as one number and as a range, dataBind, change and changed, each EJ2 33.1.47's public member; the payload of its two events, read as a number or a list as the browser hands them; the input it is, its value committed by changed; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, with its values typed nullable as EJ2 documents them, a range's payload read as lists, and the slider started at the member's value.",
+   "summary": "FusionSlider: one declaration of the Syncfusion Slider by its JavaScript names, value typed by the member it binds, a number for one handle and a list for a range, dataBind, change and changed, each EJ2 33.1.47's public member; the payload of its two events, read as the bound member's type, a number or a list as the browser hands them; the input it is, its value committed by changed; and the render helpers that render it bound to a model member. Main spreads the slice over six files whose events, writes and calls name members by strings over ComponentRef, a payload class with setters and a Reactive extension on the vendor's builder; the redesign declares it in one file, the shape the rewrite keeps, generic in the value's type as EJ2 marks it, one value typed by the member and nullable as EJ2 documents it, a range's payload read as lists, and the slider started at the member's value.",
    "status": "both",
    "types": [
     "Alis.Reactive.Fusion:FusionSlider",
@@ -13142,7 +13153,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionSlider declares Value as Property<double?> for a slider of one handle and RangeValue as Property<double[]?> for a range, each reading value, which EJ2 types number | number[] and documents null until set (M21.X614), the second named by name: since the compiler refuses two members called Value; DataBind as a method; and Change and Changed as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
+     "text": "FusionSlider<TValue> declares the EJ2 Slider by its JavaScript names, TValue the type of the member it binds, since EJ2 marks the slider's value a generic type, number | number[] (@syncfusion/ej2-inputs/src/slider/slider.d.ts:355-366): value as Value, one Property<TValue> that holds null until set, so the bound member's type admits null, one number for a slider of one handle (double?, int?) and a list of numbers for a range (double[]?) (M21.X614); DataBind as a method; and Change and Changed as events whose payload is the listener's first argument; each named as EJ2 33.1.47 names its public member.",
      "doors": [
       "M21.N41",
       "N5.4",
@@ -13151,7 +13162,7 @@
     },
     {
      "line": "proposed",
-     "text": "FusionSlider.SliderChangeEventArgs, the payload of Change and Changed, reads Value and PreviousValue as numbers, the browser's kind for a slider of one handle (probe:ej2-payload-slider-pain-change, probe:ej2-payload-slider-pain-changed), and RangeValue and PreviousRangeValue as lists, the kind for a range (probe:ej2-payload-slider-rest-change, probe:ej2-payload-slider-rest-changed; M21.X616), with Text, Action and IsInteracted.",
+     "text": "FusionSlider<TValue>.SliderChangeEventArgs, the payload of Change and Changed, reads Value and PreviousValue as TValue, since EJ2 marks each a generic type, number | number[] (@syncfusion/ej2-inputs/src/slider/slider.d.ts:64-76): one number for a slider of one handle (probe:ej2-payload-slider-pain-change, probe:ej2-payload-slider-pain-changed) and a list for a range (probe:ej2-payload-slider-rest-change, probe:ej2-payload-slider-rest-changed; M21.X616), with Text, Action and IsInteracted.",
      "doors": [
       "M21.N41",
       "N5.6"
@@ -13159,7 +13170,7 @@
     },
     {
      "line": "proposed",
-     "text": "A FusionSlider bound to a member is an input: its Value, committed by Changed when the handle settles, is what a form sends and a check reads.",
+     "text": "A FusionSlider<TValue> bound to a member is an input: its Value, the member's own type, committed by Changed when the handle settles, is what a form sends and a check reads.",
      "doors": [
       "M21.N41",
       "M7.N3"
@@ -13167,7 +13178,7 @@
     },
     {
      "line": "proposed",
-     "text": "field.FusionSlider() and field.FusionSlider(build => ..) render the element under the field's id and binding name, starting at the member's value as M21.D1 writes it, which neither line does (M21.X615).",
+     "text": "field.FusionSlider() and field.FusionSlider(build => ..) render FusionSlider<TProp>, TProp the bound member's type, under the field's id and binding name, starting at the member's value as M21.D1 writes it, which neither line does (M21.X615); a member that holds a list of numbers renders EJ2's Range type, the type whose value is a list (@syncfusion/ej2-inputs/src/slider/slider.d.ts:415-423).",
      "doors": [
       "M21.N41",
       "M7.N2",
@@ -13177,11 +13188,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionSlider's Reactive(s => s.Change, pipeline) follows the handle as it moves and Reactive(s => s.Changed, pipeline) runs when it settles, each from the plan's start; p.Component<FusionSlider>(m => m.RoomTemperature) reaches it in any block.",
+     "text": "The rendered FusionSlider<TProp>'s Reactive(s => s.Change, pipeline) follows the handle as it moves and Reactive(s => s.Changed, pipeline) runs when it settles, each from the plan's start, the payload typed by the bound member; pipeline.Input(m => m.RoomTemperature).Component<FusionSlider<double?>>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N41"
+      "M21.N41",
+      "N14.4"
      ]
     }
    ],
@@ -13257,7 +13269,7 @@
     {
      "id": "M21.X614",
      "rung": "analyzer",
-     "defect": "Both lines declare the slider's value with no null: the redesign's Value is Property<double> and RangeValue Property<double[]> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:20, :23 at 65fdf118d), and main's are ComponentProperty<double> and ComponentProperty<double[]> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderExtensions.cs:13-17 at 623dd4a27), where EJ2 documents value null until set (@syncfusion/ej2-inputs/src/slider/slider.d.ts:355-366): the vendor contract analyzer (N17.2) reads a member documented @default null with null added to its type (D17.5) and refuses the declaration by ALIS019, and the rewrite declares Property<double?> and Property<double[]?>."
+     "defect": "Both lines declare the slider's value with no null: the redesign's Value is Property<double> and RangeValue Property<double[]> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:20, :23 at 65fdf118d), and main's are ComponentProperty<double> and ComponentProperty<double[]> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSliderExtensions.cs:13-17 at 623dd4a27), where EJ2 documents value null until set and marks it a generic type, number | number[] (@syncfusion/ej2-inputs/src/slider/slider.d.ts:355-366). The rewrite's FusionSlider<TValue> declares one Value, a Property<TValue>, TValue the member it binds, and the vendor contract analyzer (N17.2) checks each type argument the views give: one type of the union, a number or a list of numbers (ALIS037), whose read admits null (ALIS019), as D17.5 reads a member documented @default null, so a double? or double[]? member binds and a double member is refused; the redesign's second member over the same value, RangeValue, which names value by a string (Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:23 at 65fdf118d), leaves."
     },
     {
      "id": "M21.X615",
@@ -13267,7 +13279,7 @@
     {
      "id": "M21.X616",
      "rung": "type",
-     "defect": "Both lines read the change payload's value and previous value as one number: the redesign's are ReadOnly<double> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:43, :46 at 65fdf118d) and main's payload holds double (Alis.Reactive.Fusion/Components/FusionSlider/Events/FusionSliderOnChanged.cs:9 at 623dd4a27), where EJ2 types each number | number[] (@syncfusion/ej2-inputs/src/slider/slider.d.ts:64-76) and a range slider hands lists (probe:ej2-payload-slider-rest-change), so a range slider's handles have no typed read in a handler. The rewrite's payload in M21.N41 adds RangeValue and PreviousRangeValue as ReadOnly<double[]>, reading value and previousValue, as the component's RangeValue reads its value."
+     "defect": "Both lines read the change payload's value and previous value as one number: the redesign's are ReadOnly<double> (Alis.Reactive.Fusion/Components/FusionSlider/FusionSlider.cs:43, :46 at 65fdf118d) and main's payload holds double (Alis.Reactive.Fusion/Components/FusionSlider/Events/FusionSliderOnChanged.cs:9 at 623dd4a27), where EJ2 types each number | number[] and marks each a generic type (@syncfusion/ej2-inputs/src/slider/slider.d.ts:64-76) and a range slider hands lists (probe:ej2-payload-slider-rest-change), so a range slider's handles have no typed read in a handler. The rewrite's payload, FusionSlider<TValue>.SliderChangeEventArgs in M21.N41, reads Value and PreviousValue as TValue, the bound member's type, so a range slider bound to a list reads both handles."
     }
    ],
    "promises": [
@@ -13579,11 +13591,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionSmartTextArea's Reactive(a => a.Change, pipeline), and its BeforeSuggestionInsert and AfterSuggestionInsert the same way, handle its events from the plan's start; p.Component<FusionSmartTextArea>(m => m.ShiftNote) reaches it in any block.",
+     "text": "The rendered FusionSmartTextArea's Reactive(a => a.Change, pipeline), and its BeforeSuggestionInsert and AfterSuggestionInsert the same way, handle its events from the plan's start; pipeline.Input(m => m.ShiftNote).Component<FusionSmartTextArea>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N43"
+      "M21.N43",
+      "N14.4"
      ]
     }
    ],
@@ -13945,11 +13958,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionTextArea's Reactive(a => a.Change, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; p.Component<FusionTextArea>(m => m.DischargeSummary) reaches it in any block.",
+     "text": "The rendered FusionTextArea's Reactive(a => a.Change, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; pipeline.Input(m => m.DischargeSummary).Component<FusionTextArea>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N48"
+      "M21.N48",
+      "N14.4"
      ]
     }
    ],
@@ -14363,11 +14377,12 @@
     },
     {
      "line": "proposed",
-     "text": "The rendered FusionTextBox's Reactive(t => t.Change, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; p.Component<FusionTextBox>(m => m.PreferredName) reaches it in any block.",
+     "text": "The rendered FusionTextBox's Reactive(t => t.Change, pipeline), and its Input, Focus and Blur the same way, handle its events from the plan's start; pipeline.Input(m => m.PreferredName).Component<FusionTextBox>() reaches it in any block (N14.4).",
      "doors": [
       "M12.N3",
       "M12.N2",
-      "M21.N49"
+      "M21.N49",
+      "N14.4"
      ]
     }
    ],
