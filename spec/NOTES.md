@@ -834,3 +834,9 @@
   Evidence: multi-select.d.ts:416 (`@isGenericType true`); probe:fusion-ej2-builder-newtonsoft-defaults.
 - 2026-11-09 fact, from module 21 unit 1: the pin is `@syncfusion/ej2` 33.1.47, whose own ranges install ej2-base 33.1.45 beside ej2-dropdowns 33.1.47, fixed by the lockfile; a .d.ts cite reads that installed tree (module_cites, ee2a50577).
   Evidence: Alis.Reactive.SandboxApp/package.json:25 at 65fdf118d; node_modules/@syncfusion/ej2-base/package.json.
+- 2026-11-09 module 21 unit 2, by a fork the lead checked at the source: M21.F23 FusionGrid, 824 rows, 182 verdicts (exports refused by m17's text, MethodAsync kept), X201-X207; FusionGridAction is dataStateChange's action data, not a row action; EJ2 declares showColumns, hideColumns, autoFitColumns and addRecord, so unit 1's dts.py lead was false (it read no `name:`).
+  Evidence: interface.d.ts:1374-1402 and grid.d.ts:3067, :3076, :3479, :3687 at EJ2 33.1.47; FusionGridValidation.cs:119-121 and FusionGridEditTemplates.cs:146-151 at 623dd4a27, read by the lead.
+- 2026-11-09 gap, from module 21 unit 2, for the core: actionBegin's payload is a union of twelve types, and a member one of them lacks has no meaning; designed default: N17.2's type check reads a union of object types as every member any type declares, optional where one lacks it, and refuses a member none declares.
+  Evidence: @syncfusion/ej2-grids/src/grid/base/interface.d.ts (EditEventArgs rowIndex, SaveEventArgs selectedRow).
+- 2026-11-09 for gate 2, from module 21 unit 2: the form of `Html.FusionGrid(plan, id, rows, build => ..)`; M21.X203's refusal of a column rule the editor cannot check (two patterns included, where main keeps the second and the redesign the first); M21.X205, a column checks email and URL by the validator's patterns, not EJ2's; `Predicate.value` holds several kinds, default: text for text filters.
+  Evidence: FusionGridValidation.cs:96-138 at 623dd4a27; @syncfusion/ej2-data/src/query.d.ts:255.

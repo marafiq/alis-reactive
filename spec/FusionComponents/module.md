@@ -55,6 +55,21 @@ Each name is gate 2's; each door is the capability it carries.
   "removeEventListener")`, with no payload kind, since each event declares its payload's place (N17.1; module 12). It
   replaces main's string vendor (`Alis.Reactive.Fusion/FusionComponent.cs:14` at 623dd4a27). Every Fusion render
   helper writes the C# values it hands EJ2 by M21.D1, so `AddReactiveFusion` leaves (gate 2).
+- `M21.N23` kept: `FusionGrid`: `Rows<TRow>()` and `Page<TRow>()` (`dataSource`), `Refresh`, the paging, sorting,
+  filtering, searching and grouping methods, the column methods (`ShowColumn` and `HideColumn` by `showColumns` and
+  `hideColumns` with `"field"`, `AutoFitColumns`, `AutoFitColumn` by `autoFitColumns`, `ReorderColumns`,
+  `GetColumnByField` returning a `FusionGridColumn`, `RefreshHeader`, `OpenColumnChooser`), selection, editing
+  (`AddRecord`, `AddRecordAt` by `addRecord`, `UpdateRow`, `SetRowData`, `SetCellValue`, `EditCell`, `UpdateCell`,
+  `SaveCell`, `GetBatchChanges`, `StartEdit`, `EndEdit`, `CloseEdit`, `DeleteRecord`), `ExcelExport`, `CsvExport` and
+  `PdfExport` as `MethodAsync`, and `Print`; ten events and their payloads; `FusionGridSortDirection` and
+  `FusionGridTextFilterOperator` with System.Text.Json's string enum converter; the render helper
+  `Html.FusionGrid(plan, id, build => ..)` and `Html.FusionGrid(plan, id, rows, build => ..)`, which hands EJ2 the rows
+  by M21.D1; `FusionGridColumns.Of<TRow>().Field(..)`; `FusionGridEditTemplates` and its dialog form; and
+  `FusionGridValidation.From<TRow>(rules).Field(..)`, a column's rules from the validator (N16.2). It replaces main's
+  twenty-two files (`Alis.Reactive.Fusion/Components/FusionGrid/` at 623dd4a27), whose doors carry their verdicts in
+  `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member
+  (`@syncfusion/ej2-grids/src/grid/base/grid.d.ts:1558`, `:3067`, `:3076`, `:3479`, `:3687`, `:3849`, `:3859`,
+  `:3870`).
 
 The meaning `M21.D1` and the defects `M21.X1` to `M21.X3` are in `spec/FusionComponents/features.json`, on the
 features they give.
@@ -83,3 +98,20 @@ features they give.
 - One file per slice. Main's `Reactive` extension reads the element id back from the vendor builder's HTML attributes
   (`Alis.Reactive.Fusion/Components/FusionMultiSelect/FusionMultiSelectReactiveExtensions.cs:31-32` at 623dd4a27); the
   rendered component's `Reactive(event, pipeline)` (M12.N3) knows its id, so the slice needs no builder extension.
+- An export is awaited (M21.X201). Both lines drop the promise `excelExport`, `csvExport` and `pdfExport` return
+  (`@syncfusion/ej2-grids/src/grid/base/grid.d.ts:3849`, `:3859`, `:3870`), so a step after an export runs before
+  its file is written; the rewrite declares them `MethodAsync` (D11.3, B15).
+- A column's rule is checked by its editor or refused (M21.X203). Both lines drop a conditional rule and a rule the
+  column validator has no key for where the view renders
+  (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:112` at 65fdf118d); the rewrite refuses it
+  unless it is the server's.
+- A select editor opens at the row's value (M21.X204). Main's select templates mark no option selected
+  (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:88-95` at 623dd4a27); the redesign's do
+  (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:121-122` at 65fdf118d), and the rewrite keeps
+  them.
+- A column checks an email or a URL as the server does (M21.X205). Main gives a column EJ2's own email and url rules
+  (`@syncfusion/ej2-inputs/src/form-validator/form-validator.js:29-32`); the rewrite writes the validator's own
+  patterns (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:62` at 65fdf118d).
+- A payload declares only what its type declares (M21.X202): both lines read a name on four payloads whose EJ2 types
+  declare none (`@syncfusion/ej2-grids/src/grid/base/interface.d.ts:1374-1402`, `:2479-2508`); and an enum argument is
+  written as the vendor reads it (M21.X207, `@syncfusion/ej2-grids/src/grid/base/enum.d.ts:40`).

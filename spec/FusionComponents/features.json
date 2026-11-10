@@ -608,6 +608,1911 @@
      ]
     }
    ]
+  },
+  {
+   "id": "M21.F23",
+   "summary": "FusionGrid: one declaration of the Syncfusion Grid by its JavaScript names, its data, paging, sorting, filtering, searching, grouping, columns, selection, editing, exports and print, each EJ2 33.1.47's public member; the payloads of its ten events; the render helper that renders it with an element id the view gives and a plan; the column field names, edit templates and edit dialog it writes; and the column rules it gives the grid from the validator. Main spreads the slice over twenty-two files whose calls name members by strings over ComponentRef, payload classes with setters, extensions that take the pipeline, a builder of its own and a Reactive extension on it; the redesign declares it in five files, the shape the rewrite keeps, with its exports awaited, its enums written as EJ2 reads them, its rows named as every framework read names them (M21.D1), and every column rule either checked by the column's editor or refused where the view renders.",
+   "status": "both",
+   "types": [
+    "Alis.Reactive.Fusion:FusionGrid",
+    "Alis.Reactive.Fusion:FusionGridAction",
+    "Alis.Reactive.Fusion:FusionGridBatchChanges<TRow>",
+    "Alis.Reactive.Fusion:FusionGridBeforeBatchSaveArgs<TRow>",
+    "Alis.Reactive.Fusion:FusionGridBeginEditArgs<TRow>",
+    "Alis.Reactive.Fusion:FusionGridBuilder<TModel>",
+    "Alis.Reactive.Fusion:FusionGridCellSaveArgs<TRow, TValue>",
+    "Alis.Reactive.Fusion:FusionGridCellSavedArgs<TRow, TValue>",
+    "Alis.Reactive.Fusion:FusionGridColumn",
+    "Alis.Reactive.Fusion:FusionGridColumns",
+    "Alis.Reactive.Fusion:FusionGridColumns<TRow>",
+    "Alis.Reactive.Fusion:FusionGridDataStateChangeArgs",
+    "Alis.Reactive.Fusion:FusionGridDialogFormBuilder<TRow>",
+    "Alis.Reactive.Fusion:FusionGridEditActionArgs<TRow>",
+    "Alis.Reactive.Fusion:FusionGridEditEventArgsExtensions",
+    "Alis.Reactive.Fusion:FusionGridEditTemplates",
+    "Alis.Reactive.Fusion:FusionGridEvents",
+    "Alis.Reactive.Fusion:FusionGridExtensions",
+    "Alis.Reactive.Fusion:FusionGridFieldValidation<TRow>",
+    "Alis.Reactive.Fusion:FusionGridHtmlExtensions",
+    "Alis.Reactive.Fusion:FusionGridReactiveExtensions",
+    "Alis.Reactive.Fusion:FusionGridRecordClickArgs<TRow>",
+    "Alis.Reactive.Fusion:FusionGridRowSelectedArgs<TRow>",
+    "Alis.Reactive.Fusion:FusionGridSearchDescriptor",
+    "Alis.Reactive.Fusion:FusionGridSortColumn",
+    "Alis.Reactive.Fusion:FusionGridSortDirection",
+    "Alis.Reactive.Fusion:FusionGridTextFilterCriterion",
+    "Alis.Reactive.Fusion:FusionGridTextFilterOperator",
+    "Alis.Reactive.Fusion:FusionGridToolbarClickArgs",
+    "Alis.Reactive.Fusion:FusionGridToolbarItem",
+    "Alis.Reactive.Fusion:FusionGridValidation",
+    "Alis.Reactive.Fusion:IFusionGridPage<TRow>"
+   ],
+   "claims": [],
+   "sentences": [
+    {
+     "line": "main",
+     "text": "public sealed class FusionGrid : FusionComponent",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:12"
+    },
+    {
+     "line": "main",
+     "text": "\"dataStateChange\", new FusionGridDataStateChangeArgs());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEvents.cs:18"
+    },
+    {
+     "line": "main",
+     "text": "direction == FusionGridSortDirection.Descending ? \"Descending\" : \"Ascending\";",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridQueryExtensions.cs:154"
+    },
+    {
+     "line": "main",
+     "text": "ComponentMethod.Named(\"excelExport\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridToolingExtensions.cs:11"
+    },
+    {
+     "line": "main",
+     "text": "var rowValue = ValueExpression.LiteralRaw(row, Shape.FromClrType(typeof(TRow)));",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditingExtensions.cs:82"
+    },
+    {
+     "line": "main",
+     "text": "if (!rule.IsUnconditional) continue;",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:96"
+    },
+    {
+     "line": "main",
+     "text": "case \"email\":",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:108"
+    },
+    {
+     "line": "main",
+     "text": "html.Append(\"<option value=\\\"\").Append(encoded).Append(\"\\\">\").Append(encoded).Append(\"</option>\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:150"
+    },
+    {
+     "line": "main",
+     "text": "return new FusionGridBuilder<TModel>(plan, elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridHtmlExtensions.cs:40"
+    },
+    {
+     "line": "main",
+     "text": "public string? Name { get; set; }",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnDataStateChange.cs:18"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<IEnumerable<TRow>> Rows<TRow>() where TRow : class => Property<IEnumerable<TRow>>(\"dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:33"
+    },
+    {
+     "line": "redesign",
+     "text": "public Property<IFusionGridPage<TRow>> Page<TRow>() where TRow : class => Property<IFusionGridPage<TRow>>(\"dataSource\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:40"
+    },
+    {
+     "line": "redesign",
+     "text": "public void ShowColumn(Field key) => Method(key, Fixed(\"field\"), name: \"showColumns\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:111"
+    },
+    {
+     "line": "redesign",
+     "text": "public void AddRecordAt<TRow>(Arg<TRow> data, Arg<int> index) where TRow : class => Method(data, index, name: \"addRecord\");",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:158"
+    },
+    {
+     "line": "redesign",
+     "text": "public void ExcelExport() => Method();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:207"
+    },
+    {
+     "line": "redesign",
+     "text": "public enum FusionGridSortDirection",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:270"
+    },
+    {
+     "line": "redesign",
+     "text": "public ReadOnly<string> Name => ReadOnly<string>();",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:326"
+    },
+    {
+     "line": "redesign",
+     "text": "return plan.Render<global::Alis.Reactive.Fusion.FusionGrid>(elementId, builder.Render());",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:696"
+    },
+    {
+     "line": "redesign",
+     "text": "public string Field<TValue>(Expression<Func<TRow, TValue>> member) => global::Alis.Reactive.Field.Of(member).Name;",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridColumns.cs:37"
+    },
+    {
+     "line": "redesign",
+     "text": "if (!rule.IsUnconditional) continue;",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:112"
+    },
+    {
+     "line": "redesign",
+     "text": "case PatternRule pattern when pattern.Flags.Length == 0 && !rules.ContainsKey(\"regex\"):",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:132"
+    },
+    {
+     "line": "redesign",
+     "text": ".Append(SelectedWhenRowHolds(fieldName, value))",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:111"
+    },
+    {
+     "line": "redesign",
+     "text": "public static BrowserRule Email(string message) => new PatternRule(EmailPattern, \"\", message, Condition.Always);",
+     "cite": "Alis.Reactive/PlanModel/Validation/BrowserRule.cs:62"
+    },
+    {
+     "line": "proposed",
+     "text": "FusionGrid declares the EJ2 Grid by its JavaScript names: dataSource as Rows<TRow>() or Page<TRow>(), the result and count of a remote page; its paging, sorting, filtering, searching and grouping; its columns' showColumns, hideColumns, autoFitColumns, reorderColumns and getColumnByField; its selection; its editing, addRecord with and without an index, updateRow, setRowData, setCellValue, editCell, updateCell, saveCell and getBatchChanges; refresh, refreshHeader, openColumnChooser and print; each EJ2 33.1.47's public member.",
+     "doors": [
+      "M21.N23",
+      "N5.3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "ExcelExport, CsvExport and PdfExport are declared MethodAsync, as grid.d.ts declares each to return a promise, so a step after an export runs once its file is written and a failed export stops its pipeline (D11.3, B15).",
+     "doors": [
+      "M21.N23",
+      "N5.3"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "DataStateChange, ToolbarClick, RecordClick<TRow>(), RowSelected<TRow>(), ActionBegin<TRow>(), ActionComplete<TRow>(), BeginEdit<TRow>(), CellSave<TRow, TValue>(), CellSaved<TRow, TValue>() and BeforeBatchSave<TRow>() hand payloads read with Read, each payload's cancel its Property<bool>; a payload declares a name only where EJ2's type does, recordClick's and toolbarClick's, so dataStateChange's, its action's, rowSelected's, actionBegin's and actionComplete's declare none.",
+     "doors": [
+      "M21.N23",
+      "N5.6",
+      "N17.1"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionGridSortDirection and FusionGridTextFilterOperator carry System.Text.Json's string enum converter, so the live form writes Ascending and contains as sortColumn's SortDirection and filterByColumn's operator take them (D7.7).",
+     "doors": [
+      "M21.N23"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "Html.FusionGrid(plan, id, rows, build => ..) renders the grid with the rows the view hands it, written by M21.D1, and FusionGridColumns.Of<TRow>().Field(r => r.Member) names a column's field as every framework read names it.",
+     "doors": [
+      "M21.N23",
+      "M21.N2",
+      "M12.N3",
+      "N17.10"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "The rendered grid's Reactive(g => g.RecordClick<TRow>(), pipeline) and its other events handle the grid from the plan's start, and pipeline.Component<FusionGrid>(id) reaches it from any block.",
+     "doors": [
+      "M12.N3",
+      "M12.N2",
+      "M21.N23"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionGridValidation.From<TRow>(rules).Field(r => r.Member) gives a column the validator's rules its editor checks, each in the validator's own form, and refuses where the view renders a rule the editor cannot check that is not the server's (M21.X203).",
+     "doors": [
+      "M21.N23",
+      "N16.2"
+     ]
+    },
+    {
+     "line": "proposed",
+     "text": "FusionGridEditTemplates.Select, DateInput and DialogForm write a column's editor and an edit dialog, each select opening at the row's value.",
+     "doors": [
+      "M21.N23"
+     ]
+    }
+   ],
+   "nodes": [
+    "obj",
+    "element",
+    "fn",
+    "get",
+    "set",
+    "do",
+    "call",
+    "lit",
+    "on",
+    "method",
+    "returned"
+   ],
+   "writes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridQueryExtensions.cs:10-164"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditingExtensions.cs:11-222"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridRowDataExtensions.cs:11-124"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridSelectionExtensions.cs:9-70"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridToolingExtensions.cs:10-99"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridColumnExtensions.cs:10-71"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridDataSourceExtensions.cs:10-84"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEvents.cs:9-92"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnEditing.cs:64-107"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridHtmlExtensions.cs:25-41"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridReactiveExtensions.cs:19-31"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:35-142"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:25-162"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:29-697"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridColumns.cs:15-38"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:20-207"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:30-146"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Fusion/Components/FusionGrid/FusionGridPage.cs:11-18"
+    }
+   ],
+   "executes": [
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:44-90"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/events/event-fusion.ts:19-37"
+    },
+    {
+     "line": "main",
+     "cite": "Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/vendor-driver.ts:10-93"
+    },
+    {
+     "line": "redesign",
+     "cite": "Alis.Reactive.Assets/runtime/objects/plan-objects.ts:34-62"
+    }
+   ],
+   "core": [
+    "Q17",
+    "Q5",
+    "Q2",
+    "Q7",
+    "Q11",
+    "Q16"
+   ],
+   "meanings": [],
+   "oracle": "Syncfusion EJ2 33.1.47's Grid as its TypeScript declares it (@syncfusion/ej2-grids/src/grid/base/grid.d.ts, its event payloads in src/grid/base/interface.d.ts, SortDirection in src/grid/base/enum.d.ts, the toolbar's ClickEventArgs in @syncfusion/ej2-navigations, a column's rules as @syncfusion/ej2-inputs' FormValidator reads them), each JavaScript name read there by the lead and checked by scratchpad m21/tools/dts.py, whose name: overrides (showColumns, hideColumns, autoFitColumns, addRecord) and generic payloads were read by hand; the Syncfusion.EJ2.AspNet.Core 33.1.47 builder as spec/probes/AspNetCoreBinding/FusionProbes.cs renders it; and the browser, by the promises.",
+   "checker": [
+    "core:Q17",
+    "core:Q5"
+   ],
+   "defects": [
+    {
+     "id": "M21.X201",
+     "rung": "behavior",
+     "defect": "Main calls the grid's excelExport, csvExport and pdfExport as plain calls (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridToolingExtensions.cs:38-59 at 623dd4a27) and the redesign declares them Method() (Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:207-213 at 65fdf118d), while each returns a promise (@syncfusion/ej2-grids/src/grid/base/grid.d.ts:3849, :3859, :3870): the step after an export runs before its file is written, and a failed export goes unseen. The rewrite declares them MethodAsync (D11.3, B15)."
+    },
+    {
+     "id": "M21.X202",
+     "rung": "analyzer",
+     "defect": "Both lines declare a name EJ2's types do not: on dataStateChange's payload (Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnDataStateChange.cs:18 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:326 at 65fdf118d; @syncfusion/ej2-grids/src/grid/base/interface.d.ts:2479-2508), on its action (Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnDataStateChange.cs:131 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:452 at 65fdf118d; @syncfusion/ej2-grids/src/grid/base/interface.d.ts:2495), on rowSelected's (Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnRowSelected.cs:23 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:546 at 65fdf118d; @syncfusion/ej2-grids/src/grid/base/interface.d.ts:1374-1402) and on actionBegin's and actionComplete's (Alis.Reactive.Fusion/Components/FusionGrid/Events/FusionGridOnEditing.cs:27 at 623dd4a27, Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:588 at 65fdf118d; @syncfusion/ej2-grids/src/grid/base/grid.d.ts:1790, :1796). EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), which no contract declares. The vendor contract analyzer (N17.2) refuses each by ALIS016, and the rewrite's payloads declare no name where EJ2's type declares none; recordClick's and toolbarClick's keep theirs (@syncfusion/ej2-grids/src/grid/base/interface.d.ts:1438)."
+    },
+    {
+     "id": "M21.X203",
+     "rung": "refusal",
+     "defect": "A rule a grid column's editor cannot check is dropped where the view renders with nothing said: a rule under a condition (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:96 at 623dd4a27, :112 at 65fdf118d); a rule EJ2's column validator has no key for, as GreaterThan or a comparison with another member (:104-138 at 623dd4a27, :120-144 at 65fdf118d); and one of two patterns on one column (:119-121 at 623dd4a27, where the second replaces the first, and :132 at 65fdf118d, which keeps the first). The column saves a value its validator refuses, and only the server's answer says so. The rewrite refuses it where the view renders: \"'{member}' has a rule the grid column's editor cannot check ({rule}); check it on the server with ServerOnly(), or give the column a rule its editor checks.\""
+    },
+    {
+     "id": "M21.X204",
+     "rung": "behavior",
+     "defect": "Main's select editors open at their first option: the column template's Select and the edit dialog's Select write no selected option (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:88-95 and :146-151 at 623dd4a27), so a row whose status is Discharged opens its editor at Admitted, and saving it unchanged writes Admitted. The redesign selects the row's value (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:111, :121-122, :192 at 65fdf118d), which the rewrite keeps."
+    },
+    {
+     "id": "M21.X205",
+     "rung": "behavior",
+     "defect": "Main gives an email or url column EJ2's own email and url rules (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridValidation.cs:108-110 at 623dd4a27), whose patterns need a dotted domain (@syncfusion/ej2-inputs/src/form-validator/form-validator.js:29-32), so an inline edit refuses rose@ward and http://intranet/residents, which the server's EmailAddress and Url accept. The rewrite writes the validator's own patterns as the column's regex, as the redesign does (Alis.Reactive/PlanModel/Validation/BrowserRule.cs:62, :69 at 65fdf118d)."
+    },
+    {
+     "id": "M21.X206",
+     "rung": "behavior",
+     "defect": "A column bound to a member that carries [JsonPropertyName(\"room\")] shows empty cells for rows handed over with the view: a column's field names the member by System.Text.Json (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridColumns.cs:37 at 65fdf118d) while EJ2 writes the builder's DataSource through Newtonsoft as roomNumber (probe:fusion-ej2-builder-newtonsoft-defaults). The rewrite's render helper hands the rows by M21.D1 (probe:fusion-ej2-builder-raw-json)."
+    },
+    {
+     "id": "M21.X207",
+     "rung": "analyzer",
+     "defect": "The redesign's FusionGridSortDirection and FusionGridTextFilterOperator carry no string converter (Alis.Reactive.Fusion/Components/FusionGrid/FusionGrid.cs:270, :280 at 65fdf118d), and a JsonStringEnumMemberName holds only under one, so in the live form (D7.7) sortColumn receives 0 where SortDirection is 'Ascending' | 'Descending' (@syncfusion/ej2-grids/src/grid/base/enum.d.ts:40). The vendor contract analyzer's type check (N17.2) refuses an enum against the vendor's literal union by ALIS037 (X17.46), and the rewrite's enums carry System.Text.Json's string enum converter. Main writes both as text by hand (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridQueryExtensions.cs:153-164 at 623dd4a27)."
+    }
+   ],
+   "promises": [
+    {
+     "for": "M21.X201",
+     "page": "A residents grid whose Export to Excel button sets the status to Exporting, runs ExcelExport, then sets the status to Exported.",
+     "gesture": "Click Export to Excel.",
+     "outcome": "The Excel file's download starts while the status reads Exporting, and the status reads Exported after it.",
+     "opposite": "Before the click, no download starts and the status reads Ready.",
+     "defect": "The status reads Exported before the download starts, since the export's promise is dropped."
+    },
+    {
+     "for": "M21.X201",
+     "page": "A residents grid whose Export to CSV button sets the status to Exporting, runs CsvExport, then sets the status to Exported.",
+     "gesture": "Click Export to CSV.",
+     "outcome": "The CSV file's download starts while the status reads Exporting, and the status reads Exported after it.",
+     "opposite": "Before the click, no download starts and the status reads Ready.",
+     "defect": "The status reads Exported before the download starts, since the export's promise is dropped."
+    },
+    {
+     "for": "M21.X201",
+     "page": "A residents grid whose Export to PDF button sets the status to Exporting, runs PdfExport, then sets the status to Exported.",
+     "gesture": "Click Export to PDF.",
+     "outcome": "The PDF file's download starts while the status reads Exporting, and the status reads Exported after it.",
+     "opposite": "Before the click, no download starts and the status reads Ready.",
+     "defect": "The status reads Exported before the download starts, since the export's promise is dropped."
+    },
+    {
+     "for": "M21.X203",
+     "page": "A ward grid whose Beds column takes FusionGridValidation's rules for a validator whose Beds rule is GreaterThan(0) When(r => r.IsOpen).",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with M21.X203's message, naming Beds and its conditional rule.",
+     "opposite": "The same rule with no condition renders, and editing Beds to 0 shows its message under the cell.",
+     "defect": "The conditional rule is dropped, the page renders, and a row saves 0 beds with no message until the server answers."
+    },
+    {
+     "for": "M21.X203",
+     "page": "A ward grid whose Beds column takes FusionGridValidation's rules for a validator whose Beds rule is GreaterThan(0).",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with M21.X203's message, naming Beds and GreaterThan.",
+     "opposite": "With GreaterThanOrEqualTo(1) the page renders, and editing Beds to 0 shows its message under the cell.",
+     "defect": "GreaterThan has no column key and is dropped, so a row saves 0 beds with no message until the server answers."
+    },
+    {
+     "for": "M21.X203",
+     "page": "A contacts grid whose Email column takes FusionGridValidation's rules for a validator whose Email rules are Matches(\"^[a-z.]+@\") and Matches(\"@care\\\\.org$\").",
+     "gesture": "Open the page.",
+     "outcome": "The page is refused where the view renders with M21.X203's message, naming Email and its second pattern.",
+     "opposite": "With Matches(\"@care\\\\.org$\") alone the page renders, and editing Email to rose@ward.com shows its message under the cell.",
+     "defect": "One pattern is dropped and the page renders, so a row saves an address only the dropped pattern refuses (rose@ward.com, or Rose@care.org) with no message until the server answers."
+    },
+    {
+     "for": "M21.X204",
+     "page": "A residents grid whose Status column edits with FusionGridEditTemplates.Select over Admitted, Discharged and On leave, and a row whose status is Discharged.",
+     "gesture": "Double-click the Discharged row's Status cell.",
+     "outcome": "The editor's select shows Discharged.",
+     "opposite": "On a row whose status is On leave, the select shows On leave.",
+     "defect": "The select opens at its first option, Admitted, and saving the row unchanged writes Admitted."
+    },
+    {
+     "for": "M21.X204",
+     "page": "A residents grid that edits in a dialog written by FusionGridEditTemplates.DialogForm with a Status select over Admitted, Discharged and On leave, and a row whose status is Discharged.",
+     "gesture": "Select the Discharged row and click Edit.",
+     "outcome": "The dialog's Status select shows Discharged.",
+     "opposite": "On a row whose status is On leave, the dialog's select shows On leave.",
+     "defect": "The dialog's select opens at Admitted, and saving the dialog unchanged writes Admitted."
+    },
+    {
+     "for": "M21.X205",
+     "page": "A contacts grid whose Email column takes FusionGridValidation's rules for a validator whose Email rule is EmailAddress().",
+     "gesture": "Double-click a row's Email cell, type rose@ward and press Enter.",
+     "outcome": "The row saves rose@ward, as the server's EmailAddress accepts it.",
+     "opposite": "Typing rose and pressing Enter shows the email message under the cell.",
+     "defect": "EJ2's own email pattern needs a dotted domain, so rose@ward shows the email message and the row does not save."
+    },
+    {
+     "for": "M21.X205",
+     "page": "A links grid whose Address column takes FusionGridValidation's rules for a validator whose Address rule is Url().",
+     "gesture": "Double-click a row's Address cell, type http://intranet/residents and press Enter.",
+     "outcome": "The row saves http://intranet/residents, as the server's Url accepts it.",
+     "opposite": "Typing intranet/residents and pressing Enter shows the url message under the cell.",
+     "defect": "EJ2's own url pattern needs a dotted domain, so http://intranet/residents shows the url message and the row does not save."
+    },
+    {
+     "for": "M21.X206",
+     "page": "A beds grid rendered by Html.FusionGrid(plan, \"beds\", rows, build => ..) with the rows East 1 and East 2, of a bed class whose room member carries [JsonPropertyName(\"room\")], and a Room column whose field is FusionGridColumns.Of<Bed>().Field(b => b.RoomNumber).",
+     "gesture": "Open the page.",
+     "outcome": "The Room column shows East 1 and East 2.",
+     "opposite": "A Ward column bound to a member with no JsonPropertyName shows the ward of each row too.",
+     "defect": "EJ2 writes the handed rows through Newtonsoft as roomNumber while the column names room, so the Room column shows two empty cells."
+    }
+   ],
+   "verdicts": [
+    {
+     "door": "FusionGridAction.ColumnName.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridAction.Direction.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridAction.Name.get -> string?",
+     "verdict": "refused",
+     "reason": "EJ2's action, a PageEventArgs, GroupEventArgs, FilterEventArgs, SearchEventArgs, SortEventArgs or LazyLoadGroupArgs, declares no name (@syncfusion/ej2-grids/src/grid/base/interface.d.ts:2495); EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), a member no contract declares, so the vendor contract analyzer refuses the member (ALIS016, N17.2, M21.X202). A handler knows its event by the event it handles, the declaration's DataStateChange.",
+     "carriers": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridAction.RequestType.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridAction.Type.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridBeforeBatchSaveArgs<TRow>.BatchChanges.get -> FusionGridBatchChanges<TRow!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridBeforeBatchSaveArgs<TRow>.BatchChanges.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridBeforeBatchSaveArgs<TRow>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridBeforeBatchSaveArgs<TRow>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridBeginEditArgs<TRow>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridBeginEditArgs<TRow>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridBeginEditArgs<TRow>.RowData.get -> TRow!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridBeginEditArgs<TRow>.RowData.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridBeginEditArgs<TRow>.RowIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridBeginEditArgs<TRow>.RowIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridBeginEditArgs<TRow>.Type.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridBeginEditArgs<TRow>.Type.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridBuilder<TModel>",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionGridBuilder<TModel>.ToHtmlString() -> string!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionGridBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.ColumnName.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.ColumnName.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.PreviousValue.get -> TValue?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.RowData.get -> TRow!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.RowData.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.Value.get -> TValue?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSaveArgs<TRow, TValue>.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridCellSavedArgs<TRow, TValue>.ColumnName.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSavedArgs<TRow, TValue>.ColumnName.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridCellSavedArgs<TRow, TValue>.PreviousValue.get -> TValue?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSavedArgs<TRow, TValue>.PreviousValue.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridCellSavedArgs<TRow, TValue>.RowData.get -> TRow!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSavedArgs<TRow, TValue>.RowData.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridCellSavedArgs<TRow, TValue>.Value.get -> TValue?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridCellSavedArgs<TRow, TValue>.Value.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Action.get -> FusionGridAction!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Action.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Group.get -> System.Collections.Generic.List<string!>?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Group.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Name.get -> string?",
+     "verdict": "refused",
+     "reason": "EJ2's DataStateChangeEventArgs declares no name (@syncfusion/ej2-grids/src/grid/base/interface.d.ts:2479-2508); EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), a member no contract declares, so the vendor contract analyzer refuses the member (ALIS016, N17.2, M21.X202). A handler knows its event by the event it handles, the declaration's DataStateChange.",
+     "carriers": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.RequiresCounts.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.RequiresCounts.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Search.get -> System.Collections.Generic.List<FusionGridSearchDescriptor!>?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Search.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Skip.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Skip.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Sorted.get -> System.Collections.Generic.List<FusionGridSortColumn!>?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Sorted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Take.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Take.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Where.get -> System.Collections.Generic.List<FusionGridTextFilterCriterion!>?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridDataStateChangeArgs.Where.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Action.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Action.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Data.get -> TRow!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Name.get -> string?",
+     "verdict": "refused",
+     "reason": "EJ2's actionBegin and actionComplete payload in none of its twelve types declares no name (@syncfusion/ej2-grids/src/grid/base/grid.d.ts:1790, :1796); EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), a member no contract declares, so the vendor contract analyzer refuses the member (ALIS016, N17.2, M21.X202). A handler knows its event by the event it handles, the declaration's ActionBegin<TRow>() or ActionComplete<TRow>().",
+     "carriers": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.PreviousData.get -> TRow!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.PreviousData.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.RequestType.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.RequestType.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.RowIndex.get -> int?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.RowIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.SelectedRow.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.SelectedRow.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Type.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEditActionArgs<TRow>.Type.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridEditEventArgsExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.ActionBegin<TRow>() -> TypedEvent<FusionGridEditActionArgs<TRow!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.ActionComplete<TRow>() -> TypedEvent<FusionGridEditActionArgs<TRow!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.BeforeBatchSave<TRow>() -> TypedEvent<FusionGridBeforeBatchSaveArgs<TRow!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.BeginEdit<TRow>() -> TypedEvent<FusionGridBeginEditArgs<TRow!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.CellSave<TRow, TValue>() -> TypedEvent<FusionGridCellSaveArgs<TRow!, TValue>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.CellSaved<TRow, TValue>() -> TypedEvent<FusionGridCellSavedArgs<TRow!, TValue>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.DataStateChange.get -> TypedEvent<FusionGridDataStateChangeArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.RecordClick<TRow>() -> TypedEvent<FusionGridRecordClickArgs<TRow!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.RowSelected<TRow>() -> TypedEvent<FusionGridRowSelectedArgs<TRow!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridEvents.ToolbarClick.get -> TypedEvent<FusionGridToolbarClickArgs!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "FusionGridFieldValidation<TRow>.Field<TField>(System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field) -> object?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridReactiveExtensions",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRecordClickArgs<TRow>.CellIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRecordClickArgs<TRow>.CellIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridRecordClickArgs<TRow>.Name.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRecordClickArgs<TRow>.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridRecordClickArgs<TRow>.RowData.get -> TRow!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRecordClickArgs<TRow>.RowData.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridRecordClickArgs<TRow>.RowIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRecordClickArgs<TRow>.RowIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.Data.get -> TRow!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.Data.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.IsInteracted.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.IsInteracted.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.Name.get -> string?",
+     "verdict": "refused",
+     "reason": "EJ2's RowSelectEventArgs declares no name (@syncfusion/ej2-grids/src/grid/base/interface.d.ts:1374-1402); EJ2's observer stamps one at run time (@syncfusion/ej2-base/src/observer.js:92), a member no contract declares, so the vendor contract analyzer refuses the member (ALIS016, N17.2, M21.X202). A handler knows its event by the event it handles, the declaration's RowSelected<TRow>().",
+     "carriers": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.PreviousRowIndex.get -> int?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.PreviousRowIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.RowIndex.get -> int",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridRowSelectedArgs<TRow>.RowIndex.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridSearchDescriptor.Fields.get -> System.Collections.Generic.List<string!>?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridSearchDescriptor.Key.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridSearchDescriptor.Operator.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridTextFilterCriterion.Condition.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridTextFilterCriterion.Field.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridTextFilterCriterion.Operator.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridTextFilterCriterion.Predicates.get -> System.Collections.Generic.List<FusionGridTextFilterCriterion!>?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridTextFilterCriterion.Value.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridToolbarClickArgs.Cancel.get -> bool",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridToolbarClickArgs.Cancel.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridToolbarClickArgs.Item.get -> FusionGridToolbarItem!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridToolbarClickArgs.Item.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridToolbarClickArgs.Name.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridToolbarClickArgs.Name.set -> void",
+     "verdict": "refused",
+     "reason": "Main's payload is a C# class whose setter no view runs in the browser; a member the vendor reads back from its listener is the payload's declared Property.",
+     "carriers": [
+      "M21.N23",
+      "N5.6"
+     ]
+    },
+    {
+     "door": "FusionGridToolbarItem.Id.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "FusionGridToolbarItem.Text.get -> string?",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "static FusionGridEditEventArgsExtensions.Cancel<TRow, TValue>(this FusionGridCellSaveArgs<TRow!, TValue>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "static FusionGridEditEventArgsExtensions.Cancel<TRow>(this FusionGridBeforeBatchSaveArgs<TRow!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "static FusionGridEditEventArgsExtensions.Cancel<TRow>(this FusionGridBeginEditArgs<TRow!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "static FusionGridEditEventArgsExtensions.Cancel<TRow>(this FusionGridEditActionArgs<TRow!>! args, IReactionEmitter! pipeline) -> void",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.AddRecord<TModel, TResponse, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, TRow!>!>! path, int? index = null) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.AddRecord<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, TRow! row, int? index = null) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.AutoFitColumn<TModel, TRow, TField>(this ComponentRef<FusionGrid!, TModel!>! self, System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.AutoFitColumns<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.BatchChanges<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self) -> TypedComponentSource<FusionGridBatchChanges<TRow!>!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ClearFiltering<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ClearGrouping<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ClearSearch<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ClearSelection<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ClearSorting<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.CloseEdit<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.CsvExport<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "refused",
+     "reason": "An extension over ComponentRef, which module 12 refuses, that calls the grid's csvExport as a plain call (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridToolingExtensions.cs:47-50 at 623dd4a27) whose promise main's runtime drops (Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181 at 623dd4a27), so the step after it runs before the file is written and a failed export goes unseen. The grid's declaration carries it (M12.N2), its CsvExport declared MethodAsync through the method door (N5.3), as D11.3 and B15 require.",
+     "carriers": [
+      "M12.N2",
+      "N5.3"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.CurrentViewRecords<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self) -> TypedComponentSource<TRow![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.Data<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self) -> TypedComponentSource<TRow![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.DeleteSelectedRecord<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.EditCell<TModel, TRow, TField>(this ComponentRef<FusionGrid!, TModel!>! self, int rowIndex, System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.EndEdit<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ExcelExport<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "refused",
+     "reason": "An extension over ComponentRef, which module 12 refuses, that calls the grid's excelExport as a plain call (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridToolingExtensions.cs:38-41 at 623dd4a27) whose promise main's runtime drops (Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181 at 623dd4a27), so the step after it runs before the file is written and a failed export goes unseen. The grid's declaration carries it (M12.N2), its ExcelExport declared MethodAsync through the method door (N5.3), as D11.3 and B15 require.",
+     "carriers": [
+      "M12.N2",
+      "N5.3"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.FilterTextBy<TModel, TRow, TField>(this ComponentRef<FusionGrid!, TModel!>! self, System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field, FusionGridTextFilterOperator filterOperator, string! value) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.GoToPage<TModel>(this ComponentRef<FusionGrid!, TModel!>! self, int pageNumber) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.GroupBy<TModel, TRow, TField>(this ComponentRef<FusionGrid!, TModel!>! self, System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.HideColumn<TModel, TRow, TField>(this ComponentRef<FusionGrid!, TModel!>! self, System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.PdfExport<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "refused",
+     "reason": "An extension over ComponentRef, which module 12 refuses, that calls the grid's pdfExport as a plain call (Alis.Reactive.Fusion/Components/FusionGrid/FusionGridToolingExtensions.cs:56-59 at 623dd4a27) whose promise main's runtime drops (Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181 at 623dd4a27), so the step after it runs before the file is written and a failed export goes unseen. The grid's declaration carries it (M12.N2), its PdfExport declared MethodAsync through the method door (N5.3), as D11.3 and B15 require.",
+     "carriers": [
+      "M12.N2",
+      "N5.3"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.Print<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.Refresh<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ReorderColumnBefore<TModel, TRow, TFromField, TToField>(this ComponentRef<FusionGrid!, TModel!>! self, System.Linq.Expressions.Expression<System.Func<TRow!, TFromField>!>! fromField, System.Linq.Expressions.Expression<System.Func<TRow!, TToField>!>! beforeField) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.RowIndexByPrimaryKey<TModel>(this ComponentRef<FusionGrid!, TModel!>! self, int primaryKey) -> TypedComponentSource<int>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SaveCell<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.Search<TModel>(this ComponentRef<FusionGrid!, TModel!>! self, string! searchText) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SelectRow<TModel>(this ComponentRef<FusionGrid!, TModel!>! self, int rowIndex) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SelectRowsByRange<TModel>(this ComponentRef<FusionGrid!, TModel!>! self, int startIndex, int endIndex) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SelectedRecords<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self) -> TypedComponentSource<TRow![]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SelectedRowIndexes<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> TypedComponentSource<int[]!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SetCellValue<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, int primaryKey, System.Linq.Expressions.Expression<System.Func<TRow!, int>!>! field, int value) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SetCellValue<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, int primaryKey, System.Linq.Expressions.Expression<System.Func<TRow!, string!>!>! field, string! value) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SetDataSource<TModel, TElement>(this ComponentRef<FusionGrid!, TModel!>! self, TypedSource<TElement[]!>! source) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SetDataSource<TModel, TResponse, TValue>(this ComponentRef<FusionGrid!, TModel!>! self, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, TValue>!>! path) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SetDataSource<TModel, TResponse>(this ComponentRef<FusionGrid!, TModel!>! self, ResponseBody<TResponse!>! source) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SetDataSource<TModel, TSource, TValue>(this ComponentRef<FusionGrid!, TModel!>! self, TSource source, System.Linq.Expressions.Expression<System.Func<TSource, TValue>!>! path) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SetRowData<TModel, TResponse, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, int primaryKey, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, TRow!>!>! path) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SetRowData<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, int primaryKey, TRow! row) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ShowColumn<TModel, TRow, TField>(this ComponentRef<FusionGrid!, TModel!>! self, System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.ShowColumnChooser<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.SortBy<TModel, TRow, TField>(this ComponentRef<FusionGrid!, TModel!>! self, System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field, FusionGridSortDirection direction, bool keepExistingSorts = false) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.StartEdit<TModel>(this ComponentRef<FusionGrid!, TModel!>! self) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.UngroupBy<TModel, TRow, TField>(this ComponentRef<FusionGrid!, TModel!>! self, System.Linq.Expressions.Expression<System.Func<TRow!, TField>!>! field) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.UpdateCell<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, int rowIndex, System.Linq.Expressions.Expression<System.Func<TRow!, int>!>! field, int value) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.UpdateCell<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, int rowIndex, System.Linq.Expressions.Expression<System.Func<TRow!, string!>!>! field, string! value) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.UpdateRow<TModel, TResponse, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, int rowIndex, ResponseBody<TResponse!>! source, System.Linq.Expressions.Expression<System.Func<TResponse!, TRow!>!>! path) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridExtensions.UpdateRow<TModel, TRow>(this ComponentRef<FusionGrid!, TModel!>! self, int rowIndex, TRow! row) -> ComponentRef<FusionGrid!, TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N2"
+     ]
+    },
+    {
+     "door": "static FusionGridHtmlExtensions.FusionGrid<TModel, TRow>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Grids.GridBuilder<TRow!>!>! build) -> FusionGridBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionGridHtmlExtensions.FusionGrid<TModel, TRow>(this System.Web.Mvc.HtmlHelper<TModel!>! html, ReactivePlan<TModel!>! plan, string! elementId, System.Action<Syncfusion.EJ2.Grids.GridBuilder<TRow!>!>! build) -> FusionGridBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "M12.N3"
+     ]
+    },
+    {
+     "door": "static FusionGridReactiveExtensions.Reactive<TModel, TArgs>(this FusionGridBuilder<TModel!>! builder, System.Func<FusionGridEvents!, TypedEvent<TArgs>!>! eventSelector, System.Action<TArgs, PipelineBuilder<TModel!>!>! pipeline) -> FusionGridBuilder<TModel!>!",
+     "verdict": "renamed",
+     "to": [
+      "M12.N3",
+      "M21.N23"
+     ]
+    },
+    {
+     "door": "static FusionGridValidation.From<TValidator, TRow>(IClientValidationRuleSource! source) -> FusionGridFieldValidation<TRow!>!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23",
+      "N16.2"
+     ]
+    },
+    {
+     "door": "static readonly FusionGridEvents.Instance -> FusionGridEvents!",
+     "verdict": "renamed",
+     "to": [
+      "M21.N23"
+     ]
+    }
+   ]
   }
  ]
 }
