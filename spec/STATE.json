@@ -1268,9 +1268,9 @@
     },
     "defects": {
       "counts": {
-        "defects": 387,
+        "defects": 389,
         "doubled": 0,
-        "features": 32,
+        "features": 33,
         "mapped": 1918,
         "rows": 8909,
         "unmapped": 6991
@@ -1281,7 +1281,7 @@
     "doors_mapped": {
       "counts": {
         "doubled": 0,
-        "features": 32,
+        "features": 33,
         "mapped": 1918,
         "rows": 8909,
         "unmapped": 6991
@@ -1300,7 +1300,7 @@
     "features_core": {
       "counts": {
         "doubled": 0,
-        "features": 32,
+        "features": 33,
         "mapped": 1918,
         "rows": 8909,
         "unmapped": 6991
@@ -1334,7 +1334,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 62,
+        "files": 64,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1416,9 +1416,9 @@
     "promises": {
       "counts": {
         "doubled": 0,
-        "features": 32,
+        "features": 33,
         "mapped": 1918,
-        "promises": 263,
+        "promises": 266,
         "rows": 8909,
         "unmapped": 6991
       },
@@ -3360,7 +3360,7 @@
     "verdicts": {
       "counts": {
         "doubled": 0,
-        "features": 32,
+        "features": 33,
         "main_only": 4156,
         "main_only_in_features": 801,
         "mapped": 1918,
@@ -3372,7 +3372,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "7c52c48424a2993140576ef2324b24c694499817",
+  "read_at_head": "1c9e9b7c3325571ab7bab43a4d45d6895f2a0cb3",
   "step": {
     "failing": [
       "doors_mapped",
