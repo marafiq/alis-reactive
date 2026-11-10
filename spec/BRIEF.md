@@ -575,7 +575,10 @@ Each pilot ran one part of this brief on its own. Their drafts are in `~/.claude
     - a scalar payload;
     - a nested-object payload;
     - a list payload;
-    - a payload that carries a method the pipeline calls.
+    - a payload that carries a method the pipeline calls;
+    - a payload member that holds a promise, its read stopping the pipeline;
+    - an async method three objects deep in the payload (`MethodAsync<T>` on an object an object of the payload holds), awaited before the next step, and the payload read again after the await;
+    - every door POC 15 proved on a payload and on an object it holds, before and after an await: `WriteOnly`, `LiveObjects`, `Method<T>`, `MethodAsync<T>`, `ReturnedObject`, `ReturnedObjects`, `Callback`, and a payload that is a component.
   - **Absence:**
     - a declared member the object lacks;
     - data past a declared member;

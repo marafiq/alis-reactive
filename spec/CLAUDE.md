@@ -476,6 +476,26 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   element's text), and a Playwright test that makes the real gesture and reads that text. It reruns on every
   Syncfusion upgrade, so a vendor that changes a shape fails the upgrade before an app meets it. The probe's own
   listener (`spec/probes/ej2-payloads.mjs`) is the spec's oracle, never the rewrite's proof.
+- The owner, 2026-11-09, in plain words: "Write a TS custom component with all the complex features, framework has
+  the ability to onboard and use that component to behavior test the framework where tests stay stable and catch
+  real issues." It is BRIEF.md's native reference: a TypeScript component the framework writes as an app writes one,
+  onboarded only through the core's public surface (its own vendor data, `alis:mount`), holding every conformance
+  cell, and replacing the 16 partial components of today's framework test app. Framework behavior is proven on it
+  once per cell, FusionMultiSelect proving that a real vendor's contract onboards the same way (the owner's choice
+  over two custom components). The owner's examples, "promise in payload, or a async method 3 level deep in complex
+  pay load", and every payload door the POCs proved are cells (BRIEF.md section 8). With the owner's
+  yes, a shipped slice's proofs cover only what its declaration adds (its members' names and shapes, its browser
+  facts, its own defects) and never re-prove a cell through another slice.
+- The owner, 2026-11-09: "TLA+ ... help design this out because main badly failed at slow tests and broken ones
+  that can not be fully relied". The lead's design within it: the TLC specs carry every ordering of the async lanes,
+  so no browser test provokes a race by timing. A promise on an async lane names the one action of a spec's `Next`
+  it observes (`Request.tla` Route, `Run.tla`, `Composition.tla`, `Ownership.tla`, `Lanes.tla`, `Realtime.tla`,
+  `Tracing.tla`, `CallbackProperty.tla`), the test app's endpoint holds the machine at that action until the
+  test's gesture releases it, and every action is named by one promise: the browser proves the code refines each
+  action once, and the browser test count is the actions plus the cells plus each slice's own surface. A timer the
+  plan carries (a toast's time, a debounce, a retry's wait) runs on Playwright's clock (`Page.Clock`), never real
+  time. Step 9 writes the actions into the promises; step 10's check.py refuses an action no promise names and a
+  promise naming an action its spec lacks.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
