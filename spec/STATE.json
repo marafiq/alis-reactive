@@ -1280,13 +1280,14 @@
     },
     "doors_mapped": {
       "counts": {
+        "core_doors_homeless": 8,
         "doubled": 0,
         "features": 34,
         "mapped": 1944,
         "rows": 8909,
         "unmapped": 6965
       },
-      "detail": "every feature row valid; 6965 of 8909 spec doors in no feature",
+      "detail": "every feature row valid; 6965 of 8909 spec doors in no feature; core doors no module names: N18.6, N18.7, N18.8, N18.11, N18.13, N20.1, N20.2, N20.3",
       "pass": false
     },
     "evidence": {
@@ -3372,7 +3373,7 @@
     }
   },
   "passed": 14,
-  "read_at_head": "0717cfa02961940b9074ca6c63e7472cd2853ecd",
+  "read_at_head": "c6d06b6393a5646e7b8412702fb6e7860144dac6",
   "step": {
     "failing": [
       "doors_mapped",
