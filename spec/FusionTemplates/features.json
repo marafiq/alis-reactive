@@ -1,0 +1,1000 @@
+{
+  "module": "FusionTemplates",
+  "features": [
+    {
+      "id": "M22.F1",
+      "summary": "A Fusion template and its reads: FusionTemplate.Create<T>() starts a typed HTML builder for the rows, cards and list items a Syncfusion component renders with its own template engine, and the builder's element doors (Id, Class, Attr, Text, Span, Img, Div, Badge, Icon, Link and Raw) write the text that engine compiles once per component and runs on each item. A read is a typed lambda of the item. The rewrite writes each read through the Fusion module's text helper with the item's prefix, so data shows as text and a null or missing member shows nothing (M22.D1); writes a read past holders behind the engine's condition on each holder, so a row that lacks one shows nothing there and the component's other rows render (M22.D2); and names each member as the app's JSON options name it, from the plan Render(plan) takes (M22.D3). Both lines write a read raw as ${path}, so markup in data becomes live elements and a null or missing member shows the word null or undefined, guard no holder and name every member in camel case; main also publishes the writer, FusionTemplateExpression.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Fusion:FusionTemplate",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>",
+        "Alis.Reactive.Fusion:FusionTemplateExpression"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "/// Creates typed Syncfusion template HTML builders.",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:9"
+        },
+        {
+          "line": "main",
+          "text": "/// Starts a template for rows, cards, list items, or other Syncfusion template contexts.",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:14"
+        },
+        {
+          "line": "main",
+          "text": "/// Rendered string is consumed by Syncfusion's template engine. It is not a",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:24"
+        },
+        {
+          "line": "main",
+          "text": "/// Caller-provided literal text, attributes, CSS classes, URLs, inline JavaScript,",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:26"
+        },
+        {
+          "line": "main",
+          "text": "/// and raw HTML are emitted as supplied; use trusted developer-authored values.",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:27"
+        },
+        {
+          "line": "main",
+          "text": "public class FusionTemplateBuilder<TModel>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:30"
+        },
+        {
+          "line": "main",
+          "text": "var binding = FusionTemplateExpression.ToBinding(property);",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:76"
+        },
+        {
+          "line": "main",
+          "text": "_childRenderers.Add(() => text);",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:87"
+        },
+        {
+          "line": "main",
+          "text": "_childRenderers.Add(() => html);",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:420"
+        },
+        {
+          "line": "main",
+          "text": "public string Render()",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:427"
+        },
+        {
+          "line": "main",
+          "text": "public override string ToString() => Render();",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:449"
+        },
+        {
+          "line": "main",
+          "text": "/// Examples include <c>m =&gt; m.PropertyName</c> becoming <c>${propertyName}</c>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:12"
+        },
+        {
+          "line": "main",
+          "text": "public static class FusionTemplateExpression",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:16"
+        },
+        {
+          "line": "main",
+          "text": "return $\"${{{propertyPath}}}\";",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:28"
+        },
+        {
+          "line": "main",
+          "text": "// Template data carries the same camel-case JSON names the runtime reads.",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:71"
+        },
+        {
+          "line": "main",
+          "text": "parts.Insert(0, JsonMemberName.Of(current.Member.Name));",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:72"
+        },
+        {
+          "line": "main",
+          "text": "return $\"<span{css.ClassAttribute}>{content}</span>\";",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:10"
+        },
+        {
+          "line": "main",
+          "text": "return $\"<img src=\\\"{src}\\\"{css.ClassAttribute}{alt.Attribute} />\";",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:25"
+        },
+        {
+          "line": "main",
+          "text": "return $\"<a href=\\\"{href}\\\"{css.ClassAttribute}>{text}</a>\";",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:30"
+        },
+        {
+          "line": "redesign",
+          "text": "public static FusionTemplateBuilder<TModel> Create<TModel>() => new FusionTemplateBuilder<TModel>();",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:18"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class FusionTemplateBuilder<TModel>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:31"
+        },
+        {
+          "line": "redesign",
+          "text": "internal FusionTemplateBuilder() { }",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:33"
+        },
+        {
+          "line": "redesign",
+          "text": "public string Render()",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:376"
+        },
+        {
+          "line": "redesign",
+          "text": "public override string ToString() => Render();",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:398"
+        },
+        {
+          "line": "redesign",
+          "text": "internal static class FusionTemplateExpression",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:9"
+        },
+        {
+          "line": "redesign",
+          "text": "return $\"${{{propertyPath}}}\";",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:14"
+        },
+        {
+          "line": "redesign",
+          "text": "parts.Insert(0, JsonNamingPolicy.CamelCase.ConvertName(current.Member.Name));",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:44"
+        },
+        {
+          "line": "redesign",
+          "text": "return $\"<img src=\\\"{src}\\\"{css.ClassAttribute}{alt.Attribute} />\";",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:26"
+        },
+        {
+          "line": "redesign",
+          "text": "return $\"<a href=\\\"{href}\\\"{css.ClassAttribute}>{text}</a>\";",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:31"
+        },
+        {
+          "line": "proposed",
+          "text": "The rewrite keeps FusionTemplate.Create<T>() and the builder's element doors as they are (D15.2): a read is a typed lambda of the item, literal text, classes and attributes are the view's own text, and Raw is the one door for markup the view writes.",
+          "doors": [
+            "M22.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Each read, as an element's text or an attribute's value, is written ${alisFusionText(data.<path>)}: the Fusion package's own classic script defines the helper, loaded by the layout before the components' scripts, and the engine calls it by name with the item's prefix the builder writes, so a member whose name holds the word window or data is still read from the item (M22.D1).",
+          "doors": [
+            "M22.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Literal text, Attr and Raw are written as the view writes them, as main's remarks state (D15.2); gate 2 puts the default that literal text is written as HTML text and Attr refuses a name that starts with on, since views carry no JavaScript.",
+          "doors": [
+            "M22.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A read past holders is written behind the engine's condition on each holder of its path, ${if(resident && resident.address)}, whatever the model declares about them, so a row that lacks a holder shows nothing there and the component's other rows render (M22.D2).",
+          "doors": [
+            "M22.N1"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Render(plan) writes the template under the JSON options the plan carries on both hosts, as Html.Raises takes them (M1.N5), so each member is named as System.Text.Json names it for the app (D2.9); Render() and the ToString() override, which have no options to name by, leave for it (M22.D3).",
+          "doors": [
+            "M22.N4",
+            "M22.N1",
+            "M1.N5"
+          ]
+        }
+      ],
+      "nodes": [
+        "lit",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:11-491"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:16-153"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:6-143"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:12-399"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:9-125"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:7-69"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.SandboxApp/Views/Shared/_Layout.cshtml:56"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.SandboxApp/Views/Shared/_Layout.cshtml:61"
+        }
+      ],
+      "core": [
+        "Q15",
+        "Q4",
+        "Q2"
+      ],
+      "meanings": [
+        {
+          "id": "M22.D1",
+          "meaning": "A template's read writes data as text. Each read the builder writes, as an element's text (Text, Span, Badge, Link's text) or as an attribute's value (Img's src, Link's href, the event button's member), is the call ${alisFusionText(data.<path>)} of the Fusion module's text helper, a global function the Fusion package ships as a classic script of its own. The layout loads it after ej2.min.js and before the components' scripts, @Html.EJS().ScriptManager(), since a component whose starting options hold its data runs its template there, and on both lines the framework's scripts load after that line: a gap, with this as its default. The helper shows null and a missing member as nothing and any other value as its text with &, <, >, \" and ' written as entities, so markup in data stays text, and since the engine writes every attribute between single quotes, no value ends the attribute it fills (probe:ej2-grid-template-helper-text, probe:ej2-grid-template-missing-helper, probe:ej2-grid-template-attribute). The builder writes the item's prefix, data., itself: the engine passes a helper's argument bare when it holds the word window or data, and a bare member is read as a global (probe:ej2-grid-template-helper-prefix). A raw ${path} renders markup in data as live elements and writes null and undefined as those words (probe:ej2-grid-template-unencoded, probe:ej2-grid-template-missing-raw); the rewrite writes none. Encoding leaves a URL's scheme as it is, so a Link whose href holds a javascript: URL stays a live link (probe:ej2-grid-template-link-href): a gate 2 item, with the default that Link's href is written through a second helper, alisFusionUrl, which writes a relative URL or one whose scheme is http, https, mailto or tel and writes # for any other."
+        },
+        {
+          "id": "M22.D2",
+          "meaning": "A read past holders reads nothing when a holder is missing (D4.2), and the engine stops a component's rendering with a TypeError at a member past a missing holder (probe:ej2-grid-template-unguarded-holder). The builder writes each read whose path passes holders inside the engine's condition on every holder of the path, in order, ${if(resident && resident.address)}${alisFusionText(data.resident.address.city)}${/if}, whatever the model declares about them, since the JSON a server sends can lack any member: the row shows nothing there and the component's other rows render (probe:ej2-grid-template-guarded-holders). A condition's term that reads past holders is written behind the same check, so it does not hold when a holder is missing (D8.5). D15.3 guards a holder the model declares nullable, and this guards each one: a gate 2 item, with this as its default."
+        },
+        {
+          "id": "M22.D3",
+          "meaning": "A template names each member of a read or a condition as System.Text.Json names it under the app's options (D2.9): its JsonPropertyName, else the options' naming policy, else its C# name. The builder takes those options from the plan: Render(plan) writes the template, and the plan carries the app's options on both hosts, as Html.Raises takes them (M1.N5). The text it returns is what a slice's template property takes, the column's, card's or item's template the view hands the component. Render() and the ToString() override, which have no options to name by, leave for Render(plan): both lines name every member in camel case whatever the options."
+        }
+      ],
+      "oracle": "Syncfusion EJ2 33.1.47's string template engine (@syncfusion/ej2-base/src/template.js), which compiles a component's template once into a function of each item and runs it per item, observed in Chromium in a real Grid's column templates by spec/probes/ej2-template-m22.mjs: a raw read writes markup in data as elements and null and undefined as words, a global helper the engine calls by name writes data as text, a read past a missing holder throws a TypeError that stops the grid, and a read inside the engine's condition on its holders renders nothing for that row and every other row; and System.Text.Json's naming under the app's options (D2.9).",
+      "checker": [
+        "core:Q15",
+        "core:Q4",
+        "core:Q2"
+      ],
+      "defects": [
+        {
+          "id": "X15.1",
+          "rung": "behavior"
+        },
+        {
+          "id": "X15.2",
+          "rung": "behavior"
+        },
+        {
+          "id": "X15.5",
+          "rung": "behavior"
+        },
+        {
+          "id": "M22.X3",
+          "rung": "behavior",
+          "defect": "Both lines write a read raw as ${path} (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:28 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:14 at 65fdf118d), so an item whose member holds null shows the word null and one that lacks the member shows undefined (probe:ej2-grid-template-missing-raw), where a missing value set as an element's text shows nothing (M22.D1). The redesign refuses a nullable payload member of its event button for that reason (Alis.Reactive.Fusion/Templates/TemplateElements.cs:44-53 at 65fdf118d) and none of its reads."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X15.1",
+          "page": "A resident board whose grid's Name column is FusionTemplate.Create<Resident>().Span(m => m.Name).Render(plan), over the rows the server sends: Ann, and a resident whose name is <img src=x onerror=alert(1)>.",
+          "gesture": "Open the page.",
+          "outcome": "The second row's Name cell reads <img src=x onerror=alert(1)> as text, the cell holds no image, no dialog opens, and Ann's cell reads Ann.",
+          "opposite": "The second resident renamed Bo on the server: both cells read their names and neither holds an image.",
+          "defect": "Both lines write the read raw as ${name} (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:28 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:14 at 65fdf118d), so the engine writes the name into the cell as markup: an image element renders, its onerror runs and the cell's text is empty (probe:ej2-grid-template-unencoded)."
+        },
+        {
+          "for": "X15.2",
+          "page": "A resident board whose grid's City column is FusionTemplate.Create<Resident>().Span(m => m.Address.City).Render(plan), where Resident declares Address as an Address, not nullable, over three rows the server sends: Ann at Leeds, Bo whose address is null and Cy whose row has no address.",
+          "gesture": "Open the page.",
+          "outcome": "The grid shows three rows; Ann's City cell reads Leeds, and Bo's and Cy's are empty.",
+          "opposite": "Bo and Cy given addresses at York and Hull: the three cells read Leeds, York and Hull.",
+          "defect": "Both lines write ${address.city} with no guard, so the engine stops at Bo's row with a TypeError and the grid renders no row (probe:ej2-grid-template-unguarded-holder); a guard written only for a holder the model declares nullable leaves Address unguarded here, with the same result."
+        },
+        {
+          "for": "X15.5",
+          "page": "An app whose JSON options name members by their C# names (no naming policy), and a resident board whose grid's Name column is FusionTemplate.Create<Resident>().Span(m => m.Name).Render(plan), over the rows the server sends, {\"Name\": \"Ann\"} and {\"Name\": \"Bo\"}.",
+          "gesture": "Open the page.",
+          "outcome": "The two Name cells read Ann and Bo.",
+          "opposite": "Under camel-case options the server sends name, and the same page's cells read Ann and Bo.",
+          "defect": "Both lines name the member name in camel case whatever the options (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:72 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:44 at 65fdf118d), so the engine reads a member the rows lack and each cell shows undefined (probe:ej2-grid-template-missing-raw)."
+        },
+        {
+          "for": "M22.X3",
+          "page": "A resident board whose grid's Ward column is FusionTemplate.Create<Resident>().Span(m => m.Ward).Render(plan), over Ann on North, Bo whose ward is null and Cy whose row has no ward.",
+          "gesture": "Open the page.",
+          "outcome": "Ann's Ward cell reads North, and Bo's and Cy's are empty.",
+          "opposite": "Bo and Cy given wards South and East: the cells read North, South and East.",
+          "defect": "A raw read shows null in Bo's cell and undefined in Cy's (probe:ej2-grid-template-missing-raw)."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "FusionTemplateExpression",
+          "verdict": "refused",
+          "reason": "An implementation detail no view author calls: main publishes the writer that turns a template's typed lambdas into the engine's text (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:16 at 623dd4a27), and the redesign makes it internal (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:9 at 65fdf118d). A view writes a read or a condition through the builder's doors, which write the text under the plan's options.",
+          "carriers": [
+            "M22.N1",
+            "M22.N2"
+          ]
+        },
+        {
+          "door": "static FusionTemplateExpression.ToBinding<TModel, TProperty>(System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! expression) -> string!",
+          "verdict": "refused",
+          "reason": "An implementation detail no view author calls: main publishes the writer that turns a template's typed lambdas into the engine's text (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:16 at 623dd4a27), and the redesign makes it internal (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:9 at 65fdf118d). A view writes a read or a condition through the builder's doors, which write the text under the plan's options.",
+          "carriers": [
+            "M22.N1"
+          ]
+        },
+        {
+          "door": "static FusionTemplateExpression.ToCondition<TModel>(System.Linq.Expressions.Expression<System.Func<TModel, bool>!>! predicate) -> string!",
+          "verdict": "refused",
+          "reason": "An implementation detail no view author calls: main publishes the writer that turns a template's typed lambdas into the engine's text (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:16 at 623dd4a27), and the redesign makes it internal (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:9 at 65fdf118d). A view writes a read or a condition through the builder's doors, which write the text under the plan's options.",
+          "carriers": [
+            "M22.N2"
+          ]
+        },
+        {
+          "door": "static FusionTemplateExpression.ToPropertyPath<TModel, TProperty>(System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! expression) -> string!",
+          "verdict": "refused",
+          "reason": "An implementation detail no view author calls: main publishes the writer that turns a template's typed lambdas into the engine's text (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:16 at 623dd4a27), and the redesign makes it internal (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:9 at 65fdf118d). A view writes a read or a condition through the builder's doors, which write the text under the plan's options.",
+          "carriers": [
+            "M22.N1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M22.F2",
+      "summary": "A template's conditions: When(condition, then) and When(condition, then, else) write the engine's own condition, ${if(..)} with ${else} and ${/if}, around the branches a FusionConditionalBuilder writes with its element doors (Span, Badge, Icon, Div, Img and Raw); the engine evaluates it on each item, not the core (D8.4). The condition is a typed lambda of the item: members, ==, !=, <, <=, >, >=, &&, ||, !, arithmetic and constants. The rewrite writes each comparison with its member first, only constants the engine reads back as written and only * and / of two members, refuses any other constant or arithmetic where the view renders, and reads a view value the lambda captures when the view renders, as D6.7 reads one (M22.D4). Both lines write each comparison in its authored order and each constant as it is, text between single quotes, and compile a captured value with Expression.Compile; main's ShowIf is When with no else.",
+      "status": "both",
+      "types": [
+        "Alis.Reactive.Fusion:FusionConditionalBuilder<TModel>"
+      ],
+      "claims": [
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.ShowIf(System.Linq.Expressions.Expression<System.Func<TModel, bool>!>! condition, System.Action<FusionConditionalBuilder<TModel>!>! content) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.When(System.Linq.Expressions.Expression<System.Func<TModel, bool>!>! condition, System.Action<FusionConditionalBuilder<TModel>!>! then) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.When(System.Linq.Expressions.Expression<System.Func<TModel, bool>!>! condition, System.Action<FusionConditionalBuilder<TModel>!>! then, System.Action<FusionConditionalBuilder<TModel>!>! else) -> FusionTemplateBuilder<TModel>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "public FusionTemplateBuilder<TModel> When(",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:363"
+        },
+        {
+          "line": "main",
+          "text": "var templateCondition = FusionTemplateExpression.ToCondition(condition);",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:387"
+        },
+        {
+          "line": "main",
+          "text": "html.Append($\"${{if({templateCondition})}}\");",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:392"
+        },
+        {
+          "line": "main",
+          "text": "html.Append(\"${/if}\");",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:397"
+        },
+        {
+          "line": "main",
+          "text": "/// Adds conditional content when the typed condition is true.",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:404"
+        },
+        {
+          "line": "main",
+          "text": "public FusionTemplateBuilder<TModel> ShowIf(Expression<Func<TModel, bool>> condition, Action<FusionConditionalBuilder<TModel>> content)",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:408"
+        },
+        {
+          "line": "main",
+          "text": "return When(condition, content);",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:410"
+        },
+        {
+          "line": "main",
+          "text": "public class FusionConditionalBuilder<TModel>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:16"
+        },
+        {
+          "line": "main",
+          "text": "return $\"{left} {op} {right}\";",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:97"
+        },
+        {
+          "line": "main",
+          "text": "var compiled = lambda.Compile();",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:116"
+        },
+        {
+          "line": "main",
+          "text": "var value = compiled.DynamicInvoke();",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:117"
+        },
+        {
+          "line": "main",
+          "text": "string s => $\"'{s}'\",",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:127"
+        },
+        {
+          "line": "main",
+          "text": "IFormattable number => number.ToString(null, CultureInfo.InvariantCulture),",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:129"
+        },
+        {
+          "line": "main",
+          "text": "_ => $\"'{value}'\"",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:130"
+        },
+        {
+          "line": "main",
+          "text": "ExpressionType.Add => \"+\",",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:146"
+        },
+        {
+          "line": "main",
+          "text": "ExpressionType.Subtract => \"-\",",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:147"
+        },
+        {
+          "line": "redesign",
+          "text": "public FusionTemplateBuilder<TModel> When(",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:322"
+        },
+        {
+          "line": "redesign",
+          "text": "var templateCondition = FusionTemplateExpression.ToCondition(condition);",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:346"
+        },
+        {
+          "line": "redesign",
+          "text": "html.Append($\"${{if({templateCondition})}}\");",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:351"
+        },
+        {
+          "line": "redesign",
+          "text": "public sealed class FusionConditionalBuilder<TModel>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:17"
+        },
+        {
+          "line": "redesign",
+          "text": "internal FusionConditionalBuilder() { }",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:19"
+        },
+        {
+          "line": "redesign",
+          "text": "return $\"{left} {op} {right}\";",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:69"
+        },
+        {
+          "line": "redesign",
+          "text": "var compiled = lambda.Compile();",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:88"
+        },
+        {
+          "line": "redesign",
+          "text": "var value = compiled.DynamicInvoke();",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:89"
+        },
+        {
+          "line": "redesign",
+          "text": "string s => $\"'{s}'\",",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:99"
+        },
+        {
+          "line": "proposed",
+          "text": "The rewrite keeps When with and without an else and FusionConditionalBuilder's element doors (D15.2, D8.4); ShowIf, which calls When with no else, leaves for it, and a FusionConditionalBuilder is made only by When, which hands it to the branch's lambda.",
+          "doors": [
+            "M22.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Each comparison is written with its member first, m => 2 < m.Beds as beds > 2, and each constant only in a form the engine reads back: true, false, a whole number of decimal digits, or text of ASCII letters, digits, single spaces, _, - and . between single quotes; any other constant is refused where the view renders, and so are + and - and arithmetic with a constant (M22.D4).",
+          "doors": [
+            "M22.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "A view value the condition captures, m => m.Ward == Model.Ward, is read when the view renders by walking its fields and properties as D6.7 reads one, with no expression compiled; the writer's exception to D18.3 goes to the owner at gate 2.",
+          "doors": [
+            "M22.N2"
+          ]
+        }
+      ],
+      "nodes": [
+        "lit",
+        "string"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:363-411"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:16-224"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:49-152"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:322-360"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:17-227"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:22-124"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.SandboxApp/Views/Shared/_Layout.cshtml:56"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.SandboxApp/Views/Shared/_Layout.cshtml:61"
+        }
+      ],
+      "core": [
+        "Q15",
+        "Q8",
+        "Q6",
+        "Q18"
+      ],
+      "meanings": [
+        {
+          "id": "M22.D4",
+          "meaning": "A template's condition is code the engine runs, and the engine rewrites what it reads in it word by word (template.js:127-131): it prefixes a bare word with the item, data., keeps a word that holds a quote, and keeps a run of digits as a number only when the global regular expression that tests it starts from the run's first character, which a number tested just before, in the same condition or in one compiled earlier, prevents (template.js:13, template.js:209-211). The builder therefore writes each comparison with its member first, so a member's word is tested before each constant (probe:ej2-grid-template-member-first, probe:ej2-grid-template-constant-first), and each constant only in a form the engine is pinned to read back: true and false, a whole number of decimal digits (probe:ej2-grid-template-condition-integers), and text holding only ASCII letters, digits, single spaces, _, - and . between single quotes (probe:ej2-grid-template-condition-text, probe:ej2-grid-template-condition-plain-text). The comparisons ==, !=, <, <=, >, >=, &&, || and ! read as written (probe:ej2-grid-template-operators), and so does * or / of two members; + and - of two members, which the engine reads as one word with the prefix on its first member only, and arithmetic with a constant, whose two numbers in a row the engine reads as a number and a member, are refused where the view renders, naming a member the server computes (probe:ej2-grid-template-arithmetic). An enum constant is the value the app's options write for it, held to the same forms. Any other constant, null, a decimal, a negative number, text with an apostrophe or any other character, is refused where the view renders, naming a boolean member of the item the server computes: the engine fails to compile a decimal and an apostrophe (probe:ej2-grid-template-decimal-constant, probe:ej2-grid-template-apostrophe-constant), and reads text with two escapes as other text though one escape reads back (probe:ej2-grid-template-two-escapes, probe:ej2-grid-template-escaped-constant). A view value the lambda captures is read when the view renders by its chain of fields and properties as D6.7 reads one, with no expression compiled, and is held to the same forms; a captured value that calls a method, indexes or computes is refused as D6.7 refuses it, naming a local computed before the lambda."
+        }
+      ],
+      "oracle": "Syncfusion EJ2 33.1.47's string template engine (@syncfusion/ej2-base/src/template.js), which compiles a component's template once into a function of each item and runs it per item, observed in Chromium in a real Grid's column templates by spec/probes/ej2-template-m22.mjs: a condition on text, on two whole numbers and on a member written first renders each branch per item, a constant written first after a template whose condition ends on a number, a decimal and an apostrophe fail the compile with a SyntaxError, and text with two escapes reads as other text; ==, !=, <=, >=, || and ! read as written, * and / of two members read, and + or - of two members throws a ReferenceError; and D6.7's read of a view value.",
+      "checker": [
+        "core:Q15",
+        "core:Q8",
+        "core:Q6"
+      ],
+      "defects": [
+        {
+          "id": "X15.3",
+          "rung": "behavior"
+        },
+        {
+          "id": "M22.X1",
+          "rung": "refusal",
+          "defect": "Both lines write a condition's constant as it is, text between single quotes and a number by its invariant digits (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:121-132 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:93-104 at 65fdf118d), so a decimal or text holding an apostrophe makes the engine's compile fail with a SyntaxError and the component renders no row (M22.D4). The rewrite refuses such a constant where the view renders: \"A template condition compares FallScore with 2.5, which Syncfusion's template engine cannot read back as written; compare with true, false, a whole number or plain text, or with a boolean member the server sets on the item.\""
+        },
+        {
+          "id": "M22.X4",
+          "rung": "refusal",
+          "defect": "Both lines write a condition's arithmetic as it is (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:146-149 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:118-121 at 65fdf118d), so the engine reads m.Visits + m.Calls as one word with the item's prefix on its first member only and the template throws a ReferenceError, and reads the second of two numbers in a row as a member, so m.Visits * 2 > 4 fails the compile; either way the component renders no row (probe:ej2-grid-template-arithmetic). The rewrite refuses them where the view renders: \"A template condition adds Visits and Calls, which Syncfusion's template engine reads as one word; compare with a member the server computes on the item.\""
+        },
+        {
+          "id": "M22.X2",
+          "rung": "behavior",
+          "defect": "Both lines write a comparison in its authored order (Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:97 at 623dd4a27, Alis.Reactive.Fusion/Templates/FusionTemplateExpression.cs:69 at 65fdf118d), so a condition written constant first, m => 2 < m.Beds, compiled after a template whose condition ends on a number, is read by the engine with its constant as a member: the compile fails with a SyntaxError and the component renders no row (probe:ej2-grid-template-constant-first). The rewrite writes the member first (M22.D4)."
+        }
+      ],
+      "promises": [
+        {
+          "for": "X15.3",
+          "page": "A resident board whose grid's Status column is FusionTemplate.Create<Resident>().When(m => m.Status == \"Active\", then: t => t.Badge(m => m.Status, \"e-badge\"), @else: e => e.Span(\"Away\")).Render(plan), over Ann, active, and Bo, on leave.",
+          "gesture": "Open the page.",
+          "outcome": "Ann's Status cell shows the badge Active and Bo's shows Away.",
+          "opposite": "Bo made active on the server: both rows show the badge Active.",
+          "defect": "A writer that drops the else branch leaves Bo's cell empty, and one that names Status as the app's options do not, or evaluates the condition once for the grid where the view renders, shows one branch on both rows."
+        },
+        {
+          "for": "M22.X1",
+          "page": "A resident board whose grid's Risk column is FusionTemplate.Create<Resident>().When(m => m.FallScore > 2.5, then: t => t.Badge(\"High\"), @else: e => e.Span(\"Low\")).Render(plan).",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with M22.X1's message, which names FallScore and 2.5 and cures it with a whole number, plain text or a boolean member the server sets.",
+          "opposite": "The same board comparing m => m.FallScore > 2: it renders, and a resident of score 3 shows High and one of score 1 shows Low.",
+          "defect": "Both lines write 2.5 into the engine's condition, so the page renders and the grid shows no row: the engine's compile fails with a SyntaxError (probe:ej2-grid-template-decimal-constant)."
+        },
+        {
+          "for": "M22.X4",
+          "page": "A resident board whose grid's Contact column is FusionTemplate.Create<Resident>().When(m => m.Visits + m.Calls > 3, then: t => t.Badge(\"Busy\"), @else: e => e.Span(\"Quiet\")).Render(plan).",
+          "gesture": "Open the page.",
+          "outcome": "The page is refused where the view renders with M22.X4's message, which names Visits and Calls and cures it with a member the server computes.",
+          "opposite": "The same board comparing m => m.Visits * m.Calls > 3: it renders, and a resident of 3 visits and 2 calls shows Busy and one of 1 visit and 1 call shows Quiet.",
+          "defect": "Both lines write visits + calls into the engine's condition, so the page renders and the grid shows no row: the template throws a ReferenceError (probe:ej2-grid-template-arithmetic)."
+        },
+        {
+          "for": "M22.X2",
+          "page": "A ward page with two grids rendered in this order: Residents, whose Band column is When(m => m.Age < 90, then: t => t.Span(\"under 90\"), @else: e => e.Span(\"90 and over\")), and Rooms, whose Spare column is When(m => 2 < m.Beds, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
+          "gesture": "Open the page.",
+          "outcome": "Both grids show their rows; the Rooms grid's room of 3 beds shows spare and the room of 1 bed shows full.",
+          "opposite": "The Rooms grid's condition written m => m.Beds > 2: the same cells.",
+          "defect": "A writer that keeps the authored order writes 2 < beds after the Residents grid's condition ends on 90, so the Rooms grid renders no row (probe:ej2-grid-template-constant-first)."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "FusionTemplateBuilder<TModel>.ShowIf(System.Linq.Expressions.Expression<System.Func<TModel, bool>!>! condition, System.Action<FusionConditionalBuilder<TModel>!>! content) -> FusionTemplateBuilder<TModel>!",
+          "verdict": "renamed",
+          "to": [
+            "M22.N2"
+          ]
+        },
+        {
+          "door": "FusionConditionalBuilder<TModel>.FusionConditionalBuilder() -> void",
+          "verdict": "refused",
+          "reason": "An implementation detail: main's FusionConditionalBuilder declares no constructor, so the compiler makes a public one (Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:16 at 623dd4a27), and a view that makes one writes a branch no When renders. When makes the branch's builder and hands it to the branch's lambda, as the redesign's internal constructor states (Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:19 at 65fdf118d).",
+          "carriers": [
+            "M22.N2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M22.F3",
+      "summary": "A template's event button: EventButton(text, raises, member, from) and its css overload, on the template and in a condition's branch, write a button that raises a declared app event (M1.N2) when it is clicked, with one payload member filled from the item, through markup's form (M1.D3), so the page's handler of that event (M1.N3) runs its pipeline with that row's value. The rewrite fills the member's attribute through the text helper behind its holders' check and names it as M1.D3 names a markup member under the app's options (M22.D5). Main writes the button's JavaScript into onclick: EventButton dispatches a CustomEvent named by a string with detail.id written as bare code, and Button and ButtonFor take the onclick text or a function's name. The redesign writes markup's attributes, which its document plugin reads on a click, with the member written raw and named in camel case.",
+      "status": "both",
+      "types": [],
+      "claims": [
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.Button(string! text, string! onClick) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.Button(string! text, string! onClick, string! css) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.ButtonFor<TProperty>(string! text, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty, string! onClickFn) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.ButtonFor<TProperty>(string! text, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty, string! onClickFn, string! css) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.EventButton<TPayload, TProperty>(string! text, AppEvent<TPayload!>! raises, System.Linq.Expressions.Expression<System.Func<TPayload!, TProperty>!>! member, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! from) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.EventButton<TPayload, TProperty>(string! text, AppEvent<TPayload!>! raises, System.Linq.Expressions.Expression<System.Func<TPayload!, TProperty>!>! member, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! from, string! css) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.EventButton<TProperty>(string! text, string! eventName, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionTemplateBuilder<TModel>.EventButton<TProperty>(string! text, string! eventName, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty, string! css) -> FusionTemplateBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionConditionalBuilder<TModel>.Button(string! text, string! onClick) -> FusionConditionalBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionConditionalBuilder<TModel>.Button(string! text, string! onClick, string! css) -> FusionConditionalBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionConditionalBuilder<TModel>.EventButton<TPayload, TProperty>(string! text, AppEvent<TPayload!>! raises, System.Linq.Expressions.Expression<System.Func<TPayload!, TProperty>!>! member, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! from) -> FusionConditionalBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionConditionalBuilder<TModel>.EventButton<TPayload, TProperty>(string! text, AppEvent<TPayload!>! raises, System.Linq.Expressions.Expression<System.Func<TPayload!, TProperty>!>! member, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! from, string! css) -> FusionConditionalBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionConditionalBuilder<TModel>.EventButton<TProperty>(string! text, string! eventName, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty) -> FusionConditionalBuilder<TModel>!",
+        "Alis.Reactive.Fusion:FusionConditionalBuilder<TModel>.EventButton<TProperty>(string! text, string! eventName, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty, string! css) -> FusionConditionalBuilder<TModel>!"
+      ],
+      "sentences": [
+        {
+          "line": "main",
+          "text": "/// <param name=\"onClick\">Raw <c>onclick</c> expression.</param>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:225"
+        },
+        {
+          "line": "main",
+          "text": "public FusionTemplateBuilder<TModel> Button(string text, string onClick) =>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:227"
+        },
+        {
+          "line": "main",
+          "text": "/// <param name=\"onClickFn\">JavaScript function name written to <c>onclick</c>.</param>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:251"
+        },
+        {
+          "line": "main",
+          "text": "public FusionTemplateBuilder<TModel> ButtonFor<TProperty>(",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:253"
+        },
+        {
+          "line": "main",
+          "text": "return $\"<button class=\\\"{css.AppendTo(\"e-btn\")}\\\" onclick=\\\"{onClickFn}({idBinding})\\\">{text}</button>\";",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:283"
+        },
+        {
+          "line": "main",
+          "text": "/// Adds a button that dispatches a DOM <c>CustomEvent</c> with <c>detail.id</c> bound from the model.",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:289"
+        },
+        {
+          "line": "main",
+          "text": "public FusionTemplateBuilder<TModel> EventButton<TProperty>(",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:294"
+        },
+        {
+          "line": "main",
+          "text": "return $\"<button class=\\\"{css.AppendTo(\"e-btn\")}\\\" onclick=\\\"{onClick}\\\">{text}</button>\";",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:38"
+        },
+        {
+          "line": "main",
+          "text": "var onClick = $\"document.dispatchEvent(new CustomEvent(&quot;{eventName}&quot;,{{detail:{{id:{idBinding}}}}}))\";",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:48"
+        },
+        {
+          "line": "main",
+          "text": "public FusionConditionalBuilder<TModel> Button(string text, string onClick) =>",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:147"
+        },
+        {
+          "line": "main",
+          "text": "public FusionConditionalBuilder<TModel> EventButton<TProperty>(",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:172"
+        },
+        {
+          "line": "main",
+          "text": ".EventButton(\"Review\", \"grid:review-resident\", m => m.ResidentId, \"e-small e-primary\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/Operations.cshtml:37"
+        },
+        {
+          "line": "main",
+          "text": "if (event instanceof CustomEvent) return customEventPayload(event);",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:16"
+        },
+        {
+          "line": "main",
+          "text": "if (detailWasProvided) return event.detail;",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:23"
+        },
+        {
+          "line": "redesign",
+          "text": "public FusionTemplateBuilder<TModel> EventButton<TPayload, TProperty>(",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:240"
+        },
+        {
+          "line": "redesign",
+          "text": "if (raises == null) throw new ArgumentNullException(nameof(raises));",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:276"
+        },
+        {
+          "line": "redesign",
+          "text": "var detailAttribute = TemplateElements.DetailAttribute(text, member);",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:277"
+        },
+        {
+          "line": "redesign",
+          "text": "_childRenderers.Add(() => TemplateElements.EventButton(text, raises.Name, detailAttribute, binding, css));",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:279"
+        },
+        {
+          "line": "redesign",
+          "text": "=> $\"<button class=\\\"{css.AppendTo(\"e-btn\")}\\\" data-alis-raise=\\\"{eventName}\\\" \" +",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:35"
+        },
+        {
+          "line": "redesign",
+          "text": "$\"{detailAttribute}=\\\"{valueBinding}\\\">{text}</button>\";",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:36"
+        },
+        {
+          "line": "redesign",
+          "text": "throw new ArgumentException($\"A template button fills a direct payload member; '{path}' is nested.\", nameof(member));",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:42"
+        },
+        {
+          "line": "redesign",
+          "text": "\"engine writes a missing value as the text \\\"null\\\", which the listener would read as that text. Fill it from \" +",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:50"
+        },
+        {
+          "line": "redesign",
+          "text": "var key = \"alisDetail\" + char.ToUpperInvariant(member[0]) + member.Substring(1);",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:60"
+        },
+        {
+          "line": "redesign",
+          "text": "public FusionConditionalBuilder<TModel> EventButton<TPayload, TProperty>(",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:162"
+        },
+        {
+          "line": "redesign",
+          "text": ".EventButton(\"Start review\", WingReviewEvents.StartReview, e => e.ResidentId, m => m.ResidentId, \"e-small\")",
+          "cite": "Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Components/Fusion/Grid/CareReview.cshtml:17"
+        },
+        {
+          "line": "redesign",
+          "text": "const RAISE_ATTRIBUTE = \"data-alis-raise\";",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:8"
+        },
+        {
+          "line": "redesign",
+          "text": "const source = target.closest<HTMLElement>(`[${RAISE_ATTRIBUTE}]`);",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:59"
+        },
+        {
+          "line": "redesign",
+          "text": "detail[member.charAt(0).toLowerCase() + member.slice(1)] = text!;",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:70"
+        },
+        {
+          "line": "proposed",
+          "text": "The rewrite keeps the redesign's EventButton(text, raises, member, from) and its css overload, on the template and in a condition's branch: the event is an AppEvent the app declares, and the member a typed lambda of its payload filled from a typed lambda of the item (M22.N3, M1.N2).",
+          "doors": [
+            "M22.N3",
+            "M1.N2"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "The button writes markup's attributes as M1.D3 names them, the member's holding ${alisFusionText(data.<path>)} behind its holders' check, so a click raises the event with that row's value and the page's handler runs (M22.D5, M1.N3).",
+          "doors": [
+            "M22.N3",
+            "M1.N3"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "Main's Button and ButtonFor, which write the view's JavaScript into onclick, leave: a button that does work raises an app event whose handler runs the pipeline, and work the DSL does not express is a plugin's (N17.11).",
+          "doors": [
+            "M22.N3",
+            "M1.N3",
+            "N17.11"
+          ]
+        }
+      ],
+      "nodes": [
+        "lit",
+        "string",
+        "on",
+        "data"
+      ],
+      "writes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:227-322"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:147-200"
+        },
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:36-50"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:240-281"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/FusionConditionalBuilder.cs:162-203"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Fusion/Templates/TemplateElements.cs:34-68"
+        }
+      ],
+      "executes": [
+        {
+          "line": "main",
+          "cite": "Alis.Reactive.Assets/runtime/events/event-native.ts:3-26"
+        },
+        {
+          "line": "redesign",
+          "cite": "Alis.Reactive.Assets/runtime/plugins/document.ts:53-73"
+        }
+      ],
+      "core": [
+        "Q15",
+        "Q17",
+        "Q4"
+      ],
+      "meanings": [
+        {
+          "id": "M22.D5",
+          "meaning": "A template's event button raises its app event by markup's form (M1.D3): the builder writes the attributes Html.Raises writes for the declared event and one payload member, the member's attribute holding ${alisFusionText(data.<path>)} of the item's from read behind its holders' check (M22.D1, M22.D2), so the engine fills it per row and the core's document plugin raises the event with that row's value on a click at or inside the button (probe:ej2-grid-template-attribute). The member is named, and refused, as M1.D3 names and refuses a markup member under the app's options: a record, a list, a member past another member, or a name an attribute cannot carry back is refused where the view renders, naming JsonPropertyName on the payload member, since a template has no Dispatch. A row whose from holds null or is missing fills the attribute empty, and the builder writes no data-alis-null for it, so a handler reads that member as M1.D3 reads its empty text: a gap, with this as its default."
+        }
+      ],
+      "oracle": "Syncfusion EJ2 33.1.47's string template engine (@syncfusion/ej2-base/src/template.js), which compiles a component's template once into a function of each item and runs it per item, observed in Chromium in a real Grid's column templates by spec/probes/ej2-template-m22.mjs: a helper read in an attribute keeps the attribute whole whatever quotes the value holds; the DOM Standard's click, dispatched to the document plugin's listener in the capture phase (M1.D3); and the app event's CustomEvent, whose detail its handler reads (D17.4).",
+      "checker": [
+        "core:Q15",
+        "core:Q17"
+      ],
+      "defects": [
+        {
+          "id": "X15.4",
+          "rung": "behavior"
+        }
+      ],
+      "promises": [
+        {
+          "for": "X15.4",
+          "page": "A wing review page whose grid of residents has a Review column, FusionTemplate.Create<Resident>().EventButton(\"Review\", WingReviewEvents.StartReview, p => p.ResidentId, m => m.ResidentId).Render(plan), over residents R-101 and R-102, and whose handler of StartReview sets reviewing's text to the payload's ResidentId.",
+          "gesture": "Click Review on the second row.",
+          "outcome": "reviewing reads R-102.",
+          "opposite": "Click Review on the first row: reviewing reads R-101.",
+          "defect": "Main writes the id into onclick as bare code, {detail:{id:R-102}} (Alis.Reactive.Fusion/Templates/TemplateElements.cs:46-50 at 623dd4a27), so the click throws a ReferenceError and reviewing stays empty; a button whose attribute is filled once for the grid where the view renders shows R-101 for both rows."
+        }
+      ],
+      "verdicts": [
+        {
+          "door": "FusionTemplateBuilder<TModel>.Button(string! text, string! onClick) -> FusionTemplateBuilder<TModel>!",
+          "verdict": "refused",
+          "reason": "Writes the view's JavaScript into the button's onclick, the onclick text as the view supplies it (Alis.Reactive.Fusion/Templates/TemplateElements.cs:38 at 623dd4a27), and views carry no JavaScript. A button that does work raises a declared app event, whose handler runs the pipeline, and work the DSL does not express is a plugin's.",
+          "carriers": [
+            "M22.N3",
+            "M1.N3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "FusionTemplateBuilder<TModel>.Button(string! text, string! onClick, string! css) -> FusionTemplateBuilder<TModel>!",
+          "verdict": "refused",
+          "reason": "Writes the view's JavaScript into the button's onclick, the onclick text as the view supplies it (Alis.Reactive.Fusion/Templates/TemplateElements.cs:38 at 623dd4a27), and views carry no JavaScript. A button that does work raises a declared app event, whose handler runs the pipeline, and work the DSL does not express is a plugin's.",
+          "carriers": [
+            "M22.N3",
+            "M1.N3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "FusionTemplateBuilder<TModel>.ButtonFor<TProperty>(string! text, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty, string! onClickFn) -> FusionTemplateBuilder<TModel>!",
+          "verdict": "refused",
+          "reason": "Writes the view's JavaScript into the button's onclick, a function named by a string and called with the item's value written as bare code (Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:283 at 623dd4a27), and views carry no JavaScript. A button that does work raises a declared app event, whose handler runs the pipeline, and work the DSL does not express is a plugin's.",
+          "carriers": [
+            "M22.N3",
+            "M1.N3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "FusionTemplateBuilder<TModel>.ButtonFor<TProperty>(string! text, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty, string! onClickFn, string! css) -> FusionTemplateBuilder<TModel>!",
+          "verdict": "refused",
+          "reason": "Writes the view's JavaScript into the button's onclick, a function named by a string and called with the item's value written as bare code (Alis.Reactive.Fusion/Templates/FusionTemplateBuilder.cs:283 at 623dd4a27), and views carry no JavaScript. A button that does work raises a declared app event, whose handler runs the pipeline, and work the DSL does not express is a plugin's.",
+          "carriers": [
+            "M22.N3",
+            "M1.N3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "FusionTemplateBuilder<TModel>.EventButton<TProperty>(string! text, string! eventName, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty) -> FusionTemplateBuilder<TModel>!",
+          "verdict": "renamed",
+          "to": [
+            "M22.N3",
+            "M1.N2"
+          ]
+        },
+        {
+          "door": "FusionTemplateBuilder<TModel>.EventButton<TProperty>(string! text, string! eventName, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty, string! css) -> FusionTemplateBuilder<TModel>!",
+          "verdict": "renamed",
+          "to": [
+            "M22.N3",
+            "M1.N2"
+          ]
+        },
+        {
+          "door": "FusionConditionalBuilder<TModel>.Button(string! text, string! onClick) -> FusionConditionalBuilder<TModel>!",
+          "verdict": "refused",
+          "reason": "Writes the view's JavaScript into the button's onclick, the onclick text as the view supplies it (Alis.Reactive.Fusion/Templates/TemplateElements.cs:38 at 623dd4a27), and views carry no JavaScript. A button that does work raises a declared app event, whose handler runs the pipeline, and work the DSL does not express is a plugin's.",
+          "carriers": [
+            "M22.N3",
+            "M1.N3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "FusionConditionalBuilder<TModel>.Button(string! text, string! onClick, string! css) -> FusionConditionalBuilder<TModel>!",
+          "verdict": "refused",
+          "reason": "Writes the view's JavaScript into the button's onclick, the onclick text as the view supplies it (Alis.Reactive.Fusion/Templates/TemplateElements.cs:38 at 623dd4a27), and views carry no JavaScript. A button that does work raises a declared app event, whose handler runs the pipeline, and work the DSL does not express is a plugin's.",
+          "carriers": [
+            "M22.N3",
+            "M1.N3",
+            "N17.11"
+          ]
+        },
+        {
+          "door": "FusionConditionalBuilder<TModel>.EventButton<TProperty>(string! text, string! eventName, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty) -> FusionConditionalBuilder<TModel>!",
+          "verdict": "renamed",
+          "to": [
+            "M22.N3",
+            "M1.N2"
+          ]
+        },
+        {
+          "door": "FusionConditionalBuilder<TModel>.EventButton<TProperty>(string! text, string! eventName, System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! idProperty, string! css) -> FusionConditionalBuilder<TModel>!",
+          "verdict": "renamed",
+          "to": [
+            "M22.N3",
+            "M1.N2"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -3151,6 +3151,306 @@
         "gesture": "Click Save.",
         "outcome": "The echo shows 0."
       }
+    },
+    {
+      "id": "ej2-grid-template-unencoded",
+      "statement": "EJ2 33.1.47's template engine, in a Grid's column template, writes a raw read into the cell unencoded, so markup in data renders as elements.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-unencoded: a raw read renders 1 img element and text \"\"",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Name column is FusionTemplate.Create<Resident>().Span(m => m.Name).Render(plan), one resident named <img src=x onerror=alert(1)>.",
+        "gesture": "Open the page.",
+        "outcome": "That resident's Name cell reads <img src=x onerror=alert(1)> as text and holds no image."
+      }
+    },
+    {
+      "id": "ej2-grid-template-helper-text",
+      "statement": "EJ2 33.1.47's template engine, in a Grid's column template, calls a global helper named in ${..} with the item's member, so a helper that encodes writes data as text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-helper-text: a helper read renders 0 img elements and text \"<img src=x onerror=alert(1)>\"",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Name column is FusionTemplate.Create<Resident>().Span(m => m.Name).Render(plan), one resident named <img src=x onerror=alert(1)>.",
+        "gesture": "Open the page.",
+        "outcome": "That resident's Name cell reads <img src=x onerror=alert(1)> as text and holds no image."
+      }
+    },
+    {
+      "id": "ej2-grid-template-missing-raw",
+      "statement": "EJ2 33.1.47's template engine, in a Grid's column template, writes a raw read of null as null and of a missing member as undefined.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-missing-raw: a raw read shows \"null\" for null and \"undefined\" for a missing member",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Ward column is FusionTemplate.Create<Resident>().Span(m => m.Ward).Render(plan), over Ann on North, Bo whose ward is null and Cy whose row has no ward.",
+        "gesture": "Open the page.",
+        "outcome": "Ann's Ward cell reads North, and Bo's and Cy's are empty."
+      }
+    },
+    {
+      "id": "ej2-grid-template-missing-helper",
+      "statement": "EJ2 33.1.47's template engine hands a helper read of null or of a missing member to the helper, which writes nothing for it.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-missing-helper: a helper read shows \"\" for null and \"\" for a missing member",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Ward column is FusionTemplate.Create<Resident>().Span(m => m.Ward).Render(plan), over Ann on North, Bo whose ward is null and Cy whose row has no ward.",
+        "gesture": "Open the page.",
+        "outcome": "Ann's Ward cell reads North, and Bo's and Cy's are empty."
+      }
+    },
+    {
+      "id": "ej2-grid-template-helper-prefix",
+      "statement": "EJ2 33.1.47's template engine passes a helper's argument bare when it holds the word window, so the member is read as a global and the grid fails, and reads it from the item when the argument is written with the data prefix.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-helper-prefix: windowSeat passed bare gives ReferenceError, passed as data.windowSeat gives yes",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Seat column is FusionTemplate.Create<Resident>().Span(m => m.WindowSeat).Render(plan), one resident whose window seat is yes.",
+        "gesture": "Open the page.",
+        "outcome": "That resident's Seat cell reads yes."
+      }
+    },
+    {
+      "id": "ej2-grid-template-unguarded-holder",
+      "statement": "EJ2 33.1.47's template engine, in a Grid's column template, throws a TypeError at a read past a missing holder, and the grid renders no row.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-unguarded-holder: a read past a missing holder gives TypeError",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose City column is FusionTemplate.Create<Resident>().Span(m => m.Resident.Address.City).Render(plan), over Ann at Leeds, Bo whose resident has no address and Cy whose row has no resident.",
+        "gesture": "Open the page.",
+        "outcome": "The grid shows three rows; Ann's City cell reads Leeds, and Bo's and Cy's are empty."
+      }
+    },
+    {
+      "id": "ej2-grid-template-guarded-holders",
+      "statement": "EJ2 33.1.47's template engine renders nothing for a read inside its condition on each holder of the read's path, for a row that lacks either holder, and renders every row.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-guarded-holders: reads guarded on each holder render 3 rows, cells Leeds||, names Ann|Bo|Cy",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose City column is FusionTemplate.Create<Resident>().Span(m => m.Resident.Address.City).Render(plan), over Ann at Leeds, Bo whose resident has no address and Cy whose row has no resident.",
+        "gesture": "Open the page.",
+        "outcome": "The grid shows three rows; Ann's City cell reads Leeds, and Bo's and Cy's are empty."
+      }
+    },
+    {
+      "id": "ej2-grid-template-condition-text",
+      "statement": "EJ2 33.1.47's template engine evaluates a condition comparing a member with text between single quotes on each item.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-condition-text: status === 'Active' shows Active|Away",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Status column is When(m => m.Status == \"Active\", then: t => t.Badge(m => m.Status, \"e-badge\"), @else: e => e.Span(\"Away\")), over Ann, active, and Bo, on leave.",
+        "gesture": "Open the page.",
+        "outcome": "Ann's Status cell shows the badge Active and Bo's shows Away."
+      }
+    },
+    {
+      "id": "ej2-grid-template-condition-integers",
+      "statement": "EJ2 33.1.47's template engine evaluates a condition holding two whole-number constants, each after its member, on each item.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-condition-integers: beds > 2 && age < 90 shows yes|no",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Placement column is When(m => m.Beds > 2 && m.Age < 90, then: t => t.Span(\"yes\"), @else: e => e.Span(\"no\")), over a resident of 3 beds aged 80 and one of 1 bed aged 95.",
+        "gesture": "Open the page.",
+        "outcome": "The first resident's Placement cell reads yes and the second's no."
+      }
+    },
+    {
+      "id": "ej2-grid-template-condition-plain-text",
+      "statement": "EJ2 33.1.47's template engine reads back a text constant of letters, digits, a single space, _, - and . between single quotes.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-condition-plain-text: status === 'On leave_2-b.c' shows plain|other",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Leave column is When(m => m.Status == \"On leave_2-b.c\", then: t => t.Span(\"plain\"), @else: e => e.Span(\"other\")), over a resident of that status and one active.",
+        "gesture": "Open the page.",
+        "outcome": "The first resident's Leave cell reads plain and the second's other."
+      }
+    },
+    {
+      "id": "ej2-grid-template-member-first",
+      "statement": "EJ2 33.1.47's template engine reads a whole number written after its member in a condition compiled after one that ends on a number.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-member-first: beds > 2 gives yes|no after a template whose condition ends on a number",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A ward page with two FusionGrids rendered in this order: Residents, whose Band column is When(m => m.Age < 90, ..), and Rooms, whose Spare column is When(m => 2 < m.Beds, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
+        "gesture": "Open the page.",
+        "outcome": "Both grids show their rows; the room of 3 beds shows spare and the room of 1 bed shows full."
+      }
+    },
+    {
+      "id": "ej2-grid-template-constant-first",
+      "statement": "EJ2 33.1.47's template engine reads a whole number written first in a comparison as a member, failing the compile with a SyntaxError, when the condition compiled before ends on a number, and reads it as a number otherwise.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-constant-first: 2 < beds gives yes|no after a template whose condition ends on text and SyntaxError after one whose condition ends on a number",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A ward page with two FusionGrids rendered in this order: Residents, whose Band column is When(m => m.Age < 90, ..), and Rooms, whose Spare column is When(m => 2 < m.Beds, then: t => t.Span(\"spare\"), @else: e => e.Span(\"full\")), over rooms of 3 beds and 1 bed.",
+        "gesture": "Open the page.",
+        "outcome": "Both grids show their rows; the room of 3 beds shows spare and the room of 1 bed shows full."
+      }
+    },
+    {
+      "id": "ej2-grid-template-arithmetic",
+      "statement": "EJ2 33.1.47's template engine reads + and - of two members in a condition as one word, prefixing the first member only, so the template throws a ReferenceError; reads * and / of two members as written; fails to compile a product with a constant compared with a second number; and reads a sum with one constant.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-arithmetic: a + b > 3 gives ReferenceError, a - b > 0 gives ReferenceError, a * b > 3 gives yes|no, a / b > 1 gives yes|no, a * 2 > 4 gives SyntaxError, a + 1 > 3 gives yes|no",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Contact column is When(m => m.Visits * m.Calls > 3, then: t => t.Badge(\"Busy\"), @else: e => e.Span(\"Quiet\")), over a resident of 3 visits and 2 calls and one of 1 visit and 1 call.",
+        "gesture": "Open the page.",
+        "outcome": "The first resident's Contact cell shows the badge Busy and the second's Quiet."
+      }
+    },
+    {
+      "id": "ej2-grid-template-operators",
+      "statement": "EJ2 33.1.47's template engine evaluates a condition with === true, !, ||, !==, >= and <= on each item as written.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-operators: isActive === true gives yes|no, !isActive gives no|yes, beds > 2 || a > 2 gives yes|no, status !== 'Active' gives no|yes, beds >= 3 gives yes|no, beds <= 1 gives no|yes",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Flags column holds six conditions in turn, m => m.IsActive == true, !m.IsActive, m => m.Beds > 2 || m.A > 2, m => m.Status != \"Active\", m => m.Beds >= 3 and m => m.Beds <= 1, each writing yes or no, over an active resident of 3 beds and one away with 1 bed.",
+        "gesture": "Open the page.",
+        "outcome": "The first resident's six cells read yes, no, yes, no, yes, no and the second's no, yes, no, yes, no, yes."
+      }
+    },
+    {
+      "id": "ej2-grid-template-decimal-constant",
+      "statement": "EJ2 33.1.47's template engine fails to compile a condition holding a decimal constant, with a SyntaxError, and the grid renders no row.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-decimal-constant: score > 2.5 gives SyntaxError",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Risk column is When(m => m.FallScore > 2.5, then: t => t.Badge(\"High\"), @else: e => e.Span(\"Low\")).",
+        "gesture": "Open the page.",
+        "outcome": "The page is refused where the view renders with M22.X1's message, which names FallScore and 2.5."
+      }
+    },
+    {
+      "id": "ej2-grid-template-apostrophe-constant",
+      "statement": "EJ2 33.1.47's template engine fails to compile a condition holding text with an apostrophe between single quotes, with a SyntaxError.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-apostrophe-constant: a constant written 'Resident's choice' gives SyntaxError",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Choice column is When(m => m.Status == \"Resident's choice\", then: t => t.Span(\"chosen\"), @else: e => e.Span(\"other\")).",
+        "gesture": "Open the page.",
+        "outcome": "The page is refused where the view renders with M22.X1's message, which names Status and the text Resident's choice."
+      }
+    },
+    {
+      "id": "ej2-grid-template-escaped-constant",
+      "statement": "EJ2 33.1.47's template engine reads back a double-quoted text constant holding one JSON escape, \\u0027, as its text.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-escaped-constant: a constant written \"Resident\\u0027s choice\" gives chosen|other",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Choice column is When(m => m.Status == \"Resident's choice\", then: t => t.Span(\"chosen\"), @else: e => e.Span(\"other\")).",
+        "gesture": "Open the page.",
+        "outcome": "The page is refused where the view renders with M22.X1's message, which names Status and the text Resident's choice."
+      }
+    },
+    {
+      "id": "ej2-grid-template-two-escapes",
+      "statement": "EJ2 33.1.47's template engine reads a double-quoted text constant holding two JSON escapes as other text, so the item that holds that text takes the other branch.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-two-escapes: a constant written \"Zo\\u00EB Bront\\u00EB\" gives other",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F2",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Name column's condition is When(m => m.Name == \"Zoë Brontë\", then: t => t.Span(\"same\"), @else: e => e.Span(\"other\")).",
+        "gesture": "Open the page.",
+        "outcome": "The page is refused where the view renders with M22.X1's message, which names Name and the text Zoë Brontë."
+      }
+    },
+    {
+      "id": "ej2-grid-template-attribute",
+      "statement": "EJ2 33.1.47's template engine writes a helper read into an attribute so that the attribute reads the value whole, quotes included, and the value adds no attribute.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-attribute: 2 rows, data-alis-detail-name reads O'Brien\" title=\"x|Ann, 0 buttons with a title",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F3",
+        "page": "A wing review page whose FusionGrid of residents has a Review column, EventButton(\"Review\", WingReviewEvents.StartReview, p => p.Name, m => m.Name), over O'Brien\" title=\"x and Ann, and whose handler of StartReview sets reviewing's text to the payload's Name.",
+        "gesture": "Click Review on the first row.",
+        "outcome": "reviewing reads O'Brien\" title=\"x."
+      }
+    },
+    {
+      "id": "ej2-grid-template-link-href",
+      "statement": "EJ2 33.1.47's template engine writes a helper read into an href whole, so a javascript: URL stays the link's href and & reads back as &.",
+      "host": "browser",
+      "oracle": "Syncfusion EJ2 33.1.47's ej2.min.js in Chromium, its Grid's column templates compiled by its string template engine, driven by Playwright 1.63.0",
+      "probe": "ej2-template-m22.mjs",
+      "expect": "ej2-grid-template-link-href: hrefs read javascript:alert(1)|/residents?id=7&tab=care",
+      "source": "spec/probes/ej2-template-m22.mjs",
+      "proof": {
+        "feature": "M22.F1",
+        "page": "A resident board, FusionGrid over the rows the server sends, whose Chart column is Link(m => m.ChartUrl, m => m.Name), over a resident whose chart URL is javascript:alert(1) and one whose is /residents?id=7&tab=care.",
+        "gesture": "Click the second resident's link, go back, then click the first resident's link.",
+        "outcome": "The second link opens /residents?id=7&tab=care, and the first opens no dialog and leaves the page where it is."
+      }
     }
   ]
 }

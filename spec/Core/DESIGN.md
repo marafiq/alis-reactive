@@ -3354,9 +3354,13 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - It writes a read into the HTML unencoded, so markup in data becomes live elements
     (`probe:ej2-template-unencoded`). The builder writes each read through a text helper that the Fusion module's
     browser code supplies, which the engine calls by name (`probe:ej2-template-helper-encodes`). Data is then text.
+    The builder writes the helper's argument as `data.` and the path itself: the engine prefixes an argument only
+    when it holds neither "data" nor "window" and reads any other as a global, so a member named like `windowSeat`
+    fails the grid (`probe:ej2-grid-template-helper-prefix`).
   - It throws on a member past a missing holder (`probe:ej2-template-missing-holder`), so one row stops the grid's
-    rendering. The builder writes a read past a holder the model declares nullable inside the engine's condition on
-    that holder (`probe:ej2-template-guarded-holder`), so the row shows nothing there and the others render.
+    rendering. The builder writes a read inside the engine's condition on every holder of its path, since data reads
+    as nothing when absent whatever the model declares (`probe:ej2-template-guarded-holder`,
+    `probe:ej2-grid-template-guarded-holders`), so the row shows nothing there and the others render.
   - Member names are the data's JSON names under the app's options (D2.9), not the camel case the writer
     hard-codes today.
 - D15.4 Each of the three fixes lands in the Fusion module, and none reaches the core.
