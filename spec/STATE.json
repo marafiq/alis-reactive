@@ -1320,8 +1320,42 @@
       "pass": true
     },
     "fluent": {
-      "counts": {},
-      "detail": "not started: spec/Fluent/sentences.json absent",
+      "counts": {
+        "F1": "pass",
+        "F1_names": 141,
+        "F1_rows": 141,
+        "F1_synonym_groups": 26,
+        "F2": "fail",
+        "F2_cells": 240,
+        "F2_compiling": 116,
+        "F2_failing": 1,
+        "F2_forms": 33,
+        "F2_forms_as_named": 33,
+        "F2_gaps": 119,
+        "F2_position_gaps": 4,
+        "F2_positions": 15,
+        "F2_refused": 4,
+        "F2_source_gaps": 5,
+        "F2_sources": 16,
+        "F3": "fail",
+        "F3_differ": 21,
+        "F3_names": 35,
+        "F4": "fail",
+        "F4_hides": 0,
+        "F4_no_row": 455,
+        "F4_other_name": 0,
+        "F4_parameters": 455,
+        "F4_slots": 92,
+        "F4_stale_rows": 6,
+        "F5": "fail",
+        "F5_parameters": 110,
+        "F5_rows": 45,
+        "F5_stale_rows": 0,
+        "F5_untyped": 0,
+        "lambda_parameters": 463,
+        "members": 539
+      },
+      "detail": "F2 ConditionLeft x Literal: fails CS1929 and is no refused cell; F2 PropertySet x HubInvokeResult: no door (N21.1, N21.8: no hub door); F3 All: (callback1)>source on LiveObjects<TItem>; (path)>source on ITypedSource<T>; F3 Any: ()>source | (callback1)>source on LiveObjects<TItem>; ()>source | (path)>source on ITypedSource<T>; F4 spec/api/HttpSurface/EveryStage.cs:19 'handled': Rendered.Reactive(pipeline)#1:Pipeline has no row; F4 spec/api/HttpSurface/EveryStage.cs:25 'north': Guard.Then(branch)#0:Pipeline has no row; F5 IHtmlHelper.PartialFor(viewName): no string kind; F5 RequestDefaults.Header(value): no string kind",
       "pass": false
     },
     "gate1": {
@@ -1336,7 +1370,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 56,
+        "files": 57,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -3392,7 +3426,7 @@
     }
   },
   "passed": 21,
-  "read_at_head": "59fb0b2a4eb4b131e66bf005e59f3df583064fc7",
+  "read_at_head": "9a5ac64b40ab74920b61e5e8d59dbd6851c2cbda",
   "step": {
     "failing": [
       "fluent",
