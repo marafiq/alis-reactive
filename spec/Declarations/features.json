@@ -358,101 +358,101 @@
       "promises": [
         {
           "for": "X4.2",
-          "page": "A medication room page with two infusion pumps of one declaration, which declares Alarms, a ReadOnly<int>, and Drug, a Property<string>: pump-a, an older pump, has no alarms member, and pump-b holds 3 alarms; both hold the drug Heparin. Count pump A's alarms writes counting into alarms-tried, pump-a's Alarms into alarms-read and counted into alarms-done; Count pump B's alarms writes pump-b's Alarms into b-alarms and counted into b-done; Read pump A's drug writes pump-a's Drug into drug-read.",
-          "gesture": "Click Count pump A's alarms, then Read pump A's drug.",
-          "outcome": "drug-read reads Heparin, alarms-tried reads counting, and alarms-read and alarms-done are empty.",
-          "opposite": "Count pump B's alarms shows 3 in b-alarms and counted in b-done.",
-          "defect": "The read of the member pump A lacks reads nothing and the pipeline goes on, so alarms-done reads counted; or the stop ends more than its own pipeline, so drug-read stays empty.",
+          "page": "The bench page with two ConformanceComponents, both holding the text Alpha: conformance-older, of the older version, which lacks the readOnlyText member the declaration declares as a ReadOnly<string>, and conformance, whose read-only text is RO-2026-11-10. Read older's read-only text writes reading into tried, conformance-older's ReadOnlyText into read and read into done; Read the read-only text writes conformance's ReadOnlyText into b-read and read into b-done; Show older's text writes conformance-older's Text into text-read.",
+          "gesture": "Click Read older's read-only text, then Show older's text.",
+          "outcome": "text-read reads Alpha, tried reads reading, and read and done are empty.",
+          "opposite": "Read the read-only text shows RO-2026-11-10 in b-read and read in b-done.",
+          "defect": "The read of the member the older version lacks reads nothing and the pipeline goes on, so done reads read; or the stop ends more than its own pipeline, so text-read stays empty.",
           "existing_test": "redesign WhenADeclarationIsNewerThanItsComponent.a_read_of_a_member_the_component_does_not_have_fails_only_its_own_pipeline"
         },
         {
           "for": "X4.5",
-          "page": "A medication room page with two infusion pumps whose prime returns a promise that resolves once the pump shows primed: pump-a's declaration declares Prime() with Method, and pump-b's declares it with MethodAsync. Prime pump A writes priming into prime-tried, calls pump-a's Prime() and writes primed into prime-done; Prime pump B calls pump-b's Prime() and writes primed into b-prime-done; Read pump A's drug writes pump-a's Drug, Heparin, into drug-read.",
-          "gesture": "Click Prime pump A, wait until pump A shows primed, then click Read pump A's drug.",
-          "outcome": "drug-read reads Heparin, prime-tried reads priming, and prime-done is empty.",
-          "opposite": "Prime pump B shows primed in b-prime-done once pump B shows primed.",
-          "defect": "The pipeline goes on past the call whose promise nobody awaits, so prime-done reads primed (Alis.Reactive.Assets/runtime/grammar/execute.ts:45-47 at 65fdf118d)."
+          "page": "The bench page with two ConformanceComponents holding the text Alpha: conformance-promised, of the promised version, whose Ping(), declared with Method, answers a promise that resolves once the component shows Pinged, and conformance, whose Settle(), declared with MethodAsync, awaits the test app's settle endpoint, which answers at once. Ping promised writes pinging into ping-tried, calls conformance-promised's Ping() and writes pinged into ping-done; Settle calls conformance's Settle() and writes settled into settle-done; Show promised's text writes conformance-promised's Text into text-read.",
+          "gesture": "Click Ping promised, wait until conformance-promised shows Pinged, then click Show promised's text.",
+          "outcome": "text-read reads Alpha, ping-tried reads pinging, and ping-done is empty.",
+          "opposite": "Settle shows settled in settle-done once the settle endpoint answers.",
+          "defect": "The pipeline goes on past the call whose promise nobody awaits, so ping-done reads pinged (Alis.Reactive.Assets/runtime/grammar/execute.ts:45-47 at 65fdf118d)."
         },
         {
           "for": "X5.3",
-          "page": "A ward page with a bed board whose declaration declares RowFor(Arg<int> room), a ReturnedObject<BedRow> whose BedRow declares Mark() and Flag(); this board's rows have mark and lack flag, and the board holds the ward South. Mark room 4 calls RowFor(4).Mark(), which shows Room 4 (marked) on the board, and writes marked into mark-done; Flag room 4 writes flagging into flag-tried, calls RowFor(4).Flag() and writes flagged into flag-done; Read the ward writes the board's Ward into ward-read.",
-          "gesture": "Click Flag room 4, then Read the ward.",
-          "outcome": "ward-read reads South, flag-tried reads flagging, and flag-done is empty.",
-          "opposite": "Mark room 4 shows Room 4 (marked) on the board and marked in mark-done.",
-          "defect": "The call of the method the returned row lacks runs nothing and the pipeline goes on, so flag-done reads flagged; or the stop ends more than its own pipeline, so ward-read stays empty.",
+          "page": "The bench page with two ConformanceComponents holding the text Alpha: conformance, whose current item, named One, has act, which the component shows as One acted, and conformance-lacking, whose current item, named One, lacks the act member Item declares as Act(). Act on current calls conformance's Current().Act() and writes acted into act-done; Act on lacking writes acting into act-tried, calls conformance-lacking's Current().Act() and writes acted into lacking-done; Show lacking's text writes conformance-lacking's Text into text-read.",
+          "gesture": "Click Act on lacking, then Show lacking's text.",
+          "outcome": "text-read reads Alpha, act-tried reads acting, and lacking-done is empty.",
+          "opposite": "Act on current shows One acted on conformance and acted in act-done.",
+          "defect": "The call of the method the returned item lacks runs nothing and the pipeline goes on, so lacking-done reads acted; or the stop ends more than its own pipeline, so text-read stays empty.",
           "existing_test": "redesign WhenADeclarationIsNewerThanItsComponent.a_call_of_a_method_an_object_a_method_returned_does_not_have_fails_only_its_own_pipeline"
         },
         {
           "for": "X5.4",
-          "page": "A visit planner page whose planner's declaration declares Slot, a Property<VisitSlot> of the app's class VisitSlot with a string Label and an int Seats that starts at 2; the planner holds the slot {\"label\": \"Morning\"} with no seats. Show the slot writes the slot's Label and Seats, each read past the declared member, into slot-label and slot-seats, then adds one to the page's tally and writes it into slot-shown; Clear the slot sets the planner's Slot to null; Hold the evening slot sets it to {\"label\": \"Evening\", \"seats\": 5}.",
-          "gesture": "Click Show the slot, then Clear the slot and Show the slot again.",
-          "outcome": "After the first Show the slot, slot-label reads Morning and slot-seats reads 2; after the second, slot-label and slot-seats are empty and slot-shown reads 2.",
-          "opposite": "Hold the evening slot, then Show the slot, shows Evening in slot-label and 5 in slot-seats.",
-          "defect": "The absent Seats reads nothing, so slot-seats is empty after the first Show the slot (D4.2 reads it as System.Text.Json binds it, 2); or a slot that holds null stops the pipeline, so slot-shown keeps 1."
+          "page": "The bench page with the ConformanceComponent conformance, whose declaration declares Record, a Property<Record> of the class Record with a string Name and a string Code that the class starts at C0; the component holds the record {\"name\": \"Morning\"} with no code. Show the record writes the record's Name and Code, each read past the declared member, into record-name and record-code, then adds one to the page's tally and writes it into record-shown; Clear the record sets the component's Record to null; Hold the evening record sets it to {\"name\": \"Evening\", \"code\": \"C5\"}.",
+          "gesture": "Click Show the record, then Clear the record and Show the record again.",
+          "outcome": "After the first Show the record, record-name reads Morning and record-code reads C0; after the second, record-name and record-code are empty and record-shown reads 2.",
+          "opposite": "Hold the evening record, then Show the record, shows Evening in record-name and C5 in record-code.",
+          "defect": "The absent Code reads nothing, so record-code is empty after the first Show the record (D4.2 reads it as System.Text.Json binds it, C0); or a record that holds null stops the pipeline, so record-shown keeps 1."
         },
         {
           "for": "X5.11",
-          "page": "A medication room page with an infusion pump whose declaration declares Summary(), a Method<string> the pump answers with its rate, as 25 ml/h, and counts in the asked counter it shows; SetRate(Arg<decimal> rate); and Channels, a LiveObjects<PumpChannel> whose items declare IsRunning(), a Method<bool> each channel counts in the checks counter it shows. The pump has three channels with channel 2 stopped, and Stop channel 3 stops channel 3. Read the summary twice binds Summary() once and writes it into summary-1 and summary-2; Call the summary twice writes one call of Summary() into call-1 and another into call-2; Hold the summary binds Summary(), calls SetRate(40), then writes the bound summary into held-summary and a new Summary() into new-summary; Count the running channels writes the count of channels whose IsRunning() is true into running.",
-          "gesture": "Click Read the summary twice, Call the summary twice, Hold the summary and Count the running channels, in that order.",
-          "outcome": "After Read the summary twice the asked counter reads 1 and summary-1 and summary-2 read 25 ml/h; after Call the summary twice it reads 3; held-summary reads 25 ml/h and new-summary 40 ml/h; running reads 2 and each channel's checks counter reads 1.",
-          "opposite": "Clicking Stop channel 3 and then Count the running channels shows running at 1 and each checks counter at 2.",
-          "defect": "A bound result is called at each read, so the asked counter reads 2 after Read the summary twice; or two calls run once; or the held summary is called again after SetRate and reads 40 ml/h; or IsRunning() is called once for the list or before the step, so running misses channel 3 stopped since."
+          "page": "The bench page with the ConformanceComponent conformance, its count 25, which shows its calls, the count of its method calls, and answers Total(), a Method<int>, with its Count; its Items hold three items, the second inactive, each showing its checks, the count of calls of its Check(), a Method<bool> that answers its Active, and its own Deactivate last button makes its third item inactive. Read the total twice binds Total() once and writes it into total-1 and total-2; Call the total twice writes one call of Total() into call-1 and another into call-2; Hold the total binds Total(), writes 40 into Count, then writes the bound total into held-total and a new Total() into new-total; Count the active items writes the count of items whose Check() is true into active.",
+          "gesture": "Click Read the total twice, Call the total twice, Hold the total and Count the active items, in that order.",
+          "outcome": "After Read the total twice the calls read 1 and total-1 and total-2 read 25; after Call the total twice they read 3; held-total reads 25 and new-total 40; active reads 2 and each item's checks read 1.",
+          "opposite": "Clicking the component's Deactivate last and then Count the active items shows active at 1 and each item's checks at 2.",
+          "defect": "A bound result is called at each read, so the calls read 2 after Read the total twice; or two calls run once; or the held total is called again after the write of 40 and reads 40; or Check() is called once for the list or before the step, so active misses the third item made inactive since."
         },
         {
           "for": "X5.12",
-          "page": "A medication room page with two infusion pumps of one declaration. On pump-old, an older pump: Silence(), which pump-old lacks; Label(), a Method<string>, where pump-old holds label as the text Ward pump; Flush(), declared with Method, and Volume(), a Method<int>, each of which pump-old answers with a promise. Silence pump A, Read pump A's label, Flush pump A and Read pump A's volume each write their own name into tried and, after the call, into done; Read pump A's drug writes pump-old's Drug, Heparin, into drug-read. On pump-new: Note(Arg<string?> text) shows the text it receives, (null) for null and (undefined) for undefined; LastDose(), a Method<DoseRecord> pump-new answers with a nurse of null; MissingDose(), which pump-new answers with undefined. Note nothing passes a null literal, Note the last dose passes LastDose()'s Nurse, and Note the missing dose passes MissingDose()'s Nurse; Flush pump B calls pump-new's Flush(), which answers no promise, and writes flushed into b-done.",
-          "gesture": "Click Silence pump A, Read pump A's label, Flush pump A and Read pump A's volume, each followed by Read pump A's drug; then click Note nothing, Note the last dose and Note the missing dose.",
-          "outcome": "After each of the four, drug-read reads Heparin, tried reads that button's name and done is empty; pump-new's note reads (null) after each of the three notes.",
-          "opposite": "Flush pump B writes flushed into b-done.",
-          "defect": "One of the four calls runs on, so done reads its name; or a null reaches the method as undefined or as the text null, so the note reads (undefined) or null."
+          "page": "The bench page with three ConformanceComponents holding the text Alpha. conformance-older, of the older version, lacks log(), which the declaration declares as Log(Arg<string> text), and holds echo, which it declares as Echo(Arg<string> text), a Method<string>, as the text Echoed; conformance-promised, of the promised version, answers Ping(), declared with Method, and Total(), a Method<int>, each with a promise. Log older, Echo older, Ping promised and Total promised each write their own name into tried and, after the call, into done; Show older's text and Show promised's text write that component's Text into text-read. On conformance: TakeText(Arg<string?> text) shows the text it receives as its taken text, (null) for null and (undefined) for undefined; Snapshot(), a Method<Record>, answers a record whose name holds null; MaybeItem(), a ReturnedObject<Item> declared nullable: true, answers undefined. Take nothing passes a null literal, Take the snapshot's name passes Snapshot().Name, and Take the missing item's name passes MaybeItem().Name; Ping calls conformance's Ping(), which answers no promise, and writes pinged into b-done.",
+          "gesture": "Click Log older, Echo older, Ping promised and Total promised, each followed by the Show text button of the component it reached; then click Take nothing, Take the snapshot's name and Take the missing item's name.",
+          "outcome": "After each of the four, text-read reads Alpha, tried reads that button's name and done is empty; conformance's taken text reads (null) after each of the three takes.",
+          "opposite": "Ping writes pinged into b-done.",
+          "defect": "One of the four calls runs on, so done reads its name; or a null reaches the method as undefined or as the text null, so the taken text reads (undefined) or null."
         },
         {
           "for": "X11.3",
-          "page": "A ward page with a bed board whose declaration declares Lock() with Method, while the board's lock returns a promise that rejects while the board is in use, and Unlock() with MethodAsync, whose promise resolves; the board holds the ward South. Lock the board writes locking into lock-tried, calls Lock() and writes locked into lock-done; Unlock the board calls Unlock() and writes unlocked into unlock-done; Read the ward writes the board's Ward into ward-read.",
-          "gesture": "Click Lock the board, then Read the ward.",
-          "outcome": "ward-read reads South, lock-tried reads locking, and lock-done is empty.",
-          "opposite": "Unlock the board shows unlocked in unlock-done.",
-          "defect": "The step after the call runs, so lock-done reads locked though the board refused the lock (Alis.Reactive.Assets/runtime/grammar/execute.ts:45-47 at 65fdf118d); or the rejection stops more than its own pipeline, so ward-read stays empty."
+          "page": "The bench page with the ConformanceComponent conformance-promised, of the promised version, its text Alpha and its Enabled false, whose Ping(), declared with Method, answers a promise that rejects while Enabled is false, and the ConformanceComponent conformance, whose Settle(), declared with MethodAsync, awaits the test app's settle endpoint, which answers at once. Ping promised writes pinging into ping-tried, calls conformance-promised's Ping() and writes pinged into ping-done; Settle calls conformance's Settle() and writes settled into settle-done; Show promised's text writes conformance-promised's Text into text-read.",
+          "gesture": "Click Ping promised, then Show promised's text.",
+          "outcome": "text-read reads Alpha, ping-tried reads pinging, and ping-done is empty.",
+          "opposite": "Settle shows settled in settle-done.",
+          "defect": "The step after the call runs, so ping-done reads pinged though the component refused the ping (Alis.Reactive.Assets/runtime/grammar/execute.ts:45-47 at 65fdf118d); or the rejection stops more than its own pipeline, so text-read stays empty."
         },
         {
           "for": "M11.X1",
-          "page": "A medication room page in an app whose JSON options name members in snake case, with an infusion pump that shows 10 ml/h and whose declaration declares SetRate(Arg<decimal> rate) with no name:. Set the rate to 25 calls SetRate(25), which the pump shows as 25 ml/h, and writes set into rate-done. Read the order gets /orders/last, which answers {\"max_rate\": 40}, and writes its MaxRate, of the app's class OrderLimit, into max-rate; Read the camel order gets /orders/camel, which answers {\"maxRate\": 40}, and writes its MaxRate into camel-rate.",
-          "gesture": "Click Set the rate to 25, then Read the order.",
-          "outcome": "The pump shows 25 ml/h, rate-done reads set, and max-rate reads 40.",
-          "opposite": "Read the camel order shows 0 in camel-rate, the start of a member the snake-case contract does not name.",
-          "defect": "The declared name follows the app's naming, so the call reaches set_rate, which the pump lacks: the pump keeps 10 ml/h and rate-done stays empty; or the data read follows camel case, so max-rate reads 0 and camel-rate 40."
+          "page": "The bench page in an app whose JSON options name members in snake case, with the ConformanceComponent conformance, which shows Took none until its TakeNullable(Arg<int?> count), declared with no name:, shows the count it receives as Took 25. Take 25 calls TakeNullable(25) and writes taken into take-done. Read the record gets the test app's record endpoint, which answers {\"multi_word\": 40}, and writes its MultiWord, of the class Record, into multi-word; Read the camel record gets the camel record endpoint, which answers {\"multiWord\": 40}, and writes its MultiWord into camel-word.",
+          "gesture": "Click Take 25, then Read the record.",
+          "outcome": "The component shows Took 25, take-done reads taken, and multi-word reads 40.",
+          "opposite": "Read the camel record shows 0 in camel-word, the start of a member the snake-case contract does not name.",
+          "defect": "The declared name follows the app's naming, so the call reaches take_nullable, which the component lacks: the component keeps Took none and take-done stays empty; or the data read follows camel case, so multi-word reads 0 and camel-word 40."
         },
         {
           "for": "M11.X2",
-          "page": "A care board page in an app whose JSON options name members in snake case, with a board holding the residents [{\"name\": \"Ada\", \"care_level\": 2}, {\"name\": \"Ben\", \"care_level\": 1}, {\"name\": \"Cy\", \"care_level\": 3}] as the app writes them, listed Ada, Ben, Cy; the board's declaration declares SortBy(Field field), which orders its rows by the member the field names. Sort by care level calls SortBy(Field.Of((Resident r) => r.CareLevel)).",
-          "gesture": "Click Sort by care level.",
-          "outcome": "The board lists Ben, Ada, Cy.",
-          "opposite": "Before the click the board lists Ada, Ben, Cy.",
-          "defect": "The field is named careLevel, so the board orders by a member no row holds and keeps Ada, Ben, Cy."
+          "page": "The bench page in an app whose JSON options name members in snake case, with the ConformanceComponent conformance, whose Records hold [{\"name\": \"Ada\", \"multi_word\": 2}, {\"name\": \"Ben\", \"multi_word\": 1}, {\"name\": \"Cy\", \"multi_word\": 3}] as the app writes them, listed Ada, Ben, Cy; its declaration declares SortBy(Field field), which orders its records by the member the field names. Sort by multi-word calls SortBy(Field.Of((Record r) => r.MultiWord)).",
+          "gesture": "Click Sort by multi-word.",
+          "outcome": "The component lists Ben, Ada, Cy.",
+          "opposite": "Before the click the component lists Ada, Ben, Cy.",
+          "defect": "The field is named multiWord, so the component orders by a member no record holds and keeps Ada, Ben, Cy."
         },
         {
           "for": "M11.X3",
-          "page": "A ward page with a bed board whose declaration declares FindRow(Arg<string> resident), a ReturnedObject<BedRow> declared without nullable: true, whose BedRow declares Label, a ReadOnly<string>, and Note, a Property<string>; this board's rows have label and lack note, the board has a row for Ada Byron and none for Zed, and it holds the ward South. Note Ada's row writes noting into note-tried, sets FindRow(\"Ada\").Note to seen at handover and writes noted into note-done; Read Zed's row writes reading into read-tried, FindRow(\"Zed\").Label into row-label and read into read-done; Read Ada's row writes FindRow(\"Ada\").Label into ada-label; Read the ward writes the board's Ward into ward-read.",
-          "gesture": "Click Note Ada's row, then Read Zed's row, then Read the ward.",
-          "outcome": "ward-read reads South; note-tried reads noting and note-done is empty; read-tried reads reading, and row-label and read-done are empty.",
-          "opposite": "Read Ada's row shows Ada Byron in ada-label.",
-          "defect": "The write gives Ada's row a note and note-done reads noted, or the read through no row reads nothing and read-done reads read, as the redesign's returned objects read and write as optional."
+          "page": "The bench page with two ConformanceComponents holding the text Alpha, whose declaration declares Current(), a ReturnedObject<Item> declared without nullable: true, whose Item declares Name, a ReadOnly<string>, and Value, a Property<int>: conformance-held, whose current item is named One and lacks value, and conformance-empty, whose Current() answers no item. Write the value writes writing into write-tried, sets conformance-held's Current().Value to 7 and writes written into write-done; Read the empty current writes reading into read-tried, conformance-empty's Current().Name into current-name and read into read-done; Read the held current writes conformance-held's Current().Name into held-name; Show the text writes conformance-empty's Text into text-read.",
+          "gesture": "Click Write the value, then Read the empty current, then Show the text.",
+          "outcome": "text-read reads Alpha; write-tried reads writing and write-done is empty; read-tried reads reading, and current-name and read-done are empty.",
+          "opposite": "Read the held current shows One in held-name.",
+          "defect": "The write gives the held item a value and write-done reads written, or the read through no item reads nothing and read-done reads read, as the redesign's returned objects read and write as optional."
         },
         {
           "for": "X7.9",
-          "page": "A ward page whose census component declares its count as int?, as its TypeScript reads number | null, and a Count button that sets it from the count of the ward's residents, an int.",
-          "gesture": "Click Count on a ward of 12 residents.",
-          "outcome": "The census shows 12.",
-          "opposite": "On an empty ward, the census shows 0 and not its empty state.",
-          "defect": "The int source does not reach the int? member, so the census keeps its empty state."
+          "page": "The bench page whose ConformanceComponent declares NullableCount as int?, as its TypeScript reads number | null, and shows it in its nullable count line, none when it holds null; a Count button sets it from the count of the component's Records, an int.",
+          "gesture": "Click Count on a component of 12 records.",
+          "outcome": "The nullable count line reads 12.",
+          "opposite": "On a component with no records, the nullable count line reads 0 and not none.",
+          "defect": "The int source does not reach the int? member, so the nullable count line keeps none."
         },
         {
           "for": "X7.9",
-          "page": "A ward page whose census component declares its count as int?, and a Total beds button that sets it from the sum of each room's beds, an int.",
-          "gesture": "Click Total beds on a ward whose four rooms hold 2 beds each.",
-          "outcome": "The census shows 8.",
-          "opposite": "On a ward with no rooms, the census shows 0 and not its empty state.",
-          "defect": "The int sum does not reach the int? member, so the census keeps its empty state."
+          "page": "The bench page whose ConformanceComponent declares NullableCount as int?, shown in its nullable count line, none when it holds null, and a Total button that sets it from the sum of each record's Count, an int.",
+          "gesture": "Click Total on a component whose four records each count 2.",
+          "outcome": "The nullable count line reads 8.",
+          "opposite": "On a component with no records, the nullable count line reads 0 and not none.",
+          "defect": "The int sum does not reach the int? member, so the nullable count line keeps none."
         }
       ],
       "verdicts": []
@@ -633,35 +633,35 @@
       "promises": [
         {
           "for": "X4.3",
-          "page": "A medication round page with a dose cart that holds the round Morning and raises DoseGiven, whose payload is declared with Resident, a required ReadOnly<string>, and Note, a ReadOnly<DoseNote> of the app's class DoseNote with an int Refills. Give a dose without a resident makes the cart raise DoseGiven with no resident and the note {}, and Give Ada's dose raises it with the resident Ada Byron and the note {}. The page's DoseGiven handler writes the note's Refills into refills, then the resident into given-to, then recorded into dose-recorded; Read the round writes the cart's Round into round-read.",
-          "gesture": "Click Give a dose without a resident, then Read the round.",
-          "outcome": "round-read reads Morning, refills reads 0, and given-to and dose-recorded are empty.",
-          "opposite": "Give Ada's dose shows 0 in refills, Ada Byron in given-to and recorded in dose-recorded.",
-          "defect": "The absent resident reads nothing and the handler goes on, so dose-recorded reads recorded, as the redesign reads a payload's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d); or the note's absent Refills reads nothing or stops, so refills is empty."
+          "page": "The bench page with the ConformanceComponent conformance, its text Alpha, which raises Raised, whose payload is declared with Text, a required ReadOnly<string>, and Record, a ReadOnly<Record> of the class Record with an int Count. Its Raise without text button raises Raised with no text and the record {}, and its Raise Ada button with the text Ada Byron and the record {}. The page's Raised handler writes the record's Count into record-count, then the text into raised-text, then recorded into raised-recorded; Show the text writes the component's Text into text-read.",
+          "gesture": "Click the component's Raise without text, then Show the text.",
+          "outcome": "text-read reads Alpha, record-count reads 0, and raised-text and raised-recorded are empty.",
+          "opposite": "Raise Ada shows 0 in record-count, Ada Byron in raised-text and recorded in raised-recorded.",
+          "defect": "The absent text reads nothing and the handler goes on, so raised-recorded reads recorded, as the redesign reads a payload's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d); or the record's absent Count reads nothing or stops, so record-count is empty."
         },
         {
           "for": "X5.7",
-          "page": "A call bell page with two call bells of one declaration, whose Answered payload declares Room, a required ReadOnly<string>, and Note, a ReadOnly<string> declared optional: true, as the bell's typed API marks note?. Answer room 4 makes bell-a raise Answered with the room 4 and no note; Answer room 4 with a note raises it with the room 4 and the note Water please; Answer the silent bell makes bell-b raise it with the note Fell asleep and no room. bell-a's handler writes the note into a-note, the room into a-room and answered into a-done; bell-b's handler writes the note into b-note, the room into b-room and answered into b-done; Read bell A writes bell-a's Calls, its count of calls, into a-calls.",
-          "gesture": "Click Answer room 4, then Answer the silent bell, then Read bell A.",
-          "outcome": "a-note is empty, a-room reads 4 and a-done reads answered; b-note reads Fell asleep, and b-room and b-done are empty; a-calls reads 1.",
-          "opposite": "Answer room 4 with a note shows Water please in a-note and 4 in a-room.",
-          "defect": "The optional note the bell leaves out stops the handler, so a-room stays empty; or the required room bell B leaves out reads nothing and the handler goes on, so b-done reads answered."
+          "page": "The bench page with two ConformanceComponents, each showing Raised and its count of raises, whose Raised payload declares Text, a required ReadOnly<string>, and OptionalText, a ReadOnly<string?> declared optional: true, as the component's typed API marks optionalText?. conformance-a's Raise 4 raises Raised with the text 4 and no optional text; its Raise 4 with a note raises it with the text 4 and the optional text Water please; conformance-b's Raise the silent raises it with the optional text Fell asleep and no text. conformance-a's handler writes the optional text into a-note, the text into a-text and raised into a-done; conformance-b's handler writes the optional text into b-note, the text into b-text and raised into b-done.",
+          "gesture": "Click conformance-a's Raise 4, then conformance-b's Raise the silent.",
+          "outcome": "a-note is empty, a-text reads 4 and a-done reads raised; b-note reads Fell asleep, and b-text and b-done are empty; conformance-a shows Raised 1.",
+          "opposite": "Raise 4 with a note shows Water please in a-note and 4 in a-text.",
+          "defect": "The optional text the component leaves out stops the handler, so a-text stays empty; or the required text conformance-b leaves out reads nothing and the handler goes on, so b-done reads raised."
         },
         {
           "for": "X5.8",
-          "page": "A resident card page with a card that raises Opened, whose payload declares Name, a ReadOnly<string>, and BirthCountry, a ReadOnly<string?>, as the card's typed API types it string | null. Open Ben's card raises Opened with the name Ben Ng and the country Ireland, and Open Ada's card with the name Ada Byron and the country null. The handler writes the country into country, then the name into card-opened.",
-          "gesture": "Click Open Ben's card, then Open Ada's card.",
-          "outcome": "country is empty and card-opened reads Ada Byron.",
-          "opposite": "After Open Ben's card alone, country reads Ireland and card-opened reads Ben Ng.",
-          "defect": "The null reads as the text null, so country reads null; or a null the declaration admits stops the handler, so card-opened keeps Ben Ng."
+          "page": "The bench page with the ConformanceComponent conformance that raises Raised, whose payload declares Text, a ReadOnly<string>, and NullableText, a ReadOnly<string?>, as the component's typed API types it string | null. Its Raise Ben button raises Raised with the text Ben Ng and the nullable text Ireland, and its Raise Ada button with the text Ada Byron and the nullable text null. The handler writes the nullable text into nullable-text, then the text into raised-text.",
+          "gesture": "Click the component's Raise Ben, then Raise Ada.",
+          "outcome": "nullable-text is empty and raised-text reads Ada Byron.",
+          "opposite": "After Raise Ben alone, nullable-text reads Ireland and raised-text reads Ben Ng.",
+          "defect": "The null reads as the text null, so nullable-text reads null; or a null the declaration admits stops the handler, so raised-text keeps Ben Ng."
         },
         {
           "for": "X5.10",
-          "page": "A ward page with a bed board that raises RowChosen, whose payload declares Row, a LiveObject<BedRow>, the board's own row object, whose BedRow declares Note, a Property<string>, and Highlight(); the board shows each row's note beside it and highlights a row whose highlight is called. Choose room 4 makes the board raise RowChosen for its room 4 row, and the handler sets the payload's Row.Note to seen at handover and calls Row.Highlight().",
-          "gesture": "Click Choose room 4.",
-          "outcome": "The board's room 4 row shows seen at handover and is highlighted.",
-          "opposite": "The room 5 row shows no note and is not highlighted after the click, as room 4 did before it.",
-          "defect": "The write lands on a copy of the row, so the board's room 4 row shows no note; or the call of Highlight() runs nothing, so the row is not highlighted."
+          "page": "The bench page with the ConformanceComponent conformance that raises Raised, whose payload declares Outer, a LiveObject<Outer>, the component's own outer object, whose Outer declares Text, a Property<string>, and Act(); the component shows its outer's text as Outer: and the text, and Outer acted once the outer's act is called. Its Raise button raises Raised with its outer, and the handler sets the payload's Outer.Text to seen at handover and calls Outer.Act().",
+          "gesture": "Click the component's Raise.",
+          "outcome": "The component shows Outer: seen at handover and Outer acted.",
+          "opposite": "Before the click the component shows Outer: Gamma and no Outer acted line.",
+          "defect": "The write lands on a copy of the outer object, so the component shows Outer: Gamma; or the call of Act() runs nothing, so no Outer acted line shows."
         }
       ],
       "verdicts": [

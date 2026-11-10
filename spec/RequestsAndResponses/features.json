@@ -424,10 +424,10 @@
         },
         {
           "for": "X9.9",
-          "page": "A chart button whose GET goes to /Residents/{residentId}, its residentId read as picked.Read(r => r.Room.ResidentId) over a picked resident whose Room holds null; its WhileLoading sets the status to Loading, its Finally sets it to Done, and the step after the request writes After into the log.",
-          "gesture": "Click Show chart with the resident whose room holds null.",
+          "page": "The residents screen's Show chart button, whose GET goes to /Residents/{residentName}, its residentName read as census.Read(c => c.Record.Detail.Name) over the census panel's Record, whose Detail holds null; its WhileLoading sets the status to Loading, its Finally sets it to Done, and the step after the request writes After into the log.",
+          "gesture": "Click Show chart.",
           "outcome": "The status reads Done, the log keeps its dash, and the network log holds no request to /Residents.",
-          "opposite": "With a resident whose Id is 42, the network log holds GET /Residents/42 and the log reads After.",
+          "opposite": "With the census panel's Record holding a Detail named Ada, the network log holds GET /Residents/Ada and the log reads After.",
           "defect": "The request sent to /Residents/ or /Residents/undefined, so the network log holds it; or Finally skipped, so the status keeps Loading; or the step after run, so the log reads After.",
           "observes": "Request.tla:Guard"
         },
@@ -481,19 +481,19 @@
         },
         {
           "for": "X9.18",
-          "page": "A shift picker component holding night-shift, the held form of Night under JsonStringEnumMemberName, sets r => r.Shift of a GET's query; the endpoint echoes the Shift it bound.",
-          "gesture": "Pick Night and click Find staff.",
-          "outcome": "The URL holds Shift=Night and the echo reads Night.",
-          "opposite": "With Day picked, the URL holds Shift=Day.",
-          "defect": "The held form sent as it is, so the URL holds Shift=night-shift and the echo reads its start, Day."
+          "page": "The dose scanner, the round's ConformanceComponent, whose Choice holds high, the held form of Choice.Maximum under JsonStringEnumMemberName, sets r => r.Choice of a GET's query; the endpoint echoes the Choice it bound.",
+          "gesture": "Click the scanner's High, then Find staff.",
+          "outcome": "The URL holds Choice=Maximum and the echo reads Maximum.",
+          "opposite": "With the scanner's Low clicked, the URL holds Choice=Minimum.",
+          "defect": "The held form sent as it is, so the URL holds Choice=high and the echo reads its start, Minimum."
         },
         {
           "for": "X9.19",
-          "page": "A shift picker component that the test sets to hold dusk, a form no value of the Shift enum is held as, sets r => r.Shift of a GET whose step after writes Sent into the log.",
-          "gesture": "Click Hold dusk, then Find staff.",
-          "outcome": "The network log holds no request, the log keeps its dash, and the console names r => r.Shift and the forms day-shift and night-shift.",
-          "opposite": "With night-shift held, the URL holds Shift=Night and the log reads Sent.",
-          "defect": "The unknown form sent, so the URL holds Shift=dusk; or the request skipped with the pipeline going on, so the log reads Sent."
+          "page": "The dose scanner, the round's ConformanceComponent, whose own Hold medium button sets its Choice to medium, a form no value of the Choice enum is held as, sets r => r.Choice of a GET whose step after writes Sent into the log.",
+          "gesture": "Click the scanner's Hold medium, then Find staff.",
+          "outcome": "The network log holds no request, the log keeps its dash, and the console names r => r.Choice and the forms low and high.",
+          "opposite": "With high held, the URL holds Choice=Maximum and the log reads Sent.",
+          "defect": "The unknown form sent, so the URL holds Choice=medium; or the request skipped with the pipeline going on, so the log reads Sent."
         },
         {
           "for": "X9.20",
@@ -505,11 +505,11 @@
         },
         {
           "for": "X9.21",
-          "page": "A view whose GET sets r => r.Shift from a component whose Shift member carries its own converter that writes Day as {\"code\":0}.",
+          "page": "A refusal view whose GET sets r => r.Choice from a ConformanceComponent's Choice, where the request's Choice member carries its own converter that writes Minimum as {\"code\":0}.",
           "gesture": "Open the page.",
-          "outcome": "The page is refused where it renders with \"'r => r.Shift' holds Day as {\\\"code\\\":0} under its own JSON converter, and a request sends one text or number per member; send a member written as text or a number.\"",
-          "opposite": "With the converter removed, the page renders and picking Day sends Shift=Day.",
-          "defect": "The page renders and sends Shift=[object Object]."
+          "outcome": "The page is refused where it renders with \"'r => r.Choice' holds Minimum as {\\\"code\\\":0} under its own JSON converter, and a request sends one text or number per member; send a member written as text or a number.\"",
+          "opposite": "With the converter removed, the page renders and the component's Low sends Choice=Minimum.",
+          "defect": "The page renders and sends Choice=[object Object]."
         },
         {
           "for": "X9.22",
@@ -1372,11 +1372,11 @@
         },
         {
           "for": "X10.8",
-          "page": "The residents screen's Load census sends a GET under the defaults' retry policy; its WhileLoading appends loading to a log, its Finally appends done, and a counting busy component counts its show calls. The harness seeds the census endpoint's answers, 503 and then 200, and runs the retry's wait on the clock, never on real time.",
-          "gesture": "Click Load census; run the clock forward by the standard first wait.",
-          "outcome": "The census shows, the log reads loading, done once, and the busy count reads 1.",
+          "page": "The residents screen's Load census sends a GET under the defaults' retry policy; its WhileLoading appends loading to a log, its Finally appends done, and the host's ShowBusy() shows NativeLoader. The harness seeds the census endpoint's answers, 503 and then 200, and runs the retry's wait on the clock, never on real time.",
+          "gesture": "Click Load census; once the 503 has answered and the clock holds the retry's wait, run it forward by the standard first wait.",
+          "outcome": "While the clock holds the wait, NativeLoader shows and the log reads loading; after it the census shows, the log reads loading, done once, and NativeLoader hides.",
           "opposite": "With NoRetry(), the 503 runs the error route and the census keeps its dash.",
-          "defect": "Each attempt runs WhileLoading and Finally, so the log reads loading, loading, done, done; the busy indicator shown per attempt, so the count reads 2; or the 503 routed at once, so the census never shows.",
+          "defect": "Each attempt runs WhileLoading and Finally, so the log reads loading, loading, done, done; the busy indicator shown and hidden per attempt, so NativeLoader is hidden during the wait, or shown twice and hidden once, so it stays shown; or the 503 routed at once, so the census never shows.",
           "observes": "Composition.tla:Answer"
         },
         {
@@ -1398,11 +1398,11 @@
         },
         {
           "for": "X10.13",
-          "page": "A medication grid that sorts and edits the rows a GET's JSON body sets into it; the success route's Chained POST sends the body's rows, and the endpoint echoes their order and first dose.",
-          "gesture": "Click Load, change the first row's dose in the grid, then Send.",
-          "outcome": "The echo reads the server's order and the server's first dose.",
-          "opposite": "With the grid left untouched, the echo reads the same.",
-          "defect": "The response shared with the grid, so the echo reads the grid's sorted order or the edited dose."
+          "page": "The round's Load button sends a GET whose JSON body's records the success route sets into the dose scanner's Records, which the scanner's own Sort button orders by name in place and its own Edit first button changes the first record's count of; the success route's Chained POST sends the body's records, and the endpoint echoes their order and first count.",
+          "gesture": "Click Load, click the scanner's Sort and Edit first, then Send.",
+          "outcome": "The echo reads the server's order and the server's first count.",
+          "opposite": "With the scanner left untouched, the echo reads the same.",
+          "defect": "The response shared with the scanner, so the echo reads the scanner's sorted order or the edited count."
         },
         {
           "for": "X10.14",

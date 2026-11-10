@@ -356,11 +356,11 @@
       "promises": [
         {
           "for": "X1.4",
-          "page": "A ward board with the link Open the bed board, to a bed board view with a number box occupied and a Save button that posts the occupied beds of room East 4 through Set(r => r.Beds[east4], occupied), where Beds is a Dictionary<RoomKey, int> on the request, RoomKey a class of the app that holds a ward and a room, and east4 a RoomKey the view holds; the endpoint answers each entry it binds as its key, a colon and its count, into beds-saved.",
-          "gesture": "On the ward board, click Open the bed board.",
-          "outcome": "The bed board is refused where the view renders with \"A dictionary keyed by RoomKey cannot be sent: System.Text.Json writes no property name for its keys; key it by text or a number.\"",
-          "opposite": "With Beds a Dictionary<string, int> set through r => r.Beds[\"E4\"], the bed board renders, and typing 2 into occupied and clicking Save shows E4: 2 in beds-saved.",
-          "defect": "The key read as a number, as both lines read one with Convert.ToInt32 (Alis.Reactive/Members/ExpressionPathHelper.cs:204 at 65fdf118d), so the view fails with a conversion's exception that names neither Beds nor a cure; or the key's ToString written as the member step, so the bed board renders and Save sends a key the endpoint binds no entry for."
+          "page": "The refusals index with the link Open the occupancy view, to an occupancy view with a number box occupied and a Save button that posts the occupied beds of room East 4 through Set(r => r.Beds[east4], occupied), where Beds is a Dictionary<RoomKey, int> on the request, RoomKey a class of the app that holds a ward and a room, and east4 a RoomKey the view holds; the endpoint answers each entry it binds as its key, a colon and its count, into beds-saved.",
+          "gesture": "On the refusals index, click Open the occupancy view.",
+          "outcome": "The occupancy view is refused where the view renders with \"A dictionary keyed by RoomKey cannot be sent: System.Text.Json writes no property name for its keys; key it by text or a number.\"",
+          "opposite": "With Beds a Dictionary<string, int> set through r => r.Beds[\"E4\"], the occupancy view renders, and typing 2 into occupied and clicking Save shows E4: 2 in beds-saved.",
+          "defect": "The key read as a number, as both lines read one with Convert.ToInt32 (Alis.Reactive/Members/ExpressionPathHelper.cs:204 at 65fdf118d), so the view fails with a conversion's exception that names neither Beds nor a cure; or the key's ToString written as the member step, so the occupancy view renders and Save sends a key the endpoint binds no entry for."
         },
         {
           "for": "X2.3",
@@ -436,19 +436,19 @@
         },
         {
           "for": "X3.10",
-          "page": "A rounds page with a visit planner the test app brings, declared with Plan(DateTime day), PlanVisit(VisitSlot slot), whose VisitSlot holds a Starts DateTime and a Room text, PlanDays(IReadOnlyList<DateTime> days), At(DateTimeOffset moment), Until(DateTime? until), a Property<DateTime> Next, a method Suggest() that returns its own Suggestion class instance, Take(Suggestion suggestion), and an event Proposed whose payload's When, a DateTime, the planner raises as the text 2026-11-12T10:00:00 when its own Propose button is clicked. The planner writes a line into its log for each value it receives: Date and the value's local yyyy-MM-dd HH:mm, or for At its toISOString, or null, or same suggestion when Take receives the object Suggest returned, or text and the text; its own Log text button logs the text 2026-11-09T09:00:00. The page's Plan the week button calls Plan, PlanVisit, PlanDays with two days, Until with null and sets Next, each at 2026-11-09 09:00, calls At with 2026-11-09T09:00:00-05:00, then calls Take(Suggest()); its handler of Proposed calls Plan with the payload's When.",
-          "gesture": "Click Plan the week, then click Propose.",
-          "outcome": "The log reads Date 2026-11-09 09:00 for Plan, for PlanVisit's Starts, for both of PlanDays' days and for Next, Date 2026-11-09T14:00:00.000Z for At, null for Until, same suggestion for Take, and Date 2026-11-12 10:00 for Propose.",
-          "opposite": "Clicking the planner's Log text logs text 2026-11-09T09:00:00, so a value that reaches it as text shows as text.",
-          "defect": "The dates written as their wire text with no as, so the log reads text for each date; or the suggestion copied as a plain object, so Take logs no same suggestion; or the null converted, so Until logs a Date."
+          "page": "The resident record's care panel, a ConformanceComponent declared with TakeDay(Arg<DateTime> day), Take(Arg<Record> record), whose Record holds a Day DateTime and a Name text, TakeDays(Arg<IReadOnlyList<DateTime>> days), TakeMoment(Arg<DateTimeOffset> moment), NullableDay, a Property<DateTime?>, Day, a Property<DateTime>, Snapshot(), a Method<Record> that returns its own Record instance, and Raised, whose payload's Day, a DateTime, the panel raises as the text 2026-11-12T10:00:00 when its own Raise button is clicked. The panel writes a line into its log for each value it receives: Date and the value's local yyyy-MM-dd HH:mm, or for TakeMoment its toISOString, or null, or same record when Take receives the object Snapshot returned, or text and the text. The page's Take the week button calls TakeDay, Take, TakeDays with two days, sets NullableDay to null and sets Day, each at 2026-11-09 09:00, calls TakeMoment with 2026-11-09T09:00:00-05:00, then calls Take(Snapshot()); its handler of Raised calls TakeDay with the payload's Day; its Log text button calls Log(\"2026-11-09T09:00:00\").",
+          "gesture": "Click Take the week, then click the panel's Raise.",
+          "outcome": "The log reads Date 2026-11-09 09:00 for TakeDay, for Take's Day, for both of TakeDays' days and for Day, Date 2026-11-09T14:00:00.000Z for TakeMoment, null for NullableDay, same record for Take(Snapshot()), and Date 2026-11-12 10:00 for Raise.",
+          "opposite": "Clicking Log text logs text 2026-11-09T09:00:00, so a value that reaches the panel as text shows as text.",
+          "defect": "The dates written as their wire text with no as, so the log reads text for each date; or the record copied as a plain object, so Take logs no same record; or the null converted, so NullableDay logs a Date."
         },
         {
           "for": "X3.12",
-          "page": "A ward board with the link Open the planner, to a rounds view with a visit planner the test app brings, declared with PlanStay(CarePlan plan) and PlanDays(IReadOnlyList<DateTime> days), where CarePlan holds a Starts DateTime and a Previous CarePlan?; the planner writes a line into its log for each value it receives, Date and the value's local yyyy-MM-dd HH:mm, or text and the text. The view's Plan the stay button calls PlanStay with the resident's care plan, whose previous plan holds a plan of its own.",
-          "gesture": "On the ward board, click Open the planner.",
-          "outcome": "The rounds view is refused where the view renders with \"A value written into a live member holds its own type and a date in it. A date reaches a live member through a shape that ends: pass the dates as a list of their own.\"",
-          "opposite": "With the step passing the plan's dates as an IReadOnlyList<DateTime> to PlanDays, the view renders, and Plan the stay logs a Date for each.",
-          "defect": "The shape cut at the second level, as the redesign shapes a type that holds itself (Alis.Reactive/Components/ArgumentShape.cs:14 at 65fdf118d), so the view renders and the previous plan's Starts reaches the planner as text; or a shape that does not end, so the view fails with a stack overflow."
+          "page": "The refusals index with the link Open the linked record, to a view with a ConformanceComponent declared with TakeLinked(Arg<Linked> linked) and TakeDays(Arg<IReadOnlyList<DateTime>> days), where Linked holds a Day DateTime and a Previous Linked?; the component writes a line into its log for each value it receives, Date and the value's local yyyy-MM-dd HH:mm, or text and the text. The view's Take the linked button calls TakeLinked with a linked record whose previous holds a linked record of its own.",
+          "gesture": "On the refusals index, click Open the linked record.",
+          "outcome": "The view is refused where the view renders with \"A value written into a live member holds its own type and a date in it. A date reaches a live member through a shape that ends: pass the dates as a list of their own.\"",
+          "opposite": "With the step passing the linked records' days as an IReadOnlyList<DateTime> to TakeDays, the view renders, and Take the linked logs a Date for each.",
+          "defect": "The shape cut at the second level, as the redesign shapes a type that holds itself (Alis.Reactive/Components/ArgumentShape.cs:14 at 65fdf118d), so the view renders and the previous record's Day reaches the component as text; or a shape that does not end, so the view fails with a stack overflow."
         },
         {
           "for": "X3.13",

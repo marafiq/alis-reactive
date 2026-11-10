@@ -150,8 +150,8 @@
       "promises": [
         {
           "for": "X11.10",
-          "page": "A nurse call button with two handlers of its click: the first sets the call's text from Idle to Heard, awaits the call desk's async acknowledge, then sets the desk's text to Acknowledged; the second copies the call's text into the empty pager.",
-          "gesture": "Click the call button, then release the desk's acknowledgement.",
+          "page": "A nurse call button with two handlers of its click: the first sets the call's text from Idle to Heard, awaits the dose scanner's Settle(), which awaits the test app's settle endpoint the harness gates (Run.tla's Settle), then sets the desk's text from Waiting to Acknowledged; the second copies the call's text into the empty pager.",
+          "gesture": "Click the call button, then release the settle once the harness reports it held.",
           "outcome": "Before the release the pager reads Heard and the desk reads Waiting; after it the desk reads Acknowledged.",
           "opposite": "With the second handler subscribed first, the pager copies Idle.",
           "defect": "The second handler waits for the first one's await, so the pager stays empty before the release, or the first never goes on and the desk keeps Waiting.",
@@ -159,11 +159,11 @@
         },
         {
           "for": "X11.19",
-          "page": "A chime, a test component whose own button raises its ring event from its own code and, as soon as its listeners return, shows the two values its handlers wrote; two handlers of ring, neither with an awaited step, each write one value.",
-          "gesture": "Click the chime's button.",
-          "outcome": "The chime shows both values, the first handler's and the second's.",
-          "opposite": "With an awaited step before the second handler's write, the chime shows the first value alone.",
-          "defect": "A handler continues in a microtask, so the chime reads before either write and shows neither value, or the second handler starts after the chime's turn and its value is missing.",
+          "page": "The care panel, the resident record's ConformanceComponent, whose Raise button raises Raised from its own code and, as soon as its listeners return, shows its payload line, Payload text: and the payload's WriteOnlyText, and its answer line, the payload's Answer for its first item, One; two handlers of Raised, neither with an awaited step: the first writes Kappa into the payload's WriteOnlyText, the second sets the payload's Answer to item => item.Name + \" by Lambda\".",
+          "gesture": "Click the care panel's Raise.",
+          "outcome": "The panel shows Payload text: Kappa and One by Lambda.",
+          "opposite": "With an awaited step before the second handler's write, the panel shows Payload text: Kappa and an empty answer line.",
+          "defect": "A handler continues in a microtask, so the panel reads before either write and shows Payload text: none and an empty answer line, or the second handler starts after the panel's turn and One by Lambda is missing.",
           "observes": "Run.tla:SecondReturns"
         },
         {
@@ -476,7 +476,7 @@
       "promises": [
         {
           "for": "M1.X2",
-          "page": "A desk whose button's handler dispatches CallLogged, then copies the pager's text into the desk's status; CallLogged has two handlers: the first sets the log's text to Logged and then reads a component the page lacks, which stops it, the second sets the pager's text from Idle to Paged.",
+          "page": "A desk whose button's handler dispatches CallLogged, then copies the pager's text into the desk's status; CallLogged has two handlers: the first sets the log's text to Logged and then reads the Text of a ConformanceComponent at the id absent-scanner, an element the page does not render, which stops it, the second sets the pager's text from Idle to Paged.",
           "gesture": "Click the button.",
           "outcome": "The log reads Logged, the pager reads Paged, and the desk's status reads Paged.",
           "opposite": "With no handler of CallLogged, the desk's status copies Idle.",

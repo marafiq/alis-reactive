@@ -519,10 +519,10 @@
         },
         {
           "for": "X6.7",
-          "page": "A schedule page whose step counts the entries its component's Entries property holds, then sets the status to Counted; one button makes Entries hold a paged result, an object with result and count, another makes it hold null.",
-          "gesture": "Click the paged button, then Count.",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose step counts the records its NullableRecords property holds, then sets the status to Counted; the panel's own Paged button makes NullableRecords hold a paged result, an object with result and count, and its Clear button makes it hold null.",
+          "gesture": "Click the census panel's Paged, then Count.",
           "outcome": "The count keeps its dash and the status keeps Waiting.",
-          "opposite": "With Entries holding null, Count empties the count and the status shows Counted.",
+          "opposite": "With NullableRecords holding null, Count empties the count and the status shows Counted.",
           "defect": "The paged result read as a list of one item, so the count shows 1 and the status Counted; or the null list counted as no item, so the opposite shows 0."
         },
         {
@@ -751,19 +751,19 @@
         },
         {
           "for": "M4.X2",
-          "page": "A visit planner whose Slots hold three slots: Monday, Tuesday, and one the vendor sends with no day, whose class starts Day at Monday; on load a step shows planner.Slots.Select(slot => slot.Day).Count(day => day == \"Monday\").",
-          "gesture": "Open the board.",
-          "outcome": "The Monday count shows 2.",
-          "opposite": "With the third slot sent with Day null, the count shows 1, since a member that holds null reads null.",
-          "defect": "The absent day read as nothing, as the redesign's Each reads it, so the count shows 1."
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Records hold three records: one with the code C0, one with the code C1, and one its JavaScript sends with no code, whose class Record starts Code at C0; on load a step shows the panel's Records.Select(r => r.Code).Count(code => code == \"C0\").",
+          "gesture": "Open the residents screen.",
+          "outcome": "The C0 count shows 2.",
+          "opposite": "With the third record sent with Code null, the count shows 1, since a member that holds null reads null.",
+          "defect": "The absent code read as nothing, as the redesign's Each reads it, so the count shows 1."
         },
         {
           "for": "M4.X3",
-          "page": "A roster component whose rows property holds a plain array of Martin, Adams and Lee in the order of admission; a button sets a second roster's rows from the first's rows ordered by name, then shows the first roster's first name, Find(r => true, r => r.Name).",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Records property holds a plain array of Martin, Adams and Lee in the order of admission, and a second ConformanceComponent beside it, census-sorted; a Sort button sets census-sorted's Records from the census panel's Records ordered by Name, then shows the census panel's first name, Records.Find(r => true, r => r.Name).",
           "gesture": "Click Sort.",
-          "outcome": "The second roster lists Adams, Lee and Martin, and the first name shows Martin.",
-          "opposite": "Ordered by name descending, the second roster lists Martin, Lee and Adams, and the first name shows Martin.",
-          "defect": "The sort runs in place on the roster's own array, so the first name shows Adams."
+          "outcome": "census-sorted lists Adams, Lee and Martin, and the first name shows Martin.",
+          "opposite": "Ordered by name descending, census-sorted lists Martin, Lee and Adams, and the first name shows Martin.",
+          "defect": "The sort runs in place on the census panel's own array, so the first name shows Adams."
         },
         {
           "for": "X6.11",
@@ -799,11 +799,11 @@
         },
         {
           "for": "X6.58",
-          "page": "A visit board test component whose Visits property holds data its own JavaScript writes, one item's At, a DateTime, held as the text 10/27/2026; a Count button counts the visits with v => v.At < cutoff, a DateTime the view holds, shows the count, then writes checked into a log.",
+          "page": "The residents screen's census panel, a ConformanceComponent whose Records property holds data its own JavaScript writes, one record's Day, a DateTime, held as the text 10/27/2026; a Count button counts the records with r => r.Day < cutoff, a DateTime the view holds, shows the count, then writes checked into a log.",
           "gesture": "Click Count.",
           "outcome": "No count shows, the log stays empty, and the console holds one error naming the text 10/27/2026.",
-          "opposite": "With that item's At held as 2026-10-27, the count shows and the log reads checked; held as 2026-02-30, a day no month holds, the count shows without that visit, the log reads checked and the console holds no error.",
-          "defect": "The text read as nothing, so the count shows without that visit and the log reads checked; or parsed by the browser's Date, so it counts as October 27, a reading no endpoint's binding shares on both hosts. Or 2026-02-30 stops the pipeline too, so with it no count shows."
+          "opposite": "With that record's Day held as 2026-10-27, the count shows and the log reads checked; held as 2026-02-30, a day no month holds, the count shows without that record, the log reads checked and the console holds no error.",
+          "defect": "The text read as nothing, so the count shows without that record and the log reads checked; or parsed by the browser's Date, so it counts as October 27, a reading no endpoint's binding shares on both hosts. Or 2026-02-30 stops the pipeline too, so with it no count shows."
         },
         {
           "for": "X6.57",
@@ -823,10 +823,10 @@
         },
         {
           "for": "X6.58",
-          "page": "A net10 rota test component with a Starts text box and a Change button, whose click raises its Changed event with a payload declared with Starts, a TimeOnly, which its JavaScript fills with the box's text; the handler's When orders Starts before new TimeOnly(12, 0) and writes morning, Else afternoon, then writes checked into a log.",
-          "gesture": "Type 7:00 PM into Starts and click Change, then type 19:00 and click Change.",
+          "page": "The residents screen's census panel on net10, a ConformanceComponent with its own text box and Raise button, whose click raises Raised with a payload whose Time, a TimeOnly, its JavaScript fills with the box's text; the handler's When orders Time before new TimeOnly(12, 0) and writes morning, Else afternoon, then writes checked into a log.",
+          "gesture": "Type 7:00 PM into the census panel's box and click Raise, then type 19:00 and click Raise.",
           "outcome": "After 7:00 PM neither morning nor afternoon shows, the log stays empty and the console holds one error naming the text 7:00 PM; after 19:00 the line reads afternoon and the log reads checked.",
-          "opposite": "Typed 07:00 and changed, the line reads morning; typed 24:00 and changed, a time no day holds, the line reads afternoon, the log reads checked and the console holds no error.",
+          "opposite": "Typed 07:00 and raised, the line reads morning; typed 24:00 and raised, a time no day holds, the line reads afternoon, the log reads checked and the console holds no error.",
           "defect": "The text read as nothing, so the Else runs, afternoon shows and the log reads checked though nothing named the text; or compared as text, so the branch runs by the letters of 7:00 PM. Or 24:00 stops the pipeline too, so with it the log stays empty."
         }
       ],
@@ -1024,51 +1024,51 @@
       "promises": [
         {
           "for": "M4.X4",
-          "page": "A thermostat with two zones, Hall at 20 and Bath at 21; a button raises At(1)'s target to 24, another shows At(2)'s name in the zone text, then sets the status to Read.",
-          "gesture": "Click Boost second zone, then Read third zone.",
-          "outcome": "Bath shows 24 and Hall keeps 20; the zone text keeps its dash and the status keeps Waiting.",
-          "opposite": "A button that shows At(1)'s name sets the zone text to Bath and the status to Read.",
-          "defect": "The position read as a member that reads optional, so At(2)'s name reads nothing, the zone text empties and the status shows Read; or At(1) reaching the first zone, so Hall shows 24."
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Items hold two items, Hall with the value 20 and Bath with 21, each shown with its value; a button sets Items.At(1)'s Value to 24, another shows Items.At(2)'s Name in the item text, then sets the status to Read.",
+          "gesture": "Click Raise second item, then Read third item.",
+          "outcome": "Bath shows 24 and Hall keeps 20; the item text keeps its dash and the status keeps Waiting.",
+          "opposite": "A button that shows Items.At(1)'s Name sets the item text to Bath and the status to Read.",
+          "defect": "The position read as a member that reads optional, so Items.At(2)'s Name reads nothing, the item text empties and the status shows Read; or At(1) reaching the first item, so Hall shows 24."
         },
         {
           "for": "M4.X5",
-          "page": "A thermostat view whose step shows Zones.At(position).Name, where position is a local that holds -1 when the view renders.",
+          "page": "A view of the ConformanceComponent whose step shows Items.At(position).Name, where position is a local that holds -1 when the view renders.",
           "gesture": "Open the page.",
           "outcome": "The page is refused where the view renders with \"An item's position is zero or more.\", naming the position -1.",
-          "opposite": "With position holding 0, the page renders and the zone text shows Hall.",
-          "defect": "The negative position written to the plan, so the page renders and the zone text shows nothing, as JavaScript reads zones[-1]."
+          "opposite": "With position holding 0, the page renders and the item text shows Hall.",
+          "defect": "The negative position written to the plan, so the page renders and the item text shows nothing, as JavaScript reads items[-1]."
         },
         {
           "for": "M4.X6",
-          "page": "A quiet station of two empty beds and a north station of three beds, the second and third occupied; each station's Check button sets the station status to Checking, writes Checked to the status of Find(bed => bed.Occupied), then sets the station status to Checked.",
-          "gesture": "Click the quiet station's Check.",
-          "outcome": "Both quiet beds keep Ready, and the station status keeps Checking.",
-          "opposite": "The north station's Check shows its beds Ready, Checked and Ready, and the station status shows Checked.",
-          "defect": "A write through a find that kept no bed writing nothing and the pipeline going on, so the station status shows Checked; or every kept bed taking the write, so the north beds show Ready, Checked and Checked."
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Items hold two inactive items, and a second ConformanceComponent beside it, census-north, whose Items hold three, the second and third active; each item shows its Value, 0 to start. Each component's Check button sets that component's status line to Checking, writes 1 into the Value of Items.Find(item => item.Active), then sets the status line to Checked.",
+          "gesture": "Click the census panel's Check.",
+          "outcome": "Both of the census panel's items keep 0, and its status line keeps Checking.",
+          "opposite": "census-north's Check shows its items' values 0, 1 and 0, and its status line shows Checked.",
+          "defect": "A write through a find that kept no item writes nothing and the pipeline goes on, so the status line shows Checked; or every kept item takes the write, so census-north's items show 0, 1 and 1."
         },
         {
           "for": "M4.X7",
-          "page": "A quiet station of two empty beds with no alert and a south station whose one bed with an alert lacks the resident member its declaration names; each Ask button sets the status to Asking, shows Find(bed => bed.Alert, bed => bed.Resident) of its station in the resident text, which starts unknown, then sets the status to Asked.",
-          "gesture": "Click the quiet station's Ask.",
-          "outcome": "The resident text is empty and the status shows Asked.",
-          "opposite": "The south station's Ask leaves the resident text unknown and the status at Asking.",
-          "defect": "A find that keeps no bed stopping the pipeline, so the status keeps Asking; or the field read optional, so the south Ask empties the resident text and sets the status to Asked."
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Items hold two inactive items, and a second ConformanceComponent beside it, census-south, whose one active item lacks the name member Item declares; each component's Ask button sets the status to Asking, shows Items.Find(item => item.Active, item => item.Name) of that component in the name text, which starts unknown, then sets the status to Asked.",
+          "gesture": "Click the census panel's Ask.",
+          "outcome": "The name text is empty and the status shows Asked.",
+          "opposite": "census-south's Ask leaves the name text unknown and the status at Asking.",
+          "defect": "A find that keeps no item stopping the pipeline, so the status keeps Asking; or the field read optional, so census-south's Ask empties the name text and sets the status to Asked."
         },
         {
           "for": "M4.X9",
-          "page": "A thermostat of three zones, one lacking the humidity member its declaration marks optional and types int; a button sets the status to Counting, shows Zones.Select(zone => zone.Humidity).Count() in the count, which starts at a dash, then sets the status to Counted.",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Items hold three items, one lacking OptionalScore, which Item declares optional: true and types int; a button sets the status to Counting, shows Items.Select(item => item.OptionalScore).Count() in the count, which starts at a dash, then sets the status to Counted.",
           "gesture": "Click Count.",
           "outcome": "The count keeps its dash and the status keeps Counting.",
-          "opposite": "On a page whose declaration types Humidity int?, the same button shows 3, and a count of Select(zone => zone.Humidity).Count(humidity => humidity == null) shows 1.",
-          "defect": "The missing humidity put in the list as nothing, so the count shows 3 and the status Counted."
+          "opposite": "Over the same items, the third also lacking OptionalCount, which Item types int?, Items.Select(item => item.OptionalCount).Count() shows 3, and Items.Select(item => item.OptionalCount).Count(count => count == null) shows 1.",
+          "defect": "The missing score put in the list as nothing, so the count shows 3 and the status Counted."
         },
         {
           "for": "M4.X8",
-          "page": "A north station whose second bed lacks the occupied member its declaration names, and a west ward whose Beds list is declared nullable; each Count button sets the status to Counting, shows the station's Count(bed => bed.Occupied) or the ward's Beds.Count() in the count, which starts at a dash, then sets the status to Counted.",
-          "gesture": "Click the north station's Count.",
+          "page": "A ConformanceComponent beside the census panel, census-north, whose second item lacks the active member Item declares, and the census panel, the residents screen's ConformanceComponent, whose NullableItems, a LiveObjects<Item> declared nullable, holds null; each component's Count button sets the status to Counting, shows census-north's Items.Count(item => item.Active) or the census panel's NullableItems.Count() in the count, which starts at a dash, then sets the status to Counted.",
+          "gesture": "Click census-north's Count.",
           "outcome": "The count keeps its dash and the status keeps Counting.",
-          "opposite": "The west ward's Count, its Beds holding null, empties the count and sets the status to Counted.",
-          "defect": "The member the bed lacks read as nothing, so the count shows 1 and the status Counted; or the null list counted as no item, so the west count shows 0."
+          "opposite": "The census panel's Count, its NullableItems holding null, empties the count and sets the status to Counted.",
+          "defect": "The member the item lacks read as nothing, so the count shows 1 and the status Counted; or the null list counted as no item, so the census panel's count shows 0."
         }
       ],
       "verdicts": []

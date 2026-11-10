@@ -525,11 +525,11 @@
         },
         {
           "for": "X12.14",
-          "page": "A ward page that renders a monitor component at the id monitor, whose plan's own handler of the monitor's Reading event writes the pulse into page-pulse; Open the card loads a card whose plan, when it loads, listens to the monitor reached by its id and writes each reading's pulse into the page's card-pulse; Take a reading makes the monitor raise Reading with the pulse typed beside it.",
-          "gesture": "Click Open the card, take a reading of 72, click Close the card, then take a reading of 75.",
-          "outcome": "After the first reading page-pulse and card-pulse read 72; after the second page-pulse reads 75 and card-pulse still reads 72.",
-          "opposite": "With the card left open, the second reading shows 75 in both.",
-          "defect": "The card's listen is not released with the card, so the second reading writes 75 into card-pulse; or the release removes the page's own handler as well, and page-pulse stays at 72.",
+          "page": "The resident record, which renders its care panel, a ConformanceComponent at the id care-panel, whose plan's own Raised handler writes the payload's Count into page-count; Open the card loads a card whose plan, when it loads, listens to the care panel reached by its id and writes each Raised payload's Count into the page's card-count; the panel's Raise button raises Raised with the count typed into the panel's own box.",
+          "gesture": "Click Open the card, type 72 into the panel's box and click Raise, click Close the card, then type 75 and click Raise.",
+          "outcome": "After the first raise page-count and card-count read 72; after the second page-count reads 75 and card-count still reads 72.",
+          "opposite": "With the card left open, the second raise shows 75 in both.",
+          "defect": "The card's listen is not released with the card, so the second raise writes 75 into card-count; or the release removes the page's own handler as well, and page-count stays at 72.",
           "observes": "Lanes.tla:FireFirst"
         },
         {

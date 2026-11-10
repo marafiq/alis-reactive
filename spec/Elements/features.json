@@ -214,7 +214,7 @@
       "promises": [
         {
           "for": "X7.8",
-          "page": "A pump card with its class list and a summary panel.",
+          "page": "A record card with its class list and a summary panel.",
           "gesture": "Click add, remove, toggle twice, then the toggle whose name reads nothing, then load the summary.",
           "outcome": "The card holds the class after add, loses it after remove, gains and loses it on the two toggles, and keeps its classes when the name reads nothing; the summary shows its markup.",
           "opposite": "HTML set from a value that reads nothing leaves the panel empty, where the text undefined would show.",
@@ -254,11 +254,11 @@
         },
         {
           "for": "M5.X3",
-          "page": "A rounds test component whose two buttons raise its NoteTaken event from its own JavaScript, its payload declaring an optional note member: No note with a payload that lacks the note member, and Ward round with the note Ward round. The handler sets the first status from the note, then sets the second status to Saved.",
-          "gesture": "Click No note.",
+          "page": "The care panel, the resident record's ConformanceComponent, whose two buttons raise Raised from its own JavaScript, its payload declaring OptionalText optional: No text with a payload that lacks the optionalText member, and Ward round with the optional text Ward round. The handler sets the first status from the payload's OptionalText, then sets the second status to Saved.",
+          "gesture": "Click No text.",
           "outcome": "The first status is empty and the second shows Saved.",
           "opposite": "Clicking Ward round, the first status shows Ward round.",
-          "defect": "The missing note shown as the text undefined or null, or the missing value stopping the pipeline so the second status keeps its text."
+          "defect": "The missing text shown as the text undefined or null, or the missing value stopping the pipeline so the second status keeps its text."
         }
       ],
       "verdicts": [

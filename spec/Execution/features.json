@@ -335,7 +335,7 @@
       "promises": [
         {
           "for": "X4.4",
-          "page": "A bed board whose Find a free bed button sends GET /beds/free, which answers {\"bed\": null} when the ward is full; its success route sends GET /beds/{bedId} with bedId read from the answer's Bed.Id. That second request's WhileLoading writes Opening into bed-status, its busy indicator is bed-busy, its success route writes the bed's name into bed-name and its Finally writes Closed into bed-status.",
+          "page": "The admission screen, whose Find a free bed button sends GET /beds/free, which answers {\"bed\": null} when the ward is full; its success route sends GET /beds/{bedId} with bedId read from the answer's Bed.Id. That second request's WhileLoading writes Opening into bed-status, its busy indicator is bed-busy, its success route writes the bed's name into bed-name and its Finally writes Closed into bed-status.",
           "gesture": "With the ward full, click Find a free bed.",
           "outcome": "bed-status reads Closed, bed-busy never shows, bed-name stays empty, and only the GET /beds/free request is sent.",
           "opposite": "With bed East 4 free, the same click shows bed-busy while the second request is in flight, then East 4 in bed-name and Closed in bed-status.",
@@ -343,67 +343,67 @@
         },
         {
           "for": "X4.6",
-          "page": "A dose census, a test component whose doses property holds the ward's doses as data the app's options wrote under WhenWritingDefault, and an on-call board, a test component whose nurse property holds data that lacks callback. Dose declares Refills, an int, and Unit, a string initialized to mg; OnCallNurse initializes Callback to switchboard. Digoxin's refills are 0 and its unit mcg, Heparin's refills 0 and its unit null, so Heparin's data holds neither, and Aspirin's refills 2 and its unit mg. Count doses with no refills left writes the count of doses whose Refills is 0 into refills-count; Count doses measured in mg writes the count of doses whose Unit is mg into mg-count; Show Heparin's unit writes the Unit of the dose Find(d => d.Drug == \"Heparin\") returns into heparin-unit; Show callback writes the nurse's Callback into nurse-callback.",
-          "gesture": "Click Count doses with no refills left, Count doses measured in mg, Show Heparin's unit and Show callback.",
-          "outcome": "refills-count reads 2, mg-count reads 2, heparin-unit reads mg and nurse-callback reads switchboard.",
-          "opposite": "With Heparin's refills 1 and its unit mL, refills-count reads 1, mg-count reads 1 and heparin-unit reads mL; with the nurse's data holding callback x4410, nurse-callback reads x4410.",
-          "defect": "An absent member reads nothing, as the redesign reads data's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d), so refills-count reads 0, mg-count reads 1, and heparin-unit and nurse-callback stay empty; or the browser picks a start by the member's shape, so heparin-unit shows an empty text."
+          "page": "The bench page on an app whose JSON options write under WhenWritingDefault, with the ConformanceComponent conformance, whose Bindings hold three bindings as data those options wrote and whose Binding holds a binding whose data lacks started. Binding declares Count, an int, and Started, a string initialized to start. Alpha's count is 0 and its started own, Beta's count is 0 and its started null, so Beta's data holds neither, and Gamma's count is 2 and its started start. Count the zero counts writes the count of bindings whose Count is 0 into zero-count; Count the started writes the count of bindings whose Started is start into started-count; Show Beta's started writes the Started of the binding Find(b => b.Name == \"Beta\") returns into beta-started; Show the binding's started writes Binding's Started into binding-started.",
+          "gesture": "Click Count the zero counts, Count the started, Show Beta's started and Show the binding's started.",
+          "outcome": "zero-count reads 2, started-count reads 2, beta-started reads start and binding-started reads start.",
+          "opposite": "With Beta's count 1 and its started other, zero-count reads 1, started-count reads 1 and beta-started reads other; with the Binding's data holding started bound, binding-started reads bound.",
+          "defect": "An absent member reads nothing, as the redesign reads data's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d), so zero-count reads 0, started-count reads 1, and beta-started and binding-started stay empty; or the browser picks a start by the member's shape, so beta-started shows an empty text."
         },
         {
           "for": "X4.7",
-          "page": "The dose census, whose Dose declares Shelf, a Storage it populates ([JsonObjectCreationHandling(Populate)]), Locker, a getter-only Storage, and Spare, a Storage it replaces, each initialized by Dose to a Storage whose Place is fridge, where Storage's own initializer sets Place to cupboard; Heparin's data holds shelf, locker and spare each as {}. Show Heparin's stores writes Heparin's Shelf.Place, Locker.Place and Spare.Place into shelf-place, locker-place and spare-place.",
-          "gesture": "Click Show Heparin's stores.",
-          "outcome": "shelf-place reads fridge, locker-place reads fridge and spare-place reads cupboard.",
-          "opposite": "With each of Heparin's three stores holding place Ward 4, shelf-place, locker-place and spare-place read Ward 4.",
-          "defect": "One start per type, as the redesign builds a start from the type alone (Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:126 at 65fdf118d), so all three read cupboard; or an absent member reads nothing and the three stay empty."
+          "page": "The bench page with the ConformanceComponent conformance, whose Binding declares Populated, a Spot it populates ([JsonObjectCreationHandling(Populate)]), GetterOnly, a getter-only Spot, and Replaced, a Spot it replaces, each initialized by Binding to a Spot whose Place is binding start, where Spot's own initializer sets Place to own start; Beta's data holds populated, getterOnly and replaced each as {}. Show Beta's spots writes Beta's Populated.Place, GetterOnly.Place and Replaced.Place into populated-place, getter-place and replaced-place.",
+          "gesture": "Click Show Beta's spots.",
+          "outcome": "populated-place reads binding start, getter-place reads binding start and replaced-place reads own start.",
+          "opposite": "With each of Beta's three spots holding the place Ward 4, populated-place, getter-place and replaced-place read Ward 4.",
+          "defect": "One start per type, as the redesign builds a start from the type alone (Alis.Reactive/PlanModel/Validation/ModelDefaults.cs:126 at 65fdf118d), so all three read own start; or an absent member reads nothing and the three stay empty."
         },
         {
           "for": "X4.8",
-          "page": "The dose census, whose Dose declares Constructor, a string? whose JSON name is constructor, which none of its four doses' data holds. Count doses with no maker writes the count of doses whose Constructor is null into maker-count.",
-          "gesture": "Click Count doses with no maker.",
-          "outcome": "maker-count reads 4.",
-          "opposite": "With Heparin's data holding constructor Ward pharmacy, maker-count reads 3.",
-          "defect": "The read finds what every object inherits, the Object function, at constructor, so no dose's Constructor is null and maker-count reads 0."
+          "page": "The bench page with the ConformanceComponent conformance, whose Binding declares Constructor, a string? whose JSON name is constructor, which none of its four bindings' data holds. Count the bindings with no constructor writes the count of bindings whose Constructor is null into constructor-count.",
+          "gesture": "Click Count the bindings with no constructor.",
+          "outcome": "constructor-count reads 4.",
+          "opposite": "With Beta's data holding constructor own, constructor-count reads 3.",
+          "defect": "The read finds what every object inherits, the Object function, at constructor, so no binding's Constructor is null and constructor-count reads 0."
         },
         {
           "for": "X4.9",
-          "page": "The dose census, whose Aspirin batch holds lot L-17 and expiry 2027-01 and whose Heparin batch lacks lot, which DoseBatch declares [JsonRequired]; a seal lacking its breaker, where DoseSeal has only a private constructor; and a delivery lacking its site, where DoseDelivery is [JsonPolymorphic]. Beside it, an on-call board whose nurse's pager holds a list where OnCallNurse declares an object, and a ward board, a test component whose census property holds data whose count member the component set to a promise. List batch expiries, List seal breakers, List delivery sites, Show the pager's number and Show the census count each write a status into census-status (Listing expiries, Listing breakers, Listing sites, Paging, Counting) and then write their read into census-list, pager-number or census-count; Show Aspirin's batch expiry writes Aspirin's expiry into aspirin-expiry.",
-          "gesture": "Click List batch expiries, List seal breakers, List delivery sites, Show the pager's number, Show the census count and Show Aspirin's batch expiry in turn.",
-          "outcome": "census-status reads each button's status in turn, census-list holds no row, pager-number and census-count stay empty, and aspirin-expiry reads 2027-01.",
-          "opposite": "With Heparin's batch holding lot L-12, the seal holding breaker R. Okafor, the delivery holding site Ward 4, the pager holding an object whose number is x4410 and the census count holding 42, each button writes its read after its status: the expiries, the breaker, the sites, x4410 and 42.",
-          "defect": "An absent member reads nothing and the pipeline goes on, as the redesign reads data's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d), so census-list shows empty rows and pager-number and census-count show nothing; or a start the binding cannot make, a new seal or a delivery of the declared type, is read in the member's place; or the promise is written as text."
+          "page": "The bench page with the ConformanceComponent conformance, whose Bindings hold Alpha, whose strict holds the place here and the name A-1, and Beta, whose strict lacks place, which StrictSpot declares [JsonRequired], whose sealed lacks its name, where SealedSpot has only a private constructor, and whose polymorphic lacks its name, where PolySpot is [JsonPolymorphic]; its Binding's shaped holds a list where Binding declares a Shape object, and the component's own code sets that binding's count to a promise. List the strict names, List the sealed names, List the polymorphic names, Show the shaped number and Show the binding's count each write a status into binding-status (Listing strict, Listing sealed, Listing polymorphic, Shaping, Counting) and then write their read into binding-list, shaped-number or binding-count; Show Alpha's strict name writes Alpha's Strict.Name into alpha-strict.",
+          "gesture": "Click List the strict names, List the sealed names, List the polymorphic names, Show the shaped number, Show the binding's count and Show Alpha's strict name in turn.",
+          "outcome": "binding-status reads each button's status in turn, binding-list holds no row, shaped-number and binding-count stay empty, and alpha-strict reads A-1.",
+          "opposite": "With Beta's strict holding the place here, its sealed holding the name S-2, its polymorphic holding the name P-2, the shaped holding an object whose number is 4410 and the binding's count holding 42, each button writes its read after its status: the strict names, the sealed names, the polymorphic names, 4410 and 42.",
+          "defect": "An absent member reads nothing and the pipeline goes on, as the redesign reads data's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d), so binding-list shows empty rows and shaped-number and binding-count show nothing; or a start the binding cannot make, a new sealed spot or a polymorphic spot of the declared type, is read in the member's place; or the promise is written as text."
         },
         {
           "for": "X4.10",
-          "page": "A dose census on an app whose JSON options set RespectRequiredConstructorParameters, where Dose is a record whose constructor takes Drug and Ward: Heparin's data lacks ward, and Digoxin's holds both and lacks refills. Count doses with no refills left writes Counting refills into census-status and then the count into census-count, which reads unknown until then; Show Digoxin's refills left writes Digoxin's Refills into digoxin-refills.",
-          "gesture": "Click Count doses with no refills left, then Show Digoxin's refills left.",
-          "outcome": "census-status reads Counting refills, census-count keeps unknown, and digoxin-refills reads 0.",
-          "opposite": "On the same app with RespectRequiredConstructorParameters off, Count doses with no refills left writes the count into census-count.",
-          "defect": "The missing constructor parameter goes unchecked, so the count reads Heparin's Refills as its start and census-count shows a number; or the option stops every read through a dose, so digoxin-refills stays empty."
+          "page": "The bench page on an app whose JSON options set RespectRequiredConstructorParameters, with the ConformanceComponent conformance, whose Binding is a record whose constructor takes Name and Code: Beta's data lacks code, and Gamma's holds both and lacks count. Count the zero counts writes Counting into binding-status and then the count of bindings whose Count is 0 into zero-count, which reads unknown until then; Show Gamma's count writes Gamma's Count into gamma-count.",
+          "gesture": "Click Count the zero counts, then Show Gamma's count.",
+          "outcome": "binding-status reads Counting, zero-count keeps unknown, and gamma-count reads 0.",
+          "opposite": "On the same app with RespectRequiredConstructorParameters off, Count the zero counts writes the count into zero-count.",
+          "defect": "The missing constructor parameter goes unchecked, so the count reads Beta's Count as its start and zero-count shows a number; or the option stops every read through a binding, so gamma-count stays empty."
         },
         {
           "for": "X4.11",
-          "page": "An infusion pump page. The pump, a test component, declares Check as a MethodAsync it settles by its own Finish the check and Fail the check buttons, Measure as a MethodAsync<PumpReading> that resolves to a reading of volume 125 with a limit of 750, LastCheck as a MethodAsync<PumpCheck?> that resolves to nothing, and Caption, a method that shows (no caption) when it receives null and the text it receives otherwise; an older pump declares Measure as a MethodAsync<PumpReading> whose method returns a plain reading of volume 90. Run the self-test writes Testing into check-status, awaits Check and writes Self-test passed; Measure the volume writes the reading's volume into volume; Show the remote volume limit writes the reading's limit into volume-limit; Measure the older pump's volume writes its volume into older-volume; Caption with the last check passes LastCheck's result to Caption.",
-          "gesture": "Click Run the self-test, then Finish the check; click Run the self-test again, then Fail the check; then click Measure the volume, Show the remote volume limit, Measure the older pump's volume and Caption with the last check.",
-          "outcome": "check-status reads Testing until Finish the check and Self-test passed after it; after the second run and Fail the check it reads Testing; volume reads 125, volume-limit 750, older-volume 90, and the pump's caption (no caption).",
-          "opposite": "Before any click on Finish the check, check-status keeps Testing; with Measure resolving to a volume of 60, volume reads 60.",
-          "defect": "The step after the call runs in the call's turn, as main drops a call's promise (Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181 at 623dd4a27), so Self-test passed shows before Finish the check and after Fail the check; or a resolution to nothing reaches Caption as undefined, which shows undefined; or the older pump's plain value stops the pipeline, so older-volume stays empty."
+          "page": "The bench page. The ConformanceComponent conformance declares Settle() as a MethodAsync that awaits the test app's settle endpoint, SettleRecord() as a MethodAsync<Record> that answers the record endpoint's record, of count 125 and code C-750, SettleMaybe() as a MethodAsync<Record?> that answers nothing, and TakeText(Arg<string?> text), a method that shows the text it receives as its taken text, (null) when it receives null; conformance-older, of the older version, declares SettleRecord() the same way while its method returns a plain record of count 90. Run the self-test writes Testing into check-status, awaits Settle() and writes Self-test passed; Read the count writes the record's Count into record-count; Show the remote code writes the record's Code into record-code; Read older's count writes conformance-older's record's Count into older-count; Take the missing record passes SettleMaybe()'s Name to TakeText. The harness seeds the settle endpoint's answers, a success and then a 500, and gates each (Run.tla's Settle); Settle() rejects when the endpoint answers a 500.",
+          "gesture": "Click Run the self-test and, once the harness reports the settle held, release it, the endpoint answering the seeded success; click Run the self-test again and, once held, release it, the endpoint answering the seeded 500; then click Read the count, Show the remote code, Read older's count and Take the missing record.",
+          "outcome": "check-status reads Testing until the first release and Self-test passed after it; after the second run and the 500 it reads Testing; record-count reads 125, record-code C-750, older-count 90, and conformance's taken text (null).",
+          "opposite": "Before the first release, check-status keeps Testing; with the record endpoint answering a count of 60, record-count reads 60.",
+          "defect": "The step after the call runs in the call's turn, as main drops a call's promise (Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181 at 623dd4a27), so Self-test passed shows before the release and after the 500; or a resolution to nothing reaches TakeText as undefined, which shows (undefined); or the older version's plain value stops the pipeline, so older-count stays empty."
         },
         {
           "for": "X4.13",
-          "page": "A dose census index with the link Count Ruth's charters, to a census page whose Dose declares Charter, a Charterer its own [JsonConverter] writes as the charterer's name, and whose Count button writes Count(d => d.Charter.Name == \"Ruth\") over the doses into charter-count.",
-          "gesture": "On the census index, click Count Ruth's charters.",
-          "outcome": "The census page is refused where the view renders with \"'d.Charter.Name' reads past 'd.Charter', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'd.Charter' itself, or read past it on the server.\"",
-          "opposite": "With Charter written by the app's options, the page renders, and Count writes 2 into charter-count, the doses Ruth charters.",
-          "defect": "The read is written past the converter's text, so the page renders and Count writes 0, since the browser's charter is a text with no Name."
+          "page": "The refusals index with the link Count the converted names, to a page whose ConformanceComponent's Binding declares Converted, a ConvertedSpot its own [JsonConverter] writes as its name, and whose Count button writes Count(b => b.Converted.Name == \"Ruth\") over the component's Bindings into converted-count.",
+          "gesture": "On the refusals index, click Count the converted names.",
+          "outcome": "The page is refused where the view renders with \"'b.Converted.Name' reads past 'b.Converted', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'b.Converted' itself, or read past it on the server.\"",
+          "opposite": "With Converted written by the app's options, the page renders, and Count writes 2 into converted-count, the bindings whose converted name is Ruth.",
+          "defect": "The read is written past the converter's text, so the page renders and Count writes 0, since the browser's converted spot is a text with no Name."
         },
         {
           "for": "X4.13",
-          "page": "The census index's link Find Ruth's dose, to a census page whose Dose declares Charter as above, and whose Show the charter button writes the field d => d.Charter.Name of the dose Find(d => d.Drug == \"Heparin\") returns into found-charter.",
-          "gesture": "On the census index, click Find Ruth's dose.",
-          "outcome": "The census page is refused where the view renders with \"'d.Charter.Name' reads past 'd.Charter', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'd.Charter' itself, or read past it on the server.\"",
-          "opposite": "With Charter written by the app's options, the page renders, and Show the charter writes Ruth into found-charter.",
-          "defect": "The field is read past the converter's text, so the page renders and found-charter stays empty."
+          "page": "The refusals index's link Find the converted name, to a page whose ConformanceComponent's Binding declares Converted as above, and whose Show the converted button writes the field b => b.Converted.Name of the binding Find(b => b.Name == \"Beta\") returns into found-converted.",
+          "gesture": "On the refusals index, click Find the converted name.",
+          "outcome": "The page is refused where the view renders with \"'b.Converted.Name' reads past 'b.Converted', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 'b.Converted' itself, or read past it on the server.\"",
+          "opposite": "With Converted written by the app's options, the page renders, and Show the converted writes Ruth into found-converted.",
+          "defect": "The field is read past the converter's text, so the page renders and found-converted stays empty."
         },
         {
           "for": "X11.2",
@@ -415,11 +415,11 @@
         },
         {
           "for": "X11.4",
-          "page": "A medication order page whose Start infusion button sends POST /orders with the busy indicator order-busy; its success route writes Priming into prime-status, awaits the pump's Prime, a MethodAsync the pump settles by its own Finish priming and Fail priming buttons, then writes Primed; the request's Finally writes Finished into order-status.",
-          "gesture": "Click Start infusion, then the pump's Fail priming.",
-          "outcome": "prime-status keeps Priming, order-status reads Finished and order-busy hides.",
-          "opposite": "With Finish priming instead of Fail priming, prime-status reads Primed, order-status reads Finished and order-busy hides.",
-          "defect": "The call's promise is not awaited, as main drops it (Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181 at 623dd4a27), so Primed shows before the pump settles; or the stop skips the Finally, so order-status stays empty and order-busy stays shown."
+          "page": "A medication order page whose Start button sends POST /orders with the busy indicator order-busy; its success route writes Settling into settle-status, awaits the dose scanner's Settle(), which awaits the test app's settle endpoint, then writes Settled; the request's Finally writes Finished into order-status. The harness seeds the settle endpoint's answer, a 500, and gates it (Run.tla's Settle); Settle() rejects when the endpoint answers a 500.",
+          "gesture": "Click Start and, once the harness reports the settle held, release it, the endpoint answering the seeded 500.",
+          "outcome": "settle-status keeps Settling, order-status reads Finished and order-busy hides.",
+          "opposite": "With the settle endpoint seeded to answer a success, settle-status reads Settled after the release, order-status reads Finished and order-busy hides.",
+          "defect": "The call's promise is not awaited, as main drops it (Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181 at 623dd4a27), so Settled shows before the release; or the stop skips the Finally, so order-status stays empty and order-busy stays shown."
         },
         {
           "for": "X11.5",
@@ -440,37 +440,37 @@
         },
         {
           "for": "X11.9",
-          "page": "A vitals monitor, a test component whose Raise a noted alarm button raises its alarm with the patient it holds, a live object whose status the monitor shows, resting until written. The alarm handler awaits the desk's Acknowledge, a MethodAsync the monitor's Confirm the acknowledgement button settles, then writes acknowledged into the patient's Status.",
-          "gesture": "Click Raise a noted alarm, then Confirm the acknowledgement.",
-          "outcome": "The monitor's patient reads resting until the confirmation and acknowledged after it.",
-          "opposite": "Without Confirm the acknowledgement, the patient keeps resting.",
-          "defect": "Every write after an awaited step is refused where the view renders, as a write to the payload itself is, so the page does not render; or the write lands on a copy of the payload, so the patient keeps resting."
+          "page": "The resident record's care panel, a ConformanceComponent whose Raise button raises Raised with its outer object, a live object whose text the panel shows as Outer: Gamma. The Raised handler awaits the care panel's Settle(), which awaits the test app's settle endpoint, then writes acknowledged into the payload's Outer.Text. The harness gates the settle endpoint (Run.tla's Settle).",
+          "gesture": "Click the care panel's Raise; once the harness reports the settle held, check the panel, then release it.",
+          "outcome": "The panel reads Outer: Gamma while the settle is held and Outer: acknowledged after the release.",
+          "opposite": "Without the release, the panel keeps Outer: Gamma.",
+          "defect": "Every write after an awaited step is refused where the view renders, as a write to the payload itself is, so the page does not render; or the write lands on a copy of the payload, so the panel keeps Outer: Gamma."
         },
         {
           "for": "X11.11",
-          "page": "Three vitals monitors, each a test component that raises its alarm from its own Raise a noted alarm button and, once its listeners return, shows cancelled when the alarm's cancel holds true and sounding otherwise, then moves the alarm from bed 4 to bed 6. The first monitor's handler writes the alarm's Cancel and Acknowledging into ack-status, awaits the desk's Acknowledge, which the monitor's Confirm the acknowledgement settles, then writes acknowledged into the alarm's patient, calls the alarm's Silence, which the monitor shows as silenced, and writes the alarm's bed and Acknowledged into ack-bed and ack-status. The second monitor has two handlers: the first awaits the desk's Acknowledge at once, and the second, written after it, writes the alarm's Cancel before its own await. The third monitor's handler writes nothing to its alarm.",
-          "gesture": "Click Raise a noted alarm on each monitor, then Confirm the acknowledgement on the first.",
-          "outcome": "The first monitor shows cancelled and ack-status reads Acknowledging; after the confirmation its patient reads acknowledged, it shows silenced, ack-bed reads 6 and ack-status reads Acknowledged; the second monitor shows cancelled and the third sounding.",
-          "opposite": "Before the confirmation, the first monitor's patient reads resting, it shows not silenced and ack-bed stays empty.",
-          "defect": "The handler continues after a microtask, so the first monitor reads no cancel and shows sounding; or the second handler waits for the first one's await, so its Cancel misses the second monitor's turn and it shows sounding; or a read after the await reads a snapshot of the payload, so ack-bed reads 4.",
+          "page": "Three care panels, each a ConformanceComponent on the resident record that raises Raised from its own Raise button and, once its listeners return, shows its payload line, Payload text: and what its handlers wrote into the payload's WriteOnlyText, or none, then counts the payload's total down from 3 to 2. The first panel's handler writes Kappa into the payload's WriteOnlyText and Writing into ack-status, awaits the panel's Settle(), which awaits the test app's settle endpoint, then writes acknowledged into the payload's Outer.Text, calls the payload's Act(), which the panel shows as Payload acted, and writes the payload's Total() and Settled into ack-total and ack-status. The second panel has two handlers: the first awaits its panel's Settle() at once, and the second, written after it, writes Kappa into the payload's WriteOnlyText before its own await. The third panel's handler writes nothing to its payload. The harness gates the settle endpoint (Run.tla's Settle).",
+          "gesture": "Click Raise on each panel; once the harness reports the first panel's settle held, check the panels, then release it.",
+          "outcome": "The first panel shows Payload text: Kappa and ack-status reads Writing; after the release its outer reads acknowledged, it shows Payload acted, ack-total reads 2 and ack-status reads Settled; the second panel shows Payload text: Kappa and the third Payload text: none.",
+          "opposite": "Before the release, the first panel's outer reads Gamma, it shows no Payload acted line and ack-total stays empty.",
+          "defect": "The handler continues after a microtask, so the first panel reads no write and shows Payload text: none; or the second handler waits for the first one's await, so its write misses the second panel's turn and it shows Payload text: none; or a read after the await reads a snapshot of the payload, so ack-total reads 3.",
           "observes": "Run.tla:VendorReads"
         },
         {
           "for": "X11.12",
-          "page": "A vitals monitor whose alarm handler, when the alarm is noted, awaits the desk's Acknowledge, and in its Else writes the alarm's Cancel; the monitor shows cancelled or sounding once its listeners return. On the monitors index, the link Late cancel opens a page whose handler writes the Cancel after that When.",
-          "gesture": "Click Raise an unnoted alarm, then Raise a noted alarm, then click Late cancel on the monitors index.",
-          "outcome": "After the unnoted alarm the monitor shows cancelled and after the noted one sounding, and the Late cancel page is refused where the view renders with \"A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.\"",
-          "opposite": "With the late Cancel moved before the When, the Late cancel page renders and its unnoted alarm shows cancelled.",
-          "defect": "The C# counts any await in the handler as before every write, so the first page is refused; or the Else runs after the monitor's turn, so the unnoted alarm sounds; or the late write passes the render and reaches no vendor.",
+          "page": "The resident record's care panel, a ConformanceComponent whose Raised handler, when the payload's Flag holds, awaits the panel's Settle(), which awaits the test app's settle endpoint, which answers at once, and in its Else writes Kappa into the payload's WriteOnlyText; once its listeners return the panel shows its payload line, Payload text: Kappa or Payload text: none. Its Raise flagged and Raise unflagged buttons raise Raised with Flag true and false. On the resident record, the link Late write opens a page whose handler writes the WriteOnlyText after that When.",
+          "gesture": "Click the panel's Raise unflagged, then Raise flagged, then click Late write on the resident record.",
+          "outcome": "After Raise unflagged the panel shows Payload text: Kappa and after Raise flagged Payload text: none, and the Late write page is refused where the view renders with \"A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.\"",
+          "opposite": "With the late write moved before the When, the Late write page renders and its Raise unflagged shows Payload text: Kappa.",
+          "defect": "The C# counts any await in the handler as before every write, so the first page is refused; or the Else runs after the panel's turn, so Raise unflagged shows Payload text: none; or the late write passes the render and reaches no vendor.",
           "observes": "Run.tla:Fire"
         },
         {
           "for": "X11.13",
-          "page": "A vitals monitor whose alarm handler awaits the desk's Acknowledge when the alarm is critical, writes Watching into monitor-note in an ElseIf when it is noted, and in its Else writes the alarm's Cancel. On the monitors index, the link Cancel after an awaited check opens a page whose ElseIf condition awaits the desk's IsStaffed, a MethodAsync<bool>, before the same Else.",
-          "gesture": "Click Raise an unnoted alarm, then click Cancel after an awaited check on the monitors index.",
-          "outcome": "The monitor shows cancelled, and the second page is refused where the view renders with \"A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.\"",
-          "opposite": "With the ElseIf's condition reading the alarm's Noted member instead of IsStaffed, the second page renders and its unnoted alarm shows cancelled.",
-          "defect": "The Else reads the state before the ElseIf's condition, so the second page renders and its Cancel reaches no vendor; or an await in a sibling branch refuses the Else, so the first page is refused."
+          "page": "The resident record's care panel, a ConformanceComponent whose Raised handler awaits the panel's Settle() when the payload's Count is above 2, writes Watching into panel-note in an ElseIf when its Flag holds, and in its Else writes Kappa into the payload's WriteOnlyText; once its listeners return the panel shows its payload line. On the resident record, the link Write after an awaited check opens a page whose ElseIf condition awaits the panel's SettleCheck(), a MethodAsync<bool>, before the same Else.",
+          "gesture": "Click the panel's Raise unflagged, whose payload counts 1, then click Write after an awaited check on the resident record.",
+          "outcome": "The panel shows Payload text: Kappa, and the second page is refused where the view renders with \"A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.\"",
+          "opposite": "With the ElseIf's condition reading the payload's Flag instead of SettleCheck(), the second page renders and its Raise unflagged shows Payload text: Kappa.",
+          "defect": "The Else reads the state before the ElseIf's condition, so the second page renders and its write reaches no vendor; or an await in a sibling branch refuses the Else, so the first page is refused."
         },
         {
           "for": "X11.14",
@@ -509,38 +509,38 @@
         },
         {
           "for": "X11.20",
-          "page": "An admissions page whose Admit button sends POST /admissions; its success route sends POST /beds, then appends after beds, and the beds request's success route reads the bed board's Capacity, a declared property the page's bed board lacks. The beds request's Finally appends inner finally, the admission's Finally outer finally, the app's request defaults' Finally defaults finally for each request, and the step after the admission appends after admission.",
+          "page": "An admissions page whose Admit button sends POST /admissions; its success route sends POST /beds, then appends after beds, and the beds request's success route reads the care level picker's ReadOnlyText, a declared member the picker, a ConformanceComponent of the older version, lacks. The beds request's Finally appends inner finally, the admission's Finally outer finally, the app's request defaults' Finally defaults finally for each request, and the step after the admission appends after admission.",
           "gesture": "Click Admit.",
           "outcome": "The log reads inner finally, defaults finally, outer finally, defaults finally, and neither after beds nor after admission.",
-          "opposite": "With the bed board holding Capacity, the log reads inner finally, defaults finally, after beds, outer finally, defaults finally, after admission.",
+          "opposite": "With the picker of the current version, which holds ReadOnlyText, the log reads inner finally, defaults finally, after beds, outer finally, defaults finally, after admission.",
           "defect": "A stop unwinds past a request frame without its Finally layers, so the log lacks inner finally; or the stop ends the inner route alone, so after beds appears.",
           "observes": "Run.tla:Step"
         },
         {
           "for": "X11.21",
-          "page": "A roster page whose Refresh button, under replace, sends GET /roster and writes its round, 1 then 2, into each line it appends. The request's own WhileLoading awaits the pump's Prime, a MethodAsync whose every pending call the pump settles by its Finish priming button, then shows roster-busy; its Finally appends finally, the app's request defaults' Finally defaults finally, and its success route route, each with the round.",
-          "gesture": "Click Refresh, click Refresh again before Finish priming, then click Finish priming.",
-          "outcome": "After the second click the log reads defaults finally 1 and roster-busy stays hidden; after Finish priming the log reads defaults finally 1, route 2, finally 2, defaults finally 2.",
-          "opposite": "Under overlap, the second click leaves round 1 running, and after Finish priming the log holds route 1, finally 1 and defaults finally 1 as well.",
+          "page": "A residents page whose Refresh button, under replace, sends GET /roster and writes its round, 1 then 2, into each line it appends. The request's own WhileLoading awaits the census panel's Settle(), which awaits the test app's settle endpoint, then shows roster-busy; its Finally appends finally, the app's request defaults' Finally defaults finally, and its success route route, each with the round. The harness gates the settle endpoint (Run.tla's Settle).",
+          "gesture": "Click Refresh, and once the harness reports the settle held click Refresh again, then release every held settle.",
+          "outcome": "After the second click the log reads defaults finally 1 and roster-busy stays hidden; after the release the log reads defaults finally 1, route 2, finally 2, defaults finally 2.",
+          "opposite": "Under overlap, the second click leaves round 1 running, and after the release the log holds route 1, finally 1 and defaults finally 1 as well.",
           "defect": "The aborted request runs its own Finally although its WhileLoading never completed, so finally 1 appears; or the defaults' Finally is skipped with it, so defaults finally 1 is missing; or round 1's WhileLoading goes on after its await, so roster-busy shows before round 2 sends and route 1 appears.",
           "observes": "Lanes.tla:Finally"
         },
         {
           "for": "X11.22",
-          "page": "A roster page whose Refresh button, under replace, sends GET /roster and writes its round into each line it appends. The request's Finally appends finally start, awaits the pump's Flush, a MethodAsync the pump settles by its Finish flushing button, then appends finally end; the app's request defaults' Finally appends defaults finally, and the step after the request appends after.",
-          "gesture": "Click Refresh, and once finally start 1 shows click Refresh again, then click Finish flushing each time the pump asks.",
-          "outcome": "finally end 1 shows once, after the first Finish flushing, followed by defaults finally 1, and after 1 never shows.",
-          "opposite": "Under overlap, the second click leaves round 1 running, and after Finish flushing the log holds after 1.",
+          "page": "A residents page whose Refresh button, under replace, sends GET /roster and writes its round into each line it appends. The request's Finally appends finally start, awaits the census panel's Settle(), which awaits the test app's settle endpoint, then appends finally end; the app's request defaults' Finally appends defaults finally, and the step after the request appends after. The harness gates the settle endpoint (Run.tla's Settle).",
+          "gesture": "Click Refresh, and once finally start 1 shows click Refresh again, then release each settle the harness reports held.",
+          "outcome": "finally end 1 shows once, after the first release, followed by defaults finally 1, and after 1 never shows.",
+          "opposite": "Under overlap, the second click leaves round 1 running, and after the releases the log holds after 1.",
           "defect": "The replace ends the old Finally at its await, so finally end 1 never shows; or the old Finally runs again for the new run, so finally end 1 shows twice; or the step after the old request runs, so after 1 shows.",
           "observes": "Lanes.tla:After"
         },
         {
           "for": "X11.23",
-          "page": "A ward page whose resident slot holds the resident card partial. The card's Refresh sends GET /residents/7 with the busy indicator ward-busy outside the slot; the app's request defaults' Finally awaits the session plugin's Flush, a MethodAsync the page's Finish flushing button settles, then appends flushed to the log outside the slot; the page's Close card button unloads the slot.",
-          "gesture": "Click Refresh, once the answer arrives click Close card, then click Finish flushing.",
-          "outcome": "ward-busy hides when the card closes, and the log holds no flushed after Finish flushing.",
-          "opposite": "Without Close card, Finish flushing appends flushed and hides ward-busy.",
-          "defect": "A disposed run waits again, so flushed appears after Finish flushing; or the busy target is held until the defaults' Finally ends, so ward-busy stays shown after the card closes.",
+          "page": "The resident record, whose tab slot holds the notes tab partial. The tab's Refresh sends GET /residents/7 with the busy indicator record-busy outside the slot; the host's request defaults' Finally awaits the session plugin's Flush, which the harness gates (Run.tla's Settle), then writes flushed into the flush line outside the slot; the record's Close tab button unloads the slot.",
+          "gesture": "Click Refresh; once the answer arrives and the harness reports the flush held, click Close tab; then release the flush.",
+          "outcome": "record-busy hides when the tab closes, and the flush line stays empty after the release.",
+          "opposite": "Without Close tab, the release writes flushed into the flush line and hides record-busy.",
+          "defect": "A disposed run waits again, so the flush line reads flushed after the release; or the busy target is held until the defaults' Finally ends, so record-busy stays shown after the tab closes.",
           "observes": "Lanes.tla:Dispose"
         }
       ],

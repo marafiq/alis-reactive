@@ -157,51 +157,51 @@
       "promises": [
         {
           "for": "X7.5",
-          "page": "A resident card whose note is set from the note field of a monitor's alarm, and a monitor whose alarm button raises the alarm with or without its note.",
-          "gesture": "Click the alarm button that raises the alarm without its note.",
-          "outcome": "The card shows its empty note state.",
-          "opposite": "Raised with the note Fall at 3am, the card shows Fall at 3am.",
-          "defect": "The missing field stops the pipeline, so the card keeps its earlier note, or reaches the card as the text undefined."
+          "page": "The resident record's note text, set from the OptionalText of the care panel's Raised, and the care panel, a ConformanceComponent whose Raise buttons raise Raised with or without its optional text.",
+          "gesture": "Click the care panel's Raise without optional text.",
+          "outcome": "The note text shows its empty state.",
+          "opposite": "Raised with the optional text Fall at 3am, the note text shows Fall at 3am.",
+          "defect": "The missing member stops the pipeline, so the note text keeps its earlier text, or reaches it as the text undefined."
         },
         {
           "for": "X7.10",
-          "page": "A pump page whose step sets the pump's rate property from a response field its own JSON converter writes as text.",
+          "page": "A refusal page whose step sets a ConformanceComponent's Amount from a response field its own JSON converter writes as text.",
           "gesture": "Open the page.",
           "outcome": "The page is refused where the view renders with X7.10's message, naming the field and its own JSON converter.",
-          "opposite": "The same field with no converter of its own renders, and the pump shows the rate the response holds.",
-          "defect": "The converter's text reaches the live member, so the pump holds the text in place of its number."
+          "opposite": "The same field with no converter of its own renders, and the component shows the amount the response holds.",
+          "defect": "The converter's text reaches the live member, so the component holds the text in place of its number."
         },
         {
           "for": "X7.13",
-          "page": "A dose page whose step sets a pump's live number from the literal 9007199254740993.",
+          "page": "A refusal page whose step sets a ConformanceComponent's Amount, a decimal, from the literal 9007199254740993.",
           "gesture": "Open the page.",
-          "outcome": "The page is refused where the view renders with X7.13's message, naming the pump's member and the value.",
-          "opposite": "The literal 9007199254740991 renders, and the pump shows 9007199254740991.",
-          "defect": "JavaScript reads the literal as 9007199254740992, so the page renders and the pump shows another dose."
+          "outcome": "The page is refused where the view renders with X7.13's message, naming the component's member and the value.",
+          "opposite": "The literal 9007199254740991 renders, and the component shows the amount 9007199254740991.",
+          "defect": "JavaScript reads the literal as 9007199254740992, so the page renders and the component shows another amount."
         },
         {
           "for": "X7.14",
-          "page": "An app whose JSON options write numbers as text; a supply search whose found supply's vial count is 5, and a stock counter that holds 1 and adds what its method is passed.",
-          "gesture": "Search for the supply, then click add.",
-          "outcome": "The counter shows 6.",
-          "opposite": "A found supply whose vial count is 0 leaves the counter at 1.",
-          "defect": "The text 5 reaches the method, so the counter shows 15."
+          "page": "An app whose JSON options write numbers as text; a supply search whose found supply's vial count is 5, and the dose scanner, the round's ConformanceComponent, whose Amount holds 1 and whose Add(amount) adds what it is passed to its Amount, which it shows.",
+          "gesture": "Search for the supply, then click Add.",
+          "outcome": "The scanner shows the amount 6.",
+          "opposite": "A found supply whose vial count is 0 leaves the scanner's amount at 1.",
+          "defect": "The text 5 reaches the method, so the scanner shows 15."
         },
         {
           "for": "X7.6",
-          "page": "A pump page whose alarm card shows the alarm's note IfNull the pump's summary, Infusing 50 ml/h, and two buttons that raise the alarm with the note Line occluded or with a null note.",
-          "gesture": "Click the button that raises the alarm with a null note.",
-          "outcome": "The card shows Infusing 50 ml/h.",
-          "opposite": "Raised with the note Line occluded, the card shows Line occluded and not the summary.",
-          "defect": "The null note reaches the card, so it shows nothing or the text null, or the summary is taken over a held note."
+          "page": "The resident record, whose note text shows the care panel's Raised payload's NullableText IfNull the care panel's Text, Morning round, and the care panel's two buttons that raise Raised with the nullable text Line occluded or with a null nullable text.",
+          "gesture": "Click the care panel's button that raises Raised with a null nullable text.",
+          "outcome": "The note text shows Morning round.",
+          "opposite": "Raised with Line occluded, the note text shows Line occluded and not the panel's text.",
+          "defect": "The null reaches the note text, so it shows nothing or the text null, or the panel's text is taken over a held nullable text."
         },
         {
           "for": "X7.6",
-          "page": "A pump page whose Show last alarm button passes the pump's last alarm IfNull the text No alarm to the caption's setCaption method, on a pump whose last alarm reads nothing and one whose last alarm is Air in line.",
-          "gesture": "Click Show last alarm on the pump with no alarm.",
-          "outcome": "The caption shows No alarm.",
-          "opposite": "On the pump whose last alarm is Air in line, the caption shows Air in line.",
-          "defect": "The method receives undefined, so the caption shows undefined or keeps its earlier text."
+          "page": "The resident record whose Log value button passes the care panel's Value IfNull the text No value to the panel's Log(text), which writes text and the text into its log, on a care panel whose Value holds null and one whose Value is Air in line.",
+          "gesture": "Click Log value on the care panel whose Value holds null.",
+          "outcome": "The panel's log reads text No value.",
+          "opposite": "On the care panel whose Value is Air in line, the log reads text Air in line.",
+          "defect": "The method receives undefined, so the log reads text undefined or keeps its earlier line."
         },
         {
           "for": "X7.6",
@@ -213,19 +213,19 @@
         },
         {
           "for": "X7.6",
-          "page": "A fluid chart whose Set target button sets the target from Choose on the order's restriction flag, 1000 ml when it holds and the measured intake when it reads nothing; the intake is a component method that shows how many times it was called.",
+          "page": "The resident record whose Set target button sets the target from Choose on the order's restriction flag, 1000 ml when it holds and the care panel's Total() when it reads nothing; the care panel, the record's ConformanceComponent, answers Total() with its count, 850, and shows its calls, the count of its method calls.",
           "gesture": "Click Set target on an order whose flag holds, then on an order whose flag reads nothing.",
-          "outcome": "The target shows 1000 ml, then the measured intake, 850 ml, and the intake's call count shows 1.",
-          "opposite": "Set on the flagged order alone, the call count stays 0.",
-          "defect": "Both arms are read each time, so the call count shows 2, or the flag that reads nothing takes the first arm and shows 1000 ml."
+          "outcome": "The target shows 1000 ml, then 850, and the panel's calls show 1.",
+          "opposite": "Set on the flagged order alone, the calls stay 0.",
+          "defect": "Both arms are read each time, so the calls show 2, or the flag that reads nothing takes the first arm and shows 1000 ml."
         },
         {
           "for": "X7.7",
-          "page": "A fluid balance page whose Record button sets the chart's nullable intake property from the intake field widened with OrNull(), and an intake field that can be cleared.",
+          "page": "The resident record whose Record button sets the care panel's NullableCount, shown in its nullable count line, from the intake field, a number input, widened with OrNull(), and that field can be cleared.",
           "gesture": "Type 500 in the intake field and click Record.",
-          "outcome": "The chart shows 500 ml.",
-          "opposite": "With the field cleared, Record sets the chart's intake to its empty state.",
-          "defect": "The widened value is dropped or written as text, so the chart keeps its earlier intake or shows the text 500."
+          "outcome": "The care panel's nullable count line reads 500.",
+          "opposite": "With the field cleared, Record sets the panel's nullable count line to none.",
+          "defect": "The widened value is dropped or written as text, so the panel keeps its earlier nullable count or shows the text 500."
         },
         {
           "for": "X7.7",
@@ -237,11 +237,11 @@
         },
         {
           "for": "X7.7",
-          "page": "A pump page whose Show summary button passes the pump's summary widened to string? to the caption's setCaption method, on a pump whose summary is Infusing 50 ml/h and one with no summary.",
-          "gesture": "Click Show summary on the pump whose summary is Infusing 50 ml/h.",
-          "outcome": "The caption shows Infusing 50 ml/h.",
-          "opposite": "On the pump with no summary, the caption shows its empty state.",
-          "defect": "The widened source writes nothing, so the caption keeps its earlier text."
+          "page": "The resident record whose Take text button passes the care panel's Text widened to string? to the panel's TakeText(text), which shows the text it receives as its taken text, (null) for null, on a care panel whose text is Morning round and one whose text holds null.",
+          "gesture": "Click Take text on the care panel whose text is Morning round.",
+          "outcome": "The panel's taken text reads Morning round.",
+          "opposite": "On the care panel whose text holds null, the taken text reads (null).",
+          "defect": "The widened source writes nothing, so the taken text keeps its earlier text."
         },
         {
           "for": "X7.11",

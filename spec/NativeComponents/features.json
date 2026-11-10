@@ -1403,7 +1403,7 @@
       "promises": [
         {
           "for": "M24.X2",
-          "page": "A bed board whose model's AssignedBed renders through Html.NativeHiddenField(plan, m => m.AssignedBed), whose Change handler sets bed-echo's text to the field's Value, reached by pipeline.Input(m => m.AssignedBed).Component<NativeHiddenField>(), and an Assign B-12 button whose click sets that Value to B-12.",
+          "page": "The admission screen's intake form, whose model's AssignedBed renders through Html.NativeHiddenField(plan, m => m.AssignedBed), whose Change handler sets bed-echo's text to the field's Value, reached by pipeline.Input(m => m.AssignedBed).Component<NativeHiddenField>(), and an Assign B-12 button whose click sets that Value to B-12.",
           "gesture": "Click Assign B-12.",
           "outcome": "bed-echo shows B-12.",
           "opposite": "Open the page and click nothing: bed-echo is empty, since the field's starting value raises no change.",

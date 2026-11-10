@@ -535,19 +535,19 @@
         },
         {
           "for": "X17.14",
-          "page": "A dose chart page with two charts the app brings, each of whose declaration declares TickLabel, a Callback<TickArgs, string> its vendor calls for each tick with the tick's Resident and draws the answer as the tick's label; a chart with no TickLabel draws each tick's position, 1, 2 and 3. Both charts hold the ticks Ada, Bea and Cy. The view sets chart-labeled's TickLabel to tick => tick.Resident and leaves chart-plain's unset; the page's button Draw the charts draws both.",
-          "gesture": "Click Draw the charts.",
-          "outcome": "chart-labeled's ticks read Ada, Bea and Cy.",
-          "opposite": "chart-plain's ticks read 1, 2 and 3.",
-          "defect": "The answer is not the function the vendor calls, or answers nothing, so chart-labeled's ticks read 1, 2 and 3, or are empty (D17.12)."
+          "page": "The bench page with two ConformanceComponents, each declaring Answer, a Callback<Item, string> its own Ask button calls for each item, drawing the answers in its answer line; a component with no Answer draws each item's position, 1, 2 and 3. Both hold the items Ada, Bea and Cy. The view sets conformance-answered's Answer to item => item.Name and leaves conformance-plain's unset.",
+          "gesture": "Click Ask on conformance-answered, then on conformance-plain.",
+          "outcome": "conformance-answered's answer line reads Ada, Bea and Cy.",
+          "opposite": "conformance-plain's answer line reads 1, 2 and 3.",
+          "defect": "The answer is not the function the vendor calls, or answers nothing, so conformance-answered's answer line reads 1, 2 and 3, or is empty (D17.12)."
         },
         {
           "for": "X17.15",
-          "page": "A call bell page whose bell the app brings declares Rang, an Event<RingArgs> with a string Room, and Chimed, an Event with no payload. The bell's button Ring with no room raises rang with no argument, its button Ring room 7 raises rang with {\"room\": \"7\"}, and its button Chime raises chimed with no argument; after each raise the bell's own code writes its count of raises into raised. The Rang handler writes ringing into ring-tried as its first step, then the payload's Room into ring-room; the Chimed handler writes chimed into chime-heard.",
-          "gesture": "Click Ring with no room, then Chime.",
-          "outcome": "After Ring with no room, raised reads 1 and ring-tried and ring-room are empty; after Chime, chime-heard reads chimed and raised reads 2.",
-          "opposite": "Click Ring room 7: ring-tried reads ringing, ring-room reads 7 and raised reads 3.",
-          "defect": "The missing payload reads as nothing and the handler runs, so ring-tried reads ringing after Ring with no room, as the redesign reads a payload's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d); or the stop reaches the vendor, so raised stays empty; or Chimed's empty payload stops it, so chime-heard is empty."
+          "page": "The bench page with the ConformanceComponent conformance, whose Raised is an Event<Raised> with a string Text, and the ConformanceRegistered registered-1, whose Alarmed is an Event with no payload. conformance's button Raise with no payload raises raised with no argument, its button Raise with text 7 raises raised with {\"text\": \"7\"}, and after each raise its own code shows its count of raises, Raised 1 and on; registered-1's button Sound the alarm raises alarmed with no argument. The Raised handler writes raising into raise-tried as its first step, then the payload's Text into raise-text; the Alarmed handler writes alarmed into alarm-heard.",
+          "gesture": "Click Raise with no payload, then Sound the alarm.",
+          "outcome": "After Raise with no payload, conformance shows Raised 1 and raise-tried and raise-text are empty; after Sound the alarm, alarm-heard reads alarmed.",
+          "opposite": "Click Raise with text 7: raise-tried reads raising, raise-text reads 7 and conformance shows Raised 2.",
+          "defect": "The missing payload reads as nothing and the handler runs, so raise-tried reads raising after Raise with no payload, as the redesign reads a payload's members as optional (Alis.Reactive/PlanModel/Values/Target.cs:80 at 65fdf118d); or the stop reaches the vendor, so conformance shows no count of raises; or Alarmed's empty payload stops it, so alarm-heard is empty."
         },
         {
           "for": "X17.17",
@@ -560,35 +560,35 @@
         },
         {
           "for": "X17.20",
-          "page": "A dose chart page with a text box unit-name, a shift clock the app brings whose Shift(), a Method<string>, answers Day until its button Next shift turns it to Night, and a chart the app brings that declares Caption and Footer, each a Callback<CaptionArgs, string> it calls at each draw and shows above and below its ticks, and SortTicks(Answer(key)), a Method that orders and redraws its ticks by the key its answer gives for each. The view sets Caption to unit-name's value and Footer to the clock's Shift(); the chart's ticks are Ada with 2 doses, Bea with 4 and Cy with 1, drawn in that order; its button Redraw draws it; the page's button Sort by doses calls chart.SortTicks(tick => tick.Doses).",
-          "gesture": "Type East into unit-name and click Redraw; type West over it, click Next shift and click Redraw; click Sort by doses.",
-          "outcome": "After the first Redraw the caption reads East and the footer Day; after the second the caption reads West and the footer Night; after Sort by doses the ticks read Cy, Ada and Bea, in that order.",
-          "opposite": "Before any typing, Redraw shows an empty caption and the footer Day, and the ticks read Ada, Bea and Cy.",
-          "defect": "The answer reads the page once, when it is assigned, so the second Redraw still shows East or Day; or the sort's argument is passed as a value, not as the function the vendor calls for each tick, so the ticks keep Ada, Bea and Cy (D17.12)."
+          "page": "The bench page with a text box unit-name and three ConformanceComponents. conformance-caption and conformance-footer each declare Answer, a Callback<Item, string> it calls for each item at each click of its own Ask button and shows in its answer line; conformance holds the text Day, and the page's button Set the text to Night writes Night into its Text. The view sets conformance-caption's Answer to unit-name's value and conformance-footer's to conformance's Text; conformance-footer holds one item, Ada. conformance-caption also declares SortItems(Answer<Item, int> key), a Method that orders and redraws its items by the key its answer gives for each; its items are Ada with the value 2, Bea with 4 and Cy with 1, listed in that order, and the page's button Sort by value calls conformance-caption.SortItems(item => item.Value).",
+          "gesture": "Type East into unit-name and click Ask on conformance-caption and conformance-footer; type West over it, click Set the text to Night and click both Asks again; click Sort by value.",
+          "outcome": "After the first Asks conformance-caption's answer line reads East, East and East and conformance-footer's Day; after the second West, West and West and Night; after Sort by value conformance-caption lists Cy, Ada and Bea, in that order.",
+          "opposite": "Before any typing, Ask on conformance-caption shows three empty answers and conformance-footer's Ask shows Day, and conformance-caption lists Ada, Bea and Cy.",
+          "defect": "The answer reads the page once, when it is assigned, so the second Asks still show East or Day; or the sort's argument is passed as a value, not as the function the vendor calls for each item, so the items keep Ada, Bea and Cy (D17.12)."
         },
         {
           "for": "X17.21",
-          "page": "A dose chart page with a unit tracker the app brings, whose Unit, a ReadOnly<string>, holds Ward 3 until its button Retire the unit deletes that member, and a chart the app brings that declares Ward, a Property<string>, and Caption, a Callback<CaptionArgs, string> it calls when a write changes Ward, before it draws the answer as its caption, so a throw from Caption leaves the caption it drew. The view sets Caption to the tracker's Unit. Set ward North writes North into the chart's Ward, then set into north-done; Set ward South writes trying into south-tried, writes South into the chart's Ward, then set into south-done.",
-          "gesture": "Click Set ward North, Retire the unit, then Set ward South.",
-          "outcome": "After Set ward North the caption reads Ward 3 and north-done reads set; after Set ward South, south-tried reads trying, south-done is empty, and the caption still reads Ward 3.",
-          "opposite": "Without Retire the unit, Set ward South leaves the caption Ward 3 and writes set into south-done.",
-          "defect": "The stopped answer gives its vendor nothing or a default and the pipeline goes on, so south-done reads set or the caption is empty (D17.12)."
+          "page": "The bench page with two ConformanceComponents: conformance-source, whose ReadOnlyText holds Ward 3 until its own button Remove the read-only text deletes that member, and conformance, holding one item, whose Answer, a Callback<Item, string>, it calls when a write changes its Text, before it draws the answer in its answer line, so a throw from Answer leaves the answer it drew. The view sets conformance's Answer to conformance-source's ReadOnlyText. Set the text North writes North into conformance's Text, then set into north-done; Set the text South writes trying into south-tried, writes South into conformance's Text, then set into south-done.",
+          "gesture": "Click Set the text North, conformance-source's Remove the read-only text, then Set the text South.",
+          "outcome": "After Set the text North the answer line reads Ward 3 and north-done reads set; after Set the text South, south-tried reads trying, south-done is empty, and the answer line still reads Ward 3.",
+          "opposite": "Without Remove the read-only text, Set the text South leaves the answer line Ward 3 and writes set into south-done.",
+          "defect": "The stopped answer gives its vendor nothing or a default and the pipeline goes on, so south-done reads set or the answer line is empty (D17.12)."
         },
         {
           "for": "X17.22",
-          "page": "A dose chart page with a unit tracker the app brings, whose Unit, a ReadOnly<string>, holds Ward 3 until its button Retire the unit deletes that member, and a chart the app brings that declares Caption, a Callback<CaptionArgs, string> it calls before it draws the answer as its caption; the chart's own button Redraw draws it in the chart's own turn, and the button's code shows the message of an error the draw throws in chart-error, so a throw leaves the caption it drew. The view sets Caption to the tracker's Unit.",
-          "gesture": "Click Redraw, Retire the unit, then Redraw.",
-          "outcome": "After the first Redraw the caption reads Ward 3 and chart-error is empty; after the second, chart-error shows a message and the caption still reads Ward 3.",
-          "opposite": "Without Retire the unit, the second Redraw leaves chart-error empty and the caption Ward 3.",
-          "defect": "The stopped answer returns nothing to the vendor's call in place of the throw, so the chart draws an empty caption and chart-error stays empty (D17.12)."
+          "page": "The bench page with two ConformanceComponents: conformance-source, whose ReadOnlyText holds Ward 3 until its own button Remove the read-only text deletes that member, and conformance, holding one item, whose Answer, a Callback<Item, string>, its own Ask button calls in the component's own turn before it draws the answer in its answer line; the button's code shows the message of an error the call throws in the component's error line, so a throw leaves the answer it drew. The view sets conformance's Answer to conformance-source's ReadOnlyText.",
+          "gesture": "Click conformance's Ask, conformance-source's Remove the read-only text, then conformance's Ask.",
+          "outcome": "After the first Ask the answer line reads Ward 3 and the error line is empty; after the second, the error line shows a message and the answer line still reads Ward 3.",
+          "opposite": "Without Remove the read-only text, the second Ask leaves the error line empty and the answer line Ward 3.",
+          "defect": "The stopped answer returns nothing to the vendor's call in place of the throw, so the component draws an empty answer and the error line stays empty (D17.12)."
         },
         {
           "for": "X17.23",
-          "page": "A dose chart page with two charts the app brings, each of whose declaration declares ValueOf, a Callback<AccessorArgs, string> its vendor calls with a field name first and a row second, as a value accessor is called, and draws each row's answer as that row's value. AccessorArgs declares Field, the first argument's text, and Row, Argument<DoseRow>(1), a DoseRow with a string Label and an int Doses. Both charts hold the rows Ada with 2 doses, Bea with 4 and Cy with 1, and are called with the field name doses. The view sets chart-rows' ValueOf to args => args.Row.Label and chart-fields' to args => args.Field; the page's button Draw draws both.",
-          "gesture": "Click Draw.",
-          "outcome": "chart-rows' values read Ada, Bea and Cy.",
-          "opposite": "chart-fields' values read doses, doses and doses.",
-          "defect": "The answer reads Row from the first argument, the field name, so chart-rows' values are empty (D17.4)."
+          "page": "The bench page with two ConformanceComponents, each declaring Pair, a Callback<PairArgs, string> its own Ask button calls with a key first and a record second, as a value accessor is called, and draws each record's answer in its answer line. PairArgs declares Key, Argument<string>(0), the first argument's text, and Record, Argument<Record>(1), a Record with a string Name and an int Count. Both hold the records Ada with the count 2, Bea with 4 and Cy with 1, and call with the key count. The view sets conformance-records' Pair to args => args.Record.Name and conformance-keys' to args => args.Key.",
+          "gesture": "Click Ask on conformance-records and on conformance-keys.",
+          "outcome": "conformance-records' answer line reads Ada, Bea and Cy.",
+          "opposite": "conformance-keys' answer line reads count, count and count.",
+          "defect": "The answer reads Record from the first argument, the key, so conformance-records' answer line is empty (D17.4)."
         },
         {
           "for": "X17.49",
@@ -637,15 +637,15 @@
         },
         {
           "for": "X12.10",
-          "page": "A ward page with a bed board the app brings that stays on the page and raises Opened with the bed card it opened, whose button Mark as cleaned raises Cleaned; the board's button Open bed 4 opens bed 4's card. Open the board card loads the slot board-card, whose plan listens to the board's Opened, reached by its element's id, and in that pipeline listens to the payload's card's Cleaned with a pipeline that adds one to the page's tally and writes it into cleaned-count, an element outside the slot; Close the board card unloads it.",
-          "gesture": "Click Open the board card, Open bed 4 and Mark as cleaned; click Close the board card and Mark as cleaned.",
-          "outcome": "After the first Mark as cleaned, cleaned-count reads 1, and after the second it still reads 1.",
-          "opposite": "Without Close the board card, the second Mark as cleaned writes 2.",
-          "defect": "The listen's listener stays on the card past its owner's release, so the second Mark as cleaned writes 2."
+          "page": "The resident record with the care panel, a ConformanceComponent that stays on the page and raises Handed with the ConformancePeer it hands, and that peer, which the page renders beside the panel at the id peer, as native.json's event.poc15.component cells render one, and whose own button Change raises its Change; the panel's button Hand a peer hands it. Open the panel card loads the slot panel-card, whose plan listens to the care panel's Handed, reached by its element's id, and in that pipeline listens to the payload peer's Change with a pipeline that adds one to the page's tally and writes it into changed-count, an element outside the slot; Close the panel card unloads it.",
+          "gesture": "Click Open the panel card, the care panel's Hand a peer and the peer's Change; click Close the panel card and the peer's Change.",
+          "outcome": "After the first Change, changed-count reads 1, and after the second it still reads 1.",
+          "opposite": "Without Close the panel card, the second Change writes 2.",
+          "defect": "The listen's listener stays on the peer past its owner's release, so the second Change writes 2."
         },
         {
           "for": "X12.16",
-          "page": "A nurses' station page whose own code provides the plugin ward-clock, whose events subscribe with on and off; its button Break off makes off throw, and its button Tick raises tick. Open the card loads the slot card, whose plan's Tick handler adds one to the page's tally and writes it into ticks-heard, an element outside the slot; Close the card unloads it.",
+          "page": "The bench page, whose own code provides the plugin bench-clock, whose events subscribe with on and off; its button Break off makes off throw, and its button Tick raises tick. Open the card loads the bench slot's card, whose plan's Tick handler adds one to the page's tally and writes it into ticks-heard, an element outside the slot; Close the card unloads it.",
           "gesture": "Click Break off, Open the card, Close the card, Open the card, then Tick.",
           "outcome": "ticks-heard reads 1.",
           "opposite": "Without Break off, Open the card, Close the card and Tick leave ticks-heard empty.",
@@ -926,45 +926,45 @@
       "promises": [
         {
           "for": "X17.4",
-          "page": "A medication room page with a dose timer the app brings: its declaration, its render helper and its browser code are the app's own, and its code builds the timer on alis:mount. The timer shows its minutes and declares Minutes, a Property<int> that starts at 30; Restart(), a Method that sets the minutes back to 30; and Elapsed, an Event<TimerElapsed> with a string Resident, which the timer's button Let it elapse raises for the resident Ada. Read the minutes writes Minutes into minutes-read; Set 15 minutes writes 15 into Minutes; Restart calls Restart(); the Elapsed handler writes the payload's Resident into elapsed-for.",
-          "gesture": "Click Set 15 minutes and Read the minutes; click Restart and Read the minutes; click Let it elapse.",
-          "outcome": "After the first Read the minutes, minutes-read reads 15 and the timer shows 15; after the second, minutes-read reads 30 and the timer shows 30; after Let it elapse, elapsed-for reads Ada.",
-          "opposite": "Before any click, the timer shows 30, and minutes-read and elapsed-for are empty.",
-          "defect": "A step reaches only a component the framework's packages onboard, as main's runtime holds drivers for native and fusion alone (Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89-90 at 623dd4a27), so minutes-read, the timer's minutes or elapsed-for stays as it was."
+          "page": "The bench page with the ConformanceComponent conformance, which the test app brings as an app brings a component: its declaration, its render helper and its browser code are the app's own, and its code builds it on alis:mount. It shows its amount and declares Amount, a Property<decimal> that starts at 30 here; Add(Arg<decimal> amount), a Method that adds the amount to its Amount; and Raised, an Event<Raised> with a string Text, which its button Raise raises with the text Ada. Read the amount writes Amount into amount-read; Set 15 writes 15 into Amount; Add 15 calls Add(15); the Raised handler writes the payload's Text into raised-for.",
+          "gesture": "Click Set 15 and Read the amount; click Add 15 and Read the amount; click the component's Raise.",
+          "outcome": "After the first Read the amount, amount-read reads 15 and the component shows 15; after the second, amount-read reads 30 and the component shows 30; after Raise, raised-for reads Ada.",
+          "opposite": "Before any click, the component shows 30, and amount-read and raised-for are empty.",
+          "defect": "A step reaches only a component the framework's packages onboard, as main's runtime holds drivers for native and fusion alone (Alis.Reactive.Assets/runtime/browser-objects/component-driver.ts:89-90 at 623dd4a27), so amount-read, the component's amount or raised-for stays as it was."
         },
         {
           "for": "X12.7",
-          "page": "A ward page whose slot bed-panel, loaded by Open the panel and unloaded by Close the panel, renders a bed monitor the app brings, which its code builds on alis:mount, and a text alarm-heard inside the panel; the panel's plan has the monitor's Alarmed handler, which writes alarm into alarm-heard. The monitor's button Sound the alarm raises Alarmed, and its button Shut down destroys it and takes it off its element.",
-          "gesture": "Click Open the panel, Shut down, Close the panel, Open the panel, then Sound the alarm.",
-          "outcome": "alarm-heard reads alarm, and the console shows no error.",
-          "opposite": "In the first panel, before Shut down, Sound the alarm writes alarm into alarm-heard as well.",
-          "defect": "The release calls the destroyed monitor's unsubscribe, which throws, so the console shows an error, or the error stops the next load, so the new panel's alarm-heard stays empty."
+          "page": "The resident record, whose slot panel-slot, loaded by Open the panel and unloaded by Close the panel, renders a ConformanceComponent, which its code builds on alis:mount, and a text raised-heard inside the panel; the panel's plan has the component's Raised handler, which writes raised into raised-heard. The component's button Raise raises Raised, and its button Destroy destroys it and takes it off its element.",
+          "gesture": "Click Open the panel, the component's Destroy, Close the panel, Open the panel, then the component's Raise.",
+          "outcome": "raised-heard reads raised, and the console shows no error.",
+          "opposite": "In the first panel, before Destroy, Raise writes raised into raised-heard as well.",
+          "defect": "The release calls the destroyed component's unsubscribe, which throws, so the console shows an error, or the error stops the next load, so the new panel's raised-heard stays empty."
         },
         {
           "for": "X12.13",
-          "page": "The resident record, whose slot bed-card, loaded by Open the card and unloaded by Close the card, renders a bed monitor the app brings; the card's plan has the monitor's Alarmed handler, which adds one to the page's tally and writes it into alarms-heard, an element outside the slot. The monitor's button Sound the alarm raises Alarmed; every monitor's unsubscribe adds one to the page's count of calls in off-calls, and a monitor's destroy, by its host or on alis:unmount, calls no unsubscribe. The harness's restart, standing for the monitor's host, destroys it and puts a new monitor on the same element (Ownership.tla's HostDestroys).",
-          "gesture": "Click Open the card and Sound the alarm; restart the monitor through the harness; click Sound the alarm, then Close the card.",
-          "outcome": "alarms-heard reads 1, and off-calls reads 0 after Close the card.",
+          "page": "The resident record, whose slot panel-card, loaded by Open the card and unloaded by Close the card, renders a ConformanceComponent; the card's plan has the component's Raised handler, which adds one to the page's tally and writes it into raised-heard, an element outside the slot. The component's button Raise raises Raised; every object's unsubscribe adds one to the page's count in off-calls, and a destroy, by its host or on alis:unmount, calls no unsubscribe. The harness's restart, standing for the component's host, destroys it and puts a new ConformanceComponent object on the same element (Ownership.tla's HostDestroys).",
+          "gesture": "Click Open the card and Raise; restart the component through the harness; click Raise, then Close the card.",
+          "outcome": "raised-heard reads 1, and off-calls reads 0 after Close the card.",
           "opposite": "Without the restart, Close the card writes 1 into off-calls.",
-          "defect": "The handler follows the element to the new object, so alarms-heard reads 2; or the release calls the unsubscribe of the object the element holds now, so off-calls reads 1.",
+          "defect": "The handler follows the element to the new object, so raised-heard reads 2; or the release calls the unsubscribe of the object the element holds now, so off-calls reads 1.",
           "observes": "Ownership.tla:HostDestroys"
         },
         {
           "for": "M12.X2",
-          "page": "A ward page that renders the bed monitor bed-4, whose plan's button Quiet the bed runs a pipeline that calls Silence() on bed-4 reached through the bed monitor's declaration, of the vendor monitor, then writes 1 into the Level of bed-4 reached through the oxygen gauge's declaration, of the vendor oxygengauge.",
+          "page": "A refusal page that renders the ConformanceComponent conformance, whose plan's button Ping and write runs a pipeline that calls Ping() on conformance reached through ConformanceComponent's declaration, of the vendor conformance-component, then writes 0.5 into the Ratio of conformance reached through ConformancePeer's declaration, of the vendor conformance-peer.",
           "gesture": "Open the page.",
-          "outcome": "The page is refused where the view renders with \"Element 'bed-4' is named as a component of vendor 'monitor' and as one of vendor 'oxygengauge', but an element holds one component: name it by the declaration of the component its view renders.\"",
-          "opposite": "With both steps reaching bed-4 through the monitor's declaration, the page renders and Quiet the bed silences the monitor.",
-          "defect": "Both vendors are written, so the page renders and each step finds bed-4 by its own declaration's vendor, one of them reading what the monitor is not.",
+          "outcome": "The page is refused where the view renders with \"Element 'conformance' is named as a component of vendor 'conformance-component' and as one of vendor 'conformance-peer', but an element holds one component: name it by the declaration of the component its view renders.\"",
+          "opposite": "With both steps reaching conformance through ConformanceComponent's declaration, the page renders and Ping and write pings the component and sets its ratio to 0.5.",
+          "defect": "Both vendors are written, so the page renders and each step finds conformance by its own declaration's vendor, one of them reading what the component is not.",
           "existing_test": "redesign WhenAVendorIsDeclaredWrongly.an_element_named_as_the_components_of_two_vendors_is_refused"
         },
         {
           "for": "M12.X4",
-          "page": "A medication room page with a dose timer the app brings, whose code builds it only when the page's button Build the timer is clicked; the page's plan has the timer's Elapsed handler, which writes elapsed into elapsed-heard, and the button Say hello, which writes hello into greeting. A built timer's button Let it elapse raises Elapsed.",
-          "gesture": "Click Say hello; then click Build the timer and Let it elapse.",
-          "outcome": "greeting reads hello and the console shows one error naming the timer's element and its vendor; after Let it elapse, elapsed-heard is empty.",
-          "opposite": "On the same page with the timer built on alis:mount, Let it elapse writes elapsed into elapsed-heard.",
-          "defect": "The missing object stops every handler of the plan from subscribing, so greeting stays empty; or the handler subscribes at a later step, so elapsed-heard reads elapsed; or no error names the handler.",
+          "page": "The bench page with a ConformanceComponent whose code builds it only when the page's button Build the component is clicked; the page's plan has the component's Raised handler, which writes raised into raised-heard, and the button Say hello, which writes hello into greeting. A built component's button Raise raises Raised.",
+          "gesture": "Click Say hello; then click Build the component and the component's Raise.",
+          "outcome": "greeting reads hello and the console shows one error naming the component's element and its vendor; after Raise, raised-heard is empty.",
+          "opposite": "On the same page with the component built on alis:mount, Raise writes raised into raised-heard.",
+          "defect": "The missing object stops every handler of the plan from subscribing, so greeting stays empty; or the handler subscribes at a later step, so raised-heard reads raised; or no error names the handler.",
           "existing_test": "redesign WhenAComponentIsNotBuiltYet.a_handler_of_a_component_not_built_yet_stops_no_other_handler_from_listening"
         },
         {

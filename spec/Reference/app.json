@@ -96,7 +96,7 @@
     },
     {
       "id": "defaultHooks",
-      "what": "request defaults whose WhileLoading awaits the session plugin's Renew and whose Finally appends defaults finally and awaits Flush, each settled at once unless the test holds it",
+      "what": "request defaults whose WhileLoading awaits the session plugin's Renew and whose Finally appends defaults finally, awaits Flush and then writes flushed into the flush line, each settled at once unless the test holds it",
       "framework": "net10"
     },
     {
@@ -174,7 +174,7 @@
         {
           "id": "census",
           "kind": "conformance",
-          "role": "the census panel, the screen's custom widget",
+          "role": "the census panel, the screen's custom widget, a ConformanceComponent whose records and items the array lambdas read",
           "declares": "ConformanceComponent"
         }
       ]
@@ -239,7 +239,7 @@
         {
           "id": "carePicker",
           "kind": "conformance",
-          "role": "the care level picker, the screen's custom widget",
+          "role": "the care level picker, the screen's custom widget, a ConformanceComponent whose value, days and change the conditions and the intake check read",
           "declares": "ConformanceComponent"
         },
         {
@@ -350,8 +350,14 @@
         {
           "id": "carePanel",
           "kind": "conformance",
-          "role": "the care panel, the record's custom widget: vitals monitor, visit planner and call bell",
+          "role": "the care panel, the record's custom widget, a ConformanceComponent whose Raised payload, methods and handed peer the record's triggers, values and slots use",
           "declares": "ConformanceComponent"
+        },
+        {
+          "id": "carePeer",
+          "kind": "conformance",
+          "declares": "ConformancePeer",
+          "role": "the peer the care panel hands, which the record renders beside it"
         },
         {
           "id": "radio",
@@ -429,7 +435,7 @@
         {
           "id": "scanner",
           "kind": "conformance",
-          "role": "the dose scanner, the round's custom widget",
+          "role": "the dose scanner, the round's custom widget, a ConformanceComponent whose methods, choice and records the round's requests use",
           "declares": "ConformanceComponent"
         }
       ]
@@ -568,7 +574,12 @@
         {
           "id": "plugins",
           "kind": "plugin",
-          "role": "the bench's plugins: EventTarget, plain object, callback property, the lookup conformance-registry and two scripts that provide one name"
+          "role": "the bench's plugins: EventTarget, plain object, callback property, the lookup conformance-registry two scripts that provide one name, and bench-clock, whose on and off a Break off button makes throw"
+        },
+        {
+          "id": "benchSlot",
+          "kind": "slot",
+          "role": "the bench's slot, a card partial loaded and unloaded"
         }
       ]
     },
@@ -2072,7 +2083,20 @@
         "conformance"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the settle endpoint's answers, a success then a 500"
+        },
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "conformance's Settle()"
+        }
       ]
     },
     {
@@ -2132,7 +2156,20 @@
         "scanner"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "seed",
+          "action": null,
+          "on": "the settle endpoint's answer, a 500 or a success"
+        },
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the dose scanner's Settle()"
+        }
       ]
     },
     {
@@ -2188,7 +2225,15 @@
         "carePanel"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the care panel's Settle()"
+        }
       ]
     },
     {
@@ -2204,7 +2249,15 @@
         "carePanel"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the first care panel's Settle()"
+        }
       ]
     },
     {
@@ -2357,7 +2410,15 @@
         "census"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the census panel's Settle() in each round's WhileLoading"
+        }
       ]
     },
     {
@@ -2374,7 +2435,15 @@
         "census"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the census panel's Settle() in each round's Finally"
+        }
       ]
     },
     {
@@ -2391,7 +2460,15 @@
         "recordEndpoint"
       ],
       "harness": [
-        "seed"
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Run.tla:Settle",
+          "on": "the session plugin's Flush in the defaults' Finally"
+        }
       ]
     },
     {
@@ -5034,9 +5111,9 @@
         "net10"
       ],
       "parts": [
-        "filters",
         "list",
-        "residentsEndpoint"
+        "residentsEndpoint",
+        "census"
       ],
       "harness": [
         "seed"
@@ -5491,7 +5568,7 @@
         {
           "verb": "clock",
           "action": null,
-          "on": "the retry's standard first wait"
+          "on": "the retry's standard first wait, NativeLoader shown while it holds"
         }
       ]
     },
@@ -5993,7 +6070,7 @@
         {
           "verb": "gate",
           "action": "Run.tla:Settle",
-          "on": "the desk's async acknowledge"
+          "on": "the dose scanner's Settle()"
         }
       ]
     },
@@ -7020,7 +7097,8 @@
         "net10"
       ],
       "parts": [
-        "conformance"
+        "conformance",
+        "registered"
       ],
       "harness": [
         "seed"
@@ -7197,7 +7275,8 @@
       "parts": [
         "tabSlot",
         "notes",
-        "carePanel"
+        "carePanel",
+        "carePeer"
       ],
       "harness": [
         "seed"
@@ -7213,7 +7292,8 @@
       ],
       "parts": [
         "conformance",
-        "plugins"
+        "plugins",
+        "benchSlot"
       ],
       "harness": [
         "seed"

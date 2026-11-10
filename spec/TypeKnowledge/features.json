@@ -304,19 +304,19 @@
         },
         {
           "for": "X18.7",
-          "page": "A night roster page whose OnCallStaff declares an abstract Role with [JsonPropertyName(\"duty_role\")], which OnCallNurse overrides with the same name, as ALIS025 requires, starting empty. The roster holds its night on-call nurse as data the app's options wrote, {\"name\": \"Ada\", \"duty_role\": \"Charge nurse\"}, read as an OnCallNurse; the button Show night on-call role writes nurse => nurse.Role into night-role.",
-          "gesture": "Click Show night on-call role.",
-          "outcome": "night-role reads Charge nurse.",
-          "opposite": "With the nurse's duty_role holding Staff nurse, the same click writes Staff nurse into night-role.",
-          "defect": "The read names the member in a camel case of the framework's own, role, as main does (Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9 at 623dd4a27), which the data lacks, so night-role shows the override's empty start; a read by the CLR name, Role, shows the same."
+          "page": "The round, whose dose scanner's Bindings hold Binding items; Binding derives from BindingBase, which declares an abstract Renamed with [JsonPropertyName(\"renamed_member\")], which Binding overrides with the same name, as ALIS025 requires, starting empty. The scanner holds the binding as data the app's options wrote, {\"name\": \"Ada\", \"renamed_member\": \"Charge nurse\"}; the button Show the renamed member writes Bindings.Find(b => b.Name == \"Ada\", b => b.Renamed) into renamed.",
+          "gesture": "Click Show the renamed member.",
+          "outcome": "renamed reads Charge nurse.",
+          "opposite": "With the binding's renamed_member holding Staff nurse, the same click writes Staff nurse into renamed.",
+          "defect": "The read names the member in a camel case of the framework's own, renamed, as main does (Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9 at 623dd4a27), which the data lacks, so renamed shows the override's empty start; a read by the CLR name, Renamed, shows the same."
         },
         {
           "for": "X18.8",
-          "page": "A rosters index whose link Night station opens a night station page. There OnCallStaff declares an abstract Station, and OnCallNurse overrides it with [JsonIgnore], the drift ALIS025 refuses, suppressed on that member for this page; the roster holds its night on-call nurse as data the app's options wrote, and the button Show night station writes nurse => nurse.Station into night-station.",
-          "gesture": "Click Night station on the rosters index.",
-          "outcome": "The night station page is refused where the view renders with X18.8's message, naming 'nurse => nurse.Station' and OnCallNurse.",
-          "opposite": "With the override's [JsonIgnore] removed, the roster's nurse holds station Ward 4, the page renders, and Show night station writes Ward 4 into night-station.",
-          "defect": "The read is written by the declaration's JSON name, station, which the browser never holds, so the page renders and night-station shows the override's start with no word; or the refusal names OnCallStaff, the declaration, where the read starts from OnCallNurse."
+          "page": "The refusals index whose link Ignored member opens a page with a ConformanceComponent. There BindingBase declares an abstract Ignored, and Binding overrides it with [JsonIgnore], the drift ALIS025 refuses, suppressed on that member; the component holds its bindings as data the app's options wrote, and the button Show the ignored member writes Bindings.Find(b => b.Name == \"Ada\", b => b.Ignored) into ignored.",
+          "gesture": "Click Ignored member on the refusals index.",
+          "outcome": "The page is refused where the view renders with X18.8's message, naming 'b => b.Ignored' and Binding.",
+          "opposite": "With the override's [JsonIgnore] removed, the binding holds ignored Ward 4, the page renders, and Show the ignored member writes Ward 4 into ignored.",
+          "defect": "The read is written by the declaration's JSON name, ignored, which the browser never holds, so the page renders and ignored shows the override's start with no word; or the refusal names BindingBase, the declaration, where the read starts from Binding."
         }
       ],
       "verdicts": []

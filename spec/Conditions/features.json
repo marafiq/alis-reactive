@@ -413,11 +413,11 @@
         },
         {
           "for": "X8.13",
-          "page": "A pain meter and a visit calendar test component whose IsOpen counts its calls in a text on the page; one button's condition is the pain below 4 And IsOpen, another's the pain at least 4 Or IsOpen.",
+          "page": "The resident record with a pain box, a number input, and the care panel, the record's ConformanceComponent, whose Check(), a Method<bool> answering its Enabled, true here, adds one to its Calls, which the panel shows; one button's condition is the pain below 4 And Check(), another's the pain at least 4 Or Check().",
           "gesture": "Set the pain to 5 and click both buttons, then set it to 1 and click both again.",
-          "outcome": "At pain 5 the count reads 0 after both clicks; at pain 1 it reads 2.",
-          "opposite": "With IsOpen read on its own line before the When, the count rises by one on every click.",
-          "defect": "The right term is called whatever the left term reads, so the count reads 2 at pain 5, or it is never called, so the count stays 0 at pain 1."
+          "outcome": "At pain 5 the calls read 0 after both clicks; at pain 1 they read 2.",
+          "opposite": "With Check() read on its own line before the When, the calls rise by one on every click.",
+          "defect": "The right term is called whatever the left term reads, so the calls read 2 at pain 5, or it is never called, so the calls stay 0 at pain 1."
         },
         {
           "for": "X8.14",
@@ -429,11 +429,11 @@
         },
         {
           "for": "X8.15",
-          "page": "A fluid balance test component whose Measure returns its millilitres: Check measures 100 ml, sets the balance to 999 ml, then When the measured result is below 500 sets the status to Low; Restore measures 600 ml, and When that result is above 500 its branch sets the balance to 999 ml and then to the result.",
+          "page": "The care panel, the resident record's ConformanceComponent, whose Total(), a Method<int>, answers its Count: Check writes 100 into Count, binds Total(), writes 999 into Count, then When the bound total is below 500 sets the status to Low; Restore writes 600 into Count, binds Total(), and When that total is above 500 its branch writes 999 into Count and then the bound total.",
           "gesture": "Click Check, then click Restore.",
-          "outcome": "After Check the status reads Low and the balance shows 999 ml; after Restore the balance shows 600 ml.",
-          "opposite": "With Check's measure written after the set, the status stays empty.",
-          "defect": "A term or a branch calls Measure again where it reads the result, so Check reads 999 and Low never shows, or Restore sets the balance back to 999 ml."
+          "outcome": "After Check the status reads Low and the panel shows the count 999; after Restore it shows the count 600.",
+          "opposite": "With Check's Total() bound after the write of 999, the status stays empty.",
+          "defect": "A term or a branch calls Total() again where it reads the bound result, so Check reads 999 and Low never shows, or Restore writes 999 back."
         },
         {
           "for": "X8.23",
@@ -453,11 +453,11 @@
         },
         {
           "for": "M3.X1",
-          "page": "A front desk test component whose four buttons raise its Announced event from its own JavaScript, its payload declaring a Visitor with a Name: Unnamed visitor with a visitor whose name holds null, No visitor with a visitor that holds null, Nameless visitor with a visitor that has no name member, and Ada with the name Ada. The handler: When the visitor's name IsNull the gate reads No name, ElseIf it is NotNull the gate reads Named, Else Unknown; a second When, the name IsEmpty, sets the badge to Blank, Else Filled.",
-          "gesture": "Click Unnamed visitor, then No visitor, then Ada.",
-          "outcome": "The null name reads No name and Blank; the null visitor reads Unknown and Blank; Ada reads Named and Filled.",
-          "opposite": "Clicking Nameless visitor, whose visitor lacks the name member, reads its start, null, so the gate reads No name.",
-          "defect": "IsNull or NotNull holds past the null visitor, so the gate reads No name or Named where it reads Unknown, or IsEmpty does not hold over nothing, so the badge reads Filled."
+          "page": "The care panel, the resident record's ConformanceComponent, whose four buttons raise Raised from its own JavaScript, its payload's Record a Record with a Name: Unnamed record with a record whose name holds null, No record with a record that holds null, Nameless record with a record that has no name member, and Ada with the name Ada. The handler: When the record's name IsNull the gate reads No name, ElseIf it is NotNull the gate reads Named, Else Unknown; a second When, the name IsEmpty, sets the badge to Blank, Else Filled.",
+          "gesture": "Click Unnamed record, then No record, then Ada.",
+          "outcome": "The null name reads No name and Blank; the null record reads Unknown and Blank; Ada reads Named and Filled.",
+          "opposite": "Clicking Nameless record, whose record lacks the name member, reads its start, null, so the gate reads No name.",
+          "defect": "IsNull or NotNull holds past the null record, so the gate reads No name or Named where it reads Unknown, or IsEmpty does not hold over nothing, so the badge reads Filled."
         },
         {
           "for": "X8.19",
@@ -485,16 +485,16 @@
         },
         {
           "for": "X8.22",
-          "page": "A pump list whose Offset double the app's number handling writes as text; a button's When compares the found pump's offset with 0.",
+          "page": "A view of the ConformanceComponent whose Records hold data whose Ratio, a double, the app's number handling writes as text; a button's When compares the found record's Ratio with 0.",
           "gesture": "Open the page.",
           "outcome": "The page is refused where the view renders with one error naming the double written as text and ending compare it on the server.",
-          "opposite": "The same comparison over an offset written as a JSON number renders, and its branch runs for an offset of -0.",
+          "opposite": "The same comparison over a ratio written as a JSON number renders, and its branch runs for a ratio of -0.",
           "defect": "The page renders and the browser compares the text -0 with 0, so the branch does not run where .NET's -0.0 == 0.0 holds."
         },
         {
           "for": "X8.27",
-          "page": "The redesign's Visit page: a day picker test component whose Day, a DateTime? its JavaScript holds as a Date, is compared with the open day, 2026-10-27, by IsNull, NotNull, Eq, NotEq, Lt, Lte, Gt, Gte and Between it and 2026-10-29, each branch writing its line.",
-          "gesture": "Pick 2026-10-26, then 2026-10-27, then 2026-10-28, then clear the day.",
+          "page": "The care level picker, the admission screen's ConformanceComponent, whose NullableDay, a DateTime? its JavaScript holds as a Date and its own day field sets, is compared with the open day, 2026-10-27, by IsNull, NotNull, Eq, NotEq, Lt, Lte, Gt, Gte and Between it and 2026-10-29, each branch writing its line.",
+          "gesture": "Pick 2026-10-26 in the picker's day field, then 2026-10-27, then 2026-10-28, then clear the field.",
           "outcome": "At 2026-10-26 the lines read before the open day and by the open day; at 2026-10-27 the open day, the open day itself, by the open day, from the open day on and in the open week; at 2026-10-28 another day, after the open day and from the open day on; with no day, pick a day, nothing to book, another day, and neither an ordering nor Between holds.",
           "opposite": "Picking 2026-10-30 reads outside the open week.",
           "defect": "The picker's Date compared with the literal's text, so the open day never equals and its lines read not the open day; or the cleared day, null, ordered as JavaScript orders null, so before and by hold with no day.",
@@ -502,7 +502,7 @@
         },
         {
           "for": "X8.27",
-          "page": "The redesign's Stay page: two day pickers, arrive and leave, whose days a Check button compares by Gt, Gte, Lt and Lte, each branch writing its line.",
+          "page": "The admission screen's care level picker, a ConformanceComponent placed as arrive, and a second ConformanceComponent, leave, each with its own day field setting its Day; a Check button compares the two Days by Gt, Gte, Lt and Lte, each branch writing its line.",
           "gesture": "Pick 2026-10-28 to leave, then pick 2026-10-27, 2026-10-28 and 2026-10-29 to arrive, clicking Check after each.",
           "outcome": "The later line reads leaves after arriving only for an arrival on 2026-10-27, and the same-or-earlier line reads leaves after arriving for 2026-10-27 and leaves on or before arriving for 2026-10-28 and 2026-10-29.",
           "opposite": "With both days 2026-10-28, Gte and Lte hold, and neither Gt nor Lt.",
@@ -520,7 +520,7 @@
         },
         {
           "for": "X8.27",
-          "page": "Three net10 pages: a noon page whose query member Starts, a TimeOnly?, is compared by Eq with new TimeOnly(12, 0), reading noon or not noon; a handover page whose response body's Seen, a DateTimeOffset, is compared by Eq with new DateTimeOffset(2026, 11, 9, 18, 0, 0, TimeSpan.Zero), reading the same moment or another moment; and a day picker whose Day is tested by In(2026-10-27, 2026-10-29), reading an open day or a closed day.",
+          "page": "Three net10 pages: a noon page whose query member Starts, a TimeOnly?, is compared by Eq with new TimeOnly(12, 0), reading noon or not noon; a handover page whose response body's Seen, a DateTimeOffset, is compared by Eq with new DateTimeOffset(2026, 11, 9, 18, 0, 0, TimeSpan.Zero), reading the same moment or another moment; and the admission screen, whose care level picker, a ConformanceComponent, has its Day, set by its own day field, tested by In(2026-10-27, 2026-10-29), reading an open day or a closed day.",
           "gesture": "Open the noon page at ?starts=12:00, then at ?starts=12:00:00.0000001; load a handover whose Seen the server writes 2026-11-09T10:00:00-08:00, then one it writes 2026-11-09T10:00:00-07:00; pick 2026-10-27, 2026-10-28 and 2026-10-29.",
           "outcome": "noon, then not noon; the same moment, then another moment; an open day, a closed day, an open day.",
           "opposite": "At ?starts=12:00:00.0000000 the noon page reads noon.",

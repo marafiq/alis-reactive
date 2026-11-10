@@ -358,11 +358,11 @@
         },
         {
           "for": "M7.X3",
-          "page": "A care form whose care level is a choice component declaring its value Level and its committing event Picked, which its own code raises when the person picks a level and which raises no change event on the element; the validator requires a level other than None with \"Pick a care level.\"",
-          "gesture": "Click Save with no level, then focus the choice and pick Residential with the arrow key and Enter, without leaving the choice.",
-          "outcome": "After Save \"Pick a care level.\" shows beside the choice; after the pick it is gone, while the choice still has focus.",
-          "opposite": "Picking None the same way after Residential shows \"Pick a care level.\" beside the choice again.",
-          "defect": "The check listens to the element's change or blur, so the pick leaves \"Pick a care level.\" beside the choice until the person leaves it.",
+          "page": "The admission screen's care form, whose care level is the care level picker, a ConformanceComponent whose value is its Value and whose committing event is its Change, which its own code raises when the person picks a level from its own list, none, residential and nursing, and which raises no change event on the element; the validator requires a level other than none with \"Pick a care level.\"",
+          "gesture": "Click Save with no level, then focus the picker and pick residential with the arrow key and Enter, without leaving the picker.",
+          "outcome": "After Save \"Pick a care level.\" shows beside the picker; after the pick it is gone, while the picker still has focus.",
+          "opposite": "Picking none the same way after residential shows \"Pick a care level.\" beside the picker again.",
+          "defect": "The check listens to the element's change or blur, so the pick leaves \"Pick a care level.\" beside the picker until the person leaves it.",
           "existing_test": "redesign WhenAnInputHoldsAnEnumMember.picking_a_member_rechecks_the_input_by_the_choices_own_event"
         },
         {
@@ -554,10 +554,10 @@
         },
         {
           "for": "X14.12",
-          "page": "A fluids chart whose model's Entry is a ChartEntry<FluidsReading> declaring Initials, in Alis.Reactive.Framework.App.Partials; a label written for the id Alis_Reactive_Framework_App_Partials_ChartEntry_FluidsReading___Initials; Save posts and shows what the endpoint bound.",
+          "page": "The resident record's fluids chart tab, whose model's Entry is a ChartEntry<FluidsReading> declaring Initials, in Alis.Reactive.Conformance.App.Care; a label written for the id Alis_Reactive_Conformance_App_Care_ChartEntry_FluidsReading___Initials; Save posts and shows what the endpoint bound.",
           "gesture": "Click the label, type AB and click Save.",
           "outcome": "The typed AB lands in the Initials input, and the page shows initials AB.",
-          "opposite": "A label written for Alis_Reactive_Framework_App_Partials_ChartEntry_1__Initials focuses nothing, and typing after clicking it leaves the initials none.",
+          "opposite": "A label written for Alis_Reactive_Conformance_App_Care_ChartEntry_1__Initials focuses nothing, and typing after clicking it leaves the initials none.",
           "defect": "The scope reads the generic class's full name, with its arity mark or its arguments' assembly names, so the label fills no input, the typing goes nowhere, and the page shows initials none.",
           "existing_test": "redesign WhenAMembersClassIsGeneric.the_scope_is_the_namespace_and_the_csharp_name_with_other_characters_as_underscores"
         },
