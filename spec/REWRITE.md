@@ -216,7 +216,9 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   is the test app's host script on the harness's word. Clock is `Page.Clock`, installed only by a test that names it.
   Gc is `Page.RequestGCAsync`, confirmed by the page's own weak hold.
 - **Bindings.** `Promises.g.cs` is generated from app.json and the features: a test carries `[FailsFor(...)]` naming its
-  feature, defect and index, its cell, or its harness test. The bindings check fails when the generated files differ
+  feature, defect and index, its cell, or its harness test. `spec/tools/check.py --generate`, which U2 adds, writes
+  `Gates.g.cs` and `Promises.g.cs` into the world contract, where they are committed, since check.py is the one reader
+  of the spec's JSON and of a TLA+ spec's `Next`. The bindings check fails when the generated files differ
   from what the spec writes, when a test names no test of the spec or a test of the spec has no test, when a test never
   reached the gate its held steps name, and when a screen's view uses a module namespace that neither the test's
   feature nor a part it lists belongs to, since check.py lands each test in the latest unit of those modules.
@@ -431,7 +433,10 @@ rule or a named check:
   both fail. An architecture test's `[Test]` runs its rule over the tracked repository and its cases run it over files
   the case writes; a scan of a clean repository alone passes whether the rule works or not, and at 2f9f9b1a2 that is
   all WhenCodeIsWritten, WhenARuleNamesTheCode, WhenAnAppRendersItsPages and SandboxStaticStateTests hold, while
-  WhenClaudeRunsAHook already refuses an edit to the generated contract and allows one beside it. U1 lands the cases
+  WhenClaudeRunsAHook already refuses an edit to the generated contract and allows one beside it. A case is a test
+  marked `[RefusedCase]` or `[AcceptedCase]`, the project's two marks, each a test attribute, so the runner runs a
+  case as it runs a rule; WhenAnArchitectureTestIsWritten reads the project's fixtures through Roslyn and refuses a
+  fixture that holds a rule, a `[Test]`, with no case of each mark. U1 lands the cases
   of every architecture test it keeps, and WhenAnArchitectureTestIsWritten refuses a rule with no refused or no
   accepted case. check.py's checks keep theirs in `spec/plants/`, which its `plants` check runs in throwaway
   worktrees.
