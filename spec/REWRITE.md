@@ -25,6 +25,8 @@ in the line.
   | The render | a refusal the compiler cannot see, on the refusal routes | Playwright |
   | Playwright | behavior: a gesture and its visible outcome, in Chromium | every pull request |
   | The test rules | that a browser test cannot lean on the code it tests: TEST001 to TEST013 (section 2.10) | every build of a Playwright project |
+  | Architecture tests | what the repository holds: no comment, every name a rule file cites, the hooks' refusals, the app's pages and statics | every pull request |
+  | Cases and plants | that each analyzer, test rule, architecture test and check.py check reports its refused case by name and passes its accepted case (section 2.10) | with the rule each proves |
   | verify-net48 | each test whose placement lists the twin, on MVC 5 (no stream or hub: realtime is net10's, check_app), and the packed packages on a fresh MVC 5 app | every pull request |
   | Vitest, PlanTests | feedback while coding (BRIEF.md, Principles 10); never counted as proof | the inner loop |
 
@@ -96,8 +98,9 @@ tests/
   Alis.Reactive.ArchitectureTests/            WhenCodeIsWritten, WhenARuleNamesTheCode, WhenClaudeRunsAHook, the POC's
                                               WhenTheCoreIsCompiled and WhenAContractDriftIsSuppressed, and over the
                                               conformance app WhenAnAppRendersItsPages and SandboxStaticStateTests,
-                                              renamed WhenTheAppHoldsNoStaticState; their helpers Repository, Scripts
-                                              and read-scripts
+                                              renamed WhenTheAppHoldsNoStaticState, each rule with its refused and
+                                              accepted cases, which WhenAnArchitectureTestIsWritten holds; their
+                                              helpers Repository, Scripts and read-scripts
 spec/                                         the design source: this file, CLAUDE.md, NOTES.md, Core/, probes/,
                                               Reference/, tools/, one folder per module
 ```
@@ -362,6 +365,17 @@ rule or a named check:
   `tests/Alis.Reactive.TestRules.AnalyzerTests` holds each rule's refused case and accepted case. Unit U2 lands both
   before the first feature test, and check.py's `test_rules` binds each line of the second table to
   `.claude/rules/tests.md`.
+- **A rule's own test.** An analyzer, a test rule, an architecture test and a check.py check are each a rule over the
+  inputs it is given, and each is proven the same way: a refused case, a planted input the rule must report by name,
+  and an accepted case, a legitimate input beside it (for WhenCodeIsWritten a shebang, `#nullable` and a pinned
+  action's version), which the rule must pass, so a rule that reports nothing and a rule that fires on a rewording
+  both fail. An architecture test's `[Test]` runs its rule over the tracked repository and its cases run it over files
+  the case writes; a scan of a clean repository alone passes whether the rule works or not, and at 2f9f9b1a2 that is
+  all WhenCodeIsWritten, WhenARuleNamesTheCode, WhenAnAppRendersItsPages and SandboxStaticStateTests hold, while
+  WhenClaudeRunsAHook already refuses an edit to the generated contract and allows one beside it. U1 lands the cases
+  of every architecture test it keeps, and WhenAnArchitectureTestIsWritten refuses a rule with no refused or no
+  accepted case. check.py's checks keep theirs in `spec/plants/`, which its `plants` check runs in throwaway
+  worktrees.
 
 | Id | Refuses |
 |---|---|
@@ -499,7 +513,8 @@ Features: M20.F1
 
 The cut and the rewritten rule files (section 4's opening), the pins of section 2.7 with the TLC lock, central package
 management, the SliceTree tables, the analyzers project with ALIS010 to ALIS013 and module 20's rules, the lint at its
-strictest, `check.py --ci`, `scripts/check.sh` green on an empty core.
+strictest, `check.py --ci`, `scripts/check.sh` green on an empty core, and every architecture test it keeps with its
+refused and accepted cases and WhenAnArchitectureTestIsWritten (section 2.10).
 
 ### U2. The harness, the conformance app's shell and CI
 Features: none
