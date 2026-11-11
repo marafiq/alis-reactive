@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import hashlib
 import io
+import fnmatch
 import itertools
 import json
 import os
@@ -2274,6 +2275,59 @@ def check_packages():
     return result(not problems, "; ".join(problems[:6]) or detail, packages=len(rows), pins=len(pin_rows), references=len(references), problems=len(problems))
 
 
+PATH_EXPANDED = ["tests", "tools", "build", "examples", "scripts", ".github", ".github/workflows", ".claude", ".claude/rules",
+                 ".claude/skills", ".claude/agents", ".claude/hooks", ".claude/commands", ".claude/workflows", ".claude/memory"]
+PATH_FILES = "tests/Alis.Reactive.ArchitectureTests"
+BACKTICKED_PATH = re.compile(r"`([^`\s]+)`")
+
+
+def tree_entries(sha):
+    entries = set(git("ls-tree", "--name-only", sha).splitlines())
+    for folder in PATH_EXPANDED + [PATH_FILES]:
+        if folder in entries or any(entry.startswith(folder + "/") for entry in entries):
+            entries.discard(folder)
+            entries |= set(git("ls-tree", "--name-only", sha, folder + "/").splitlines())
+    return {entry for entry in entries if entry not in PATH_EXPANDED and entry != PATH_FILES}
+
+
+def tree_line(text, path):
+    block = rewrite_section(text, "### 2.1 The tree")
+    name = path.split("/")[-1] + "/"
+    lines = block.splitlines()
+    for index, line in enumerate(lines):
+        if line.strip().startswith(name):
+            following = list(itertools.takewhile(lambda next_line: next_line.startswith(" " * 20), lines[index + 1:]))
+            return " ".join([line] + following)
+    return ""
+
+
+def check_paths():
+    path = SPEC / "REWRITE.md"
+    if not path.exists():
+        return not_started(path)
+    text = path.read_text()
+    kept_text = text[:text.find("\n## 3.")]
+    retired_text = rewrite_section(text, "## 3. What retires")
+    held = rewrite_tree(text) | set(BACKTICKED_PATH.findall(kept_text))
+    retired = [token.rstrip("/") for token in BACKTICKED_PATH.findall(retired_text)]
+    files_line = tree_line(text, PATH_FILES)
+    judged = tree_entries("HEAD") | tree_entries(MAIN_TIP)
+    problems = []
+    for entry in sorted(judged):
+        stem = entry.split("/")[-1].split(".")[0]
+        keeps = entry in held or entry.rstrip("/") + "/" in held or (entry.startswith(PATH_FILES + "/") and re.search(r"\b" + re.escape(stem) + r"\b", files_line))
+        if entry.startswith(PATH_FILES + "/") and entry.endswith(".csproj"):
+            keeps = True
+        retires = any(fnmatch.fnmatch(entry, token) for token in retired)
+        if keeps and retires:
+            problems.append(f"{entry} is both kept by section 2 and retired by section 3")
+        elif not keeps and not retires:
+            problems.append(f"{entry} has no verdict: section 2 does not keep it and section 3 does not retire it")
+    detail = (f"each of {len(judged)} paths at HEAD and main's tip, down to {', '.join(PATH_EXPANDED[:6])} and .claude's folders, "
+              "is kept by section 2 or retired by section 3, never both")
+    return result(not problems, "; ".join(problems[:8]) or detail, paths=len(judged), problems=len(problems))
+
+
 TEST_RULE = re.compile(r"^(\d+)\. \*\*(.+?)\.\*\*")
 TEST_SMELL = re.compile(r"^- (.+) \(\d+(?:, \d+)*\)\.$")
 TEST_ID_ROW = re.compile(r"^\| (TEST\d{3}) \| .+ \|$")
@@ -2672,6 +2726,7 @@ CHECKS = [
     ("carriers", "every D line and module meaning carried by a resolving defect, invariant, probe, check, cell or delivery test", check_carriers),
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
+    ("paths", "every path at HEAD and main's tip kept by REWRITE.md's section 2 or retired by its section 3, so the cut drops nothing by omission", check_paths),
     ("packages", "every package REWRITE.md packs is main's or a decided door's, ships bundles only, and every dependency and kept reference is pinned at its version", check_packages),
     ("test_rules", "every rule and smell of tests.md held by a test rule or a named check", check_test_rules),
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
@@ -2693,7 +2748,7 @@ STEPS = [
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
     (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests"], "Finish every check and make each pass."),
-    (11, "E", "REWRITE.md", ["rewrite_units", "packages"], "Write spec/REWRITE.md in SliceTree order."),
+    (11, "E", "REWRITE.md", ["rewrite_units", "packages", "paths"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]
 

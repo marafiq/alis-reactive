@@ -1777,7 +1777,7 @@ Terms used throughout:
     `probe:core-query-parameter-name`, `probe:mvc5-parameter-binding-name`, `probe:mvc5-prefix-no-fallback`), and a
     parameter named like one of its type's members binds none of them (`probe:core-query-parameter-name-collision`).
     Both are per action, and a view names its action only by URL text, so no build check refuses them, since none links a
-    request to its action; gate 1 accepted both as MVC's binding, which the docs name (C25).
+    request to its action; gate 1 accepted both as MVC's binding, which the request door's XML doc names (C25).
 
 - D9.21 The body formats are closed: none, JSON (D9.7), URL-encoded, multipart (D9.8), text and one file. Each
   sets its own `Content-Type` as fetch writes it: `application/json`, `application/x-www-form-urlencoded;charset=UTF-8`

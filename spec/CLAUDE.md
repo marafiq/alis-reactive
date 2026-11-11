@@ -253,7 +253,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The owner, 2026-11-06: branches that nest to any depth (D8.7, D8.8) are "golden".
 - The owner, 2026-11-06: the slices are vertical in an app as in the framework (the owner's words are in
   `spec/NOTES.md`). An action that needs a model has a model of its own, plain, shared with no other view; an app
-  shares a base class only for abstract members it enforces. The docs and the component onboarding skill teach
+  shares a base class only for abstract members it enforces. README.md and the component onboarding skill teach
   it as the app's standard; the framework refuses nothing for it.
 - The owner, 2026-11-06: no defensive code where a type or a check stops the bug; no closest match; fail loudly, so a
   bug surfaces and challenges the design. Tests are Playwright in a real browser, never jsdom, which is brittle.
@@ -381,7 +381,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   member net10 binds under another name, a `[BindNever]` member and a member of another list type are marked in the
   generated table and refused where a view sends them, never at build, so an app's endpoints no framework view sends still
   build. A parameter prefix and a parameter named like its type's member bind none of the keys, accepted at gate 1 as
-  MVC's binding, which the docs name (C25). Request.tla checks the first two over both hosts. The owner can overrule
+  MVC's binding, which the request door's XML doc names (C25). Request.tla checks the first two over both hosts. The owner can overrule
   each.
 - The owner, 2026-11-07 (verbatim in `spec/NOTES.md`): the official default is C# 7.3, most of C# 8 works on net48 with
   few gotchas, so assume C# 8. An MVC 5 app is assumed at C# 8, so nothing the framework writes into an app needs
@@ -544,6 +544,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   verdicts, 103 refused with their carriers and 2 kept (`spec/inventory/doors.tsv`). Main's `ReactiveValidator<T>` derives
   from FluentValidation's `AbstractValidator<T>`, so an app on main's release candidates drops the reference and moves
   each validator onto the core's `ReactiveValidator<T>`, whose `RuleFor` rules reach the browser in place of main's ClientRule calls.
+- The owner, 2026-11-10, asked whether main's docs site (docs-site, deployed to GitHub Pages on each push to main, and
+  tools/ApiDocGenerator, which writes its API page) survives the rewrite, after the redesign's line had dropped it:
+  "Retire the site". The docs are README.md, packed as every package's readme, and the XML docs on the shipped surface;
+  a line that says the docs carry something names the one that does, and `spec/REWRITE.md` names the unit that writes it.
 - The lead, 2026-11-10, within gate 1's C8 and gate 2's G13: N20.2's default ships the OpenTelemetry adapter as one more
   id, AlisReactive.OpenTelemetry, beside the five of main's six that stay, since D20.2 keeps it out of the core, and the
   core's net48 references take System.Diagnostics.DiagnosticSource (D20.8). Every pin in `spec/REWRITE.md` section 2.7 is

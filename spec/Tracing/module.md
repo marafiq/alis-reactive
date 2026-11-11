@@ -61,7 +61,7 @@ evidence), so no inventory row is this module's, and its doors are the core's th
   the error door (D20.8), and the app's tracing options, `console` among them, on both hosts. Their form is gate 2's.
   The default: the source's name as a public constant, `ReactiveTracing.SourceName`, so an app's tracer provider
   names it with no text of its own; `console` a boolean of the framework's one startup call (N16.4's), false unless
-  the app sets it, which the docs set from the host's development setting.
+  the app sets it, which README.md's startup example sets from the host's development setting.
 
 A second gate 2 item is the span and activity names, the vocabulary an operator reads in a trace. The default: each
 attempt named by OpenTelemetry's HTTP client convention, its method and its route template (D20.4), and every other

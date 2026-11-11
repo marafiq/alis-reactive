@@ -48,8 +48,14 @@ Directory.Packages.props              central package management: one exact vers
                                       Roslyn's second (2.7), which the architecture tests take by VersionOverride
 global.json                           SDK 10.0.101, rollForward disable
 .node-version .python-version .java-version
-package.json  eslint.config.js        npm workspaces; the lint, its import order generated from each SliceTree.txt
+package.json  package-lock.json  eslint.config.js   npm workspaces, locked; the lint, its import order generated from
+                                      each SliceTree.txt
 tools/PlanContractGenerator/          writes Alis.Reactive.Assets/runtime/Schema/plan.ts and plan.schema.json
+.editorconfig .gitignore AGENTS.md CLAUDE.md
+README.md                             every package's readme (Directory.Build.props packs it): the docs, beside the XML docs
+.claude/                              the session's settings, hook, rules, skills and agent (below the tree)
+.github/                              the toolchain action, Dependabot, the release notes and section 2.8's workflows
+scripts/                              section 2.7's scripts
 
 Alis.Reactive/                        net48;net10.0, PackageId AlisReactive, AlisSliceTree on
   SliceTree.txt BannedSymbols.txt PublicAPI/net48/ PublicAPI/net10.0/
@@ -87,10 +93,19 @@ tests/
   Alis.Reactive.Consumer.Net48/               a fresh MVC 5 app on the packed packages, outside the slnx
   Alis.Reactive.PlanTests/<Module>/           feedback
   Alis.Reactive.AnalyzerTests/<Module>/       each analyzer's cases
-  Alis.Reactive.ArchitectureTests/            WhenCodeIsWritten, WhenARuleNamesTheCode, WhenTheCoreIsCompiled
+  Alis.Reactive.ArchitectureTests/            WhenCodeIsWritten, WhenARuleNamesTheCode, WhenClaudeRunsAHook, the POC's
+                                              WhenTheCoreIsCompiled and WhenAContractDriftIsSuppressed, and over the
+                                              conformance app WhenAnAppRendersItsPages and SandboxStaticStateTests,
+                                              renamed WhenTheAppHoldsNoStaticState; their helpers Repository, Scripts
+                                              and read-scripts
 spec/                                         the design source: this file, CLAUDE.md, NOTES.md, Core/, probes/,
                                               Reference/, tools/, one folder per module
 ```
+
+Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/protect-generated.mjs`,
+`.claude/rules/csharp.md`, `.claude/rules/docs.md`, `.claude/rules/tests.md`, `.claude/rules/views.md`,
+`.claude/skills/onboard-component`, `.claude/skills/prove-behavior` and `.claude/agents/pragmatic-architect.md`, which
+the cut rewrites for the new tree, and `.github/actions`, `.github/dependabot.yml` and `.github/release.yml`.
 
 The Playwright project keeps the `PlaywrightTests` suffix, so the deny rule on a raw `dotnet test` of a Playwright
 project holds. It names the app with `ReferenceOutputAssembly="false"`, so the app builds first and none of its types
@@ -262,8 +277,10 @@ actions its tests will observe. A change to an async lane is a spec change first
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, `tsc -b`, eslint, `dotnet build -c Release`, the
 architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (build, then run, with the selectors below,
-the result line and the leftover-server check); `scripts/test.sh` (both); `build.sh`, `run.sh`, `pack.sh`,
-`doctor.sh` (every pin), `plant-defect.sh`, `verify-release-tag.sh`, `pin-syncfusion.mjs`, `install-git-hooks.sh`.
+the result line and the leftover-server check); `scripts/test.sh` (both); `scripts/build.sh`, `scripts/run.sh`,
+`scripts/pack.sh`, `scripts/doctor.sh` (every pin), `scripts/plant-defect.sh` with `scripts/trx-failed-tests.mjs`, which
+reads a TRX's failed and passed tests, `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`,
+`scripts/install-git-hooks.sh`.
 MSBuild never runs npm; an app whose bundle is missing refuses to start.
 
 `check.py --ci`, which U1 adds, runs every check but survival, a spec session's own hook and branch, and probes,
@@ -284,17 +301,19 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
   from the TRX-measured weights in `shard-weights.json`, so a stale weight unbalances and never drops a test. Unit U2
   measures one test at a time against 2, 4 and 8 per process, 20 runs each, and keeps parallelism only when every run
   is green and the wall time falls by at least 1.6 times.
-- **`ci.yml`** on every pull request and push to main: `checks` (`scripts/check.sh` without check.py); `spec`
+- **`.github/workflows/ci.yml`** on every pull request and push to main: `checks` (`scripts/check.sh` without check.py); `spec`
   (`check.py --ci`, TLC only for a spec whose hash CI has not checked); `playwright` per pool and shard in the
   Playwright image; `verify-net48` on Windows (pack, the twin and the fresh MVC 5 app built against the packs with
   warnings as errors, the net48 tests under IIS Express); `delivery-net10` (pack, the fresh net10 app restored from the
   packs, its delivery tests); `proof`, the one required status: every shard has a TRX with tests, none failed, none
   over budget, and the executed names equal the full list, each once.
-- **`nightly.yml`**: everything, every TLC config uncached, every probe; an issue on failure.
-- **`syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
+- **`.github/workflows/nightly.yml`**: everything, every TLC config uncached, every probe; an issue on failure.
+- **`.github/workflows/syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
   fusion pool.
-- **`nuget-publish.yml`**, on a `v*` tag: `verify-release-tag.sh`; ci on the tag; one pack job, its expected ids 2.9's six; verify-net48 and
-  delivery-net10 restore those exact packages; publish pushes the same files by trusted publishing.
+- **`.github/workflows/nuget-publish.yml`**, on a `v*` tag: `verify-release-tag.sh`; ci on the tag; one pack job, its expected ids 2.9's six; verify-net48 and
+  delivery-net10 restore those exact packages; publish pushes the same files by trusted publishing, in the
+  `nuget-release` environment: nuget.org's policy names this repository, this workflow's file and that environment, so
+  neither is renamed.
 
 ### 2.9 Packages and delivery
 
@@ -316,7 +335,7 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 - Script order in a layout, on both hosts: `ej2.min.js` (Fusion only), the Fusion templates script, each package's
   script, then `alis-reactive.js` last, every one a classic script without `async`.
 - A fresh net10 app: `dotnet add package`, the startup calls, a `@using` per module namespace a view uses, the links.
-  A fresh MVC 5 app: PackageReference (packages.config unsupported, the docs say to migrate), the startup calls and
+  A fresh MVC 5 app: PackageReference (packages.config unsupported, README.md says to migrate), the startup calls and
   the resolver in `Application_Start`, the namespaces in `Views/Web.config`, the links.
 - The delivery tests run on both fresh apps: each link's version equals the hash of the bytes served, the plan boots, a
   gesture shows its outcome, a validator refuses in the browser and the server saves a valid post, two time zones each
@@ -396,27 +415,61 @@ bindings check makes its promise, not its name, the specification it is held to.
 Each retirement waits for `features_lost` at 0 and the rule files that name the item rewritten; "nothing references it"
 is never the reason.
 - `Alis.Reactive.SandboxApp` with `tests/Alis.Reactive.PlaywrightTests`; `tests/Alis.Reactive.Framework.App` with its
-  16 components and `Framework.PlaywrightTests`; `ClassNames.App` and its tests, now the host `classNames`;
-  `scripts/framework-coverage.*`, `vstest-filter.mjs`, every `playwright.project.sh`, `check_ci_shard_matrix`.
-- `poc/`, the `Poc` test projects and `tests/Alis.Reactive.Playwright.TestHost` they build on, last: each proof ported
-  by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC analyzers moved to their
-  modules' folders, `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
+  16 components and `tests/Alis.Reactive.Framework.PlaywrightTests`; `tests/Alis.Reactive.ClassNames.App` and
+  `tests/Alis.Reactive.ClassNames.PlaywrightTests`, now the host `classNames`; `scripts/framework-coverage.*`,
+  `scripts/vstest-filter.mjs`, every `playwright.project.sh`, `check_ci_shard_matrix`.
+- `poc/`, the POC's test projects (`tests/Alis.Reactive.Poc.*`) and `tests/Alis.Reactive.Playwright.TestHost` they build
+  on, last: each proof ported by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC
+  analyzers moved to their modules' folders and its two architecture tests to the architecture tests,
+  `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
   `spec/api/HttpSurface` retargeted to the core, and every cite of `poc/` pinned to a SHA.
-- The sources of DesignSystem and NativeTagHelpers, their workspaces and asset lines; `examples/net48-mvc-smoke`, which
-  becomes `tests/Alis.Reactive.Consumer.Net48`; `build/AlisReactiveBrowserAssets.targets`; `Alis.Reactive.Assets/components/`,
-  whose code moves into its package; jsdom and Tailwind.
-- Main's `Alis.Reactive.FluentValidator`, its line in `scripts/pack.sh` and its id in `nuget-publish.yml`'s expected
+- The sources of `Alis.Reactive.DesignSystem` and `Alis.Reactive.NativeTagHelpers`, their workspaces and asset lines, since
+  their ids ship from `build/EmptyPackage.proj`; `examples/net48-mvc-smoke`, which becomes
+  `tests/Alis.Reactive.Consumer.Net48`; the build targets `build/AlisReactiveBrowserAssets.targets`,
+  `build/AlisReactiveNetFrameworkContent.targets`, `build/AlisReactiveStaticWebAssets.targets` and main's
+  `build/AlisReactiveAssets.targets`, which each package's own build target and static web assets replace (section 2.9,
+  U3); `Alis.Reactive.Assets/components/`, whose code moves into its package; jsdom and Tailwind.
+- Main's `Alis.Reactive.FluentValidator`, its line in the pack script and its id in the publish workflow's expected
   list, which the merge of main brings in; M8.F1 holds its doors' verdicts.
-- `.claude/rules/docs.md`'s worked example: the cut removes the sandbox's, and U12 writes the conformance app's.
+- The sandbox's worked example in the docs rule file: the cut removes it, and U12 writes the conformance app's.
+- The docs site, by the owner's answer (spec/CLAUDE.md, 2026-11-10): `docs-site/`, the workflow that deploys it,
+  `.github/workflows/deploy-docs.yml`, and the generator of its API page, `tools/ApiDocGenerator`. The docs are README.md,
+  packed as every package's readme, and the XML docs on the shipped surface.
+- Main's working notes and another editor's rules, readable at 7b9e987cc: `docs/` (process notes, decision records and
+  handoffs; root CLAUDE.md's Workflow and section 2.8 hold the process), `issues/`, `.cursor/`,
+  `RC1_RELEASE_READINESS.md`, `high-quality-bar-tasks.md`, `pure-gold-refacorts.md`, and
+  `.github/PULL_REQUEST_TEMPLATE.md`, whose bar is main's definition-of-done rule.
+- SonarQube, `docker-compose.sonarqube.yml` and `scripts/sonar-analyze.sh`: the rewrite's quality is section 1's layers,
+  and no check reads Sonar's result.
+- Main's artifact-gated Fusion onboarding, removed on purpose (root CLAUDE.md's vision): `tools/FusionOnboarding`,
+  `tools/FusionCoverage`, `.claude/workflows/*` and `.claude/skills/onboard-fusion-component`.
+- Main's `.claude/` beyond what section 2.1 keeps, which the redesign's rules and two skills replaced: `.claude/commands/*`,
+  `.claude/memory/*`, `.claude/hookify.*.local.md`, `.claude/hooks/require-playwright-wrapper.mjs`, whose job the deny
+  rule in the session's settings does, the rules `.claude/rules/agent-dispatch.md`, `.claude/rules/definition-of-done.md`,
+  `.claude/rules/plan-contract-boundary.md`, `.claude/rules/process-pipeline.md` and `.claude/rules/process-task-types.md`,
+  and the skills `.claude/skills/bdd-testing`, `.claude/skills/conditions-dsl`, `.claude/skills/dotnet-xml-docs`,
+  `.claude/skills/http-pipeline`, `.claude/skills/modern-csharp`, `.claude/skills/reactive-dsl`,
+  `.claude/skills/solid-ts-audit` and `.claude/skills/validation-rules`.
+- `tests/Alis.Reactive.Playwright.Extensions`, main's locators over Fusion components' markup, which TEST001 refuses: a
+  Playwright project compiles against the world contract alone.
+- Main's example app, `examples/resident-intake` with `scripts/rebuild-example-app.sh`: the conformance app and the fresh
+  consumer apps (section 2.1) replace it.
+- `.github/workflows/gate.yml` and `.github/workflows/verify-net48.yml`, whose jobs become ci's (section 2.8), which the
+  publish workflow runs on the tag.
 
 ## 4. Units
 
 The rewrite runs on `feature/rewrite`, branched from `feature/spec-first`'s tip with main at 7b9e987cc merged in, the
 tip whose delta from 623dd4a27 check.py's `main_delta` holds to verdicts, and lands on main by pull request. A later
 main commit enters only when `MAIN_TIP` moves to it and `main_delta` passes; the redesign's tip is still 65fdf118d, and
-a later commit of it needs the same before it enters. U1's first commit is the cut: it removes both lines' code that section 2.1 does not hold under
-the same path, the shipped projects' sources and every item of section 3 but the `poc/` bullet's, and in the same
-commit rewrites root CLAUDE.md, `.claude/rules/` and the folder CLAUDE.md files for the new tree, the meanings list
+a later commit of it needs the same before it enters. The merge raises six conflicts, each resolved here: `drawer.ts`,
+`FusionToastExtensions.cs`, `FusionScheduleExtensions.cs` and `FusionTemplateExpression.cs` take this line's side, since
+the cut removes both lines' code and main_delta holds main's changes to them as verdicts; main's `docs/RELEASING.md`
+stays deleted (section 3); `nuget-publish.yml` takes main's trusted publishing, its OIDC login and `id-token: write`,
+into this line's file, which U2 rewrites to section 2.8's. U1's first commit is the cut: it removes both lines' code that
+section 2.1 does not hold under the same path, the shipped projects' sources and every item of section 3 but the `poc/`
+bullet's, and in the same commit rewrites root CLAUDE.md, `.claude/rules/`, the two skills and the agent section 2.1
+keeps, and the folder CLAUDE.md files for the new tree, the meanings list
 stated from D2.4 to D2.6, D2.9 and D4.2 (D2.8), since `WhenARuleNamesTheCode` fails on a rule that names what the cut
 removed. Each removed line stays readable at 65fdf118d or at main's SHA, which every cite pins, and `features_lost` at
 0 is each removed door's verdict. Until the `poc/` bullet's items leave, they keep their own package versions: nine of
@@ -453,7 +506,8 @@ budget and the parallelism (section 2.5, 2.8).
 Features: M19.F1
 
 One plan with a load trigger that sets an element's text, through every row, rendered by `Html.RenderPlan` on both
-hosts; the six packages packed; the delivery tests green on both fresh apps; the twin built.
+hosts; the six packages packed; the delivery tests green on both fresh apps; the twin built. README.md, every package's
+readme, holds what a fresh app of section 2.9 does on each host, a net48 app's move to PackageReference among it.
 
 ### U4. Triggers and pipelines
 Features: M1.F1, M1.F2
@@ -468,6 +522,7 @@ Features: M5.F1
 Features: M11.F1, M11.F2, M11.F3, M12.F1, M12.F2
 
 The conformance library's six declarations land here with the doors that reach them; the bench's cells run from here on.
+README.md and the onboarding skill teach a component's slice as the app's standard (spec/CLAUDE.md, 2026-11-06).
 
 ### U8. Inputs and ids
 Features: M7.F1, M7.F2, M7.F3
@@ -490,6 +545,8 @@ Features: M13.F1, M13.F2
 
 ### U12. Requests and responses
 Features: M6.F1, M6.F2
+
+The request door's XML doc names MVC's binding of a parameter prefix and of a parameter named like its type's member (C25).
 
 ### U13. Partials and slots
 Features: M9.F1, M9.F2
@@ -524,7 +581,8 @@ Features: M17.F1
 ### U22. Tracing
 Features: M26.F1, M26.F2, M26.F3
 
-AlisReactive.OpenTelemetry's trace sink and layout helper (N20.2), its bundle built on 2.7's OpenTelemetry pins; D20.8's
+AlisReactive.OpenTelemetry's trace sink and layout helper (N20.2), its bundle built on 2.7's OpenTelemetry pins, and
+README.md's startup example setting `console` from the host's development setting (N20.3); D20.8's
 net48 fact, joining an inbound traceparent through the app's ASP.NET instrumentation module, probed on verify-net48
 before the unit claims it.
 
