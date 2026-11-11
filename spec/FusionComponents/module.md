@@ -780,3 +780,12 @@ features they give.
 - A carousel's slide direction is EJ2's two names, and a sidebar can be kept open or closed (M21.X904). Both lines read
   the direction as any text (`@syncfusion/ej2-navigations/src/carousel/carousel.d.ts:12`); the rewrite reads
   `FusionCarousel.CarouselSlideDirection`, and its sidebar payload adds the `Cancel` EJ2 reads back on open and close.
+- Fusion ships no stylesheet, as no package does (`spec/REWRITE.md` section 2.9). Main's themes EJ2 on the design
+  system's brand (`Alis.Reactive.Assets/fusion/syncfusion.entry.css:8-10` at 623dd4a27: the design system's
+  `brand.css`, EJ2's Tailwind 3 theme and its overrides), and nothing depends on a design system (`spec/CLAUDE.md`,
+  2026-11-10). The redesign's styles FusionGrid's dialog form (`Alis.Reactive.Fusion/css/fusion.css:4` at 65fdf118d),
+  whose container the slice writes with that class (`Alis.Reactive.Fusion/Components/FusionGrid/FusionGridEditTemplates.cs:202`
+  at 65fdf118d), and colors an EJ2 input group whose input holds the invalid class (`Alis.Reactive.Fusion/css/fusion.css:23-24`
+  at 65fdf118d), keyed on that class's default (`Alis.Reactive/Inputs/ReactiveClassNames.cs:30` at 65fdf118d), so an app
+  that names its own invalid class (M7.N4) loses it. An app links EJ2's theme and styles the dialog form's class and
+  its own invalid class in its stylesheet, as it styles its fields.

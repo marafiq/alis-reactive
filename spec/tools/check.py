@@ -215,7 +215,7 @@ def check_inventory():
 
 
 RUNGS = {"type", "analyzer", "refusal", "behavior"}
-CITE_EXTENSIONS = "cs|ts|tla|cfg|json|md|txt|mjs|csproj|props|targets|cshtml|js|sh|yml"
+CITE_EXTENSIONS = "cs|ts|tla|cfg|json|md|txt|mjs|csproj|props|targets|cshtml|js|sh|yml|css"
 CITE = re.compile(rf"([A-Za-z0-9_.\-/]+\.(?:{CITE_EXTENSIONS})):(\d+)(?:-(\d+))?")
 PROSE_CITE_TOKEN = re.compile(rf"(?P<path>@?[A-Za-z0-9_.\-/]+\.(?:{CITE_EXTENSIONS}))?:(?P<first>\d+)(?:-(?P<last>\d+))?|\bat\s+(?P<sha>[0-9a-f]{{7,40}})\b|(?P<stop>[.;]\s|\n\n)")
 CHECKER = re.compile(r"`(?:([A-Za-z]+)\.tla:(\w+)|probe:([\w.\-]+)|check:(\w+))`")

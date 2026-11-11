@@ -308,8 +308,9 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 | AlisReactive.NativeTagHelpers | `lib/net10.0/_._` | none | none | none | none |
 
 - Each package carries its own bundle; the core's bundle holds no component code. No CSS ships: an app names its own
-  field classes (M7.N4), the Native components carry no stylesheet (NativeAppLevelObjects/module.md), and Fusion's
-  stylesheet takes its verdict in Fusion's unit.
+  field classes (M7.N4), the Native components carry no stylesheet (NativeAppLevelObjects/module.md), and Fusion
+  carries none (FusionComponents/module.md): an app links EJ2's theme and styles the dialog form FusionGrid writes and
+  its own invalid class.
 - Every link carries the SHA-256 of the bytes served: `asp-append-version` on net10, `Url.AppendVersion` on net48 over
   the files the package's build target copies into `Content\<PackageId>\` beside a `.gitignore` of `*`.
 - Script order in a layout, on both hosts: `ej2.min.js` (Fusion only), the Fusion templates script, each package's
@@ -533,7 +534,7 @@ Features: M10.F1, M10.F2
 ### U24. Fusion's package, its reference and templates
 Features: M21.F1, M21.F2, M22.F1, M22.F2, M22.F3
 
-FusionMultiSelect's 19 own tests, the templates, and Fusion's stylesheet's verdict.
+FusionMultiSelect's 19 own tests and the templates.
 
 ### U25. The Fusion slices
 Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14, M21.F15, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27, M21.F28, M21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37, M21.F38, M21.F39, M21.F40, M21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46, M21.F47, M21.F48, M21.F49, M21.F50, M21.F51, M21.F52
