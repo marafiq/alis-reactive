@@ -66,10 +66,12 @@ HEDGES = [
     "when needed", "where possible", "if possible", "as needed", "as appropriate", "for now",
 ]
 HEDGE = re.compile(r"\b(" + "|".join(re.escape(word).replace(r"\ ", r"\s+") for word in HEDGES) + r")\b", re.IGNORECASE)
-PROSE_KEYS = {
-    "meaning", "reason", "decision", "improvement", "page", "gesture", "outcome", "opposite", "defect", "oracle",
-    "summary", "why", "statement", "description", "cell", "lacks", "scan", "what", "behavior",
+OWNER_TEXTS = {"spec/BRIEF.md", "spec/NOTES.md"}
+CODE_KEYS = {
+    "door", "claims", "ts", "expect", "member", "type", "cite", "source", "csharp", "js", "id", "for", "probe", "file",
+    "old", "new", "kind", "feature", "screen", "hosts", "parts", "harness", "line",
 }
+QUOTED_LINES = {"main", "redesign"}
 
 
 def git(*args):
@@ -90,24 +92,27 @@ def not_built(what):
 
 
 def prose_files():
-    files = [SPEC / "CLAUDE.md", SPEC / "Core" / "DESIGN.md", SPEC / "Core" / "schema.md", SPEC / "REWRITE.md"]
-    files += sorted(SPEC.glob("*/module.md"))
-    return [path for path in files if path.exists()]
+    listed = git("ls-files", "--cached", "--others", "--exclude-standard", "spec").splitlines()
+    return sorted(REPO / name for name in listed if name.endswith(".md") and name not in OWNER_TEXTS)
+
+
+def blanked(match):
+    return re.sub(r"[^\n]", " ", match.group(0))
 
 
 def without_code(text):
-    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
-    return re.sub(r"`[^`\n]*`", "", text)
+    text = re.sub(r"```.*?```", blanked, text, flags=re.DOTALL)
+    return re.sub(r"`[^`\n]*`", blanked, text)
 
 
-def json_prose(node, key=""):
+def json_prose(node, key="", holder=None):
     if isinstance(node, dict):
         for name, value in node.items():
-            yield from json_prose(value, name)
+            yield from json_prose(value, name, node)
     elif isinstance(node, list):
         for value in node:
-            yield from json_prose(value, key)
-    elif isinstance(node, str) and key in PROSE_KEYS:
+            yield from json_prose(value, key, holder)
+    elif isinstance(node, str) and key not in CODE_KEYS and not (key == "text" and holder.get("line") in QUOTED_LINES):
         yield node
 
 
@@ -2746,13 +2751,14 @@ def check_hedges():
     json_files = sorted(REPO / name for name in listed if name.endswith(".json") and REPO / name != STATE)
     hits = []
     for path in files:
-        for number, line in enumerate(without_code(path.read_text()).splitlines(), 1):
-            for match in HEDGE.finditer(line):
-                hits.append(f"{path.relative_to(REPO)}:{number} {match.group(1)}")
+        text = without_code(path.read_text())
+        for match in HEDGE.finditer(text):
+            line = text.count("\n", 0, match.start()) + 1
+            hits.append(f"{path.relative_to(REPO)}:{line} {' '.join(match.group(1).split())}")
     for path in json_files:
         for text in json_prose(json.loads(path.read_text())):
             for match in HEDGE.finditer(without_code(text)):
-                hits.append(f"{path.relative_to(REPO)} {match.group(1)}")
+                hits.append(f"{path.relative_to(REPO)} {' '.join(match.group(1).split())}")
     design = SPEC / "Core" / "DESIGN.md"
     if not design.exists():
         return result(False, f"{len(hits)} hedge words; not started: spec/Core/DESIGN.md absent", hedges=len(hits), files=len(files) + len(json_files))

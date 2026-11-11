@@ -44,6 +44,72 @@
   "expect": "spec/Reference/native.json ideally"
  },
  {
+  "name": "a hedge wrapped across two lines of a file the old scan skipped",
+  "edits": [
+   {
+    "file": "spec/Core/conversions.md",
+    "old": "of a date or a time\nreads (the last section)",
+    "new": "of a date or a time when\nneeded reads (the last section)"
+   }
+  ],
+  "expect": "spec/Core/conversions.md:5 when needed"
+ },
+ {
+  "name": "a hedge in the translated members table's prose",
+  "edits": [
+   {
+    "file": "spec/Core/translated-members.md",
+    "old": "The .NET members an array lambda translates, keyed by",
+    "new": "The .NET members an array lambda typically translates, keyed by"
+   }
+  ],
+  "expect": "spec/Core/translated-members.md:3 typically"
+ },
+ {
+  "name": "a hedge after a fenced block, at its own line",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Beside the tree the repository keeps",
+    "new": "Beside the tree the repository usually keeps"
+   }
+  ],
+  "expect": "spec/REWRITE.md:108 usually"
+ },
+ {
+  "name": "a hedge in a proposed sentence",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "The core's build fails on a reflection call",
+    "new": "The core's build likely fails on a reflection call"
+   }
+  ],
+  "expect": "spec/Analyzers/features.json likely"
+ },
+ {
+  "name": "a hedge in an app part's role",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "a NativeTextBox whose typing finds residents",
+    "new": "a NativeTextBox whose typing often finds residents"
+   }
+  ],
+  "expect": "spec/Reference/app.json often"
+ },
+ {
+  "name": "a hedge in what a harness verb does",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "the summary endpoint ends the connection without an answer",
+    "new": "the summary endpoint sometimes ends the connection without an answer"
+   }
+  ],
+  "expect": "spec/Reference/app.json sometimes"
+ },
+ {
   "name": "a hedge word inside backticks",
   "edits": [
    {
@@ -61,6 +127,28 @@
     "file": "spec/Analyzers/module.md",
     "old": "The build's rules: the compiler's rung of D18.6",
     "new": "The build's rules, which the analyzer package shoulders: the compiler's rung of D18.6"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a hedge word inside a fenced block",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "helpers Repository, Scripts and read-scripts\n",
+    "new": "helpers Repository, Scripts and read-scripts, usually\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a hedge in the owner's quoted words in NOTES.md",
+  "edits": [
+   {
+    "file": "spec/NOTES.md",
+    "old": "- 2026-11-11 plants for the last thirteen checks",
+    "new": "- 2026-11-11 the owner: \"this should hold\".\n- 2026-11-11 plants for the last thirteen checks"
    }
   ],
   "expect": null
