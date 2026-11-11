@@ -156,9 +156,10 @@ tests/
                                               WhenAPlaywrightRunEnds (section 2.5), over the lint's rules
                                               WhenTheLintIsConfigured (section 2.7), and over the shipped packages
                                               and their slice tables WhenAPackageShips (M20.D1), each rule with its
-                                              refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; their
-                                              helpers Repository, Scripts and read-scripts
-                                              and its packages.lock.json; LintCases holds the lint's refused and
+                                              refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; over
+                                              the shipped projects' files WhenCodeCompilesForBothHosts (2.2); their
+                                              helpers Repository, Hosts, Scripts and read-scripts
+                                              and its packages.lock.json and CLAUDE.md; LintCases holds the lint's refused and
                                               accepted files; RefusedCaseAttribute and AcceptedCaseAttribute are
                                               its two case marks, and WrittenFolder holds the files a case writes
 spec/                                         the design source: BRIEF.md, REWRITE.md (this file), CLAUDE.md,
@@ -170,7 +171,8 @@ Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/pro
 `.claude/rules/analyzers.md`, `.claude/rules/csharp.md`, `.claude/rules/docs.md`, `.claude/rules/tests.md`,
 `.claude/rules/views.md`,
 `.claude/skills/onboard-component`, `.claude/skills/prove-behavior` and `.claude/agents/pragmatic-architect.md`, which
-the cut rewrites for the new tree, and `.github/actions`, `.github/dependabot.yml` and `.github/release.yml`.
+the cut rewrites for the new tree, and `.github/actions`, `.github/dependabot.yml` and `.github/release.yml`. Each project
+holds a CLAUDE.md of its own: its standard, its command and what it refuses.
 
 The Playwright project keeps the `PlaywrightTests` suffix, so the deny rule on a raw `dotnet test` of a Playwright
 project holds. It names the app with `ReferenceOutputAssembly="false"`, so the app builds first and none of its types
@@ -202,7 +204,11 @@ the file it moved to:
 The folder and namespace names are the module table's (spec/CLAUDE.md). DESIGN.md's `Pipelines`, `Requests` and
 `Hosting` read `TriggersAndPipelines`, `RequestsAndResponses` and `RenderingAndDelivery`. The block writer, the POC's
 `Writing/PlanBuild.cs`, goes to `Execution/` and reads no module above it: the view's name prefix is text it holds.
-Realtime's files are wrapped whole in `#if NET10_0_OR_GREATER`, so the net48 build keeps the folder its row names.
+A file of a shipped project compiles for both hosts or for one: a one-host file is named `.Net48.cs` or `.Net10.cs` and
+wrapped whole in `#if NET48` or `#if NET10_0_OR_GREATER`, and no other conditional directive is written; a member that
+differs by host is a partial member, implemented in each host's file (the core's own rule file states it, and
+WhenCodeCompilesForBothHosts holds it). Realtime's files are net10's, each so named and wrapped, so the net48 build
+keeps the folder its row names.
 Module 20 has no folder in the core: its one type there, `TypedDslExemptionAttribute`, lives in `Declarations`, the row
 below the two slices whose doors carry it (M20.N1).
 

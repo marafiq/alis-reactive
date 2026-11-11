@@ -716,9 +716,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   confidence of a piece of work is determined. "now all these things are not meant to cause paranoie and waste and
   un-necessery waits and fear based engineering": a standard is held by the tool on its rung, a piece of work is
   proven once on the rung that holds it, and no guard is added for a defect nobody met. A module's pure tests take
-  the place the plan gave PlanTests and vitest as feedback. The lead writes this as the plan's first page, with each
-  project's own rule file, in the commit that rewrites `spec/REWRITE.md`'s units; until then this line supersedes
-  the lines it changes. The owner's order for it, the same hour: "Please write a structured list of every aspect of
+  the place the plan gave PlanTests and vitest as feedback. The plan's first page, `spec/REWRITE.md` section 1, root
+  CLAUDE.md and each project's own rule file state it. The owner's order for it, the same hour: "Please write a structured list of every aspect of
   re-write, with project, quality enforcement, session handof when and why, how to begin..how to reorient", and
   "Answer every single question with certainity and have the setup in place, test the whole govervance of re-write
   then only talk to me. You are 100% allowed to disagree with me when you have a genuine argument". So the lead

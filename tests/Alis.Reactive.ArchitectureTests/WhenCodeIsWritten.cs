@@ -17,8 +17,8 @@ public class WhenCodeIsWritten
 
     private static readonly CSharpParseOptions[] Targets =
     [
-        new CSharpParseOptions(LanguageVersion.CSharp14, DocumentationMode.Parse).WithPreprocessorSymbols("NET6_0_OR_GREATER"),
-        new CSharpParseOptions(LanguageVersion.CSharp14, DocumentationMode.Parse).WithPreprocessorSymbols("NET48"),
+        new CSharpParseOptions(LanguageVersion.CSharp14, DocumentationMode.Parse).WithPreprocessorSymbols(Hosts.SymbolsOfNet10),
+        new CSharpParseOptions(LanguageVersion.CSharp14, DocumentationMode.Parse).WithPreprocessorSymbols(Hosts.SymbolsOfNet48),
     ];
 
     private static readonly Regex RazorComment = new(@"@\*[\s\S]*?\*@|<!--[\s\S]*?-->", RegexOptions.Compiled);
@@ -67,6 +67,17 @@ public class WhenCodeIsWritten
         => Assert.That(
             CSharpComments([new("Ward/Nurse.cs", "namespace Ward;\n/// <summary>A nurse.</summary>\npublic sealed class Nurse;\n")], ["Ward"]),
             Is.Empty);
+
+    [RefusedCase]
+    public void a_comment_in_a_file_one_host_alone_compiles_is_refused_at_its_line()
+        => Assert.That(
+            CSharpComments(
+                [
+                    new("Ward/Nurse.Net48.cs", "#if NET48\nnamespace Ward;\n// the day nurse\ninternal sealed class Nurse;\n#endif\n"),
+                    new("Ward/Nurse.Net10.cs", "#if NET10_0_OR_GREATER\nnamespace Ward;\n// the night nurse\ninternal sealed class Nurse;\n#endif\n"),
+                ],
+                ["Ward"]),
+            Is.EqualTo(new[] { "Ward/Nurse.Net10.cs:3", "Ward/Nurse.Net48.cs:3" }));
 
     [AcceptedCase]
     public void a_nullable_directive_and_a_host_split_are_accepted()

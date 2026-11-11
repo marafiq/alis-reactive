@@ -26,8 +26,8 @@ public class WhenARuleNamesTheCode
     private static readonly string[] NotInTheRepo =
         [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. PlatformMembers, .. OperatorsTheSpecDecides];
 
-    private static readonly CSharpParseOptions ForNet10 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols("NET6_0_OR_GREATER");
-    private static readonly CSharpParseOptions ForNet48 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols("NET48");
+    private static readonly CSharpParseOptions ForNet10 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols(Hosts.SymbolsOfNet10);
+    private static readonly CSharpParseOptions ForNet48 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols(Hosts.SymbolsOfNet48);
     private static readonly string[] SourceExtensions = [".cs", ".cshtml", ".ts", ".mjs", ".js", ".sh", ".ps1", ".yml", ".yaml", ".json", ".csproj", ".props", ".targets", ".slnx", ".css"];
     private static readonly string[] ShellCommands = ["dotnet", "npm", "node", "git", "sh", "bash"];
     private static readonly string[] ReadFences = ["bash", "csharp", "csharp illustration"];

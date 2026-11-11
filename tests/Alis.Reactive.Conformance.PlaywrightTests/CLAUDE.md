@@ -1,0 +1,104 @@
+# Alis.Reactive.Conformance.PlaywrightTests
+
+The browser tests: each is one promise of the spec, proven by a gesture and its visible outcome in Chromium, on a
+screen of the conformance app. `.claude/rules/tests.md` holds the ten rules and loads with any file here. A test is
+written once, at the full bar, from its promise and before its code: it fails until the code lands, proves the
+behavior when it turns green, and then fails on its planted defect (`scripts/plant-defect.sh`).
+
+## What this project adds
+
+- It compiles against Playwright, NUnit and the world contract (`tests/Alis.Reactive.Conformance.World`) and against
+  no assembly of the framework or of the app, so a test finds an element as a user does, by its role, label or text,
+  or by an id written as a literal, and expects a literal.
+- A test carries one `[FailsFor]` naming its constant in `tests/Alis.Reactive.Conformance.World/Promises.g.cs`. Its
+  fixture is `When` and its situation, takes its hosts by `TestFixtureSource`, and sits in the folder of the module
+  whose test it is, under the screen it runs on. `Harness/` holds what every module's tests use.
+- Each test runs in a world of its own: `ConformanceFixture` opens it, and `TestWorld` seeds it through the world
+  contract's typed builders. Teardown ends the world and fails a gate still parked.
+- A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits
+  until the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
+  provokes an ordering by timing, by a stubbed network or by a control on the page.
+- `Harness/WhenAGateHoldsAnAnswer.cs` is the pattern: the page, the gesture and the outcome are in the test's body,
+  and the opposite case stands beside it.
+
+## Bad tests, each beside the rule it breaks
+
+Read from main at 7b9e987cc and from the redesign at 65fdf118d, in tests/Alis.Reactive.PlaywrightTests and
+tests/Alis.Reactive.Framework.PlaywrightTests. Each passed there, and each is refused here.
+
+Rule 7, no tautology: the id the code computes. Redesign,
+Components/AppLevel/PharmacyDelivery/WhenTheNightNurseReceivesADelivery.cs line 35; 51 files of the redesign and 14
+of main do it. The generator that writes the input's id also finds it, so a wrong id passes. Here the test names the
+input by its label, and the tests of InputsAndIds expect each derived id as a literal.
+
+```csharp illustration
+private ILocator ReceivedBy => Page.Locator($"#{IdGenerator.For<PharmacyDeliveryModel>(m => m.ReceivedBy)}");
+```
+
+Rules 3 and 4, real collaborators and an observed outcome: script in the page. Main,
+Components/Native/WhenButtonFires.cs line 69. The test writes the element's text itself, which no user can, to make
+its second assertion mean something. Here the opposite case is a gesture the page offers.
+
+```csharp illustration
+await admitStatus.EvaluateAsync("el => el.textContent = 'reset'");
+await Page.Locator("#btn-admit").ClickAsync();
+await Expect(admitStatus).ToHaveTextAsync("Admit Resident clicked", new() { Timeout = 3000 });
+```
+
+Rule 8, deterministic: a wait on time. Main,
+Components/Fusion/InPlaceEditor/WhenInPlaceEditorQuickEditBlocksOnValidationRule.cs line 33. It sleeps 2.8 seconds
+and then reads a flag, so it is slow when the code is right and green when a slow machine sends the request late.
+Here the test expects the state the refusal shows, and the request that was held back is read from what the harness
+collected.
+
+```csharp illustration
+await inner.PressAsync("Enter");
+await Page.WaitForTimeoutAsync(2800);
+Assert.That(postFired, Is.False, "FluentValidator must abort the POST when Value violates GreaterThan(0).");
+```
+
+Rule 9, readable as the specification: a branch on a one-shot read. Main,
+Components/Fusion/Kanban/WhenUsingFusionKanban.cs line 138. The test does not know which page it is on, so it
+proves neither. Here a test has no branch, and the page's state is the promise's own.
+
+```csharp illustration
+if (await Page.Locator("#care-kanban_dialog_wrapper.e-popup-open").IsVisibleAsync())
+    await Page.Keyboard.PressAsync("Escape");
+```
+
+Rule 7 again: an expected value the test computes from the page. Redesign,
+Components/Fusion/Schedule/WhenUsingFusionSchedule.cs line 424. The count comes from a one-shot read of the summary
+it then asserts, through a pattern that matches any prefix. Here the world is seeded, so the count is a literal.
+
+```csharp illustration
+var before = await ShiftsNeedingCoverage();
+await Expect(Summary).ToHaveTextAsync(new Regex($@": {before - 1} of 21 shifts"), new() { Timeout = 15000 });
+```
+
+Rule 3 again: a stubbed network. Redesign,
+Components/AppLevel/PharmacyDelivery/WhenTheNightNurseReceivesADelivery.cs line 157; 19 files of the redesign and 8
+of main route a request. The test's own semaphore decides when the answer leaves, so the server's part of the
+promise never runs. Here the app's endpoint holds its own answer at a gate, and the test releases it.
+
+```csharp illustration
+await Page.RouteAsync(ManifestUrl, async route =>
+{
+    await manifestReleased.WaitAsync();
+    await route.ContinueAsync();
+});
+```
+
+Rule 7 a third time: a partial match. Redesign, Conditions/WhenAConditionAsksTheUser.cs line 24, in
+tests/Alis.Reactive.Framework.PlaywrightTests; 61 files of the redesign and 73 of main do it. Text before or after
+the expected words passes. Here the whole text is expected.
+
+```csharp illustration
+await Expect(Dialog).ToContainTextAsync("Discharge the resident?");
+```
+
+## Commands
+
+```bash
+scripts/playwright.sh --project conformance
+scripts/plant-defect.sh --project conformance --filter "FullyQualifiedName~WhenTwoWorldsRun" --test each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
+```

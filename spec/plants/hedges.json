@@ -136,8 +136,8 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "helpers Repository, Scripts and read-scripts\n",
-    "new": "helpers Repository, Scripts and read-scripts, usually\n"
+    "old": "helpers Repository, Hosts, Scripts and read-scripts\n",
+    "new": "helpers Repository, Hosts, Scripts and read-scripts, usually\n"
    }
   ],
   "expect": null
