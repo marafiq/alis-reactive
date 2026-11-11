@@ -157,7 +157,9 @@ tests/
                                               WhenTheLintIsConfigured (section 2.7), and over the shipped packages
                                               and their slice tables WhenAPackageShips (M20.D1), each rule with its
                                               refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; over
-                                              the shipped projects' files WhenCodeCompilesForBothHosts (2.2); their
+                                              the shipped projects' files WhenCodeCompilesForBothHosts (2.2); over
+                                              every assembly WhenAnInternalIsExposed, which refuses a friend
+                                              assembly; their
                                               helpers Repository, Hosts, Scripts and read-scripts
                                               and its packages.lock.json and CLAUDE.md; LintCases holds the lint's refused and
                                               accepted files; RefusedCaseAttribute and AcceptedCaseAttribute are

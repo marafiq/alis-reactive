@@ -22,8 +22,8 @@ The rules govern every Playwright test. A compiler rule or a named check holds e
    the spec states it. A name that describes code (`writes_a_let_statement`,
    `set_prop_mutation_writes_value_to_ej2_instance`) describes no promise.
 2. **The public surface only.** Arrange as a developer does: Razor helpers, plan builders, validators
-   registered through DI, components declared on `Component`. No `InternalsVisibleTo`, no internal
-   constructor, no reflection. A behavior a developer cannot reach is given a public, typed door; it is
+   registered through DI, components declared on `Component`. No `InternalsVisibleTo`, which
+   `WhenAnInternalIsExposed` refuses in every project, no internal constructor, no reflection. A behavior a developer cannot reach is given a public, typed door; it is
    never tested through internals.
 3. **Real collaborators.** A real browser, a real server, real HTTP, the real DOM, and the gestures root
    CLAUDE.md names. No mocking library and no stub, spy or fake, of the framework's code or of the boundary it talks

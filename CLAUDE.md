@@ -110,6 +110,7 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | An untyped public door | `ALIS009` |
 | A slice that uses a later row; a namespace off its folder; an open public class; a table off its project | `ALIS010`, `ALIS011`, `ALIS012`, `ALIS013` |
 | A shipped package built without its slice table | `WhenAPackageShips` |
+| A friend assembly: an internal opened to a test or to a consumer | `WhenAnInternalIsExposed` |
 | In a shipped project, a conditional directive inside a file: one host's code is a file of its own | `WhenCodeCompilesForBothHosts` |
 | A public symbol outside the PublicAPI text, or a line with no symbol | the build (RS0016, RS0017) |
 | An analyzer off its release row, or one that reads a file or the environment | the build (RS2000, RS1035) |
@@ -186,9 +187,8 @@ none: its record names the line.
 - `scripts/check.sh` (every check that needs no browser), `scripts/test.sh` (that, then every browser test),
   `scripts/doctor.sh` (every pin against this machine), `scripts/build.sh`, `scripts/run.sh` (the conformance app at
   http://localhost:5220), `scripts/pack.sh <version>`. A script joins this list with the commit that writes it.
-- Every tool and package is pinned to one exact version, the latest stable when its unit lands it, and a hold names
-  its reason in `spec/REWRITE.md` section 2.7. Syncfusion's is the owner's: EJ2 33.1.47, npm and NuGet together, moved
-  by `node scripts/pin-syncfusion.mjs <version>`.
+- Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a hold names its
+  reason in `spec/REWRITE.md` section 2.7, and Syncfusion's is the owner's (`node scripts/pin-syncfusion.mjs <version>`).
 - C# 14, compiled for `net48` and `net10.0`; `Alis.Reactive/CLAUDE.md` holds the one rule for a host's own code.
 
 ## Local guidance
