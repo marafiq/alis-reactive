@@ -331,12 +331,13 @@ for the rule with the repository's own configuration and expects the rule's id a
 message for the accepted one, so a selector that matches nothing fails its refused case; its last case holds that an
 inline disable changes no result.
 
-Scripts: `scripts/check.sh` (the contract regenerated and diffed, `tsc -b`, eslint, `dotnet build -c Release`, the
-architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (build, then run, with the selectors below,
-the result line and the leftover-server check); `scripts/test.sh` (both); `scripts/build.sh`, `scripts/run.sh`,
-`scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs), `scripts/plant-defect.sh` with `scripts/trx-failed-tests.mjs`, which
-reads a TRX's failed and passed tests, `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`,
-`scripts/install-git-hooks.sh`.
+Scripts: `scripts/check.sh` (the contract regenerated and diffed, `npm audit`, `tsc -b`, eslint,
+`dotnet build -c Release`, `dotnet format --verify-no-changes` over the solution, which today's gate holds, the
+architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (build, then run, with the selectors
+below, the result line and the leftover-server check); `scripts/test.sh` (both); `scripts/build.sh`,
+`scripts/run.sh`, `scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs),
+`scripts/plant-defect.sh` with `scripts/trx-failed-tests.mjs`, which reads a TRX's failed and passed tests,
+`scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`.
 MSBuild never runs npm; an app whose bundle is missing refuses to start.
 
 `check.py --ci`, which U1 adds, runs every check but survival, a spec session's own hook and branch, and probes,
@@ -522,14 +523,15 @@ locale and time zone, `NewPageAsync`, `AddCookiesAsync`, `CloseAsync`, `SetDefau
 and of NUnit `[SetUp]`, `[TearDown]`, `[OneTimeSetUp]`, `[OneTimeTearDown]`, `[SetUpFixture]` and `[Parallelizable]`.
 TEST005's conditional operators are C#'s: `?:`, `??`, `??=`, `?.`, `?[]`, `&&` and `||`.
 
-The lists are read from the tests the spec holds and from the pinned packages. Of the 569 gestures the promises
-describe, none drags, taps or scrolls, one hovers (M25.F5's X17.9) and four click with a modifier or another button,
-which `ClickAsync` takes as an option; of their 1,138 outcomes 34 read the console, 8 a download and 3 a page a click
-opened, each one of rule 4's three kinds (what the user sees, what the server received, what the developer reads), and
-none reads whether an element is enabled. The refused lists this section held before named neither
+The lists are read from the tests the spec holds and from the pinned packages. Of the gestures the promises
+describe, none drags, taps or scrolls; one hovers (M25.F5's X17.9); a right click (M21.F14's M21.X405), a click with
+Control (M25.F3's X17.35) and one with the middle button are options `ClickAsync` takes. Their outcomes read, beside
+the page, the console (M4.F1's X6.58), a download (M21.F23's M21.X201) and a page a click opened (M25.F3's X17.34),
+each one of rule 4's three kinds (what the user sees, what the server received, what the developer reads), and none
+reads whether an element is enabled. The refused lists this section held before named neither
 `WaitForFunctionAsync`, `EvalOnSelectorAsync`, `EvaluateAllAsync`, `DispatchEventAsync`, `SetContentAsync`,
 `ToHaveJSPropertyAsync`, `ToMatchAriaSnapshotAsync` nor `IsDisabledAsync`, each a member of Playwright 1.64.1, and
-TEST006 refused the console's errors that 34 of the spec's own tests read.
+TEST006 refused the console's errors that the spec's own tests read.
 
 ## 3. What retires
 

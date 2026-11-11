@@ -32,10 +32,14 @@ A test rule, TEST001 to TEST013 of `spec/REWRITE.md` section 2.10, is an analyze
 4. **It reports what it proves.** Code the rule does not follow gets no report: the refusal where the view renders
    holds it (D18.6). The location is the smallest text the developer edits, a member's name or one argument.
 5. **No state, any order, no throw.** `Initialize` opens with `ConfigureGeneratedCodeAnalysis` and
-   `EnableConcurrentExecution`. An analyzer has no instance field: what one compilation gathers lives in its start
-   action. It registers the symbol kinds and operation kinds its rule reads and no other. A diagnostic reported at the
-   compilation's end carries the CompilationEnd tag. Every call that takes a cancellation token gets the context's.
-   Code that does not compile ends a check with no report and no exception: the editor runs every rule on it.
+   `EnableConcurrentExecution`. The first is chosen by what the rule reads: a rule that reads views analyzes generated
+   code and reports in it, since a view reaches the compiler through Razor's generator; every other rule passes
+   `GeneratedCodeAnalysisFlags.None`. An analyzer has no instance field: what one compilation gathers lives in its
+   start action. It registers the symbol kinds and operation kinds its rule reads and no other, and reports from them:
+   a report at the compilation's end is kept for what the whole compilation alone shows (a table that disagrees with
+   its package), since the editor shows it only after a build, and it carries the CompilationEnd tag. Every call that
+   takes a cancellation token gets the context's. Code that does not compile ends a check with no report and no
+   exception: the editor runs every rule on it.
 6. **A suppressor is one compiler warning at the place its spec line names.** It finds that place through the
    semantic model's operation for the warning's location, a `DiagnosticSuppressor` with one descriptor.
 
@@ -64,3 +68,5 @@ throws, and a report the case does not expect.
 5. One accepted case of every rule holds source that does not compile, with the compiler's error marked and no
    report expected.
 6. A suppressor's case expects the warning suppressed at the place its line names and kept one fact away.
+7. A rule that reads views has a refused case in a source file at the path Razor's generator gives a view, where
+   the compiler meets one; a rule whose spec line reads every file has a refused case in a hand-written file too.

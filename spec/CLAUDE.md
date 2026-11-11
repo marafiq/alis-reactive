@@ -653,9 +653,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   and TEST013 are stated over closed lists of what a test takes (`spec/REWRITE.md` section 2.10), never over lists of
   what it must not: a refused list misses every member it does not name, and Playwright 1.64.1 holds members the old rows
   did not name that run script in the page, raise an event no gesture raised, read the page once or match a snapshot. The lists are
-  read from the 569 gestures and 1,138 outcomes of the spec's own tests and from the pinned packages, each name
-  compiled against them; `Assert.That` reads what the browser reports beside the page, the console's errors among it,
-  which 34 of those tests read and TEST006 had refused. The owner can overrule each list.
+  read from the gestures and outcomes of the spec's own tests and from the pinned packages, each name compiled
+  against them; `Assert.That` reads what the browser reports beside the page, the console's errors among it, which
+  those tests read and TEST006 had refused. The owner can overrule each list.
 - The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "put these in project local claude.md as per best practice,
   tighten the quality repeatable loop". A rule for one kind of file lives in a path-scoped file under `.claude/rules`,
   loaded where it applies (`.claude/rules/analyzers.md`); what every unit keeps is root CLAUDE.md's, which a session
