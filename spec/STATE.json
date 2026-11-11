@@ -27,14 +27,14 @@
         "cell": 54,
         "check": 4,
         "d_lines": 243,
-        "defect": 226,
+        "defect": 231,
         "delivery": 1,
         "invariant": 31,
-        "meanings": 50,
+        "meanings": 55,
         "probe": 74,
         "uncarried": 0
       },
-      "detail": "each of 243 D lines and 50 module meanings has at least one carrier that resolves: a defect naming it in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it",
+      "detail": "each of 243 D lines and 55 module meanings has at least one carrier that resolves: a defect naming it in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it",
       "pass": true
     },
     "claude_md": {
@@ -1317,7 +1317,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 605,
+        "defects": 609,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -3688,7 +3688,7 @@
         "problems": 0,
         "units": 26
       },
-      "detail": "each of 26 units proves something, as browser tests (b), analyzer cases (a) or harness tests (h): U1 2a, U2 2h, U3 5b, U4 2b 3a, U5 2b 1a, U6 5b 1a, U7 99b 25a, U8 4a, U9 20b, U10 16b 10a, U11 6b 2a, U12 84b 9a, U13 40b, U14 22b 1a, U15 47b 23a, U16 35b 9a, U17 3b, U18 4b 3a, U19 14b 2a, U20 3b, U21 25b, U22 8b 1a, U23 26b, U24 32b 1a, U25 69b 35a, U26 3b",
+      "detail": "each of 26 units proves something, as browser tests (b), analyzer cases (a) or harness tests (h): U1 6a, U2 2h, U3 5b, U4 2b 3a, U5 2b 1a, U6 5b 1a, U7 99b 25a, U8 4a, U9 20b, U10 16b 10a, U11 6b 2a, U12 84b 9a, U13 40b, U14 22b 1a, U15 47b 23a, U16 35b 9a, U17 3b, U18 4b 3a, U19 14b 2a, U20 3b, U21 25b, U22 8b 1a, U23 26b, U24 32b 1a, U25 69b 35a, U26 3b",
       "pass": true
     },
     "verdicts": {
@@ -3706,7 +3706,7 @@
     }
   },
   "passed": 39,
-  "read_at_head": "fb177901fc749918b9c0f766c78aa8e4694e7d8b",
+  "read_at_head": "04f332f729f52d7c1349bbd29d571ec86ce135d9",
   "step": {
     "failing": [],
     "name": "End of session",
