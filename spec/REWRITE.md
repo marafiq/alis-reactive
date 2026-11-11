@@ -25,7 +25,7 @@ in the line.
   | The render | a refusal the compiler cannot see, on the refusal routes | Playwright |
   | Playwright | behavior: a gesture and its visible outcome, in Chromium | every pull request |
   | The test rules | that a browser test cannot lean on the code it tests: TEST001 to TEST013 (section 2.10) | every build of a Playwright project |
-  | Architecture tests | what the repository holds: no comment, every name a rule file cites, the hooks' refusals, the app's pages and statics | every pull request |
+  | Architecture tests | what the repository holds: no comment, every name a rule file cites, the hooks' refusals, the app's pages and statics, the runner's result line, a fresh app's git status | every pull request |
   | Cases and plants | that each analyzer, test rule, architecture test and check.py check reports its refused case by name and passes its accepted case (section 2.10) | with the rule each proves |
   | verify-net48 | each test whose placement lists the twin, on MVC 5 (no stream or hub: realtime is net10's, check_app), and the packed packages on a fresh MVC 5 app | every pull request |
   | Vitest, PlanTests | feedback while coding (BRIEF.md, Principles 10); never counted as proof | the inner loop |
@@ -99,8 +99,9 @@ tests/
   Alis.Reactive.ArchitectureTests/            WhenCodeIsWritten, WhenARuleNamesTheCode, WhenClaudeRunsAHook, the POC's
                                               WhenTheCoreIsCompiled and WhenAContractDriftIsSuppressed, over the
                                               conformance app WhenAnAppRendersItsPages and SandboxStaticStateTests,
-                                              renamed WhenTheAppHoldsNoStaticState, and over each fresh app's build
-                                              WhenAConsumerAppIsBuilt (section 2.9), each rule with its refused and
+                                              renamed WhenTheAppHoldsNoStaticState, over each fresh app's build
+                                              WhenAConsumerAppIsBuilt (section 2.9), and over the runner's result
+                                              WhenAPlaywrightRunEnds (section 2.5), each rule with its refused and
                                               accepted cases, which WhenAnArchitectureTestIsWritten holds; their
                                               helpers Repository, Scripts and read-scripts
 spec/                                         the design source: BRIEF.md, REWRITE.md (this file), CLAUDE.md,
@@ -223,8 +224,9 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   uses no harness verb.
 - **A run proves it ran.** Each test process ends with
   `[playwright:result] <pool> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s> <name>` and
-  fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive. No
-  retries, anywhere.
+  fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive.
+  WhenAPlaywrightRunEnds runs that reading over the TRX and the result line each case gives: a refused case for each
+  failure, and an accepted case for a green run. No retries, anywhere.
 - **Waits and budget.** Action waits, navigation waits and the per-test budget are set from measurement, never chosen:
   unit U2 runs the suite 20 times on ubuntu-latest and sets the budget at four times the slowest test it measured, the
   waits at four times the slowest step, and writes both into the harness with the run that measured them.
@@ -534,8 +536,9 @@ Features: none
 The app's areas, hosts, world, verbs, generated gates and bindings; the world contract; the Playwright project's
 harness, result line and leftover-server check; the test rules TEST001 to TEST013 with their cases (section 2.10),
 before any feature test is written; the CI workflows. Its own tests, app.json's `harnessTests`, prove the harness: two
-worlds isolated, a gate held then released, a release before reached failing, a zero-test run failing. It measures and writes the waits, the
-budget and the parallelism (section 2.5, 2.8).
+worlds isolated, a gate held then released, a release before reached failing; WhenAPlaywrightRunEnds's cases prove the
+runner, a run that selected no test failing among them. It measures and writes the waits, the budget and the
+parallelism (section 2.5, 2.8).
 
 ### U3. The walking skeleton, the packs and delivery
 Features: M19.F1

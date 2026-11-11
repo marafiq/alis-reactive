@@ -10598,20 +10598,6 @@
           "on": "the echo endpoint's answer"
         }
       ]
-    },
-    {
-      "fixture": "WhenARunSelectsNoTest",
-      "test": "the_run_fails",
-      "unit": "U2",
-      "page": "scripts/playwright.sh on the Playwright project, with a filter that no test's name matches.",
-      "gesture": "Run it.",
-      "outcome": "It exits with a non-zero code, and its result line reads 0 selected, 0 ran.",
-      "opposite": "With a filter that matches WhenTwoWorldsRun's one test, it exits with 0, and its result line reads 1 selected, 1 ran, 1 passed, 0 failed.",
-      "defect": "The runner reads a run that selected no test as green, so a filter that names no test passes CI.",
-      "hosts": [
-        "net10"
-      ],
-      "harness": []
     }
   ]
 }

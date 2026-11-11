@@ -37,22 +37,22 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "\"test\": \"the_run_fails\",\n      \"unit\": \"U2\",",
-    "new": "\"test\": \"the_run_fails\",\n      \"unit\": \"U99\","
+    "old": "\"test\": \"the_release_fails_the_test\",\n      \"unit\": \"U2\",",
+    "new": "\"test\": \"the_release_fails_the_test\",\n      \"unit\": \"U99\","
    }
   ],
-  "expect": "harness test WhenARunSelectsNoTest.the_run_fails names 'U99', no unit of REWRITE.md"
+  "expect": "harness test WhenAGateIsReleasedBeforeItIsReached.the_release_fails_the_test names 'U99', no unit of REWRITE.md"
  },
  {
   "name": "a harness test with no opposite",
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "      \"opposite\": \"With a filter that matches WhenTwoWorldsRun's one test, it exits with 0, and its result line reads 1 selected, 1 ran, 1 passed, 0 failed.\",\n",
+    "old": "      \"opposite\": \"Released after the harness reports it held, the release succeeds and the GET answers North.\",\n",
     "new": ""
    }
   ],
-  "expect": "harness test WhenARunSelectsNoTest.the_run_fails states no opposite"
+  "expect": "harness test WhenAGateIsReleasedBeforeItIsReached.the_release_fails_the_test states no opposite"
  },
  {
   "name": "a harness gate at an action no Next holds",
@@ -81,8 +81,8 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "\"gesture\": \"Run it.\",",
-    "new": "\"gesture\": \"Run the script.\","
+    "old": "\"gesture\": \"Arm the gate on the echo endpoint's answer and release it before the test sends its GET.\",",
+    "new": "\"gesture\": \"Arm the gate on the echo endpoint's answer and release it at once, before the test sends its GET.\","
    }
   ],
   "expect": null
@@ -108,8 +108,8 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "\"test\": \"the_run_fails\",\n      \"unit\": \"U2\",",
-    "new": "\"test\": \"the_run_fails\",\n      \"unit\": \"U3\","
+    "old": "\"test\": \"the_release_fails_the_test\",\n      \"unit\": \"U2\",",
+    "new": "\"test\": \"the_release_fails_the_test\",\n      \"unit\": \"U3\","
    }
   ],
   "expect": null
