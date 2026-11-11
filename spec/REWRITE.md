@@ -83,8 +83,9 @@ build/EmptyPackage.proj  build/EmptyPackage.md   packed once per empty id
 tests/
   Alis.Reactive.Conformance.World/            net48;net10.0, on no Alis.Reactive assembly: the world's records, its
                                               typed seed builders, the gate names generated from the TLA+ specs
-  Alis.Reactive.Conformance.App/              net10 MVC: Care/<Screen>/, Bench/, Refusals/<Module>/, Shared/,
-                                              Components/<Declaration>/, HostVariants/, World/
+  Alis.Reactive.Conformance.App/              net10 MVC on the shipped projects: Care/<Screen>/, Bench/,
+                                              Refusals/<Module>/, Shared/, Components/<Declaration>/, HostVariants/,
+                                              World/
   Alis.Reactive.Conformance.App.Net48/        the MVC 5 twin: links the app's files, consumes the packed packages
   Alis.Reactive.Conformance.PlaywrightTests/  Harness/, <Module>/<Screen>/When*.cs, <Module>/Hosts/<Host>/,
                                               <Slice module>/<Slice>/ for a slice's own tests; on the world alone
@@ -96,9 +97,10 @@ tests/
   Alis.Reactive.PlanTests/<Module>/           feedback
   Alis.Reactive.AnalyzerTests/<Module>/       each analyzer's cases
   Alis.Reactive.ArchitectureTests/            WhenCodeIsWritten, WhenARuleNamesTheCode, WhenClaudeRunsAHook, the POC's
-                                              WhenTheCoreIsCompiled and WhenAContractDriftIsSuppressed, and over the
+                                              WhenTheCoreIsCompiled and WhenAContractDriftIsSuppressed, over the
                                               conformance app WhenAnAppRendersItsPages and SandboxStaticStateTests,
-                                              renamed WhenTheAppHoldsNoStaticState, each rule with its refused and
+                                              renamed WhenTheAppHoldsNoStaticState, and over each fresh app's build
+                                              WhenAConsumerAppIsBuilt (section 2.9), each rule with its refused and
                                               accepted cases, which WhenAnArchitectureTestIsWritten holds; their
                                               helpers Repository, Scripts and read-scripts
 spec/                                         the design source: BRIEF.md, REWRITE.md (this file), CLAUDE.md,
@@ -208,15 +210,17 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   word. Clock is `Page.Clock`, installed only by a test that names it. Gc is `Page.RequestGCAsync`, confirmed by the
   page's own weak hold.
 - **Bindings.** `Promises.g.cs` is generated from app.json and the features: a test carries `[FailsFor(...)]` naming its
-  feature, defect and index, its cell, or its harness test. The bindings check fails when the generated files differ from what the spec
-  writes, when a test names no test of the spec or a test of the spec has no test, when a test never reached the
-  gate its held steps name, and when a screen's view uses a module namespace that neither the test's feature nor a
-  part it lists belongs to, since check.py lands each test in the latest unit of those modules.
+  feature, defect and index, its cell, or its harness test. The bindings check fails when the generated files differ
+  from what the spec writes, when a test names no test of the spec or a test of the spec has no test, when a test never
+  reached the gate its held steps name, and when a screen's view uses a module namespace that neither the test's
+  feature nor a part it lists belongs to, since check.py lands each test in the latest unit of those modules.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
   host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
   "Now listening on:" line; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
   server alive fails. The net10 clock is America/New_York, the twin's UTC; the browser context is en-US in
-  America/Los_Angeles, so a date read in the wrong zone shows.
+  America/Los_Angeles, so a date read in the wrong zone shows. The hosts consumerNet10 and consumerNet48 are the fresh
+  apps' own servers, which hold no World area: a test under one runs on app.json's `fresh` screen, sets no world and
+  uses no harness verb.
 - **A run proves it ran.** Each test process ends with
   `[playwright:result] <pool> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s> <name>` and
   fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive. No
@@ -303,15 +307,16 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 ### 2.8 Shards and CI
 
 - **The shard unit** is a module folder; the net10 host-variant fixtures form one unit, so each variant's server starts
-  once per run; FusionComponents splits by slice. Pools: core, hosts and fusion. Shards are balanced longest-first
+  once per run; FusionComponents splits by slice. Pools: core, hosts and fusion; a test under a fresh app's host runs in its delivery job, never in a pool. Shards are balanced longest-first
   from the TRX-measured weights in `shard-weights.json`, so a stale weight unbalances and never drops a test. Unit U2
   measures one test at a time against 2, 4 and 8 per process, 20 runs each, and keeps parallelism only when every run
   is green and the wall time falls by at least 1.6 times.
 - **`.github/workflows/ci.yml`** on every pull request and push to main: `checks` (`scripts/check.sh` without check.py); `spec`
   (`check.py --ci`, TLC only for a spec whose hash CI has not checked); `playwright` per pool and shard in the
   Playwright image; `verify-net48` on Windows (pack, the twin and the fresh MVC 5 app built against the packs with
-  warnings as errors, the net48 tests under IIS Express); `delivery-net10` (pack, the fresh net10 app restored from the
-  packs, its delivery tests); `proof`, the one required status: every shard has a TRX with tests, none failed, none
+  warnings as errors, WhenAConsumerAppIsBuilt over the fresh app, the tests under net48 and consumerNet48 under IIS
+  Express); `delivery-net10` (pack, the fresh net10 app restored from the packs, WhenAConsumerAppIsBuilt over it, the
+  tests under consumerNet10); `proof`, the one required status: every shard has a TRX with tests, none failed, none
   over budget, and the executed names equal the full list, each once.
 - **`.github/workflows/nightly.yml`**: everything, every TLC config uncached, every probe; an issue on failure.
 - **`.github/workflows/syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
@@ -343,9 +348,13 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 - A fresh net10 app: `dotnet add package`, the startup calls, a `@using` per module namespace a view uses, the links.
   A fresh MVC 5 app: PackageReference (packages.config retires, section 3), the startup calls and the resolver in
   `Application_Start`, the namespaces in `Views/Web.config`, the links.
-- The delivery tests run on both fresh apps: each link's version equals the hash of the bytes served, the plan boots, a
-  gesture shows its outcome, a validator refuses in the browser and the server saves a valid post, two time zones each
-  show their own day, and git lists no file the build wrote into the app (M19.D2).
+- The delivery tests run on both fresh apps: app.json's placements on its `fresh` screen under the hosts consumerNet10
+  and consumerNet48, apps that README.md's steps alone wire on the packed packages, each booting its plan (M19.X5); and
+  WhenAConsumerAppIsBuilt, whose cases hold that git lists no file a build wrote into either app (M19.D2). Each other
+  delivery behavior is proven once where its defect shows: a link's version is the content hash of the bytes served on
+  the twin (M19.X1), which runs on the packs, a validator refuses in the browser and the server saves a valid post on
+  the conformance app and the twin (M8.F1's X16.10), and each time zone shows its own day there (M15.F1's X3.7 and
+  X3.9, M18.F1's M18.X1); on net10 the version is ASP.NET Core's own `asp-append-version` (M19.N1).
 - Native, Fusion and OpenTelemetry depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U3's
   delivery job reads it back from each nuspec.
 

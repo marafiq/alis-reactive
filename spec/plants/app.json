@@ -11,12 +11,78 @@
   "expect": "uses a stream or hub on net48"
  },
  {
+  "name": "a harness verb on a fresh app's page",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": []",
+    "new": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]"
+   }
+  ],
+  "expect": "M19.F1 M19.X5 #0 uses the harness verb 'seed' on fresh, a fresh app's page, which holds no world"
+ },
+ {
+  "name": "a care screen's test under a fresh app's host",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "      \"for\": \"M19.X3\",\n      \"index\": 0,\n      \"screen\": \"record\",\n      \"hosts\": [\n        \"net10\"\n      ],",
+    "new": "      \"for\": \"M19.X3\",\n      \"index\": 0,\n      \"screen\": \"record\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],"
+   }
+  ],
+  "expect": "M19.F1 M19.X3 #0 runs on consumerNet10, a fresh app's server, which serves only a fresh app's page"
+ },
+ {
+  "name": "another module's test on a fresh app's page",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "      \"for\": \"X16.10\",\n      \"index\": 0,\n      \"screen\": \"admission\",\n      \"hosts\": [\n        \"net10\",\n        \"net48\"\n      ],\n      \"parts\": [\n        \"intakeForm\",\n        \"inputs\",\n        \"intakeEndpoint\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]",
+    "new": "      \"for\": \"X16.10\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": []"
+   }
+  ],
+  "expect": "M8.F1 X16.10 #0, a Validation test, runs on fresh, a fresh app's page, where only RenderingAndDelivery's tests run"
+ },
+ {
+  "name": "a fresh app's page that names no host",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "      \"hosts\": [\n        \"consumerNet10\",\n        \"consumerNet48\"\n      ],\n      \"parts\": [\n        {\n          \"id\": \"consumerHome\",",
+    "new": "      \"parts\": [\n        {\n          \"id\": \"consumerHome\","
+   }
+  ],
+  "expect": "screen fresh is a fresh app's page and names no host it runs under"
+ },
+ {
   "name": "a non-realtime test placed on the twin too",
   "edits": [
    {
     "file": "spec/Reference/app.json",
     "old": "      \"for\": \"X6.3\",\n      \"index\": 0,\n      \"screen\": \"residents\",\n      \"hosts\": [\n        \"net10\"\n      ],",
     "new": "      \"for\": \"X6.3\",\n      \"index\": 0,\n      \"screen\": \"residents\",\n      \"hosts\": [\n        \"net10\",\n        \"net48\"\n      ],"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a fresh app's host described in other words",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"what\": \"tests/Alis.Reactive.Consumer.Net48, a fresh classic MVC 5 project",
+    "new": "\"what\": \"tests/Alis.Reactive.Consumer.Net48, a new classic MVC 5 project"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a fresh app's test under both fresh hosts",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": []",
+    "new": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\",\n        \"consumerNet48\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": []"
    }
   ],
   "expect": null

@@ -2701,7 +2701,7 @@ def check_actions():
                   actions=len(actions), named=len(actions & named), unnamed=len(unnamed), promises=len(observed))
 
 
-APP_AREAS = {"care", "bench", "refusals"}
+APP_AREAS = {"care", "bench", "refusals", "delivery"}
 APP_SLICE_KINDS = {"FusionComponents": "fusion", "FusionTemplates": "fusion", "FusionAppLevelObjects": "fusion",
                    "NativeComponents": "nativeSlice", "NativeAppLevelObjects": "nativeSlice"}
 APP_REALTIME = {"stream", "hub"}
@@ -2748,6 +2748,7 @@ def app_screen_problems(app, screens, hosts):
         problems += [f"screen {name} says nothing of what a user does"] if not is_prose(screen.get("user")) else []
         problems += [f"screen {name} is under {screen['under']}, no screen"] if "under" in screen and screen["under"] not in screens else []
         problems += [f"screen {name} runs on {host}, no host" for host in screen.get("hosts", []) if host not in hosts]
+        problems += [f"screen {name} is a fresh app's page and names no host it runs under"] if screen.get("area") == "delivery" and not screen.get("hosts") else []
         problems += [f"screen {name}'s {part['id']} is a {part['kind']}, no part kind" for part in screen["parts"] if part["kind"] not in app["partKinds"]]
         problems += [f"screen {name}'s {part['id']} is a plain native part of InputsAndIds, and the core renders no input: a consumer's component does (M7.N2)"
                      for part in screen["parts"] if part["kind"] == "native" and part.get("module") == "InputsAndIds"]
@@ -2771,8 +2772,14 @@ def app_placement_problems(app, where, entry, screens, hosts, module, rung):
     problems += [f"{where} runs on {host}, which {screen['id']} is not on" for host in entry["hosts"] if "hosts" in screen and host not in screen["hosts"]]
     problems += [f"{where} uses the harness verb {verb!r}, which app.json's harness lacks" for verb in entry["harness"] if verb not in app["harness"]]
     problems += [f"{where} uses a stream or hub on net48" for host in entry["hosts"] if kinds & APP_REALTIME and hosts.get(host, {}).get("framework") == "net48"]
+    fresh_hosts = {host for other in screens.values() if other["area"] == "delivery" for host in other.get("hosts", [])}
+    problems += [f"{where} runs on {host}, a fresh app's server, which serves only a fresh app's page" for host in entry["hosts"]
+                 if host in fresh_hosts and screen["area"] != "delivery"]
+    problems += [f"{where} uses the harness verb {verb!r} on {screen['id']}, a fresh app's page, which holds no world"
+                 for verb in entry["harness"] if screen["area"] == "delivery"]
     if module is None:
         return problems
+    problems += [f"{where}, a {module} test, runs on {screen['id']}, a fresh app's page, where only RenderingAndDelivery's tests run"] if screen["area"] == "delivery" and module != "RenderingAndDelivery" else []
     refused = rung == "refusal"
     problems += [f"{where} is a refusal on {screen['id']}, where only refusal routes hold one"] if refused and screen["area"] != "refusals" else []
     problems += [f"{where} is a {rung} on the refusal routes"] if not refused and screen["area"] == "refusals" else []

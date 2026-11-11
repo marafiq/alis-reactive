@@ -3,7 +3,8 @@
   "areas": {
     "care": "a screen a care home's staff uses; it holds only what a user does",
     "bench": "the component bench: the object-surface variations of the custom components, which are no business behavior",
-    "refusals": "one route per refusal where the view renders, each a deliberately broken view whose error the test reads"
+    "refusals": "one route per refusal where the view renders, each a deliberately broken view whose error the test reads",
+    "delivery": "a fresh app's page: an app of its own that README.md's steps alone wire on the packed packages, outside the conformance app, with no World area"
   },
   "harness": {
     "seed": "writes the test's own data under its world key, through the world contract's typed builders: its records, the answers its endpoints script, and the sampler's decision for a request",
@@ -132,6 +133,16 @@
       "id": "fusionShell",
       "what": "a layout that renders FusionToast and FusionConfirmDialog in place of the Native ones",
       "framework": "net10"
+    },
+    {
+      "id": "consumerNet10",
+      "what": "tests/Alis.Reactive.Consumer.Net10, a fresh ASP.NET Core MVC app wired by README.md's net10 steps alone on the run's packs, its own server process, run by delivery-net10",
+      "framework": "net10"
+    },
+    {
+      "id": "consumerNet48",
+      "what": "tests/Alis.Reactive.Consumer.Net48, a fresh classic MVC 5 project restored by PackageReference and wired by README.md's net48 steps alone on the run's packs, served from IIS Express by verify-net48",
+      "framework": "net48"
     }
   ],
   "screens": [
@@ -890,6 +901,24 @@
           "id": "fusionRefusalValidator",
           "kind": "validator",
           "role": "the validators the refused Fusion pages render under"
+        }
+      ]
+    },
+    {
+      "id": "fresh",
+      "area": "delivery",
+      "title": "A fresh app's home page",
+      "user": "a developer's first page after installing the packages as README.md teaches",
+      "hosts": [
+        "consumerNet10",
+        "consumerNet48"
+      ],
+      "parts": [
+        {
+          "id": "consumerHome",
+          "kind": "native",
+          "role": "its layout and home view: one plan whose load step writes consumer-status",
+          "module": "RenderingAndDelivery"
         }
       ]
     }
@@ -5439,29 +5468,38 @@
       "index": 0,
       "screen": "shell",
       "hosts": [
-        "net10"
-      ],
-      "parts": [
-        "layout"
-      ],
-      "harness": [
-        "seed"
-      ]
-    },
-    {
-      "feature": "M19.F1",
-      "for": "M19.X1",
-      "index": 1,
-      "screen": "shell",
-      "hosts": [
         "net48"
       ],
       "parts": [
         "layout"
       ],
-      "harness": [
-        "seed"
-      ]
+      "harness": []
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X5",
+      "index": 0,
+      "screen": "fresh",
+      "hosts": [
+        "consumerNet10"
+      ],
+      "parts": [
+        "consumerHome"
+      ],
+      "harness": []
+    },
+    {
+      "feature": "M19.F1",
+      "for": "M19.X5",
+      "index": 1,
+      "screen": "fresh",
+      "hosts": [
+        "consumerNet48"
+      ],
+      "parts": [
+        "consumerHome"
+      ],
+      "harness": []
     },
     {
       "feature": "M19.F1",
@@ -6869,7 +6907,8 @@
       "index": 0,
       "screen": "admission",
       "hosts": [
-        "net10"
+        "net10",
+        "net48"
       ],
       "parts": [
         "intakeForm",

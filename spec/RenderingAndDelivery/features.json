@@ -191,7 +191,7 @@
           "meaning": "A view reads the registrations an app's startup calls write, once on each host, through one read per host: the request's services on net10 (HttpContext.RequestServices), and on net48 MVC 5's DependencyResolver.Current, which the app sets over its container in Application_Start. A registration a view needs and does not find is refused by its door's own refusal, X10.28 for AddReactiveRequests, whose net48 text names DependencyResolver.SetResolver beside the startup call."
         }
       ],
-      "oracle": "The WHATWG HTML standard's script data state for the text of a script element, and JSON's \\u escapes (RFC 8259), which the browser's JSON.parse reads; SHA-256 (FIPS 180-4) and base64url (RFC 4648, section 5); ASP.NET Core 10's asp-append-version and static web assets; MVC 5's DependencyResolver, read from the aspnetwebstack source; System.Text.Json 10's default encoder; and the verify-net48 run, which builds the net48 smoke app from the packages, serves it from IIS and lists the app's git status.",
+      "oracle": "The WHATWG HTML standard's script data state for the text of a script element, and JSON's \\u escapes (RFC 8259), which the browser's JSON.parse reads; SHA-256 (FIPS 180-4) and base64url (RFC 4648, section 5); ASP.NET Core 10's asp-append-version and static web assets; MVC 5's DependencyResolver, read from the aspnetwebstack source; System.Text.Json 10's default encoder; git's ignore rules (gitignore(5)) as git status reports them; and the delivery jobs, which build the fresh apps and the twin from the packed packages, serve them, and list each fresh app's git status.",
       "checker": [
         "core:Q14"
       ],
@@ -215,24 +215,21 @@
           "id": "M19.X4",
           "rung": "behavior",
           "defect": "A view that reads only an IServiceProvider, which an MVC 5 view is handed none of (the redesign passes none on net48: Alis.Reactive/Razor/PlanExtensions.cs:41 at 65fdf118d), so a net48 page whose app registered its requests and set MVC's resolver is refused as an app that never called AddReactiveRequests (X10.28)."
+        },
+        {
+          "id": "M19.X5",
+          "rung": "behavior",
+          "defect": "A fresh app on the packed packages, wired by README.md's steps alone, renders its page and never boots its plan: on net10 AlisReactive's package carries its runtime as no static web asset, so ~/_content/AlisReactive/js/alis-reactive.js answers 404, a path the conformance app, which takes the shipped projects, never reads; on net48 the classic MVC 5 project imports no build target from its PackageReference, or README.md's steps leave out one it needs (the runtime's link, Views/Web.config's namespaces, the binding redirects System.Text.Json 10.0.12 needs), which the twin's own startup supplies."
         }
       ],
       "promises": [
         {
           "for": "M19.X1",
-          "page": "A net10 rounds index with the link Open the rounds, to a rounds page whose layout links the framework's runtime as ~/_content/AlisReactive/js/alis-reactive.js with asp-append-version, served with a cache lifetime of one year, and whose Show the round button writes the round's ward, North, into round-ward. Between two visits the test host replaces the package's runtime, and the plans the app writes, with a later version's, as an upgrade does.",
-          "gesture": "On the rounds index, click Open the rounds and click Show the round; after the upgrade, go back to the rounds index, click Open the rounds and click Show the round.",
-          "outcome": "Each visit writes North into round-ward, and the runtime's URL on the second visit carries a v that differs from the first visit's.",
-          "opposite": "With the runtime left as it was between the visits, the second visit's runtime URL carries the first visit's v, and round-ward shows North.",
-          "defect": "The runtime's URL carries no hash of its bytes, so the second visit runs the runtime the browser cached, which refuses the later version's plan at boot (D19.10), and round-ward stays empty; or the v changes with a file that did not, so the opposite's two URLs differ."
-        },
-        {
-          "for": "M19.X1",
-          "page": "The net48 smoke app's home page, built from the packages and served from IIS by the verify-net48 run: its layout links the runtime as ~/Content/AlisReactive/js/alis-reactive.js with Url.AppendVersion, and its Show the proof check box shows reactive-proof.",
-          "gesture": "Check Show the proof.",
-          "outcome": "reactive-proof shows, and the runtime's URL ends with ?v= and the SHA-256 of the bytes IIS serves at it, in URL-safe base64.",
-          "opposite": "With the runtime's file changed and the app built again, the runtime's URL carries the new bytes' hash, and Show the proof still shows reactive-proof.",
-          "defect": "The layout links the file with Url.Content, as main's does (examples/net48-mvc-smoke/Views/Shared/_Layout.cshtml:18 at 623dd4a27), so the URL carries no v; or its v is the hash of bytes IIS does not serve at it."
+          "page": "The twin's shell, built from the packed packages and served from IIS Express: its layout links the runtime with Url.AppendVersion, and its links Open the north notice and Open the south notice are Url.AppendVersion over ~/Content/Shell/north.txt and ~/Content/Shell/south.txt, files the app ships holding the bytes North and South with no line end.",
+          "gesture": "Click Open the north notice; go back, and click Open the south notice.",
+          "outcome": "The first opens /Content/Shell/north.txt?v=Q_hTu7WShgCYp2FAwXcO4q3Wb0cgRT1k3PIlF44jjlc, which shows North.",
+          "opposite": "The second opens /Content/Shell/south.txt?v=DdLa5N2DrjCFzYCsG_wo6NdrpR3f2XLCaf6fmKhcCZo, which shows South.",
+          "defect": "Url.AppendVersion's v is not the SHA-256 of the bytes IIS serves at its path (the path's hash, the package's version, a build's time, or one v for every file), or it writes no v, as main's Url.Content link does (examples/net48-mvc-smoke/Views/Shared/_Layout.cshtml:18 at 623dd4a27), so after an upgrade the browser runs the runtime it cached."
         },
         {
           "for": "M19.X2",
@@ -257,6 +254,22 @@
           "outcome": "intake-status shows Saved Ada Lee.",
           "opposite": "With the app's resolver left unset, the intake page is refused where the view renders with X10.28's message, which on net48 names DependencyResolver.SetResolver beside AddReactiveRequests.",
           "defect": "The view reads only an IServiceProvider, which an MVC 5 view is handed none of, so the intake page is refused as an app that never called AddReactiveRequests, though it did; or the refusal of the opposite names AddReactiveRequests alone, which the app called."
+        },
+        {
+          "for": "M19.X5",
+          "page": "The fresh net10 app's home page: its layout links ~/_content/AlisReactive/js/alis-reactive.js with asp-append-version, and its plan's load step writes Booted into consumer-status, which the server renders as Not booted.",
+          "gesture": "Open the home page.",
+          "outcome": "consumer-status shows Booted.",
+          "opposite": "In a browser context with JavaScript off, consumer-status shows Not booted.",
+          "defect": "The package the fresh app restores serves no runtime at the path its layout links, or README.md's steps leave out one the page needs, so the plan never boots and consumer-status shows Not booted."
+        },
+        {
+          "for": "M19.X5",
+          "page": "The fresh MVC 5 app's home page: its layout links ~/Content/AlisReactive/js/alis-reactive.js with Url.AppendVersion, and its plan's load step writes Booted into consumer-status, which the server renders as Not booted.",
+          "gesture": "Open the home page.",
+          "outcome": "consumer-status shows Booted.",
+          "opposite": "In a browser context with JavaScript off, consumer-status shows Not booted.",
+          "defect": "The package the fresh app restores serves no runtime at the path its layout links, or README.md's steps leave out one the page needs, so the plan never boots and consumer-status shows Not booted."
         }
       ],
       "verdicts": []
