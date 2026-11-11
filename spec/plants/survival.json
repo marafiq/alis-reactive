@@ -22,12 +22,12 @@
   "expect": "is missing"
  },
  {
-  "name": "the orient mode prints no handoff (accepted: survival reads files, not output)",
+  "name": "the hook command written as two joined literals",
   "edits": [
    {
     "file": "spec/tools/check.py",
-    "old": "\"a claim stands on what is run now, never on what is recalled.\",",
-    "new": "\"a claim stands on what is run now.\","
+    "old": "HOOK_COMMAND = \"cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/spec-first; python3 spec/tools/check.py --orient\"",
+    "new": "HOOK_COMMAND = (\"cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/spec-first; \"\n                \"python3 spec/tools/check.py --orient\")"
    }
   ],
   "expect": null

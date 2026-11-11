@@ -14,7 +14,7 @@ import sys
 import tempfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 SPEC = Path(__file__).resolve().parent.parent
 REPO = SPEC.parent
@@ -487,7 +487,7 @@ def run_tlc(tla, cfg):
             cwd=tla.parent, capture_output=True, text=True,
         )
     lines = (completed.stdout + completed.stderr).splitlines()
-    green = any(TLC_GREEN in line for line in lines)
+    green = completed.returncode == 0 and any(TLC_GREEN in line for line in lines)
     violated = sorted({match.group(1) for line in lines for match in [re.search(r"Invariant (\w+) is violated", line)] if match})
     states = next((line.strip() for line in reversed(lines) if "distinct states found" in line), "")
     errors = [line.strip() for line in lines if line.startswith("Error") or "error" in line.lower() and "No error" not in line][:2]
@@ -582,20 +582,15 @@ def check_probes():
         if fact["host"] == "node":
             script = SPEC / "probes" / fact["probe"]
             if script not in outputs:
-                completed = subprocess.run(["node", str(script)], capture_output=True, text=True, cwd=REPO)
-                outputs[script] = completed.stdout.splitlines() if completed.returncode == 0 else ["exit " + str(completed.returncode) + ": " + completed.stderr[-300:]]
-            if fact["expect"] not in outputs[script]:
-                problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
+                outputs[script] = probe_run(fact["probe"], ["node", str(script)], REPO)
+            problems += probe_fact_problems(fact, outputs[script])
             continue
         if fact["host"] == "browser":
             script = SPEC / "probes" / fact["probe"]
             if script not in outputs:
                 command, environment = browser_probe(script)
-                completed = subprocess.run(command, capture_output=True, text=True, cwd=REPO, env=environment)
-                outputs[script] = completed.stdout.splitlines() if completed.returncode == 0 else ["exit " + str(completed.returncode) + ": " + completed.stderr[-300:]]
-            if fact["expect"] not in outputs[script]:
-                problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
-            problems += browser_proof_problems(fact, feature_ids)
+                outputs[script] = probe_run(fact["probe"], command, REPO, environment)
+            problems += probe_fact_problems(fact, outputs[script]) + browser_proof_problems(fact, feature_ids)
             continue
         if fact["host"] == "net48":
             source, _, number = fact["source"].rpartition(":")
@@ -605,12 +600,23 @@ def check_probes():
             continue
         probe = SPEC / "probes" / fact["probe"]
         if probe not in outputs:
-            completed = subprocess.run(["dotnet", "run", "--project", str(probe)], capture_output=True, text=True, cwd=probe)
-            outputs[probe] = completed.stdout.splitlines() if completed.returncode == 0 else ["exit " + str(completed.returncode) + ": " + completed.stderr[-300:]]
-        if fact["expect"] not in outputs[probe]:
-            problems.append(f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\"")
+            outputs[probe] = probe_run(fact["probe"], ["dotnet", "run", "--project", str(probe)], probe)
+        problems += probe_fact_problems(fact, outputs[probe])
+    problems = sorted({failure for _, failure in outputs.values() if failure}) + problems
     return result(not problems, "; ".join(problems[:6]) or "every fact printed by its probe or found at its source line, every browser fact with the proof the rewrite ships",
                   facts=len(facts), net10=sum(1 for fact in facts if fact["host"] == "net10"), net48=sum(1 for fact in facts if fact["host"] == "net48"), node=sum(1 for fact in facts if fact["host"] == "node"), browser=sum(1 for fact in facts if fact["host"] == "browser"))
+
+
+def probe_run(name, command, folder, environment=None):
+    completed = subprocess.run(command, capture_output=True, text=True, cwd=folder, env=environment)
+    if completed.returncode != 0:
+        return [], f"{name} exited {completed.returncode}: " + " ".join(completed.stderr.strip().splitlines()[-2:])[-240:]
+    return completed.stdout.splitlines(), None
+
+
+def probe_fact_problems(fact, run):
+    lines, failure = run
+    return [] if failure or fact["expect"] in lines else [f"{fact['id']}: {fact['probe']} printed no line \"{fact['expect']}\""]
 
 
 def browser_proof_problems(fact, feature_ids):
@@ -2782,6 +2788,7 @@ PLANTS = SPEC / "plants"
 PLANT_WORKERS = 4
 PLANT_EXEMPT = {"plants": "it runs every other check's plants"}
 PLANT_PASSED = {"CAUGHT", "KEPT"}
+PLANT_TIMEOUT = 1800
 
 
 def plant_sets():
@@ -2795,7 +2802,7 @@ def plant_shape_problems(check_id, plants):
         if not isinstance(plant, dict) or not is_prose(plant.get("name")) or not isinstance(edits, list) or not edits:
             problems.append(f"spec/plants/{check_id}.json holds a plant with no name or no edits")
         elif any(not plant_edit_shaped(edit) for edit in edits):
-            problems.append(f"spec/plants/{check_id}.json: {plant['name']} has an edit that is neither file, old and new text nor file and remove")
+            problems.append(f"spec/plants/{check_id}.json: {plant['name']} has an edit outside the repository or neither file, old and new text nor file and remove")
         elif plant.get("expect") is not None and not is_prose(plant.get("expect")):
             problems.append(f"spec/plants/{check_id}.json: {plant['name']} expects no text; an accepted plant expects null")
     return problems
@@ -2804,21 +2811,36 @@ def plant_shape_problems(check_id, plants):
 def plant_edit_shaped(edit):
     if not isinstance(edit, dict) or not isinstance(edit.get("file"), str):
         return False
+    path = PurePosixPath(edit["file"])
+    if not edit["file"] or path.is_absolute() or ".." in path.parts:
+        return False
     if edit.get("remove") is True:
         return set(edit) == {"file", "remove"}
     return set(edit) == {"file", "old", "new"} and all(isinstance(edit[key], str) for key in ("old", "new")) and edit["old"] != ""
 
 
+def worktree_changes():
+    listed = subprocess.run(["git", "-C", str(REPO), "status", "--porcelain=v1", "-z", "--untracked-files=all"],
+                            check=True, capture_output=True, text=True).stdout.split("\0")
+    changes, index = [], 0
+    while index < len(listed) and listed[index]:
+        changes.append(listed[index][3:])
+        if listed[index][0] in "RC":
+            index += 1
+            changes.append(listed[index])
+        index += 1
+    return changes
+
+
 def snapshot_worktree(target):
     subprocess.run(["git", "-C", str(REPO), "worktree", "add", "--detach", "-q", str(target), "HEAD"], check=True, capture_output=True)
-    for line in git("status", "--porcelain", "--untracked-files=all", "--", "spec").splitlines():
-        path = line[3:].split(" -> ")[-1]
+    for path in worktree_changes():
         source, copy = REPO / path, target / path
-        if source.is_file():
-            copy.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(source, copy)
-        elif copy.is_file():
+        if copy.is_symlink() or copy.is_file():
             copy.unlink()
+        if source.is_symlink() or source.is_file():
+            copy.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, copy, follow_symlinks=False)
 
 
 def planted_outcome(tree, check_id, plant):
@@ -2836,11 +2858,15 @@ def planted_outcome(tree, check_id, plant):
             if text.count(edit["old"]) != 1:
                 return {"pass": None, "detail": f"{edit['file']} holds {edit['old'][:50]!r} {text.count(edit['old'])} times"}
             path.write_text(text.replace(edit["old"], edit["new"]))
-        completed = subprocess.run([sys.executable, str(tree / "spec" / "tools" / "check.py"), "--check", check_id],
-                                   capture_output=True, text=True, cwd=tree)
+        try:
+            completed = subprocess.run([sys.executable, str(tree / "spec" / "tools" / "check.py"), "--check", check_id],
+                                       capture_output=True, text=True, cwd=tree, timeout=PLANT_TIMEOUT)
+        except subprocess.TimeoutExpired:
+            return {"pass": None, "detail": f"{check_id} ran past {PLANT_TIMEOUT} s"}
         if completed.returncode != 0:
             return {"pass": None, "detail": (completed.stderr.strip().splitlines() or ["the check printed nothing"])[-1]}
-        return json.loads(completed.stdout)
+        outcome = json.loads(completed.stdout)
+        return outcome if isinstance(outcome.get("pass"), bool) else {"pass": None, "detail": f"{check_id} returned pass {outcome.get('pass')!r}"}
     finally:
         for path, text in originals.items():
             path.write_text(text)
@@ -2875,8 +2901,9 @@ def run_plants(sets):
             return [verdict for found in pool.map(work, range(len(trees))) for verdict in found]
     finally:
         for tree in trees:
-            subprocess.run(["git", "-C", str(REPO), "worktree", "remove", "--force", str(tree)], capture_output=True)
+            subprocess.run(["git", "-C", str(REPO), "worktree", "remove", "--force", "--force", str(tree)], capture_output=True)
         shutil.rmtree(root, ignore_errors=True)
+        subprocess.run(["git", "-C", str(REPO), "worktree", "prune"], capture_output=True)
 
 
 def check_plants():
@@ -3061,6 +3088,13 @@ def run_one(check_id):
 
 def report_plants(names):
     sets = plant_sets()
+    known = {check_id for check_id, _, _ in CHECKS if check_id not in PLANT_EXEMPT}
+    refused = [f"{name} is no check that has plants" for name in names if name not in known]
+    refused += [f"spec/plants/{name}.json is absent" for name in names if name in known and name not in sets]
+    refused += [problem for name in names or sets for problem in plant_shape_problems(name, sets.get(name, []))]
+    if refused:
+        print("\n".join("REFUSED " + problem for problem in refused))
+        return 2
     verdicts = run_plants({name: sets.get(name, []) for name in names or sets})
     for check_id, name, verdict, detail in verdicts:
         print(f"{verdict} {check_id}: {name}: {detail[:200]}")

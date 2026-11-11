@@ -33,12 +33,12 @@
   "expect": "mvc5-sub-index-name: "
  },
  {
-  "name": "a fact's statement reworded",
+  "name": "two facts of one probe in another order",
   "edits": [
    {
     "file": "spec/probes/facts.json",
-    "old": "\"statement\": \"The largest number of parameters of a documented-public EJ2 method is 16 (ImageEditor.drawText).\"",
-    "new": "\"statement\": \"No documented-public EJ2 method takes more than 16 parameters (ImageEditor.drawText takes 16).\""
+    "old": "    {\n      \"id\": \"mvc5-sub-index-name\",\n      \"statement\": \"MVC 5 names a list item of a member by the member's name and the index in brackets, with no dot.\",\n      \"host\": \"net48\",\n      \"oracle\": \"MVC 5.3.0 source, AspNetWebStack v3.3.0\",\n      \"probe\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt\",\n      \"expect\": \"String.Format(CultureInfo.InvariantCulture, \\\"{0}[{1}]\\\", prefix, index)\",\n      \"source\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:417\"\n    },\n    {\n      \"id\": \"mvc5-sub-property-name\",\n      \"statement\": \"MVC 5 names a member of a member by joining the two names with a dot.\",\n      \"host\": \"net48\",\n      \"oracle\": \"MVC 5.3.0 source, AspNetWebStack v3.3.0\",\n      \"probe\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt\",\n      \"expect\": \"return prefix + \\\".\\\" + propertyName;\",\n      \"source\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:437\"\n    },\n",
+    "new": "    {\n      \"id\": \"mvc5-sub-property-name\",\n      \"statement\": \"MVC 5 names a member of a member by joining the two names with a dot.\",\n      \"host\": \"net48\",\n      \"oracle\": \"MVC 5.3.0 source, AspNetWebStack v3.3.0\",\n      \"probe\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt\",\n      \"expect\": \"return prefix + \\\".\\\" + propertyName;\",\n      \"source\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:437\"\n    },\n    {\n      \"id\": \"mvc5-sub-index-name\",\n      \"statement\": \"MVC 5 names a list item of a member by the member's name and the index in brackets, with no dot.\",\n      \"host\": \"net48\",\n      \"oracle\": \"MVC 5.3.0 source, AspNetWebStack v3.3.0\",\n      \"probe\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt\",\n      \"expect\": \"String.Format(CultureInfo.InvariantCulture, \\\"{0}[{1}]\\\", prefix, index)\",\n      \"source\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:417\"\n    },\n"
    }
   ],
   "expect": null

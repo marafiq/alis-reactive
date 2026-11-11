@@ -8,7 +8,7 @@
     "new": "CONSTANT Mutant = \"none\""
    }
   ],
-  "expect": "Tracing.violates.ChildEndsBeforeParent.cfg: expected ChildEndsBeforeParent violated"
+  "expect": "Tracing.violates.ChildEndsBeforeParent.cfg: expected ChildEndsBeforeParent violated, saw Model checking completed"
  },
  {
   "name": "a config that must hold now carries a mutant",
@@ -19,7 +19,7 @@
     "new": "CONSTANT Mutant = \"NameWithoutPrefix\""
    }
   ],
-  "expect": "Partials.holds.OwnPlanStops.cfg: expected green"
+  "expect": "Partials.holds.OwnPlanStops.cfg: expected green, saw violated: AttachedInputBindsItsMember"
  },
  {
   "name": "a counterexample of the redesign's validation shows another gap",
@@ -30,7 +30,7 @@
     "new": "INVARIANT AListNotSentReadsItsStart"
    }
   ],
-  "expect": "expected AConditionReadsTheObjectsStart violated"
+  "expect": "expected AConditionReadsTheObjectsStart violated, saw violated: AListNotSentReadsItsStart"
  },
  {
   "name": "Tracing's main config in another order",

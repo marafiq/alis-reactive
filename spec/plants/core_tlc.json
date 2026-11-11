@@ -8,7 +8,7 @@
     "new": "CONSTANT Mutant = \"none\""
    }
   ],
-  "expect": "DateWire.violates.DayIsItsDayAlone.cfg: expected DayIsItsDayAlone violated"
+  "expect": "DateWire.violates.DayIsItsDayAlone.cfg: expected DayIsItsDayAlone violated, saw Model checking completed"
  },
  {
   "name": "two mutants crossed, each killing the other's invariant",
