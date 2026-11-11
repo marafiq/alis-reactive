@@ -2165,16 +2165,23 @@ REWRITE_FEATURES = re.compile(r"^Features: (.+)$")
 
 
 def rewrite_units(text):
-    units, current = [], None
+    units, current, listing = [], None, None
     for line in text.splitlines():
         heading = REWRITE_UNIT.match(line)
         if heading:
-            current = {"id": heading.group(1), "number": int(heading.group(2)), "features": None}
+            current, listing = {"id": heading.group(1), "number": int(heading.group(2)), "features": None}, None
             units.append(current)
-            continue
-        listed = REWRITE_FEATURES.match(line)
-        if listed and current is not None:
-            current["features"] = [] if listed.group(1) == "none" else [name.strip() for name in listed.group(1).split(",")]
+        elif listing is not None and line.strip() and not line.startswith("#"):
+            listing.append(line.strip())
+        else:
+            listed = REWRITE_FEATURES.match(line)
+            listing = [listed.group(1)] if listed and current is not None else None
+            if listing is not None:
+                current["features"] = listing
+    for unit in units:
+        if unit["features"] is not None:
+            joined = " ".join(unit["features"])
+            unit["features"] = [] if joined == "none" else [name.strip() for name in joined.split(",")]
     return units
 
 
@@ -2426,6 +2433,16 @@ TEST_RANGE = re.compile(r"TEST001 to (TEST\d{3})")
 TEST_CHECKS = {"the bindings check", "the planted-defect run", "check_promises", "check_app", "the harness"}
 
 
+def logical_lines(text):
+    lines = []
+    for line in text.splitlines():
+        if lines and lines[-1].strip() and line.startswith(" ") and line.strip():
+            lines[-1] += " " + line.strip()
+        else:
+            lines.append(line)
+    return lines
+
+
 def test_rules_section(text):
     start = text.find("### 2.10 The test rules")
     return text[start:text.find("\n## 3.", start)] if start >= 0 else ""
@@ -2435,7 +2452,7 @@ def check_test_rules():
     path = SPEC / "REWRITE.md"
     if not path.exists():
         return not_started(path)
-    lines = (SPEC.parent / ".claude" / "rules" / "tests.md").read_text().splitlines()
+    lines = logical_lines((SPEC.parent / ".claude" / "rules" / "tests.md").read_text())
     rules = [f"{found.group(1)}. {found.group(2)}" for found in map(TEST_RULE.match, lines) if found]
     smells = [found.group(1) for found in map(TEST_SMELL.match, lines) if found]
     text = path.read_text()

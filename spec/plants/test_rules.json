@@ -77,6 +77,17 @@
   "expect": "REWRITE.md says TEST001 to TEST012, and the rules end at TEST013"
  },
  {
+  "name": "a new smell wrapped across two lines with no row",
+  "edits": [
+   {
+    "file": ".claude/rules/tests.md",
+    "old": "- A component library on a framework test's page (3).\n",
+    "new": "- A component library on a framework test's page (3).\n- A test that reads the wall clock or\n  the time zone of the machine (8).\n"
+   }
+  ],
+  "expect": "tests.md's 'A test that reads the wall clock or the time zone of the machine' is held by 0 rows"
+ },
+ {
   "name": "a held row's names in another order",
   "edits": [
    {
@@ -99,6 +110,28 @@
     "file": "spec/REWRITE.md",
     "old": "| A component library on a framework test's page | check_app, the harness |\n",
     "new": "| A component library on a framework test's page | check_app, the harness |\n| A wait on a fixed time | TEST003 |\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a smell rewrapped across two lines",
+  "edits": [
+   {
+    "file": ".claude/rules/tests.md",
+    "old": "- A component library on a framework test's page (3).\n",
+    "new": "- A component library on a\n  framework test's page (3).\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a rule's title wrapped across two lines",
+  "edits": [
+   {
+    "file": ".claude/rules/tests.md",
+    "old": "6. **Both sides of every promise.** The case where the behavior happens and the case where it must not: the\n",
+    "new": "6. **Both sides of\n   every promise.** The case where the behavior happens and the case where it must not: the\n"
    }
   ],
   "expect": null
