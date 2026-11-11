@@ -1,0 +1,34 @@
+[
+ {
+  "name": "a package's text missing",
+  "edits": [
+   {
+    "file": "spec/inventory/main/Alis.Reactive.Native/net10.0/PublicAPI.Unshipped.txt",
+    "remove": true
+   }
+  ],
+  "expect": "missing Alis.Reactive.Native/net10.0"
+ },
+ {
+  "name": "two of main's lines in another order",
+  "edits": [
+   {
+    "file": "spec/inventory/main/Alis.Reactive.Native/net10.0/PublicAPI.Unshipped.txt",
+    "old": "#nullable enable\nAlis.Reactive.Native.AppLevel.DrawerSize\nAlis.Reactive.Native.AppLevel.DrawerSize.Lg = 2 -> Alis.Reactive.Native.AppLevel.DrawerSize\n",
+    "new": "#nullable enable\nAlis.Reactive.Native.AppLevel.DrawerSize.Lg = 2 -> Alis.Reactive.Native.AppLevel.DrawerSize\nAlis.Reactive.Native.AppLevel.DrawerSize\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a blank line between two of main's lines",
+  "edits": [
+   {
+    "file": "spec/inventory/main/Alis.Reactive.Native/net10.0/PublicAPI.Unshipped.txt",
+    "old": "#nullable enable\nAlis.Reactive.Native.AppLevel.DrawerSize\n",
+    "new": "#nullable enable\n\nAlis.Reactive.Native.AppLevel.DrawerSize\n"
+   }
+  ],
+  "expect": null
+ }
+]

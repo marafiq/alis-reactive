@@ -1,0 +1,46 @@
+[
+ {
+  "name": "the owner's gate 2 answer a no",
+  "edits": [
+   {
+    "file": "spec/NOTES.md",
+    "old": "- 2026-11-10 owner, gate 2: yes (",
+    "new": "- 2026-11-10 owner, gate 2: no ("
+   }
+  ],
+  "expect": "gate 2 not answered"
+ },
+ {
+  "name": "the gate 2 yes the lead's, not the owner's",
+  "edits": [
+   {
+    "file": "spec/NOTES.md",
+    "old": "- 2026-11-10 owner, gate 2: yes (",
+    "new": "- 2026-11-10 lead, gate 2: yes ("
+   }
+  ],
+  "expect": "gate 2 not answered"
+ },
+ {
+  "name": "the gate 2 answer's note reworded",
+  "edits": [
+   {
+    "file": "spec/NOTES.md",
+    "old": "- 2026-11-10 owner, gate 2: yes (",
+    "new": "- 2026-11-10 owner, gate 2: yes, recorded here ("
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "the owner's gate 2 answer written with a capital",
+  "edits": [
+   {
+    "file": "spec/NOTES.md",
+    "old": "- 2026-11-10 owner, gate 2: yes (",
+    "new": "- 2026-11-10 owner, gate 2: Yes ("
+   }
+  ],
+  "expect": null
+ }
+]

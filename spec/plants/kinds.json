@@ -1,0 +1,167 @@
+[
+ {
+  "name": "a kind named twice",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.1 |\n",
+    "new": "| statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.1 |\n| statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.1 |\n"
+   }
+  ],
+  "expect": "a kind named twice: ['stop']"
+ },
+ {
+  "name": "a kind of today's grammar marked absent",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| expression | ref | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:29` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D8.8 |\n",
+    "new": "| expression | ref | absent | added | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | D8.8 |\n"
+   }
+  ],
+  "expect": "schema.md's today column differs from the grammar: ['ref']"
+ },
+ {
+  "name": "a today cite on another kind's case",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| statement | set | `Alis.Reactive.Assets/runtime/grammar/execute.ts:25` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | Q2 |\n",
+    "new": "| statement | set | `Alis.Reactive.Assets/runtime/grammar/execute.ts:26` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | Q2 |\n"
+   }
+  ],
+  "expect": "set: Alis.Reactive.Assets/runtime/grammar/execute.ts:26 holds no case \"set\" at the State SHA"
+ },
+ {
+  "name": "a plugin data cite on the none case",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| plugin data | hub | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.hub` | D12.6 |\n",
+    "new": "| plugin data | hub | `Alis.Reactive.Assets/runtime/plans/start.ts:38` | kept | the plugin the plan names, `alis.hub` | D12.6 |\n"
+   }
+  ],
+  "expect": "hub: Alis.Reactive.Assets/runtime/plans/start.ts:38 holds no pluginNamed(locator.name).contribute at the State SHA"
+ },
+ {
+  "name": "a kind marked added beside today's cite",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| statement | do | `Alis.Reactive.Assets/runtime/grammar/execute.ts:26` | kept | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | Q4 |\n",
+    "new": "| statement | do | `Alis.Reactive.Assets/runtime/grammar/execute.ts:26` | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | Q4 |\n"
+   }
+  ],
+  "expect": "do: proposed added beside today '`Alis.Reactive.Assets/runtime/grammar/execute.ts:26`'"
+ },
+ {
+  "name": "an added kind whose reason the design does not state",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.1 |\n",
+    "new": "| statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.99 |\n"
+   }
+  ],
+  "expect": "stop: added by N4.99, which DESIGN.md does not state"
+ },
+ {
+  "name": "a handler naming no runtime file",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| statement | listen | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D12.8 |\n",
+    "new": "| statement | listen | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/listen.ts` | D12.8 |\n"
+   }
+  ],
+  "expect": "listen: 'the statement switch of `Alis.Reactive.Assets/runtime/grammar/listen.ts`' names not exactly one runtime file"
+ },
+ {
+  "name": "a plugin data handler naming no plugin",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| plugin data | hub | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.hub` | D12.6 |\n",
+    "new": "| plugin data | hub | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, alis.hub | D12.6 |\n"
+   }
+  ],
+  "expect": "hub: its handler names no plugin"
+ },
+ {
+  "name": "a kind Schema.tla's node set drops",
+  "edits": [
+   {
+    "file": "spec/Schema/Schema.tla",
+    "old": "\"all\", \"request\", \"stop\", \"listen\"}",
+    "new": "\"all\", \"request\", \"listen\"}"
+   }
+  ],
+  "expect": "schema.md's proposed set differs from Schema.tla's Kinds: ['stop']"
+ },
+ {
+  "name": "D19.2 closing the set at another count",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D19.2 The set is closed at 51 kinds:",
+    "new": "- D19.2 The set is closed at 52 kinds:"
+   }
+  ],
+  "expect": "D19.2 closes the set at 52 kinds, and schema.md proposes 51"
+ },
+ {
+  "name": "a proposed column outside its closed set",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| expression | obj | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:28` | kept | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | Q5 |\n",
+    "new": "| expression | obj | `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:28` | keep | the expression switch of `Alis.Reactive.Assets/runtime/grammar/evaluate.ts` | Q5 |\n"
+   }
+  ],
+  "expect": "obj: proposed 'keep'"
+ },
+ {
+  "name": "the none plugin data given a handler",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| plugin data | none | `Alis.Reactive.Assets/runtime/plans/start.ts:38` | kept | none | S4 |\n",
+    "new": "| plugin data | none | `Alis.Reactive.Assets/runtime/plans/start.ts:38` | kept | the plugin data switch of `Alis.Reactive.Assets/runtime/plans/start.ts` | S4 |\n"
+   }
+  ],
+  "expect": "none has a handler"
+ },
+ {
+  "name": "two kind rows in another order",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "| statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.1 |\n| statement | listen | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D12.8 |\n",
+    "new": "| statement | listen | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | D12.8 |\n| statement | stop | absent | added | the statement switch of `Alis.Reactive.Assets/runtime/grammar/execute.ts` | N4.1 |\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "the paragraph under the table reworded",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "Today 33 kinds, proposed 51: nineteen added, one removed",
+    "new": "Today holds 33 kinds and the proposed set 51: nineteen added, one removed"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "the table's separator row aligned left",
+  "edits": [
+   {
+    "file": "spec/Core/schema.md",
+    "old": "|-------|------|-------|----------|---------|-----|\n",
+    "new": "|:------|:-----|:------|:---------|:--------|:----|\n"
+   }
+  ],
+  "expect": null
+ }
+]

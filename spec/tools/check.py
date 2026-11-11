@@ -175,24 +175,88 @@ def door_lines(text):
     return [line for line in text.splitlines() if line.strip() and line.strip() != "#nullable enable"]
 
 
+LINE_SHAS = {"redesign": BASE_SHA, "main": MAIN_SHA}
+MAIN_PLAN_TS = "Alis.Reactive.Assets/runtime/types/plan.ts"
+KIND_READERS = {
+    ("redesign", "grammar"): lambda: grammar_kinds(BASE_SHA),
+    ("redesign", "plan.schema.json"): lambda: schema_json_kinds(BASE_SHA),
+    ("main", "plan.ts"): lambda: set(re.findall(r'\bkind:\s*"(\w+)"', git("show", f"{MAIN_SHA}:{MAIN_PLAN_TS}"))),
+}
+ANALYZER_DECLARATION = re.compile(r'(\w+) = "(ALIS\d{3})"')
+ANALYZER_STATUS = {(True, True): "both", (True, False): "redesign-only", (False, True): "main-only"}
+CASE_LABEL = re.compile(r'case "([^"]+)"')
+
+
+def inventory_door_problems(doors):
+    sides = [
+        ("redesign", REDESIGN_PACKAGES, "package", "redesign_line",
+         lambda package, tfm: [line for name in ["PublicAPI.Unshipped.txt", "PublicAPI.Shipped.txt"]
+                               for line in door_lines(git("show", f"{BASE_SHA}:{package}/PublicAPI/{tfm}/{name}"))]),
+        ("main", MAIN_PACKAGES, "main_package", "main_line",
+         lambda package, tfm: door_lines((SPEC / "inventory" / "main" / package / tfm / "PublicAPI.Unshipped.txt").read_text())),
+    ]
+    problems = []
+    for side, packages, holder, column, source_lines in sides:
+        for package, tfms in packages.items():
+            for tfm in tfms:
+                source = Counter(source_lines(package, tfm))
+                rows = Counter(row[column] for row in doors if row[holder] == package and row["tfm"] == tfm and row[column])
+                unheld, unsourced = source - rows, rows - source
+                if unheld or unsourced:
+                    first = next(iter(unheld or unsourced))
+                    problems.append(f"{side} {package} {tfm}: {sum(unheld.values())} door lines no row holds and "
+                                    f"{sum(unsourced.values())} rows no door line holds, first {first[:80]!r}")
+    return problems
+
+
+def inventory_kind_problems(kinds):
+    held = {(row["line"], row["source"]) for row in kinds}
+    problems = [f"kinds.tsv holds {line} {source} rows, which no reader reads" for line, source in sorted(held - set(KIND_READERS))]
+    for (line, source), read in KIND_READERS.items():
+        rows = {row["kind"] for row in kinds if row["line"] == line and row["source"] == source}
+        found = read()
+        if rows != found:
+            problems.append(f"kinds.tsv's {line} {source} rows differ from the source: {sorted(rows ^ found)[:6]}")
+    return problems
+
+
+def inventory_analyzer_problems(analyzers):
+    problems = []
+    for side, sha in LINE_SHAS.items():
+        declared = {}
+        for hit in git("grep", "-n", "-E", r'[A-Za-z_]+ = "ALIS[0-9]{3}"', sha, "--", "Alis.Reactive.Analyzers").splitlines():
+            _, path, _, text = hit.split(":", 3)
+            declared.update({ident: f"{path}#{name}" for name, ident in ANALYZER_DECLARATION.findall(text)})
+        rows = {row["id"]: row[side] for row in analyzers if row[side]}
+        problems += [f"analyzers.tsv: the {side} line declares {ident} at {where}, and no row holds it" for ident, where in sorted(declared.items()) if ident not in rows]
+        problems += [f"analyzers.tsv: {ident}'s {side} location {where} declares no {ident} at {sha[:9]}" for ident, where in sorted(rows.items()) if declared.get(ident) != where]
+    problems += [f"analyzers.tsv: {row['id']} is marked {row['status']}" for row in analyzers if ANALYZER_STATUS.get((bool(row["redesign"]), bool(row["main"]))) != row["status"]]
+    return problems
+
+
+def inventory_case_problems(cases):
+    problems, held, texts = [], {}, {}
+    for row in cases:
+        key = (row["line"], row["file"])
+        if key not in texts:
+            texts[key] = git("show", f"{LINE_SHAS[row['line']]}:{row['file']}").splitlines()
+        held.setdefault(key, set()).add(row["label"])
+        number = int(row["line_number"])
+        if number > len(texts[key]) or f'case "{row["label"]}"' not in texts[key][number - 1]:
+            problems.append(f"cases.tsv: {row['line']} {row['file']}:{number} holds no case \"{row['label']}\"")
+    for (line, path), labels in sorted(held.items()):
+        found = set(CASE_LABEL.findall("\n".join(texts[(line, path)])))
+        if found != labels:
+            problems.append(f"cases.tsv: the {line} {path} cases differ from its rows: {sorted(found ^ labels)[:6]}")
+    return problems
+
+
 def check_inventory():
     paths = [SPEC / "inventory" / name for name in INVENTORY_FILES]
     if any(not path.exists() for path in paths):
         return not_started(*paths)
-    problems = []
     doors = table("doors.tsv")
-    for package, tfms in REDESIGN_PACKAGES.items():
-        for tfm in tfms:
-            source = sum(len(door_lines(git("show", f"{BASE_SHA}:{package}/PublicAPI/{tfm}/{name}"))) for name in ["PublicAPI.Unshipped.txt", "PublicAPI.Shipped.txt"])
-            rows = sum(1 for row in doors if row["package"] == package and row["tfm"] == tfm and row["redesign_line"])
-            if source != rows:
-                problems.append(f"redesign {package} {tfm}: {source} doors, {rows} rows")
-    for package, tfms in MAIN_PACKAGES.items():
-        for tfm in tfms:
-            source = len(door_lines((SPEC / "inventory" / "main" / package / tfm / "PublicAPI.Unshipped.txt").read_text()))
-            rows = sum(1 for row in doors if row["main_package"] == package and row["tfm"] == tfm and row["main_line"])
-            if source != rows:
-                problems.append(f"main {package} {tfm}: {source} doors, {rows} rows")
+    problems = inventory_door_problems(doors)
     for row in doors:
         expected = ("both" if row["package"] == row["main_package"] else "moved") if row["redesign_line"] and row["main_line"] else "redesign-only" if row["redesign_line"] else "main-only"
         if row["status"] != expected or not row["declaring_type"]:
@@ -205,14 +269,12 @@ def check_inventory():
         if attributes != cases:
             problems.append(f"{line} tests: {attributes} test attributes, {cases} cases in rows")
     kinds = table("kinds.tsv")
-    grammar = {row["kind"] for row in kinds if row["source"] == "grammar"}
+    problems += inventory_kind_problems(kinds) + inventory_analyzer_problems(table("analyzers.tsv")) + inventory_case_problems(table("cases.tsv"))
     schema = {row["kind"] for row in kinds if row["source"] == "plan.schema.json"}
-    if grammar != schema:
-        problems.append(f"grammar and schema kinds differ: {sorted(grammar ^ schema)}")
     status = {}
     for row in doors:
         status[row["status"]] = status.get(row["status"], 0) + 1
-    return result(not problems, "; ".join(problems[:8]) or "every door, test and kind reconciles with its source",
+    return result(not problems, "; ".join(problems[:8]) or "every door, kind, analyzer and case row equals its source line by line, and every test count its attributes",
                   doors=len(doors), both=status.get("both", 0), moved=status.get("moved", 0), main_only=status.get("main-only", 0), redesign_only=status.get("redesign-only", 0),
                   tests=len(tests), kinds=len(schema), analyzers=len(table("analyzers.tsv")), cases=len(table("cases.tsv")))
 
@@ -748,7 +810,7 @@ def closed_set_problems(proposed, today, added, removed):
 
 def gate_answered(number):
     notes = (SPEC / "NOTES.md").read_text() if (SPEC / "NOTES.md").exists() else ""
-    return re.search(rf"^- \d{{4}}-\d{{2}}-\d{{2}} owner, gate {number}: yes\b", notes, re.MULTILINE) is not None
+    return re.search(rf"^- \d{{4}}-\d{{2}}-\d{{2}} owner, gate {number}: (?i:yes)\b", notes, re.MULTILINE) is not None
 
 
 def check_gate(number):
@@ -2732,11 +2794,19 @@ def plant_shape_problems(check_id, plants):
         edits = plant.get("edits") if isinstance(plant, dict) else None
         if not isinstance(plant, dict) or not is_prose(plant.get("name")) or not isinstance(edits, list) or not edits:
             problems.append(f"spec/plants/{check_id}.json holds a plant with no name or no edits")
-        elif any(not isinstance(edit, dict) or not all(isinstance(edit.get(key), str) for key in ("file", "old", "new")) or not edit["old"] for edit in edits):
-            problems.append(f"spec/plants/{check_id}.json: {plant['name']} has an edit without file, old and new text")
+        elif any(not plant_edit_shaped(edit) for edit in edits):
+            problems.append(f"spec/plants/{check_id}.json: {plant['name']} has an edit that is neither file, old and new text nor file and remove")
         elif plant.get("expect") is not None and not is_prose(plant.get("expect")):
             problems.append(f"spec/plants/{check_id}.json: {plant['name']} expects no text; an accepted plant expects null")
     return problems
+
+
+def plant_edit_shaped(edit):
+    if not isinstance(edit, dict) or not isinstance(edit.get("file"), str):
+        return False
+    if edit.get("remove") is True:
+        return set(edit) == {"file", "remove"}
+    return set(edit) == {"file", "old", "new"} and all(isinstance(edit[key], str) for key in ("old", "new")) and edit["old"] != ""
 
 
 def snapshot_worktree(target):
@@ -2756,8 +2826,13 @@ def planted_outcome(tree, check_id, plant):
     try:
         for edit in plant["edits"]:
             path = tree / edit["file"]
-            text = path.read_text() if path.is_file() else ""
+            if not path.is_file():
+                return {"pass": None, "detail": f"{edit['file']} is not a file in the plant tree"}
+            text = path.read_text()
             originals.setdefault(path, text)
+            if edit.get("remove"):
+                path.unlink()
+                continue
             if text.count(edit["old"]) != 1:
                 return {"pass": None, "detail": f"{edit['file']} holds {edit['old'][:50]!r} {text.count(edit['old'])} times"}
             path.write_text(text.replace(edit["old"], edit["new"]))

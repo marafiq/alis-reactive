@@ -1,0 +1,128 @@
+[
+ {
+  "name": "a module folder the module table does not name",
+  "edits": [
+   {
+    "file": "spec/CLAUDE.md",
+    "old": "| 5 | Elements | view author |",
+    "new": "| 5 | Element | view author |"
+   }
+  ],
+  "expect": "spec/Elements/features.json: Elements is no module of spec/CLAUDE.md"
+ },
+ {
+  "name": "a features.json naming another module",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"module\": \"Elements\",",
+    "new": "\"module\": \"Element\","
+   }
+  ],
+  "expect": "spec/Elements/features.json: module is not Elements"
+ },
+ {
+  "name": "a feature id of another module",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"id\": \"M5.F1\",",
+    "new": "\"id\": \"M6.F1\","
+   }
+  ],
+  "expect": "spec/Elements/features.json: feature id 'M6.F1' is not a new M5.F<n>"
+ },
+ {
+  "name": "a type with no spec row",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "        \"Alis.Reactive:ChildElement\",\n",
+    "new": "        \"Alis.Reactive:ChildElements\",\n"
+   }
+  ],
+  "expect": "M5.F1: type Alis.Reactive:ChildElements has no spec row in doors.tsv"
+ },
+ {
+  "name": "a claim of no spec door",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> HtmlElement!\",",
+    "new": "\"Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> HtmlElements!\","
+   }
+  ],
+  "expect": "M5.F1: claim Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> HtmlElements! is no spec door in doors.tsv"
+ },
+ {
+  "name": "a door claimed by the feature that maps its type",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> HtmlElement!\",",
+    "new": "\"Alis.Reactive:PipelineBuilder<TModel>.Element(string! elementId) -> HtmlElement!\",\n        \"Alis.Reactive:HtmlElement.Show() -> void\","
+   }
+  ],
+  "expect": "HtmlElement.Show() -> void: claimed by the feature that maps its type"
+ },
+ {
+  "name": "a type mapped by two features",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "      \"types\": [\n        \"Alis.Reactive:TypedDslExemptionAttribute\"\n      ],",
+    "new": "      \"types\": [\n        \"Alis.Reactive:TypedDslExemptionAttribute\",\n        \"Alis.Reactive:HtmlElement\"\n      ],"
+   }
+  ],
+  "expect": "14 spec doors in two features"
+ },
+ {
+  "name": "a type mapped by no feature",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "        \"Alis.Reactive:ChildElement\",\n",
+    "new": ""
+   }
+  ],
+  "expect": "every feature row valid; 6 of 8909 spec doors in no feature"
+ },
+ {
+  "name": "a core door no module names",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `N5.6` new: `Read(..)` on a property's read",
+    "new": "- `N5.99` new: an element's attributes as a declared map.\n- `N5.6` new: `Read(..)` on a property's read"
+   }
+  ],
+  "expect": "core doors no module names: N5.99"
+ },
+ {
+  "name": "two types in another order",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "        \"Alis.Reactive:HtmlElement\",\n        \"Alis.Reactive:ElementContent\",\n",
+    "new": "        \"Alis.Reactive:ElementContent\",\n        \"Alis.Reactive:HtmlElement\",\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a new core door its module names",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `N5.6` new: `Read(..)` on a property's read",
+    "new": "- `N5.99` new: an element's attributes as a declared map.\n- `N5.6` new: `Read(..)` on a property's read"
+   },
+   {
+    "file": "spec/Elements/module.md",
+    "old": "- `M5.N5` new: `pipeline.Element(id)`, the extension method in Elements",
+    "new": "- `M5.N5` new: `pipeline.Element(id)`, the extension method in Elements, beside N5.99's attributes,"
+   }
+  ],
+  "expect": null
+ }
+]

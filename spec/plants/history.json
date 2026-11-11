@@ -1,0 +1,90 @@
+[
+ {
+  "name": "a regression SHA's row dropped",
+  "edits": [
+   {
+    "file": "spec/history.tsv",
+    "old": "0090a6adc\tredesign\tP1\tprobe:core-template-prefix-name\n",
+    "new": ""
+   }
+  ],
+  "expect": "missing 0090a6adc"
+ },
+ {
+  "name": "a row naming no commit",
+  "edits": [
+   {
+    "file": "spec/history.tsv",
+    "old": "34c99d608\tredesign\tP5\tDESIGN.md#Q16\n",
+    "new": "000000000\tredesign\tP5\tDESIGN.md#Q16\n"
+   }
+  ],
+  "expect": "000000000 is no commit"
+ },
+ {
+  "name": "a row naming the wrong branch",
+  "edits": [
+   {
+    "file": "spec/history.tsv",
+    "old": "a893ca7aa\tboth\t",
+    "new": "a893ca7aa\tmain\t"
+   }
+  ],
+  "expect": "a893ca7aa is on both, the row says main"
+ },
+ {
+  "name": "a spec line naming a question the design lacks",
+  "edits": [
+   {
+    "file": "spec/history.tsv",
+    "old": "31aacf71e\tboth\tP1\tDESIGN.md#Q14\n",
+    "new": "31aacf71e\tboth\tP1\tDESIGN.md#Q61\n"
+   }
+  ],
+  "expect": "31aacf71e spec line DESIGN.md#Q61 resolves to nothing"
+ },
+ {
+  "name": "a spec line naming an undefined invariant",
+  "edits": [
+   {
+    "file": "spec/history.tsv",
+    "old": "0b47eafd7\tboth\tP3\tOwnership.tla:HubKeptWhileHeld\n",
+    "new": "0b47eafd7\tboth\tP3\tOwnership.tla:HubKeptWhileHold\n"
+   }
+  ],
+  "expect": "0b47eafd7 spec line Ownership.tla:HubKeptWhileHold resolves to nothing"
+ },
+ {
+  "name": "a spec line naming a probe no fact holds",
+  "edits": [
+   {
+    "file": "spec/history.tsv",
+    "old": "aba543d9c\tredesign\tP1\tprobe:core-sanitized-id\n",
+    "new": "aba543d9c\tredesign\tP1\tprobe:core-sanitized-ids\n"
+   }
+  ],
+  "expect": "aba543d9c spec line probe:core-sanitized-ids resolves to nothing"
+ },
+ {
+  "name": "two rows in another order",
+  "edits": [
+   {
+    "file": "spec/history.tsv",
+    "old": "0090a6adc\tredesign\tP1\tprobe:core-template-prefix-name\naba543d9c\tredesign\tP1\tprobe:core-sanitized-id\n",
+    "new": "aba543d9c\tredesign\tP1\tprobe:core-sanitized-id\n0090a6adc\tredesign\tP1\tprobe:core-template-prefix-name\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a row naming its full SHA",
+  "edits": [
+   {
+    "file": "spec/history.tsv",
+    "old": "31aacf71e\tboth\tP1\tDESIGN.md#Q14\n",
+    "new": "31aacf71e5655a879df4dd77adb02d83192189e6\tboth\tP1\tDESIGN.md#Q14\n"
+   }
+  ],
+  "expect": null
+ }
+]

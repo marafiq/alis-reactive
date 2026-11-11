@@ -1,0 +1,207 @@
+[
+ {
+  "name": "a question's heading without its dot",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "## Q5. The object model\n",
+    "new": "## Q5 The object model\n"
+   }
+  ],
+  "expect": "Q5 absent"
+ },
+ {
+  "name": "a part's label reworded off its form",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "**Schema nodes.** `as`, the shapes of D3.1",
+    "new": "Schema nodes: `as`, the shapes of D3.1"
+   }
+  ],
+  "expect": "Q3: no Schema nodes"
+ },
+ {
+  "name": "an Evidence cite past its file's end",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "(`Alis.Reactive/Grammar/BodyStep.cs:42`)",
+    "new": "(`Alis.Reactive/Grammar/BodyStep.cs:4200`)"
+   }
+  ],
+  "expect": "Q1: Evidence cite Alis.Reactive/Grammar/BodyStep.cs:4200 resolves at neither SHA"
+ },
+ {
+  "name": "a checker invariant the cfg no longer checks",
+  "edits": [
+   {
+    "file": "spec/ValuesAndSources/Absence.cfg",
+    "old": "INVARIANT ConditionTermsLazy\n",
+    "new": ""
+   }
+  ],
+  "expect": "Q4: Checker Absence.tla:ConditionTermsLazy is not checked by Absence.cfg"
+ },
+ {
+  "name": "a type defect naming a door no Doors section proposes",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "cannot be constructed: new:N1.1.",
+    "new": "cannot be constructed: new:N1.19."
+   }
+  ],
+  "expect": "Q1: X1.1 type cites no resolving file:line and no new:N door"
+ },
+ {
+  "name": "an analyzer defect naming no analyzer and no door",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "name\n  the member the input binds, as m => m.Name.\" At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.",
+    "new": "name\n  the member the input binds, as m => m.Name.\" At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.99."
+   }
+  ],
+  "expect": "Q2: X2.5 analyzer names no existing ALIS id and no new:N door"
+ },
+ {
+  "name": "a refusal defect whose message lost its quotes",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "cannot write as a property name: \"A dictionary",
+    "new": "cannot write as a property name: A dictionary"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "key it by text or a number.\"",
+    "new": "key it by text or a number."
+   }
+  ],
+  "expect": "Q1: X1.4 refusal quotes no message"
+ },
+ {
+  "name": "a defect id given to two questions",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X2.1` type (D2.1): reading a member",
+    "new": "- `X1.1` type (D2.1): reading a member"
+   }
+  ],
+  "expect": "Q2: defect X1.1 also in Q1"
+ },
+ {
+  "name": "a module door no module states",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `N5.6` new: `Read(..)` on a property's read",
+    "new": "- `N5.6` new (M5.N99): `Read(..)` on a property's read"
+   }
+  ],
+  "expect": "Q5: names M5.N99, which no module states"
+ },
+ {
+  "name": "a section's checkers written without their backticks",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "**Checker.**\n- `Ownership.tla:RulesLeaveWithTheirOwner`\n- `Ownership.tla:RegistrationsDoNotAccumulate`\n- `probe:core-form-duplicate-name`\n- `probe:core-json-duplicate-name`\n- `probe:mvc5-form-duplicate-first`\n- `probe:mvc5-json-duplicate-last`\n",
+    "new": "**Checker.**\n- Ownership.tla:RulesLeaveWithTheirOwner\n- Ownership.tla:RegistrationsDoNotAccumulate\n- probe:core-form-duplicate-name\n- probe:core-json-duplicate-name\n- probe:mvc5-form-duplicate-first\n- probe:mvc5-json-duplicate-last\n"
+   }
+  ],
+  "expect": "Q13: Checker names no invariant or probe"
+ },
+ {
+  "name": "a section's defects written without their rungs",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.1` behavior",
+    "new": "- `X13.1` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.2` behavior",
+    "new": "- `X13.2` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.3` behavior",
+    "new": "- `X13.3` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.4` behavior",
+    "new": "- `X13.4` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.5` behavior",
+    "new": "- `X13.5` browser"
+   }
+  ],
+  "expect": "Q13: Defects lists no defect with a rung"
+ },
+ {
+  "name": "a Decision written as prose, no closed statement",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D15.1 The core depends",
+    "new": "D15.1 The core depends"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D15.2 Templates are",
+    "new": "D15.2 Templates are"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D15.3 What the engine",
+    "new": "D15.3 What the engine"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D15.4 Each of the three",
+    "new": "D15.4 Each of the three"
+   }
+  ],
+  "expect": "Q15: Decision has no closed statement"
+ },
+ {
+  "name": "a Decision bullet reworded",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D1.8 The member names in a path are the wire names of Q2 for the host the view renders on.",
+    "new": "- D1.8 A path's member names are Q2's wire names for the host the view renders on."
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a type defect rewrapped so its door opens the next line",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X1.2` type (D1.2): a member whose name looks like a marker is still a member: new:N1.1 writes members as strings only.",
+    "new": "- `X1.2` type (D1.2): a member whose name looks like a marker is still a member:\n  new:N1.1 writes members as strings only."
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "two checker bullets in another order",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "**Checker.**\n- `probe:mvc5-sub-index-name`\n- `probe:mvc5-sub-property-name`\n",
+    "new": "**Checker.**\n- `probe:mvc5-sub-property-name`\n- `probe:mvc5-sub-index-name`\n"
+   }
+  ],
+  "expect": null
+ }
+]

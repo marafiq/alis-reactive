@@ -1,0 +1,117 @@
+[
+ {
+  "name": "the last question's heading without its dot",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "## Q21. Realtime: server-sent events and SignalR\n",
+    "new": "## Q21 Realtime: server-sent events and SignalR\n"
+   }
+  ],
+  "expect": "Q21 absent"
+ },
+ {
+  "name": "a checker naming no check of check.py",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `check:kinds`, which reads the grammar",
+    "new": "- `check:kind`, which reads the grammar"
+   }
+  ],
+  "expect": "Q19: Checker check:kind is no check.py check"
+ },
+ {
+  "name": "a checker invariant misspelled",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `Tracing.tla:ResendCountSent`\n",
+    "new": "- `Tracing.tla:ResendCountSend`\n"
+   }
+  ],
+  "expect": "Q20: Checker Tracing.tla:ResendCountSend is not defined"
+ },
+ {
+  "name": "a checker invariant the cfg no longer checks",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.cfg",
+    "old": "\nINVARIANT ResendCountSent",
+    "new": ""
+   }
+  ],
+  "expect": "Q20: Checker Tracing.tla:ResendCountSent is not checked by Tracing.cfg"
+ },
+ {
+  "name": "a checker probe no fact pins",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `probe:core-caller-line-follows-line-directive`\n",
+    "new": "- `probe:core-caller-line-follows-line-directives`\n"
+   }
+  ],
+  "expect": "Q20: Checker probe:core-caller-line-follows-line-directives is not in spec/probes/facts.json"
+ },
+ {
+  "name": "a Decision naming a spec file that does not exist",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D19.1 The schema is `spec/Core/schema.md`:",
+    "new": "- D19.1 The schema is `spec/Core/schemas.md`:"
+   }
+  ],
+  "expect": "Q19: Decision names spec/Core/schemas.md, which does not exist"
+ },
+ {
+  "name": "a refusal defect whose message lost its quotes",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "\"A page that names a stream\n  or a hub needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime.\"",
+    "new": "A page that names a stream\n  or a hub needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime."
+   }
+  ],
+  "expect": "Q21: X21.11 refusal quotes no message"
+ },
+ {
+  "name": "an Evidence part naming files with no line",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "`Alis.Reactive.Assets/runtime/diagnostics/trace.ts:13-18`",
+    "new": "`Alis.Reactive.Assets/runtime/diagnostics/trace.ts`"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "`Alis.Reactive.Assets/runtime/diagnostics/trace.ts:46`",
+    "new": "`Alis.Reactive.Assets/runtime/diagnostics/trace.ts`"
+   }
+  ],
+  "expect": "Q20: Evidence cites no file:line"
+ },
+ {
+  "name": "two checker bullets in another order",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `Tracing.tla:NothingRecordedWhenOff`\n- `Tracing.tla:EveryStartedSpanEnds`\n",
+    "new": "- `Tracing.tla:EveryStartedSpanEnds`\n- `Tracing.tla:NothingRecordedWhenOff`\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a refusal's quoted message rewrapped",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "\"A page that names a stream\n  or a hub needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime.\"",
+    "new": "\"A page that names a stream or a hub\n  needs the app's reconnect choice: call ShowReconnect() or NoReconnectOffer() in AddReactiveRealtime.\""
+   }
+  ],
+  "expect": null
+ }
+]
