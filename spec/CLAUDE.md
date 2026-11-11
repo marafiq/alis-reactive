@@ -641,6 +641,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   client); TypeScript and Microsoft.AspNetCore.Mvc.Testing are held by a peer range and by net10.0. The SDK is
   11.0.100 and Node 26.13.0. Dependabot proposes every newer stable version, majors among them, and the nightly
   workflow compares the tools it does not read; a finding of either package audit fails the checks.
+- The lead, 2026-11-11, within the owner's decision of 2026-11-06 that each lint rule enforces one line of the spec
+  and the line names its rule: the lint beyond its two presets is the closed list of `spec/REWRITE.md` section 2.7
+  (an exhaustive switch for S4, strict boolean conditions for S2, no `==`, an element found by its id, imports by the
+  slice table), each named at its line and each proven by a refused and an accepted file; TypeScript runs with every
+  strictness option on, erasableSyntaxOnly holding S8's no enum on the compiler's rung. The strict lint and options
+  were run over the POC's runtime, which had never been linted: one compiler finding and 22 lint findings in 2,241
+  lines. A selector for `instanceof`, a catch or `??` is not on the list, since that runtime holds each by design;
+  one joins only with the spec line that makes it exact. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

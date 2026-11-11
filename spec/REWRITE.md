@@ -25,7 +25,7 @@ in the line.
   | The render | a refusal the compiler cannot see, on the refusal routes | Playwright |
   | Playwright | behavior: a gesture and its visible outcome, in Chromium | every pull request |
   | The test rules | that a browser test cannot lean on the code it tests: TEST001 to TEST013 (section 2.10) | every build of a Playwright project |
-  | Architecture tests | what the repository holds: no comment, every name a rule file cites, the hooks' refusals, the app's pages and statics, the runner's result line, a fresh app's git status | every pull request |
+  | Architecture tests | what the repository holds: no comment, every name a rule file cites, the hooks' refusals, the app's pages and statics, the runner's result line, the lint's own rules, a fresh app's git status | every pull request |
   | Cases and plants | that each analyzer, test rule, architecture test and check.py check reports its refused case by name and passes its accepted case (section 2.10) | with the rule each proves |
   | verify-net48 | each test whose placement lists the twin, on MVC 5 (no stream or hub: realtime is net10's, check_app), and the packed packages on a fresh MVC 5 app | every pull request |
   | Vitest, PlanTests | feedback while coding (BRIEF.md, Principles 10); never counted as proof | the inner loop |
@@ -102,7 +102,8 @@ tests/
                                               conformance app WhenAnAppRendersItsPages and SandboxStaticStateTests,
                                               renamed WhenTheAppHoldsNoStaticState, over each fresh app's build
                                               WhenAConsumerAppIsBuilt (section 2.9), and over the runner's result
-                                              WhenAPlaywrightRunEnds (section 2.5), each rule with its refused and
+                                              WhenAPlaywrightRunEnds (section 2.5), and over the lint's rules
+                                              WhenTheLintIsConfigured (section 2.7), each rule with its refused and
                                               accepted cases, which WhenAnArchitectureTestIsWritten holds; their
                                               helpers Repository, Scripts and read-scripts
 spec/                                         the design source: BRIEF.md, REWRITE.md (this file), CLAUDE.md,
@@ -274,9 +275,9 @@ actions its tests will observe. A change to an async lane is a spec change first
 | net48 build | PolySharp 1.17.0, Microsoft.NETFramework.ReferenceAssemblies 1.0.3, both private | the attributes C# 14's features need on net48, written as source, and the reference assemblies a build on any OS compiles against |
 | MSBuild SDK | Microsoft.Build.NoTargets 3.7.134 | the Assets project |
 | Node | 26.13.0 (`.node-version`) | esbuild, tsc, eslint, node probes |
-| TypeScript | 6.0.3 | `tsc -b`, no emit, the strictest options (strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature); held by typescript-eslint 8.72.2, whose peer range ends below 6.1.0 (the latest is 7.0.2) |
+| TypeScript | 6.0.3 | `tsc -b`, no emit, every strictness option on: strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature, noImplicitReturns, noFallthroughCasesInSwitch, noUnusedLocals, noUnusedParameters, noUncheckedSideEffectImports, verbatimModuleSyntax, isolatedModules and erasableSyntaxOnly, which refuses an enum (S8), with allowUnreachableCode and allowUnusedLabels off; held by typescript-eslint 8.72.2, whose peer range ends below 6.1.0 (the latest is 7.0.2) |
 | esbuild | 0.28.2 | one root `build.mjs`, one bundle per package |
-| ESLint | eslint 10.14.0, @eslint/js 10.0.1, typescript-eslint 8.72.2, with minimatch 11.0.7 by an override of the 10.2.6 they bring, which npm's audit reports (GHSA-g3hv-75wg-m249) | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, `--max-warnings 0`; `switch-exhaustiveness-check`, `no-floating-promises`, `no-unnecessary-condition`, and `no-restricted-syntax` on wide DOM queries |
+| ESLint | eslint 10.14.0, @eslint/js 10.0.1, typescript-eslint 8.72.2, with minimatch 11.0.7 by an override of the 10.2.6 they bring, which npm's audit reports (GHSA-g3hv-75wg-m249) | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, each of their rules an error, `--max-warnings 0`, no rule turned off or down and no inline configuration (`noInlineConfig`); the rules beyond the presets are listed below the table |
 | Vitest | 5.1.0, node environment, no jsdom | feedback beside the runtime's code |
 | @microsoft/signalr | 10.0.11 | the hub's own asset; held on the 10.0 line, the line of the hub it talks to (the latest is 11.0.0) |
 | OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.1 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
@@ -303,6 +304,30 @@ and the Playwright image, and ignores this table's holds and nothing else; `scri
 nightly workflow runs, compares Node, Python, Java and TLC with their registries, which Dependabot does not read. A
 finding of NuGet's audit or of `npm audit` fails `scripts/check.sh`, and a package it names moves to its patched
 version by a pin or an override in this table.
+
+The lint beyond its presets is closed. Each rule enforces one line of the spec, which names it, and a rule joins the
+list only with its line, in the unit that brings that line's code:
+- `@typescript-eslint/switch-exhaustiveness-check` refuses a switch over a union that has no case for one of its
+  members, a `default` beside it or not (S4).
+- `@typescript-eslint/strict-boolean-expressions`, with every one of its allowances off, refuses a condition and an
+  operand of `&&`, `||` or `!` that is no boolean: a text, a number or a nullable value never stands for true or false,
+  and a missing value is compared with `null` or `undefined` by name (S2).
+- `eqeqeq` refuses `==` and `!=`, a second conversion beside the one (BRIEF.md, Principles 7).
+- `no-restricted-syntax` refuses a call of `querySelector`, `querySelectorAll`, `getElementsByClassName`,
+  `getElementsByTagName`, `getElementsByName`, `closest` or `matches`: an element is found by its id (BRIEF.md,
+  Principles 8; M5.N1). It is lifted in one file, the one of `runtime/Execution/` that finds a root's plans.
+- `no-restricted-imports`, which `eslint.config.js` writes from each `SliceTree.txt`, refuses an import from a later
+  row (section 2.3).
+
+The presets already hold `no-floating-promises` (D4.4), `no-unnecessary-condition` and `no-non-null-assertion` (S2):
+since no field of the plan is optional or nullable, a default for plan data is a condition the types call unnecessary.
+Principles 8's other lines (what a listener received read by its constructor, a catch that goes on) are about what a
+value means, which no selector states: the POC's runtime, the proven design, holds `instanceof` 12 times, `try` 8 and
+`??` 8 at feb301c88, so a blanket selector would refuse the design itself. WhenTheLintIsConfigured, an architecture
+test, proves each rule of the list as section 2.10 proves every rule: it lints a refused file and an accepted file
+for the rule with the repository's own configuration and expects the rule's id at the refused file's line and no
+message for the accepted one, so a selector that matches nothing fails its refused case; its last case holds that an
+inline disable changes no result.
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, `tsc -b`, eslint, `dotnet build -c Release`, the
 architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (build, then run, with the selectors below,
@@ -558,7 +583,7 @@ Features: M20.F1
 
 The cut and the rewritten rule files (section 4's opening), the pins of section 2.7 with the TLC lock, central package
 management, the SliceTree tables, the analyzers project with ALIS010 to ALIS013 and module 20's rules, the lint at its
-strictest, `check.py --ci`, `scripts/check.sh` green on an empty core, and every architecture test it keeps with its
+strictest with its rules' cases (WhenTheLintIsConfigured), `check.py --ci`, `scripts/check.sh` green on an empty core, and every architecture test it keeps with its
 refused and accepted cases and WhenAnArchitectureTestIsWritten (section 2.10).
 
 ### U2. The harness, the conformance app's shell and CI

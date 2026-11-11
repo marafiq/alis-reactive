@@ -11,10 +11,12 @@ meaning, and `spec/Schema/Schema.tla` checks that what C# accepts is what the br
   nodes this file names for it.
 - S2 Every field is required. No field is optional, and none holds `null` as a state: a value that can be absent is a closed
   union with a kind for each case (the owner, 2026-11-06). `null` appears only as a value data holds: a `lit`
-  of null, and the JSON of a start.
+  of null, and the JSON of a start. In the browser the lint holds it: strict-boolean-expressions, no-unnecessary-condition
+  and no-non-null-assertion (`spec/REWRITE.md` section 2.7).
 - S3 A kind is one name across the whole schema, so a kind names its node without its union.
 - S4 Every kind has exactly one handler in the browser: one `case` in the one switch over its union, ending in
-  `assertNever`, or, for plugin data, the plugin the plan names. `none` has no handler: it is the plugin data of
+  `assertNever` (the lint's switch-exhaustiveness-check refuses a switch that lacks a case), or, for plugin data, the
+  plugin the plan names. `none` has no handler: it is the plugin data of
   a plugin that contributes nothing.
 - S5 A path is a list of path steps (Q1): a JSON string is a member, a non-negative JSON integer is an index, and
   `{"kind":"each"}` is every item of a list. `each` appears only in a registration's paths.
@@ -28,7 +30,8 @@ meaning, and `spec/Schema/Schema.tla` checks that what C# accepts is what the br
     per case, written as its text;
   - a choice whose cases carry data is a kind.
 
-  The TypeScript contract is the union of those texts, and every switch over it ends in `assertNever`. Today's
+  The TypeScript contract is the union of those texts, and every switch over it ends in `assertNever`; the browser's
+  TypeScript declares no enum either, which the compiler's erasableSyntaxOnly refuses. Today's
   `Operator` and `PathMembers` become such classes; the public `VendorEventPayload` leaves, since a handler carries its
   payload as a path (D17.4). The texts below in code
   font (`required`, `overlap`, `fill`) are the cases of such classes.
