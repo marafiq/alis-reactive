@@ -1,0 +1,145 @@
+[
+ {
+  "name": "Fusion ships its stylesheet",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "`alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js`",
+    "new": "`alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js`, `alis-reactive-fusion.css`"
+   }
+  ],
+  "expect": "ships alis-reactive-fusion.css"
+ },
+ {
+  "name": "the adapter's row dropped",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| AlisReactive.OpenTelemetry | net48, net10.0 | none | `build/net48` copy | `alis-reactive-opentelemetry.js`, its bundle holding 2.7's OpenTelemetry pins | AlisReactive at the same version, exactly |\n",
+    "new": ""
+   }
+  ],
+  "expect": "no row for AlisReactive.OpenTelemetry"
+ },
+ {
+  "name": "section 1 counts five",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "**Six packages, one version.**",
+    "new": "**Five packages, one version.**"
+   }
+  ],
+  "expect": "section 1 says Five packages"
+ },
+ {
+  "name": "U3 packs five",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "the six packages packed",
+    "new": "the five packages packed"
+   }
+  ],
+  "expect": "U3 says five packages"
+ },
+ {
+  "name": "a stylesheet ships",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "`alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js`",
+    "new": "`alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js`, `fusion.css`"
+   }
+  ],
+  "expect": "ships fusion.css"
+ },
+ {
+  "name": "DiagnosticSource dropped from the core",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": ", System.Diagnostics.DiagnosticSource 10.0.12 (D20.8), Microsoft.AspNet.Mvc 5.3.0; net10",
+    "new": ", Microsoft.AspNet.Mvc 5.3.0; net10"
+   }
+  ],
+  "expect": "lack System.Diagnostics.DiagnosticSource"
+ },
+ {
+  "name": "a pin without a version",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| MSBuild SDK | Microsoft.Build.NoTargets 3.7.0 |",
+    "new": "| MSBuild SDK | Microsoft.Build.NoTargets |"
+   }
+  ],
+  "expect": "MSBuild SDK pins no version"
+ },
+ {
+  "name": "a dependency at another version",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "(D20.8), Microsoft.AspNet.Mvc 5.3.0; net10",
+    "new": "(D20.8), Microsoft.AspNet.Mvc 5.2.9; net10"
+   }
+  ],
+  "expect": "takes Microsoft.AspNet.Mvc 5.2.9, and section 2.7 pins another version"
+ },
+ {
+  "name": "a kept reference unpinned",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| Plan schema | JsonSchema.Net 9.1.2 | PlanTests and the architecture tests read every plan against `plan.schema.json` |\n",
+    "new": ""
+   }
+  ],
+  "expect": "references JsonSchema.Net, which section 2.7 pins nowhere"
+ },
+ {
+  "name": "the retirement's words gone",
+  "edits": [
+   {
+    "file": "spec/CLAUDE.md",
+    "old": "if not needed remove it that is better\". The rewrite",
+    "new": "keep it\". The rewrite"
+   }
+  ],
+  "expect": "the decision CLAUDE.md states for Alis.Reactive.FluentValidator is no longer there"
+ },
+ {
+  "name": "the retired id packed",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| AlisReactive.Native | net48, net10.0 | none |",
+    "new": "| AlisReactive.FluentValidator | net48, net10.0 | none | none | none | AlisReactive |\n| AlisReactive.Native | net48, net10.0 | none |"
+   }
+  ],
+  "expect": "packs AlisReactive.FluentValidator, which no decision keeps or adds"
+ },
+ {
+  "name": "an empty id loses a target",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| AlisReactive.DesignSystem | `lib/net48/_._`, `lib/net10.0/_._` |",
+    "new": "| AlisReactive.DesignSystem | `lib/net10.0/_._` |"
+   }
+  ],
+  "expect": "AlisReactive.DesignSystem targets"
+ },
+ {
+  "name": "two package rows in another order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |\n| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |",
+    "new": "| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |\n| AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |"
+   }
+  ],
+  "expect": null
+ }
+]

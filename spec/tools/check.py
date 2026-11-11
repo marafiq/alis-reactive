@@ -8,10 +8,12 @@ import os
 import platform
 import tokenize
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 SPEC = Path(__file__).resolve().parent.parent
@@ -2714,6 +2716,116 @@ def check_no_comments():
     return result(not hits, "; ".join(hits[:10]) or "no comment in the spec's Python or TLA+", comments=len(hits))
 
 
+PLANTS = SPEC / "plants"
+PLANT_WORKERS = 4
+PLANT_EXEMPT = {"plants": "it runs every other check's plants"}
+PLANT_PASSED = {"CAUGHT", "KEPT"}
+
+
+def plant_sets():
+    return {path.stem: json.loads(path.read_text()) for path in sorted(PLANTS.glob("*.json"))}
+
+
+def plant_shape_problems(check_id, plants):
+    problems = []
+    for plant in plants if isinstance(plants, list) else [None]:
+        edits = plant.get("edits") if isinstance(plant, dict) else None
+        if not isinstance(plant, dict) or not is_prose(plant.get("name")) or not isinstance(edits, list) or not edits:
+            problems.append(f"spec/plants/{check_id}.json holds a plant with no name or no edits")
+        elif any(not isinstance(edit, dict) or not all(isinstance(edit.get(key), str) for key in ("file", "old", "new")) or not edit["old"] for edit in edits):
+            problems.append(f"spec/plants/{check_id}.json: {plant['name']} has an edit without file, old and new text")
+        elif plant.get("expect") is not None and not is_prose(plant.get("expect")):
+            problems.append(f"spec/plants/{check_id}.json: {plant['name']} expects no text; an accepted plant expects null")
+    return problems
+
+
+def snapshot_worktree(target):
+    subprocess.run(["git", "-C", str(REPO), "worktree", "add", "--detach", "-q", str(target), "HEAD"], check=True, capture_output=True)
+    for line in git("status", "--porcelain", "--untracked-files=all", "--", "spec").splitlines():
+        path = line[3:].split(" -> ")[-1]
+        source, copy = REPO / path, target / path
+        if source.is_file():
+            copy.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, copy)
+        elif copy.is_file():
+            copy.unlink()
+
+
+def planted_outcome(tree, check_id, plant):
+    originals = {}
+    try:
+        for edit in plant["edits"]:
+            path = tree / edit["file"]
+            text = path.read_text() if path.is_file() else ""
+            originals.setdefault(path, text)
+            if text.count(edit["old"]) != 1:
+                return {"pass": None, "detail": f"{edit['file']} holds {edit['old'][:50]!r} {text.count(edit['old'])} times"}
+            path.write_text(text.replace(edit["old"], edit["new"]))
+        completed = subprocess.run([sys.executable, str(tree / "spec" / "tools" / "check.py"), "--check", check_id],
+                                   capture_output=True, text=True, cwd=tree)
+        if completed.returncode != 0:
+            return {"pass": None, "detail": (completed.stderr.strip().splitlines() or ["the check printed nothing"])[-1]}
+        return json.loads(completed.stdout)
+    finally:
+        for path, text in originals.items():
+            path.write_text(text)
+
+
+def plant_verdict(plant, outcome):
+    if outcome["pass"] is None:
+        return "SETUP"
+    if plant.get("expect") is None:
+        return "KEPT" if outcome["pass"] else "BROKE"
+    return "CAUGHT" if outcome["pass"] is False and plant["expect"] in outcome["detail"] else "MISSED"
+
+
+def run_plants(sets):
+    jobs = [(check_id, plant) for check_id, plants in sets.items() for plant in plants]
+    if not jobs:
+        return []
+    root = Path(tempfile.mkdtemp(prefix="alis-plants-"))
+    trees = [root / f"tree{number}" for number in range(min(PLANT_WORKERS, len(jobs)))]
+
+    def work(index):
+        found = []
+        for check_id, plant in jobs[index::len(trees)]:
+            outcome = planted_outcome(trees[index], check_id, plant)
+            found.append((check_id, plant["name"], plant_verdict(plant, outcome), outcome["detail"]))
+        return found
+
+    try:
+        for tree in trees:
+            snapshot_worktree(tree)
+        with ThreadPoolExecutor(len(trees)) as pool:
+            return [verdict for found in pool.map(work, range(len(trees))) for verdict in found]
+    finally:
+        for tree in trees:
+            subprocess.run(["git", "-C", str(REPO), "worktree", "remove", "--force", str(tree)], capture_output=True)
+        shutil.rmtree(root, ignore_errors=True)
+
+
+def check_plants():
+    sets = plant_sets()
+    known = [check_id for check_id, _, _ in CHECKS if check_id not in PLANT_EXEMPT]
+    problems = [f"spec/plants/{name}.json names no check of check.py" for name in sets if name not in known]
+    for check_id, plants in sets.items():
+        problems += plant_shape_problems(check_id, plants)
+    if problems:
+        return result(False, "; ".join(problems[:6]), problems=len(problems))
+    verdicts = run_plants({name: plants for name, plants in sets.items() if name in known})
+    problems += [f"{check_id} {verdict} {name}: {detail[:140]}" for check_id, name, verdict, detail in verdicts if verdict not in PLANT_PASSED]
+    unrefused = [check_id for check_id in known if not any(plant.get("expect") for plant in sets.get(check_id, []))]
+    unaccepted = [check_id for check_id in known if not any(plant.get("expect") is None for plant in sets.get(check_id, []))]
+    problems += [f"{len(unrefused)} checks have no refused plant: {', '.join(unrefused)}"] if unrefused else []
+    problems += [f"{len(unaccepted)} checks have no accepted plant: {', '.join(unaccepted)}"] if unaccepted else []
+    caught = sum(1 for verdict in verdicts if verdict[2] == "CAUGHT")
+    kept = sum(1 for verdict in verdicts if verdict[2] == "KEPT")
+    proven = len(known) - len(set(unrefused) | set(unaccepted))
+    detail = f"{caught} refused plants caught and {kept} accepted plants kept green; {proven} of {len(known)} checks proven both ways"
+    return result(not problems, "; ".join(problems[:6]) or detail, caught=caught, kept=kept, proven=proven, checks=len(known),
+                  failed=len(verdicts) - caught - kept, unrefused=len(unrefused), unaccepted=len(unaccepted))
+
+
 CHECKS = [
     ("survival", "brief, notes, file map, check, compact hook and pushed branch", check_survival),
     ("main_surface", "main's PublicAPI text per package and target framework", check_main_surface),
@@ -2751,6 +2863,7 @@ CHECKS = [
     ("actions", "every action of the async lanes' specs named by one promise, the test app's endpoint holding it", check_actions),
     ("app", "every test placed on the care home app, no core test loading Syncfusion, no environment on a care screen", check_app),
     ("slice_tests", "every rendered slice of Native, Fusion and their app-level objects with a placed behavior test of its own", check_slice_tests),
+    ("plants", "every other check fails on each refused plant with its text and stays green on each accepted plant, run in throwaway worktrees", check_plants),
 ]
 
 STEPS = [
@@ -2763,7 +2876,7 @@ STEPS = [
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
-    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests"], "Finish every check and make each pass."),
+    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests", "plants"], "Finish every check and make each pass."),
     (11, "E", "REWRITE.md", ["rewrite_units", "packages", "paths", "rewrite_cites"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]
@@ -2864,10 +2977,32 @@ def orient():
     ]))
 
 
+def run_one(check_id):
+    previous = json.loads(STATE.read_text()) if STATE.exists() else {}
+    if check_id in ("core_tlc", "tlc"):
+        return check_tlc(False, previous, 4 if check_id == "core_tlc" else 5)
+    return next(function for name, _, function in CHECKS if name == check_id)()
+
+
+def report_plants(names):
+    sets = plant_sets()
+    verdicts = run_plants({name: sets.get(name, []) for name in names or sets})
+    for check_id, name, verdict, detail in verdicts:
+        print(f"{verdict} {check_id}: {name}: {detail[:200]}")
+    passed = sum(1 for verdict in verdicts if verdict[2] in PLANT_PASSED)
+    print(f"plants: {passed} of {len(verdicts)} as expected")
+    return 0 if passed == len(verdicts) else 1
+
+
 def main():
     if "--orient" in sys.argv[1:]:
         orient()
         return 0
+    if sys.argv[1:2] == ["--check"]:
+        print(json.dumps(run_one(sys.argv[2])))
+        return 0
+    if sys.argv[1:2] == ["--plants"]:
+        return report_plants(sys.argv[2:])
     brief = "--brief" in sys.argv[1:]
     previous = json.loads(STATE.read_text()) if STATE.exists() else {}
     outcomes = run_checks(brief, previous)

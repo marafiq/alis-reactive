@@ -1,0 +1,24 @@
+[
+ {
+  "name": "a hub test on the twin",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "      \"for\": \"X21.1\",\n      \"index\": 0,\n      \"screen\": \"round\",\n      \"hosts\": [\n        \"net10\"\n      ],",
+    "new": "      \"for\": \"X21.1\",\n      \"index\": 0,\n      \"screen\": \"round\",\n      \"hosts\": [\n        \"net10\",\n        \"net48\"\n      ],"
+   }
+  ],
+  "expect": "uses a stream or hub on net48"
+ },
+ {
+  "name": "a non-realtime test placed on the twin too",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "      \"for\": \"X6.3\",\n      \"index\": 0,\n      \"screen\": \"residents\",\n      \"hosts\": [\n        \"net10\"\n      ],",
+    "new": "      \"for\": \"X6.3\",\n      \"index\": 0,\n      \"screen\": \"residents\",\n      \"hosts\": [\n        \"net10\",\n        \"net48\"\n      ],"
+   }
+  ],
+  "expect": null
+ }
+]

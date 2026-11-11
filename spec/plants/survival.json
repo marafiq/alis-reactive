@@ -1,0 +1,35 @@
+[
+ {
+  "name": "the hook runs another command",
+  "edits": [
+   {
+    "file": "spec/tools/check.py",
+    "old": "spec-first; python3 spec/tools/check.py --orient\"",
+    "new": "spec-first; python3 spec/tools/check.py --brief\""
+   }
+  ],
+  "expect": "the compact|resume SessionStart hook is not installed"
+ },
+ {
+  "name": "the handoff file is gone",
+  "edits": [
+   {
+    "file": "spec/tools/check.py",
+    "old": "memory/project-spec-first-branch.md\"",
+    "new": "memory/project-spec-first-gone.md\""
+   }
+  ],
+  "expect": "is missing"
+ },
+ {
+  "name": "the orient mode prints no handoff (accepted: survival reads files, not output)",
+  "edits": [
+   {
+    "file": "spec/tools/check.py",
+    "old": "\"a claim stands on what is run now, never on what is recalled.\",",
+    "new": "\"a claim stands on what is run now.\","
+   }
+  ],
+  "expect": null
+ }
+]

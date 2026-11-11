@@ -1,0 +1,79 @@
+[
+ {
+  "name": "a retired script unnamed",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "- SonarQube, `docker-compose.sonarqube.yml` and `scripts/sonar-analyze.sh`:",
+    "new": "- SonarQube, `docker-compose.sonarqube.yml`:"
+   }
+  ],
+  "expect": "scripts/sonar-analyze.sh has no verdict"
+ },
+ {
+  "name": "a kept script retired too",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "- SonarQube, `docker-compose.sonarqube.yml` and",
+    "new": "- SonarQube, `scripts/run.sh`, `docker-compose.sonarqube.yml` and"
+   }
+  ],
+  "expect": "scripts/run.sh is both kept by section 2 and retired by section 3"
+ },
+ {
+  "name": "the lock file out of the tree",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "package.json  package-lock.json  eslint.config.js",
+    "new": "package.json  eslint.config.js"
+   }
+  ],
+  "expect": "package-lock.json has no verdict"
+ },
+ {
+  "name": "an architecture test unnamed",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "WhenARuleNamesTheCode, WhenClaudeRunsAHook, the POC's",
+    "new": "WhenARuleNamesTheCode, the POC's"
+   }
+  ],
+  "expect": "tests/Alis.Reactive.ArchitectureTests/WhenClaudeRunsAHook.cs has no verdict"
+ },
+ {
+  "name": "one of main's skills unnamed",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "`.claude/skills/modern-csharp`, `.claude/skills/reactive-dsl`,",
+    "new": "`.claude/skills/modern-csharp`,"
+   }
+  ],
+  "expect": ".claude/skills/reactive-dsl has no verdict"
+ },
+ {
+  "name": "a glob dropped",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "`.claude/memory/*`, `.claude/hookify.*.local.md`,",
+    "new": "`.claude/memory/*`,"
+   }
+  ],
+  "expect": ".claude/hookify.bdd-public-api-only.local.md has no verdict"
+ },
+ {
+  "name": "a retired item's reason reworded",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "the rewrite's quality is section 1's layers,",
+    "new": "the rewrite's quality lives in section 1's layers,"
+   }
+  ],
+  "expect": null
+ }
+]
