@@ -175,7 +175,8 @@ tables and the names; the module table is `spec/CLAUDE.md`'s.
   at HEAD.
 - `scripts/check.sh` (every check that needs no browser; its last line is "[check] every check passed."),
   `scripts/test.sh` (that, then every browser test), `scripts/doctor.sh` (every pin against what this machine
-  runs), `scripts/build.sh`, `scripts/pack.sh <version>`. A script joins this list with the commit that writes it
+  runs), `scripts/build.sh`, `scripts/run.sh` (the conformance app at http://localhost:5220),
+  `scripts/pack.sh <version>`. A script joins this list with the commit that writes it
   (`spec/REWRITE.md`, section 2.7).
 - Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a version held
   below the latest names what holds it in its row of `spec/REWRITE.md` section 2.7. Syncfusion's hold is the owner's:
