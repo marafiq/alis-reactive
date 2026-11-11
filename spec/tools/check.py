@@ -642,7 +642,7 @@ def browser_probe(script):
     host = REPO / "tests" / "Alis.Reactive.Playwright.TestHost" / "Alis.Reactive.Playwright.TestHost.csproj"
     bundled = Path.home() / ".nuget" / "packages" / "microsoft.playwright" / PLAYWRIGHT_PIN.search(host.read_text()).group(1) / ".playwright"
     node = bundled / "node" / f"{PLAYWRIGHT_SYSTEMS[platform.system()]}-{PLAYWRIGHT_MACHINES[platform.machine()]}" / "node"
-    environment = {**os.environ, "PLAYWRIGHT_PACKAGE": str(bundled / "package"), "NODE_PATH": str(checkout_root() / "node_modules")}
+    environment = {**os.environ, "PLAYWRIGHT_PACKAGE": str(bundled / "package"), "NODE_PATH": str(installed_modules())}
     return [str(node), str(script)], environment
 
 
@@ -1335,6 +1335,10 @@ def prose_cites(text):
 
 def checkout_root():
     return Path(git("rev-parse", "--path-format=absolute", "--git-common-dir")).parent
+
+
+def installed_modules():
+    return next((folder / "node_modules" for folder in [REPO, *REPO.parents] if (folder / "node_modules").is_dir()), checkout_root() / "node_modules")
 
 
 def installed_package_lines(path):
@@ -3124,7 +3128,8 @@ def run_plants(sets):
     jobs = [(check_id, plant) for check_id, plants in sets.items() for plant in plants]
     if not jobs:
         return []
-    root = Path(tempfile.mkdtemp(prefix="check-plants-", dir=checkout_root() / ".worktrees"))
+    (REPO / ".worktrees").mkdir(exist_ok=True)
+    root = Path(tempfile.mkdtemp(prefix="check-plants-", dir=REPO / ".worktrees"))
     trees = [root / f"tree{number}" for number in range(min(PLANT_WORKERS, len(jobs)))]
 
     def work(index):

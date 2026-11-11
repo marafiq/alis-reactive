@@ -629,8 +629,9 @@ stated from D2.4 to D2.6, D2.9 and D4.2 (D2.8), since `WhenARuleNamesTheCode` fa
 removed. Each removed line stays readable at 65fdf118d or at main's SHA, which every cite pins, and `features_lost` at
 0 is each removed door's verdict. Until the `poc/` bullet's items leave, they keep their own package versions: those of
 their projects that write a version inline, which the central management the cut turns on refuses (NU1008), so the cut
-writes a `Directory.Packages.props` that turns it off in `poc/`, in each of their folders under `tests/` and in
-`spec/probes/`, whose projects pin the version of the fact they read.
+writes a `Directory.Packages.props` that turns it off in `poc/`, in each of their folders under `tests/`, and in
+`spec/api/` and `spec/probes/`: the spec's own projects take the solution's versions and lock files from neither, and
+a probe pins the version of the fact it reads.
 
 What the cut leaves of a path section 2.1 holds:
 - Each shipped project that exists, the core, Native and Fusion, stays as an empty project: its project file and its
