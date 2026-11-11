@@ -13,13 +13,13 @@
     "app": {
       "counts": {
         "cells": 118,
-        "hosts": 18,
-        "placed": 450,
+        "hosts": 20,
+        "placed": 451,
         "problems": 0,
         "rewrite": 0,
-        "screens": 13
+        "screens": 14
       },
-      "detail": "450 feature tests and 118 cell tests on 13 screens under 18 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "451 feature tests and 118 cell tests on 14 screens under 20 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "carriers": {
@@ -1317,7 +1317,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 604,
+        "defects": 605,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1424,7 +1424,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 100,
+        "files": 102,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1511,6 +1511,18 @@
       "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
       "pass": true
     },
+    "names": {
+      "counts": {
+        "core": 20,
+        "modules": 26,
+        "problems": 0,
+        "slice_rows": 16,
+        "spec_entries": 40,
+        "tla": 14
+      },
+      "detail": "each of the module table's 20 core modules is a folder of section 2.1's Alis.Reactive/ and in one of 16 SliceTree rows, each of its 26 modules a folder of section 2.1's projects and spec/<Module>/module.md; each of 14 TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; each of spec/'s 40 entries is a module folder or named by section 2.1's spec line",
+      "pass": true
+    },
     "native_behaviors": {
       "counts": {
         "behaviors": 25,
@@ -1546,15 +1558,15 @@
     },
     "plants": {
       "counts": {
-        "caught": 196,
-        "checks": 36,
+        "caught": 233,
+        "checks": 38,
         "failed": 0,
-        "kept": 68,
-        "proven": 36,
+        "kept": 79,
+        "proven": 38,
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "196 refused plants caught and 68 accepted plants kept green; 36 of 36 checks proven both ways",
+      "detail": "233 refused plants caught and 79 accepted plants kept green; 38 of 38 checks proven both ways",
       "pass": true
     },
     "probes": {
@@ -1575,7 +1587,7 @@
         "mapped": 8909,
         "matrix_promised": 118,
         "matrix_runs": 118,
-        "promises": 450,
+        "promises": 451,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1603,10 +1615,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 568,
+        "tests": 569,
         "units": 26
       },
-      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 3, U4 2, U5 2, U6 5, U7 99, U8 0, U9 20, U10 16, U11 6, U12 84, U13 40, U14 22, U15 47, U16 35, U17 3, U18 4, U19 14, U20 3, U21 25, U22 8, U23 26, U24 32, U25 69, U26 3",
+      "detail": "26 units hold 112 features once; the browser tests land U1 0, U2 0, U3 4, U4 2, U5 2, U6 5, U7 99, U8 0, U9 20, U10 16, U11 6, U12 84, U13 40, U14 22, U15 47, U16 35, U17 3, U18 4, U19 14, U20 3, U21 25, U22 8, U23 26, U24 32, U25 69, U26 3",
       "pass": true
     },
     "slice_tests": {
@@ -3670,6 +3682,15 @@
         }
       }
     },
+    "unit_proofs": {
+      "counts": {
+        "harness_tests": 2,
+        "problems": 0,
+        "units": 26
+      },
+      "detail": "each of 26 units proves something, as browser tests (b), analyzer cases (a) or harness tests (h): U1 2a, U2 2h, U3 4b, U4 2b 3a, U5 2b 1a, U6 5b 1a, U7 99b 25a, U8 4a, U9 20b, U10 16b 10a, U11 6b 2a, U12 84b 9a, U13 40b, U14 22b 1a, U15 47b 23a, U16 35b 9a, U17 3b, U18 4b 3a, U19 14b 2a, U20 3b, U21 25b, U22 8b 1a, U23 26b, U24 32b 1a, U25 69b 35a, U26 3b",
+      "pass": true
+    },
     "verdicts": {
       "counts": {
         "doubled": 0,
@@ -3684,8 +3705,8 @@
       "pass": true
     }
   },
-  "passed": 37,
-  "read_at_head": "24ef941a26b90797b9a4c511f3301cb8d44dc8ee",
+  "passed": 39,
+  "read_at_head": "70af8b6d1669f5988ee9cae4fa7b3b53010ebed9",
   "step": {
     "failing": [],
     "name": "End of session",
@@ -3693,5 +3714,5 @@
     "number": 13,
     "phase": "E"
   },
-  "total": 37
+  "total": 39
 }
