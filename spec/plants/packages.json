@@ -33,7 +33,7 @@
   "expect": "section 1 says Five packages"
  },
  {
-  "name": "U3 packs five",
+  "name": "section 4 packs five",
   "edits": [
    {
     "file": "spec/REWRITE.md",
@@ -41,7 +41,7 @@
     "new": "the five packages packed"
    }
   ],
-  "expect": "U3 says five packages"
+  "expect": "section 4 says five packages"
  },
  {
   "name": "a stylesheet ships",
@@ -171,6 +171,17 @@
     "file": "poc/Alis.Reactive.Poc/Alis.Reactive.Poc.csproj",
     "old": "<PackageReference Include=\"PolySharp\" Version=\"1.16.0\" PrivateAssets=\"all\" />",
     "new": "<PackageReference Include=\"PolySharp\" Version=\"1.15.0\" PrivateAssets=\"all\" />"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "the packed count's sentence in another unit's words",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "with the six packages packed, the delivery tests green",
+    "new": "and the six packages packed, with the delivery tests green"
    }
   ],
   "expect": null

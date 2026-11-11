@@ -574,9 +574,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   coverage in the conformance app and never ship; a shipped consumer's tests prove only what its declaration adds. A
   web components package is one more package id, the owner's decision after the rewrite.
 - The lead, 2026-11-10, on the owner's "I let you decide now": `spec/REWRITE.md` holds the repository the rewrite
-  builds (tree, slices, SliceTree, naming, harness, TLA+ owners, tools, shards, CI, packages, what retires) and its 26
-  units. Two independent designs fed it; where they differed: vitest and PlanTests stay as feedback (BRIEF.md
-  Principles 10), no CSS ships, a fresh MVC 5 app proves delivery apart from the twin, only the Fusion pool gets the
+  builds (tree, slices, SliceTree, naming, harness, TLA+ owners, tools, shards, CI, packages, what retires) and its
+  units, 26 then and 27 since the order of 2026-11-11 below. Two independent designs fed it; where they differed:
+  vitest and PlanTests stayed as feedback, which the owner's decision of 2026-11-11 below replaces with a module's
+  pure tests, no CSS ships, a fresh MVC 5 app proves delivery apart from the twin, only the Fusion pool gets the
   Syncfusion key, and every wait, budget and parallelism is measured before it is set. The units run in the order pages
   need doors after a walking skeleton, since a first-row unit has no page to prove it on; check.py places every feature
   in one unit and lands each test in the unit that brings the last door its screen parts need.
@@ -672,7 +673,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   string. The build reads the name and never what the string means, so a member-naming string under another name
   passes it and is read in the package's PublicAPI text. The exemption is
   `Alis.Reactive.Declarations.TypedDslExemptionAttribute`, on the row below Vendors and Plugins. The rule's reach to a
-  declaration and a render helper in a compilation with no slice table lands in U7, with the types it reads. The owner
+  declaration and a render helper in a compilation with no slice table lands in U13, with the types it reads. The owner
   can overrule each.
 - The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "With regard to merge, rewrite wins. I mean, I don't understand
   the confusion here now." The lead had ended a turn before section 2.7's runner, since it touches the path the POC's
@@ -691,8 +692,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the public surface as signatures (`spec/api` compiles it); every screen's view; every Playwright test from its
   promise, failing; then one module at a time in the slice table's order, Schema first, each half tested alone
   against the schema; a module is done when its tests pass and each fails on its planted defect. `spec/REWRITE.md`
-  section 4's order paragraph and the units after U2 are rewritten to this in the commit that follows; until then
-  this line supersedes them. TEST013 is built to section 2.10's list, which counts a navigation as a gesture, and
+  section 4 states the order as the decision of the same day below settles it. TEST013 is built to section 2.10's list, which counts a navigation as a gesture, and
   section 2.5's bindings check is U2's, by the owner's decision of 2026-11-10.
 - The owner, 2026-11-11 (verbatim in `spec/NOTES.md`), on the lead's word for a test written ahead of its code: "Test
   is not a draft, its failing test that actually proves behavior when turned green. Draft is hedge word to drift and
@@ -748,8 +748,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   door that renders a plan lives in the last core row, so in a strict row-by-row order no framework browser test
   passes before that row; the runtime's code that touches the DOM has no proof but Playwright, since its pure tests
   run in node with no DOM; and a module's done, its tests green and each failing on its planted defect, is then
-  checkable only once, at the end, for everything. This is the order the outside-in decision above runs in;
-  `spec/REWRITE.md` section 4 is rewritten to it by the governance session.
+  checkable only once, at the end, for everything. This is the order the outside-in decision above runs in, and
+  `spec/REWRITE.md` section 4 states it with its units.
 - The owner, 2026-11-11 (verbatim in `spec/NOTES.md`), on the governance session's cold read and on every review:
   "don't make it so that every review or whatever the strategy you are using keep bringing issues and becomes an
   infinite loop, and then it drift, and then it becomes its own work." A review is bounded before it starts: a

@@ -8,18 +8,18 @@
     "new": "\"harnessTestsDraft\": ["
    }
   ],
-  "expect": "U2 proves nothing: no browser test lands in it, none of its features has an analyzer defect, and app.json gives it no harness test"
+  "expect": "U2 proves nothing: no browser test lands in it, no core feature of it writes a node a module test reads, none of its features has an analyzer defect, and app.json gives it no harness test"
  },
  {
   "name": "a unit whose features are emptied",
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "### U6. Elements\nFeatures: M5.F1\n",
-    "new": "### U6. Elements\nFeatures: none\n"
+    "old": "### U15. Elements\nFeatures: M5.F1\n",
+    "new": "### U15. Elements\nFeatures: none\n"
    }
   ],
-  "expect": "U6 proves nothing"
+  "expect": "U15 proves nothing"
  },
  {
   "name": "a harness test on a care screen",
@@ -92,13 +92,13 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "Features: M1.F1, M1.F2\n",
-    "new": "Features: M1.F1\n"
+    "old": "Features: M2.F1, M2.F2\n",
+    "new": "Features: M2.F1\n"
    },
    {
     "file": "spec/REWRITE.md",
-    "old": "Features: M2.F1, M2.F2\n",
-    "new": "Features: M1.F2, M2.F1, M2.F2\n"
+    "old": "Features: M3.F1, M3.F2\n",
+    "new": "Features: M2.F2, M3.F1, M3.F2\n"
    }
   ],
   "expect": null
@@ -146,5 +146,27 @@
    }
   ],
   "expect": "harness test TwoWorldsRun.each_world_lists_only_the_residents_it_seeded's fixture is not named When and its situation"
+ },
+ {
+  "name": "a unit whose one core feature writes no node",
+  "edits": [
+   {
+    "file": "spec/OwnershipAndState/features.json",
+    "old": "      \"nodes\": [\n        \"plugin\",\n        \"none\",\n        \"form\",\n        \"model\",\n        \"hub\",\n        \"stream\",\n        \"listen\",\n        \"request\",\n        \"zone\"\n      ],",
+    "new": "      \"nodes\": [],"
+   }
+  ],
+  "expect": "U6 proves nothing: no browser test lands in it, no core feature of it writes a node a module test reads"
+ },
+ {
+  "name": "a unit its module tests alone prove, one node fewer",
+  "edits": [
+   {
+    "file": "spec/OwnershipAndState/features.json",
+    "old": "        \"request\",\n        \"zone\"\n      ],",
+    "new": "        \"request\"\n      ],"
+   }
+  ],
+  "expect": null
  }
 ]

@@ -4903,7 +4903,7 @@ Each Schema.tla invariant is the browser's need, and each mutant drops the one r
   activity for rendering a plan, the validation door (validator, rule set, failure count) and the error door. The app
   adds its own OpenTelemetry SDK and listens to that source. On net48 the source comes from the
   `System.Diagnostics.DiagnosticSource` package, pinned to one version (gate 1, C8), and joining an inbound `traceparent` takes the
-  app's ASP.NET instrumentation module, a fact U22's first step probes on verify-net48 before the unit claims it.
+  app's ASP.NET instrumentation module, a fact U7's first step probes on verify-net48 before the unit claims it.
 - D20.9 Tracing changes nothing a plan does: on and off run the same statements in the same order with the same
   results, and the port returns nothing the runtime reads.
 - D20.11 A retry is always traced (the owner, 2026-11-06: downstream services act on it, by standard headers). Every

@@ -2315,17 +2315,20 @@ def check_unit_proofs():
     app = json.loads((SPEC / "Reference" / "app.json").read_text())
     landed = test_landings(app, home, module_units(home, {name: module for name, (module, _) in features.items()}), door_units(units))
     analyzer = Counter({place: 0 for place in range(len(units))})
+    module, core = Counter({place: 0 for place in range(len(units))}), core_modules()
     for name, place in home.items():
         if name in features:
             analyzer[place] += sum(1 for defect in features[name][1].get("defects", []) if defect.get("rung") == "analyzer")
+            module[place] += len(features[name][1].get("nodes", [])) if features[name][0] in core else 0
     places = {unit["id"]: place for place, unit in enumerate(units)}
     own = Counter(places[entry["unit"]] for entry in app.get("harnessTests", []) if entry.get("unit") in places)
     problems = harness_test_problems(app, places)
-    problems += [f"{unit['id']} proves nothing: no browser test lands in it, none of its features has an analyzer defect, and app.json gives it no harness test"
-                 for place, unit in enumerate(units) if not (landed[place] or analyzer[place] or own[place])]
-    proofs = [f"{unit['id']} " + " ".join(f"{count}{mark}" for count, mark in ((landed[place], "b"), (analyzer[place], "a"), (own[place], "h")) if count)
+    problems += [f"{unit['id']} proves nothing: no browser test lands in it, no core feature of it writes a node a module test reads, none of its features has an analyzer defect, and app.json gives it no harness test"
+                 for place, unit in enumerate(units) if not (landed[place] or module[place] or analyzer[place] or own[place])]
+    proofs = [f"{unit['id']} " + " ".join(f"{count}{mark}" for count, mark in ((landed[place], "b"), (module[place], "m"), (analyzer[place], "a"), (own[place], "h")) if count)
               for place, unit in enumerate(units)]
-    detail = f"each of {len(units)} units proves something, as browser tests (b), analyzer cases (a) or harness tests (h): " + ", ".join(proofs)
+    detail = (f"each of {len(units)} units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), "
+              "analyzer cases (a) or harness tests (h): " + ", ".join(proofs))
     return result(not problems, "; ".join(problems[:6]) or detail, units=len(units), harness_tests=len(app.get("harnessTests", [])), problems=len(problems))
 
 
@@ -2487,9 +2490,9 @@ def check_packages():
     for name, uses in sorted(references.items()):
         for project, version in sorted(uses):
             problems += pin_problems(pins, name, version, project)
-    counts = [(where, found) for where, pattern in (("section 1", PACKAGE_COUNT), ("U3", PACKED_COUNT)) for found in pattern.findall(text)]
+    counts = [(where, found) for where, pattern in (("section 1", PACKAGE_COUNT), ("section 4", PACKED_COUNT)) for found in pattern.findall(text)]
     problems += [f"{where} says {word} packages, and section 2.9 packs {len(rows)}" for where, word in counts if COUNT_WORDS.get(word.lower()) != len(rows)]
-    problems += [f"{where} states no package count" for where in ("section 1", "U3") if where not in {where for where, _ in counts}]
+    problems += [f"{where} states no package count" for where in ("section 1", "section 4") if where not in {where for where, _ in counts}]
     detail = (f"section 2.9 packs {len(rows)} ids, main's but {', '.join(PACKAGE_RETIRED)} and the decided {', '.join(PACKAGE_ADDED)}; "
               f"each ships only bundles, each dependency and each of {len(references)} references the kept projects take is pinned in section 2.7 at its version")
     return result(not problems, "; ".join(problems[:6]) or detail, packages=len(rows), pins=len(pin_rows), references=len(references), problems=len(problems))
@@ -3205,7 +3208,7 @@ CHECKS = [
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("paths", "every path at HEAD and main's tip kept by REWRITE.md's section 2 or retired by its section 3, so the cut drops nothing by omission", check_paths),
-    ("unit_proofs", "every rewrite unit proves something: a browser test lands in it, an analyzer case of its features, or a harness test", check_unit_proofs),
+    ("unit_proofs", "every rewrite unit proves something: a browser test lands in it, a module test reads a node its core features write, an analyzer case of its features, or a harness test", check_unit_proofs),
     ("names", "every module named alike in the module table, REWRITE.md's tree, SliceTree and TLA+ table, and spec/", check_names),
     ("rewrite_cites", "every cite REWRITE.md makes names its SHA and resolves there", check_rewrite_cites),
     ("packages", "every package REWRITE.md packs is main's or a decided door's, ships bundles only, and every dependency and kept reference is pinned at its version", check_packages),

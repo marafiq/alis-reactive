@@ -85,8 +85,9 @@ declarations the test app brings through the extension point an app uses (`Compo
 the conformance library's components (`spec/Reference/native.json`) are the components on a core test's page and
 no Syncfusion component appears on one, so a Fusion change cannot fail one and a framework defect cannot hide behind one.
 
-A test that references the code it gives feedback on (vitest beside the runtime, a recorded plan) is feedback while
-coding, never proof.
+A module's pure tests (`spec/REWRITE.md`, section 1) prove one half of a module against the schema, through its
+public surface alone, and prove no behavior in a browser: a behavior is proven by a Playwright test, and a recorded
+plan proves nothing.
 
 ## Where a test lives
 

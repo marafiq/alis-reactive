@@ -7,6 +7,37 @@ in the line.
 
 ## 1. The view from above
 
+One screen: what the rewrite builds, where each piece lives, what proves it, and where every other answer is. Each
+later section is the detail of a line here.
+
+### 1.1 The layout
+
+```
+spec/                               the design: one folder a module, its TLA+ specs, this plan, check.py
+Alis.Reactive/                      the core, one assembly: sixteen rows of module folders, each one namespace
+Alis.Reactive.Assets/               the core's browser code: runtime/<Module>/ runs what that module's C# writes
+Alis.Reactive.Analyzers/            the compiler's rules, packed inside the core: <Module>/ holds that module's
+Alis.Reactive.Native/               a consumer: the plain-DOM components
+Alis.Reactive.Fusion/               a consumer: the Syncfusion slices
+Alis.Reactive.OpenTelemetry/        a consumer: the trace sink
+tests/
+  Alis.Reactive.Conformance.World/            what a browser test and the app agree on, and nothing of the framework
+  Alis.Reactive.Conformance.App/              the care home app every browser test runs on; .Net48 is its MVC 5 twin
+  Alis.Reactive.Conformance.PlaywrightTests/  the browser tests, <Module>/<Screen>/When*.cs
+  Alis.Reactive.TestRules/                    the browser tests' own compiler rules; .AnalyzerTests holds their cases
+  Alis.Reactive.ModuleTests/                  <Module>/: a core module's pure tests of its public surface
+  Alis.Reactive.AnalyzerTests/                <Module>/: each analyzer's cases
+  Alis.Reactive.ArchitectureTests/            what the repository holds
+  Alis.Reactive.Consumer.Net10/ and .Net48/   fresh apps on the packed packages
+scripts/                            one command for each kind of proof
+```
+
+A dependency points one way. The core names no consumer. Each consumer stands on the core's public surface alone, as
+an app's own component does. The app stands on the shipped projects and the world contract. A browser test stands on
+the world contract alone and meets the app only through the browser. A module test stands on the shipped projects'
+public surface alone. Inside a project a slice uses only the rows before its own (2.3), and a module's folder has one
+name in every tree (2.2). Section 2.1 is this tree in full.
+
 - **Six packages, one version.** AlisReactive (the core, its analyzers inside), AlisReactive.Native,
   AlisReactive.Fusion and AlisReactive.OpenTelemetry, the trace sink a page registers (N20.2), ship code;
   AlisReactive.DesignSystem and AlisReactive.NativeTagHelpers ship empty, so their ids stay, and nothing in the tree is
@@ -15,29 +46,44 @@ in the line.
 - **One app proves the framework.** The care home conformance app (`spec/Reference/app.json`): care screens a care
   home's staff use, the component bench with the conformance library's declarations, and the refusal routes, run
   under the hosts app.json declares. Every browser test runs on one of its screens. No core test loads Syncfusion.
-- **Each layer proves one thing, once.**
-
-  | Layer | Proves | Runs |
-  |---|---|---|
-  | TLA+ (`spec/<Module>/*.tla`) | the design: every ordering of the async lanes | TLC, on a changed spec and nightly |
-  | Probes (`spec/probes/`) | a fact of a browser, a host or a vendor the design rests on | on a changed probe or pin, nightly |
-  | The compiler | the type stages and the ALIS analyzers: what a view, a validator or a declaration cannot write | every build |
-  | The render | a refusal the compiler cannot see, on the refusal routes | Playwright |
-  | Playwright | behavior: a gesture and its visible outcome, in Chromium | every pull request |
-  | The test rules | that a browser test cannot lean on the code it tests: TEST001 to TEST013 (section 2.10) | every build of a Playwright project |
-  | Architecture tests | what the repository holds: no comment, every name a rule file cites, the hooks' refusals, the app's pages and statics, the runner's result line, the lint's own rules, a fresh app's git status | every pull request |
-  | Cases and plants | that each analyzer, test rule, architecture test and check.py check reports its refused case by name and passes its accepted case (section 2.10) | with the rule each proves |
-  | verify-net48 | each test whose placement lists the twin, on MVC 5 (no stream or hub: realtime is net10's, check_app), and the packed packages on a fresh MVC 5 app | every pull request |
-  | Vitest, PlanTests | feedback while coding (BRIEF.md, Principles 10); never counted as proof | the inner loop |
-
-- **Tests stand apart from the code.** A Playwright project references no assembly of the framework or of the
-  conformance app; it reaches a page only through the browser and the world contract, so a test cannot compute what
-  the code computes. Its quality rules are compiler rules in a project of their own. The feedback projects, vitest
-  beside the runtime and PlanTests, reference the code they give feedback on and are never counted as proof.
 - **A feature is one path through the spec to the code.** `spec/<Module>/features.json` names its question, its
   sentences, its nodes, its TLA+ invariants, its defects and its tests; each test names its screen, hosts, parts and
-  held steps in `spec/Reference/app.json`. A new feature runs: spec line, TLC green, its tests written from their
-  promises and failing, the screen and the doors until they pass, each test failing on its planted defect, commit.
+  held steps in `spec/Reference/app.json`.
+
+### 1.2 The kinds of proof
+
+Each kind proves one thing, once, on the rung that holds it. A defect a higher row prevents gets no test on a lower
+one.
+
+| Kind | What it is | It proves | It prevents | Its standard | Its command | When |
+|---|---|---|---|---|---|---|
+| TLA+ | the specs of `spec/<Module>/*.tla` under TLC, each with the mutant configurations that must fail (2.6) | the design: every ordering of the async lanes keeps its invariants | an ordering decided in code, and a browser test that provokes a race by timing | `spec/CLAUDE.md`: an invariant that restates its action proves nothing, and each one is a named browser test | `python3 spec/tools/check.py --check tlc` | before a lane's tests are written, and on every changed spec |
+| The compiler | the types of the public surface and the ALIS analyzers (`Alis.Reactive.Analyzers`) | that a view, a validator or a declaration cannot write the mistake | a defect that reaches a browser though the source states it | `.claude/rules/analyzers.md`, a refused and an accepted case a rule | `dotnet test tests/Alis.Reactive.AnalyzerTests`; `spec/api` compiles the surface and its refused sentences | every build; a rule lands with the module whose line it enforces |
+| The runtime's compiler and lint | TypeScript at every strictness option and the lint of 2.7 | that the runtime invents no behavior the plan does not carry | a default for plan data, a floating promise, a switch that misses a kind | `Alis.Reactive.Assets/CLAUDE.md`, a refused and an accepted file a rule | `npx tsc -b Alis.Reactive.Assets`; `npx eslint Alis.Reactive.Assets --max-warnings 0` | every commit |
+| Module tests | a core module's pure tests of its public surface, each half alone against the schema: in C#, a sentence written through public doors, the nodes it renders compared with literal nodes written from `spec/Core/schema.md` and read against `plan.schema.json`, and a validator's server verdict; in TypeScript, what a runtime module's index exports, run in node with no DOM | that a module's half writes, or executes, the schema's nodes as the spec states them | a half that drifts from the schema before a page shows it; it proves no behavior in a browser | the project's own rule file: the public surface alone, no internal exposed, no recorded snapshot | `dotnet test tests/Alis.Reactive.ModuleTests`; `npx vitest run` | in the module's own unit, with its code |
+| Playwright tests | a gesture and its visible outcome in Chromium, on a screen of the conformance app, in a world of its own; a refusal the compiler cannot see is read on a refusal route | behavior, and that the code refines each TLA+ action a test holds | a framework that compiles and lies | `.claude/rules/tests.md`, held by the test rules TEST001 to TEST013 (section 2.10) and the bindings (2.5) | `scripts/playwright.sh` | written from its promise before its code; it passes in the unit check.py lands it in |
+| The planted defect | the defect a test names, put in the code it proves | that the test fails for that defect | an assertion the broken code also satisfies | `.claude/rules/tests.md`, rule 5 | `scripts/plant-defect.sh` | before a test is kept |
+| Architecture tests | rules over what the repository holds: no comment, every name a rule file cites, the hooks' refusals, the lint's own rules, the shipped packages and their slice tables | that the tree keeps its own rules | drift between the tree and the pages that govern it | the project's own rule file; a refused and an accepted case a rule, which WhenAnArchitectureTestIsWritten holds | `dotnet test tests/Alis.Reactive.ArchitectureTests` | every commit |
+| The spec's checks | `spec/tools/check.py`: the spec against itself and against the tree | that every feature has its unit, every test its screen, every door its verdict, every pin its version | a plan that drifts from the design it builds | `spec/CLAUDE.md`; a refused and an accepted plant a check (`spec/plants`) | `python3 spec/tools/check.py` | at every committed head, before its push |
+| Probes | a console or a browser script under `spec/probes/` | a fact of a browser, a host or a vendor the design rests on | a design built on a remembered fact | each probe pins the version of the fact it reads | `python3 spec/tools/check.py --check probes` | on a changed probe or pin |
+| verify-net48 | CI's Windows job (2.8) | each test whose placement lists the twin, on MVC 5, and the packed packages on a fresh MVC 5 app | a net48 host that compiles and does not run | section 2.8 | the workflow | when the rewrite is done; it gates no unit (the owner, 2026-11-11) |
+
+`scripts/check.sh` runs every row that needs no browser, in one command; `scripts/test.sh` adds the browser tests.
+The confidence of a piece of work is the line its row's command printed, read when it printed; root CLAUDE.md says
+how a unit collects those lines.
+
+### 1.3 Where every answer is
+
+| The question | Its one place |
+|---|---|
+| What is built, and where each piece lives | 1.1 and section 2 |
+| The order it is built in, and when a unit is done | section 4 |
+| What proves a piece of work, by what command | 1.2 |
+| What governs what; each forbidden practice and the tool that refuses it; how a unit is worked; how confidence is determined; when a handoff is written and a session starts, how to begin and how to reorient; where a correction goes; when a fork is used | root CLAUDE.md |
+| The standard of one kind of file | its file under `.claude/rules` |
+| The standard, the command and the refusals of one project | that project's own CLAUDE.md |
+| The owner's decisions, in the owner's words | `spec/CLAUDE.md`; verbatim in `spec/NOTES.md` |
+| A module's doors, features, defects and tests | `spec/<Module>/module.md` and `features.json` |
 
 ## 2. The repository
 
@@ -100,7 +146,7 @@ tests/
   Alis.Reactive.TestRules.AnalyzerTests/      each test rule's refused case and accepted case
   Alis.Reactive.Consumer.Net10/               a fresh net10 app on the packed packages, outside the slnx
   Alis.Reactive.Consumer.Net48/               a fresh MVC 5 app on the packed packages, outside the slnx
-  Alis.Reactive.PlanTests/<Module>/           feedback
+  Alis.Reactive.ModuleTests/<Module>/         each core module's pure tests of its public surface (1.2)
   Alis.Reactive.AnalyzerTests/<Module>/       each analyzer's cases
   Alis.Reactive.ArchitectureTests/            WhenCodeIsWritten, WhenARuleNamesTheCode, WhenClaudeRunsAHook, the POC's
                                               WhenTheCoreIsCompiled and WhenAContractDriftIsSuppressed, over the
@@ -137,9 +183,9 @@ off, so their builds see what a fresh app sees.
 | Tree | Folder | Holds |
 |---|---|---|
 | C# | `Alis.Reactive/<Module>/` | its builders, objects and sources, the plan nodes it writes, its render-time refusals; namespace `Alis.Reactive.<Module>` |
-| Browser | `Alis.Reactive.Assets/runtime/<Module>/` | the code that executes its nodes, and its vitest feedback |
+| Browser | `Alis.Reactive.Assets/runtime/<Module>/` | the code that executes its nodes, and its pure tests beside it |
 | Analyzer | `Alis.Reactive.Analyzers/<Module>/` | each rule that enforces one of its lines, the rule's id in the file name |
-| Tests | `tests/Alis.Reactive.Conformance.PlaywrightTests/<Module>/`, `tests/Alis.Reactive.AnalyzerTests/<Module>/` | its browser tests, its analyzer cases |
+| Tests | `tests/Alis.Reactive.Conformance.PlaywrightTests/<Module>/`, `tests/Alis.Reactive.ModuleTests/<Module>/`, `tests/Alis.Reactive.AnalyzerTests/<Module>/` | its browser tests, its pure tests, its analyzer cases |
 | Spec | `spec/<Module>/` | `module.md` and `features.json`; the TLA+ it owns (section 2.6) |
 
 Four rules move a type out of its module's folder, each forced by a fact, and the feature row's `writes` field cites
@@ -198,7 +244,7 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
 A row enters a table with the first file of its folder, since ALIS013 refuses an entry that names no folder (M20.D6).
 U1 writes the four shipped projects' tables and builds each with AlisSliceTree on, so from then on a file in a
 folder with no row fails the build. The tables are empty but for the core's, which holds `Declarations` for the
-exemption (M20.N1); U3's skeleton writes the core's 16 rows with their folders.
+exemption (M20.N1); U3 writes the core's 16 rows with their folders.
 
 ### 2.4 Naming
 
@@ -260,9 +306,12 @@ exemption (M20.N1); U3's skeleton writes the core's 16 rows with their folders.
   fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive.
   WhenAPlaywrightRunEnds runs that reading over the TRX and the result line each case gives: a refused case for each
   failure, and an accepted case for a green run. No retries, anywhere.
-- **Waits and budget.** Action waits, navigation waits and the per-test budget are set from measurement, never chosen:
-  unit U2 runs the suite 20 times on ubuntu-latest and sets the budget at four times the slowest test it measured, the
-  waits at four times the slowest step, and writes both into the harness with the run that measured them.
+- **Waits and budget.** Action waits, navigation waits and the per-test budget are set from measurement, never chosen,
+  on the machine the delivery loop runs on, this Mac (the owner, 2026-11-11): unit U2 runs the suite 20 times there
+  and sets the budget at four times the slowest test it measured, the waits at four times the slowest step, and
+  writes both into the harness with the run that measured them. A test over the budget fails its run, and the budget
+  moves only by a new measurement of 20 green runs, written with that run. CI measures its own numbers the same way
+  when the rewrite is done; no number measured there gates a unit.
 - **Syncfusion.** Only the Fusion pool's job receives the licence key; the app registers it at startup when its host
   serves a Fusion screen, and a Fusion screen refuses to render without it. A core test also fails at run time if its
   page requests the EJ2 script.
@@ -306,7 +355,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | TypeScript | 6.0.3 | `tsc -b`, no emit, every strictness option on: strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature, noImplicitReturns, noFallthroughCasesInSwitch, noUnusedLocals, noUnusedParameters, noUncheckedSideEffectImports, verbatimModuleSyntax, isolatedModules and erasableSyntaxOnly, which refuses an enum (S8), with allowUnreachableCode and allowUnusedLabels off; held by typescript-eslint 8.72.2, whose peer range ends below 6.1.0 (the latest is 7.0.2) |
 | esbuild | 0.28.2 | one root `build.mjs`, one bundle per package; `package.json` denies its install script, since its platform package holds the binary |
 | ESLint | eslint 10.14.0, @eslint/js 10.0.1, typescript-eslint 8.72.2, with minimatch 11.0.7 by an override of the 10.2.6 they bring, which npm's audit reports (GHSA-g3hv-75wg-m249) | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, each of their rules an error, `--max-warnings 0`, no rule turned off or down and no inline configuration (`noInlineConfig`); the rules beyond the presets are listed below the table |
-| Vitest | 5.1.0, node environment, no jsdom | feedback beside the runtime's code |
+| Vitest | 5.1.0, node environment, no jsdom | a runtime module's pure tests of what its index exports (1.2); U3 lands it with the first of them |
 | @microsoft/signalr | 10.0.11 | the hub's own asset; held on the 10.0 line, the line of the hub it talks to (the latest is 11.0.0) |
 | Probe packages | jsdom 31.0.0, parse5 8.1.1, ws 8.22.2 | what the node probes load beside the pins they read: a DOM for EJ2's code, HTML's parser and a WebSocket server; no test loads them |
 | OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.1 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
@@ -315,7 +364,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | Analyzer cases | Microsoft.CodeAnalysis.CSharp.Analyzer.Testing 1.1.4, with Microsoft.CodeAnalysis.CSharp.Workspaces 5.9.0 and System.Security.Cryptography.Pkcs 10.0.15 | every analyzer's, suppressor's and test rule's cases; the library takes the workspaces package at any version, and without its pin the restore brings 1.0.1 and fails (NU1701); the Pkcs pin replaces the 9.0.6 that the library's NuGet.Packaging 7.0.3 brings, which NuGet's audit refuses (NU1903) |
 | PublicApi and BannedApi analyzers | Microsoft.CodeAnalysis.PublicApiAnalyzers 5.6.0, Microsoft.CodeAnalysis.BannedApiAnalyzers 5.6.0 | the surface text; no run-time reflection |
 | NUnit, adapter, test SDK | NUnit 5.0.0, NUnit3TestAdapter 6.3.1, Microsoft.NET.Test.Sdk 18.11.1 | tests |
-| Plan schema | JsonSchema.Net 9.6.0 | PlanTests and the architecture tests read every plan against `plan.schema.json` |
+| Plan schema | JsonSchema.Net 9.6.0 | the module tests and the architecture tests read every plan against `plan.schema.json` |
 | App sweep | Microsoft.AspNetCore.Mvc.Testing 10.0.15 | the architecture tests' sweep of the conformance app's pages; held by net10.0, which its 11.0.0 does not support (NU1202) |
 | Playwright | Microsoft.Playwright 1.64.1, CI's image `mcr.microsoft.com/playwright/dotnet:v1.64.1-noble` by digest | every browser test and probe |
 | Java, TLC | OpenJDK 27.0.1, tla2tools v1.7.4 (TLC 2.19) by SHA-256 in `spec/tools/tla2tools.lock` | model checking; v1.8.0 is a prerelease |
@@ -381,7 +430,7 @@ with no cache file every config runs, the nightly run's way. It reads java from 
 `TLA2TOOLS_JAR`, as every mode does where they are set, and refuses to run with either unset; it refuses a jar whose
 SHA-256 is not the lock's, writes no `spec/STATE.json`, and exits 1 on any failure. The checks that read code keep reading the SHAs their cites
 pin, except kinds, which from U3 on reads the rewrite's grammar at HEAD: a kind `spec/Core/schema.md` does not list
-fails, and from U26 on so does a kind it lists that HEAD lacks.
+fails, and from U27 on so does a kind it lists that HEAD lacks.
 
 `scripts/playwright.sh` selects a module (`RequestsAndResponses`), a screen (`--screen Residents`), a feature
 (`--feature M6.F1`), one test (`--test M3_F1_X8_27_2`), one fixture, one host (`--host snakeCase`), a pool's shard
@@ -392,8 +441,8 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 - **The shard unit** is a module folder; the net10 host-variant fixtures form one unit, so each variant's server starts
   once per run; FusionComponents splits by slice. Pools: core, hosts and fusion; a test under a fresh app's host runs in its delivery job, never in a pool. Shards are balanced longest-first
   from the TRX-measured weights in `shard-weights.json`, so a stale weight unbalances and never drops a test. Unit U2
-  measures one test at a time against 2, 4 and 8 per process, 20 runs each, and keeps parallelism only when every run
-  is green and the wall time falls by at least 1.6 times.
+  measures, on this Mac, one test at a time against 2, 4 and 8 per process, 20 runs each, and keeps parallelism only
+  when every run is green and the wall time falls by at least 1.6 times.
 - **`.github/workflows/ci.yml`** on every pull request and push to main: `checks` (`scripts/check.sh` without check.py); `spec`
   (`check.py --ci`, TLC only for a spec whose hash CI has not checked); `playwright` per pool and shard in the
   Playwright image; `verify-net48` on Windows (pack, the twin and the fresh MVC 5 app built against the packs with
@@ -441,7 +490,7 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
   the twin (M19.X1), which runs on the packs, a validator refuses in the browser and the server saves a valid post on
   the conformance app and the twin (M8.F1's X16.10), and each time zone shows its own day there (M15.F1's X3.7 and
   X3.9, M18.F1's M18.X1); on net10 the version is ASP.NET Core's own `asp-append-version` (M19.N1).
-- Native, Fusion and OpenTelemetry depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U3's
+- Native, Fusion and OpenTelemetry depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U22's
   delivery job reads it back from each nuspec.
 
 ### 2.10 The test rules
@@ -601,7 +650,7 @@ is never the reason.
   `tests/Alis.Reactive.Consumer.Net48`; the build targets `build/AlisReactiveBrowserAssets.targets`,
   `build/AlisReactiveNetFrameworkContent.targets`, `build/AlisReactiveStaticWebAssets.targets` and main's
   `build/AlisReactiveAssets.targets`, which each package's own build target and static web assets replace (section 2.9,
-  U3); `Alis.Reactive.Assets/components/`, whose code moves into its package; Tailwind, and jsdom as a test's
+  U22); `Alis.Reactive.Assets/components/`, whose code moves into its package; Tailwind, and jsdom as a test's
   browser, which the node probes alone still load.
 - Main's packages.config layout, by the owner's word on main (spec/CLAUDE.md, 2026-11-10). Main's build target reads a
   version from a packages.config folder too (`build/AlisReactiveAssets.targets:41-50` at 7b9e987cc), a path main never
@@ -610,10 +659,10 @@ is never the reason.
   7b9e987cc calls it "not yet observed". NuGet gives a packages.config project a package's analyzers only through an `install.ps1` that Visual
   Studio runs, which main does not ship, so the rules the compiler holds would not reach that app. One layout is
   proven by one fresh app. An MVC 5 app on packages.config moves to PackageReference by hand, since NuGet's migrator
-  refuses ASP.NET projects, and README.md gives the steps (U3).
+  refuses ASP.NET projects, and README.md gives the steps (U22).
 - Main's `Alis.Reactive.FluentValidator`, its line in the pack script and its id in the publish workflow's expected
   list, which the merge of main brings in; M8.F1 holds its doors' verdicts.
-- The sandbox's worked example in the docs rule file: the cut removes it, and U12 writes the conformance app's.
+- The sandbox's worked example in the docs rule file: the cut removes it, and U18 writes the conformance app's.
 - The docs site, by the owner's answer (spec/CLAUDE.md, 2026-11-10): `docs-site/`, the workflow that deploys it,
   `.github/workflows/deploy-docs.yml`, and the generator of its API page, `tools/ApiDocGenerator`. The docs are README.md,
   packed as every package's readme, and the XML docs on the shipped surface.
@@ -665,7 +714,7 @@ What the cut leaves of a path section 2.1 holds:
   surface text, emptied, since `WhenCodeIsWritten` reads which packages ship from their `PublicAPI` folders. The
   solution holds those three and the architecture tests.
 - A file whose whole content was the old lines' leaves and returns with the commit or unit that writes it: the
-  analyzers and their cases, the Assets project, PlanTests and the contract generator; `eslint.config.js` with the
+  analyzers and their cases, the Assets project, the module tests and the contract generator; `eslint.config.js` with the
   lint; `scripts/test.sh` with `scripts/check.sh`; `scripts/run.sh` and the two architecture tests that sweep an app,
   WhenAnAppRendersItsPages and SandboxStaticStateTests, in U2 with the conformance app.
 - Every other script and build file is reduced to what is true of the tree the cut leaves. `scripts/playwright.sh`
@@ -681,16 +730,27 @@ What the cut leaves of a path section 2.1 holds:
 - `ci.yml`, `nightly.yml` and the publish workflow call the gate the cut removes, so each fails closed until U2
   writes section 2.8's: no run reports green and no tag publishes in between.
 
-A unit ends when every test check.py assigns it passes on `scripts/playwright.sh`, each written from its promise
-before the doors it needs and failing then, and failing again on its planted defect, the specs its module owns are
-green under TLC with each mutant failing, and its analyzer cases pass; the commit names the run and its result line.
+A unit ends when every test check.py lands in it passes on `scripts/playwright.sh`, each written from its promise
+before the code it needs and failing then, and failing again on its planted defect; its module's pure tests pass, each
+written from the schema's lines; the specs its module owns are green under TLC with each mutant failing; and its
+analyzer cases pass. The commit names each run and its result line.
 
-The order is the order pages need doors, not the SliceTree's. A unit for Schema alone has no page to prove it on, so
-U3 is a walking skeleton that gives every row its folder and the thinnest door, and each unit after it widens the
-rows its features need; ALIS010 holds at every commit. A test lands in the unit that brings the last door its page
-uses: its feature's unit, or a later unit that holds the module of one of its screen parts (check.py prints each
-unit's tests). A unit's Doors line names the doors it brings ahead of their features' units, as U3's skeleton does, and
-a part that lists its doors, each on a Doors line, lands with the latest unit that brings one of them.
+The order is the owner's of 2026-11-11 (spec/CLAUDE.md): outside in, then one module a unit in the slice table's
+order. U3 lands the seam and the surface whole: the schema's nodes and the generated contract, every door of the
+public surface as a signature, the runtime's dispatch with a case for every kind, every screen's view, and every
+browser test, written from its promise and failing. In the same unit it makes one thin path real, a plan that
+renders, a runtime that boots and a load trigger whose pipeline sets an element's text, since every door that renders
+a plan sits in the table's last core row and the runtime's code that touches the DOM has no proof but a browser test.
+Each unit after it owns one module, in the table's order (2.3) and a row's modules in the order the row lists them:
+the C# half that writes its nodes, the runtime half that executes them, its analyzers and its pure tests. Then Native,
+then Fusion. ALIS010 holds at every commit.
+
+A browser test passes in the unit check.py lands it in: its feature's unit, or a later unit that holds the module of
+one of its screen parts (check.py prints each unit's tests). So a module's unit proves its two halves by its pure
+tests and its analyzer cases and turns green the browser tests whose pages need nothing later; a test whose page
+needs a later module, a Native input or a request among them, turns green in that module's unit and fails on its
+planted defect there. A unit's Doors line names the doors it makes real ahead of their features' units, as U3's thin
+path does, and a part that lists its doors, each on a Doors line, lands with the latest unit that brings one of them.
 
 ### U1. Tools, pins and tables
 Features: M20.F1
@@ -714,87 +774,30 @@ before reached from compiling, and WhenAPlaywrightRunEnds's cases prove the runn
 among them. It measures and writes the waits, the budget and the
 parallelism (section 2.5, 2.8).
 
-### U3. The walking skeleton, the packs and delivery
-Features: M19.F1
+### U3. The seam, the surface, every view, every test and one thin path
+Features: M14.F1
 Doors: N14.2, M1.N1, M5.N5, M5.N1
 
-One plan, the block of its view (N14.2), with a load trigger (M1.N1) that sets an element's text (M5.N5, M5.N1),
-through every row, on both hosts; the six packages packed; the delivery tests green on both fresh apps; the twin built. README.md, every package's
-readme, holds what a fresh app of section 2.9 does on each host, a net48 app's move to PackageReference among it.
-The lint's two rules that read a path of the runtime, each with its refused and accepted file (section 2.7).
+The schema's nodes, sealed, with the generated contract and its step in `scripts/check.sh`; the core's sixteen rows
+with their folders; every door of the public surface as a signature, as `spec/api` compiles it; the runtime's rows
+and its dispatch, a case for every kind; the harness's remaining verbs; every screen's view; every browser test, from
+its promise, failing. The module tests land here with their first tests, the schema's: the project
+`tests/Alis.Reactive.ModuleTests` with its rule file and its slice table, and vitest with the runtime's first
+`*.test.ts`. The thin path: one plan, the block of its view (N14.2), with a load trigger (M1.N1) whose pipeline, one
+run of one block, sets an element's text (M5.N5, M5.N1), compiled for both hosts. The lint's two rules that read a
+path of the runtime land here, each with its refused and accepted file (section 2.7), and so do the core's banned
+symbols with WhenTheCoreIsCompiled, before the core's first code that reads a type.
 
-### U4. Triggers and pipelines
-Features: M1.F1, M1.F2
-
-### U5. Values and sources
-Features: M2.F1, M2.F2
-
-### U6. Elements
-Features: M5.F1
-
-### U7. Declarations and vendors
-Features: M11.F1, M11.F2, M11.F3, M12.F1, M12.F2
-
-The conformance library's declarations land here with the doors that reach them; the bench's cells run from here on.
-ALIS009's reach to a component declaration and a render helper in a compilation with no slice table (M20.D1, M20.D7)
-lands here with its cases, since it reads the types this unit lands.
-README.md and the onboarding skill teach a component's slice as the app's standard (spec/CLAUDE.md, 2026-11-06).
-
-### U8. Inputs and ids
-Features: M7.F1, M7.F2, M7.F3
-
-The core renders no input: `Html.InputField` builds on a component's render helper (M7.N2), so each behavior test of
-this unit's features lists the component that renders its field, a conformance declaration of U7 or a Native input of
-U9 (check_app), and lands with the last door its page uses.
-
-### U9. Native components
-Features: M24.F1, M24.F2, M24.F3, M24.F4, M24.F5, M24.F6, M24.F7, M24.F8, M24.F9
-
-Written to the highest bar: a component-writing expert's review of each slice before its commit, and the strictest
-lint and TypeScript options of section 2.7 with no exemption.
-
-### U10. Conditions
-Features: M3.F1, M3.F2
-
-### U11. Plugins
-Features: M13.F1, M13.F2
-
-### U12. Requests and responses
-Features: M6.F1, M6.F2
-
-The request door's XML doc names MVC's binding of a parameter prefix and of a parameter named like its type's member (C25).
-
-### U13. Partials and slots
-Features: M9.F1, M9.F2
-
-### U14. Native app-level objects
-Features: M25.F1, M25.F2, M25.F3, M25.F4, M25.F5, M25.F6, M25.F7
-
-NativeDrawer, NativeToast, NativeConfirm, NativeLoader, the reconnect offer and the action link, each rendered into
-the target a legacy layout holds by the helper the layout calls once; the same review and lint as U9.
-
-### U15. Array lambdas
-Features: M4.F1, M4.F2
-
-### U16. Validation
-Features: M8.F1, M8.F2, M8.F3, M8.F4
-
-### U17. Schema
-Features: M14.F1
-
-### U18. Type knowledge
+### U4. Type knowledge
 Features: M16.F1
 
-### U19. Paths and wire
+### U5. Paths and wire
 Features: M15.F1
 
-### U20. Ownership and state
+### U6. Ownership and state
 Features: M18.F1
 
-### U21. Execution
-Features: M17.F1
-
-### U22. Tracing
+### U7. Tracing
 Features: M26.F1, M26.F2, M26.F3
 
 AlisReactive.OpenTelemetry's trace sink and layout helper (N20.2), its bundle built on 2.7's OpenTelemetry pins, and
@@ -802,15 +805,85 @@ README.md's startup example setting `console` from the host's development settin
 net48 fact, joining an inbound traceparent through the app's ASP.NET instrumentation module, probed on verify-net48
 before the unit claims it.
 
-### U23. Realtime
+### U8. Execution
+Features: M17.F1
+
+### U9. Values and sources
+Features: M2.F1, M2.F2
+
+### U10. Conditions
+Features: M3.F1, M3.F2
+
+### U11. Array lambdas
+Features: M4.F1, M4.F2
+
+### U12. Declarations
+Features: M11.F1, M11.F2, M11.F3
+
+### U13. Vendors
+Features: M12.F1, M12.F2
+
+The conformance library's declarations land here with the doors that reach them; the bench's cells run from here on.
+ALIS009's reach to a component declaration and a render helper in a compilation with no slice table (M20.D1, M20.D7)
+lands here with its cases, since it reads the types this unit and U12 land.
+README.md and the onboarding skill teach a component's slice as the app's standard (spec/CLAUDE.md, 2026-11-06).
+
+### U14. Plugins
+Features: M13.F1, M13.F2
+
+### U15. Elements
+Features: M5.F1
+
+### U16. Inputs and ids
+Features: M7.F1, M7.F2, M7.F3
+
+The core renders no input: `Html.InputField` builds on a component's render helper (M7.N2), so each behavior test of
+this unit's features lists the component that renders its field, a conformance declaration of U13 or a Native input of
+U23 (check_app), and lands with the last door its page uses.
+
+### U17. Validation
+Features: M8.F1, M8.F2, M8.F3, M8.F4
+
+### U18. Requests and responses
+Features: M6.F1, M6.F2
+
+The request door's XML doc names MVC's binding of a parameter prefix and of a parameter named like its type's member (C25).
+
+### U19. Realtime
 Features: M10.F1, M10.F2
 
-### U24. Fusion's package, its reference and templates
+### U20. Triggers and pipelines
+Features: M1.F1, M1.F2
+
+### U21. Partials and slots
+Features: M9.F1, M9.F2
+
+### U22. Rendering and delivery
+Features: M19.F1
+
+The last core row whole, with the six packages packed, the delivery tests green on both fresh apps and the twin
+built. README.md, every package's readme, holds what a fresh app of section 2.9 does on each host, a net48 app's move
+to PackageReference among it; its first code example lands with the architecture test that holds each example to a
+view a browser test runs (`.claude/rules/docs.md`).
+
+### U23. Native components
+Features: M24.F1, M24.F2, M24.F3, M24.F4, M24.F5, M24.F6, M24.F7, M24.F8, M24.F9
+
+Written to the highest bar: a component-writing expert's review of each slice before its commit, bounded as root
+CLAUDE.md bounds every review, and the strictest lint and TypeScript options of section 2.7 with no exemption.
+
+### U24. Native app-level objects
+Features: M25.F1, M25.F2, M25.F3, M25.F4, M25.F5, M25.F6, M25.F7
+
+NativeDrawer, NativeToast, NativeConfirm, NativeLoader, the reconnect offer and the action link, each rendered into
+the target a legacy layout holds by the helper the layout calls once; the same review and lint as U23.
+
+### U25. Fusion's package, its reference and templates
 Features: M21.F1, M21.F2, M22.F1, M22.F2, M22.F3
 
 FusionMultiSelect's own tests, syncfusion.json's `own`, and the templates.
 
-### U25. The Fusion slices
+### U26. The Fusion slices
 Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14,
 M21.F15, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27,
 M21.F28, M21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37, M21.F38, M21.F39, M21.F40,
@@ -818,5 +891,5 @@ M21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46, M21.F47, M21.F48, M21.F49,
 
 One commit per slice, each with its own tests, which `slice_tests` holds.
 
-### U26. Fusion's app-level objects
+### U27. Fusion's app-level objects
 Features: M23.F1, M23.F2

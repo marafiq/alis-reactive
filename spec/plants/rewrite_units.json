@@ -19,7 +19,7 @@
     "new": "Features: M2.F1, M2.F2, M1.F1\n"
    }
   ],
-  "expect": "M1.F1 is in U4 and U5"
+  "expect": "M1.F1 is in U9 and U20"
  },
  {
   "name": "a unit lists a feature no features.json holds",
@@ -30,18 +30,18 @@
     "new": "Features: M5.F1, M5.F2\n"
    }
   ],
-  "expect": "U6 lists M5.F2, no feature of spec/*/features.json"
+  "expect": "U15 lists M5.F2, no feature of spec/*/features.json"
  },
  {
   "name": "a unit heading renumbered",
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "### U6. Elements\n",
-    "new": "### U7. Elements\n"
+    "old": "### U15. Elements\n",
+    "new": "### U16. Elements\n"
    }
   ],
-  "expect": "U7 stands at place 6"
+  "expect": "U16 stands at place 15"
  },
  {
   "name": "a unit's Features line dropped",
@@ -74,7 +74,7 @@
     "new": "Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14,\nM21.F15, M21.F99, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27,\n"
    }
   ],
-  "expect": "U25 lists M21.F99, no feature of spec/*/features.json"
+  "expect": "U26 lists M21.F99, no feature of spec/*/features.json"
  },
  {
   "name": "a Doors line naming a door no module has",
@@ -92,11 +92,11 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "### U4. Triggers and pipelines\nFeatures: M1.F1, M1.F2\n",
-    "new": "### U4. Triggers and pipelines\nFeatures: M1.F1, M1.F2\nDoors: M1.N1\n"
+    "old": "### U20. Triggers and pipelines\nFeatures: M1.F1, M1.F2\n",
+    "new": "### U20. Triggers and pipelines\nFeatures: M1.F1, M1.F2\nDoors: M1.N1\n"
    }
   ],
-  "expect": "M1.N1 is on the Doors lines of U3 and U4"
+  "expect": "M1.N1 is on the Doors lines of U3 and U20"
  },
  {
   "name": "a part listing a door no module has",
@@ -125,13 +125,13 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "Features: M1.F1, M1.F2\n",
-    "new": "Features: M1.F1\n"
+    "old": "Features: M2.F1, M2.F2\n",
+    "new": "Features: M2.F1\n"
    },
    {
     "file": "spec/REWRITE.md",
-    "old": "Features: M2.F1, M2.F2\n",
-    "new": "Features: M1.F2, M2.F1, M2.F2\n"
+    "old": "Features: M3.F1, M3.F2\n",
+    "new": "Features: M2.F2, M3.F1, M3.F2\n"
    }
   ],
   "expect": null

@@ -136,7 +136,7 @@ The owner tested the redesign on net48 and it works flawlessly there. The compil
    - TLC's green result is the proof of a design.
    - A Playwright run in a real browser is the proof of behavior.
    - The `verify-net48` CI run is the proof on net48.
-   - Vitest, PlanTests and goldens are feedback. They never assert copied output.
+   - A module's pure tests prove one half of a module against the schema, through its public surface alone (the owner, 2026-11-11, in place of "Vitest, PlanTests and goldens are feedback"). They never assert copied output, and they prove no behavior in a browser.
 
 **Overrides by the owner's decision**, written into CLAUDE.md in step 12:
 - For `spec/`, the line "Do not build other gates, coverage maps, checklists or proof artifacts" no longer applies.
