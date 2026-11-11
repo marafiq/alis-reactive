@@ -13,8 +13,8 @@ in the line.
   kept for them. Main's AlisReactive.FluentValidator is not packed: the core's validation carries its doors (M8.F1;
   spec/CLAUDE.md, 2026-11-10).
 - **One app proves the framework.** The care home conformance app (`spec/Reference/app.json`): care screens a care
-  home's staff use, the component bench with the conformance library's six declarations, and the refusal routes, run
-  under 18 hosts. Every browser test runs on one of its screens. No core test loads Syncfusion.
+  home's staff use, the component bench with the conformance library's declarations, and the refusal routes, run
+  under the hosts app.json declares. Every browser test runs on one of its screens. No core test loads Syncfusion.
 - **Each layer proves one thing, once.**
 
   | Layer | Proves | Runs |
@@ -195,8 +195,8 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   person can run the app. Teardown ends the world and fails any gate still parked.
 - **The verbs** are app.json's: seed, gate, push, drop, refuse, reopen, restart, clock, gc. A placement lists its
   verbs and its held steps, each held step with the TLA+ action it holds, and check_app refuses a verb with no step.
-  Gates are generated from the `Next` of the eight async specs into the world contract (`Gates.g.cs`, one enum per
-  spec), so the app and the tests name a gate the same way without either seeing the other: the test arms a gate
+  Gates are generated from the `Next` of each spec a held step names into the world contract (`Gates.g.cs`, one enum
+  per spec), so the app and the tests name a gate the same way without either seeing the other: the test arms a gate
   before its gesture, waits until the harness reports it held, asserts the held state, then releases it by its own
   request; a release before the gate is reached fails the test. Restart is the test app's host script on the harness's
   word. Clock is `Page.Clock`, installed only by a test that names it. Gc is `Page.RequestGCAsync`, confirmed by the
@@ -480,8 +480,8 @@ bullet's, and in the same commit rewrites root CLAUDE.md, `.claude/rules/`, the 
 keeps, and the folder CLAUDE.md files for the new tree, the meanings list
 stated from D2.4 to D2.6, D2.9 and D4.2 (D2.8), since `WhenARuleNamesTheCode` fails on a rule that names what the cut
 removed. Each removed line stays readable at 65fdf118d or at main's SHA, which every cite pins, and `features_lost` at
-0 is each removed door's verdict. Until the `poc/` bullet's items leave, they keep their own package versions: nine of
-their projects write a version inline, which the central management the cut turns on refuses (NU1008), so the cut
+0 is each removed door's verdict. Until the `poc/` bullet's items leave, they keep their own package versions: those of
+their projects that write a version inline, which the central management the cut turns on refuses (NU1008), so the cut
 writes a `Directory.Packages.props` that turns it off in `poc/` and in each of their folders under `tests/`.
 
 A unit ends when every test check.py assigns it passes on `scripts/playwright.sh`, each written from its promise
@@ -529,7 +529,7 @@ Features: M5.F1
 ### U7. Declarations and vendors
 Features: M11.F1, M11.F2, M11.F3, M12.F1, M12.F2
 
-The conformance library's six declarations land here with the doors that reach them; the bench's cells run from here on.
+The conformance library's declarations land here with the doors that reach them; the bench's cells run from here on.
 README.md and the onboarding skill teach a component's slice as the app's standard (spec/CLAUDE.md, 2026-11-06).
 
 ### U8. Inputs and ids
@@ -600,7 +600,7 @@ Features: M10.F1, M10.F2
 ### U24. Fusion's package, its reference and templates
 Features: M21.F1, M21.F2, M22.F1, M22.F2, M22.F3
 
-FusionMultiSelect's 19 own tests and the templates.
+FusionMultiSelect's own tests, syncfusion.json's `own`, and the templates.
 
 ### U25. The Fusion slices
 Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14, M21.F15, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27, M21.F28, M21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37, M21.F38, M21.F39, M21.F40, M21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46, M21.F47, M21.F48, M21.F49, M21.F50, M21.F51, M21.F52
