@@ -1543,30 +1543,30 @@
         "packages": 6,
         "pins": 24,
         "problems": 0,
-        "references": 15
+        "references": 12
       },
-      "detail": "section 2.9 packs 6 ids, main's but Alis.Reactive.FluentValidator and the decided Alis.Reactive.OpenTelemetry; each ships only bundles, each dependency and each of 15 references the kept projects take is pinned in section 2.7 at its version",
+      "detail": "section 2.9 packs 6 ids, main's but Alis.Reactive.FluentValidator and the decided Alis.Reactive.OpenTelemetry; each ships only bundles, each dependency and each of 12 references the kept projects take is pinned in section 2.7 at its version",
       "pass": true
     },
     "paths": {
       "counts": {
-        "paths": 148,
+        "paths": 139,
         "problems": 0
       },
-      "detail": "each of 148 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
+      "detail": "each of 139 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
       "pass": true
     },
     "plants": {
       "counts": {
-        "caught": 233,
+        "caught": 235,
         "checks": 38,
         "failed": 0,
-        "kept": 79,
+        "kept": 80,
         "proven": 38,
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "233 refused plants caught and 79 accepted plants kept green; 38 of 38 checks proven both ways",
+      "detail": "235 refused plants caught and 80 accepted plants kept green; 38 of 38 checks proven both ways",
       "pass": true
     },
     "probes": {
@@ -3706,7 +3706,7 @@
     }
   },
   "passed": 39,
-  "read_at_head": "4f8d9a8b9a239e96900eaacf030254daca2a7b10",
+  "read_at_head": "805433c7daf2d8de853642c505159146e30e4fd0",
   "step": {
     "failing": [],
     "name": "End of session",
