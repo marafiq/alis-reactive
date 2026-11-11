@@ -127,8 +127,8 @@ Four rules move a type out of its module's folder, each forced by a fact, and th
 the file it moved to:
 - P1. A type lives in the folder of the module whose meaning it carries.
 - P2. `Pipeline<TModel>` and each type that hands a pipeline back live in `TriggersAndPipelines`: a call that names only
-  its own type argument binds only to an instance member (DESIGN.md:2301-2310), so the request verbs, the stage types,
-  `RequestDefaults` and `NoModel` are members or types of the pipeline's module.
+  its own type argument binds only to an instance member (`spec/Core/DESIGN.md:2322-2331` at 924147dbb), so the request
+  verbs, the stage types, `RequestDefaults` and `NoModel` are members or types of the pipeline's module.
 - P3. Every core door on `HtmlHelper<TModel>` and every startup call lives in `RenderingAndDelivery`: `Html.InputField`
   takes the plan, which holds handlers.
 - P4. A type whose module sits below a type it needs moves to the lowest module that can hold it: `PageUrl` and
@@ -432,8 +432,8 @@ is never the reason.
 - Main's packages.config layout, by the owner's word on main (spec/CLAUDE.md, 2026-11-10). Main's build target reads a
   version from a packages.config folder too (`build/AlisReactiveAssets.targets:41-50` at 7b9e987cc), a path main never
   ran: its own MVC 5 app restores by PackageReference "so NuGet resolves transitive deps"
-  (`examples/net48-mvc-smoke/Net48MvcSmoke.csproj:29-31`), and `RC1_RELEASE_READINESS.md:170-171` calls it "not yet
-  observed". NuGet gives a packages.config project a package's analyzers only through an `install.ps1` that Visual
+  (`examples/net48-mvc-smoke/Net48MvcSmoke.csproj:29-31` at 7b9e987cc), and `RC1_RELEASE_READINESS.md:170-171` at
+  7b9e987cc calls it "not yet observed". NuGet gives a packages.config project a package's analyzers only through an `install.ps1` that Visual
   Studio runs, which main does not ship, so the rules the compiler holds would not reach that app. One layout is
   proven by one fresh app. An MVC 5 app on packages.config moves to PackageReference by hand, since NuGet's migrator
   refuses ASP.NET projects, and README.md gives the steps (U3).

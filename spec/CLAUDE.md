@@ -549,10 +549,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   "Retire the site". The docs are README.md, packed as every package's readme, and the XML docs on the shipped surface;
   a line that says the docs carry something names the one that does, and `spec/REWRITE.md` names the unit that writes it.
 - The owner, 2026-11-10, while the lead was restoring main's packages.config layout: "I'm not in favor of taking
-  garbage from main. Like, do the right thing, keep the quality high, drop if you need to." Main is evidence of a
-  need, not a requirement of its form: what main ships stays when it holds the rewrite's bar, and leaves with its
-  reason and evidence in `spec/REWRITE.md` section 3 when it does not; a door that leaves keeps its verdict in
-  features_lost. Main's packages.config layout leaves.
+  garbage from main. Like, do the right thing, keep the quality high, drop if you need to." Then: "quality pincipals
+  must not degrade anywhere". This narrows 2026-11-05's "no feature lost" for main, whose lines are evidence of
+  features and not of the design: what main ships stays when it holds the rewrite's bar, and leaves with its reason
+  and evidence in `spec/REWRITE.md` section 3 when it does not; a door that leaves keeps its verdict in features_lost.
+  Main's packages.config layout leaves.
 - The lead, 2026-11-10, within gate 1's C8 and gate 2's G13: N20.2's default ships the OpenTelemetry adapter as one more
   id, AlisReactive.OpenTelemetry, beside the five of main's six that stay, since D20.2 keeps it out of the core, and the
   core's net48 references take System.Diagnostics.DiagnosticSource (D20.8). Every pin in `spec/REWRITE.md` section 2.7 is

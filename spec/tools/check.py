@@ -2165,6 +2165,10 @@ DECIDED_REFERENCES = {
 PINNED_PACKAGE = re.compile(r"(@?[A-Za-z][\w.\-/]*) \[?(\d+\.\d+\.\d+)\]?")
 SHIPPED_BUNDLE = re.compile(r"^alis-reactive(?:-[a-z0-9]+)*\.js$")
 TARGET_NAMES = re.compile(r"net48|net10\.0")
+NUMBER_WORDS = {word: value for value, word in enumerate(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty".split())}
+POC_PROJECTS = ["poc/**/*.csproj", "tests/Alis.Reactive.Poc.*/*.csproj", "tests/Alis.Reactive.Playwright.TestHost/*.csproj"]
+PLAYWRIGHT_FILES = ["tests/*Playwright*/**/*.cs", "tests/*Playwright*/*.cs"]
 
 
 def rewrite_section(text, heading):
@@ -2299,6 +2303,65 @@ def tree_line(text, path):
             following = list(itertools.takewhile(lambda next_line: next_line.startswith(" " * 20), lines[index + 1:]))
             return " ".join([line] + following)
     return ""
+
+
+def stated_number(word):
+    return int(word) if word.isdigit() else NUMBER_WORDS.get(word.lower())
+
+
+def files_calling(sha, pattern, globs):
+    return len(git("grep", "-l", "-E", pattern, sha, "--", *globs).splitlines())
+
+
+def rewrite_counts():
+    app = json.loads((SPEC / "Reference" / "app.json").read_text())
+    native = json.loads((SPEC / "Reference" / "native.json").read_text())
+    syncfusion = json.loads((SPEC / "Reference" / "syncfusion.json").read_text())
+    held = {spec for entry in app["placements"] + app["cells"] for spec in re.findall(r"([A-Z][A-Za-z]+)\.tla", json.dumps(entry.get("held", [])))}
+    return [
+        (r"under (\w+) hosts", "hosts app.json declares", len(app["hosts"])),
+        (r"conformance library's (\w+) declarations", "Conformance declarations native.json holds",
+         sum(1 for declared in native["types"] if declared["name"].startswith("Conformance"))),
+        (r"the (\w+) async specs", "specs a held step of app.json names", len(held)),
+        (r"FusionMultiSelect's (\w+) own tests", "cells syncfusion.json gives MultiSelect as its own", len(syncfusion.get("own", {}))),
+        (r"at 65fdf118d, (\w+) Playwright test files find their inputs with the framework's own `IdGenerator\.For`",
+         "Playwright files calling IdGenerator.For at 65fdf118d", files_calling(BASE_SHA, r"IdGenerator\.For", PLAYWRIGHT_FILES)),
+        (r"`IdGenerator\.For` \((\w+) on main at 7b9e987cc\)", "Playwright files calling IdGenerator.For at 7b9e987cc",
+         files_calling(MAIN_TIP, r"IdGenerator\.For", PLAYWRIGHT_FILES)),
+        (r"(\w+) of their projects write a version inline", "projects of the POC bullet writing a PackageReference version at HEAD",
+         files_calling("HEAD", "<PackageReference[^>]*Version=", POC_PROJECTS)),
+    ]
+
+
+def check_rewrite_counts():
+    path = SPEC / "REWRITE.md"
+    if not path.exists():
+        return not_started(path)
+    text = " ".join(path.read_text().split())
+    problems, stated = [], 0
+    for pattern, what, actual in rewrite_counts():
+        found = re.findall(pattern, text, re.IGNORECASE)
+        problems += [f"REWRITE.md no longer states the count of {what}"] if not found else []
+        for word in found:
+            stated += 1
+            problems += [f"REWRITE.md says {word} for the {what}, which number {actual}"] if stated_number(word) != actual else []
+    return result(not problems, "; ".join(problems[:6]) or f"each of {stated} counts REWRITE.md states equals the number its data holds",
+                  counts=stated, problems=len(problems))
+
+
+def check_rewrite_cites():
+    path = SPEC / "REWRITE.md"
+    if not path.exists():
+        return not_started(path)
+    problems, cites = [], 0
+    for cite, sha, line in prose_cites(path.read_text()):
+        cites += 1
+        if sha is None:
+            problems.append(f"spec/REWRITE.md:{line}: {written_cite(cite)} names no SHA, and the cut and every later commit move the lines it cites")
+        elif not prose_cite_resolves(cite, sha):
+            problems.append(f"spec/REWRITE.md:{line}: {written_cite(cite)} resolves nowhere at {sha}")
+    return result(not problems, "; ".join(problems[:6]) or f"each of {cites} cites REWRITE.md makes names its SHA and resolves there",
+                  cites=cites, problems=len(problems))
 
 
 def check_paths():
@@ -2727,6 +2790,8 @@ CHECKS = [
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("paths", "every path at HEAD and main's tip kept by REWRITE.md's section 2 or retired by its section 3, so the cut drops nothing by omission", check_paths),
+    ("rewrite_cites", "every cite REWRITE.md makes names its SHA and resolves there", check_rewrite_cites),
+    ("rewrite_counts", "every count REWRITE.md states equals the number its data holds", check_rewrite_counts),
     ("packages", "every package REWRITE.md packs is main's or a decided door's, ships bundles only, and every dependency and kept reference is pinned at its version", check_packages),
     ("test_rules", "every rule and smell of tests.md held by a test rule or a named check", check_test_rules),
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
@@ -2748,7 +2813,7 @@ STEPS = [
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
     (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests"], "Finish every check and make each pass."),
-    (11, "E", "REWRITE.md", ["rewrite_units", "packages", "paths"], "Write spec/REWRITE.md in SliceTree order."),
+    (11, "E", "REWRITE.md", ["rewrite_units", "packages", "paths", "rewrite_cites", "rewrite_counts"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]
 
