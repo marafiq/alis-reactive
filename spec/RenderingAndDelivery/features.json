@@ -232,6 +232,14 @@
           "defect": "Url.AppendVersion's v is not the SHA-256 of the bytes IIS serves at its path (the path's hash, the package's version, a build's time, or one v for every file), or it writes no v, as main's Url.Content link does (examples/net48-mvc-smoke/Views/Shared/_Layout.cshtml:18 at 623dd4a27), so after an upgrade the browser runs the runtime it cached."
         },
         {
+          "for": "M19.X1",
+          "page": "The twin's shell, built from the packed packages and served from IIS Express: its link Open the world's notice is Url.AppendVersion over ~/Content/World/{key}/notice.txt, the file the harness's seed writes under the folder of the test's own world, which teardown removes.",
+          "gesture": "Seed the notice North, open the shell and click Open the world's notice; go back, seed the notice South, reload, and click Open the world's notice again.",
+          "outcome": "The first click requests notice.txt?v=Q_hTu7WShgCYp2FAwXcO4q3Wb0cgRT1k3PIlF44jjlc and the page shows North; the second requests notice.txt?v=DdLa5N2DrjCFzYCsG_wo6NdrpR3f2XLCaf6fmKhcCZo and the page shows South.",
+          "opposite": "With North seeded again in place of South, the same bytes written anew, the second click requests notice.txt?v=Q_hTu7WShgCYp2FAwXcO4q3Wb0cgRT1k3PIlF44jjlc again and the page shows North.",
+          "defect": "Url.AppendVersion keeps the first hash it read of a path for the life of the process, so after the file's bytes change the link still carries North's v and the browser shows the North it cached; or its v follows the file's last write time, so bytes written anew change the URL of an unchanged file."
+        },
+        {
           "for": "M19.X2",
           "page": "A net48 wards index with the link Open the ward, to a ward page whose layout links ~/Content/AlisReactive/js/alis-reactive.jss with Url.AppendVersion, a path at which no file is, and whose plan's load step writes North into ward-name.",
           "gesture": "On the wards index, click Open the ward.",
