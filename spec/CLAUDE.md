@@ -656,6 +656,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   read from the 569 gestures and 1,138 outcomes of the spec's own tests and from the pinned packages, each name
   compiled against them; `Assert.That` reads what the browser reports beside the page, the console's errors among it,
   which 34 of those tests read and TEST006 had refused. The owner can overrule each list.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "put these in project local claude.md as per best practice,
+  tighten the quality repeatable loop". A rule for one kind of file lives in a path-scoped file under `.claude/rules`,
+  loaded where it applies (`.claude/rules/analyzers.md`); what every unit keeps is root CLAUDE.md's, which a session
+  re-reads after a compaction: the pins rule, and one loop of seven steps in its Spec-first section, each exit a
+  line a tool printed. The loop replaces Workflow's five states and holds what a prompt had to repeat: read before
+  writing, decide from the proof in hand, one meaning with every carrier, a rule proven by a refused and an accepted
+  case, the full check at the committed head before the push, a slip said in one line. The cut rewrites that file
+  within Claude Code's 200-line guide; until then it holds the redesign's sections too.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
@@ -712,5 +720,6 @@ Alis.Reactive.Assets.
 
 ## How a step runs
 
-Re-read the step's section of `spec/BRIEF.md`, do it, run `python3 spec/tools/check.py`, append what was
-decided to `spec/NOTES.md`, then commit by path and push the spec branch the one way section 16 of the brief allows.
+A spec unit closes the loop of root CLAUDE.md's Spec-first section: re-read the step's section of `spec/BRIEF.md`,
+change it, append what was decided to `spec/NOTES.md`, commit by path, run `python3 spec/tools/check.py` at that head,
+and push the spec branch the one way section 16 of the brief allows, then `spec/STATE.json` as that run wrote it.

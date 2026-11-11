@@ -41,6 +41,27 @@ modules and the owner's decisions are `spec/CLAUDE.md`'s.
   their promises and failing, the code until they pass, each test failing on its planted defect, commit.
 - The server decides when async work happens and the test releases it through the harness; a test waits for the
   state it names, never for time, in a world of its own, and asserts literal outcomes.
+- Every unit closes one loop, a spec or a rules unit as a rewrite unit, and each exit is a line a tool printed, read
+  when it printed:
+  1. Restate the goal in your own words; a new direction waits for the owner's yes.
+  2. Read the owner's decisions (`spec/CLAUDE.md`), then every file the unit touches, whole, at HEAD, and the rules
+     that file states. A line enters a spec file, a rule file or a test only after it is held against each rule.
+  3. Decide from the proof in hand: the TLA+ specs, the principles and the owner's decisions. A decision on a
+     principle, a closed rule or the scope goes to the owner as one line with its cost and its risk; no other does.
+  4. Change one meaning in one commit, with every place that carries it.
+  5. Prove it on the rung that holds it. Behavior: a `scripts/playwright.sh` result line, the test first failing on
+     its planted defect. A rule (an analyzer, a test rule, a lint rule, an architecture test, a check): a refused
+     case it reports by name and an accepted case one fact away, both kept in the repo. A pin: a restore or an
+     install, and a run. Rules and docs: each rule found in one file, every removed line traced to its home. A
+     failure goes back to 4, twice at most; then stop and research.
+  6. Run the rules test on the staged unit (`tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` and
+     `WhenCodeIsWritten`), commit locally, and run the full check at that head (`python3 spec/tools/check.py`). Push
+     on their two result lines alone, then the unit's STATE; `git ls-remote` equals HEAD after each push.
+  7. The commit says what changed, its proof lines and what did not run. A slip is said in one line and fixed in
+     every place that shares its cause, with no new mechanism built for it. Work an agent finished is landed or
+     dropped, with the reason, in the same session.
+- `spec/tools/check.py` and `spec/plants` change in two cases: a check reports wrongly on correct content, or it passes
+  a defect met in content. A new check waits for the owner's yes.
 
 ## Vision: typed access to JavaScript objects
 
@@ -193,16 +214,8 @@ Everything else stays sync.
   git worktree add .worktrees/<name> -b feature/<name> origin/main
   ```
 
-- A unit of work moves through five states. Each exit shows in git or a run's log, never in a
-  checklist or an artifact:
-  1. Restate the goal in your own words; a new direction waits for the owner's yes.
-  2. Read every file the unit touches, whole, at HEAD.
-  3. Change.
-  4. Prove. Behavior: a `scripts/playwright.sh` result line, the test first failing on a planted
-     defect. Rules and docs: each rule found in one file, every removed line traced to its home. A
-     failure goes back to 3, twice at most; then stop and research.
-  5. Commit one unit: what changed, the proof line, what was not exercised. Work an agent finished
-     is landed or dropped, with the reason, in the same session.
+- A unit of work closes the loop of Spec-first. Each exit shows in git or a run's log, never in a
+  checklist or an artifact.
 - A review names the branch and HEAD SHA it read. A finding counts only if its `file:line` exists
   at HEAD.
 - `scripts/doctor.sh` (preflight), `scripts/build.sh`, `scripts/run.sh` (sandbox at

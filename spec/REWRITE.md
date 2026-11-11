@@ -593,7 +593,7 @@ the cut removes both lines' code and main_delta holds main's changes to them as 
 stays deleted (section 3); `nuget-publish.yml` takes main's trusted publishing, its OIDC login and `id-token: write`,
 into this line's file, which U2 rewrites to section 2.8's. U1's first commit is the cut: it removes both lines' code that
 section 2.1 does not hold under the same path, the shipped projects' sources and every item of section 3 but the `poc/`
-bullet's, and in the same commit rewrites root CLAUDE.md, `.claude/rules/`, the two skills and the agent section 2.1
+bullet's, and in the same commit rewrites root CLAUDE.md, within 200 lines and with its loop kept, `.claude/rules/`, the two skills and the agent section 2.1
 keeps, and the folder CLAUDE.md files for the new tree, the meanings list
 stated from D2.4 to D2.6, D2.9 and D4.2 (D2.8), since `WhenARuleNamesTheCode` fails on a rule that names what the cut
 removed. Each removed line stays readable at 65fdf118d or at main's SHA, which every cite pins, and `features_lost` at
