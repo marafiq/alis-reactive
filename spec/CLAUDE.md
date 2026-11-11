@@ -20,7 +20,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   nothing an app does not.
 - The owner, 2026-11-05: the core takes as few dependencies as it can, and each one is the owner's decision.
   Dependency injection is one. Every dependency is pinned to one version; at gate 1 (C7) the
-  DI abstractions take one exact version per target framework, set beside System.Text.Json's 10.0.12.
+  DI abstractions take one exact version per target framework, set beside System.Text.Json's 10.0.12. The owner's
+  rule of 2026-11-11 moves both to the 10.0 line's latest patch, section 2.7's.
 - The owner, 2026-11-05: the HTTP module is requests and responses. What comes back from the server belongs
   to it: the status, the body, how the browser decodes it, and the error body each host sends.
 - The owner, 2026-11-05: work survives compaction. A correction is written here and in `spec/NOTES.md` the
@@ -630,6 +631,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   cases on Microsoft.CodeAnalysis.Testing, a refused case for each message and an accepted case one fact away for each
   condition. The analyzers of main, of the redesign and of the POC are evidence of the rules and their cases, and the
   unit that lands a rule writes it to that file.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "use latest stable versions sir except where sf is pinned for a
+  reason", and of the tools, "i m shocked that tooling quality was not addressed". Section 2.7's pins had been copied
+  from what the tree held. So: a pin is the latest stable version on the day its unit lands it, looked up at its own
+  registry and proven by a restore or an install and a run; a pin below the latest names what holds it in its row of
+  `spec/REWRITE.md` section 2.7, and Syncfusion's hold is the owner's. The lead's holds, each the owner's to lift: the
+  analyzers compile against Roslyn 4.14.0, Visual Studio 2022's last compiler, since a compiler below an analyzer's
+  Roslyn refuses to load it; what runs in a host follows the net10 host's 10.0 line (the net48 references, the hub's
+  client); TypeScript and Microsoft.AspNetCore.Mvc.Testing are held by a peer range and by net10.0. The SDK is
+  11.0.100 and Node 26.13.0. Dependabot proposes every newer stable version, majors among them, and the nightly
+  workflow compares the tools it does not read; a finding of either package audit fails the checks.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

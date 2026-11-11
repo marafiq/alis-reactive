@@ -49,7 +49,7 @@ Directory.Build.props                 LangVersion 14.0, warnings as errors, Alis
 Directory.Packages.props              central package management: one exact version per package and framework, but
                                       Roslyn's second (2.7), which the projects that host the compiler take by
                                       VersionOverride
-global.json                           SDK 10.0.101, rollForward disable
+global.json                           SDK 11.0.100, rollForward disable
 .node-version .python-version .java-version
 package.json  package-lock.json  eslint.config.js   npm workspaces, locked; the lint, its import order generated from
                                       each SliceTree.txt
@@ -268,35 +268,46 @@ actions its tests will observe. A change to an async lane is a spec change first
 
 | Tool | Pin | One job |
 |---|---|---|
-| .NET SDK | 10.0.101 (`global.json`, rollForward disable) | compile, test, pack |
-| NuGet | the SDK's, 10.0.101's; `Directory.Packages.props`, lock files restored locked in CI | restore |
-| net48 references | System.Text.Json 10.0.12, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.12, System.Diagnostics.DiagnosticSource 10.0.12, Microsoft.AspNet.Mvc 5.3.0 | the core's net48 dependencies (2.9), restored together at these exact versions; net10 takes the first three from the framework reference |
-| net48 build | PolySharp 1.16.0, Microsoft.NETFramework.ReferenceAssemblies 1.0.3, both private | the attributes C# 14's features need on net48, written as source, and the reference assemblies a build on any OS compiles against |
-| MSBuild SDK | Microsoft.Build.NoTargets 3.7.0 | the Assets project |
-| Node | 24.19.0 (`.node-version`) | esbuild, tsc, eslint, node probes |
-| TypeScript | 5.9.3 | `tsc -b`, no emit, the strictest options (strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature) |
+| .NET SDK | 11.0.100 (`global.json`, rollForward disable) | compile, test, pack, for net48 and net10.0; the net10 hosts run on the 10.0 runtime |
+| NuGet | the SDK's, 11.0.100's; `Directory.Packages.props`, lock files restored locked in CI | restore; a finding of its audit fails the restore |
+| net48 references | System.Text.Json 10.0.15, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.15, System.Diagnostics.DiagnosticSource 10.0.15, Microsoft.AspNet.Mvc 5.3.0 | the core's net48 dependencies (2.9), restored together at these exact versions; net10 takes the first three from the framework reference; held on the 10.0 line, the net10 host's, so both hosts run one line of System.Text.Json (each one's latest is 11.0.0) |
+| net48 build | PolySharp 1.17.0, Microsoft.NETFramework.ReferenceAssemblies 1.0.3, both private | the attributes C# 14's features need on net48, written as source, and the reference assemblies a build on any OS compiles against |
+| MSBuild SDK | Microsoft.Build.NoTargets 3.7.134 | the Assets project |
+| Node | 26.13.0 (`.node-version`) | esbuild, tsc, eslint, node probes |
+| TypeScript | 6.0.3 | `tsc -b`, no emit, the strictest options (strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature); held by typescript-eslint 8.72.2, whose peer range ends below 6.1.0 (the latest is 7.0.2) |
 | esbuild | 0.28.2 | one root `build.mjs`, one bundle per package |
-| ESLint | eslint 9.39.4, @eslint/js 9.39.5, typescript-eslint 8.70.1 | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, `--max-warnings 0`; `switch-exhaustiveness-check`, `no-floating-promises`, `no-unnecessary-condition`, and `no-restricted-syntax` on wide DOM queries |
-| Vitest | 3.2.7, node environment, no jsdom | feedback beside the runtime's code |
-| @microsoft/signalr | 10.0.11 | the hub's own asset |
-| OpenTelemetry | @opentelemetry/api 1.9.1, @opentelemetry/sdk-trace-web 2.12.1, @opentelemetry/exporter-trace-otlp-http 0.223.1 | the adapter's bundle (N20.2); the web SDK 2.12.1 takes the API below 1.10.0, so the three move together |
-| Roslyn | Microsoft.CodeAnalysis.CSharp 4.12.0 for the analyzer projects; 5.0.0 for the projects that host the compiler | 4.12.0 is the floor, the lowest compiler the packed analyzers load in: a compiler below an analyzer's Roslyn refuses to load it (CS9057); the analyzer cases, the test-rule cases and the architecture tests host 5.0.0, which parses C# 14 (`LanguageVersion.CSharp14`) |
+| ESLint | eslint 10.14.0, @eslint/js 10.0.1, typescript-eslint 8.72.2, with minimatch 11.0.7 by an override of the 10.2.6 they bring, which npm's audit reports (GHSA-g3hv-75wg-m249) | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, `--max-warnings 0`; `switch-exhaustiveness-check`, `no-floating-promises`, `no-unnecessary-condition`, and `no-restricted-syntax` on wide DOM queries |
+| Vitest | 5.1.0, node environment, no jsdom | feedback beside the runtime's code |
+| @microsoft/signalr | 10.0.11 | the hub's own asset; held on the 10.0 line, the line of the hub it talks to (the latest is 11.0.0) |
+| OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.1 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
+| Roslyn | Microsoft.CodeAnalysis.CSharp 4.14.0 for the analyzer projects; 5.9.0 for the projects that host the compiler | 4.14.0 is the floor, the lowest compiler the packed analyzers load in: a compiler below an analyzer's Roslyn refuses to load it (CS9057), and 4.14.0 is Visual Studio 2022's last, so an MVC 5 app built there runs every rule; the analyzer cases, the test-rule cases and the architecture tests host 5.9.0, the latest, which parses C# 14 (`LanguageVersion.CSharp14`) |
 | Analyzer authoring | Microsoft.CodeAnalysis.Analyzers 5.9.0, private | the compiler's own rules for an analyzer project, release tracking among them (`.claude/rules/analyzers.md`) |
 | Analyzer cases | Microsoft.CodeAnalysis.CSharp.Analyzer.Testing 1.1.4, with System.Security.Cryptography.Pkcs 10.0.15 | every analyzer's, suppressor's and test rule's cases; the Pkcs pin replaces the 9.0.6 that the library's NuGet.Packaging 7.0.3 brings, which NuGet's audit refuses (NU1903) |
 | PublicApi and BannedApi analyzers | Microsoft.CodeAnalysis.PublicApiAnalyzers 5.6.0, Microsoft.CodeAnalysis.BannedApiAnalyzers 5.6.0 | the surface text; no run-time reflection |
-| NUnit, adapter, test SDK | NUnit 4.6.1, NUnit3TestAdapter 5.2.0, Microsoft.NET.Test.Sdk 17.14.1 | tests |
-| Plan schema | JsonSchema.Net 9.1.2 | PlanTests and the architecture tests read every plan against `plan.schema.json` |
-| App sweep | Microsoft.AspNetCore.Mvc.Testing 10.0.1 | the architecture tests' sweep of the conformance app's pages |
-| Playwright | Microsoft.Playwright 1.63.0, CI's image `mcr.microsoft.com/playwright/dotnet:v1.63.0-noble` by digest | every browser test and probe |
-| Java, TLC | OpenJDK 27.0.1, tla2tools v1.7.4 (TLC 2.19) by SHA-256 in `spec/tools/tla2tools.lock` | model checking |
-| Python | 3.14.7, standard library | `spec/tools/check.py` |
-| Syncfusion | 33.1.47: Syncfusion.EJ2.AspNet.Core on net10, Syncfusion.EJ2.MVC5 on net48, @syncfusion/ej2, together | `node scripts/pin-syncfusion.mjs <version>` moves both |
+| NUnit, adapter, test SDK | NUnit 5.0.0, NUnit3TestAdapter 6.3.1, Microsoft.NET.Test.Sdk 18.11.1 | tests |
+| Plan schema | JsonSchema.Net 9.6.0 | PlanTests and the architecture tests read every plan against `plan.schema.json` |
+| App sweep | Microsoft.AspNetCore.Mvc.Testing 10.0.15 | the architecture tests' sweep of the conformance app's pages; held by net10.0, which its 11.0.0 does not support (NU1202) |
+| Playwright | Microsoft.Playwright 1.64.1, CI's image `mcr.microsoft.com/playwright/dotnet:v1.64.1-noble` by digest | every browser test and probe |
+| Java, TLC | OpenJDK 27.0.1, tla2tools v1.7.4 (TLC 2.19) by SHA-256 in `spec/tools/tla2tools.lock` | model checking; v1.8.0 is a prerelease |
+| Python | 3.15.2, standard library | `spec/tools/check.py` |
+| Syncfusion | 33.1.47: Syncfusion.EJ2.AspNet.Core on net10, Syncfusion.EJ2.MVC5 on net48, @syncfusion/ej2, together | `node scripts/pin-syncfusion.mjs <version>` moves both; the owner's hold (the latest is 35.1.43) |
 | Actions | by SHA with Dependabot's version comment | CI |
+
+A pin is the latest stable version of its package or tool on the day its unit lands it (the owner, 2026-11-11), looked
+up at its own registry and proven by a restore or an install and a run. A pin below the latest names what holds it in
+its row, and the holds are this table's and no other: Syncfusion's, the owner's; the analyzers' Roslyn floor; the 10.0
+line for what runs in a host (the net48 references, the Pkcs pin, the hub's client); TypeScript, by typescript-eslint's
+peer range; Microsoft.AspNetCore.Mvc.Testing, by net10.0. Each hold is the owner's to lift. `.github/dependabot.yml`
+proposes every newer stable version each week, majors among them, of every NuGet and npm package, every action, the SDK
+and the Playwright image, and ignores this table's holds and nothing else; `scripts/doctor.sh --latest`, which the
+nightly workflow runs, compares Node, Python, Java and TLC with their registries, which Dependabot does not read. A
+finding of NuGet's audit or of `npm audit` fails `scripts/check.sh`, and a package it names moves to its patched
+version by a pin or an override in this table.
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, `tsc -b`, eslint, `dotnet build -c Release`, the
 architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (build, then run, with the selectors below,
 the result line and the leftover-server check); `scripts/test.sh` (both); `scripts/build.sh`, `scripts/run.sh`,
-`scripts/pack.sh`, `scripts/doctor.sh` (every pin), `scripts/plant-defect.sh` with `scripts/trx-failed-tests.mjs`, which
+`scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs), `scripts/plant-defect.sh` with `scripts/trx-failed-tests.mjs`, which
 reads a TRX's failed and passed tests, `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`,
 `scripts/install-git-hooks.sh`.
 MSBuild never runs npm; an app whose bundle is missing refuses to start.
@@ -326,7 +337,7 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
   Express); `delivery-net10` (pack, the fresh net10 app restored from the packs, WhenAConsumerAppIsBuilt over it, the
   tests under consumerNet10); `proof`, the one required status: every shard has a TRX with tests, none failed, none
   over budget, and the executed names equal the full list, each once.
-- **`.github/workflows/nightly.yml`**: everything, every TLC config uncached, every probe; an issue on failure.
+- **`.github/workflows/nightly.yml`**: everything, every TLC config uncached, every probe, `scripts/doctor.sh --latest`; an issue on failure.
 - **`.github/workflows/syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
   fusion pool.
 - **`.github/workflows/nuget-publish.yml`**, on a `v*` tag: `verify-release-tag.sh`; ci on the tag; one pack job, its expected ids 2.9's six; verify-net48 and
@@ -338,7 +349,7 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 
 | Package | lib | analyzers | build | browser files | dependencies |
 |---|---|---|---|---|---|
-| AlisReactive | net48, net10.0 | the ALIS analyzers and the validator generator, packed from the analyzer project's own output path | `build/net48` copies the browser files; the vendor contract target, opt-in | `alis-reactive.js`; `alis-reactive-hub.js` on net10 | net48: System.Text.Json 10.0.12, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.12, System.Diagnostics.DiagnosticSource 10.0.12 (D20.8), Microsoft.AspNet.Mvc 5.3.0; net10: the framework reference |
+| AlisReactive | net48, net10.0 | the ALIS analyzers and the validator generator, packed from the analyzer project's own output path | `build/net48` copies the browser files; the vendor contract target, opt-in | `alis-reactive.js`; `alis-reactive-hub.js` on net10 | net48: System.Text.Json 10.0.15, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.15, System.Diagnostics.DiagnosticSource 10.0.15 (D20.8), Microsoft.AspNet.Mvc 5.3.0; net10: the framework reference |
 | AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |
 | AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |
 | AlisReactive.OpenTelemetry | net48, net10.0 | none | `build/net48` copy | `alis-reactive-opentelemetry.js`, its bundle holding 2.7's OpenTelemetry pins | AlisReactive at the same version, exactly |

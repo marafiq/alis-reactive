@@ -208,8 +208,9 @@ Everything else stays sync.
 - `scripts/doctor.sh` (preflight), `scripts/build.sh`, `scripts/run.sh` (sandbox at
   http://localhost:5220), `scripts/pack.sh <version>`. Watchers: `npm run watch:runtime` and the other
   watch scripts in `package.json`.
-- Syncfusion EJ2 33.1.47 with npm and NuGet pinned together; upgrade with
-  `node scripts/pin-syncfusion.mjs <version>`.
+- Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a version held
+  below the latest names what holds it in its row of `spec/REWRITE.md` section 2.7. Syncfusion's hold is the owner's:
+  EJ2 33.1.47 with npm and NuGet pinned together; upgrade with `node scripts/pin-syncfusion.mjs <version>`.
 
 ## Local guidance
 

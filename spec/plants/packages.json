@@ -59,7 +59,7 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": ", System.Diagnostics.DiagnosticSource 10.0.12 (D20.8), Microsoft.AspNet.Mvc 5.3.0; net10",
+    "old": ", System.Diagnostics.DiagnosticSource 10.0.15 (D20.8), Microsoft.AspNet.Mvc 5.3.0; net10",
     "new": ", Microsoft.AspNet.Mvc 5.3.0; net10"
    }
   ],
@@ -70,7 +70,7 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "| MSBuild SDK | Microsoft.Build.NoTargets 3.7.0 |",
+    "old": "| MSBuild SDK | Microsoft.Build.NoTargets 3.7.134 |",
     "new": "| MSBuild SDK | Microsoft.Build.NoTargets |"
    }
   ],
@@ -92,7 +92,7 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "| Plan schema | JsonSchema.Net 9.1.2 | PlanTests and the architecture tests read every plan against `plan.schema.json` |\n",
+    "old": "| Plan schema | JsonSchema.Net 9.6.0 | PlanTests and the architecture tests read every plan against `plan.schema.json` |\n",
     "new": ""
    }
   ],
