@@ -3376,26 +3376,33 @@ def generated_gates():
     return f"namespace {WORLD_NAMESPACE};\n\n" + "\n".join(enums)
 
 
+def held_gates(entry):
+    gates = [step["action"].replace(".tla:", "Gate.") for step in entry.get("held", []) if step["verb"] == "gate" and step["action"]]
+    return list(dict.fromkeys(gates))
+
+
 def promise_constants():
     app = json.loads((SPEC / "Reference" / "app.json").read_text())
     groups = {}
     for placement in app["placements"]:
-        named = (csharp_name(f"{placement['for']}_{placement['index']}"), f"{placement['feature']} {placement['for']} {placement['index']}")
+        named = (csharp_name(f"{placement['for']}_{placement['index']}"), f"{placement['feature']} {placement['for']} {placement['index']}", held_gates(placement))
         groups.setdefault(placement["feature"], []).append(named)
     features = sorted(groups, key=lambda feature: [int(number) for number in re.findall(r"\d+", feature)])
     ordered = {csharp_name(feature): groups[feature] for feature in features}
-    ordered["Cells"] = [(csharp_name(cell["cell"]), f"cell {cell['cell']}") for cell in app["cells"] if "cell" in cell]
-    ordered["OwnCells"] = [(csharp_name(cell["own"]), f"own {cell['own']}") for cell in app["cells"] if "own" in cell]
-    ordered["Harness"] = [(f"{test['fixture']}_{test['test']}", f"harness {test['fixture']}.{test['test']}") for test in app["harnessTests"]]
+    ordered["Cells"] = [(csharp_name(cell["cell"]), f"cell {cell['cell']}", held_gates(cell)) for cell in app["cells"] if "cell" in cell]
+    ordered["OwnCells"] = [(csharp_name(cell["own"]), f"own {cell['own']}", held_gates(cell)) for cell in app["cells"] if "own" in cell]
+    ordered["Harness"] = [(f"{test['fixture']}_{test['test']}", f"harness {test['fixture']}.{test['test']}", held_gates(test)) for test in app["harnessTests"]]
     return ordered
 
 
 def generated_promises():
     groups = promise_constants()
-    twice = [f"{group}.{name}" for group, constants in groups.items() for name, count in Counter(name for name, _ in constants).items() if count > 1]
+    twice = [f"{group}.{name}" for group, constants in groups.items() for name, count in Counter(name for name, _, _ in constants).items() if count > 1]
     if twice:
         raise SystemExit("check.py --generate: two tests of the spec take one constant: " + ", ".join(twice))
-    classes = [f"    public static class {group}\n    {{\n" + "".join(f"        public const string {name} = \"{value}\";\n" for name, value in constants) + "    }\n"
+    classes = [f"    public static class {group}\n    {{\n"
+               + "".join("".join(f"        [Holds({gate})]\n" for gate in gates) + f"        public const string {name} = \"{value}\";\n" for name, value, gates in constants)
+               + "    }\n"
                for group, constants in groups.items()]
     return f"namespace {WORLD_NAMESPACE};\n\npublic static class Promises\n{{\n" + "\n".join(classes) + "}\n"
 

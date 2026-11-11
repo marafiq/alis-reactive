@@ -4,9 +4,12 @@ public static class Promises
 {
     public static class M1_F1
     {
+        [Holds(RunGate.Settle)]
         public const string X11_10_0 = "M1.F1 X11.10 0";
         public const string X11_19_0 = "M1.F1 X11.19 0";
+        [Holds(LanesGate.Respond)]
         public const string X11_6_0 = "M1.F1 X11.6 0";
+        [Holds(LanesGate.Respond)]
         public const string X11_7_0 = "M1.F1 X11.7 0";
         public const string X11_24_0 = "M1.F1 X11.24 0";
         public const string M1_X1_0 = "M1.F1 M1.X1 0";
@@ -53,8 +56,10 @@ public static class Promises
     {
         public const string X8_4_0 = "M3.F1 X8.4 0";
         public const string X8_6_0 = "M3.F1 X8.6 0";
+        [Holds(RunGate.Settle)]
         public const string X8_11_0 = "M3.F1 X8.11 0";
         public const string X8_13_0 = "M3.F1 X8.13 0";
+        [Holds(RunGate.Settle)]
         public const string X8_14_0 = "M3.F1 X8.14 0";
         public const string X8_15_0 = "M3.F1 X8.15 0";
         public const string X8_23_0 = "M3.F1 X8.23 0";
@@ -179,16 +184,20 @@ public static class Promises
         public const string X10_3_0 = "M6.F2 X10.3 0";
         public const string X10_4_0 = "M6.F2 X10.4 0";
         public const string X10_5_0 = "M6.F2 X10.5 0";
+        [Holds(LanesGate.Settle)]
         public const string X10_6_0 = "M6.F2 X10.6 0";
         public const string X10_7_0 = "M6.F2 X10.7 0";
         public const string X10_8_0 = "M6.F2 X10.8 0";
         public const string X10_11_0 = "M6.F2 X10.11 0";
         public const string X10_12_0 = "M6.F2 X10.12 0";
         public const string X10_13_0 = "M6.F2 X10.13 0";
+        [Holds(LanesGate.Settle)]
         public const string X10_14_0 = "M6.F2 X10.14 0";
         public const string X10_15_0 = "M6.F2 X10.15 0";
+        [Holds(CompositionGate.Answer)]
         public const string X10_16_0 = "M6.F2 X10.16 0";
         public const string X10_17_0 = "M6.F2 X10.17 0";
+        [Holds(CompositionGate.Answer)]
         public const string X10_19_0 = "M6.F2 X10.19 0";
         public const string X10_20_0 = "M6.F2 X10.20 0";
         public const string M6_X1_0 = "M6.F2 M6.X1 0";
@@ -261,6 +270,7 @@ public static class Promises
         public const string X16_16_0 = "M8.F4 X16.16 0";
         public const string X16_17_0 = "M8.F4 X16.17 0";
         public const string X16_18_0 = "M8.F4 X16.18 0";
+        [Holds(OwnershipGate.ShowsFailures)]
         public const string X16_19_0 = "M8.F4 X16.19 0";
         public const string X16_20_0 = "M8.F4 X16.20 0";
     }
@@ -286,14 +296,19 @@ public static class Promises
         public const string X21_1_0 = "M10.F1 X21.1 0";
         public const string X21_2_0 = "M10.F1 X21.2 0";
         public const string X21_3_0 = "M10.F1 X21.3 0";
+        [Holds(RealtimeGate.Answer)]
         public const string X21_8_0 = "M10.F1 X21.8 0";
         public const string X21_9_0 = "M10.F1 X21.9 0";
         public const string X21_10_0 = "M10.F1 X21.10 0";
         public const string X21_11_0 = "M10.F1 X21.11 0";
         public const string X21_12_0 = "M10.F1 X21.12 0";
         public const string M10_X4_0 = "M10.F1 M10.X4 0";
+        [Holds(RealtimeGate.Answer)]
         public const string X21_8_1 = "M10.F1 X21.8 1";
+        [Holds(RealtimeGate.Answer)]
+        [Holds(RealtimeGate.DefaultFinally)]
         public const string X21_8_2 = "M10.F1 X21.8 2";
+        [Holds(RealtimeGate.Answer)]
         public const string X21_8_3 = "M10.F1 X21.8 3";
         public const string X21_15_0 = "M10.F1 X21.15 0";
         public const string X21_16_0 = "M10.F1 X21.16 0";
@@ -425,24 +440,35 @@ public static class Promises
         public const string X4_8_0 = "M17.F1 X4.8 0";
         public const string X4_9_0 = "M17.F1 X4.9 0";
         public const string X4_10_0 = "M17.F1 X4.10 0";
+        [Holds(RunGate.Settle)]
         public const string X4_11_0 = "M17.F1 X4.11 0";
         public const string X4_13_0 = "M17.F1 X4.13 0";
         public const string X4_13_1 = "M17.F1 X4.13 1";
         public const string X11_2_0 = "M17.F1 X11.2 0";
+        [Holds(RunGate.Settle)]
         public const string X11_4_0 = "M17.F1 X11.4 0";
+        [Holds(CompositionGate.Answer)]
         public const string X11_5_0 = "M17.F1 X11.5 0";
         public const string X11_8_0 = "M17.F1 X11.8 0";
+        [Holds(RunGate.Settle)]
         public const string X11_9_0 = "M17.F1 X11.9 0";
+        [Holds(RunGate.Settle)]
         public const string X11_11_0 = "M17.F1 X11.11 0";
         public const string X11_12_0 = "M17.F1 X11.12 0";
         public const string X11_13_0 = "M17.F1 X11.13 0";
+        [Holds(LanesGate.SettleTheTail)]
         public const string X11_14_0 = "M17.F1 X11.14 0";
+        [Holds(LanesGate.Respond)]
         public const string X11_15_0 = "M17.F1 X11.15 0";
+        [Holds(LanesGate.Settle)]
         public const string X11_16_0 = "M17.F1 X11.16 0";
         public const string X11_18_0 = "M17.F1 X11.18 0";
         public const string X11_20_0 = "M17.F1 X11.20 0";
+        [Holds(RunGate.Settle)]
         public const string X11_21_0 = "M17.F1 X11.21 0";
+        [Holds(RunGate.Settle)]
         public const string X11_22_0 = "M17.F1 X11.22 0";
+        [Holds(RunGate.Settle)]
         public const string X11_23_0 = "M17.F1 X11.23 0";
     }
 
@@ -826,6 +852,7 @@ public static class Promises
 
     public static class M25_F2
     {
+        [Holds(CompositionGate.Answer)]
         public const string M25_X3_0 = "M25.F2 M25.X3 0";
     }
 
@@ -834,8 +861,10 @@ public static class Promises
         public const string X17_33_0 = "M25.F3 X17.33 0";
         public const string X17_34_0 = "M25.F3 X17.34 0";
         public const string X17_35_0 = "M25.F3 X17.35 0";
+        [Holds(LanesGate.Respond)]
         public const string X17_36_0 = "M25.F3 X17.36 0";
         public const string X17_37_0 = "M25.F3 X17.37 0";
+        [Holds(LanesGate.Respond)]
         public const string X17_38_0 = "M25.F3 X17.38 0";
         public const string M25_X4_0 = "M25.F3 M25.X4 0";
     }
@@ -844,6 +873,7 @@ public static class Promises
     {
         public const string X17_6_0 = "M25.F4 X17.6 0";
         public const string X17_7_0 = "M25.F4 X17.7 0";
+        [Holds(CompositionGate.Answer)]
         public const string X17_8_0 = "M25.F4 X17.8 0";
         public const string M25_X5_0 = "M25.F4 M25.X5 0";
         public const string M25_X6_0 = "M25.F4 M25.X6 0";
@@ -864,12 +894,14 @@ public static class Promises
 
     public static class M26_F1
     {
+        [Holds(TracingGate.Respond)]
         public const string X20_1_0 = "M26.F1 X20.1 0";
         public const string X20_9_0 = "M26.F1 X20.9 0";
     }
 
     public static class M26_F2
     {
+        [Holds(TracingGate.Respond)]
         public const string X20_3_0 = "M26.F2 X20.3 0";
         public const string X20_5_0 = "M26.F2 X20.5 0";
         public const string X20_8_0 = "M26.F2 X20.8 0";
@@ -877,8 +909,11 @@ public static class Promises
 
     public static class M26_F3
     {
+        [Holds(TracingGate.Respond)]
         public const string X20_2_0 = "M26.F3 X20.2 0";
+        [Holds(TracingGate.Respond)]
         public const string X20_4_0 = "M26.F3 X20.4 0";
+        [Holds(TracingGate.Respond)]
         public const string X20_7_0 = "M26.F3 X20.7 0";
     }
 
@@ -897,7 +932,9 @@ public static class Promises
         public const string method_value = "cell method.value";
         public const string method_object_memberRead = "cell method.object.memberRead";
         public const string method_object_methodCall = "cell method.object.methodCall";
+        [Holds(RunGate.Settle)]
         public const string method_async_void = "cell method.async.void";
+        [Holds(RunGate.Settle)]
         public const string method_async_value = "cell method.async.value";
         public const string method_arg_scalar = "cell method.arg.scalar";
         public const string method_arg_object = "cell method.arg.object";
@@ -907,36 +944,53 @@ public static class Promises
         public const string event_list = "cell event.list";
         public const string event_method = "cell event.method";
         public const string event_promise = "cell event.promise";
+        [Holds(RunGate.Settle)]
         public const string event_deepAsync = "cell event.deepAsync";
         public const string event_poc15_writeOnly_payload_before = "cell event.poc15.writeOnly.payload.before";
         public const string event_poc15_writeOnly_held_before = "cell event.poc15.writeOnly.held.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_writeOnly_held_after = "cell event.poc15.writeOnly.held.after";
         public const string event_poc15_liveObjects_payload_before = "cell event.poc15.liveObjects.payload.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_liveObjects_payload_after = "cell event.poc15.liveObjects.payload.after";
         public const string event_poc15_liveObjects_held_before = "cell event.poc15.liveObjects.held.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_liveObjects_held_after = "cell event.poc15.liveObjects.held.after";
         public const string event_poc15_methodValue_payload_before = "cell event.poc15.methodValue.payload.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_methodValue_payload_after = "cell event.poc15.methodValue.payload.after";
         public const string event_poc15_methodValue_held_before = "cell event.poc15.methodValue.held.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_methodValue_held_after = "cell event.poc15.methodValue.held.after";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_methodAsyncValue_payload_before = "cell event.poc15.methodAsyncValue.payload.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_methodAsyncValue_payload_after = "cell event.poc15.methodAsyncValue.payload.after";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_methodAsyncValue_held_before = "cell event.poc15.methodAsyncValue.held.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_methodAsyncValue_held_after = "cell event.poc15.methodAsyncValue.held.after";
         public const string event_poc15_returnedObject_payload_before = "cell event.poc15.returnedObject.payload.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_returnedObject_payload_after = "cell event.poc15.returnedObject.payload.after";
         public const string event_poc15_returnedObject_held_before = "cell event.poc15.returnedObject.held.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_returnedObject_held_after = "cell event.poc15.returnedObject.held.after";
         public const string event_poc15_returnedObjects_payload_before = "cell event.poc15.returnedObjects.payload.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_returnedObjects_payload_after = "cell event.poc15.returnedObjects.payload.after";
         public const string event_poc15_returnedObjects_held_before = "cell event.poc15.returnedObjects.held.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_returnedObjects_held_after = "cell event.poc15.returnedObjects.held.after";
         public const string event_poc15_callback_payload_before = "cell event.poc15.callback.payload.before";
         public const string event_poc15_callback_held_before = "cell event.poc15.callback.held.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_callback_held_after = "cell event.poc15.callback.held.after";
         public const string event_poc15_component_payload_before = "cell event.poc15.component.payload.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_component_payload_after = "cell event.poc15.component.payload.after";
         public const string event_poc15_component_held_before = "cell event.poc15.component.held.before";
+        [Holds(RunGate.Settle)]
         public const string event_poc15_component_held_after = "cell event.poc15.component.held.after";
         public const string absence_member = "cell absence.member";
         public const string absence_past = "cell absence.past";
@@ -966,10 +1020,12 @@ public static class Promises
         public const string http_beside_static = "cell http.beside.static";
         public const string http_beside_hidden = "cell http.beside.hidden";
         public const string http_into = "cell http.into";
+        [Holds(RequestGate.Route)]
         public const string http_whileLoading = "cell http.whileLoading";
         public const string http_response_success = "cell http.response.success";
         public const string http_response_error = "cell http.response.error";
         public const string http_chained = "cell http.chained";
+        [Holds(LanesGate.Respond)]
         public const string http_parallel = "cell http.parallel";
         public const string http_finally = "cell http.finally";
         public const string lane_confirm = "cell lane.confirm";
@@ -1011,6 +1067,7 @@ public static class Promises
     public static class Harness
     {
         public const string WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded = "harness WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded";
+        [Holds(CompositionGate.Answer)]
         public const string WhenAGateHoldsAnAnswer_the_held_answer_reads_the_word_seeded_while_it_was_held = "harness WhenAGateHoldsAnAnswer.the_held_answer_reads_the_word_seeded_while_it_was_held";
         public const string WhenAPersonOpensTheApp_the_first_page_opens_in_a_world_of_its_own = "harness WhenAPersonOpensTheApp.the_first_page_opens_in_a_world_of_its_own";
     }
