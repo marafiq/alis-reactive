@@ -27,14 +27,14 @@
         "cell": 54,
         "check": 4,
         "d_lines": 243,
-        "defect": 231,
+        "defect": 232,
         "delivery": 1,
         "invariant": 31,
-        "meanings": 55,
+        "meanings": 56,
         "probe": 74,
         "uncarried": 0
       },
-      "detail": "each of 243 D lines and 55 module meanings has at least one carrier that resolves: a defect naming it in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it",
+      "detail": "each of 243 D lines and 56 module meanings has at least one carrier that resolves: a defect naming it in an id group, or an invariant, probe or check it names, or a matrix cell or delivery test resting on it",
       "pass": true
     },
     "claude_md": {
@@ -1550,10 +1550,10 @@
     },
     "paths": {
       "counts": {
-        "paths": 153,
+        "paths": 154,
         "problems": 0
       },
-      "detail": "each of 153 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
+      "detail": "each of 154 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
       "pass": true
     },
     "plants": {
@@ -3706,7 +3706,7 @@
     }
   },
   "passed": 39,
-  "read_at_head": "800347ca0ddb8be2b0079cec0d28a7d409ec6900",
+  "read_at_head": "429b3afd5d46d2b56746d7a834923f6a33211718",
   "step": {
     "failing": [],
     "name": "End of session",
