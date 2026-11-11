@@ -1,1 +1,4 @@
 #nullable enable
+Alis.Reactive.Declarations.TypedDslExemptionAttribute
+Alis.Reactive.Declarations.TypedDslExemptionAttribute.Reason.get -> string!
+Alis.Reactive.Declarations.TypedDslExemptionAttribute.TypedDslExemptionAttribute(string! reason) -> void

@@ -72,7 +72,7 @@ Alis.Reactive.Assets/                 NoTargets, not packed: the core's browser 
   tsconfig.json runtime/SliceTree.txt runtime/index.ts runtime/<Module>/ (with its *.test.ts beside it)
 Alis.Reactive.Analyzers/              netstandard2.0, packed inside AlisReactive
   <Module>/                           the rules that enforce that module's lines, its generators and build files
-  Analyzers/                          module 20's own rules, ALIS010 to ALIS013
+  Analyzers/                          module 20's own rules, ALIS009 to ALIS013
 Alis.Reactive.Native/                 net48;net10.0, PackageId AlisReactive.Native, on the core alone
   SliceTree.txt PublicAPI/ native.ts
   NativeComponents/ NativeComponents/<Slice>/ NativeAppLevelObjects/<Slice>/   declaration, render helper, its .ts
@@ -106,9 +106,10 @@ tests/
                                               conformance app WhenAnAppRendersItsPages and SandboxStaticStateTests,
                                               renamed WhenTheAppHoldsNoStaticState, over each fresh app's build
                                               WhenAConsumerAppIsBuilt (section 2.9), and over the runner's result
-                                              WhenAPlaywrightRunEnds (section 2.5), and over the lint's rules
-                                              WhenTheLintIsConfigured (section 2.7), each rule with its refused and
-                                              accepted cases, which WhenAnArchitectureTestIsWritten holds; their
+                                              WhenAPlaywrightRunEnds (section 2.5), over the lint's rules
+                                              WhenTheLintIsConfigured (section 2.7), and over the shipped packages
+                                              and their slice tables WhenAPackageShips (M20.D1), each rule with its
+                                              refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; their
                                               helpers Repository, Scripts and read-scripts
                                               and its packages.lock.json; LintCases holds the lint's refused and
                                               accepted files; RefusedCaseAttribute and AcceptedCaseAttribute are
@@ -155,6 +156,8 @@ The folder and namespace names are the module table's (spec/CLAUDE.md). DESIGN.m
 `Hosting` read `TriggersAndPipelines`, `RequestsAndResponses` and `RenderingAndDelivery`. The block writer, the POC's
 `Writing/PlanBuild.cs`, goes to `Execution/` and reads no module above it: the view's name prefix is text it holds.
 Realtime's files are wrapped whole in `#if NET10_0_OR_GREATER`, so the net48 build keeps the folder its row names.
+Module 20 has no folder in the core: its one type there, `TypedDslExemptionAttribute`, lives in `Declarations`, the row
+below the two slices whose doors carry it (M20.N1).
 
 ### 2.3 The SliceTree
 
@@ -190,8 +193,9 @@ ALIS011 expects `<assembly>.<first folder>` for every file; ALIS013 reads the `A
 of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-restricted-imports` from each table.
 
 A row enters a table with the first file of its folder, since ALIS013 refuses an entry that names no folder (M20.D6).
-U1 writes the four shipped projects' tables empty and builds each with AlisSliceTree on, so from then on a file in a
-folder with no row fails the build; U3's skeleton writes the core's 16 rows with their folders.
+U1 writes the four shipped projects' tables and builds each with AlisSliceTree on, so from then on a file in a
+folder with no row fails the build. The tables are empty but for the core's, which holds `Declarations` for the
+exemption (M20.N1); U3's skeleton writes the core's 16 rows with their folders.
 
 ### 2.4 Naming
 
@@ -680,9 +684,10 @@ a part that lists its doors, each on a Doors line, lands with the latest unit th
 Features: M20.F1
 
 The cut and the rewritten rule files (section 4's opening), the pins of section 2.7 with the TLC lock, central package
-management, the SliceTree tables, the analyzers project with ALIS010 to ALIS013 and module 20's rules, the lint at its
-strictest with its rules' cases (WhenTheLintIsConfigured), `check.py --ci`, `scripts/check.sh` green on an empty core
-with `scripts/test.sh`, and every architecture test it keeps with its
+management, the SliceTree tables, the analyzers project with module 20's rules (ALIS010 to ALIS013, and ALIS009 over a
+compilation that carries a slice table, with its exemption and WhenAPackageShips, M20.D7), the lint at its
+strictest with its rules' cases (WhenTheLintIsConfigured), `check.py --ci`, `scripts/check.sh` green on a core that
+holds the exemption alone, with `scripts/test.sh`, and every architecture test it keeps with its
 refused and accepted cases and WhenAnArchitectureTestIsWritten (section 2.10).
 
 ### U2. The harness, the conformance app's shell and CI
@@ -719,6 +724,8 @@ Features: M5.F1
 Features: M11.F1, M11.F2, M11.F3, M12.F1, M12.F2
 
 The conformance library's declarations land here with the doors that reach them; the bench's cells run from here on.
+ALIS009's reach to a component declaration and a render helper in a compilation with no slice table (M20.D1, M20.D7)
+lands here with its cases, since it reads the types this unit lands.
 README.md and the onboarding skill teach a component's slice as the app's standard (spec/CLAUDE.md, 2026-11-06).
 
 ### U8. Inputs and ids

@@ -664,6 +664,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   writing, decide from the proof in hand, one meaning with every carrier, a rule proven by a refused and an accepted
   case, the full check at the committed head before the push, a slip said in one line. The cut rewrites that file
   within Claude Code's 200-line guide; until then it holds the redesign's sections too.
+- The lead, 2026-11-11, within the owner's decisions of 2026-11-06 (an analyzer is written as .NET's own are and
+  enforces one line of the spec) and of 2026-11-08 (a rule the source states is the compiler's): ALIS009's conditions
+  are M20.D7's. `dynamic` is refused as `object` is, and a delegate's and an expression's type arguments are read. A
+  string is read by the words of its parameter's name, as .NET's CA1054 reads a URI parameter's, over a closed list of
+  sixteen words that holds every name both lines matched whole and "param", from main's doors that key a request by a
+  string. The build reads the name and never what the string means, so a member-naming string under another name
+  passes it and is read in the package's PublicAPI text. The exemption is
+  `Alis.Reactive.Declarations.TypedDslExemptionAttribute`, on the row below Vendors and Plugins. The rule's reach to a
+  declaration and a render helper in a compilation with no slice table lands in U7, with the types it reads. The owner
+  can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

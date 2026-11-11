@@ -17,6 +17,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" />
+        <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj" />
     </ItemGroup>
 
 </Project>

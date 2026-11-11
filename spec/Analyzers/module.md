@@ -59,11 +59,14 @@ Kept from the core, each the analyzer that holds its rule:
   the same name (`Alis.Reactive/Components/TypedDslExemptionAttribute.cs:13` at 623dd4a27), which only the framework's
   own packages could carry. Fusion carries it on its column rules and the core on `ComponentVendor`'s two JavaScript
   name doors (`Alis.Reactive/Vendors/ComponentVendor.cs:77` and `:108` at 65fdf118d), and an app's brought component
-  carries it as they do.
+  carries it as they do. In the rewrite it is `Alis.Reactive.Declarations.TypedDslExemptionAttribute`, in the core's
+  `Declarations` folder, row 9 of its slice table: the doors that carry it take the JavaScript names of that row's
+  vocabulary, Vendors and Plugins share row 10, and a slice uses no slice of its own row (M20.D3).
 
-The meanings `M20.D1` to `M20.D6` and the defects `M20.X1` to `M20.X6` are in `spec/Analyzers/features.json`, on the
+The meanings `M20.D1` to `M20.D7` and the defects `M20.X1` to `M20.X6` are in `spec/Analyzers/features.json`, on the
 feature they give. `M20.D2` is the slice table's whole syntax, and `M20.D3` to `M20.D6` are the four rules that read
-it, each with its messages.
+it, each with its messages. `M20.D7` is ALIS009 whole: what a door is, the types and the strings it refuses, where
+each is reported and each message.
 
 One id, one rule. Each analyzer id of both lines and the rewrite:
 
@@ -77,7 +80,7 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS006 | a condition with no browser form | kept as an error (N18.11) |
 | ALIS007 | a second `Chained` | the chain does not compile; ALIS030 carries a reuse (N18.7) |
 | ALIS008 | two requests in one block | kept, retargeted to every block and file (D9.17, N9.9) |
-| ALIS009 | an untyped public door | kept (D18.5), scoped by M20.D1, exempted by M20.N1 |
+| ALIS009 | an untyped public door | kept (D18.5, M20.D7), scoped by M20.D1, exempted by M20.N1 |
 | ALIS010 | a use of a slice on a later row, or on the file's own row | kept for each project that carries a slice table (D18.6, M20.D3) |
 | ALIS011 | a namespace other than the project's root namespace and the file's first folder | kept; the redesign's split by a file's public types leaves (M20.D4) |
 | ALIS012 | a public class nothing derives from, left unsealed | kept (M20.D5) |

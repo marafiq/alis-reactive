@@ -338,6 +338,9 @@
       "alis.reactive.analyzers": {
         "type": "Project"
       },
+      "AlisReactive": {
+        "type": "Project"
+      },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "CentralTransitive",
         "requested": "[5.9.0, )",

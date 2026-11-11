@@ -32,13 +32,16 @@ A test rule, TEST001 to TEST013 of `spec/REWRITE.md` section 2.10, is an analyze
    `GetTypeByMetadataName` inside `RegisterCompilationStartAction`, and a compilation that lacks one registers
    nothing. The rule reads symbols and `IOperation` nodes and compares symbols with `SymbolEqualityComparer`. It
    decides what code means from a name's text, a file's path or an assembly's name in one case only: its spec line is
-   about that name or path, as the slice tree's lines are. What a rule needs beside the code (a slice table, the
+   about that name or path, as the slice tree's lines are. A rule whose line is about what a name says reads the
+   name's words, parted at its capitals, digits and underscores as .NET's own rule for a URI parameter parts one,
+   and never a run of letters inside a word. What a rule needs beside the code (a slice table, the
    vendor contract, a build property) reaches it as an additional file or a compiler-visible property of the build. A
    rule that reads the compilation alone, and no symbol or operation of it, uses the compilation action, which the
    compiler's own rules ask for (RS1013).
 4. **It reports what it proves.** Code the rule does not follow gets no report; where its spec line names a refusal
    at render, that holds it (D18.6). The location is the smallest text the developer edits, a member's name or one
-   argument. A report about a line of an additional file is made from that file's own action, at the line's text.
+   argument. A member written in two declarations, a partial method or property, is reported once, where it is
+   defined. A report about a line of an additional file is made from that file's own action, at the line's text.
    A rule about the compilation itself (a reference, a table the build did not hand over) has no text to
    mark: it reports with no location, and its case expects none.
 5. **No state, any order, no throw.** `Initialize` opens with `ConfigureGeneratedCodeAnalysis` and
@@ -79,7 +82,8 @@ throws, and a report the case does not expect.
    literal sentence, the one the developer reads. Every message of the rule has one.
 3. **The accepted case** differs from a refused case by one fact, the fact the rule turns on, and expects no report.
    Every condition of the rule has one.
-4. A rule that reads an additional file has a case without that file.
+4. A rule that reads an additional file has a case without that file, and a rule that reads a type of the core has
+   a case in a project that references no core.
 5. One accepted case of every rule holds source that does not compile, with the compiler's error marked and no
    report expected.
 6. A suppressor's case expects the warning suppressed at the place its line names and kept one fact away.

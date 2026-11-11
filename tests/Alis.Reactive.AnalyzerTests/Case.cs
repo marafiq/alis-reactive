@@ -14,6 +14,8 @@ internal sealed class Case<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, DefaultVer
     internal const string Project = "TestProject";
     internal const string Table = "/TestProject/SliceTree.txt";
 
+    private const string TheCore = "Alis.Reactive.dll";
+
     public Case()
     {
         ReferenceAssemblies = new ReferenceAssemblies("net10.0");
@@ -55,6 +57,19 @@ internal sealed class Case<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, DefaultVer
         return this;
     }
 
+    internal Case<TAnalyzer> WithAProjectThatReferencesNoCore(string name, string path, string source)
+    {
+        WithAnotherProject(name, path, source);
+        LeaveTheCore(TestState.AdditionalProjects[name]);
+        return this;
+    }
+
+    internal Case<TAnalyzer> WithoutTheCore()
+    {
+        LeaveTheCore(TestState);
+        return this;
+    }
+
     internal Case<TAnalyzer> Expecting(params DiagnosticResult[] reports)
     {
         ExpectedDiagnostics.AddRange(reports);
@@ -66,6 +81,9 @@ internal sealed class Case<TAnalyzer> : CSharpAnalyzerTest<TAnalyzer, DefaultVer
         var hostAssemblies = (string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!;
         foreach (var path in hostAssemblies.Split(Path.PathSeparator)) project.AdditionalReferences.Add(MetadataReference.CreateFromFile(path));
     }
+
+    private static void LeaveTheCore(ProjectState project)
+        => project.AdditionalReferences.RemoveAll(reference => string.Equals(Path.GetFileName(reference.Display), TheCore, StringComparison.Ordinal));
 
     protected override ParseOptions CreateParseOptions()
         => ((CSharpParseOptions)base.CreateParseOptions()).WithLanguageVersion(LanguageVersion.CSharp14);
