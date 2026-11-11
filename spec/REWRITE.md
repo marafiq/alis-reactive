@@ -335,8 +335,8 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 - Script order in a layout, on both hosts: `ej2.min.js` (Fusion only), the Fusion templates script, each package's
   script, then `alis-reactive.js` last, every one a classic script without `async`.
 - A fresh net10 app: `dotnet add package`, the startup calls, a `@using` per module namespace a view uses, the links.
-  A fresh MVC 5 app: PackageReference (packages.config unsupported, README.md says to migrate), the startup calls and
-  the resolver in `Application_Start`, the namespaces in `Views/Web.config`, the links.
+  A fresh MVC 5 app: PackageReference (packages.config retires, section 3), the startup calls and the resolver in
+  `Application_Start`, the namespaces in `Views/Web.config`, the links.
 - The delivery tests run on both fresh apps: each link's version equals the hash of the bytes served, the plan boots, a
   gesture shows its outcome, a validator refuses in the browser and the server saves a valid post, two time zones each
   show their own day, and git lists no file the build wrote into the app (M19.D2).
@@ -429,6 +429,14 @@ is never the reason.
   `build/AlisReactiveNetFrameworkContent.targets`, `build/AlisReactiveStaticWebAssets.targets` and main's
   `build/AlisReactiveAssets.targets`, which each package's own build target and static web assets replace (section 2.9,
   U3); `Alis.Reactive.Assets/components/`, whose code moves into its package; jsdom and Tailwind.
+- Main's packages.config layout, by the owner's word on main (spec/CLAUDE.md, 2026-11-10). Main's build target reads a
+  version from a packages.config folder too (`build/AlisReactiveAssets.targets:41-50` at 7b9e987cc), a path main never
+  ran: its own MVC 5 app restores by PackageReference "so NuGet resolves transitive deps"
+  (`examples/net48-mvc-smoke/Net48MvcSmoke.csproj:29-31`), and `RC1_RELEASE_READINESS.md:170-171` calls it "not yet
+  observed". NuGet gives a packages.config project a package's analyzers only through an `install.ps1` that Visual
+  Studio runs, which main does not ship, so the rules the compiler holds would not reach that app. One layout is
+  proven by one fresh app. An MVC 5 app on packages.config moves to PackageReference by hand, since NuGet's migrator
+  refuses ASP.NET projects, and README.md gives the steps (U3).
 - Main's `Alis.Reactive.FluentValidator`, its line in the pack script and its id in the publish workflow's expected
   list, which the merge of main brings in; M8.F1 holds its doors' verdicts.
 - The sandbox's worked example in the docs rule file: the cut removes it, and U12 writes the conformance app's.
