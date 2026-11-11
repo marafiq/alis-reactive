@@ -622,6 +622,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   an accepted plant, and a new check waits for the owner's yes; no agent decides or words anything, and a fork takes one
   bounded task and is landed or dropped in its session; a unit is committed on its own full check and its own rules
   test; progress is the open queue shrinking toward U1's cut.
+- The owner, 2026-11-11, as the next session read the POC's analyzers (verbatim in `spec/NOTES.md`): "i never said use
+  poc analyzer as verbatim, do you know how to write good analyzers?" The handoff had asked for authoring rules read
+  "from what the POC's analyzers already do"; that clause is void. An analyzer, a suppressor and a test rule are written
+  as .NET's own are, and `.claude/rules/analyzers.md` holds how, loaded where an analyzer or its cases are opened: one
+  id for one line of the spec, tracked in release files the build compares with every descriptor; semantic reads only;
+  cases on Microsoft.CodeAnalysis.Testing, a refused case for each message and an accepted case one fact away for each
+  condition. The analyzers of main, of the redesign and of the POC are evidence of the rules and their cases, and the
+  unit that lands a rule writes it to that file.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

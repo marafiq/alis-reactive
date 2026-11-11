@@ -47,7 +47,8 @@ in the line.
 Alis.Reactive.slnx                    the shipped projects, the generator and the net10 test projects
 Directory.Build.props                 LangVersion 14.0, warnings as errors, AlisSliceTree off by default
 Directory.Packages.props              central package management: one exact version per package and framework, but
-                                      Roslyn's second (2.7), which the architecture tests take by VersionOverride
+                                      Roslyn's second (2.7), which the projects that host the compiler take by
+                                      VersionOverride
 global.json                           SDK 10.0.101, rollForward disable
 .node-version .python-version .java-version
 package.json  package-lock.json  eslint.config.js   npm workspaces, locked; the lint, its import order generated from
@@ -110,7 +111,8 @@ spec/                                         the design source: BRIEF.md, REWRI
 ```
 
 Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/protect-generated.mjs`,
-`.claude/rules/csharp.md`, `.claude/rules/docs.md`, `.claude/rules/tests.md`, `.claude/rules/views.md`,
+`.claude/rules/analyzers.md`, `.claude/rules/csharp.md`, `.claude/rules/docs.md`, `.claude/rules/tests.md`,
+`.claude/rules/views.md`,
 `.claude/skills/onboard-component`, `.claude/skills/prove-behavior` and `.claude/agents/pragmatic-architect.md`, which
 the cut rewrites for the new tree, and `.github/actions`, `.github/dependabot.yml` and `.github/release.yml`.
 
@@ -278,7 +280,9 @@ actions its tests will observe. A change to an async lane is a spec change first
 | Vitest | 3.2.7, node environment, no jsdom | feedback beside the runtime's code |
 | @microsoft/signalr | 10.0.11 | the hub's own asset |
 | OpenTelemetry | @opentelemetry/api 1.9.1, @opentelemetry/sdk-trace-web 2.12.1, @opentelemetry/exporter-trace-otlp-http 0.223.1 | the adapter's bundle (N20.2); the web SDK 2.12.1 takes the API below 1.10.0, so the three move together |
-| Roslyn | Microsoft.CodeAnalysis.CSharp 4.12.0; 5.0.0 for the architecture tests | the analyzers and their cases; the architecture tests parse C# 14 (`LanguageVersion.CSharp14`), which 4.12.0 does not know |
+| Roslyn | Microsoft.CodeAnalysis.CSharp 4.12.0 for the analyzer projects; 5.0.0 for the projects that host the compiler | 4.12.0 is the floor, the lowest compiler the packed analyzers load in: a compiler below an analyzer's Roslyn refuses to load it (CS9057); the analyzer cases, the test-rule cases and the architecture tests host 5.0.0, which parses C# 14 (`LanguageVersion.CSharp14`) |
+| Analyzer authoring | Microsoft.CodeAnalysis.Analyzers 5.9.0, private | the compiler's own rules for an analyzer project, release tracking among them (`.claude/rules/analyzers.md`) |
+| Analyzer cases | Microsoft.CodeAnalysis.CSharp.Analyzer.Testing 1.1.4, with System.Security.Cryptography.Pkcs 10.0.15 | every analyzer's, suppressor's and test rule's cases; the Pkcs pin replaces the 9.0.6 that the library's NuGet.Packaging 7.0.3 brings, which NuGet's audit refuses (NU1903) |
 | PublicApi and BannedApi analyzers | Microsoft.CodeAnalysis.PublicApiAnalyzers 5.6.0, Microsoft.CodeAnalysis.BannedApiAnalyzers 5.6.0 | the surface text; no run-time reflection |
 | NUnit, adapter, test SDK | NUnit 4.6.1, NUnit3TestAdapter 5.2.0, Microsoft.NET.Test.Sdk 17.14.1 | tests |
 | Plan schema | JsonSchema.Net 9.1.2 | PlanTests and the architecture tests read every plan against `plan.schema.json` |
@@ -395,6 +399,15 @@ rule or a named check:
   of every architecture test it keeps, and WhenAnArchitectureTestIsWritten refuses a rule with no refused or no
   accepted case. check.py's checks keep theirs in `spec/plants/`, which its `plants` check runs in throwaway
   worktrees.
+- **How an analyzer is written.** `.claude/rules/analyzers.md` holds it for every analyzer, suppressor and test rule,
+  and loads when a file of an analyzer project or of its cases is opened: one id for one line of the spec, tracked in
+  the project's release files, which the build compares with every descriptor; semantic reads only; cases on
+  Microsoft.CodeAnalysis.Testing (2.7), a refused case for each message and an accepted case one fact away for each
+  condition. The unit that lands a rule writes it to that file. The analyzers of main, of the redesign and of the POC
+  are evidence of the rules and of the cases they met, never code the rewrite moves: all three switch release tracking
+  off (`Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj:11` at 7b9e987cc and at 65fdf118d,
+  `poc/Alis.Reactive.Poc.Analyzers/Alis.Reactive.Poc.Analyzers.csproj:8` at feb301c88), main's analyzers have no cases, and the
+  redesign's and the POC's cases each run on a fixture of their own that builds every compilation by hand.
 
 | Id | Refuses |
 |---|---|
@@ -452,8 +465,9 @@ is never the reason.
   `tests/Alis.Reactive.ClassNames.PlaywrightTests`, now the host `classNames`; `scripts/framework-coverage.*`,
   `scripts/vstest-filter.mjs`, every `playwright.project.sh`, `check_ci_shard_matrix`.
 - `poc/`, the POC's test projects (`tests/Alis.Reactive.Poc.*`) and `tests/Alis.Reactive.Playwright.TestHost` they build
-  on, last: each proof ported by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC
-  analyzers moved to their modules' folders and its two architecture tests to the architecture tests,
+  on, last: each proof ported by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC's
+  analyzers rewritten in their modules' folders to `.claude/rules/analyzers.md`, their rules and cases the evidence,
+  and its two architecture tests moved to the architecture tests,
   `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
   `spec/api/HttpSurface` retargeted to the core, and every cite of `poc/` pinned to a SHA.
 - The sources of `Alis.Reactive.DesignSystem` and `Alis.Reactive.NativeTagHelpers`, their workspaces and asset lines, since

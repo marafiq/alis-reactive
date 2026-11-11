@@ -217,6 +217,6 @@ The code and its XML docs are the reference: read the declaration, the builder a
 page before writing a view, a component or a test.
 
 Rules for one kind of file live in `.claude/rules/` and load when you open such a file: `tests.md`
-(files under `tests/`), `views.md` (`.cshtml`), `csharp.md` (`.cs`) and `docs.md` (docs, Markdown and
-XML docs). `CLAUDE.md` files in the runtime, Fusion, sandbox and test folders hold what is true of
+(files under `tests/`), `views.md` (`.cshtml`), `csharp.md` (`.cs`), `analyzers.md` (an analyzer project
+and its cases) and `docs.md` (docs, Markdown and XML docs). `CLAUDE.md` files in the runtime, Fusion, sandbox and test folders hold what is true of
 that folder. This file wins on conflict. `AGENTS.md` is a symlink to this file.

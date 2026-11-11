@@ -23,8 +23,10 @@ public class WhenARuleNamesTheCode
         ["page.evaluate()", "window.alis", "InternalsVisibleTo", "vi.mock", "spyOn", "writes_a_let_statement", "set_prop_mutation_writes_value_to_ej2_instance"];
     private static readonly string[] VendorTypes = ["EmitType", "ChangeEventArgs"];
     private static readonly string[] OperatorsTheSpecDecides = ["eqDecimal"];
+    private static readonly string[] WhatAnAnalyzerUnitAdds =
+        ["AnalyzerReleases.Shipped.md", "AnalyzerReleases.Unshipped.md", "CSharpAnalyzerTest", "DefaultVerifier"];
     private static readonly string[] NotInTheRepo =
-        [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. OperatorsTheSpecDecides];
+        [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. OperatorsTheSpecDecides, .. WhatAnAnalyzerUnitAdds];
 
     private static readonly CSharpParseOptions ForNet10 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols("NET6_0_OR_GREATER");
     private static readonly CSharpParseOptions ForNet48 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols("NET48");
