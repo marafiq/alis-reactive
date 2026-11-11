@@ -1,0 +1,95 @@
+[
+ {
+  "name": "a core defect on another rung than DESIGN.md's",
+  "edits": [
+   {
+    "file": "spec/PathsAndWire/features.json",
+    "old": "\"id\": \"X1.2\",\n          \"rung\": \"type\"",
+    "new": "\"id\": \"X1.2\",\n          \"rung\": \"analyzer\""
+   }
+  ],
+  "expect": "M15.F1: X1.2 is no analyzer defect of spec/Core/DESIGN.md"
+ },
+ {
+  "name": "a core defect placed in a second feature",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "        {\n          \"id\": \"M5.X1\",\n          \"rung\": \"behavior\",",
+    "new": "        {\n          \"id\": \"X1.2\",\n          \"rung\": \"type\"\n        },\n        {\n          \"id\": \"M5.X1\",\n          \"rung\": \"behavior\","
+   }
+  ],
+  "expect": "M15.F1: X1.2 is placed in M5.F1 too; a core defect has one feature"
+ },
+ {
+  "name": "a core defect no feature places",
+  "edits": [
+   {
+    "file": "spec/PathsAndWire/features.json",
+    "old": "        {\n          \"id\": \"X1.2\",\n          \"rung\": \"type\"\n        },\n",
+    "new": ""
+   }
+  ],
+  "expect": "core defects no feature places: X1.2"
+ },
+ {
+  "name": "an analyzer defect names no existing analyzer",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "takes object and builds, since ALIS009 checks the whole surface",
+    "new": "takes object and builds, since ALIS099 checks the whole surface"
+   },
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "): ALIS009 refuses it, keyed on the table",
+    "new": "): ALIS099 refuses it, keyed on the table"
+   }
+  ],
+  "expect": "M20.F1: M20.X1 analyzer names no existing ALIS id and no door"
+ },
+ {
+  "name": "a refusal defect quotes no message",
+  "edits": [
+   {
+    "file": "spec/ArrayLambdas/features.json",
+    "old": "is refused there with \\\"An item's position is zero or more.\\\", since",
+    "new": "is refused there, since"
+   }
+  ],
+  "expect": "M4.F2: M4.X5 refusal quotes no message"
+ },
+ {
+  "name": "a promised defect moved to the type rung",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"id\": \"M5.X1\",\n          \"rung\": \"behavior\",",
+    "new": "\"id\": \"M5.X1\",\n          \"rung\": \"type\","
+   }
+  ],
+  "expect": "M5.F1: promise for M5.X1, whose rung is type, which the compiler proves"
+ },
+ {
+  "name": "an analyzer defect reworded",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "A public method of an app's own component package that carries a slice table takes object and builds",
+    "new": "A public method in an app's own component package, one that carries a slice table, takes object and builds"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "two core defects of a feature in another order",
+  "edits": [
+   {
+    "file": "spec/PathsAndWire/features.json",
+    "old": "        {\n          \"id\": \"X1.1\",\n          \"rung\": \"type\"\n        },\n        {\n          \"id\": \"X1.2\",\n          \"rung\": \"type\"\n        },\n",
+    "new": "        {\n          \"id\": \"X1.2\",\n          \"rung\": \"type\"\n        },\n        {\n          \"id\": \"X1.1\",\n          \"rung\": \"type\"\n        },\n"
+   }
+  ],
+  "expect": null
+ }
+]

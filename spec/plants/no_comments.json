@@ -1,0 +1,79 @@
+[
+ {
+  "name": "a line comment in the inventory script",
+  "edits": [
+   {
+    "file": "spec/tools/inventory.py",
+    "old": "REPO = SPEC.parent\nOUT = SPEC / \"inventory\"\n",
+    "new": "REPO = SPEC.parent\n# the folder the tables land in\nOUT = SPEC / \"inventory\"\n"
+   }
+  ],
+  "expect": "spec/tools/inventory.py:10"
+ },
+ {
+  "name": "a docstring on a function",
+  "edits": [
+   {
+    "file": "spec/tools/main_surface.py",
+    "old": "def doors(path):\n",
+    "new": "def doors(path):\n    \"\"\"The door lines of a PublicAPI text.\"\"\"\n"
+   }
+  ],
+  "expect": "spec/tools/main_surface.py:28 docstring"
+ },
+ {
+  "name": "a line comment in a TLA+ spec",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.tla",
+    "old": "SpanNames == {\"run\", \"send\", \"attempt1\", \"attempt2\"}\n",
+    "new": "\\* the spans a run opens\nSpanNames == {\"run\", \"send\", \"attempt1\", \"attempt2\"}\n"
+   }
+  ],
+  "expect": "spec/Tracing/Tracing.tla:11"
+ },
+ {
+  "name": "a block comment in a TLA+ spec",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.tla",
+    "old": "---- MODULE Tracing ----\nEXTENDS Naturals, FiniteSets\n",
+    "new": "---- MODULE Tracing ----\n(* the tracing model *)\nEXTENDS Naturals, FiniteSets\n"
+   }
+  ],
+  "expect": "spec/Tracing/Tracing.tla:2"
+ },
+ {
+  "name": "a comment in a TLC config",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.cfg",
+    "old": "INVARIANT ResendCountSent\n",
+    "new": "INVARIANT ResendCountSent \\* the resend header\n"
+   }
+  ],
+  "expect": "spec/Tracing/Tracing.cfg:11"
+ },
+ {
+  "name": "a hash inside a string literal",
+  "edits": [
+   {
+    "file": "spec/tools/inventory.py",
+    "old": "REPO = SPEC.parent\nOUT = SPEC / \"inventory\"\n",
+    "new": "REPO = SPEC.parent\nMARK = \"# \"\nOUT = SPEC / \"inventory\"\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a triple-quoted string assigned to a name",
+  "edits": [
+   {
+    "file": "spec/tools/main_surface.py",
+    "old": "def doors(path):\n",
+    "new": "HEADER = \"\"\"#nullable enable\"\"\"\n\n\ndef doors(path):\n"
+   }
+  ],
+  "expect": null
+ }
+]

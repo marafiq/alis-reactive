@@ -1,0 +1,95 @@
+[
+ {
+  "name": "a promise with no opposite case",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"opposite\": \"Show on a note that already shows leaves it showing.\",",
+    "new": "\"opposite\": \"\","
+   }
+  ],
+  "expect": "M5.F1: promise for M5.X1 lacks opposite"
+ },
+ {
+  "name": "a behavior defect's promise retargeted at an id the feature lacks",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"for\": \"M5.X1\",",
+    "new": "\"for\": \"M5.X9\","
+   }
+  ],
+  "expect": "M5.F1: behavior defect M5.X1 has no promise"
+ },
+ {
+  "name": "a promise names a test tests.tsv lacks",
+  "edits": [
+   {
+    "file": "spec/Declarations/features.json",
+    "old": "a_read_of_a_member_the_component_does_not_have_fails_only_its_own_pipeline\"",
+    "new": "a_read_of_a_member_the_component_does_not_have_fails_only_its_own_pipelin\""
+   }
+  ],
+  "expect": "a_read_of_a_member_the_component_does_not_have_fails_only_its_own_pipelin', no test of tests.tsv"
+ },
+ {
+  "name": "a cell the native reference runs loses its promise",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"version\": \"current\",\n      \"promise\": {\n        \"page\": \"On net10, a page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, subscribed to the test stream whose Renamed message sets conformance.Text to the message's Text. The harness pushes Renamed with the text the test names.\",\n        \"gesture\": \"Wait until the harness reports the test stream open, then push Renamed with Beta through the harness.\",\n        \"outcome\": \"The component's heading reads Beta.\",\n        \"opposite\": \"Before the push it reads Alpha.\",\n        \"defect\": \"The message's member is read by its C# name Text, so conformance.Text is set to nothing and the heading empties.\",\n        \"observes\": \"Realtime.tla:Message\"\n      }\n    }",
+    "new": "\"version\": \"current\"\n    }"
+   }
+  ],
+  "expect": "spec/Reference/native.json lane.push has no promise"
+ },
+ {
+  "name": "a request-lane cell observes no action",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"defect\": \"The loaded partial's plan is not started, so Pick a-2 runs no handler and picked stays empty.\",\n        \"observes\": \"Request.tla:Route\"",
+    "new": "\"defect\": \"The loaded partial's plan is not started, so Pick a-2 runs no handler and picked stays empty.\""
+   }
+  ],
+  "expect": "spec/Reference/native.json http.into sends on the request lane and observes no action"
+ },
+ {
+  "name": "a MultiSelect cell leaves its own and keeps its promise",
+  "edits": [
+   {
+    "file": "spec/Reference/syncfusion.json",
+    "old": "    \"prop.scalar.read\": \"a property EJ2 holds on its component object, read where the vendor data locates it\",\n",
+    "new": ""
+   }
+  ],
+  "expect": "spec/Reference/syncfusion.json prop.scalar.read holds a promise that re-proves a cell ConformanceComponent runs"
+ },
+ {
+  "name": "a promise's outcome reworded",
+  "edits": [
+   {
+    "file": "spec/Elements/features.json",
+    "old": "\"outcome\": \"The note hides, then shows; the status keeps its text after the third click.\",",
+    "new": "\"outcome\": \"The note hides and then shows again; after the third click the status keeps its text.\","
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a MultiSelect cell leaves its own with its promise",
+  "edits": [
+   {
+    "file": "spec/Reference/syncfusion.json",
+    "old": "    \"prop.scalar.read\": \"a property EJ2 holds on its component object, read where the vendor data locates it\",\n",
+    "new": ""
+   },
+   {
+    "file": "spec/Reference/syncfusion.json",
+    "old": "\"cites\": [\n        \"@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277\"\n      ],\n      \"promise\": {\n        \"page\": \"Helen Martinez's intake page renders her allergy box with field.FusionMultiSelect(m => m.AllergyCodes, build => ..) over Penicillin, Latex and Peanut (codes 7, 9 and 12) with Fields(a => a.Name, a => a.Code), rendered with Placeholder \\\"Choose Helen's allergies\\\", and a Show hint button whose click sets the element hint's text to the box's Placeholder; hint starts as No hint.\",\n        \"gesture\": \"Click Show hint.\",\n        \"outcome\": \"hint reads Choose Helen's allergies.\",\n        \"opposite\": \"On the same page with the box rendered without Placeholder, which EJ2 holds as null, the click leaves hint empty.\",\n        \"defect\": \"The read takes placeholder from the input element's placeholder attribute instead of EJ2's placeholder property, so it reads the attribute EJ2 rewrote and the null case shows text.\"\n      }\n    }",
+    "new": "\"cites\": [\n        \"@syncfusion/ej2-dropdowns/src/multi-select/multi-select.d.ts:277\"\n      ]\n    }"
+   }
+  ],
+  "expect": null
+ }
+]

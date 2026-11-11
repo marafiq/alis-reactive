@@ -1,0 +1,68 @@
+[
+ {
+  "name": "a one-word hedge in a module's prose",
+  "edits": [
+   {
+    "file": "spec/Analyzers/module.md",
+    "old": "The build's rules: the compiler's rung of D18.6",
+    "new": "The build's rules: usually the compiler's rung of D18.6"
+   }
+  ],
+  "expect": "spec/Analyzers/module.md:3 usually"
+ },
+ {
+  "name": "a two-word hedge in REWRITE.md",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "What the rewrite builds and the order it builds it in.",
+    "new": "What the rewrite builds for now and the order it builds it in."
+   }
+  ],
+  "expect": "spec/REWRITE.md:3 for now"
+ },
+ {
+  "name": "a hedge in a feature's summary",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "\"summary\": \"Analyzers: the build's rules,",
+    "new": "\"summary\": \"Analyzers: the build's rules, which should hold,"
+   }
+  ],
+  "expect": "spec/Analyzers/features.json should"
+ },
+ {
+  "name": "a hedge in a reference cell's promise",
+  "edits": [
+   {
+    "file": "spec/Reference/native.json",
+    "old": "\"gesture\": \"Click Rename.\",",
+    "new": "\"gesture\": \"Click Rename, ideally once.\","
+   }
+  ],
+  "expect": "spec/Reference/native.json ideally"
+ },
+ {
+  "name": "a hedge word inside backticks",
+  "edits": [
+   {
+    "file": "spec/Analyzers/module.md",
+    "old": "The build's rules: the compiler's rung of D18.6",
+    "new": "The build's rules, read from `/etc/rules`: the compiler's rung of D18.6"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a word that holds a hedge inside it",
+  "edits": [
+   {
+    "file": "spec/Analyzers/module.md",
+    "old": "The build's rules: the compiler's rung of D18.6",
+    "new": "The build's rules, which the analyzer package shoulders: the compiler's rung of D18.6"
+   }
+  ],
+  "expect": null
+ }
+]

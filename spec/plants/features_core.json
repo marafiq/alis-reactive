@@ -1,0 +1,90 @@
+[
+ {
+  "name": "a feature's status against its doors",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "\"status\": \"redesign-only\",\n      \"types\": [\n        \"Alis.Reactive:TypedDslExemptionAttribute\"",
+    "new": "\"status\": \"both\",\n      \"types\": [\n        \"Alis.Reactive:TypedDslExemptionAttribute\""
+   }
+  ],
+  "expect": "M20.F1: status 'both', its doors say 'redesign-only'"
+ },
+ {
+  "name": "a main sentence that is not at its cite",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "DiagnosticId = \\\"ALIS006\\\";",
+    "new": "DiagnosticId = \\\"ALIS066\\\";"
+   }
+  ],
+  "expect": "M20.F1: main sentence 'public const string DiagnosticId = \"ALIS066\";' is not at Alis.Reactive.Analyzers/Validation/ServerOnlyConditionAnalyzer.cs:17"
+ },
+ {
+  "name": "a proposed sentence names a door no section or module holds",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "\"doors\": [\n            \"N18.1\"\n          ]",
+    "new": "\"doors\": [\n            \"N18.99\"\n          ]"
+   }
+  ],
+  "expect": "M20.F1: proposed sentence \"The core's build fails on a reflection call in a shipped package outside the owner's list, read as an operation, so new T() over a type parameter is an Activator read.\" names a door no core or module door"
+ },
+ {
+  "name": "a checker names an invariant its cfg does not check",
+  "edits": [
+   {
+    "file": "spec/Execution/features.json",
+    "old": "\"Run.tla:WritesAfterTheTurnAreRefused\",",
+    "new": "\"Run.tla:ReachAbortInAnInnerRequest\","
+   }
+  ],
+  "expect": "M17.F1: checker Run.tla:ReachAbortInAnInnerRequest is no core:Qn and no checked TLC invariant"
+ },
+ {
+  "name": "a new feature's door no longer marked new",
+  "edits": [
+   {
+    "file": "spec/NativeAppLevelObjects/module.md",
+    "old": "- `M25.N5` new:",
+    "new": "- `M25.N5` kept:"
+   }
+  ],
+  "expect": "M25.F5: a new feature whose proposed sentences name no door its module.md's Doors section marks new"
+ },
+ {
+  "name": "a declaring type in no feature",
+  "edits": [
+   {
+    "file": "spec/NativeComponents/features.json",
+    "old": "\"Alis.Reactive.Native:NativeButtonClickArgs\",\n",
+    "new": ""
+   }
+  ],
+  "expect": "every feature row valid; 4 of "
+ },
+ {
+  "name": "a main sentence shortened to part of its line",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "\"text\": \"defaultSeverity: DiagnosticSeverity.Warning,\"",
+    "new": "\"text\": \"DiagnosticSeverity.Warning\""
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a feature's core questions in another order",
+  "edits": [
+   {
+    "file": "spec/Analyzers/features.json",
+    "old": "\"core\": [\n        \"Q18\",\n        \"Q17\"\n      ],",
+    "new": "\"core\": [\n        \"Q17\",\n        \"Q18\"\n      ],"
+   }
+  ],
+  "expect": null
+ }
+]

@@ -1,0 +1,57 @@
+[
+ {
+  "name": "a refused door carried by nothing",
+  "edits": [
+   {
+    "file": "spec/ArrayLambdas/features.json",
+    "old": "\"carriers\": [\n            \"N6.1\",\n            \"N6.4\"\n          ]",
+    "new": "\"carriers\": []"
+   }
+  ],
+  "expect": "M4.F1: ReactiveArray<TElement>.AsSource() -> TypedSource<TElement[]!>!"
+ },
+ {
+  "name": "a renamed door renamed to nothing",
+  "edits": [
+   {
+    "file": "spec/Conditions/features.json",
+    "old": "\"door\": \"PipelineBuilder<TModel>.When<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!\",\n          \"verdict\": \"renamed\",\n          \"to\": [\n            \"N8.2\"\n          ]",
+    "new": "\"door\": \"PipelineBuilder<TModel>.When<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!\",\n          \"verdict\": \"renamed\",\n          \"to\": []"
+   }
+  ],
+  "expect": "M3.F1: PipelineBuilder<TModel>.When<TProp>(TypedSource<TProp>! source) -> ConditionSourceBuilder<TModel!, TProp>!"
+ },
+ {
+  "name": "a declaring type dropped from its feature",
+  "edits": [
+   {
+    "file": "spec/NativeComponents/features.json",
+    "old": "\"Alis.Reactive.Native:NativeButtonClickArgs\",\n",
+    "new": ""
+   }
+  ],
+  "expect": "1 declaring types in no feature"
+ },
+ {
+  "name": "a refused door's reason reworded",
+  "edits": [
+   {
+    "file": "spec/ArrayLambdas/features.json",
+    "old": "\"reason\": \"An operation's result is a source itself (D6.10, D7.2), as the redesign's ReactiveArray already is, so a door that turns it into one is a second door for one concept; main needs it only because its ReactiveArray is no source.\",",
+    "new": "\"reason\": \"The result of an operation is itself a source (D6.10, D7.2), as the redesign's ReactiveArray already is, so a door that turns it into one is a second door for one concept; main needs it only because its ReactiveArray is no source.\","
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a refused door's carriers in another order",
+  "edits": [
+   {
+    "file": "spec/ArrayLambdas/features.json",
+    "old": "\"carriers\": [\n            \"N6.1\",\n            \"N6.4\"\n          ]",
+    "new": "\"carriers\": [\n            \"N6.4\",\n            \"N6.1\"\n          ]"
+   }
+  ],
+  "expect": null
+ }
+]

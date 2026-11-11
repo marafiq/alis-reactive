@@ -1,0 +1,90 @@
+[
+ {
+  "name": "a D line's only carrier group dropped",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X1.2` type (D1.2): a member whose name",
+    "new": "- `X1.2` type: a member whose name"
+   }
+  ],
+  "expect": "carried by nothing: D1.2"
+ },
+ {
+  "name": "a D line names a defect no section states",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "at their position (X14.10).",
+    "new": "at their position (X14.99)."
+   }
+  ],
+  "expect": "D1.9 names X14.99, which no defect is"
+ },
+ {
+  "name": "a D line names an invariant its cfg does not check",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "(`Run.tla:ReleasedWhenEnded`). A retry's wait ends",
+    "new": "(`Run.tla:ReachAbortInAnInnerRequest`). A retry's wait ends"
+   }
+  ],
+  "expect": "D11.8 names Run.tla:ReachAbortInAnInnerRequest, which is no invariant its spec defines and its cfg checks"
+ },
+ {
+  "name": "a D line names a probe facts.json lacks",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "(`probe:mvc5-json-result-clr-names`), so it is no framework response",
+    "new": "(`probe:mvc5-json-result-clr-name`), so it is no framework response"
+   }
+  ],
+  "expect": "D2.6 names probe:mvc5-json-result-clr-name, which is no probe of spec/"
+ },
+ {
+  "name": "a module.md cites a meaning no feature states",
+  "edits": [
+   {
+    "file": "spec/Elements/module.md",
+    "old": "its children read as a list. Module 5 of `spec/CLAUDE.md`.",
+    "new": "its children read as a list (M5.D1). Module 5 of `spec/CLAUDE.md`."
+   }
+  ],
+  "expect": "spec/Elements/module.md cites M5.D1, which no features.json meaning states"
+ },
+ {
+  "name": "a D line's id stated twice",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- D1.9 On a read",
+    "new": "- D1.8 On a read"
+   }
+  ],
+  "expect": "D1.8 is stated twice"
+ },
+ {
+  "name": "a D line rewrapped inside an id group",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "are browser promises (X12.15, X12.17), since",
+    "new": "are browser promises (X12.15,\n  X12.17), since"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "the ids of a group in another order",
+  "edits": [
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "`eqDecimal` (X6.53, X8.26).",
+    "new": "`eqDecimal` (X8.26, X6.53)."
+   }
+  ],
+  "expect": null
+ }
+]

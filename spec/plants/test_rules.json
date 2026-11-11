@@ -1,0 +1,106 @@
+[
+ {
+  "name": "a new smell of tests.md with no row",
+  "edits": [
+   {
+    "file": ".claude/rules/tests.md",
+    "old": "- A component library on a framework test's page (3).\n",
+    "new": "- A component library on a framework test's page (3).\n- A test that reads the wall clock (8).\n"
+   }
+  ],
+  "expect": "tests.md's 'A test that reads the wall clock' is held by 0 rows"
+ },
+ {
+  "name": "a rule held by two rows",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 6. Both sides of every promise | check_promises |\n",
+    "new": "| 6. Both sides of every promise | check_promises |\n| 6. Both sides of every promise | the harness |\n"
+   }
+  ],
+  "expect": "tests.md's '6. Both sides of every promise' is held by 2 rows"
+ },
+ {
+  "name": "a rule reworded in tests.md and not in REWRITE.md",
+  "edits": [
+   {
+    "file": ".claude/rules/tests.md",
+    "old": "2. **The public surface only.**",
+    "new": "2. **The public surface alone.**"
+   }
+  ],
+  "expect": "REWRITE.md holds '2. The public surface only', no rule or smell of tests.md"
+ },
+ {
+  "name": "a row held by a test rule that does not exist",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 2. The public surface only | TEST001 |\n",
+    "new": "| 2. The public surface only | TEST099 |\n"
+   }
+  ],
+  "expect": "'2. The public surface only' is held by 'TEST099', no test rule and no named check"
+ },
+ {
+  "name": "a test rule that holds nothing",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 4. An outcome someone observes | TEST002, TEST006 |\n",
+    "new": "| 4. An outcome someone observes | TEST002 |\n"
+   }
+  ],
+  "expect": "TEST006 holds no rule or smell of tests.md"
+ },
+ {
+  "name": "two test rule rows out of order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |\n| TEST004 | a skipped, repeated or ordered test: `[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` |\n",
+    "new": "| TEST004 | a skipped, repeated or ordered test: `[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` |\n| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |\n"
+   }
+  ],
+  "expect": "test rule TEST004 stands at place 3"
+ },
+ {
+  "name": "the range names a rule short",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "TEST001 to TEST013 (section 2.10)",
+    "new": "TEST001 to TEST012 (section 2.10)"
+   }
+  ],
+  "expect": "REWRITE.md says TEST001 to TEST012, and the rules end at TEST013"
+ },
+ {
+  "name": "a held row's names in another order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 3. Real collaborators | TEST001, TEST002 |\n",
+    "new": "| 3. Real collaborators | TEST002, TEST001 |\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a new smell with its row",
+  "edits": [
+   {
+    "file": ".claude/rules/tests.md",
+    "old": "- A component library on a framework test's page (3).\n",
+    "new": "- A component library on a framework test's page (3).\n- A wait on a fixed time (8).\n"
+   },
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| A component library on a framework test's page | check_app, the harness |\n",
+    "new": "| A component library on a framework test's page | check_app, the harness |\n| A wait on a fixed time | TEST003 |\n"
+   }
+  ],
+  "expect": null
+ }
+]
