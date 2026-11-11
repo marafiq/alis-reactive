@@ -740,6 +740,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   and a number measured there gate no unit. A fork's result is proven by the command its task names, run once where
   it lands, and of a check that costs what the work costs: "if you going to spend same amount of time checking then
   do it yourself".
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`), after the lead argued the order of the rewrite: "ok i concede my
+  position." The order after U2: U3 lands the seam and the surface whole and makes one thin path real (a plan
+  renders, the runtime boots, a trigger runs a pipeline that sets an element's text); then one module a unit in the
+  slice table's order, each unit owning its module's two halves and its pure tests, its browser tests turning green
+  and failing on their planted defects in that unit; then Native; then Fusion. The argument that decided it: every
+  door that renders a plan lives in the last core row, so in a strict row-by-row order no framework browser test
+  passes before that row; the runtime's code that touches the DOM has no proof but Playwright, since its pure tests
+  run in node with no DOM; and a module's done, its tests green and each failing on its planted defect, is then
+  checkable only once, at the end, for everything. This is the order the outside-in decision above runs in;
+  `spec/REWRITE.md` section 4 is rewritten to it by the governance session.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
