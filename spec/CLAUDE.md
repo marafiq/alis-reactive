@@ -681,6 +681,50 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   that lands the rewrite, the rewrite's piece is written as its spec states it and the older line gives way. The POC,
   main and the redesign stay evidence; nothing of the rewrite is shaped to keep one of them running, and the lead
   stops for none of them. That "merge" is every place the lines meet is the lead's reading, the owner's to correct.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "The schema is done. Only bugs will be addressed if found." The
+  rewrite runs outside in: "once the CSHTML is there, all the open doors as per agreed schema, then you can write
+  tests, the playwright ones. So those tests would fail, and then you can keep bringing one module at a time in the
+  mix", a piece tested alone against the schema, and "when all the scenes or Lego pieces comes together, eventually
+  the playwright test will pass". To the lead's three conditions on it: "why would u think otherwise? why we did all
+  the TLA+ work for ?" The TLA+ specs fixed every ordering and named every step so that a test is written from the
+  spec before the code, and the lead attaches no condition. The order: the schema's nodes and generated contract with
+  the public surface as signatures (`spec/api` compiles it); every screen's view; every Playwright test from its
+  promise, failing; then one module at a time in the slice table's order, Schema first, each half tested alone
+  against the schema; a module is done when its tests pass and each fails on its planted defect. `spec/REWRITE.md`
+  section 4's order paragraph and the units after U2 are rewritten to this in the commit that follows; until then
+  this line supersedes them. TEST013 is built to section 2.10's list, which counts a navigation as a gesture, and
+  section 2.5's bindings check is U2's, by the owner's decision of 2026-11-10.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`), on the lead's word for a test written ahead of its code: "Test
+  is not a draft, its failing test that actually proves behavior when turned green. Draft is hedge word to drift and
+  write sloppy code so u can argue later because of it was draft." A test is written once, at the full bar of
+  `.claude/rules/tests.md`: it tests behavior and never internals, is named for its promise inside the test
+  architecture of `spec/REWRITE.md` sections 2.4 and 2.5, and runs by one repeatable command. It fails until its code
+  lands and proves the behavior when it turns green. "TLA+ is central part of the rewrite not a throw away": a held
+  step of a test names the action of its spec, and the specs stay the design's proof through every unit. Before the
+  tests are written, the Playwright project's own CLAUDE.md holds bad tests of main and the redesign as examples,
+  each beside the rule it breaks: "You can get plenty of bad tests examples to put it in test project claude.md for
+  the test quality."
+- The owner, 2026-11-11 (five messages, verbatim in `spec/NOTES.md`): the rewrite states its standards so that each
+  question has one answer in one place. For each kind of test: what it is, what it proves, what it prevents, its
+  quality standard, the one repeatable command that runs it and when it applies. The kinds are the architecture tests,
+  the Playwright tests with their project's own enforced standard, and "a module level pure tests for public surface";
+  "Tests will never ever test implementation or internals (intenal exposure is forbidden)." The TypeScript runtime
+  answers the same: its standards, its lint rules, its pure tests, its folder's own rule file. "every project is
+  vertically sliced namespaced logically." "TLA+ proved it, it is central governing pience of re-write." Root
+  CLAUDE.md says how it governs encapsulation, TLA+, the map and the doors, and how each bad practice is stopped; the
+  tree's view from above shows the architecture on one screen; each standard says how drift is stopped and how the
+  confidence of a piece of work is determined. "now all these things are not meant to cause paranoie and waste and
+  un-necessery waits and fear based engineering": a standard is held by the tool on its rung, a piece of work is
+  proven once on the rung that holds it, and no guard is added for a defect nobody met. A module's pure tests take
+  the place the plan gave PlanTests and vitest as feedback. The lead writes this as the plan's first page, with each
+  project's own rule file, in the commit that rewrites `spec/REWRITE.md`'s units; until then this line supersedes
+  the lines it changes. The owner's order for it, the same hour: "Please write a structured list of every aspect of
+  re-write, with project, quality enforcement, session handof when and why, how to begin..how to reorient", and
+  "Answer every single question with certainity and have the setup in place, test the whole govervance of re-write
+  then only talk to me. You are 100% allowed to disagree with me when you have a genuine argument". So the lead
+  answers each question in the tree, puts each standard's enforcement in place, proves each enforcement by a refused
+  and an accepted case, and reports to the owner once, when all of it stands; a disagreement is stated with its
+  argument where it arises.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
