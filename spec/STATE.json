@@ -1424,7 +1424,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 62,
+        "files": 100,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1450,7 +1450,7 @@
         "redesign_only": 3031,
         "tests": 4153
       },
-      "detail": "every door, test and kind reconciles with its source",
+      "detail": "every door, kind, analyzer and case row equals its source line by line, and every test count its attributes",
       "pass": true
     },
     "kinds": {
@@ -1542,6 +1542,19 @@
         "problems": 0
       },
       "detail": "each of 147 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
+      "pass": true
+    },
+    "plants": {
+      "counts": {
+        "caught": 196,
+        "checks": 36,
+        "failed": 0,
+        "kept": 68,
+        "proven": 36,
+        "unaccepted": 0,
+        "unrefused": 0
+      },
+      "detail": "196 refused plants caught and 68 accepted plants kept green; 36 of 36 checks proven both ways",
       "pass": true
     },
     "probes": {
@@ -3671,8 +3684,8 @@
       "pass": true
     }
   },
-  "passed": 36,
-  "read_at_head": "2c0bfb7ab78fc47a34c235f2152d5540d1afd553",
+  "passed": 37,
+  "read_at_head": "24ef941a26b90797b9a4c511f3301cb8d44dc8ee",
   "step": {
     "failing": [],
     "name": "End of session",
@@ -3680,5 +3693,5 @@
     "number": 13,
     "phase": "E"
   },
-  "total": 36
+  "total": 37
 }
