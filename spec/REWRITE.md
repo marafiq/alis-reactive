@@ -25,7 +25,7 @@ in the line.
   | The render | a refusal the compiler cannot see, on the refusal routes | Playwright |
   | Playwright | behavior: a gesture and its visible outcome, in Chromium | every pull request |
   | The test rules | that a browser test cannot lean on the code it tests: TEST001 to TEST013 (section 2.10) | every build of a Playwright project |
-  | verify-net48 | the same tests on MVC 5, and the packed packages on a fresh MVC 5 app | every pull request |
+  | verify-net48 | each test whose placement lists the twin, on MVC 5 (no stream or hub: realtime is net10's, check_app), and the packed packages on a fresh MVC 5 app | every pull request |
   | Vitest, PlanTests | feedback while coding (BRIEF.md, Principles 10); never counted as proof | the inner loop |
 
 - **Tests stand apart from the code.** A Playwright project references no assembly of the framework or of the
