@@ -131,7 +131,7 @@
           "meaning": "A Native event hands its listener the lib.dom event object HTMLElementEventMap names for it, an Event for change and a PointerEvent for click (probe:dom-change-listener-event, probe:dom-click-listener-event), and the payload's declaration reads it at [0] (D17.4). Each Native slice declares that payload as a class nested in its component, named for the event (Changed, Clicked), which mirrors the lib.dom type, so ALIS016 checks each member against it (N17.2), as the owner's walk of the native text box built it (spec/NOTES.md:515, items 1 and 7). It declares the members lib.dom types concretely: Event's Type, IsTrusted and TimeStamp, and, on a click, each member PointerEvent, MouseEvent and UIEvent declare with a concrete type and no deprecation; it declares no Target, CurrentTarget, RelatedTarget or View, which lib.dom types EventTarget | null or Window | null (item 2). The event holds no value, so a handler reads the component's value from the component, through the rendered component or pipeline.Input(m => m.Member).Component<TComponent>() (N14.4, item 4); the DOM raises change after the value is committed, so the component holds what both lines' payload read. The input an Event<Changed> commits is ComponentInput.Of(value, committedBy: Change) as M7.N3 states it. A change the Native package's own code raises (the hidden field's, the radio group's) is a script's Event, whose IsTrusted reads false; a script's write raises no change on any Native input but the hidden field (M24.D3), as the DOM raises none."
         }
       ],
-      "oracle": "lib.dom.d.ts of TypeScript 5.9.3 (node_modules/typescript/lib/lib.dom.d.ts in the main checkout): EventTarget's addEventListener and removeEventListener, Event's target and currentTarget typed EventTarget | null, and HTMLElementEventMap's change and click; and the browser, by the fact named (probe:dom-change-listener-event).",
+      "oracle": "lib.dom.d.ts of TypeScript 6.0.3 (node_modules/typescript/lib/lib.dom.d.ts): EventTarget's addEventListener and removeEventListener, Event's target and currentTarget typed EventTarget | null, and HTMLElementEventMap's change and click; and the browser, by the fact named (probe:dom-change-listener-event).",
       "checker": [
         "core:Q17",
         "core:Q9"
@@ -303,7 +303,7 @@
         "Q5"
       ],
       "meanings": [],
-      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLButtonElement, Element's textContent (a string getter and a setter that takes null), HTMLElement's focus, and HTMLElementEventMap's click, a PointerEvent, with PointerEvent's, MouseEvent's, UIEvent's and Event's members; each JavaScript name read there by hand; and the browser, by the fact named (probe:dom-click-listener-event).",
+      "oracle": "lib.dom.d.ts of TypeScript 6.0.3: HTMLButtonElement, Element's textContent (a string getter and a setter that takes null), HTMLElement's focus, and HTMLElementEventMap's click, a PointerEvent, with PointerEvent's, MouseEvent's, UIEvent's and Event's members; each JavaScript name read there by hand; and the browser, by the fact named (probe:dom-click-listener-event).",
       "checker": [
         "core:Q17",
         "core:Q5"
@@ -540,7 +540,7 @@
         "Q7"
       ],
       "meanings": [],
-      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLInputElement's checked, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's CheckBoxFor on both hosts; each JavaScript name read there by hand.",
+      "oracle": "lib.dom.d.ts of TypeScript 6.0.3: HTMLInputElement's checked, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's CheckBoxFor on both hosts; each JavaScript name read there by hand.",
       "checker": [
         "core:Q17",
         "core:Q14"
@@ -845,7 +845,7 @@
           "meaning": "A check list's value is the checked boxes' values in the boxes' order. The Native package's check list code defines value and focus on the list's element on alis:mount and declares their type, NativeCheckListElement, an HTMLDivElement with value: string[], which the declaration mirrors (D17.5). A write checks exactly the boxes whose values it holds and unchecks the rest; a write of nothing checks none; a write raises no change, as a script's write to a box raises none. The render helper renders one carrier of the value for a form's own submission: a member whose JSON contract is a collection (D18.2) by the boxes, each under the binding name, so a submission holds one entry per checked box and none when none is checked; a member of string by one hidden input under the binding name that holds the checked values joined by commas, with the boxes nameless; the code writes the joined text on each change and write where the list renders that input, and writes none where it renders none. A request the framework sends writes the list's Value in its wire form either way (D9.15)."
         }
       ],
-      "oracle": "The Native package's check list code as the redesign writes it (Alis.Reactive.Assets/components/native/check-list.ts at 65fdf118d), which defines the list's value and focus; lib.dom.d.ts of TypeScript 5.9.3 for HTMLDivElement, HTMLInputElement's checked and value and HTMLElementEventMap's change; the HTML standard's form submission, pinned in Chromium (probe:dom-check-list-form-data); and the browser, by the promises.",
+      "oracle": "The Native package's check list code as the redesign writes it (Alis.Reactive.Assets/components/native/check-list.ts at 65fdf118d), which defines the list's value and focus; lib.dom.d.ts of TypeScript 6.0.3 for HTMLDivElement, HTMLInputElement's checked and value and HTMLElementEventMap's change; the HTML standard's form submission, pinned in Chromium (probe:dom-check-list-form-data); and the browser, by the promises.",
       "checker": [
         "core:Q17",
         "core:Q14"
@@ -1148,7 +1148,7 @@
         "Q7"
       ],
       "meanings": [],
-      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLSelectElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's DropDownListFor and SelectListItem on both hosts; each JavaScript name read there by hand.",
+      "oracle": "lib.dom.d.ts of TypeScript 6.0.3: HTMLSelectElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's DropDownListFor and SelectListItem on both hosts; each JavaScript name read there by hand.",
       "checker": [
         "core:Q17",
         "core:Q14"
@@ -1433,7 +1433,7 @@
           "meaning": "A hidden field's Change runs when a write changes its value. A hidden input has no user to commit it, and the DOM raises no change on a script's write (probe:dom-hidden-write-no-change), so the Native package's hidden field code, on alis:mount, raises change, bubbling, after a write that leaves the value different from what it held, and none after a write of the same text. It is the one Native input whose script write raises change; every other raises none, as the DOM does (M24.D1)."
         }
       ],
-      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLInputElement's value and HTMLElementEventMap's change; the Native package's hidden field code as the redesign writes it (Alis.Reactive.Assets/components/native/hidden-field.ts at 65fdf118d); MVC's HiddenFor on both hosts; and the browser, by the fact named (probe:dom-hidden-write-no-change) and the promise.",
+      "oracle": "lib.dom.d.ts of TypeScript 6.0.3: HTMLInputElement's value and HTMLElementEventMap's change; the Native package's hidden field code as the redesign writes it (Alis.Reactive.Assets/components/native/hidden-field.ts at 65fdf118d); MVC's HiddenFor on both hosts; and the browser, by the fact named (probe:dom-hidden-write-no-change) and the promise.",
       "checker": [
         "core:Q17",
         "core:Q14"
@@ -1786,7 +1786,7 @@
           "meaning": "A radio group's value is the chosen radio's value, held by the group's input under the field's id, which carries no name, while the radios carry the binding name for a form's own submission. The Native package's radio group code, on alis:mount, defines the input's value and focus: a write sets the value and checks the radio whose value it is and no other, so a value no radio holds, or the empty text, checks none; a person's pick sets the value to the picked radio's and raises change, bubbling, on the group's input, which Change hears; a write raises no change (M24.D1); focus focuses the checked radio, else the first."
         }
       ],
-      "oracle": "The Native package's radio group code as the redesign writes it (Alis.Reactive.Assets/components/native/radio-group.ts at 65fdf118d); lib.dom.d.ts of TypeScript 5.9.3 for HTMLInputElement's value and checked, HTMLElement's focus and HTMLElementEventMap's change; MVC's RadioButtonFor on both hosts; and the browser, by the promise.",
+      "oracle": "The Native package's radio group code as the redesign writes it (Alis.Reactive.Assets/components/native/radio-group.ts at 65fdf118d); lib.dom.d.ts of TypeScript 6.0.3 for HTMLInputElement's value and checked, HTMLElement's focus and HTMLElementEventMap's change; MVC's RadioButtonFor on both hosts; and the browser, by the promise.",
       "checker": [
         "core:Q17",
         "core:Q14"
@@ -2069,7 +2069,7 @@
         "Q7"
       ],
       "meanings": [],
-      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLTextAreaElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's TextAreaFor on both hosts; each JavaScript name read there by hand.",
+      "oracle": "lib.dom.d.ts of TypeScript 6.0.3: HTMLTextAreaElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's TextAreaFor on both hosts; each JavaScript name read there by hand.",
       "checker": [
         "core:Q17",
         "core:Q14"
@@ -2350,7 +2350,7 @@
         "Q7"
       ],
       "meanings": [],
-      "oracle": "lib.dom.d.ts of TypeScript 5.9.3: HTMLInputElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's TextBoxFor on both hosts; and the browser, by the fact named (probe:dom-change-listener-event).",
+      "oracle": "lib.dom.d.ts of TypeScript 6.0.3: HTMLInputElement's value, HTMLElement's focus and HTMLElementEventMap's change, an Event; MVC's TextBoxFor on both hosts; and the browser, by the fact named (probe:dom-change-listener-event).",
       "checker": [
         "core:Q17",
         "core:Q14"

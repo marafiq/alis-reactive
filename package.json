@@ -6,9 +6,12 @@
     "@microsoft/signalr": "10.0.11",
     "@syncfusion/ej2": "33.1.47",
     "esbuild": "0.28.2",
-    "jsdom": "27.4.0",
-    "parse5": "8.0.1",
-    "typescript": "5.9.3",
-    "ws": "7.5.11"
+    "jsdom": "31.0.0",
+    "parse5": "8.1.1",
+    "typescript": "6.0.3",
+    "ws": "8.22.2"
+  },
+  "allowScripts": {
+    "esbuild": false
   }
 }

@@ -250,7 +250,7 @@
           "meaning": "D19.10's refusal, by the plan script. At boot, a plan script whose text does not parse as JSON, an empty one among them, or parses to no object holding a number version, such as [] or {}, is refused as a plan of another version is. Each refused script is one error: X19.3's message for a plan of another version, and for any other script an error naming the parse failure or the missing version. A refused plan's handlers never start. The page's other plans start, since each plan is its owner's and plans compose without merging (D14.2). Both lines throw out of the whole boot instead: main from its discovery (Alis.Reactive.Assets/runtime/root.ts:64-70 at 623dd4a27) and the redesign from its own (Alis.Reactive.Assets/runtime/plans/discover.ts:19-24 at 65fdf118d), so no plan of the page starts."
         }
       ],
-      "oracle": "JSON as RFC 8259 defines it, which System.Text.Json writes and the browser's JSON.parse reads; TypeScript 5.9.3's exhaustive switch, a default of never, over the generated contract's unions; the DOM Standard's CustomEvent detail and UI Events' KeyboardEvent key for the payload's place; and check:kinds, which reads the grammar and plan.schema.json at 65fdf118d, schema.md's kinds table and Schema.tla's node set.",
+      "oracle": "JSON as RFC 8259 defines it, which System.Text.Json writes and the browser's JSON.parse reads; TypeScript 6.0.3's exhaustive switch, a default of never, over the generated contract's unions; the DOM Standard's CustomEvent detail and UI Events' KeyboardEvent key for the payload's place; and check:kinds, which reads the grammar and plan.schema.json at 65fdf118d, schema.md's kinds table and Schema.tla's node set.",
       "checker": [
         "core:Q19",
         "core:Q17",

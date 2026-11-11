@@ -316,7 +316,7 @@
           "meaning": "A vendor name names one vendor: one place of the object (its path or its lookup), one listening and one element path. Two definitions of one name whose data differ are refused: at build by ALIS034 when both are constants of one compilation, and where the view renders when one plan names both, as the redesign refuses them."
         }
       ],
-      "oracle": "The DOM Standard's EventTarget, addEventListener and removeEventListener, and CustomEvent's detail; ECMAScript's property assignment, call and Object.freeze, by which a vendor's object adds, assigns, refuses and removes a listener; and each vendor's typed API as TypeScript 5.9.3 types it (D17.5).",
+      "oracle": "The DOM Standard's EventTarget, addEventListener and removeEventListener, and CustomEvent's detail; ECMAScript's property assignment, call and Object.freeze, by which a vendor's object adds, assigns, refuses and removes a listener; and each vendor's typed API as TypeScript 6.0.3 types it (D17.5).",
       "checker": [
         "core:Q17",
         "core:Q12",

@@ -277,7 +277,7 @@
           "meaning": "A declared member's JavaScript name is the constant name: its door gives, else the simple name of the C# member that declares it, as [CallerMemberName] gives it, converted by System.Text.Json's camel-case policy (JsonNamingPolicy.CamelCase), whatever naming the app's JSON options choose. The name is a member of the vendor's object (D2.7), not a member of data the app's contract writes (D2.9), so the app's naming never renames a vendor member, and data the declaration reads past it (D4.2), a Field among it, follows the app's naming. An event's name is derived the same way."
         }
       ],
-      "oracle": "The vendor's TypeScript declarations as TypeScript 5.9.3 types them: a member's optional mark (?), a value typed with | null or | undefined, a method's parameters and its return type, Promise<T> among them; and ECMAScript's property read, assignment and call, which the declaration mirrors member for member (D5.3).",
+      "oracle": "The vendor's TypeScript declarations as TypeScript 6.0.3 types them: a member's optional mark (?), a value typed with | null or | undefined, a method's parameters and its return type, Promise<T> among them; and ECMAScript's property read, assignment and call, which the declaration mirrors member for member (D5.3).",
       "checker": [
         "core:Q5",
         "core:Q4",
@@ -604,7 +604,7 @@
         "Q17"
       ],
       "meanings": [],
-      "oracle": "The vendor's TypeScript declaration of the event and of the arguments its listener receives, as TypeScript 5.9.3 types them, a member's optional mark (?) and | null among them; and ECMAScript's property read, assignment and call on the object the listener is handed, which the payload's declaration mirrors (D5.6).",
+      "oracle": "The vendor's TypeScript declaration of the event and of the arguments its listener receives, as TypeScript 6.0.3 types them, a member's optional mark (?) and | null among them; and ECMAScript's property read, assignment and call on the object the listener is handed, which the payload's declaration mirrors (D5.6).",
       "checker": [
         "core:Q5",
         "core:Q17",

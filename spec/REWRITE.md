@@ -50,7 +50,7 @@ Directory.Build.targets               a project with AlisSliceTree on hands its 
                                       compiler
 Directory.Packages.props              central package management: one exact version per package and framework, but
                                       Roslyn's second (2.7), which the projects that host the compiler take by
-                                      VersionOverride
+                                      VersionOverride; each project it manages holds a packages.lock.json
 global.json                           SDK 11.0.100, rollForward disable
 nuget.config                          nuget.org alone, every other source cleared
 .node-version .python-version .java-version
@@ -110,6 +110,7 @@ tests/
                                               WhenTheLintIsConfigured (section 2.7), each rule with its refused and
                                               accepted cases, which WhenAnArchitectureTestIsWritten holds; their
                                               helpers Repository, Scripts and read-scripts
+                                              and its packages.lock.json
 spec/                                         the design source: BRIEF.md, REWRITE.md (this file), CLAUDE.md,
                                               NOTES.md, STATE.json, history.tsv, Core/, Fluent/, api/, inventory/,
                                               plants/, probes/, Reference/, tools/, one folder per module
@@ -284,10 +285,11 @@ actions its tests will observe. A change to an async lane is a spec change first
 | MSBuild SDK | Microsoft.Build.NoTargets 3.7.134 | the Assets project |
 | Node | 26.13.0 (`.node-version`) | esbuild, tsc, eslint, node probes |
 | TypeScript | 6.0.3 | `tsc -b`, no emit, every strictness option on: strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature, noImplicitReturns, noFallthroughCasesInSwitch, noUnusedLocals, noUnusedParameters, noUncheckedSideEffectImports, verbatimModuleSyntax, isolatedModules and erasableSyntaxOnly, which refuses an enum (S8), with allowUnreachableCode and allowUnusedLabels off; held by typescript-eslint 8.72.2, whose peer range ends below 6.1.0 (the latest is 7.0.2) |
-| esbuild | 0.28.2 | one root `build.mjs`, one bundle per package |
+| esbuild | 0.28.2 | one root `build.mjs`, one bundle per package; `package.json` denies its install script, since its platform package holds the binary |
 | ESLint | eslint 10.14.0, @eslint/js 10.0.1, typescript-eslint 8.72.2, with minimatch 11.0.7 by an override of the 10.2.6 they bring, which npm's audit reports (GHSA-g3hv-75wg-m249) | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, each of their rules an error, `--max-warnings 0`, no rule turned off or down and no inline configuration (`noInlineConfig`); the rules beyond the presets are listed below the table |
 | Vitest | 5.1.0, node environment, no jsdom | feedback beside the runtime's code |
 | @microsoft/signalr | 10.0.11 | the hub's own asset; held on the 10.0 line, the line of the hub it talks to (the latest is 11.0.0) |
+| Probe packages | jsdom 31.0.0, parse5 8.1.1, ws 8.22.2 | what the node probes load beside the pins they read: a DOM for EJ2's code, HTML's parser and a WebSocket server; no test loads them |
 | OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.1 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
 | Roslyn | Microsoft.CodeAnalysis.CSharp 4.14.0 for the analyzer projects; 5.9.0 for the projects that host the compiler | 4.14.0 is the floor, the lowest compiler the packed analyzers load in: a compiler below an analyzer's Roslyn refuses to load it (CS9057), and 4.14.0 is Visual Studio 2022's last, so an MVC 5 app built there runs every rule; the analyzer cases, the test-rule cases and the architecture tests host 5.9.0, the latest, which parses C# 14 (`LanguageVersion.CSharp14`) |
 | Analyzer authoring | Microsoft.CodeAnalysis.Analyzers 5.9.0, private | the compiler's own rules for an analyzer project, release tracking among them (`.claude/rules/analyzers.md`) |
@@ -341,7 +343,8 @@ Scripts: `scripts/check.sh` (the contract regenerated and diffed, `npm audit`, `
 `dotnet build -c Release`, `dotnet format --verify-no-changes` over the solution, which today's gate holds, the
 architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (build, then run, with the selectors
 below, the result line and the leftover-server check); `scripts/test.sh` (both); `scripts/build.sh`,
-`scripts/run.sh`, `scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs),
+`scripts/run.sh`, `scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,
+Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
 `scripts/plant-defect.sh` with `scripts/trx-failed-tests.mjs`, which reads a TRX's failed and passed tests,
 `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`.
 MSBuild never runs npm; an app whose bundle is missing refuses to start.

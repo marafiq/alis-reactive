@@ -2094,7 +2094,7 @@
       "host": "node",
       "oracle": "node_modules/typescript/package.json",
       "probe": "dom-iterables.mjs",
-      "expect": "typescript-version: 5.9.3",
+      "expect": "typescript-version: 6.0.3",
       "source": "spec/probes/dom-iterables.mjs"
     },
     {

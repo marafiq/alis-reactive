@@ -170,7 +170,7 @@
         "Q17"
       ],
       "meanings": [],
-      "oracle": "The HTML standard's textContent, innerHTML, classList, hidden, children, getAttribute and hasAttribute, as lib.dom types them in TypeScript 5.9.3, which the element's declaration mirrors (D5.3).",
+      "oracle": "The HTML standard's textContent, innerHTML, classList, hidden, children, getAttribute and hasAttribute, as lib.dom types them in TypeScript 6.0.3, where hidden is boolean | \"until-found\", which the element's declaration mirrors (D5.3).",
       "checker": [
         "core:Q4",
         "core:Q5",
