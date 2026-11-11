@@ -448,18 +448,18 @@ rule or a named check:
 | Id | Refuses |
 |---|---|
 | TEST001 | a reference beyond the target framework's assemblies, Playwright, NUnit and its test platform, and the world contract: the framework, the app, a mocking or a snapshot library |
-| TEST002 | script run in the page or a stubbed network: `EvaluateAsync`, `EvaluateHandleAsync`, `AddInitScriptAsync`, `ExposeFunctionAsync`, `ExposeBindingAsync`, `RouteAsync`, `RouteFromHARAsync`, `RouteWebSocketAsync`, and a literal that names `ej2_instances` or `window.alis` |
+| TEST002 | a member of Microsoft.Playwright outside the members a test takes, listed below the tables: script run in the page (`EvaluateAsync`, `WaitForFunctionAsync`), a stubbed network (`RouteAsync`), a one-shot read of the page (`InnerTextAsync`, `IsVisibleAsync`), an event no gesture raised (`DispatchEventAsync`) and every member a later version adds; and a literal that names `ej2_instances` or `window.alis` |
 | TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |
-| TEST004 | a skipped, repeated or ordered test: `[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` |
-| TEST005 | a branch or a loop in a test method: `if`, `switch`, `?:`, `for`, `foreach`, `while`, `do`, `try`, `goto` |
-| TEST006 | a one-shot read of the page (`InnerTextAsync`, `TextContentAsync`, `InputValueAsync`, `GetAttributeAsync`, `InnerHTMLAsync`, `IsVisibleAsync`, `IsHiddenAsync`, `IsCheckedAsync`, `IsEnabledAsync`, `CountAsync`, `AllInnerTextsAsync`, `AllTextContentsAsync`); a page is asserted through `Expect` alone, and `Assert.That` reads only a request the page sent, its body and its headers |
+| TEST004 | a skipped, repeated, ordered or parameterized test: an NUnit attribute outside `[Test]`, `[TestFixtureSource]` and `[Category]` (`[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `[TestCase]` among them), and a member of `Assert`, `Assume` or `Warn` outside `Assert.That` (`Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` among them) |
+| TEST005 | a branch or a loop in a test method: `if`, `switch` as a statement or an expression, `for`, `foreach`, `while`, `do`, `try`, `goto`, and a conditional operator, listed below the tables |
+| TEST006 | an `Assert.That` over anything but what the browser reports beside the page: a request the page sent, a console message, an uncaught error, a download and a page a gesture opened; the page itself is asserted through `Expect` alone |
 | TEST007 | an expected value, or a locator's selector, role name, label or text, that is neither a compile-time constant nor a generated promise constant |
 | TEST008 | a partial match on the page: `ToContainTextAsync`, or a `Regex` in a page matcher; a regex reads only a request's header |
 | TEST009 | an expected value equal to a constant the same test typed into the same locator |
 | TEST010 | a test whose every assertion is an absence (`ToBeHiddenAsync`, a `Not` matcher, `ToHaveCountAsync(0)`, `ToBeEmptyAsync`, an empty text) |
 | TEST011 | `Expect` or `Assert` outside a test method: a helper builds a page or performs a gesture, and never asserts |
 | TEST012 | a test method without exactly one `[FailsFor]` taking a generated promise constant, or a fixture not named `When` and its situation |
-| TEST013 | a test method that performs no gesture itself: a navigation, click, fill, press, select, check, drag or file, or a harness release or push |
+| TEST013 | a test method that performs no gesture itself: a gesture member of the list below the tables, or a harness release or push |
 
 | `.claude/rules/tests.md` | Held by |
 |---|---|
@@ -491,6 +491,40 @@ check_promises gives every promise its opposite case as a promise of its own; th
 planted-defect run is `scripts/plant-defect.sh`, its red line in the unit's commit; the harness gives each test its
 own world and fails a core test whose page requests the EJ2 script. A test's name is the author's sentence: the
 bindings check makes its promise, not its name, the specification it is held to.
+
+The members a test takes of Microsoft.Playwright 1.64.1 are closed, and TEST002 refuses every other one, so a member a
+later version adds is refused until this list takes it. A member TEST003 or TEST008 names is reported by that rule
+alone.
+- **Gestures**, the ones TEST013 counts: a page's `GotoAsync`, `ReloadAsync`, `GoBackAsync` and `GoForwardAsync`; a
+  locator's `ClickAsync`, `DblClickAsync`, `FillAsync`, `ClearAsync`, `PressAsync`, `PressSequentiallyAsync`,
+  `SelectOptionAsync`, `CheckAsync`, `UncheckAsync`, `SetCheckedAsync`, `DragToAsync`, `SetInputFilesAsync` and
+  `HoverAsync`; `Keyboard.PressAsync` and `Mouse.MoveAsync`.
+- **Finding**: `GetByRole`, `GetByLabel`, `GetByText` and `Locator`, its selector one id (`#` and the id), of a page, a
+  locator and a frame locator; a locator's `First`, `Last`, `Nth`, `Filter`, `And` and `Or`; `FrameLocator` and `ContentFrame`.
+- **Expecting**, through `Assertions.Expect` alone: a locator's `ToHaveTextAsync`, `ToHaveValueAsync`,
+  `ToHaveValuesAsync`, `ToBeCheckedAsync`, `ToBeVisibleAsync`, `ToBeHiddenAsync`, `ToBeFocusedAsync`,
+  `ToHaveClassAsync`, `ToHaveAttributeAsync`, `ToHaveIdAsync`, `ToHaveCountAsync`, `ToBeEmptyAsync` and `Not`; a
+  page's `ToHaveURLAsync` and `Not`.
+- **Beside the page**, what TEST006 lets `Assert.That` read: a page's `RunAndWaitForRequestAsync`,
+  `RunAndWaitForDownloadAsync` and `RunAndWaitForPopupAsync`, their gesture written in the test; a request's `Url`,
+  `Method`, `PostData`, `Headers` and `HeaderValueAsync`; a console message's `Type` and `Text`; a download's
+  `SuggestedFilename`; and what the harness collected of the page's requests, console and uncaught errors.
+
+The project's `Harness/` takes besides: `Playwright.CreateAsync`, `Chromium`, `LaunchAsync`, `NewContextAsync` with its
+locale and time zone, `NewPageAsync`, `AddCookiesAsync`, `CloseAsync`, `SetDefaultTimeout`,
+`SetDefaultNavigationTimeout`, the page's events `Request`, `Console`, `PageError`, `Download`, `Popup` and `Close`,
+`RequestGCAsync`, and the clock's `InstallAsync`, `PauseAtAsync`, `FastForwardAsync`, `RunForAsync` and `ResumeAsync`;
+and of NUnit `[SetUp]`, `[TearDown]`, `[OneTimeSetUp]`, `[OneTimeTearDown]`, `[SetUpFixture]` and `[Parallelizable]`.
+TEST005's conditional operators are C#'s: `?:`, `??`, `??=`, `?.`, `?[]`, `&&` and `||`.
+
+The lists are read from the tests the spec holds and from the pinned packages. Of the 569 gestures the promises
+describe, none drags, taps or scrolls, one hovers (M25.F5's X17.9) and four click with a modifier or another button,
+which `ClickAsync` takes as an option; of their 1,138 outcomes 34 read the console, 8 a download and 3 a page a click
+opened, each one of rule 4's three kinds (what the user sees, what the server received, what the developer reads), and
+none reads whether an element is enabled. The refused lists this section held before named neither
+`WaitForFunctionAsync`, `EvalOnSelectorAsync`, `EvaluateAllAsync`, `DispatchEventAsync`, `SetContentAsync`,
+`ToHaveJSPropertyAsync`, `ToMatchAriaSnapshotAsync` nor `IsDisabledAsync`, each a member of Playwright 1.64.1, and
+TEST006 refused the console's errors that 34 of the spec's own tests read.
 
 ## 3. What retires
 

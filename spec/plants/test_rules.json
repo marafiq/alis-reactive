@@ -59,8 +59,8 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |\n| TEST004 | a skipped, repeated or ordered test: `[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` |\n",
-    "new": "| TEST004 | a skipped, repeated or ordered test: `[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` |\n| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |\n"
+    "old": "| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |\n| TEST004 | a skipped, repeated, ordered or parameterized test: an NUnit attribute outside `[Test]`, `[TestFixtureSource]` and `[Category]` (`[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `[TestCase]` among them), and a member of `Assert`, `Assume` or `Warn` outside `Assert.That` (`Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` among them) |\n",
+    "new": "| TEST004 | a skipped, repeated, ordered or parameterized test: an NUnit attribute outside `[Test]`, `[TestFixtureSource]` and `[Category]` (`[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `[TestCase]` among them), and a member of `Assert`, `Assume` or `Warn` outside `Assert.That` (`Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` among them) |\n| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |\n"
    }
   ],
   "expect": "test rule TEST004 stands at place 3"

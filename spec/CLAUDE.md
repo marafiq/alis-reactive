@@ -649,6 +649,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   were run over the POC's runtime, which had never been linted: one compiler finding and 22 lint findings in 2,241
   lines. A selector for `instanceof`, a catch or `??` is not on the list, since that runtime holds each by design;
   one joins only with the spec line that makes it exact. The owner can overrule each.
+- The lead, 2026-11-11, within the owner's decision of 2026-11-10 on the test rules: TEST002, TEST004, TEST005, TEST006
+  and TEST013 are stated over closed lists of what a test takes (`spec/REWRITE.md` section 2.10), never over lists of
+  what it must not: a refused list misses every member it does not name, and Playwright 1.64.1 holds members the old rows
+  did not name that run script in the page, raise an event no gesture raised, read the page once or match a snapshot. The lists are
+  read from the 569 gestures and 1,138 outcomes of the spec's own tests and from the pinned packages, each name
+  compiled against them; `Assert.That` reads what the browser reports beside the page, the console's errors among it,
+  which 34 of those tests read and TEST006 had refused. The owner can overrule each list.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
