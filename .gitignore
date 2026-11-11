@@ -13,3 +13,5 @@ node_modules/
 
 .DS_Store
 TestResults/
+tests/Alis.Reactive.ArchitectureTests/LintCases/written/
+*.tsbuildinfo

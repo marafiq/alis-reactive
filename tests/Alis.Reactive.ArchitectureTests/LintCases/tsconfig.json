@@ -1,0 +1,4 @@
+{
+  "extends": "../../../Alis.Reactive.Assets/tsconfig.json",
+  "include": ["."]
+}

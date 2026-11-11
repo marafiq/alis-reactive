@@ -69,7 +69,7 @@ Alis.Reactive/                        net48;net10.0, PackageId AlisReactive, Ali
   ArrayLambdas/ Declarations/ Vendors/ Plugins/ Elements/ InputsAndIds/ Validation/ RequestsAndResponses/
   Realtime/ TriggersAndPipelines/ PartialsAndSlots/ RenderingAndDelivery/
 Alis.Reactive.Assets/                 NoTargets, not packed: the core's browser code
-  runtime/SliceTree.txt runtime/index.ts runtime/<Module>/ (with its *.test.ts beside it)
+  tsconfig.json runtime/SliceTree.txt runtime/index.ts runtime/<Module>/ (with its *.test.ts beside it)
 Alis.Reactive.Analyzers/              netstandard2.0, packed inside AlisReactive
   <Module>/                           the rules that enforce that module's lines, its generators and build files
   Analyzers/                          module 20's own rules, ALIS010 to ALIS013
@@ -110,7 +110,9 @@ tests/
                                               WhenTheLintIsConfigured (section 2.7), each rule with its refused and
                                               accepted cases, which WhenAnArchitectureTestIsWritten holds; their
                                               helpers Repository, Scripts and read-scripts
-                                              and its packages.lock.json
+                                              and its packages.lock.json; LintCases holds the lint's refused and
+                                              accepted files; RefusedCaseAttribute and AcceptedCaseAttribute are
+                                              its two case marks
 spec/                                         the design source: BRIEF.md, REWRITE.md (this file), CLAUDE.md,
                                               NOTES.md, STATE.json, history.tsv, Core/, Fluent/, api/, inventory/,
                                               plants/, probes/, Reference/, tools/, one folder per module
@@ -341,7 +343,12 @@ value means, which no selector states: the POC's runtime, the proven design, hol
 test, proves each rule of the list as section 2.10 proves every rule: it lints a refused file and an accepted file
 for the rule with the repository's own configuration and expects the rule's id at the refused file's line and no
 message for the accepted one, so a selector that matches nothing fails its refused case; its last case holds that an
-inline disable changes no result.
+inline disable changes no result. Its files are kept in its `LintCases` folder, which the configuration covers
+beside the runtime; a file that holds a comment, the inline disable's, is written by its case and removed. It holds
+the three rules the presets carry for a spec line the same way, and the compiler's refusal of an enum (S8) by a file
+its case writes. U1 lands the presets, the ban on inline configuration and the three rules that read no path (the
+switch, the boolean conditions, the equality); the wide query's refusal and the import rows read a path of the
+runtime, and land in U3 with the file that finds a root's plans and the runtime's rows.
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, `npm audit`, `tsc -b`, eslint,
 `dotnet build -c Release`, `dotnet format --verify-no-changes` over the solution, which today's gate holds, the
@@ -694,6 +701,7 @@ Doors: N14.2, M1.N1, M5.N5, M5.N1
 One plan, the block of its view (N14.2), with a load trigger (M1.N1) that sets an element's text (M5.N5, M5.N1),
 through every row, on both hosts; the six packages packed; the delivery tests green on both fresh apps; the twin built. README.md, every package's
 readme, holds what a fresh app of section 2.9 does on each host, a net48 app's move to PackageReference among it.
+The lint's two rules that read a path of the runtime, each with its refused and accepted file (section 2.7).
 
 ### U4. Triggers and pipelines
 Features: M1.F1, M1.F2

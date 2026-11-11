@@ -5,6 +5,7 @@
   </Folder>
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />
   <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />
+  <Project Path="Alis.Reactive.Assets/Alis.Reactive.Assets.csproj" />
   <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
   <Project Path="Alis.Reactive.OpenTelemetry/Alis.Reactive.OpenTelemetry.csproj" />
