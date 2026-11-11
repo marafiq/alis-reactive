@@ -61,6 +61,7 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: write
+      id-token: write
     env:
       PACKAGE_VERSION: ${{ needs.verify-tag.outputs.package_version }}
       PRERELEASE: ${{ needs.verify-tag.outputs.prerelease }}
@@ -77,15 +78,6 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: package-lock.json
-
-      - name: Fail early if the publish secret is missing
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          if [ -z "$NUGET_API_KEY" ]; then
-            echo "::error::NUGET_API_KEY secret is not set — cannot publish. Add it in repo Settings -> Secrets and variables -> Actions."
-            exit 1
-          fi
 
       - name: Pack NuGet packages
         run: scripts/pack.sh "${PACKAGE_VERSION}"
@@ -116,11 +108,19 @@ jobs:
             ./nupkgs/*.snupkg
           retention-days: 30
 
+      - name: Log in to NuGet.org (Trusted Publishing)
+        id: nuget-login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: madnan.rafiq
+
       - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
         run: |
           dotnet nuget push ./nupkgs/*.nupkg \
             --source "https://api.nuget.org/v3/index.json" \
-            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --api-key "$NUGET_API_KEY" \
             --skip-duplicate
 
       - name: Create or update the GitHub Release (idempotent)
