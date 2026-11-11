@@ -1012,5 +1012,6 @@ public static class Promises
     {
         public const string WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded = "harness WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded";
         public const string WhenAGateHoldsAnAnswer_the_held_answer_reads_the_word_seeded_while_it_was_held = "harness WhenAGateHoldsAnAnswer.the_held_answer_reads_the_word_seeded_while_it_was_held";
+        public const string WhenAPersonOpensTheApp_the_first_page_opens_in_a_world_of_its_own = "harness WhenAPersonOpensTheApp.the_first_page_opens_in_a_world_of_its_own";
     }
 }

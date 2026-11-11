@@ -6,6 +6,7 @@ namespace Alis.Reactive.Conformance.App.World;
 internal static class WorldArea
 {
     private const string Html = "text/html; charset=utf-8";
+    private const string DocumentHeader = "Sec-Fetch-Dest";
 
     internal static void AddWorld(this IServiceCollection services)
     {
@@ -16,14 +17,8 @@ internal static class WorldArea
     internal static void UseWorld(this WebApplication app)
         => app.Use(async (context, next) =>
         {
-            var worlds = context.RequestServices.GetRequiredService<Worlds>();
-            if (!context.Request.Cookies.TryGetValue(WorldKey.Cookie, out var key) || string.IsNullOrEmpty(key))
-            {
-                key = Guid.NewGuid().ToString("N");
-                context.Response.Cookies.Append(WorldKey.Cookie, key);
-            }
-
-            context.RequestServices.GetRequiredService<CurrentWorld>().Open(key, worlds.Of(key));
+            if (WorldOf(context) is { } key)
+                context.RequestServices.GetRequiredService<CurrentWorld>().Open(key, context.RequestServices.GetRequiredService<Worlds>().Of(key));
             await next(context);
         });
 
@@ -50,6 +45,19 @@ internal static class WorldArea
                 return await next(context);
             });
     }
+
+    private static string? WorldOf(HttpContext context)
+    {
+        if (context.Request.Cookies.TryGetValue(WorldKey.Cookie, out var carried) && !string.IsNullOrEmpty(carried)) return carried;
+        if (!IsADocuments(context.Request)) return null;
+
+        var key = Guid.NewGuid().ToString("N");
+        context.Response.Cookies.Append(WorldKey.Cookie, key);
+        return key;
+    }
+
+    private static bool IsADocuments(HttpRequest request)
+        => string.Equals(request.Headers[DocumentHeader].ToString(), "document", StringComparison.Ordinal);
 
     private static string RecordsPage(WorldData world)
         => Page("Residents", "<h1>Residents</h1><ul>" + string.Concat(world.Residents.Select(resident => $"<li>{Text(resident)}</li>")) + "</ul>");

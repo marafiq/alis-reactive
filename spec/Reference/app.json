@@ -10617,6 +10617,22 @@
           "on": "the word endpoint's answer"
         }
       ]
+    },
+    {
+      "fixture": "WhenAPersonOpensTheApp",
+      "test": "the_first_page_opens_in_a_world_of_its_own",
+      "unit": "U2",
+      "page": "The world's records page, opened in a browser context that carries no world cookie, beside the same page in a world a test seeded.",
+      "gesture": "Seed the resident Ada in a world, then open the records page in a context with no world cookie and in the seeded world's context.",
+      "outcome": "The person's page shows its heading Residents and lists no resident: the document request that carried no world was given a world of its own.",
+      "opposite": "The seeded world's page lists Ada.",
+      "defect": "The world middleware opens no world for a document request that carries none, so the person's page fails and shows no heading; or it puts that request in a world another context holds, so the person's page lists Ada.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": [
+        "seed"
+      ]
     }
   ]
 }

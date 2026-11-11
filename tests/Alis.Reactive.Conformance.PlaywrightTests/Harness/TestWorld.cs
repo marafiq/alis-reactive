@@ -33,10 +33,13 @@ public sealed class TestWorld
         var key = Guid.NewGuid().ToString("N");
         var harness = new HttpClient { BaseAddress = host.Address };
         harness.DefaultRequestHeaders.Add("Cookie", $"{WorldKey.Cookie}={key}");
-        var context = await Run.Browser.NewContextAsync(new BrowserNewContextOptions { BaseURL = host.Address.ToString(), Locale = "en-US", TimezoneId = "America/Los_Angeles" });
+        var context = await NewContext(host);
         await context.AddCookiesAsync([new Cookie { Name = WorldKey.Cookie, Value = key, Url = host.Address.ToString() }]);
         return new TestWorld(harness, context, await context.NewPageAsync());
     }
+
+    internal static Task<IBrowserContext> NewContext(ConformanceHost host)
+        => Run.Browser.NewContextAsync(new BrowserNewContextOptions { BaseURL = host.Address.ToString(), Locale = "en-US", TimezoneId = "America/Los_Angeles" });
 
     internal async Task<IList<string>> End()
     {
