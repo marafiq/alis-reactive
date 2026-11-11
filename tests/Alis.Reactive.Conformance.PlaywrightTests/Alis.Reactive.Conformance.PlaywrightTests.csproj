@@ -4,6 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
+        <AlisSliceTree>true</AlisSliceTree>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\Alis.Reactive.Conformance.World\Alis.Reactive.Conformance.World.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Conformance.App\Alis.Reactive.Conformance.App.csproj" ReferenceOutputAssembly="false" />
     </ItemGroup>

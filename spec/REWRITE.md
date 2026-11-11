@@ -159,7 +159,8 @@ tests/
                                               refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; over
                                               the shipped projects' files WhenCodeCompilesForBothHosts (2.2); over
                                               every assembly WhenAnInternalIsExposed, which refuses a friend
-                                              assembly; their
+                                              assembly; over the solution's projects WhenAProjectHoldsFolders
+                                              (2.3); their
                                               helpers Repository, Hosts, Scripts and read-scripts
                                               and its packages.lock.json and CLAUDE.md; LintCases holds the lint's refused and
                                               accepted files; RefusedCaseAttribute and AcceptedCaseAttribute are
@@ -178,7 +179,7 @@ holds a CLAUDE.md of its own: its standard, its command and what it refuses.
 
 The Playwright project keeps the `PlaywrightTests` suffix, so the deny rule on a raw `dotnet test` of a Playwright
 project holds. It names the app with `ReferenceOutputAssembly="false"`, so the app builds first and none of its types
-reach a test; the app's `World/` holds the world's middleware and endpoints on the world contract. The consumer apps
+reach a test, and the framework's analyzers the same way, as an analyzer, for its slice table; the app's `World/` holds the world's middleware and endpoints on the world contract. The consumer apps
 and the twin each hold an empty `Directory.Build.props` and a `Directory.Packages.props` that turns central management
 off, so their builds see what a fresh app sees.
 
@@ -244,8 +245,11 @@ alone. The runtime has its own table,
 `Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top. The test app
 holds `Components/*` over `World HostVariants` over `Care/* Bench/* Refusals/*`, so no screen reaches into another's
 model, and last the files beside the table, its entry point, a class in the app's namespace, since ALIS011 refuses a
-type in no namespace; the Playwright project holds one row of module folders, so no module's tests use another's
-helpers.
+type in no namespace; the Playwright project holds `Harness` and then one row of module folders, so no module's tests
+use another's helpers; the analyzer cases and the module tests hold the files beside the table and then one row of
+module folders. Every project of the solution that holds a folder of C# builds with its table, which
+WhenAProjectHoldsFolders holds; the analyzers project is the one that cannot, since an analyzer cannot load into its
+own build.
 ALIS011 expects `<assembly>.<first folder>` for every file; ALIS013 reads the `AlisSliceTree` build property in place
 of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-restricted-imports` from each table.
 
@@ -548,7 +552,7 @@ rule or a named check:
 
 | Id | Refuses |
 |---|---|
-| TEST001 | a package, project or file reference of the project beyond the packages Microsoft.Playwright, NUnit, NUnit3TestAdapter and Microsoft.NET.Test.Sdk, the rules project and the world contract: the framework, the app, a mocking or a snapshot library |
+| TEST001 | a package, project or file reference of the project beyond the packages Microsoft.Playwright, NUnit, NUnit3TestAdapter and Microsoft.NET.Test.Sdk, the rules project, the framework's analyzers taken as an analyzer, which give a test no type, and the world contract: the framework, the app, a mocking or a snapshot library |
 | TEST002 | a member of Microsoft.Playwright outside the members a test takes, listed below the tables: script run in the page (`EvaluateAsync`, `WaitForFunctionAsync`), a stubbed network (`RouteAsync`), a one-shot read of the page (`InnerTextAsync`, `IsVisibleAsync`), an event no gesture raised (`DispatchEventAsync`) and every member a later version adds; and a literal that names `ej2_instances` or `window.alis` |
 | TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |
 | TEST004 | a skipped, repeated, ordered or parameterized test: an NUnit attribute outside `[Test]`, `[TestFixtureSource]` and `[Category]` (`[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `[TestCase]` among them), and a member of `Assert`, `Assume` or `Warn` outside `Assert.That` (`Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` among them) |

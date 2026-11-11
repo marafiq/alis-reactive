@@ -109,7 +109,7 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | A hand edit of the generated contract | `.claude/hooks/protect-generated.mjs`, held by `WhenClaudeRunsAHook` |
 | An untyped public door | `ALIS009` |
 | A slice that uses a later row; a namespace off its folder; an open public class; a table off its project | `ALIS010`, `ALIS011`, `ALIS012`, `ALIS013` |
-| A shipped package built without its slice table | `WhenAPackageShips` |
+| A project that holds folders, or a shipped package, built without its slice table | `WhenAProjectHoldsFolders`, `WhenAPackageShips` |
 | A friend assembly: an internal opened to a test or to a consumer | `WhenAnInternalIsExposed` |
 | In a shipped project, a conditional directive inside a file: one host's code is a file of its own | `WhenCodeCompilesForBothHosts` |
 | A public symbol outside the PublicAPI text, or a line with no symbol | the build (RS0016, RS0017) |

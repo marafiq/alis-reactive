@@ -12,7 +12,8 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   or by an id written as a literal, and expects a literal.
 - A test carries one `[FailsFor]` naming its constant in `tests/Alis.Reactive.Conformance.World/Promises.g.cs`. Its
   fixture is `When` and its situation, takes its hosts by `TestFixtureSource`, and sits in the folder of the module
-  whose test it is, under the screen it runs on. `Harness/` holds what every module's tests use.
+  whose test it is, under the screen it runs on. `Harness/` holds what every module's tests use, and `SliceTree.txt`
+  orders the folders: `Harness/`, then one row of module folders, so no module's tests use another's helpers.
 - Each test runs in a world of its own: `ConformanceFixture` opens it, and `TestWorld` seeds it through the world
   contract's typed builders. Teardown ends the world and fails a gate still parked.
 - A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits

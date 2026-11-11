@@ -13,6 +13,8 @@ with any file here. What this project adds:
   and of the cases they met, never code this project takes.
 - The project compiles against the Roslyn floor of `spec/REWRITE.md` section 2.7, the lowest compiler the packed
   analyzers load in.
+- It carries no slice table, since an analyzer cannot load into its own build, and it is the one project
+  `WhenAProjectHoldsFolders` lists so. A file's namespace is still the project's root namespace and its first folder.
 
 ## Commands
 
