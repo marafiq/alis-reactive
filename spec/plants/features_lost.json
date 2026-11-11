@@ -30,7 +30,51 @@
     "new": ""
    }
   ],
-  "expect": "1 declaring types in no feature"
+  "expect": "1 declaring types in no feature, first Alis.Reactive.Native:NativeButtonClickArgs"
+ },
+ {
+  "name": "a verdict of a kind no verdict has",
+  "edits": [
+   {
+    "file": "spec/ArrayLambdas/features.json",
+    "old": "\"door\": \"ReactiveArray<TElement>.AsSource() -> TypedSource<TElement[]!>!\",\n          \"verdict\": \"refused\",",
+    "new": "\"door\": \"ReactiveArray<TElement>.AsSource() -> TypedSource<TElement[]!>!\",\n          \"verdict\": \"dropped\","
+   }
+  ],
+  "expect": "M4.F1: ReactiveArray<TElement>.AsSource() -> TypedSource<TElement[]!>! 'dropped' is carried by no door"
+ },
+ {
+  "name": "a main-only door's verdict deleted",
+  "edits": [
+   {
+    "file": "spec/ArrayLambdas/features.json",
+    "old": "        {\n          \"door\": \"ReactiveArray<TElement>.AsSource() -> TypedSource<TElement[]!>!\",\n          \"verdict\": \"refused\",\n          \"reason\": \"An operation's result is a source itself (D6.10, D7.2), as the redesign's ReactiveArray already is, so a door that turns it into one is a second door for one concept; main needs it only because its ReactiveArray is no source.\",\n          \"carriers\": [\n            \"N6.1\",\n            \"N6.4\"\n          ]\n        },\n",
+    "new": ""
+   }
+  ],
+  "expect": "M4.F1: main-only ReactiveArray<TElement>.AsSource() -> TypedSource<TElement[]!>! has no verdict"
+ },
+ {
+  "name": "a refused door carried by a door that does not exist",
+  "edits": [
+   {
+    "file": "spec/ArrayLambdas/features.json",
+    "old": "\"carriers\": [\n            \"N6.1\",\n            \"N6.4\"\n          ]",
+    "new": "\"carriers\": [\n            \"N6.99\"\n          ]"
+   }
+  ],
+  "expect": "M4.F1: ReactiveArray<TElement>.AsSource() -> TypedSource<TElement[]!>! 'refused' is carried by no door"
+ },
+ {
+  "name": "a feature row that is invalid",
+  "edits": [
+   {
+    "file": "spec/NativeComponents/features.json",
+    "old": "\"Alis.Reactive.Native:NativeButtonClickArgs\",\n",
+    "new": "\"Alis.Reactive.Native:NativeButtonClickArgs\",\n\"Alis.Reactive.Native:NoSuchType\",\n"
+   }
+  ],
+  "expect": "features lost not counted while the feature rows are invalid: "
  },
  {
   "name": "a refused door's reason reworded",

@@ -989,11 +989,16 @@ def mapping_counts(model):
     return {"features": len(model["features"]), "rows": len(model["rows"]), "mapped": len(model["rows"]) - unmapped - doubled, "unmapped": unmapped, "doubled": doubled}
 
 
-def feature_result(problems, counts, complete, done):
+def unmapped_text(model):
+    unmapped = [row["package"] + ":" + row["door"] for row, owners in zip(model["rows"], model["owners"]) if not owners]
+    return f"every feature row valid; {len(unmapped)} spec doors in no feature" + (f", first {unmapped[0]}" if unmapped else "")
+
+
+def feature_result(model, problems, counts, done):
     if problems:
         return result(False, "; ".join(problems[:8]), **counts)
-    if not complete:
-        return result(False, f"every feature row valid; {counts['unmapped']} of {counts['rows']} spec doors in no feature", **counts)
+    if counts["unmapped"]:
+        return result(False, unmapped_text(model), **counts)
     return result(True, done, **counts)
 
 
@@ -1008,8 +1013,8 @@ def check_doors_mapped():
     homeless = homeless_core_doors(all_new_doors(design_sections() or {}))
     counts["core_doors_homeless"] = len(homeless)
     if not problems and homeless:
-        return result(False, f"every feature row valid; {counts['unmapped']} of {counts['rows']} spec doors in no feature; core doors no module names: {', '.join(homeless)}", **counts)
-    return feature_result(problems, counts, counts["unmapped"] == 0, "every spec door in exactly one feature, every core door named by a module")
+        return result(False, f"{unmapped_text(model)}; core doors no module names: {', '.join(homeless)}", **counts)
+    return feature_result(model, problems, counts, "every spec door in exactly one feature, every core door named by a module")
 
 
 CORE_DOOR_NAMED = re.compile(r"\bN\d+\.\d+\b")
@@ -1112,7 +1117,7 @@ def check_verdicts():
     counts["main_only"] = len(main_only)
     counts["main_only_in_features"] = sum(1 for owners in main_only if len(owners) == 1)
     problems = model["problems"] + verdict_problems(model, doors)
-    return feature_result(problems, counts, counts["unmapped"] == 0, "every main-only door has a verdict, and every refusal names its carriers")
+    return feature_result(model, problems, counts, "every main-only door has a verdict, and every refusal names its carriers")
 
 
 def checker_problems(feature):
@@ -1216,23 +1221,37 @@ def check_features_core():
     model = feature_model()
     doors = all_new_doors(design_sections() or {}) | module_doors()
     counts = mapping_counts(model)
-    return feature_result(model["problems"] + core_problems(model, doors), counts, counts["unmapped"] == 0, "every feature rests on answered questions, schema nodes and checked invariants")
+    return feature_result(model, model["problems"] + core_problems(model, doors), counts, "every feature rests on answered questions, schema nodes and checked invariants")
+
+
+VERDICT_CARRIERS = {"renamed": "to", "refused": "carriers"}
+
+
+def verdict_carried(feature, verdict, doors):
+    kind = verdict.get("verdict")
+    if kind == "kept":
+        return "as" not in verdict or not door_target_problems(feature, {**verdict, "to": verdict["as"]}, "to", doors)
+    return kind in VERDICT_CARRIERS and not door_target_problems(feature, verdict, VERDICT_CARRIERS[kind], doors)
 
 
 def check_features_lost():
     if not feature_files():
         return result(False, "not started: no spec/<Module>/features.json")
     model = feature_model()
+    doors = all_new_doors(design_sections() or {}) | module_doors()
     lost = []
     for feature in model["features"]:
-        for verdict in feature.get("verdicts", []):
-            carried = verdict.get("carriers") if verdict.get("verdict") == "refused" else verdict.get("to") if verdict.get("verdict") == "renamed" else [None]
-            if not carried:
-                lost.append(f"{feature['id']}: {verdict.get('door')}")
+        given = {verdict.get("door"): verdict for verdict in feature.get("verdicts", [])}
+        main_only = {row["door"] for row in owned_rows(model, feature["id"]) if row["status"] == "main-only"}
+        lost += [f"{feature['id']}: main-only {door} has no verdict" for door in sorted(main_only - set(given))]
+        lost += [f"{feature['id']}: {door} {verdict.get('verdict')!r} is carried by no door" for door, verdict in given.items()
+                 if not verdict_carried(feature, verdict, doors)]
     unmapped_types = sorted({row["package"] + ":" + row["declaring_type"] for row, owners in zip(model["rows"], model["owners"]) if not owners})
     counts = {"lost": len(lost) + len(unmapped_types), "uncarried_doors": len(lost), "types_in_no_feature": len(unmapped_types)}
-    detail = "; ".join(lost[:4] + [f"{len(unmapped_types)} declaring types in no feature"]) if counts["lost"] else "features lost 0"
-    return result(counts["lost"] == 0 and not model["problems"], detail, **counts)
+    if model["problems"]:
+        return result(False, f"features lost not counted while the feature rows are invalid: {'; '.join(model['problems'][:4])}", **counts)
+    named = lost[:4] + ([f"{len(unmapped_types)} declaring types in no feature, first {', '.join(unmapped_types[:3])}"] if unmapped_types else [])
+    return result(counts["lost"] == 0, "; ".join(named) or "features lost 0", **counts)
 
 
 def defect_problems(model, core_rungs, doors, analyzer_ids):
@@ -1340,8 +1359,8 @@ def check_defects():
     unplaced = unplaced_core_defects(model, rungs)
     counts["core_defects_unplaced"] = len(unplaced)
     if not problems and unplaced:
-        return result(False, f"every feature row valid; {counts['unmapped']} of {counts['rows']} spec doors in no feature; core defects no feature places: {', '.join(unplaced)}", **counts)
-    return feature_result(problems, counts, counts["unmapped"] == 0, "every defect on its rung, every core defect in a feature; no promise for a type or analyzer defect")
+        return result(False, f"{unmapped_text(model)}; core defects no feature places: {', '.join(unplaced)}", **counts)
+    return feature_result(model, problems, counts, "every defect on its rung, every core defect in a feature; no promise for a type or analyzer defect")
 
 
 CARRIER_ID = r"(?:M\d+\.[DNX]\d+|[DNXR]\d+\.\d+)"
@@ -1472,7 +1491,7 @@ def check_promises():
     counts = mapping_counts(model)
     counts["promises"] = sum(len(feature.get("promises", [])) for feature in model["features"])
     cells, counts["matrix_runs"], counts["matrix_promised"] = matrix_promise_problems()
-    return feature_result(model["problems"] + promise_problems(model, tests) + cells, counts, counts["unmapped"] == 0,
+    return feature_result(model, model["problems"] + promise_problems(model, tests) + cells, counts,
                           "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise")
 
 

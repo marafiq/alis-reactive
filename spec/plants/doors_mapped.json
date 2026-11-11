@@ -85,7 +85,7 @@
     "new": ""
    }
   ],
-  "expect": "every feature row valid; 6 of 8909 spec doors in no feature"
+  "expect": "every feature row valid; 6 spec doors in no feature, first Alis.Reactive:ChildElement"
  },
  {
   "name": "a core door no module names",
