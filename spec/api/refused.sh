@@ -14,9 +14,16 @@ for file in "$here"/HttpSurface/refused/*.cs.txt; do
   name=$(basename "$file" .cs.txt)
   expected=$(echo "$name" | tr '.' '\n' | grep -E '^CS[0-9]+$' | sort -u | tr '\n' ' ')
   cp "$file" "$run/Refused.cs"
-  observed=$(dotnet build "$run" -nologo -v q -p:BuildProjectReferences=false 2>&1 | grep -oE "error CS[0-9]+" | sed 's/error //' | sort -u | tr '\n' ' ' || true)
+  log=$(dotnet build "$run" -nologo -v q -p:BuildProjectReferences=false 2>&1) && status=0 || status=$?
+  observed=$(printf '%s\n' "$log" | grep -oE "error CS[0-9]+" | sed 's/error //' | sort -u | tr '\n' ' ' || true)
   total=$((total + 1))
-  if [ "$expected" = "$observed" ]; then echo "PASS $name"; else echo "FAIL $name expected [$expected] observed [$observed]"; failed=$((failed + 1)); fi
+  if [ "$expected" = "$observed" ]; then
+    echo "PASS $name"
+  else
+    cause=$(printf '%s\n' "$log" | grep -m1 -E "error|warning" || true)
+    echo "FAIL $name expected [$expected] observed [$observed] exit $status: ${cause:-the build printed no error}"
+    failed=$((failed + 1))
+  fi
 done
 echo "refused: $((total - failed)) of $total fail as named"
 [ "$failed" = "0" ]
