@@ -1,0 +1,46 @@
+[
+ {
+  "name": "a node fact expects a line its probe does not print",
+  "edits": [
+   {
+    "file": "spec/probes/facts.json",
+    "old": "\"expect\": \"ej2-max-public-method-arity: 16\"",
+    "new": "\"expect\": \"ej2-max-public-method-arity: 17\""
+   }
+  ],
+  "expect": "ej2-max-public-method-arity: ej2-method-arity.mjs printed no line"
+ },
+ {
+  "name": "a net10 fact expects another bound value",
+  "edits": [
+   {
+    "file": "spec/probes/facts.json",
+    "old": "\"expect\": \"core-frombody-binds-json-name: Ann\"",
+    "new": "\"expect\": \"core-frombody-binds-json-name: Bob\""
+   }
+  ],
+  "expect": "core-frombody-binds-json-name: AspNetCoreBinding printed no line"
+ },
+ {
+  "name": "a net48 fact cites a source line that does not hold it",
+  "edits": [
+   {
+    "file": "spec/probes/facts.json",
+    "old": "\"source\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:417\"",
+    "new": "\"source\": \"spec/probes/aspnetwebstack/DefaultModelBinder.cs.txt:418\""
+   }
+  ],
+  "expect": "mvc5-sub-index-name: "
+ },
+ {
+  "name": "a fact's statement reworded",
+  "edits": [
+   {
+    "file": "spec/probes/facts.json",
+    "old": "\"statement\": \"The largest number of parameters of a documented-public EJ2 method is 16 (ImageEditor.drawText).\"",
+    "new": "\"statement\": \"No documented-public EJ2 method takes more than 16 parameters (ImageEditor.drawText takes 16).\""
+   }
+  ],
+  "expect": null
+ }
+]

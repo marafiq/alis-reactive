@@ -1,0 +1,46 @@
+[
+ {
+  "name": "a step-5 mutant disarmed",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.violates.ChildEndsBeforeParent.cfg",
+    "old": "CONSTANT Mutant = \"DisposeEndsRunFirst\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "Tracing.violates.ChildEndsBeforeParent.cfg: expected ChildEndsBeforeParent violated"
+ },
+ {
+  "name": "a config that must hold now carries a mutant",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.holds.OwnPlanStops.cfg",
+    "old": "CONSTANT Mutant = \"none\"",
+    "new": "CONSTANT Mutant = \"NameWithoutPrefix\""
+   }
+  ],
+  "expect": "Partials.holds.OwnPlanStops.cfg: expected green"
+ },
+ {
+  "name": "a counterexample of the redesign's validation shows another gap",
+  "edits": [
+   {
+    "file": "spec/Validation/ValidationToday.violates.AConditionReadsTheObjectsStart.cfg",
+    "old": "INVARIANT AConditionReadsTheObjectsStart",
+    "new": "INVARIANT AListNotSentReadsItsStart"
+   }
+  ],
+  "expect": "expected AConditionReadsTheObjectsStart violated"
+ },
+ {
+  "name": "Tracing's main config in another order",
+  "edits": [
+   {
+    "file": "spec/Tracing/Tracing.cfg",
+    "old": "INVARIANT TraceHeadersStayHome\nINVARIANT SinkFailureChangesNothing\n",
+    "new": "INVARIANT SinkFailureChangesNothing\nINVARIANT TraceHeadersStayHome\n"
+   }
+  ],
+  "expect": null
+ }
+]

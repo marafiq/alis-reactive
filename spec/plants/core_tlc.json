@@ -1,0 +1,51 @@
+[
+ {
+  "name": "a mutant disarmed, so its invariant is never shown to fail",
+  "edits": [
+   {
+    "file": "spec/PathsAndWire/DateWire.violates.DayIsItsDayAlone.cfg",
+    "old": "CONSTANT Mutant = \"DayWritesTime\"",
+    "new": "CONSTANT Mutant = \"none\""
+   }
+  ],
+  "expect": "DateWire.violates.DayIsItsDayAlone.cfg: expected DayIsItsDayAlone violated"
+ },
+ {
+  "name": "two mutants crossed, each killing the other's invariant",
+  "edits": [
+   {
+    "file": "spec/PathsAndWire/DateWire.violates.DayIsItsDayAlone.cfg",
+    "old": "CONSTANT Mutant = \"DayWritesTime\"",
+    "new": "CONSTANT Mutant = \"TimeWritesDay\""
+   },
+   {
+    "file": "spec/PathsAndWire/DateWire.violates.TimeIsItsTimeAlone.cfg",
+    "old": "CONSTANT Mutant = \"TimeWritesDay\"",
+    "new": "CONSTANT Mutant = \"DayWritesTime\""
+   }
+  ],
+  "expect": "expected DayIsItsDayAlone violated, saw violated: TimeIsItsTimeAlone"
+ },
+ {
+  "name": "the model itself carries a defect, so its main run fails",
+  "edits": [
+   {
+    "file": "spec/PathsAndWire/DateWire.cfg",
+    "old": "CONSTANT Mutant = \"none\"",
+    "new": "CONSTANT Mutant = \"DayWritesTime\""
+   }
+  ],
+  "expect": "DateWire: violated: DayIsItsDayAlone"
+ },
+ {
+  "name": "the main config's invariants in another order",
+  "edits": [
+   {
+    "file": "spec/PathsAndWire/DateWire.cfg",
+    "old": "INVARIANT DayIsItsDayAlone\nINVARIANT TimeIsItsTimeAlone\n",
+    "new": "INVARIANT TimeIsItsTimeAlone\nINVARIANT DayIsItsDayAlone\n"
+   }
+  ],
+  "expect": null
+ }
+]

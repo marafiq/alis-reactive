@@ -1,0 +1,35 @@
+[
+ {
+  "name": "a concept row names a meaning the spec does not hold",
+  "edits": [
+   {
+    "file": "spec/Fluent/sentences.json",
+    "old": "\"Add\": [\n      \"M5.N2\"\n    ],",
+    "new": "\"Add\": [\n      \"M5.N99\"\n    ],"
+   }
+  ],
+  "expect": "F1 Add: M5.N99 resolves nowhere"
+ },
+ {
+  "name": "a surface member loses its concept row",
+  "edits": [
+   {
+    "file": "spec/Fluent/sentences.json",
+    "old": "\"Add\": [\n      \"M5.N2\"\n    ],",
+    "new": "\"Added\": [\n      \"M5.N2\"\n    ],"
+   }
+  ],
+  "expect": "F1 Add: no concept row"
+ },
+ {
+  "name": "two concept rows in another order",
+  "edits": [
+   {
+    "file": "spec/Fluent/sentences.json",
+    "old": "    \"Add\": [\n      \"M5.N2\"\n    ],\n    \"AddReactiveRequests\": [\n      \"N9.6\",\n      \"D10.12\"\n    ],\n",
+    "new": "    \"AddReactiveRequests\": [\n      \"N9.6\",\n      \"D10.12\"\n    ],\n    \"Add\": [\n      \"M5.N2\"\n    ],\n"
+   }
+  ],
+  "expect": null
+ }
+]

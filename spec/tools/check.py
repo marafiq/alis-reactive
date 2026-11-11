@@ -421,7 +421,7 @@ def spec_hash(tla, cfg):
 def run_tlc(tla, cfg):
     with tempfile.TemporaryDirectory() as meta:
         completed = subprocess.run(
-            [JAVA, "-cp", str(TLA_JAR), "tlc2.TLC", "-deadlock", "-workers", "auto", "-metadir", meta, "-config", cfg.name, tla.name],
+            [JAVA, f"-Djava.io.tmpdir={meta}", "-cp", str(TLA_JAR), "tlc2.TLC", "-deadlock", "-workers", "auto", "-metadir", meta, "-config", cfg.name, tla.name],
             cwd=tla.parent, capture_output=True, text=True,
         )
     lines = (completed.stdout + completed.stderr).splitlines()
@@ -2783,7 +2783,7 @@ def run_plants(sets):
     jobs = [(check_id, plant) for check_id, plants in sets.items() for plant in plants]
     if not jobs:
         return []
-    root = Path(tempfile.mkdtemp(prefix="alis-plants-"))
+    root = Path(tempfile.mkdtemp(prefix="check-plants-", dir=checkout_root() / ".worktrees"))
     trees = [root / f"tree{number}" for number in range(min(PLANT_WORKERS, len(jobs)))]
 
     def work(index):
