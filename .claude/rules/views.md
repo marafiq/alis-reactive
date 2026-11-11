@@ -6,7 +6,8 @@ paths:
 # Views
 
 Every view, in the conformance app and in an app. A view is a `.cshtml` MVC view, on MVC 5 and on ASP.NET Core MVC,
-never a Razor Page, and it carries no JavaScript (root CLAUDE.md).
+never a Razor Page, and it carries no JavaScript: `WhenAViewIsWritten` refuses an inline script, a handler attribute
+and a script URL in any tracked view, and a layout links a script by its file.
 
 - A view writes the doors its unit has landed, in the form `spec/Fluent/sentences.json` gives each and `spec/api/`
   compiles. A door a view needs and the DSL lacks is a gap to raise with its use case, never a workaround in the

@@ -111,6 +111,7 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | A slice that uses a later row; a namespace off its folder; an open public class; a table off its project | `ALIS010`, `ALIS011`, `ALIS012`, `ALIS013` |
 | A project that holds folders, or a shipped package, built without its slice table | `WhenAProjectHoldsFolders`, `WhenAPackageShips` |
 | A friend assembly: an internal opened to a test or to a consumer | `WhenAnInternalIsExposed` |
+| JavaScript in a view: an inline script, a handler attribute, a script URL | `WhenAViewIsWritten` |
 | In a shipped project, a conditional directive inside a file: one host's code is a file of its own | `WhenCodeCompilesForBothHosts` |
 | A public symbol outside the PublicAPI text, or a line with no symbol | the build (RS0016, RS0017) |
 | An analyzer off its release row, or one that reads a file or the environment | the build (RS2000, RS1035) |
@@ -131,12 +132,11 @@ holds a credential, a machine's NuGet or npm configuration among them.
 ## Confidence
 
 The confidence of a piece of work is determined, never felt: it is the result line of the command that proves its
-kind (`spec/REWRITE.md`, section 1.2), printed on the committed tree and read when it printed. A line that printed
-stands until a fact changes. Nothing is run twice to feel safer, nothing waits on a run that gates no unit, and a
-question the TLA+ specs, the principles or the owner's decisions answer is decided from them and held. A report says
-what was run, by its line, and what was not: MVC 5 on net48 is run by CI's Windows job when the rewrite is done, and
-this Mac is the delivery loop until then. Drift is stopped where it starts: one meaning changes in one commit with
-every place that carries it, and a green check proves only what it compares.
+kind (`spec/REWRITE.md`, section 1.2), printed on the committed tree and read when it printed, and it stands until a
+fact changes. Nothing is run twice to feel safer, nothing waits on a run that gates no unit, and a question the TLA+
+specs, the principles or the owner's decisions answer is decided from them and held. A report says what was run, by
+its line, and what was not: MVC 5 on net48 is run by CI's Windows job when the rewrite is done, and this Mac is the
+loop until then. Drift is stopped where it starts: one meaning changes in one commit, with every place it is in.
 
 ## Sessions
 

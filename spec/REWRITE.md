@@ -160,7 +160,8 @@ tests/
                                               the shipped projects' files WhenCodeCompilesForBothHosts (2.2); over
                                               every assembly WhenAnInternalIsExposed, which refuses a friend
                                               assembly; over the solution's projects WhenAProjectHoldsFolders
-                                              (2.3); their
+                                              (2.3); over every view WhenAViewIsWritten, which refuses script
+                                              in one; their
                                               helpers Repository, Hosts, Scripts and read-scripts
                                               and its packages.lock.json and CLAUDE.md; LintCases holds the lint's refused and
                                               accepted files; RefusedCaseAttribute and AcceptedCaseAttribute are
