@@ -52,6 +52,7 @@ Directory.Packages.props              central package management: one exact vers
                                       Roslyn's second (2.7), which the projects that host the compiler take by
                                       VersionOverride
 global.json                           SDK 11.0.100, rollForward disable
+nuget.config                          nuget.org alone, every other source cleared
 .node-version .python-version .java-version
 package.json  package-lock.json  eslint.config.js   npm workspaces, locked; the lint, its import order generated from
                                       each SliceTree.txt
@@ -85,7 +86,8 @@ build/EmptyPackage.proj  build/EmptyPackage.md   packed once per empty id
 
 tests/
   Alis.Reactive.Conformance.World/            net48;net10.0, on no Alis.Reactive assembly: the world's records, its
-                                              typed seed builders, the gate names generated from the TLA+ specs
+                                              typed seed builders, the gate names generated from the TLA+ specs,
+                                              the Gesture mark
   Alis.Reactive.Conformance.App/              net10 MVC on the shipped projects: Care/<Screen>/, Bench/,
                                               Refusals/<Module>/, Shared/, Components/<Declaration>/, HostVariants/,
                                               World/
@@ -214,7 +216,8 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   Gates are generated from the `Next` of each spec a held step names into the world contract (`Gates.g.cs`, one enum
   per spec), so the app and the tests name a gate the same way without either seeing the other: the test arms a gate
   before its gesture, waits until the harness reports it held, asserts the held state, then releases, by its own
-  request, the held gate the wait returns, so a release before the gate is reached does not compile. A gate parks its
+  request, the held gate the wait returns, so a release before the gate is reached does not compile. The harness's release
+  and push carry the world contract's `[Gesture]` mark, which TEST013 reads (section 2.10). A gate parks its
   request before the endpoint runs, so a held answer is computed at its release, from the world as it is then. Restart
   is the test app's host script on the harness's word. Clock is `Page.Clock`, installed only by a test that names it.
   Gc is `Page.RequestGCAsync`, confirmed by the page's own weak hold.
@@ -275,7 +278,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | Tool | Pin | One job |
 |---|---|---|
 | .NET SDK | 11.0.100 (`global.json`, rollForward disable) | compile, test, pack, for net48 and net10.0; the net10 hosts run on the 10.0 runtime |
-| NuGet | the SDK's, 11.0.100's; `Directory.Packages.props`, lock files restored locked in CI | restore; a finding of its audit fails the restore |
+| NuGet | the SDK's, 11.0.100's; `Directory.Packages.props`, lock files restored locked in CI, `nuget.config` with nuget.org alone | restore; a finding of its audit fails the restore, and so does a second source on a machine, which central package management refuses (NU1507) |
 | net48 references | System.Text.Json 10.0.15, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.15, System.Diagnostics.DiagnosticSource 10.0.15, Microsoft.AspNet.Mvc 5.3.0 | the core's net48 dependencies (2.9), restored together at these exact versions; net10 takes the first three from the framework reference; held on the 10.0 line, the net10 host's, so both hosts run one line of System.Text.Json (each one's latest is 11.0.0) |
 | net48 build | PolySharp 1.17.0, Microsoft.NETFramework.ReferenceAssemblies 1.0.3, both private | the attributes C# 14's features need on net48, written as source, and the reference assemblies a build on any OS compiles against |
 | MSBuild SDK | Microsoft.Build.NoTargets 3.7.134 | the Assets project |
@@ -288,7 +291,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.1 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
 | Roslyn | Microsoft.CodeAnalysis.CSharp 4.14.0 for the analyzer projects; 5.9.0 for the projects that host the compiler | 4.14.0 is the floor, the lowest compiler the packed analyzers load in: a compiler below an analyzer's Roslyn refuses to load it (CS9057), and 4.14.0 is Visual Studio 2022's last, so an MVC 5 app built there runs every rule; the analyzer cases, the test-rule cases and the architecture tests host 5.9.0, the latest, which parses C# 14 (`LanguageVersion.CSharp14`) |
 | Analyzer authoring | Microsoft.CodeAnalysis.Analyzers 5.9.0, private | the compiler's own rules for an analyzer project, release tracking among them (`.claude/rules/analyzers.md`) |
-| Analyzer cases | Microsoft.CodeAnalysis.CSharp.Analyzer.Testing 1.1.4, with System.Security.Cryptography.Pkcs 10.0.15 | every analyzer's, suppressor's and test rule's cases; the Pkcs pin replaces the 9.0.6 that the library's NuGet.Packaging 7.0.3 brings, which NuGet's audit refuses (NU1903) |
+| Analyzer cases | Microsoft.CodeAnalysis.CSharp.Analyzer.Testing 1.1.4, with Microsoft.CodeAnalysis.CSharp.Workspaces 5.9.0 and System.Security.Cryptography.Pkcs 10.0.15 | every analyzer's, suppressor's and test rule's cases; the library takes the workspaces package at any version, and without its pin the restore brings 1.0.1 and fails (NU1701); the Pkcs pin replaces the 9.0.6 that the library's NuGet.Packaging 7.0.3 brings, which NuGet's audit refuses (NU1903) |
 | PublicApi and BannedApi analyzers | Microsoft.CodeAnalysis.PublicApiAnalyzers 5.6.0, Microsoft.CodeAnalysis.BannedApiAnalyzers 5.6.0 | the surface text; no run-time reflection |
 | NUnit, adapter, test SDK | NUnit 5.0.0, NUnit3TestAdapter 6.3.1, Microsoft.NET.Test.Sdk 18.11.1 | tests |
 | Plan schema | JsonSchema.Net 9.6.0 | PlanTests and the architecture tests read every plan against `plan.schema.json` |
@@ -440,7 +443,9 @@ rule or a named check:
   WhenClaudeRunsAHook already refuses an edit to the generated contract and allows one beside it. A case is a test
   marked `[RefusedCase]` or `[AcceptedCase]`, the project's two marks, each a test attribute, so the runner runs a
   case as it runs a rule; WhenAnArchitectureTestIsWritten reads the project's fixtures through Roslyn and refuses a
-  fixture that holds a rule, a `[Test]`, with no case of each mark. U1 lands the cases
+  fixture that holds a rule, a `[Test]`, with no case of each mark. The analyzers' and the test rules' case projects
+  mark their cases the same way, and the same test holds every analyzer and suppressor of the two rules projects to
+  a refused and an accepted case that runs it. U1 lands the cases
   of every architecture test it keeps, and WhenAnArchitectureTestIsWritten refuses a rule with no refused or no
   accepted case. check.py's checks keep theirs in `spec/plants/`, which its `plants` check runs in throwaway
   worktrees.
@@ -456,7 +461,7 @@ rule or a named check:
 
 | Id | Refuses |
 |---|---|
-| TEST001 | a reference beyond the target framework's assemblies, Playwright, NUnit and its test platform, and the world contract: the framework, the app, a mocking or a snapshot library |
+| TEST001 | a package, project or file reference of the project beyond the packages Microsoft.Playwright, NUnit, NUnit3TestAdapter and Microsoft.NET.Test.Sdk, the rules project and the world contract: the framework, the app, a mocking or a snapshot library |
 | TEST002 | a member of Microsoft.Playwright outside the members a test takes, listed below the tables: script run in the page (`EvaluateAsync`, `WaitForFunctionAsync`), a stubbed network (`RouteAsync`), a one-shot read of the page (`InnerTextAsync`, `IsVisibleAsync`), an event no gesture raised (`DispatchEventAsync`) and every member a later version adds; and a literal that names `ej2_instances` or `window.alis` |
 | TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |
 | TEST004 | a skipped, repeated, ordered or parameterized test: an NUnit attribute outside `[Test]`, `[TestFixtureSource]` and `[Category]` (`[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `[TestCase]` among them), and a member of `Assert`, `Assume` or `Warn` outside `Assert.That` (`Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` among them) |
@@ -525,6 +530,16 @@ locale and time zone, `NewPageAsync`, `AddCookiesAsync`, `CloseAsync`, `SetDefau
 `RequestGCAsync`, and the clock's `InstallAsync`, `PauseAtAsync`, `FastForwardAsync`, `RunForAsync` and `ResumeAsync`;
 and of NUnit `[SetUp]`, `[TearDown]`, `[OneTimeSetUp]`, `[OneTimeTearDown]`, `[SetUpFixture]` and `[Parallelizable]`.
 TEST005's conditional operators are C#'s: `?:`, `??`, `??=`, `?.`, `?[]`, `&&` and `||`.
+
+How the rules read a project and a test. The test rules run where a project takes them: the Playwright project
+references the rules project as an analyzer, and no rule asks whether its compilation is a Playwright project. TEST001
+reads the project's own reference items, which the rules project's build file hands the compiler as a property, so
+an assembly that an allowed package brings is no reference of the project's. A test method is a method marked
+`[Test]`. A gesture counts where it is written inside the test method's body, a lambda or a local function of it
+included, as a member of `IPage`, `ILocator`, `IKeyboard` or `IMouse`; a call of a helper that performs one counts as
+none. The harness's release and push carry `[Gesture]`, a mark of the world contract, and TEST013 counts a call of a
+member that carries it. A test rule's title and message are its author's, written to the rule file's second rule:
+this section gives what each rule refuses, never its words.
 
 The lists are read from the tests the spec holds and from the pinned packages. Of the gestures the promises
 describe, none drags, taps or scrolls; one hovers (M25.F5's X17.9); a right click (M21.F14's M21.X405), a click with

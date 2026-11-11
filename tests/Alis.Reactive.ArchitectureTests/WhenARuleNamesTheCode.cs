@@ -24,7 +24,7 @@ public class WhenARuleNamesTheCode
     private static readonly string[] VendorTypes = ["EmitType", "ChangeEventArgs"];
     private static readonly string[] OperatorsTheSpecDecides = ["eqDecimal"];
     private static readonly string[] WhatAnAnalyzerUnitAdds =
-        ["AnalyzerReleases.Shipped.md", "AnalyzerReleases.Unshipped.md", "CSharpAnalyzerTest", "DefaultVerifier"];
+        ["AnalyzerReleases.Shipped.md", "AnalyzerReleases.Unshipped.md", "CSharpAnalyzerTest", "DefaultVerifier", "RefusedCase", "AcceptedCase"];
     private static readonly string[] NotInTheRepo =
         [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. OperatorsTheSpecDecides, .. WhatAnAnalyzerUnitAdds];
 
