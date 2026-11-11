@@ -2,6 +2,8 @@
   <Folder Name="/tests/">
     <Project Path="tests/Alis.Reactive.AnalyzerTests/Alis.Reactive.AnalyzerTests.csproj" />
     <Project Path="tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj" />
+    <Project Path="tests/Alis.Reactive.Conformance.App/Alis.Reactive.Conformance.App.csproj" />
+    <Project Path="tests/Alis.Reactive.Conformance.PlaywrightTests/Alis.Reactive.Conformance.PlaywrightTests.csproj" />
     <Project Path="tests/Alis.Reactive.Conformance.World/Alis.Reactive.Conformance.World.csproj" />
   </Folder>
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />

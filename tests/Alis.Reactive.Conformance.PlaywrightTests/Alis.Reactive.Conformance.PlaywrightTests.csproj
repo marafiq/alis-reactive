@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Playwright" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="NUnit" />
+        <PackageReference Include="NUnit3TestAdapter" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Alis.Reactive.Conformance.World\Alis.Reactive.Conformance.World.csproj" />
+        <ProjectReference Include="..\Alis.Reactive.Conformance.App\Alis.Reactive.Conformance.App.csproj" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+
+</Project>

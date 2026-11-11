@@ -189,7 +189,9 @@ Native's table is `NativeComponents` over `NativeAppLevelObjects/* NativeCompone
 alone. The runtime has its own table,
 `Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top. The test app
 holds `Components/*` over `World HostVariants` over `Care/* Bench/* Refusals/*`, so no screen reaches into another's
-model, and the Playwright project holds one row of module folders, so no module's tests use another's helpers.
+model, and last the files beside the table, its entry point, a class in the app's namespace, since ALIS011 refuses a
+type in no namespace; the Playwright project holds one row of module folders, so no module's tests use another's
+helpers.
 ALIS011 expects `<assembly>.<first folder>` for every file; ALIS013 reads the `AlisSliceTree` build property in place
 of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-restricted-imports` from each table.
 
@@ -667,7 +669,8 @@ What the cut leaves of a path section 2.1 holds:
   lint; `scripts/test.sh` with `scripts/check.sh`; `scripts/run.sh` and the two architecture tests that sweep an app,
   WhenAnAppRendersItsPages and SandboxStaticStateTests, in U2 with the conformance app.
 - Every other script and build file is reduced to what is true of the tree the cut leaves. `scripts/playwright.sh`
-  runs the POC's suites until U2 writes section 2.7's runner. `scripts/pin-syncfusion.mjs` reads the NuGet pin in
+  runs the POC's suites, and from U2's harness on the conformance project by a descriptor of its own, until U2 writes
+  section 2.7's runner. `scripts/pin-syncfusion.mjs` reads the NuGet pin in
   `Directory.Packages.props` and the npm pin in the root `package.json`, which drops its workspaces and declares what
   the kept code loads, each at the version the tree held: TypeScript and esbuild for the POC's build and the rules
   test, and EJ2, SignalR, jsdom, parse5 and ws for the probes.

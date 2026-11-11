@@ -1,0 +1,20 @@
+using System.Collections.Generic;
+
+namespace Alis.Reactive.Conformance.World;
+
+public sealed class Seed
+{
+    public IList<string> Residents { get; set; } = new List<string>();
+
+    public string? Word { get; set; }
+
+    public static Seed Resident(string name) => new Seed().AndResident(name);
+
+    public static Seed TheWord(string word) => new() { Word = word };
+
+    public Seed AndResident(string name)
+    {
+        Residents.Add(name);
+        return this;
+    }
+}
