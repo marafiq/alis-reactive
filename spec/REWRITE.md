@@ -352,7 +352,10 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
   `Application_Start`, the namespaces in `Views/Web.config`, the links.
 - The delivery tests run on both fresh apps: app.json's placements on its `fresh` screen under the hosts consumerNet10
   and consumerNet48, apps that README.md's steps alone wire on the packed packages, each booting its plan (M19.X5); and
-  WhenAConsumerAppIsBuilt, whose cases hold that git lists no file a build wrote into either app (M19.D2). Each other
+  WhenAConsumerAppIsBuilt, whose cases hold that git lists no file a build wrote into either app (M19.D2), that a file an
+  ALIS analyzer refuses fails a fresh app's build with that analyzer's id, so the analyzers packed inside AlisReactive
+  reach an app on both hosts, and that the fresh net10 app's static web assets serve each package's browser file under
+  `_content/<PackageId>/js/`, which only a fresh app reads, since the conformance app takes the shipped projects. Each other
   delivery behavior is proven once where its defect shows: a link's version is the content hash of the bytes served on
   the twin (M19.X1), which runs on the packs, a validator refuses in the browser and the server saves a valid post on
   the conformance app and the twin (M8.F1's X16.10), and each time zone shows its own day there (M15.F1's X3.7 and
