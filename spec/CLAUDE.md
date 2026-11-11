@@ -725,6 +725,21 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   answers each question in the tree, puts each standard's enforcement in place, proves each enforcement by a refused
   and an accepted case, and reports to the owner once, when all of it stands; a disagreement is stated with its
   argument where it arises.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): governance is closed in a session of its own. "Prepare a
+  handoff for a dedicated session where the govervance become a closed topic. Governance must establish feedback look
+  as in flip notes, u corrected forks mistakes", each "linked to claude. so that we are not going in circles". So
+  every correction has one home where the work happens: a reversal of the lead's ("flips must be linked to
+  claude.mds...as in if flip apply to tests then there..."), a fork's or an agent's mistake the lead corrected, a
+  slip of a session and an owner's correction each become a rule line in the rule file that owns the subject, and
+  the record of it names that file. The framework's projects hold one simple rule for code that compiles for net48
+  and net10.0 in their own rule file ("a simple rule will solve that for ever in local project"). When and where a
+  fork is used is stated once, since "all of that is known at this point after extensive sessions, pocs, tla+ work".
+  A gap is closed and proven, or it is open: "do not read closing the gaps as if you can or use this an execure as
+  best effort. Prove your goverance work". The delivery loop is this Mac's: "you will use local mac for faster
+  delivery loop, once rewrite is done CI can pass its results, no need to hedge and buy time into that"; a run of CI
+  and a number measured there gate no unit. A fork's result is proven by the command its task names, run once where
+  it lands, and of a check that costs what the work costs: "if you going to spend same amount of time checking then
+  do it yourself".
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
