@@ -22,6 +22,16 @@
       "detail": "452 feature tests and 118 cell tests on 14 screens under 20 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
+    "bindings": {
+      "counts": {
+        "constants": 573,
+        "gates": 73,
+        "marks": 57,
+        "problems": 0
+      },
+      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 573 constants, 57 of a held gate marked on them, each as the spec writes it",
+      "pass": true
+    },
     "carriers": {
       "counts": {
         "cell": 54,
@@ -1424,7 +1434,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 102,
+        "files": 103,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1558,15 +1568,15 @@
     },
     "plants": {
       "counts": {
-        "caught": 236,
-        "checks": 38,
+        "caught": 244,
+        "checks": 39,
         "failed": 0,
-        "kept": 82,
-        "proven": 38,
+        "kept": 84,
+        "proven": 39,
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "236 refused plants caught and 82 accepted plants kept green; 38 of 38 checks proven both ways",
+      "detail": "244 refused plants caught and 84 accepted plants kept green; 39 of 39 checks proven both ways",
       "pass": true
     },
     "probes": {
@@ -3705,8 +3715,8 @@
       "pass": true
     }
   },
-  "passed": 39,
-  "read_at_head": "67067e4955deb29327cf8dee87cd74616d729612",
+  "passed": 40,
+  "read_at_head": "1357e7742a57cc3ea59ddc816d52589753b370ed",
   "step": {
     "failing": [],
     "name": "End of session",
@@ -3714,5 +3724,5 @@
     "number": 13,
     "phase": "E"
   },
-  "total": 39
+  "total": 40
 }
