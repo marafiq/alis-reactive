@@ -1,194 +1,200 @@
 # Alis.Reactive
 
-Alis.Reactive lets developers author dynamic UI in ASP.NET MVC (.NET Framework 4.8 MVC 5 and
-.NET 10) with fluent, fully typed C#. The aim is developer and agent productivity: typed
-abstractions so the compiler catches mistakes before the browser does, and defaults so developers
-type less.
+Alis.Reactive lets developers author dynamic UI in ASP.NET MVC (.NET Framework 4.8 MVC 5 and .NET 10) with fluent,
+fully typed C#. The compiler catches a mistake before the browser does, and defaults mean less typing.
 
 This branch is the rewrite. `spec/` is its design, and `spec/REWRITE.md` is the repository it builds and the 27 units
-it builds it in. Main, the redesign and `poc/` are evidence of features and of the mechanisms the POCs proved, never
-the design: the unit that lands a door writes it from its spec lines.
-
-## Spec-first
-
-The rewrite is spec-first: `spec/BRIEF.md` states its thesis (section 2), its closed principles (section 3) and the
-stability rules every test keeps (section 10); `spec/REWRITE.md` holds the repository it builds and its units; the 26
-modules and the owner's decisions are `spec/CLAUDE.md`'s.
-- A defect is prevented on the highest rung that holds it: the type, an analyzer, a refusal where the view renders,
-  then behavior in the browser. A defect a type or an analyzer prevents gets no browser test.
-- A unit runs in this order: its spec lines, TLC green with each mutant failing, its Playwright tests written from
-  their promises and failing, the code until they pass, each test failing on its planted defect, commit.
-- The server decides when async work happens and the test releases it through the harness; a test waits for the
-  state it names, never for time, in a world of its own, and asserts literal outcomes.
-- Every unit closes one loop, a spec or a rules unit as a rewrite unit, and each exit is a line a tool printed, read
-  when it printed:
-  1. Restate the goal in your own words; a new direction waits for the owner's yes.
-  2. Read the owner's decisions (`spec/CLAUDE.md`), then every file the unit touches, whole, at HEAD, and the rules
-     that file states. A line enters a spec file, a rule file or a test only after it is held against each rule.
-  3. Decide from the proof in hand: the TLA+ specs, the principles and the owner's decisions. A decision on a
-     principle, a closed rule or the scope goes to the owner as one line with its cost and its risk; no other does.
-  4. Change one meaning in one commit, with every place that carries it.
-  5. Prove it on the rung that holds it. Behavior: a `scripts/playwright.sh` result line, the test first failing on
-     its planted defect. A rule (an analyzer, a test rule, a lint rule, an architecture test, a check): a refused
-     case it reports by name and an accepted case one fact away, both kept in the repo. A pin: a restore or an
-     install, and a run. Rules and docs: each rule found in one file, every removed line traced to its home. A
-     failure goes back to 4, twice at most; then stop and research.
-  6. Run the rules test on the staged unit (`tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` and
-     `WhenCodeIsWritten`), commit locally, and run the full check at that head (`python3 spec/tools/check.py`). Push
-     on their two result lines alone, then the unit's STATE; `git ls-remote` equals HEAD after each push.
-  7. The commit says what changed, its proof lines and what did not run. A slip is said in one line and fixed in
-     every place that shares its cause, with no new mechanism built for it. Work an agent finished is landed or
-     dropped, with the reason, in the same session.
-- `spec/tools/check.py` and `spec/plants` change in two cases: a check reports wrongly on correct content, or it passes
-  a defect met in content. A new check waits for the owner's yes.
-
-## Playwright is the proof
-
-Behavior is done when a Playwright test proves it in a real browser, and not before.
-
-- A real gesture (click, type, select) and a visible outcome, on a page a developer would write. A test finds an
-  element as a user does and expects a literal: no `page.evaluate()`, no read of a component's object, no DOM
-  poking. The test rules are `.claude/rules/tests.md`; they load when you open a file under `tests/`.
-- The test fails when the behavior breaks. Ask what defect would still pass it, plant that defect
-  (`scripts/plant-defect.sh`) and read the test fail.
-- Run through `scripts/playwright.sh`. A deny rule in `.claude/settings.json` refuses raw `dotnet test` on a
-  Playwright project or the solution; a non-browser project runs when it is named first
-  (`dotnet test tests/Alis.Reactive.ArchitectureTests`).
-- A build, a typecheck and a feedback test are feedback while coding, never proof of behavior. Outside `spec/`,
-  whose checks are `spec/tools/check.py`, build no other gate, coverage map, checklist or proof artifact. A done
-  report names the run and the line of output that proves it, and what did not run. MVC 5 on net48 is proven only
-  by the Windows job of CI (`spec/REWRITE.md`, section 2.8).
-
-```bash
-scripts/playwright.sh --project poc --filter "FullyQualifiedName~Properties"
-scripts/playwright.sh --project poc
-```
-
-The POC's suites are the one browser run until U2 lands the conformance app's harness; a unit ports each proof it
-replaces, and `poc/` leaves last (`spec/REWRITE.md`, section 3).
+it builds it in. Read its section 1 first: the layout on one screen, the kinds of proof with their commands, and the
+one place of every other answer. Main, the redesign and `poc/` are evidence of features and of the mechanisms the
+POCs proved, never the design: the unit that lands a door writes it from its spec lines, and where the rewrite meets
+an older line the rewrite's piece is written as its spec states it and the older line gives way.
 
 ## Vision: typed access to JavaScript objects
 
-Everything the browser runs (a Syncfusion component, a native input, a plugin, an app service like
-Toast or Drawer) is a JavaScript object with public capabilities: properties (read, write), methods
-(call, may return a value) and events (callbacks with payloads). The framework gives typed C# access
-to those capabilities through one fluent API. Any member that returns a value can be a source
-wherever the DSL takes one: reaction values, conditions, request parts, dispatch payloads and plugin
-arguments.
-
-**Components are consumers.** A component, the framework's own or an app's, is one declaration class that mirrors
-the object's typed API member for member by its JavaScript names, and one render helper, built on the core's public
-surface with zero TypeScript runtime changes: a component that seems to need one means the plan is missing
-information, and the C# side carries it. The core names no consumer. Fusion and Native are built on the surface an
-app uses and get nothing an app does not, and any developer onboards a component
+Everything the browser runs (a Syncfusion component, a native input, a plugin, an app service like Toast or Drawer)
+is a JavaScript object with properties, methods and events. The framework gives typed C# access to them through one
+fluent API, and any member that returns a value is a source wherever the DSL takes one. A component, the framework's
+own or an app's, is a consumer: one declaration class that mirrors the object's typed API member for member by its
+JavaScript names, and one render helper, built on the core's public surface with zero TypeScript runtime changes. A
+component that seems to need one means the plan is missing information, and the C# side carries it. The core names
+no consumer, Fusion and Native get nothing an app does not, and any developer onboards a component
 (`.claude/skills/onboard-component/SKILL.md`).
 
-## Architecture
+## What governs what
 
-C# builders write the plan, a closed grammar of sealed nodes; the view renders it as JSON; the TypeScript contract
-is generated from the grammar; the TypeScript runtime executes the plan. There is one C# model: no semantic graph
-and no lowering pass sit between the builders and the grammar. The core is one assembly, and each module is one
-folder and one namespace of the same name in every tree. `spec/REWRITE.md` section 2 holds the tree, the slice
-tables and the names; the module table is `spec/CLAUDE.md`'s.
+- **TLA+ governs every ordering.** Each async lane is a spec under `spec/` that TLC checks, with the mutants that must
+  fail (`spec/REWRITE.md`, section 2.6). A lane changes in its spec first, a browser test holds the machine at one
+  named action through the harness and never provokes a race by timing, and a question a spec answers is decided
+  from it.
+- **The schema governs the seam.** C# builders write the plan, a closed grammar of sealed nodes
+  (`spec/Core/schema.md`); the view renders it as JSON; the TypeScript contract is generated from the grammar; the
+  runtime executes it and invents no behavior the plan does not carry. C# states what a sentence means when the page
+  does not match its declaration: a state left to a runtime default is a gap, and no field of the plan is optional
+  or nullable. The runtime trusts a framework-generated plan and fails loud only at real boundaries: DOM lookup,
+  browser APIs, the network, component or plugin lookup, and JSON the framework did not produce. A new behavior is a
+  builder method and the node it writes; a new production is the owner's decision. Views carry no JavaScript: no
+  inline `<script>`, no `addEventListener`, no `window.alis`.
+- **The map governs where a thing lives.** The module table (`spec/CLAUDE.md`) names 26 modules. The core is one
+  assembly; a module is one folder and one namespace of the same name in every tree; a slice uses only the rows
+  before its own in its project's slice table (`Alis.Reactive/SliceTree.txt` is the core's). A meaning has one home,
+  its D line in `spec/Core/DESIGN.md` or its module's own under `spec/`; `.claude/rules/views.md` restates the two every
+  view meets, a member's name and absent data.
+- **The doors govern the surface.** A door is public only when a view author, a validator author or a component
+  author needs it. A shipped package's surface is the text in its `PublicAPI/<tfm>/PublicAPI.Unshipped.txt`, and a
+  change to it is a reviewed diff of that file. A door is typed: no `object`, no `System.Type`, no string that names a
+  member, field, event, method or path; strings stay for text people read, URLs, element ids the developer chose,
+  header names, CSS classes, and JavaScript names at the vendor and plugin boundary, and a deliberate exception
+  carries the exemption of M20.N1. No door of either line is lost: one whose form is refused names the doors that
+  carry its capability. Code that new code replaces is evidence of intent: each throw, guard and default it holds
+  gets a verdict in the replacement, and "nothing references it" is none.
+- **Encapsulation is the heart.** One place owns each concept's data and meaning, internal by default. The grammar's
+  nodes are sealed, with `internal` constructors, and developers author through builders. No internal is exposed to a
+  test or to a consumer. Slices are self-contained: duplication between slices beats a shared base class.
+- **A defect is prevented on the highest rung that holds it:** the type, an analyzer, a refusal where the view
+  renders, then behavior in the browser. A defect a type or an analyzer prevents gets no browser test.
 
-- C# never executes browser behavior. The runtime never invents behavior the plan does not carry:
-  what a sentence means when the page does not match its declaration (a member absent, its holder or
-  its value missing, a promise where a value was declared) is stated by the C# and carried by the plan.
-  A state left to a runtime default is a gap. Make invalid behavior unrepresentable in the plan domain.
-- A meaning has one home: its D line in `spec/Core/DESIGN.md`, or its module's own in that module's folder under
-  `spec/`. A rule file restates two, since every view meets them:
-  - A member's name (D2.4 to D2.6, D2.9). A request body names each member as the endpoint's binder reads it: on
-    net10 the name System.Text.Json's contract gives it under the app's JSON options, on net48 its C# name. Form-data
-    and query keys are the member's C# path on both hosts. Data read from a response body or a pushed message is
-    named as the endpoint writes it, under the app's JSON options. The naming is the app's: no name is camel-cased by
-    a rule of the framework's own.
-  - Absent data (D4.2). A member a present holder lacks reads its start, the value System.Text.Json binds for it
-    under the app's options. A holder that holds null or reads nothing reads nothing, and so does every member past
-    it.
-- The generated contract is never hand-edited: `.claude/hooks/protect-generated.mjs` refuses the edit, and a change
-  to it is a change to the C# grammar, regenerated.
-- A new behavior is a builder method and the node it writes in the existing grammar. The grammar is closed
-  (`spec/Core/schema.md`): a new production is the owner's decision.
-- The runtime trusts framework-generated plans: no validators, fallbacks, registries or defensive
-  throws for shapes the DSL controls. Errors belong at real boundaries: DOM lookup, browser APIs,
-  network, component or plugin lookup, and JSON the framework did not produce. No field of the plan is optional or
-  nullable, so plan data takes no default.
-- Views carry no JavaScript: no inline `<script>`, no `addEventListener`, no `window.alis`.
-- Every ordering of the async lanes is a TLA+ spec's (`spec/REWRITE.md`, section 2.6). A browser test holds the
-  machine at one named action through the harness and never provokes a race by timing.
+## Spec-first
 
-## Rules
+`spec/BRIEF.md` states the thesis (section 2), the closed principles (section 3) and the stability rules every test
+keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s.
+- A unit runs in this order: its spec lines, TLC green with each mutant failing, its Playwright tests written from
+  their promises and failing, the code until they pass, each test failing on its planted defect, commit.
+- From U3 on every Playwright test stands written and failing; a module's unit writes its pure tests from the
+  schema's lines before the half they prove, and turns green the browser tests `spec/tools/check.py` lands in it.
+- The server decides when async work happens and the test releases it through the harness; a test waits for the
+  state it names, never for time, in a world of its own, and asserts literal outcomes.
+- Every unit closes one loop, and each exit is a line a tool printed, read when it printed:
+  1. Restate the goal in your own words; a new direction waits for the owner's yes.
+  2. Read the owner's decisions (`spec/CLAUDE.md`), then every file the unit touches, whole, at HEAD, and the rules
+     that file states: a line enters a spec file, a rule file or a test only after it is held against each. Before
+     an edit, name its row: the spec line, the door, the node it writes, the runtime that executes it, the test.
+  3. Decide from the proof in hand: the TLA+ specs, the principles and the owner's decisions. A decision on a
+     principle, a closed rule or the scope goes to the owner as one line with its cost and its risk; no other does.
+  4. Change one meaning in one commit, with every place that carries it.
+  5. Prove it on the rung that holds it, once. Behavior: a `scripts/playwright.sh` result line, the test first failing
+     on its planted defect (`scripts/plant-defect.sh`). A rule (an analyzer, a test rule, a lint rule, an architecture
+     test, a check): a refused case it reports by name and an accepted case one fact away, both kept in the repo.
+     A pin: a restore or an install, and a run. A failure goes back to 4, twice at most; then stop and research.
+  6. Stage the unit by path and run `scripts/check.sh --no-spec`; commit behind its last line,
+     `"[check] every check passed."`; run the full check once at that head; push behind its first line, then the
+     unit's STATE. `git ls-remote` equals HEAD after each push.
+  7. The commit says what changed, its proof lines and what did not run, and a unit's last commit rewrites where
+     the rewrite stands (`spec/REWRITE.md`, section 4). A slip is said in one line and fixed in every place that
+     shares its cause, with no new mechanism built for it.
+- `spec/tools/check.py` and `spec/plants` change in two cases: a check reports wrongly on correct content, or it passes
+  a defect met in content. A new check waits for the owner's yes.
 
-- Read the spec lines and the source before an edit; old tests, docs and plans are history. Before editing, name
-  the row: the spec line, the door, the node it writes, the runtime that executes it, the Playwright test.
-- Typed APIs only. Analyzer ALIS009 fails the build on the whole public surface of the shipped packages and on
-  every component declaration and render helper, shipped or brought: no `object`, no `System.Type`, no string that
-  names a member, field, event, method or path. Strings stay for text people read, URLs, element ids the developer
-  chose, header names, CSS classes, and JavaScript names at the vendor and plugin boundary. A deliberate exception
-  carries the exemption `spec/Analyzers/module.md` keeps (M20.N1).
-- The grammar's nodes are sealed, with `internal` constructors. Developers author through builders.
-- The public surface of a shipped package is the text in its `PublicAPI/<tfm>/PublicAPI.Unshipped.txt`
-  (`PublicAPI/<tfm>/PublicAPI.Shipped.txt` once released). A public symbol missing from it or a line without a symbol
-  fails the build (RS0016, RS0017); a change to the surface is a reviewed diff of that file. A door is public only
-  when a view author, a validator author or a component author needs it.
-- Never lose typed nature or a feature. No door of either line is lost: one whose form is refused names the doors
-  that carry its capability, and `spec/tools/check.py` holds features lost at zero. Code that new code replaces is
-  evidence of intent, not the design: read what it does when the page does not match (each throw, guard and
-  default) and give each a verdict in the replacement. "Nothing references it" is no verdict.
-- No comments: code is the truth. Name the thing what it is, extract a function, guard the
-  boundary. The one exception is an XML doc on the public surface of a shipped package (what its
-  PublicAPI text lists): the developer's IntelliSense, written to `.claude/rules/docs.md`.
-  A shebang, `#nullable` and the version Dependabot reads beside a pinned action are directives, not
-  comments. `WhenCodeIsWritten` fails on any other comment, in every language the repo holds.
-- Raise a gap, never invent. When a view, component or test needs a door the DSL or the vendor's
-  public API lacks, name the gap with its use case; never invent a member, a syntax or a runtime
-  behavior so a test passes. A member's real shape comes from the installed package or the vendor's
-  source.
-- Never read secrets: no `dotnet user-secrets list`, nothing that prints a secret's value, and no file that holds
-  a credential, a machine's NuGet or npm configuration among them. When a secret is in doubt, say so without
-  reading the store. Deny rules in `.claude/settings.json` refuse the first two; an agent's brief states all three.
-- Slices are self-contained. Duplication between slices beats a shared base class.
-- Root cause, not patch. A fix lands in the code that owns the meaning (the C# that states it), not
-  where the symptom shows, and covers every place that shares its cause, each proven on its rung. A
-  meaning is decided against these rules when a real case or one of the spec's matrices
-  (`spec/Reference/`) raises it, never by analogy. After two failed attempts, stop and research. Leave
-  touched files cleaner: delete private helpers no feature reaches.
-- C# 14, compiled for `net48` and `net10.0`. A net48 language error means rework to what PolySharp polyfills;
-  realtime is net10's alone.
+```bash
+python3 spec/tools/check.py
+python3 spec/tools/check.py --orient
+scripts/playwright.sh --project poc --filter "FullyQualifiedName~Properties"
+```
+
+Behavior is done when a Playwright test proves it in a real browser, and not before: a real gesture and a visible
+outcome, on a page a developer would write. A test finds an element as a user does and expects a literal: no
+`page.evaluate()`, no read of a component's object, no DOM poking (`.claude/rules/tests.md`). A build, a typecheck and
+a module's pure tests are no proof of behavior. A non-browser project runs when it is named first
+(`dotnet test tests/Alis.Reactive.ArchitectureTests`). The POC's suites run through `scripts/playwright.sh --project poc`
+until U2 lands the rewrite's runner; a unit ports each proof it replaces, and `poc/` leaves last.
+
+## What is forbidden, and what refuses it
+
+A standard is held by the tool on its rung, with a refused case it reports by name and an accepted case. A rule in
+prose alone is a gap to close; a guard for a defect nobody met is not built.
+
+| Forbidden | Refused by |
+|---|---|
+| A comment in any language; an XML doc off a shipped package's public surface | `WhenCodeIsWritten` |
+| A rule file that names code the repo does not hold | `tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` |
+| A hand edit of the generated contract | `.claude/hooks/protect-generated.mjs`, held by `WhenClaudeRunsAHook` |
+| An untyped public door | `ALIS009` |
+| A slice that uses a later row; a namespace off its folder; an open public class; a table off its project | `ALIS010`, `ALIS011`, `ALIS012`, `ALIS013` |
+| A shipped package built without its slice table | `WhenAPackageShips` |
+| A public symbol outside the PublicAPI text, or a line with no symbol | the build (RS0016, RS0017) |
+| An analyzer off its release row, or one that reads a file or the environment | the build (RS2000, RS1035) |
+| In the runtime: a default for plan data, a floating promise, a switch that misses a kind, a condition that is no boolean, a loose equality, an enum, an inline lint directive | the lint and the TypeScript compiler, held by `WhenTheLintIsConfigured` |
+| A rule with no refused or no accepted case | `WhenAnArchitectureTestIsWritten`; `spec/plants` for a check |
+| A door or a feature lost; a defect below its rung; a meaning with no carrier; a kind outside the grammar; a unit that proves nothing; a path with no verdict; a pin off its version; a hedge word in the spec | `spec/tools/check.py`, each check with its plants |
+| C# off the formatter; an unread private member or parameter | `dotnet format --verify-no-changes` and the build, in `scripts/check.sh` |
+| A package off its lock, a tool off its pin, a package with a known vulnerability | the locked restore, `scripts/doctor.sh` and both audits |
+| A raw `dotnet test` of a Playwright project or the solution; `git stash`; a listing of user secrets | the deny rules of `.claude/settings.json` |
+| A commit on `main` | the pre-commit hook `scripts/install-git-hooks.sh` installs |
+
+Kept by the loop, with no tool: a new direction without the owner's yes; a gap worked around by an invented member,
+syntax or runtime behavior, where the gap is raised with its use case and a member's real shape is read from the
+installed package; a patch where the symptom shows; a meaning decided by analogy, where no real case and no matrix of
+`spec/Reference/` raises it; a gate, coverage map, checklist or proof artifact outside `spec/`; reading a file that
+holds a credential, a machine's NuGet or npm configuration among them.
+
+## Confidence
+
+The confidence of a piece of work is determined, never felt: it is the result line of the command that proves its
+kind (`spec/REWRITE.md`, section 1.2), printed on the committed tree and read when it printed. A line that printed
+stands until a fact changes. Nothing is run twice to feel safer, nothing waits on a run that gates no unit, and a
+question the TLA+ specs, the principles or the owner's decisions answer is decided from them and held. A report says
+what was run, by its line, and what was not: MVC 5 on net48 is run by CI's Windows job when the rewrite is done, and
+this Mac is the delivery loop until then. Drift is stopped where it starts: one meaning changes in one commit with
+every place that carries it, and a green check proves only what it compares.
+
+## Sessions
+
+- A session starts and ends at a stable state: every unit pushed, `git ls-remote` equal to HEAD, nothing uncommitted.
+  The lead says so in one line after each push. The owner starts a new session; the lead ends none.
+- A handoff is written after every push, never only at a session's end, since the harness compacts without warning
+  and a session does not always reach its end. It holds the head, what landed with its proof line and what is next;
+  the lead's memory names its folder.
+- To begin: `scripts/doctor.sh`, then the orient command above, which prints the branch against its remote, what is
+  uncommitted, the last committed STATE, the owner's latest decisions and the handoff. Then read this file,
+  `spec/REWRITE.md` sections 1 and 4, `spec/CLAUDE.md`'s standing decisions, the latest first, and the rule file of
+  what the unit touches. Section 4 says where the rewrite stands and which unit is next.
+- To reorient after a compaction: read what the compact hook printed, the same orient output, whole; re-read the
+  owner's latest decisions and the rule file of the file in hand before the next edit. A claim stands on what is run
+  now, never on what is recalled.
+
+## Corrections
+
+A correction has one home, where the work happens. An owner's correction, a reversal of the lead's with no new fact,
+a fork's or an agent's mistake the lead corrected, and a slip of a session each become, the turn they happen, a line
+of the rule file that owns the subject: a test's in `.claude/rules/tests.md` or its project's own file, an analyzer's
+in `.claude/rules/analyzers.md`, C#'s in `.claude/rules/csharp.md` or its project's own file, the runtime's in
+`Alis.Reactive.Assets/CLAUDE.md`, the spec's and the owner's decisions in `spec/CLAUDE.md`, the plan's, the loop's, a
+session's and a fork's here. The line states the rule as a plain fact, with its date and whose words it is, and its
+record (the lead's flip log, `spec/NOTES.md`, the commit) names that file. A correction a line already states adds
+none: its record names the line.
+
+## Forks, agents and reviews
+
+- A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it:
+  one test rule to a landed rule's pattern, one module's half against the schema. Three at a time at most. None
+  decides or words a rule. Its brief names the base SHA, says it never reads a secret or a file that holds a
+  credential, and carries the full bar: the task is finished before anything reads it.
+- The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
+  session, with the reason. A task whose check costs what the work costs is the lead's own.
+- No review is planned behind a writer. A review that runs is bounded before it starts: a fixed list of questions,
+  each with the answer that passes; a finding is an answer that fails; one fix in the page it was read from, one
+  second reading, then it ends, and what still fails, or anything raised outside the list, is one line to the owner.
+  It names the branch and HEAD SHA it read, and a finding counts only if its `file:line` exists at HEAD.
 
 ## Workflow
 
 - `main` is the trunk and the release line. A release is an annotated `vX.Y.Z[-rc.N]` tag on `main`:
   `scripts/verify-release-tag.sh` checks it and `.github/workflows/nuget-publish.yml` publishes it.
-- The rewrite runs on `feature/rewrite` and lands on `main` by pull request; other work branches from
-  `origin/main` in a worktree (`feature/`, `fix/`, `chore/`). A SessionStart hook installs the pre-commit guard
-  that refuses commits on `main`. `git stash` is never run: `stash@{0}` holds work that stays put, and a deny rule
-  refuses it.
-
-  ```bash
-  git worktree add .worktrees/<name> -b feature/<name> origin/main
-  ```
-
-- A unit of work closes the loop of Spec-first. Each exit shows in git or a run's log, never in a
-  checklist or an artifact.
-- A review names the branch and HEAD SHA it read. A finding counts only if its `file:line` exists
-  at HEAD.
-- `scripts/check.sh` (every check that needs no browser; its last line is "[check] every check passed."),
-  `scripts/test.sh` (that, then every browser test), `scripts/doctor.sh` (every pin against what this machine
-  runs), `scripts/build.sh`, `scripts/run.sh` (the conformance app at http://localhost:5220),
-  `scripts/pack.sh <version>`. A script joins this list with the commit that writes it
-  (`spec/REWRITE.md`, section 2.7).
-- Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a version held
-  below the latest names what holds it in its row of `spec/REWRITE.md` section 2.7. Syncfusion's hold is the owner's:
-  EJ2 33.1.47 with npm and NuGet pinned together; upgrade with `node scripts/pin-syncfusion.mjs <version>`.
+- The rewrite runs on `feature/rewrite` and lands on `main` by pull request; other work branches from `origin/main` in
+  a worktree (`feature/`, `fix/`, `chore/`): `git worktree add .worktrees/<name> -b feature/<name> origin/main`. A
+  SessionStart hook installs the pre-commit guard. `git stash` is never run: `stash@{0}` holds work that stays put.
+- `scripts/check.sh` (every check that needs no browser), `scripts/test.sh` (that, then every browser test),
+  `scripts/doctor.sh` (every pin against this machine), `scripts/build.sh`, `scripts/run.sh` (the conformance app at
+  http://localhost:5220), `scripts/pack.sh <version>`. A script joins this list with the commit that writes it.
+- Every tool and package is pinned to one exact version, the latest stable when its unit lands it, and a hold names
+  its reason in `spec/REWRITE.md` section 2.7. Syncfusion's is the owner's: EJ2 33.1.47, npm and NuGet together, moved
+  by `node scripts/pin-syncfusion.mjs <version>`.
+- C# 14, compiled for `net48` and `net10.0`; a net48 language error means rework to what PolySharp polyfills, and
+  realtime is net10's alone.
 
 ## Local guidance
 
-The spec is the reference for a door that is not built; the code and its XML docs are the reference for one that
-is. Read the declaration, the builder and a page that uses it before writing a view, a component or a test.
-
-Rules for one kind of file live in `.claude/rules/` and load when you open such a file: `tests.md`
-(files under `tests/`), `views.md` (`.cshtml`), `csharp.md` (`.cs`), `analyzers.md` (an analyzer project
-and its cases) and `docs.md` (docs, Markdown and XML docs). A folder's own `CLAUDE.md` holds what is true of that
-folder; `spec/CLAUDE.md` holds the owner's decisions. This file wins on conflict. `AGENTS.md` is a symlink to this
-file.
+The spec is the reference for a door that is not built; the code and its XML docs are the reference for one that is.
+Rules for one kind of file live in `.claude/rules/` and load when you open such a file: `tests.md` (files under
+`tests/`), `views.md` (`.cshtml`), `csharp.md` (`.cs`), `analyzers.md` (an analyzer project and its cases) and
+`docs.md` (docs, Markdown and XML docs). A project's own `CLAUDE.md` holds its standard, its command and what it
+refuses. This file wins on conflict. `AGENTS.md` is a symlink to this file.

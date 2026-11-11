@@ -752,6 +752,12 @@ needs a later module, a Native input or a request among them, turns green in tha
 planted defect there. A unit's Doors line names the doors it makes real ahead of their features' units, as U3's thin
 path does, and a part that lists its doors, each on a Doors line, lands with the latest unit that brings one of them.
 
+**Where the rewrite stands.** U1 is landed. U2 is running. Landed of it: the world contract with the generated gates
+and promises, the harness with its three tests, the app's World area and `scripts/run.sh`. Open of it: the test rules,
+the bindings check and section 2.7's runner, then the CI workflows, the two architecture tests over the app, the
+harness's refusal of the EJ2 script, and the measurements. U3 is next. The commit that lands a piece rewrites this
+paragraph.
+
 ### U1. Tools, pins and tables
 Features: M20.F1
 

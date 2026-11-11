@@ -17,3 +17,13 @@ never a Razor Page, and it carries no JavaScript (root CLAUDE.md).
 - A screen that needs a model has a model of its own, shared with no other view.
 - A page carries only what a real application page would: no echo spans, no debug divs, nothing that exists
   only to be asserted. It reads as a product screen, not a test rig.
+
+Two meanings every view meets, restated from their D lines in `spec/Core/DESIGN.md`:
+- A member's name (D2.4 to D2.6, D2.9). A request body names each member as the endpoint's binder reads it: on
+  net10 the name System.Text.Json's contract gives it under the app's JSON options, on net48 its C# name. Form-data
+  and query keys are the member's C# path on both hosts. Data read from a response body or a pushed message is
+  named as the endpoint writes it, under the app's JSON options. No name is camel-cased by a rule of the
+  framework's own.
+- Absent data (D4.2). A member a present holder lacks reads its start, the value System.Text.Json binds for it
+  under the app's options. A holder that holds null or reads nothing reads nothing, and so does every member past
+  it.

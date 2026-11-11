@@ -122,8 +122,8 @@ Terms used throughout:
   boundary and is not translated.
 - D2.8 D2.4 to D2.6 and D2.9 replace the root CLAUDE.md meaning "A member is named as System.Text.Json names it: its
   JsonPropertyName, else camel case", which holds for a net10 JSON body only. Gate 1 approved the change
-  (2026-11-09), and that root line describes main and the redesign until the rewrite's root CLAUDE.md states D2.4 to
-  D2.6 and D2.9 in its place. A snake-case app's net10 body sends its members by that policy (X18.5).
+  (2026-11-09), and that root line described main and the redesign; the rewrite's rule file for views,
+  `.claude/rules/views.md`, restates D2.4 to D2.6 and D2.9 in its place. A snake-case app's net10 body sends its members by that policy (X18.5).
 
 **Schema nodes.** `get`, `call` (Q1 paths, `members`); the request argument's members (Q9).
 
