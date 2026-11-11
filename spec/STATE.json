@@ -1368,49 +1368,9 @@
       "pass": true
     },
     "fluent": {
-      "counts": {
-        "F1": "pass",
-        "F1_names": 140,
-        "F1_rows": 140,
-        "F1_synonym_groups": 25,
-        "F2": "pass",
-        "F2_cells": 240,
-        "F2_compiling": 117,
-        "F2_failing": 0,
-        "F2_forms": 33,
-        "F2_forms_as_named": 33,
-        "F2_gap_doors": 9,
-        "F2_gaps": 119,
-        "F2_position_gaps": 4,
-        "F2_positions": 15,
-        "F2_refused": 4,
-        "F2_source_gaps": 5,
-        "F2_sources": 16,
-        "F3": "pass",
-        "F3_differ": 22,
-        "F3_kept": 6,
-        "F3_names": 36,
-        "F3_same_under_rules": 16,
-        "F3_stale_kept": 0,
-        "F4": "pass",
-        "F4_data": 143,
-        "F4_hides": 0,
-        "F4_no_row": 0,
-        "F4_other_name": 0,
-        "F4_parameters": 455,
-        "F4_rows": 10,
-        "F4_rows_unused": 0,
-        "F4_slots": 92,
-        "F5": "pass",
-        "F5_parameters": 110,
-        "F5_rows": 47,
-        "F5_stale_rows": 0,
-        "F5_untyped": 0,
-        "lambda_parameters": 463,
-        "members": 542
-      },
-      "detail": "one concept per name, every Q7 cell compiles, is refused as named or waits on a door the spec marks new, one shape per name, callbacks named as the locked table names them, every string parameter of a closed kind",
-      "pass": true
+      "counts": {},
+      "detail": "the fluent console refused: refused: spec/api/CshtmlStages has 12 compile errors; the first: /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite/spec/api/CshtmlStages/obj/Debug/net10.0/generated/Microsoft.CodeAnalysis.Razor.Compiler/Microsoft.NET.Sdk.Razor.SourceGenerators.RazorSourceGenerator/Views_Stages_Index_cshtml.g.cs(74,27): error CS0101: The namespace 'AspNetCoreGeneratedDocument' already contains a definition for 'Views_Stages_Index'",
+      "pass": false
     },
     "gate1": {
       "counts": {},
@@ -1424,7 +1384,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 102,
+        "files": 105,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1541,7 +1501,7 @@
     "packages": {
       "counts": {
         "packages": 6,
-        "pins": 24,
+        "pins": 25,
         "problems": 0,
         "references": 12
       },
@@ -1550,24 +1510,24 @@
     },
     "paths": {
       "counts": {
-        "paths": 139,
+        "paths": 143,
         "problems": 0
       },
-      "detail": "each of 139 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
+      "detail": "each of 143 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
       "pass": true
     },
     "plants": {
       "counts": {
         "caught": 235,
         "checks": 38,
-        "failed": 0,
-        "kept": 80,
+        "failed": 2,
+        "kept": 78,
         "proven": 38,
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "235 refused plants caught and 80 accepted plants kept green; 38 of 38 checks proven both ways",
-      "pass": true
+      "detail": "fluent BROKE two concept rows in another order: F2 spec/api/refused.sh FAIL NoRetryOnPost.CS1061 expected [CS1061 ] observed [CS0411 ] exit 1: /Users/muhammadadnanrafiq/Documents/Code/alis; probes BROKE two facts of one probe in another order: typescript-lib-version: dom-iterables.mjs printed no line \"typescript-version: 6.0.3\"",
+      "pass": false
     },
     "probes": {
       "counts": {
@@ -3705,14 +3665,16 @@
       "pass": true
     }
   },
-  "passed": 39,
-  "read_at_head": "805433c7daf2d8de853642c505159146e30e4fd0",
+  "passed": 37,
+  "read_at_head": "474ee2cb2788f34378cd5d3661be883e0c144797",
   "step": {
-    "failing": [],
-    "name": "End of session",
-    "next": "Write the report and copy the handoff with pbcopy.",
-    "number": 13,
-    "phase": "E"
+    "failing": [
+      "fluent"
+    ],
+    "name": "The fluent API, gate 2",
+    "next": "Write spec/Fluent/sentences.json; present gate 2.",
+    "number": 7,
+    "phase": "D"
   },
   "total": 39
 }
