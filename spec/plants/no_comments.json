@@ -4,33 +4,33 @@
   "edits": [
    {
     "file": "spec/tools/inventory.py",
-    "old": "REPO = SPEC.parent\nOUT = SPEC / \"inventory\"\n",
-    "new": "REPO = SPEC.parent\n# the folder the tables land in\nOUT = SPEC / \"inventory\"\n"
+    "old": "#!/usr/bin/env python3\nimport json\n",
+    "new": "#!/usr/bin/env python3\n# the inventory script\nimport json\n"
    }
   ],
-  "expect": "spec/tools/inventory.py:10"
+  "expect": "spec/tools/inventory.py:2"
  },
  {
   "name": "a docstring on a function",
   "edits": [
    {
     "file": "spec/tools/main_surface.py",
-    "old": "def doors(path):\n",
-    "new": "def doors(path):\n    \"\"\"The door lines of a PublicAPI text.\"\"\"\n"
+    "old": "#!/usr/bin/env python3\nimport os\n",
+    "new": "#!/usr/bin/env python3\ndef planted():\n    \"\"\"A planted docstring.\"\"\"\n\n\nimport os\n"
    }
   ],
-  "expect": "spec/tools/main_surface.py:28 docstring"
+  "expect": "spec/tools/main_surface.py:3 docstring"
  },
  {
   "name": "a line comment in a TLA+ spec",
   "edits": [
    {
     "file": "spec/Tracing/Tracing.tla",
-    "old": "SpanNames == {\"run\", \"send\", \"attempt1\", \"attempt2\"}\n",
-    "new": "\\* the spans a run opens\nSpanNames == {\"run\", \"send\", \"attempt1\", \"attempt2\"}\n"
+    "old": "---- MODULE Tracing ----\nEXTENDS Naturals, FiniteSets\n",
+    "new": "---- MODULE Tracing ----\nEXTENDS Naturals, FiniteSets\n\\* the spans a run opens\n"
    }
   ],
-  "expect": "spec/Tracing/Tracing.tla:11"
+  "expect": "spec/Tracing/Tracing.tla:3"
  },
  {
   "name": "a block comment in a TLA+ spec",
@@ -48,11 +48,11 @@
   "edits": [
    {
     "file": "spec/Tracing/Tracing.cfg",
-    "old": "INVARIANT ResendCountSent\n",
-    "new": "INVARIANT ResendCountSent \\* the resend header\n"
+    "old": "SPECIFICATION Spec\n",
+    "new": "SPECIFICATION Spec \\* the spec\n"
    }
   ],
-  "expect": "spec/Tracing/Tracing.cfg:11"
+  "expect": "spec/Tracing/Tracing.cfg:1"
  },
  {
   "name": "a hash inside a string literal",

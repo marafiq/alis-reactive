@@ -48,11 +48,11 @@
   "edits": [
    {
     "file": "spec/Core/conversions.md",
-    "old": "of a date or a time\nreads (the last section)",
-    "new": "of a date or a time when\nneeded reads (the last section)"
+    "old": "# Conversions\n\nThe one conversion, `as(expr, shape)`,",
+    "new": "# Conversions\n\nWhen\nneeded, the one conversion, `as(expr, shape)`,"
    }
   ],
-  "expect": "spec/Core/conversions.md:5 when needed"
+  "expect": "spec/Core/conversions.md:3 When needed"
  },
  {
   "name": "a hedge in the translated members table's prose",
@@ -70,11 +70,11 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "Beside the tree the repository keeps",
-    "new": "Beside the tree the repository usually keeps"
+    "old": "# The rewrite\n\nWhat the rewrite builds and the order it builds it in.",
+    "new": "# The rewrite\n\n```\none\ntwo\n```\n\nWhat the rewrite usually builds and the order it builds it in."
    }
   ],
-  "expect": "spec/REWRITE.md:108 usually"
+  "expect": "spec/REWRITE.md:8 usually"
  },
  {
   "name": "a hedge in a proposed sentence",

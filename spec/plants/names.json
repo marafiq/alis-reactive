@@ -1,0 +1,214 @@
+[
+ {
+  "name": "a core module dropped from its SliceTree row",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 10 | Vendors Plugins |",
+    "new": "| 10 | Vendors |"
+   }
+  ],
+  "expect": "Plugins is in 0 SliceTree rows"
+ },
+ {
+  "name": "a core module in two SliceTree rows",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 11 | Elements InputsAndIds |",
+    "new": "| 11 | Elements InputsAndIds Plugins |"
+   }
+  ],
+  "expect": "Plugins is in 2 SliceTree rows"
+ },
+ {
+  "name": "a SliceTree row holding a name no core module has",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 12 | Validation |",
+    "new": "| 12 | Validations |"
+   }
+  ],
+  "expect": "SliceTree row 12 holds Validations, no core module"
+ },
+ {
+  "name": "a SliceTree row renumbered",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 12 | Validation |",
+    "new": "| 13 | Validation |"
+   }
+  ],
+  "expect": "SliceTree row 13 stands at place 12"
+ },
+ {
+  "name": "a core folder misspelt in the tree",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "  ArrayLambdas/ Declarations/ Vendors/ Plugins/",
+    "new": "  ArrayLambdas/ Declarations/ Vendors/ Plugin/"
+   }
+  ],
+  "expect": "Alis.Reactive/Plugin/ in section 2.1 is no core module of spec/CLAUDE.md's table"
+ },
+ {
+  "name": "a module renamed in the module table only",
+  "edits": [
+   {
+    "file": "spec/CLAUDE.md",
+    "old": "| 13 | Plugins | component author |",
+    "new": "| 13 | Plugin hooks | component author |"
+   }
+  ],
+  "expect": "Alis.Reactive/Plugins/ in section 2.1 is no core module of spec/CLAUDE.md's table"
+ },
+ {
+  "name": "a consumer module with no folder in the tree",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "  FusionComponents/ FusionComponents/<Slice>/ FusionTemplates/ FusionAppLevelObjects/<Slice>/",
+    "new": "  FusionComponents/ FusionComponents/<Slice>/ FusionAppLevelObjects/<Slice>/"
+   }
+  ],
+  "expect": "module FusionTemplates has no folder in the projects of section 2.1"
+ },
+ {
+  "name": "a TLA+ spec listed under another owner",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| `Run.tla` | Execution |",
+    "new": "| `Run.tla` | Vendors |"
+   }
+  ],
+  "expect": "section 2.6 lists Run.tla under Vendors; it is spec/Execution/Run.tla"
+ },
+ {
+  "name": "a TLA+ spec in no row",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| `Partials.tla` | PartialsAndSlots | slot loads and unloads |\n",
+    "new": ""
+   }
+  ],
+  "expect": "spec/PartialsAndSlots/Partials.tla is in no row of section 2.6"
+ },
+ {
+  "name": "a listed TLA+ spec whose file is gone",
+  "edits": [
+   {
+    "file": "spec/PartialsAndSlots/Partials.tla",
+    "remove": true
+   }
+  ],
+  "expect": "section 2.6 lists Partials.tla under PartialsAndSlots; spec/PartialsAndSlots/Partials.tla is absent"
+ },
+ {
+  "name": "a listed TLA+ spec TLC no longer runs",
+  "edits": [
+   {
+    "file": "spec/tools/check.py",
+    "old": "    \"Partials\": {\"question\": \"Q14 with Q13 and Q16\", \"step\": 5, \"expect\": \"green\"},\n",
+    "new": ""
+   }
+  ],
+  "expect": "section 2.6 lists Partials.tla, which TLC_SPECS does not run"
+ },
+ {
+  "name": "an owner that is no module",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| `Tracing.tla` | Tracing |",
+    "new": "| `Tracing.tla` | Telemetry |"
+   }
+  ],
+  "expect": "section 2.6's owner Telemetry is no module"
+ },
+ {
+  "name": "a spec folder the tree's spec line drops",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "inventory/,\n",
+    "new": "\n"
+   }
+  ],
+  "expect": "spec/inventory/ is neither a module folder nor named by section 2.1's spec line"
+ },
+ {
+  "name": "a spec line naming an entry spec/ lacks",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "plants/, probes/,",
+    "new": "plants/, probes/, drafts/,"
+   }
+  ],
+  "expect": "section 2.1's spec line names spec/drafts/, which is absent"
+ },
+ {
+  "name": "a module whose module.md is gone",
+  "edits": [
+   {
+    "file": "spec/Plugins/module.md",
+    "remove": true
+   }
+  ],
+  "expect": "module Plugins has no spec/Plugins/module.md"
+ },
+ {
+  "name": "a slice moved to the next SliceTree row",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 10 | Vendors Plugins |",
+    "new": "| 10 | Vendors |"
+   },
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| 11 | Elements InputsAndIds |",
+    "new": "| 11 | Plugins Elements InputsAndIds |"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "the TLA+ table's rows in another order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "| `Run.tla` | Execution | a handler run's awaits, settles and stops |\n| `Lanes.tla` | Execution | the async lanes and their policies |\n",
+    "new": "| `Lanes.tla` | Execution | the async lanes and their policies |\n| `Run.tla` | Execution | a handler run's awaits, settles and stops |\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "the core folders in another order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "  Schema/ TypeKnowledge/ PathsAndWire/",
+    "new": "  TypeKnowledge/ Schema/ PathsAndWire/"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "the spec line's names in another order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "plants/, probes/, Reference/, tools/,",
+    "new": "Reference/, tools/, plants/, probes/,"
+   }
+  ],
+  "expect": null
+ }
+]

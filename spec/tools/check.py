@@ -845,13 +845,25 @@ MAIN_SIDE = {"main-only", "both", "moved"}
 REDESIGN_SIDE = {"redesign-only", "both", "moved"}
 
 
-def module_names():
+MODULE_ROW = re.compile(r"^\| (\d+) \| ([^|]+?) \| ([^|]+?) \|", re.MULTILINE)
+CONSUMER_SEEN = {"build", "built on the core"}
+
+
+def module_folder(name):
+    return "".join(word[:1].upper() + word[1:] for word in re.split(r"[\s-]+", name) if word)
+
+
+def module_rows():
     text = (SPEC / "CLAUDE.md").read_text()
-    section = text[text.index("## Modules"):]
-    names = {}
-    for number, name in re.findall(r"^\| (\d+) \| ([^|]+?) \|", section, re.MULTILINE):
-        names["".join(word[:1].upper() + word[1:] for word in re.split(r"[\s-]+", name) if word)] = int(number)
-    return names
+    return MODULE_ROW.findall(text[text.index("## Modules"):])
+
+
+def module_names():
+    return {module_folder(name): int(number) for number, name, _ in module_rows()}
+
+
+def core_modules():
+    return {module_folder(name) for _, name, seen in module_rows() if seen not in CONSUMER_SEEN}
 
 
 def internal_modules():
@@ -2467,6 +2479,74 @@ def test_rules_section(text):
     return text[start:text.find("\n## 3.", start)] if start >= 0 else ""
 
 
+TREE_FOLDER = re.compile(r"^([A-Z]\w*)/")
+TLA_NAME = re.compile(r"`(\w+)\.tla`")
+
+
+def tree_blocks(text):
+    block = rewrite_section(text, "### 2.1 The tree")
+    block = block[block.find("```") + 3:]
+    blocks, current = {}, None
+    for line in block[:block.find("```")].splitlines():
+        if line[:1] not in ("", " "):
+            first = line.split()[0]
+            current = blocks.setdefault(first, []) if first.startswith("Alis.Reactive") and first.endswith("/") else None
+        elif current is not None and line.strip():
+            current += line.split()
+    return blocks
+
+
+def spec_line_names(text):
+    return set(re.findall(r"(?<![\w/])([\w.-]+\.\w+|[\w-]+/)(?=[,\s]|$)", tree_line(text, "spec").split(None, 1)[-1]))
+
+
+def names_problems(text):
+    modules, core = set(module_names()), core_modules()
+    blocks = tree_blocks(text)
+    core_tree = [token.rstrip("/") for token in blocks.get("Alis.Reactive/", []) if re.fullmatch(r"[A-Z]\w*/", token)]
+    homes = {found.group(1) for tokens in blocks.values() for token in tokens for found in [TREE_FOLDER.match(token)] if found}
+    problems = [f"Alis.Reactive/{name}/ in section 2.1 is no core module of spec/CLAUDE.md's table" for name in core_tree if name not in core]
+    problems += [f"core module {name} has no folder in section 2.1's Alis.Reactive/" for name in sorted(core - set(core_tree))]
+    problems += [f"module {name} has no folder in the projects of section 2.1" for name in sorted(modules - homes)]
+    rows = table_rows(rewrite_section(text, "### 2.3 The SliceTree"))
+    problems += [f"SliceTree row {row[0]} stands at place {place}" for place, row in enumerate(rows, 1) if row[0] != str(place)]
+    sliced = Counter(name for row in rows for name in row[1].split())
+    problems += [f"SliceTree row {row[0]} holds {name}, no core module" for row in rows for name in row[1].split() if name not in core]
+    problems += [f"{name} is in {sliced[name]} SliceTree rows" for name in sorted(core) if sliced[name] != 1]
+    listed = [(name, row[1]) for row in table_rows(rewrite_section(text, "### 2.6 TLA+")) for name in TLA_NAME.findall(row[0])]
+    on_disk = {path.stem: path.parent.relative_to(SPEC).as_posix() for path in SPEC.glob("**/*.tla")}
+    problems += [f"section 2.6's owner {owner} is no module" for owner in sorted({owner for _, owner in listed} - modules)]
+    problems += [f"section 2.6 lists {name}.tla {count} times" for name, count in Counter(name for name, _ in listed).items() if count > 1]
+    for name, owner in listed:
+        if name not in on_disk:
+            problems.append(f"section 2.6 lists {name}.tla under {owner}; spec/{owner}/{name}.tla is absent")
+        elif on_disk[name] != owner:
+            problems.append(f"section 2.6 lists {name}.tla under {owner}; it is spec/{on_disk[name]}/{name}.tla")
+    problems += [f"spec/{folder}/{name}.tla is in no row of section 2.6" for name, folder in sorted(on_disk.items()) if name not in dict(listed)]
+    problems += [f"section 2.6 lists {name}.tla, which TLC_SPECS does not run" for name, _ in listed if name not in TLC_SPECS]
+    problems += [f"TLC_SPECS runs {name}, in no row of section 2.6" for name in TLC_SPECS if name not in dict(listed)]
+    entries = {name.split("/")[1] + ("/" if name.count("/") > 1 else "") for name in git("ls-files", "spec").splitlines()}
+    named = spec_line_names(text)
+    problems += [f"module {name} has no spec/{name}/module.md" for name in sorted(modules) if not (SPEC / name / "module.md").is_file()]
+    problems += [f"spec/{entry} is neither a module folder nor named by section 2.1's spec line" for entry in sorted(entries)
+                 if entry.rstrip("/") not in modules and entry not in named]
+    problems += [f"section 2.1's spec line names spec/{name}, which is absent" for name in sorted(named - entries)]
+    counts = {"modules": len(modules), "core": len(core), "slice_rows": len(rows), "tla": len(listed), "spec_entries": len(entries)}
+    return problems, counts
+
+
+def check_names():
+    path = SPEC / "REWRITE.md"
+    if not path.exists():
+        return not_started(path)
+    problems, counts = names_problems(path.read_text())
+    detail = (f"each of the module table's {counts['core']} core modules is a folder of section 2.1's Alis.Reactive/ and in one of "
+              f"{counts['slice_rows']} SliceTree rows, each of its {counts['modules']} modules a folder of section 2.1's projects and "
+              f"spec/<Module>/module.md; each of {counts['tla']} TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; "
+              f"each of spec/'s {counts['spec_entries']} entries is a module folder or named by section 2.1's spec line")
+    return result(not problems, "; ".join(problems[:8]) or detail, problems=len(problems), **counts)
+
+
 def check_test_rules():
     path = SPEC / "REWRITE.md"
     if not path.exists():
@@ -2998,6 +3078,7 @@ CHECKS = [
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("paths", "every path at HEAD and main's tip kept by REWRITE.md's section 2 or retired by its section 3, so the cut drops nothing by omission", check_paths),
+    ("names", "every module named alike in the module table, REWRITE.md's tree, SliceTree and TLA+ table, and spec/", check_names),
     ("rewrite_cites", "every cite REWRITE.md makes names its SHA and resolves there", check_rewrite_cites),
     ("packages", "every package REWRITE.md packs is main's or a decided door's, ships bundles only, and every dependency and kept reference is pinned at its version", check_packages),
     ("test_rules", "every rule and smell of tests.md held by a test rule or a named check", check_test_rules),
@@ -3021,7 +3102,7 @@ STEPS = [
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
     (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests", "plants"], "Finish every check and make each pass."),
-    (11, "E", "REWRITE.md", ["rewrite_units", "packages", "paths", "rewrite_cites"], "Write spec/REWRITE.md in SliceTree order."),
+    (11, "E", "REWRITE.md", ["rewrite_units", "packages", "paths", "names", "rewrite_cites"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]
 

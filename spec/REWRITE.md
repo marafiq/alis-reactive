@@ -101,8 +101,9 @@ tests/
                                               renamed WhenTheAppHoldsNoStaticState, each rule with its refused and
                                               accepted cases, which WhenAnArchitectureTestIsWritten holds; their
                                               helpers Repository, Scripts and read-scripts
-spec/                                         the design source: this file, CLAUDE.md, NOTES.md, Core/, probes/,
-                                              Reference/, tools/, one folder per module
+spec/                                         the design source: BRIEF.md, REWRITE.md (this file), CLAUDE.md,
+                                              NOTES.md, STATE.json, history.tsv, Core/, Fluent/, api/, inventory/,
+                                              plants/, probes/, Reference/, tools/, one folder per module
 ```
 
 Beside the tree the repository keeps `.claude/settings.json`, `.claude/hooks/protect-generated.mjs`,
