@@ -3357,6 +3357,54 @@ def report_plants(names):
     return 0 if passed == len(verdicts) else 1
 
 
+WORLD_CONTRACT = REPO / "tests" / "Alis.Reactive.Conformance.World"
+WORLD_NAMESPACE = "Alis.Reactive.Conformance.World"
+
+
+def csharp_name(text):
+    return re.sub(r"\W", "_", text)
+
+
+def generated_gates():
+    app = json.loads((SPEC / "Reference" / "app.json").read_text())
+    held = [step["action"] for group in ("placements", "cells", "harnessTests") for entry in app[group] for step in entry.get("held", []) if step["action"]]
+    specs = sorted({action.split(".tla:")[0] for action in held})
+    enums = [f"public enum {spec}Gate\n{{\n" + "".join(f"    {action},\n" for action in spec_actions(spec)) + "}\n" for spec in specs]
+    return f"namespace {WORLD_NAMESPACE};\n\n" + "\n".join(enums)
+
+
+def promise_constants():
+    app = json.loads((SPEC / "Reference" / "app.json").read_text())
+    groups = {}
+    for placement in app["placements"]:
+        named = (csharp_name(f"{placement['for']}_{placement['index']}"), f"{placement['feature']} {placement['for']} {placement['index']}")
+        groups.setdefault(placement["feature"], []).append(named)
+    features = sorted(groups, key=lambda feature: [int(number) for number in re.findall(r"\d+", feature)])
+    ordered = {csharp_name(feature): groups[feature] for feature in features}
+    ordered["Cells"] = [(csharp_name(cell["cell"]), f"cell {cell['cell']}") for cell in app["cells"] if "cell" in cell]
+    ordered["OwnCells"] = [(csharp_name(cell["own"]), f"own {cell['own']}") for cell in app["cells"] if "own" in cell]
+    ordered["Harness"] = [(f"{test['fixture']}_{test['test']}", f"harness {test['fixture']}.{test['test']}") for test in app["harnessTests"]]
+    return ordered
+
+
+def generated_promises():
+    groups = promise_constants()
+    twice = [f"{group}.{name}" for group, constants in groups.items() for name, count in Counter(name for name, _ in constants).items() if count > 1]
+    if twice:
+        raise SystemExit("check.py --generate: two tests of the spec take one constant: " + ", ".join(twice))
+    classes = [f"    public static class {group}\n    {{\n" + "".join(f"        public const string {name} = \"{value}\";\n" for name, value in constants) + "    }\n"
+               for group, constants in groups.items()]
+    return f"namespace {WORLD_NAMESPACE};\n\npublic static class Promises\n{{\n" + "\n".join(classes) + "}\n"
+
+
+def generate():
+    written = {"Gates.g.cs": generated_gates(), "Promises.g.cs": generated_promises()}
+    for name, text in written.items():
+        (WORLD_CONTRACT / name).write_text(text)
+    print("generated " + " and ".join(str((WORLD_CONTRACT / name).relative_to(REPO)) for name in written))
+    return 0
+
+
 def run_ci():
     global SKIPPED
     unset = [name for name in CI_TOOLS if not os.environ.get(name)]
@@ -3379,6 +3427,8 @@ def main():
         return 0
     if "--ci" in sys.argv[1:]:
         return run_ci()
+    if "--generate" in sys.argv[1:]:
+        return generate()
     if sys.argv[1:2] == ["--check"]:
         print(json.dumps(run_one(sys.argv[2])))
         return 0

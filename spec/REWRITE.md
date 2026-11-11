@@ -87,7 +87,8 @@ build/EmptyPackage.proj  build/EmptyPackage.md   packed once per empty id
 tests/
   Alis.Reactive.Conformance.World/            net48;net10.0, on no Alis.Reactive assembly: the world's records, its
                                               typed seed builders, the gate names generated from the TLA+ specs,
-                                              the Gesture mark
+                                              the promise constants generated from app.json, the FailsFor and
+                                              Gesture marks
   Alis.Reactive.Conformance.App/              net10 MVC on the shipped projects: Care/<Screen>/, Bench/,
                                               Refusals/<Module>/, Shared/, Components/<Declaration>/, HostVariants/,
                                               World/
@@ -235,7 +236,13 @@ exemption (M20.N1); U3's skeleton writes the core's 16 rows with their folders.
 - **Bindings.** `Promises.g.cs` is generated from app.json and the features: a test carries `[FailsFor(...)]` naming its
   feature, defect and index, its cell, or its harness test. `spec/tools/check.py --generate`, which U2 adds, writes
   `Gates.g.cs` and `Promises.g.cs` into the world contract, where they are committed, since check.py is the one reader
-  of the spec's JSON and of a TLA+ spec's `Next`. The bindings check fails when the generated files differ
+  of the spec's JSON and of a TLA+ spec's `Next`. `Gates.g.cs` holds one enum for each spec a held step names,
+  `<Spec>Gate`, its members the actions of that spec's `Next` in their order. `Promises.g.cs` holds the class
+  `Promises`, and in it one class for each feature (`M4_F1`) and the classes `Cells`, `OwnCells` and `Harness`; each
+  test of the spec is a text constant there, named for it with `_` in place of every character a name cannot hold
+  (`X6_3_0`), its value the test's id in the spec ("M4.F1 X6.3 0"), and two tests that would take one constant stop
+  the generation. The world contract declares the two marks: `FailsForAttribute`, which takes one of those constants,
+  and `GestureAttribute`. The bindings check fails when the generated files differ
   from what the spec writes, when a test names no test of the spec or a test of the spec has no test, when a test never
   reached the gate its held steps name, and when a screen's view uses a module namespace that neither the test's
   feature nor a part it lists belongs to, since check.py lands each test in the latest unit of those modules.
