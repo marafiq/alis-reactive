@@ -304,10 +304,15 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   (`X6_3_0`), its value the test's id in the spec ("M4.F1 X6.3 0"), and two tests that would take one constant stop
   the generation. The world contract declares four marks: `FailsForAttribute`, which takes one of those constants;
   `GestureAttribute`; `BesideThePageAttribute`, on what the harness collected beside the page (TEST006); and
-  `HoldsAttribute`, which `check.py --generate` writes on a constant once for each gate its test holds (TEST012). The bindings check fails when the generated files differ
-  from what the spec writes, when a test names no test of the spec or a test of the spec has no test, when a test never
-  reached the gate its held steps name, and when a screen's view uses a module namespace that neither the test's
-  feature nor a part it lists belongs to, since check.py lands each test in the latest unit of those modules.
+  `HoldsAttribute`, which `check.py --generate` writes on a constant once for each gate its test holds (TEST012). The bindings are held on the rung that
+  reads each. check.py's `bindings` check fails when a generated file differs from what the spec writes, so a hand's
+  edit, and a spec that moved without its constants, are both refused. TEST012 fails the build of a test that names
+  no test of the spec, of two tests on one constant, of a test that never arms a gate its held steps name and, once
+  every test is written, of a project that leaves a test of the spec unwritten (2.10). The harness releases a gate
+  only through the held gate its wait returns, and its teardown fails a gate still parked. From U3 on the check
+  also fails when a screen's view uses a module namespace that neither its test's feature nor a part the test lists
+  belongs to, since check.py lands each test in the latest unit of those modules: no view exists before U3, so U3
+  lands that clause with the first one, with its refused and its accepted plant.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
   host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
   "Now listening on:" line; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
@@ -855,7 +860,8 @@ its promise, failing. The module tests land here with their first tests, the sch
 `*.test.ts`. The thin path: one plan, the block of its view (N14.2), with a load trigger (M1.N1) whose pipeline, one
 run of one block, sets an element's text (M5.N5, M5.N1), compiled for both hosts. The lint's two rules that read a
 path of the runtime land here, each with its refused and accepted file (section 2.7), and so do the core's banned
-symbols with WhenTheCoreIsCompiled, before the core's first code that reads a type.
+symbols with WhenTheCoreIsCompiled, before the core's first code that reads a type. The bindings check gains its
+view clause with the first screen's view (section 2.5).
 
 ### U4. Type knowledge
 Features: M16.F1

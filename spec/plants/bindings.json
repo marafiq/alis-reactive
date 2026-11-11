@@ -1,0 +1,111 @@
+[
+ {
+  "name": "a promise constant edited by hand",
+  "edits": [
+   {
+    "file": "tests/Alis.Reactive.Conformance.World/Promises.g.cs",
+    "old": "= \"harness WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded\";",
+    "new": "= \"harness WhenTwoWorldsRun.each_world_lists_the_residents_it_seeded\";"
+   }
+  ],
+  "expect": "Promises.g.cs differs from what the spec writes at line"
+ },
+ {
+  "name": "a gate removed by hand",
+  "edits": [
+   {
+    "file": "tests/Alis.Reactive.Conformance.World/Gates.g.cs",
+    "old": "public enum CompositionGate\n{\n    Unload,\n",
+    "new": "public enum CompositionGate\n{\n"
+   }
+  ],
+  "expect": "Gates.g.cs differs from what the spec writes at line 18"
+ },
+ {
+  "name": "a held gate's mark removed by hand",
+  "edits": [
+   {
+    "file": "tests/Alis.Reactive.Conformance.World/Promises.g.cs",
+    "old": "        [Holds(CompositionGate.Answer)]\n        public const string WhenAGateHoldsAnAnswer_",
+    "new": "        public const string WhenAGateHoldsAnAnswer_"
+   }
+  ],
+  "expect": "Promises.g.cs differs from what the spec writes at line"
+ },
+ {
+  "name": "a harness test renamed in the spec and its constant not regenerated",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"test\": \"each_world_lists_only_the_residents_it_seeded\",",
+    "new": "\"test\": \"each_world_lists_the_residents_it_seeded\","
+   }
+  ],
+  "expect": "Promises.g.cs differs from what the spec writes at line"
+ },
+ {
+  "name": "a held step moved to another action and its mark not regenerated",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"action\": \"Composition.tla:Answer\",\n          \"on\": \"the word endpoint's answer\"",
+    "new": "\"action\": \"Composition.tla:Route\",\n          \"on\": \"the word endpoint's answer\""
+   }
+  ],
+  "expect": "Promises.g.cs differs from what the spec writes at line"
+ },
+ {
+  "name": "an action dropped from a spec's Next and the gates not regenerated",
+  "edits": [
+   {
+    "file": "spec/RequestsAndResponses/Composition.tla",
+    "old": "Answer(r) \\/ Route(r) \\/ DefaultFinally(r)\n",
+    "new": "Answer(r) \\/ Route(r)\n"
+   }
+  ],
+  "expect": "Gates.g.cs differs from what the spec writes at line 23"
+ },
+ {
+  "name": "two tests of the spec on one constant",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"fixture\": \"WhenAGateHoldsAnAnswer\",\n      \"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",",
+    "new": "\"fixture\": \"WhenTwoWorldsRun\",\n      \"test\": \"each_world_lists_only_the_residents_it_seeded\","
+   }
+  ],
+  "expect": "two tests of the spec take one constant: Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded"
+ },
+ {
+  "name": "a generated file gone",
+  "edits": [
+   {
+    "file": "tests/Alis.Reactive.Conformance.World/Gates.g.cs",
+    "remove": true
+   }
+  ],
+  "expect": "Gates.g.cs is absent; check.py --generate writes it"
+ },
+ {
+  "name": "a harness test's gesture reworded",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "click the link, wait until the harness reports the gate held, seed the word South",
+    "new": "click the link, wait until the harness says the gate holds, seed the word South"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a held step's place reworded",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"action\": \"Composition.tla:Answer\",\n          \"on\": \"the word endpoint's answer\"",
+    "new": "\"action\": \"Composition.tla:Answer\",\n          \"on\": \"the answer of the word endpoint\""
+   }
+  ],
+  "expect": null
+ }
+]

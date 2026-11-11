@@ -117,7 +117,7 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | An analyzer off its release row, or one that reads a file or the environment | the build (RS2000, RS1035) |
 | In the runtime: a default for plan data, a floating promise, a switch that misses a kind, a condition that is no boolean, a loose equality, an enum, an inline lint directive | the lint and the TypeScript compiler, held by `WhenTheLintIsConfigured` |
 | A rule with no refused or no accepted case | `WhenAnArchitectureTestIsWritten`; `spec/plants` for a check |
-| A door or a feature lost; a defect below its rung; a meaning with no carrier; a kind outside the grammar; a unit that proves nothing; a path with no verdict; a pin off its version; a hedge word in the spec | `spec/tools/check.py`, each check with its plants |
+| A door or a feature lost; a defect below its rung; a meaning with no carrier; a kind outside the grammar; a unit that proves nothing; a path with no verdict; a pin off its version; a generated binding off the spec; a hedge word in the spec | `spec/tools/check.py`, each check with its plants |
 | C# off the formatter; an unread private member or parameter | `dotnet format --verify-no-changes` and the build, in `scripts/check.sh` |
 | A package off its lock, a tool off its pin, a package with a known vulnerability | the locked restore, `scripts/doctor.sh` and both audits |
 | A raw `dotnet test` of a Playwright project or the solution; `git stash`; a listing of user secrets | the deny rules of `.claude/settings.json` |

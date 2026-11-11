@@ -3180,6 +3180,83 @@ def check_plants():
                   failed=len(verdicts) - caught - kept, unrefused=len(unrefused), unaccepted=len(unaccepted))
 
 
+WORLD_CONTRACT = REPO / "tests" / "Alis.Reactive.Conformance.World"
+WORLD_NAMESPACE = "Alis.Reactive.Conformance.World"
+
+
+def csharp_name(text):
+    return re.sub(r"\W", "_", text)
+
+
+def generated_gates():
+    app = json.loads((SPEC / "Reference" / "app.json").read_text())
+    held = [step["action"] for group in ("placements", "cells", "harnessTests") for entry in app[group] for step in entry.get("held", []) if step["action"]]
+    specs = sorted({action.split(".tla:")[0] for action in held})
+    enums = [f"public enum {spec}Gate\n{{\n" + "".join(f"    {action},\n" for action in spec_actions(spec)) + "}\n" for spec in specs]
+    return f"namespace {WORLD_NAMESPACE};\n\n" + "\n".join(enums)
+
+
+def held_gates(entry):
+    gates = [step["action"].replace(".tla:", "Gate.") for step in entry.get("held", []) if step["verb"] == "gate" and step["action"]]
+    return list(dict.fromkeys(gates))
+
+
+def promise_constants():
+    app = json.loads((SPEC / "Reference" / "app.json").read_text())
+    groups = {}
+    for placement in app["placements"]:
+        named = (csharp_name(f"{placement['for']}_{placement['index']}"), f"{placement['feature']} {placement['for']} {placement['index']}", held_gates(placement))
+        groups.setdefault(placement["feature"], []).append(named)
+    features = sorted(groups, key=lambda feature: [int(number) for number in re.findall(r"\d+", feature)])
+    ordered = {csharp_name(feature): groups[feature] for feature in features}
+    ordered["Cells"] = [(csharp_name(cell["cell"]), f"cell {cell['cell']}", held_gates(cell)) for cell in app["cells"] if "cell" in cell]
+    ordered["OwnCells"] = [(csharp_name(cell["own"]), f"own {cell['own']}", held_gates(cell)) for cell in app["cells"] if "own" in cell]
+    ordered["Harness"] = [(f"{test['fixture']}_{test['test']}", f"harness {test['fixture']}.{test['test']}", held_gates(test)) for test in app["harnessTests"]]
+    return ordered
+
+
+def generated_promises():
+    groups = promise_constants()
+    twice = [f"{group}.{name}" for group, constants in groups.items() for name, count in Counter(name for name, _, _ in constants).items() if count > 1]
+    if twice:
+        raise SystemExit("check.py --generate: two tests of the spec take one constant: " + ", ".join(twice))
+    classes = [f"    public static class {group}\n    {{\n"
+               + "".join("".join(f"        [Holds({gate})]\n" for gate in gates) + f"        public const string {name} = \"{value}\";\n" for name, value, gates in constants)
+               + "    }\n"
+               for group, constants in groups.items()]
+    return f"namespace {WORLD_NAMESPACE};\n\npublic static class Promises\n{{\n" + "\n".join(classes) + "}\n"
+
+
+def check_bindings():
+    try:
+        written = {"Gates.g.cs": generated_gates(), "Promises.g.cs": generated_promises()}
+    except SystemExit as stopped:
+        return result(False, str(stopped), problems=1)
+    problems = []
+    for name, text in written.items():
+        path = WORLD_CONTRACT / name
+        where = path.relative_to(REPO)
+        if not path.is_file():
+            problems.append(f"{where} is absent; check.py --generate writes it")
+            continue
+        held = path.read_text()
+        if held != text:
+            line = next(number for number, (ours, theirs) in enumerate(itertools.zip_longest(held.splitlines(), text.splitlines()), 1) if ours != theirs)
+            problems.append(f"{where} differs from what the spec writes at line {line}; a generated file is never edited by hand, and check.py --generate writes it")
+    constants = sum(len(group) for group in promise_constants().values())
+    gates, marks = written["Gates.g.cs"].count(",\n"), written["Promises.g.cs"].count("[Holds(")
+    detail = f"Gates.g.cs holds {gates} gates and Promises.g.cs {constants} constants, {marks} of a held gate marked on them, each as the spec writes it"
+    return result(not problems, "; ".join(problems) or detail, gates=gates, constants=constants, marks=marks, problems=len(problems))
+
+
+def generate():
+    written = {"Gates.g.cs": generated_gates(), "Promises.g.cs": generated_promises()}
+    for name, text in written.items():
+        (WORLD_CONTRACT / name).write_text(text)
+    print("generated " + " and ".join(str((WORLD_CONTRACT / name).relative_to(REPO)) for name in written))
+    return 0
+
+
 CHECKS = [
     ("survival", "brief, notes, file map, check, compact hook and pushed branch", check_survival),
     ("main_surface", "main's PublicAPI text per package and target framework", check_main_surface),
@@ -3219,6 +3296,7 @@ CHECKS = [
     ("actions", "every action of the async lanes' specs named by one promise, the test app's endpoint holding it", check_actions),
     ("app", "every test placed on the care home app, no core test loading Syncfusion, no environment on a care screen", check_app),
     ("slice_tests", "every rendered slice of Native, Fusion and their app-level objects with a placed behavior test of its own", check_slice_tests),
+    ("bindings", "the generated gates and promise constants are what the spec writes, never a hand's", check_bindings),
     ("plants", "every other check fails on each refused plant with its text and stays green on each accepted plant, run in throwaway worktrees", check_plants),
 ]
 
@@ -3232,7 +3310,7 @@ STEPS = [
     (7, "D", "The fluent API, gate 2", ["fluent", "gate2"], "Write spec/Fluent/sentences.json; present gate 2."),
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
-    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests", "plants"], "Finish every check and make each pass."),
+    (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests", "bindings", "plants"], "Finish every check and make each pass."),
     (11, "E", "REWRITE.md", ["rewrite_units", "unit_proofs", "packages", "paths", "names", "rewrite_cites"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]
@@ -3358,61 +3436,6 @@ def report_plants(names):
     passed = sum(1 for verdict in verdicts if verdict[2] in PLANT_PASSED)
     print(f"plants: {passed} of {len(verdicts)} as expected")
     return 0 if passed == len(verdicts) else 1
-
-
-WORLD_CONTRACT = REPO / "tests" / "Alis.Reactive.Conformance.World"
-WORLD_NAMESPACE = "Alis.Reactive.Conformance.World"
-
-
-def csharp_name(text):
-    return re.sub(r"\W", "_", text)
-
-
-def generated_gates():
-    app = json.loads((SPEC / "Reference" / "app.json").read_text())
-    held = [step["action"] for group in ("placements", "cells", "harnessTests") for entry in app[group] for step in entry.get("held", []) if step["action"]]
-    specs = sorted({action.split(".tla:")[0] for action in held})
-    enums = [f"public enum {spec}Gate\n{{\n" + "".join(f"    {action},\n" for action in spec_actions(spec)) + "}\n" for spec in specs]
-    return f"namespace {WORLD_NAMESPACE};\n\n" + "\n".join(enums)
-
-
-def held_gates(entry):
-    gates = [step["action"].replace(".tla:", "Gate.") for step in entry.get("held", []) if step["verb"] == "gate" and step["action"]]
-    return list(dict.fromkeys(gates))
-
-
-def promise_constants():
-    app = json.loads((SPEC / "Reference" / "app.json").read_text())
-    groups = {}
-    for placement in app["placements"]:
-        named = (csharp_name(f"{placement['for']}_{placement['index']}"), f"{placement['feature']} {placement['for']} {placement['index']}", held_gates(placement))
-        groups.setdefault(placement["feature"], []).append(named)
-    features = sorted(groups, key=lambda feature: [int(number) for number in re.findall(r"\d+", feature)])
-    ordered = {csharp_name(feature): groups[feature] for feature in features}
-    ordered["Cells"] = [(csharp_name(cell["cell"]), f"cell {cell['cell']}", held_gates(cell)) for cell in app["cells"] if "cell" in cell]
-    ordered["OwnCells"] = [(csharp_name(cell["own"]), f"own {cell['own']}", held_gates(cell)) for cell in app["cells"] if "own" in cell]
-    ordered["Harness"] = [(f"{test['fixture']}_{test['test']}", f"harness {test['fixture']}.{test['test']}", held_gates(test)) for test in app["harnessTests"]]
-    return ordered
-
-
-def generated_promises():
-    groups = promise_constants()
-    twice = [f"{group}.{name}" for group, constants in groups.items() for name, count in Counter(name for name, _, _ in constants).items() if count > 1]
-    if twice:
-        raise SystemExit("check.py --generate: two tests of the spec take one constant: " + ", ".join(twice))
-    classes = [f"    public static class {group}\n    {{\n"
-               + "".join("".join(f"        [Holds({gate})]\n" for gate in gates) + f"        public const string {name} = \"{value}\";\n" for name, value, gates in constants)
-               + "    }\n"
-               for group, constants in groups.items()]
-    return f"namespace {WORLD_NAMESPACE};\n\npublic static class Promises\n{{\n" + "\n".join(classes) + "}\n"
-
-
-def generate():
-    written = {"Gates.g.cs": generated_gates(), "Promises.g.cs": generated_promises()}
-    for name, text in written.items():
-        (WORLD_CONTRACT / name).write_text(text)
-    print("generated " + " and ".join(str((WORLD_CONTRACT / name).relative_to(REPO)) for name in written))
-    return 0
 
 
 def run_ci():
