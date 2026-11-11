@@ -606,6 +606,22 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   with check.py's test_rules hold every rule and smell of `.claude/rules/tests.md`; a unit writes its tests from their
   promises before the doors they need, and U2 lands the rules before the first feature test. The evidence: 51 test
   files of the redesign find their inputs with IdGenerator.For, which rule 7 of tests.md forbade in prose.
+- The owner, 2026-11-11, ending a session that lost the owner's trust (verbatim in `spec/NOTES.md`): "you have TLA plus.
+  You have proved everything"; "no low quality and low confidence even medium stuff goes through"; an analyzer is
+  written at the highest quality, "not a throw against the wall"; "this whole weeks of effort is to produce quality", so
+  the spec's work is used "unless there is bug fix with the knowledge and quality bar being held"; "i can not repeat all
+  the feedback i have given over the days"; the rewrite goes on "but not like this". That session put 4,307 of the 4,828
+  lines it added into `spec/tools/check.py` and its plants, wrote three of U2's four harness tests against rules the
+  same file states, and called a question the specs answer low confidence. So: the spec's work is used as it stands, and
+  a change to it is a bug fix made with its knowledge and at its bar; an analyzer and a test rule are written to the
+  highest bar, as 2026-11-06's decision states it; the owner's feedback is read from this section, `spec/NOTES.md` and
+  the lead's memory, and is never asked for again. The lead's rules from it, each the owner's to change: a line enters a
+  spec file or a test only after the rules its file states are read against it; a question the TLA+ specs, the
+  principles or the owner's decisions answer is decided from them and held; `spec/tools/check.py` and its plants change
+  only where a check reports wrongly on correct content or passes a defect met in content, each fix with a refused and
+  an accepted plant, and a new check waits for the owner's yes; no agent decides or words anything, and a fork takes one
+  bounded task and is landed or dropped in its session; a unit is committed on its own full check and its own rules
+  test; progress is the open queue shrinking toward U1's cut.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
