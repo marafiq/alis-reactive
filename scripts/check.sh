@@ -14,7 +14,7 @@ Runs every check that needs no browser, in order, and stops at the first that fa
   3. tsc -b over the runtime, then eslint with --max-warnings 0
   4. dotnet restore in locked mode, then dotnet build -c Release
   5. dotnet format --verify-no-changes over the solution
-  6. the architecture tests and the analyzer cases
+  6. the architecture tests, the analyzer cases and the test rules' cases
   7. python3 spec/tools/check.py --ci, which reads JAVA_HOME and TLA2TOOLS_JAR
 
 Options:
@@ -57,7 +57,7 @@ dotnet build Alis.Reactive.slnx -c Release --no-restore
 step "dotnet format --verify-no-changes"
 dotnet format Alis.Reactive.slnx --verify-no-changes --severity warn --no-restore
 
-for project in tests/Alis.Reactive.ArchitectureTests tests/Alis.Reactive.AnalyzerTests; do
+for project in tests/Alis.Reactive.ArchitectureTests tests/Alis.Reactive.AnalyzerTests tests/Alis.Reactive.TestRules.AnalyzerTests; do
   step "dotnet test $project"
   dotnet test "$project" -c Release --no-build
 done

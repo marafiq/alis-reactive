@@ -13,7 +13,11 @@ public class WhenAnArchitectureTestIsWritten
     private const string RefusedCase = "RefusedCase";
     private const string AcceptedCase = "AcceptedCase";
 
-    private static readonly (string Rules, string Cases)[] RulesProjects = [("Alis.Reactive.Analyzers/", "tests/Alis.Reactive.AnalyzerTests/")];
+    private static readonly (string Rules, string Cases)[] RulesProjects =
+    [
+        ("Alis.Reactive.Analyzers/", "tests/Alis.Reactive.AnalyzerTests/"),
+        ("tests/Alis.Reactive.TestRules/", "tests/Alis.Reactive.TestRules.AnalyzerTests/"),
+    ];
 
     private sealed record Written(string File, string Text);
 

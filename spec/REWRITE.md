@@ -428,7 +428,8 @@ runtime, and land in U3 with the file that finds a root's plans and the runtime'
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
 agreement in NuGet, npm and the lock; `tsc -b`; eslint; a locked `dotnet restore`; `dotnet build -c Release`;
-`dotnet format --verify-no-changes` over the solution; the architecture and analyzer tests; `check.py --ci`, which
+`dotnet format --verify-no-changes` over the solution; the architecture tests, the analyzer cases and the test
+rules' cases; `check.py --ci`, which
 its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (build, then run, with the selectors
 below, the result line and the leftover-server check); `scripts/test.sh` (both); `scripts/build.sh`,
 `scripts/run.sh`, `scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,

@@ -4,6 +4,8 @@ paths:
   - "poc/Alis.Reactive.Poc.Analyzers/**"
   - "tests/Alis.Reactive.AnalyzerTests/**"
   - "tests/Alis.Reactive.Poc.AnalyzerTests/**"
+  - "tests/Alis.Reactive.TestRules/**"
+  - "tests/Alis.Reactive.TestRules.AnalyzerTests/**"
 ---
 
 # Analyzers, suppressors and test rules
@@ -19,7 +21,7 @@ A test rule, TEST001 to TEST013 of `spec/REWRITE.md` section 2.10, is an analyze
 1. **One id, one rule, one line of the spec.** An ALIS id's line is its row in `spec/Analyzers/module.md` and the
    meaning that row names; a test rule's is its row in `spec/REWRITE.md` section 2.10. A rule with no line is not
    written. The id is a constant on the analyzer and opens its file's name. Its row, with its category and severity,
-   is in the project's `AnalyzerReleases.Unshipped.md`, and the build compares that file with every descriptor: an id
+   is in the project's own `<project>/AnalyzerReleases.Unshipped.md`, and the build compares that file with every descriptor: an id
    without its row fails the build (RS2000), as a public symbol without its PublicAPI line does. A project's rules
    share one category, the project's name. A rule with several messages holds one descriptor for each, all under
    its id.
@@ -64,7 +66,7 @@ errors, so the compiler's own rules for analyzers hold it: file or environment a
 (RS1035). It references Roslyn at the floor `spec/REWRITE.md` section 2.7 pins, the lowest compiler the packed
 analyzers load in: a compiler below an analyzer's Roslyn refuses to load it (CS9057). That reference is private to
 the project, so a project that hosts the compiler takes its own. Its two release files,
-`AnalyzerReleases.Shipped.md` and `AnalyzerReleases.Unshipped.md`, are additional files of the project.
+`<project>/AnalyzerReleases.Shipped.md` and `<project>/AnalyzerReleases.Unshipped.md`, are additional files of the project.
 
 ## The cases
 

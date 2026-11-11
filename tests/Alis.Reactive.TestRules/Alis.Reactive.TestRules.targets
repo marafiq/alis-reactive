@@ -1,0 +1,31 @@
+<Project>
+
+    <ItemGroup>
+        <AlisOwnPackage Include="@(PackageReference)" />
+        <AlisOwnFramework Include="@(FrameworkReference)" />
+        <AlisOwnProject Include="@(ProjectReference)" />
+        <AlisOwnFile Include="@(Reference)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(MSBuildThisFileDirectory)Alis.Reactive.TestRules.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <CompilerVisibleProperty Include="AlisTestReferences" />
+        <CompilerVisibleProperty Include="TestsAreStillBeingWritten" />
+    </ItemGroup>
+
+    <Target Name="HandTheTestRulesTheProjectsReferences" BeforeTargets="GenerateMSBuildEditorConfigFileShouldRun">
+        <ItemGroup>
+            <AlisTestReference Include="@(AlisOwnPackage->'package:%(Identity)')" />
+            <AlisTestReference Include="@(AlisOwnFramework->'framework:%(Identity)')" />
+            <AlisTestReference Include="@(AlisOwnProject->'analyzer:%(Filename)')" Condition="'%(AlisOwnProject.OutputItemType)' == 'Analyzer'" />
+            <AlisTestReference Include="@(AlisOwnProject->'build:%(Filename)')" Condition="'%(AlisOwnProject.OutputItemType)' != 'Analyzer' and '%(AlisOwnProject.ReferenceOutputAssembly)' == 'false'" />
+            <AlisTestReference Include="@(AlisOwnProject->'project:%(Filename)')" Condition="'%(AlisOwnProject.OutputItemType)' != 'Analyzer' and '%(AlisOwnProject.ReferenceOutputAssembly)' != 'false'" />
+            <AlisTestReference Include="@(AlisOwnFile->'file:%(Filename)')" />
+            <AlisTestReference Include="analyzer:Alis.Reactive.TestRules" />
+        </ItemGroup>
+        <PropertyGroup>
+            <AlisTestReferences>@(AlisTestReference, ',')</AlisTestReferences>
+        </PropertyGroup>
+    </Target>
+
+</Project>
