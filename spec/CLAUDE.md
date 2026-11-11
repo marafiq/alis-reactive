@@ -750,6 +750,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   run in node with no DOM; and a module's done, its tests green and each failing on its planted defect, is then
   checkable only once, at the end, for everything. This is the order the outside-in decision above runs in;
   `spec/REWRITE.md` section 4 is rewritten to it by the governance session.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`), on the governance session's cold read and on every review:
+  "don't make it so that every review or whatever the strategy you are using keep bringing issues and becomes an
+  infinite loop, and then it drift, and then it becomes its own work." A review is bounded before it starts: a
+  fixed list of questions, each with the answer that passes. A finding is an answer that fails, and nothing else. A
+  failed answer is fixed in the page it was read from and asked once more; after that second reading the review
+  ends, and what still fails goes to the owner in one line. What a reviewer raises outside its list is not worked:
+  it is one line to the owner. The governance session's work list closes when its inventory is written; an item
+  joins it after that only for a defect met while doing a listed item. The one round is no net for the writer: "tell
+  the first agent, either you or fork whoever writes that don't throw over the wall to one round we have, because
+  that is all bad behaviors that that agent will check and I will fix. I expect quality work on the first run."
+  Whoever writes a page or a piece of code, the lead or a fork, finishes it to the full bar before it is read.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
