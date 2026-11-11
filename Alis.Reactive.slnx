@@ -1,42 +1,8 @@
 <Solution>
-  <Folder Name="/.claude/">
-    <File Path="CLAUDE.md" />
-    <File Path=".claude/settings.json" />
-  </Folder>
-  <Folder Name="/.claude/rules/">
-    <File Path=".claude/rules/csharp.md" />
-    <File Path=".claude/rules/docs.md" />
-    <File Path=".claude/rules/tests.md" />
-    <File Path=".claude/rules/views.md" />
-  </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/Alis.Reactive.AnalyzerTests/Alis.Reactive.AnalyzerTests.csproj" />
     <Project Path="tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj" />
-    <Project Path="tests/Alis.Reactive.ClassNames.App/Alis.Reactive.ClassNames.App.csproj" />
-    <Project Path="tests/Alis.Reactive.ClassNames.PlaywrightTests/Alis.Reactive.ClassNames.PlaywrightTests.csproj" />
-    <Project Path="tests/Alis.Reactive.Framework.App/Alis.Reactive.Framework.App.csproj" />
-    <Project Path="tests/Alis.Reactive.Framework.PlaywrightTests/Alis.Reactive.Framework.PlaywrightTests.csproj" />
-    <Project Path="tests/Alis.Reactive.PlanTests/Alis.Reactive.PlanTests.csproj" />
-    <Project Path="tests/Alis.Reactive.PlaywrightTests/Alis.Reactive.PlaywrightTests.csproj" />
-    <Project Path="tests/Alis.Reactive.Playwright.TestHost/Alis.Reactive.Playwright.TestHost.csproj" />
   </Folder>
-  <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
-  <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
-  <Project Path="Alis.Reactive.NativeTagHelpers/Alis.Reactive.NativeTagHelpers.csproj" />
-  <Project Path="Alis.Reactive.Assets/Alis.Reactive.Assets.csproj" />
-  <Project Path="Alis.Reactive.DesignSystem/Alis.Reactive.DesignSystem.csproj" />
-  <Project Path="Alis.Reactive.SandboxApp/Alis.Reactive.SandboxApp.csproj" />
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />
-  <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />
-  <Folder Name="/tools/">
-    <Project Path="tools/PlanContractGenerator/PlanContractGenerator.csproj" />
-  </Folder>
-  <Folder Name="/build/">
-    <File Path="package.json" />
-    <File Path="eslint.config.js" />
-    <File Path="Directory.Build.props" />
-    <File Path="build/AlisReactiveStaticWebAssets.targets" />
-    <File Path="build/AlisReactiveNetFrameworkContent.targets" />
-    <File Path="build/AlisReactiveBrowserAssets.targets" />
-  </Folder>
+  <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
+  <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
 </Solution>

@@ -1,9 +1,0 @@
-@using Alis.Reactive.Framework.App.Partials
-@model CorrectionsPage
-@{
-    ViewData["Title"] = "The desk's corrections";
-}
-<h1>The desk's corrections</h1>
-
-@await Html.PartialAsync("RoomCorrection", new RoomCorrection())
-@await Html.PartialAsync("PhoneCorrection", new PhoneCorrection())

@@ -92,11 +92,11 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "| Plan schema | JsonSchema.Net 9.6.0 | PlanTests and the architecture tests read every plan against `plan.schema.json` |\n",
+    "old": "| NUnit, adapter, test SDK | NUnit 5.0.0, NUnit3TestAdapter 6.3.1, Microsoft.NET.Test.Sdk 18.11.1 | tests |\n",
     "new": ""
    }
   ],
-  "expect": "references JsonSchema.Net, which section 2.7 pins nowhere"
+  "expect": "references NUnit, which section 2.7 pins nowhere"
  },
  {
   "name": "the retirement's words gone",
@@ -138,6 +138,39 @@
     "file": "spec/REWRITE.md",
     "old": "| AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |\n| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |",
     "new": "| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |\n| AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a central version off its pin",
+  "edits": [
+   {
+    "file": "Directory.Packages.props",
+    "old": "<PackageVersion Include=\"PolySharp\" Version=\"1.17.0\" />",
+    "new": "<PackageVersion Include=\"PolySharp\" Version=\"1.16.0\" />"
+   }
+  ],
+  "expect": "takes PolySharp 1.16.0, and section 2.7 pins another version"
+ },
+ {
+  "name": "a version override off its pin",
+  "edits": [
+   {
+    "file": "tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj",
+    "old": "<PackageReference Include=\"Microsoft.CodeAnalysis.CSharp\" VersionOverride=\"5.9.0\" />",
+    "new": "<PackageReference Include=\"Microsoft.CodeAnalysis.CSharp\" VersionOverride=\"5.0.0\" />"
+   }
+  ],
+  "expect": "takes Microsoft.CodeAnalysis.CSharp 5.0.0, and section 2.7 pins another version"
+ },
+ {
+  "name": "a POC project at a version of its own",
+  "edits": [
+   {
+    "file": "poc/Alis.Reactive.Poc/Alis.Reactive.Poc.csproj",
+    "old": "<PackageReference Include=\"PolySharp\" Version=\"1.16.0\" PrivateAssets=\"all\" />",
+    "new": "<PackageReference Include=\"PolySharp\" Version=\"1.15.0\" PrivateAssets=\"all\" />"
    }
   ],
   "expect": null

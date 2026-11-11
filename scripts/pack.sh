@@ -11,10 +11,8 @@ Example:
   scripts/pack.sh 1.0.0-rc.1
 
 Builds delivery artifacts in order:
-  1. install npm dependencies if node_modules is missing
-  2. build the packages' browser assets
-  3. run dotnet build --configuration Release
-  4. pack the five shipped NuGet packages into ./nupkgs
+  1. run dotnet build --configuration Release
+  2. pack the shipped NuGet packages into ./nupkgs
 
 The script clears old .nupkg/.snupkg files from ./nupkgs first so the output
 list only contains packages from this run. dotnet pack never runs npm.
@@ -42,12 +40,6 @@ fi
 VERSION="$1"
 OUTPUT_DIR="nupkgs"
 
-echo "[pack] ensuring npm dependencies"
-[ -d node_modules ] || npm ci
-
-echo "[pack] building the packages' browser assets"
-npm run build:packages
-
 echo "[pack] compiling Release projects"
 dotnet build --configuration Release
 
@@ -55,8 +47,6 @@ PACKAGES=(
   Alis.Reactive
   Alis.Reactive.Native
   Alis.Reactive.Fusion
-  Alis.Reactive.DesignSystem
-  Alis.Reactive.NativeTagHelpers
 )
 
 mkdir -p "$OUTPUT_DIR"

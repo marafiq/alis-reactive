@@ -558,9 +558,10 @@ is never the reason.
 - `Alis.Reactive.SandboxApp` with `tests/Alis.Reactive.PlaywrightTests`; `tests/Alis.Reactive.Framework.App` with its
   16 components and `tests/Alis.Reactive.Framework.PlaywrightTests`; `tests/Alis.Reactive.ClassNames.App` and
   `tests/Alis.Reactive.ClassNames.PlaywrightTests`, now the host `classNames`; `scripts/framework-coverage.*`,
-  `scripts/vstest-filter.mjs`, every `playwright.project.sh`, `check_ci_shard_matrix`.
+  `check_ci_shard_matrix`.
 - `poc/`, the POC's test projects (`tests/Alis.Reactive.Poc.*`) and `tests/Alis.Reactive.Playwright.TestHost` they build
-  on, last: each proof ported by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC's
+  on, with what today's runner reads to run them, `scripts/vstest-filter.mjs` and each `playwright.project.sh`,
+  last: each proof ported by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC's
   analyzers rewritten in their modules' folders to section 2.10's authoring rules, their rules and cases the evidence,
   and its two architecture tests moved to the architecture tests,
   `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
@@ -570,7 +571,8 @@ is never the reason.
   `tests/Alis.Reactive.Consumer.Net48`; the build targets `build/AlisReactiveBrowserAssets.targets`,
   `build/AlisReactiveNetFrameworkContent.targets`, `build/AlisReactiveStaticWebAssets.targets` and main's
   `build/AlisReactiveAssets.targets`, which each package's own build target and static web assets replace (section 2.9,
-  U3); `Alis.Reactive.Assets/components/`, whose code moves into its package; jsdom and Tailwind.
+  U3); `Alis.Reactive.Assets/components/`, whose code moves into its package; Tailwind, and jsdom as a test's
+  browser, which the node probes alone still load.
 - Main's packages.config layout, by the owner's word on main (spec/CLAUDE.md, 2026-11-10). Main's build target reads a
   version from a packages.config folder too (`build/AlisReactiveAssets.targets:41-50` at 7b9e987cc), a path main never
   ran: its own MVC 5 app restores by PackageReference "so NuGet resolves transitive deps"
@@ -624,7 +626,26 @@ stated from D2.4 to D2.6, D2.9 and D4.2 (D2.8), since `WhenARuleNamesTheCode` fa
 removed. Each removed line stays readable at 65fdf118d or at main's SHA, which every cite pins, and `features_lost` at
 0 is each removed door's verdict. Until the `poc/` bullet's items leave, they keep their own package versions: those of
 their projects that write a version inline, which the central management the cut turns on refuses (NU1008), so the cut
-writes a `Directory.Packages.props` that turns it off in `poc/` and in each of their folders under `tests/`.
+writes a `Directory.Packages.props` that turns it off in `poc/`, in each of their folders under `tests/` and in
+`spec/probes/`, whose projects pin the version of the fact they read.
+
+What the cut leaves of a path section 2.1 holds:
+- Each shipped project that exists, the core, Native and Fusion, stays as an empty project: its project file and its
+  surface text, emptied, since `WhenCodeIsWritten` reads which packages ship from their `PublicAPI` folders. The
+  solution holds those three and the architecture tests.
+- A file whose whole content was the old lines' leaves and returns with the commit or unit that writes it: the
+  analyzers and their cases, the Assets project, PlanTests and the contract generator; `eslint.config.js` with the
+  lint; `scripts/test.sh` with `scripts/check.sh`; `scripts/run.sh` and the two architecture tests that sweep an app,
+  WhenAnAppRendersItsPages and SandboxStaticStateTests, in U2 with the conformance app.
+- Every other script and build file is reduced to what is true of the tree the cut leaves. `scripts/playwright.sh`
+  runs the POC's suites until U2 writes section 2.7's runner. `scripts/pin-syncfusion.mjs` reads the NuGet pin in
+  `Directory.Packages.props` and the npm pin in the root `package.json`, which drops its workspaces and declares what
+  the kept code loads, each at the version the tree held: TypeScript and esbuild for the POC's build and the rules
+  test, and EJ2, SignalR, jsdom, parse5 and ws for the probes.
+- The hook that refuses a hand edit of the generated contract follows it to `Alis.Reactive.Assets/runtime/Schema/`,
+  and WhenClaudeRunsAHook holds it there by the path, before U3 writes the two files.
+- `ci.yml`, `nightly.yml` and the publish workflow call the gate the cut removes, so each fails closed until U2
+  writes section 2.8's: no run reports green and no tag publishes in between.
 
 A unit ends when every test check.py assigns it passes on `scripts/playwright.sh`, each written from its promise
 before the doors it needs and failing then, and failing again on its planted defect, the specs its module owns are
@@ -642,7 +663,8 @@ Features: M20.F1
 
 The cut and the rewritten rule files (section 4's opening), the pins of section 2.7 with the TLC lock, central package
 management, the SliceTree tables, the analyzers project with ALIS010 to ALIS013 and module 20's rules, the lint at its
-strictest with its rules' cases (WhenTheLintIsConfigured), `check.py --ci`, `scripts/check.sh` green on an empty core, and every architecture test it keeps with its
+strictest with its rules' cases (WhenTheLintIsConfigured), `check.py --ci`, `scripts/check.sh` green on an empty core
+with `scripts/test.sh`, and every architecture test it keeps with its
 refused and accepted cases and WhenAnArchitectureTestIsWritten (section 2.10).
 
 ### U2. The harness, the conformance app's shell and CI
@@ -650,7 +672,8 @@ Features: none
 
 The app's areas, hosts, world, verbs, generated gates and bindings; the world contract; the Playwright project's
 harness, result line and leftover-server check; the test rules TEST001 to TEST013 with their cases (section 2.10),
-before any feature test is written; the CI workflows. Its own tests, app.json's `harnessTests`, prove the harness: two
+before any feature test is written; the CI workflows; `scripts/run.sh` and the two architecture tests over the app
+(section 2.1). Its own tests, app.json's `harnessTests`, prove the harness: two
 worlds isolated, and a held answer that reads the world as it is at its release; the held gate's type keeps a release
 before reached from compiling, and WhenAPlaywrightRunEnds's cases prove the runner, a run that selected no test failing
 among them. It measures and writes the waits, the budget and the

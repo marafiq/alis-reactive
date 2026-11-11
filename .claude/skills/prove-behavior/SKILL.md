@@ -45,6 +45,6 @@ scripts/plant-defect.sh --project poc --filter "FullyQualifiedName~Properties" -
 ## Report
 
 The proof is the tool's own lines from this run, a `[plant] caught:` line for each defect, and the clean run's
-result line from `scripts/playwright.sh` after the restore. An item not exercised names who owns it, a later POC or
-the `verify-net48` CI run; one this unit can reach is closed in it, not listed. Two failed attempts at one proof:
-stop and research.
+result line from `scripts/playwright.sh` after the restore. What the unit's door decides is proven in the unit; a
+host this machine lacks, MVC 5, is proven by CI's Windows job, and the report names that run. Two failed attempts at
+one proof: stop and research.

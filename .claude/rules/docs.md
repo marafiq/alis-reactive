@@ -31,10 +31,8 @@ Show small code (3-5 lines) that answers one question. Never dump big JSON blobs
 
 ## Code Examples
 
-All code must be verified in a working sandbox page before appearing in docs. Create the actual view/controller/model in SandboxApp, build, run, test in browser, then copy to docs.
-
-Cascade examples use real Gather pattern (`Alis.Reactive.SandboxApp/Areas/Sandbox/Views/Patterns/BedAssignment/Index.cshtml`):
-`.Gather<WingRoomsQuery>(g => g.Form(m => m.Wing))` -- never string concatenation for URLs.
+A code example in the docs is copied from a view a Playwright test runs, never written for the page: the view, its
+controller and its model exist in the conformance app, and the test that opens it passes.
 
 "If you get anything wrong in terms of syntax or explanation, users will not use it. It will never come back."
 
@@ -61,8 +59,8 @@ declares them, or is marked `csharp illustration`. What a rule cites from outsid
 ## Workflow
 
 1. Read the actual source code for the feature.
-2. Create a working sandbox example (view, controller, model).
-3. Build, run, verify in browser.
-4. Copy verified code to docs.
+2. Find the conformance app's screen that uses it, or write one with its test.
+3. Run its Playwright test and read the result line.
+4. Copy the view's code to the docs.
 5. Frame with question followed by answer. Progressive disclosure.
 6. Run Rider diagnostics. Fix warnings before committing.

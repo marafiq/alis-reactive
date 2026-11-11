@@ -1,8 +1,6 @@
 ---
 paths:
-  - "Alis.Reactive.Analyzers/**"
   - "poc/Alis.Reactive.Poc.Analyzers/**"
-  - "tests/Alis.Reactive.AnalyzerTests/**"
   - "tests/Alis.Reactive.Poc.AnalyzerTests/**"
 ---
 

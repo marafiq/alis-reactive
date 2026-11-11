@@ -1,7 +1,5 @@
 playwright_project=poc
 
-playwright_runtime=own
-
 playwright_shards="poc"
 
 playwright_shard_filter() {

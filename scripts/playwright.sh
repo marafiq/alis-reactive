@@ -30,7 +30,6 @@ load_project() {
   unset -f playwright_shard_filter playwright_check_assets playwright_build_assets playwright_sources
   playwright_project=""
   playwright_shards=""
-  playwright_runtime="framework"
   source "$1"
   project_dir="$(dirname "$1")"
   local name
@@ -96,7 +95,7 @@ check_asset_output_is_fresh() {
 
   if [ ! -f "$output" ]; then
     echo "[playwright:runner] ERROR: $label output '$output' does not exist." >&2
-    echo "[playwright:runner] Run scripts/build.sh before Playwright." >&2
+    echo "[playwright:runner] Build the project's assets before Playwright (poc/build.sh)." >&2
     exit 3
   fi
 
@@ -114,27 +113,9 @@ check_asset_output_is_fresh() {
     echo "[playwright:runner] ERROR: $label output is stale." >&2
     echo "[playwright:runner] Sources newer than '$output':" >&2
     printf '%s\n' "$changed" >&2
-    echo "[playwright:runner] Run scripts/build.sh before Playwright." >&2
+    echo "[playwright:runner] Build the project's assets before Playwright (poc/build.sh)." >&2
     exit 3
   fi
-}
-
-check_browser_assets_are_fresh() {
-  if [ "$playwright_runtime" = "own" ]; then
-    playwright_check_assets
-    return
-  fi
-  check_asset_output_is_fresh \
-    "runtime bundle" \
-    "Alis.Reactive.Assets/dist/scripts/alis-reactive.dev.js" \
-    Alis.Reactive.Assets/runtime \
-    Alis.Reactive.Assets/components \
-    Alis.Reactive.Assets/bundle.ts \
-    Alis.Reactive.Assets/esbuild.config.mjs \
-    Alis.Reactive.Assets/package.json \
-    Alis.Reactive.Assets/tsconfig.json
-
-  playwright_check_assets
 }
 
 check_no_build_is_fresh() {
@@ -145,9 +126,6 @@ check_no_build_is_fresh() {
   fi
 
   local sources=(
-    Alis.Reactive
-    Alis.Reactive.Analyzers
-    build
     tests/Alis.Reactive.Playwright.TestHost
     "$project_dir"
   )
@@ -198,12 +176,12 @@ usage() {
   cat <<USAGE
 Usage:
   scripts/playwright.sh
-  scripts/playwright.sh --project sandbox --filter "FullyQualifiedName~Components.Fusion.Grid"
+  scripts/playwright.sh --project poc --filter "FullyQualifiedName~Properties"
   scripts/playwright.sh --filter "Name=test_one|Name=test_two"
-  scripts/playwright.sh Components.Fusion.Grid
-  scripts/playwright.sh --shard fusion-s-z --no-build
-  scripts/playwright.sh --shard fusion-s-z --print-filter
-  scripts/playwright.sh --shard fusion-s-z --list --no-build
+  scripts/playwright.sh Properties
+  scripts/playwright.sh --shard poc --no-build
+  scripts/playwright.sh --shard poc --print-filter
+  scripts/playwright.sh --shard poc --list --no-build
 
 Projects (tests/*/playwright.project.sh): $(list_projects | tr '\n' ' ')
 Shards: $(list_shards | tr '\n' ' ')
@@ -227,7 +205,6 @@ Options:
                         times (default 0). A test that then passes is reported as flaky:
                         [playwright:flaky] lines and TestResults/observable/flaky-<stamp>.txt.
   --no-build            Skip the project build and run the existing binaries.
-                        Use after scripts/build.sh.
                         Fails if C# or Razor sources are newer than the test DLL.
   --configuration <cfg> Build/test configuration. Defaults to Debug.
   --hang-timeout <dur>  Per-test blame-hang timeout. Defaults to 10m.
@@ -441,7 +418,7 @@ run_project() {
   echo "[playwright:runner] hang-timeout=$hang_timeout"
   echo "[playwright:runner] retry-failed=$retry_failed"
 
-  check_browser_assets_are_fresh
+  playwright_check_assets
 
   if [ "$no_build" -eq 0 ]; then
     echo "[playwright:runner] building test project"

@@ -11,17 +11,5 @@ node_modules/
 /tools/*
 !/tools/PlanContractGenerator/
 
-.sonarqube/
 .DS_Store
 TestResults/
-
-Alis.Reactive.Assets/dist/
-Alis.Reactive.DesignSystem/dist/
-Alis.Reactive.SandboxApp/wwwroot/vendor/
-Alis.Reactive.SandboxApp/wwwroot/js/sandbox-plugins.js
-Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.js
-Alis.Reactive.SandboxApp/wwwroot/js/sandbox-components.css
-Alis.Reactive.SandboxApp/wwwroot/css/sandbox.css
-
-tests/Alis.Reactive.Framework.App/wwwroot/js/
-tests/Alis.Reactive.Framework.App/wwwroot/css/

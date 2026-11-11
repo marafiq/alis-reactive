@@ -2426,13 +2426,16 @@ def stated(relative, phrase):
     return " ".join(phrase.split()) in " ".join((SPEC / relative).read_text().split())
 
 
+CENTRAL_VERSIONS = "Directory.Packages.props"
+
+
 def kept_references(held):
     folders = sorted(path for path in held if path not in ("tests", "spec"))
     references = {}
-    for path in git("ls-files", "*.csproj").splitlines():
-        if any(path.startswith(folder + "/") for folder in folders):
+    for path in git("ls-files", "*.csproj", CENTRAL_VERSIONS).splitlines():
+        if path == CENTRAL_VERSIONS or any(path.startswith(folder + "/") for folder in folders):
             text = (REPO / path).read_text()
-            for name, version in re.findall(r'Include="([^"$]+)" Version="([^"]+)"', text) + re.findall(r'Sdk="([^"/]+)/([^"]+)"', text):
+            for name, version in re.findall(r'Include="([^"$]+)" Version(?:Override)?="([^"]+)"', text) + re.findall(r'Sdk="([^"/]+)/([^"]+)"', text):
                 references.setdefault(name, set()).add((path, version))
     return references
 

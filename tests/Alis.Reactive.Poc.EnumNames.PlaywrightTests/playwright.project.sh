@@ -1,7 +1,5 @@
 playwright_project=poc-enum-names
 
-playwright_runtime=own
-
 playwright_shards="poc-enum-names"
 
 playwright_shard_filter() {

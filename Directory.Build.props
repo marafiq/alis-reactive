@@ -13,7 +13,6 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <WarningsAsErrors>$(WarningsAsErrors);RS0016;RS0017;RS0022;RS0024;RS0025;RS0048;IDE0007;IDE0011;IDE0040;IDE0052;IDE0055;IDE0059;IDE0060;IDE2000;IDE2002;IDE2004;IDE2006;CA1012;CA1822</WarningsAsErrors>
     <NoWarn>$(NoWarn);RS0026</NoWarn>
-    <AlisAssetsDist>$(MSBuildThisFileDirectory)Alis.Reactive.Assets\dist</AlisAssetsDist>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

@@ -15,18 +15,21 @@ public class WhenARuleNamesTheCode
 {
     private const string ThisFile = "tests/Alis.Reactive.ArchitectureTests/" + nameof(WhenARuleNamesTheCode) + ".cs";
 
-    private static readonly string[] Branches = ["origin/main", "feature/", "feature/<name>", "fix/", "chore/"];
-    private static readonly string[] OutsideWhatGitTracks = [".worktrees/<name>", "tests/TestResults/framework-coverage/<stamp>/report.md"];
-    private static readonly string[] Placeholders =
-        ["FusionX", "XxxBuilder", "vX", "Namespace_Type__Member_Path", "file:line", "target <- source", "[component] [framework] playwright [behavior]"];
+    private static readonly string[] Branches = ["origin/main", "feature/", "feature/<name>", "feature/rewrite", "fix/", "chore/"];
+    private static readonly string[] OutsideWhatGitTracks = [".worktrees/<name>"];
+    private static readonly string[] Placeholders = ["vX", "file:line"];
     private static readonly string[] WhatTheRulesForbid =
-        ["page.evaluate()", "window.alis", "InternalsVisibleTo", "vi.mock", "spyOn", "writes_a_let_statement", "set_prop_mutation_writes_value_to_ej2_instance"];
+        ["page.evaluate()", "window.alis", "InternalsVisibleTo", "ToContainTextAsync", "writes_a_let_statement", "set_prop_mutation_writes_value_to_ej2_instance"];
     private static readonly string[] VendorTypes = ["EmitType", "ChangeEventArgs"];
+    private static readonly string[] PlatformMembers = ["Year", "Application_Start", "FlagsAttribute", "Clock"];
     private static readonly string[] OperatorsTheSpecDecides = ["eqDecimal"];
     private static readonly string[] WhatAnAnalyzerUnitAdds =
         ["AnalyzerReleases.Shipped.md", "AnalyzerReleases.Unshipped.md", "CSharpAnalyzerTest", "DefaultVerifier", "RefusedCase", "AcceptedCase"];
     private static readonly string[] NotInTheRepo =
-        [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. OperatorsTheSpecDecides, .. WhatAnAnalyzerUnitAdds];
+    [
+        .. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. PlatformMembers, .. OperatorsTheSpecDecides,
+        .. WhatAnAnalyzerUnitAdds,
+    ];
 
     private static readonly CSharpParseOptions ForNet10 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols("NET6_0_OR_GREATER");
     private static readonly CSharpParseOptions ForNet48 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols("NET48");

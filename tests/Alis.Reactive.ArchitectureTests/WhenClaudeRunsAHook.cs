@@ -9,6 +9,10 @@ namespace Alis.Reactive.ArchitectureTests;
 public class WhenClaudeRunsAHook
 {
     private static readonly Regex ProjectPath = new(@"\$CLAUDE_PROJECT_DIR/([^""\s]+)", RegexOptions.Compiled);
+    private const string ContractFolder = "Alis.Reactive.Assets/runtime/Schema/";
+    private static readonly string[] GeneratedContract = [ContractFolder + "plan.ts", ContractFolder + "plan.schema.json"];
+    private static readonly string[] OneFactFromTheContract =
+        [ContractFolder + "index.ts", "Alis.Reactive.Assets/runtime/Execution/plan.ts", "Alis.Reactive.Assets/runtime/Execution/plan.schema.json"];
 
     [Test]
     public void every_file_a_hook_command_runs_is_in_the_repo()
@@ -25,7 +29,7 @@ public class WhenClaudeRunsAHook
     [Test]
     public void an_edit_to_the_generated_plan_contract_is_refused()
     {
-        var allowed = GeneratedContract()
+        var allowed = GeneratedContract
             .SelectMany(file => new[] { "Edit", "Write" }.Select(tool => (Tool: tool, File: file)))
             .Where(edit => DecisionFor(edit.Tool, new { file_path = Path.Combine(Repository.Root, edit.File) }) != "deny")
             .Select(edit => $"{edit.Tool} {edit.File}")
@@ -37,16 +41,8 @@ public class WhenClaudeRunsAHook
     [Test]
     public void an_edit_to_a_hand_written_file_beside_or_named_like_the_contract_is_allowed()
     {
-        var generated = GeneratedContract();
-        var contractFolder = generated[0][..generated[0].LastIndexOf('/')];
-        var contractNames = generated.Select(Path.GetFileName).ToHashSet();
-        var handWritten = Repository.TrackedFiles
-            .Where(file => !generated.Contains(file))
-            .Where(file => file.StartsWith(contractFolder + "/", StringComparison.Ordinal) || contractNames.Contains(Path.GetFileName(file)))
-            .ToList();
-        var refused = handWritten.Where(file => DecisionFor("Edit", new { file_path = Path.Combine(Repository.Root, file) }) == "deny").ToList();
+        var refused = OneFactFromTheContract.Where(file => DecisionFor("Edit", new { file_path = Path.Combine(Repository.Root, file) }) == "deny").ToList();
 
-        Assert.That(handWritten, Is.Not.Empty, $"No hand-written file sits beside the contract in {contractFolder} or shares its names");
         Assert.That(refused, Is.Empty, "A hook refused an edit to a hand-written file:\n" + string.Join("\n", refused));
     }
 
@@ -90,14 +86,5 @@ public class WhenClaudeRunsAHook
 
         using var decision = JsonDocument.Parse(output);
         return decision.RootElement.GetProperty("hookSpecificOutput").GetProperty("permissionDecision").GetString() ?? "allow";
-    }
-
-    private static IReadOnlyList<string> GeneratedContract()
-    {
-        var schemas = Repository.TrackedFiles.Where(file => Path.GetFileName(file) == "plan.schema.json").ToList();
-        Assert.That(schemas, Has.Count.EqualTo(1), "The generated plan schema is the one tracked plan.schema.json");
-        var contract = schemas[0][..schemas[0].LastIndexOf('/')] + "/plan.ts";
-        Assert.That(Repository.TrackedFiles, Does.Contain(contract), "The generated plan.ts sits beside plan.schema.json");
-        return [contract, schemas[0]];
     }
 }

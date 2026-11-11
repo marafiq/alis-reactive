@@ -2,39 +2,13 @@
   "name": "alis-reactive",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "Alis.Reactive.Assets",
-    "Alis.Reactive.DesignSystem",
-    "Alis.Reactive.SandboxApp",
-    "tests/Alis.Reactive.Framework.App"
-  ],
-  "scripts": {
-    "build:packages": "npm run build -w Alis.Reactive.Assets && npm run build -w Alis.Reactive.DesignSystem",
-    "build:apps": "npm run build -w Alis.Reactive.SandboxApp",
-    "build:all": "npm run build:packages && npm run build:apps",
-    "generate:plan-types": "npm run generate:plan-types -w Alis.Reactive.Assets",
-    "build:runtime": "npm run build:runtime -w Alis.Reactive.Assets",
-    "build:design-system": "npm run build -w Alis.Reactive.DesignSystem",
-    "build:sandbox": "npm run build -w Alis.Reactive.SandboxApp",
-    "build:framework-app": "npm run build -w tests/Alis.Reactive.Framework.App",
-    "watch:framework-app": "npm run watch -w tests/Alis.Reactive.Framework.App",
-    "watch:runtime": "npm run watch:runtime -w Alis.Reactive.Assets",
-    "watch:design-system": "npm run watch -w Alis.Reactive.DesignSystem",
-    "watch:sandbox-plugins": "npm run watch:plugins -w Alis.Reactive.SandboxApp",
-    "watch:sandbox-css": "npm run watch:css -w Alis.Reactive.SandboxApp",
-    "typecheck": "npm run typecheck -w Alis.Reactive.Assets && npm run typecheck -w Alis.Reactive.SandboxApp && npm run typecheck -w tests/Alis.Reactive.Framework.App",
-    "lint": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/ tests/Alis.Reactive.Framework.App/Components/",
-    "lint:fix": "eslint Alis.Reactive.Assets/runtime/ Alis.Reactive.SandboxApp/Scripts/ tests/Alis.Reactive.Framework.App/Components/ --fix",
-    "test": "npm run test -w Alis.Reactive.Assets && npm run test -w Alis.Reactive.SandboxApp",
-    "test:watch": "npm run test:watch -w Alis.Reactive.Assets",
-    "coverage:framework": "bash scripts/framework-coverage.sh",
-    "watch:framework-css": "npm run watch:css -w tests/Alis.Reactive.Framework.App"
-  },
   "devDependencies": {
-    "@eslint/js": "9.39.5",
-    "eslint": "9.39.4",
-    "source-map-js": "1.2.1",
+    "@microsoft/signalr": "10.0.11",
+    "@syncfusion/ej2": "33.1.47",
+    "esbuild": "0.28.2",
+    "jsdom": "27.4.0",
+    "parse5": "8.0.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.70.1"
+    "ws": "7.5.11"
   }
 }

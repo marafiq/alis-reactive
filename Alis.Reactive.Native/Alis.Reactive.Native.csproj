@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
         <TargetFrameworks>net48;net10.0</TargetFrameworks>
@@ -15,25 +15,17 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-        <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
-        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
-        <PackageReference Include="PolySharp" Version="1.17.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.AspNet.Mvc" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="all" />
+        <PackageReference Include="PolySharp" PrivateAssets="all" />
         <Reference Include="System.Web" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
-        <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <AdditionalFiles Include="SliceTree.txt" />
-        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="5.6.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
-
-    <ItemGroup>
-        <AlisReactiveStaticWebAsset Include="css\native.css" RelativePath="css/native.css" />
-    </ItemGroup>
-
-    <Import Project="..\build\AlisReactiveStaticWebAssets.targets" />
 
 </Project>

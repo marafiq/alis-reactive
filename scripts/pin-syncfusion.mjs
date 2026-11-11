@@ -4,12 +4,11 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const FUSION_CSPROJ = "Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj";
+const NUGET_PINS = "Directory.Packages.props";
 const NUGET_IDS = ["Syncfusion.EJ2.AspNet.Core", "Syncfusion.EJ2.MVC5"];
 const UMBRELLA = "@syncfusion/ej2";
-const APPS = [
-  { manifest: "Alis.Reactive.SandboxApp/package.json", lock: "package-lock.json" },
-];
+const MANIFEST = "package.json";
+const LOCK = "package-lock.json";
 
 function readJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
@@ -19,28 +18,26 @@ function writeJson(path, value) {
   writeFileSync(path, JSON.stringify(value, null, 2) + "\n");
 }
 
-function csprojVersion(csproj, id) {
-  const match = new RegExp(`Include="${id.replace(/\./g, "\\.")}" Version="([^"]+)"`).exec(csproj);
+function nugetPin(pins, id) {
+  const match = new RegExp(`<PackageVersion Include="${id.replace(/\./g, "\\.")}" Version="([^"]+)"`).exec(pins);
   return match ? match[1] : null;
 }
 
 function check() {
   const problems = [];
-  const csproj = readFileSync(FUSION_CSPROJ, "utf8");
-  const pin = csprojVersion(csproj, NUGET_IDS[0])?.replace(/^\[|\]$/g, "");
+  const pins = readFileSync(NUGET_PINS, "utf8");
+  const pin = nugetPin(pins, NUGET_IDS[0])?.replace(/^\[|\]$/g, "");
   if (!/^\d+\.\d+\.\d+$/.test(pin ?? "")) {
-    problems.push(`${FUSION_CSPROJ} ${NUGET_IDS[0]} must pin an exact [version], got ${csprojVersion(csproj, NUGET_IDS[0])}`);
+    problems.push(`${NUGET_PINS} ${NUGET_IDS[0]} must pin an exact [version], got ${nugetPin(pins, NUGET_IDS[0])}`);
   }
   for (const id of NUGET_IDS) {
-    const nugetPin = csprojVersion(csproj, id);
-    if (nugetPin !== `[${pin}]`) problems.push(`${FUSION_CSPROJ} ${id} must use [${pin}], got ${nugetPin}`);
+    const pinned = nugetPin(pins, id);
+    if (pinned !== `[${pin}]`) problems.push(`${NUGET_PINS} ${id} must use [${pin}], got ${pinned}`);
   }
-  for (const app of APPS) {
-    const npmPin = readJson(app.manifest).dependencies?.[UMBRELLA];
-    if (npmPin !== pin) problems.push(`${app.manifest} ${UMBRELLA} must be ${pin}, got ${npmPin}`);
-    const locked = readJson(app.lock).packages[`node_modules/${UMBRELLA}`]?.version;
-    if (locked !== pin) problems.push(`${app.lock} resolves ${UMBRELLA} to ${locked}, pinned to ${pin}`);
-  }
+  const npmPin = readJson(MANIFEST).devDependencies?.[UMBRELLA];
+  if (npmPin !== pin) problems.push(`${MANIFEST} ${UMBRELLA} must be ${pin}, got ${npmPin}`);
+  const locked = readJson(LOCK).packages[`node_modules/${UMBRELLA}`]?.version;
+  if (locked !== pin) problems.push(`${LOCK} resolves ${UMBRELLA} to ${locked}, pinned to ${pin}`);
 
   if (problems.length > 0) {
     console.error("pin-syncfusion --check: FAILED");
@@ -48,7 +45,7 @@ function check() {
     console.error("Fix: node scripts/pin-syncfusion.mjs <version>, then npm ci.");
     process.exit(1);
   }
-  console.log(`pin-syncfusion --check: Syncfusion ${pin} pinned in NuGet and in ${APPS.length} app manifest(s) and lock(s)`);
+  console.log(`pin-syncfusion --check: Syncfusion ${pin} pinned in ${NUGET_PINS}, ${MANIFEST} and ${LOCK}`);
 }
 
 function npmView(spec, field) {
@@ -67,24 +64,21 @@ async function pin(version) {
   if (npmView(`${UMBRELLA}@${version}`, "version") !== version) throw new Error(`${UMBRELLA}@${version} is not on npm`);
   for (const id of NUGET_IDS) await assertNugetVersionExists(id, version);
 
-  let csproj = readFileSync(FUSION_CSPROJ, "utf8");
+  let pins = readFileSync(NUGET_PINS, "utf8");
   for (const id of NUGET_IDS) {
-    const pattern = new RegExp(`(Include="${id.replace(/\./g, "\\.")}" Version=")[^"]+(")`);
-    if (!pattern.test(csproj)) throw new Error(`${FUSION_CSPROJ} has no PackageReference for ${id}`);
-    csproj = csproj.replace(pattern, `$1[${version}]$2`);
+    const pattern = new RegExp(`(<PackageVersion Include="${id.replace(/\./g, "\\.")}" Version=")[^"]+(")`);
+    if (!pattern.test(pins)) throw new Error(`${NUGET_PINS} has no PackageVersion for ${id}`);
+    pins = pins.replace(pattern, `$1[${version}]$2`);
   }
-  writeFileSync(FUSION_CSPROJ, csproj);
+  writeFileSync(NUGET_PINS, pins);
 
-  for (const app of APPS) {
-    const manifest = readJson(app.manifest);
-    manifest.dependencies[UMBRELLA] = version;
-    writeJson(app.manifest, manifest);
-    execFileSync("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit", "--no-fund"],
-      { cwd: dirname(app.lock), stdio: "inherit" });
-  }
+  const manifest = readJson(MANIFEST);
+  manifest.devDependencies[UMBRELLA] = version;
+  writeJson(MANIFEST, manifest);
+  execFileSync("npm", ["install", "--package-lock-only", "--ignore-scripts", "--no-audit", "--no-fund"], { stdio: "inherit" });
 
-  console.log(`pinned Syncfusion ${version}: ${NUGET_IDS.join(", ")}; ${UMBRELLA} in ${APPS.map(app => app.manifest).join(", ")}`);
-  console.log("next: npm ci && node scripts/pin-syncfusion.mjs --check && scripts/test.sh --parallel");
+  console.log(`pinned Syncfusion ${version}: ${NUGET_IDS.join(", ")} in ${NUGET_PINS}; ${UMBRELLA} in ${MANIFEST}`);
+  console.log("next: npm ci && node scripts/pin-syncfusion.mjs --check, then python3 spec/tools/check.py, whose probes read the new version");
 }
 
 process.chdir(join(dirname(fileURLToPath(import.meta.url)), ".."));

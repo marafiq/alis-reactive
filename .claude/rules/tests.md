@@ -11,25 +11,24 @@ because every page an app builds rests on them. A test is a page authored the wa
 one, run the way a browser runs it, with one gesture and one observable outcome. Never change framework code
 to make a test pass: when a valid test fails, report the bug.
 
-The rules govern every Playwright test. `tests/Alis.Reactive.Framework.PlaywrightTests` proves the
-framework itself and adds the Framework tests section; `tests/Alis.Reactive.PlaywrightTests` proves the
-shipped components and the sandbox journeys and adds the Component and journey tests section.
+The rules govern every Playwright test. A compiler rule or a named check holds each of them and each smell
+(`spec/REWRITE.md`, section 2.10, the test rules TEST001 to TEST013, which U2 lands before the first feature test).
 
 ## The rules
 
 1. **One promise, named as the promise.** A test proves one thing a developer or a user is promised: what a
-   public member's XML docs say, a behavior of the plan grammar (`Alis.Reactive/Grammar`), or what a role sees on a journey.
-   The fixture is the situation (`WhenAPageBranches`, `WhenCoordinatorAssignsABed`); the test is the promise
-   as a sentence (`else_runs_only_when_no_arm_holds`). A name that describes code
-   (`writes_a_let_statement`, `set_prop_mutation_writes_value_to_ej2_instance`) describes no promise.
+   public member's XML docs say, a behavior of the plan grammar (`spec/Core/schema.md`), or what a role sees on a
+   screen. The fixture is the situation, When and what holds; the test is the promise as a sentence, as its line in
+   the spec states it. A name that describes code (`writes_a_let_statement`,
+   `set_prop_mutation_writes_value_to_ej2_instance`) describes no promise.
 2. **The public surface only.** Arrange as a developer does: Razor helpers, plan builders, validators
    registered through DI, components declared on `Component`. No `InternalsVisibleTo`, no internal
    constructor, no reflection. A behavior a developer cannot reach is given a public, typed door; it is
    never tested through internals.
 3. **Real collaborators.** A real browser, a real server, real HTTP, the real DOM, and the gestures root
-   CLAUDE.md names. No mocking library and no stub, spy or fake (not `vi.fn`, `vi.mock`, `vi.spyOn`,
-   `vi.stubGlobal`, not an object whose methods the test writes). What a server answers comes from an endpoint
-   of the test app, written as an app would.
+   CLAUDE.md names. No mocking library and no stub, spy or fake, of the framework's code or of the boundary it talks
+   to, and no object whose methods the test writes. What a server answers comes from an endpoint of the test app,
+   written as an app would.
 4. **An outcome someone observes.** Assert what the user sees (text, value, visibility, focus, a state
    class), what the server received (the body a gather sent), or what the developer
    reads (the message a page is refused with). Never the plan JSON, internal state, call counts or log
@@ -78,38 +77,26 @@ Each means a test proves less than its name claims; the number is the rule it br
 - A name that describes the code instead of the promise (1).
 - A component library on a framework test's page (3).
 
-## Framework tests
+## Core tests
 
 The system under test is the whole framework (the C# builders, the plan, the runtime and the browser
 together) for the core package, its validation included, and the runtime. Their components are plain-DOM
 declarations the test app brings through the extension point an app uses (`Component`, `ComponentVendor`):
-the conformance library's components (spec/Reference/native.json) are the components on a framework test's page and
+the conformance library's components (`spec/Reference/native.json`) are the components on a core test's page and
 no Syncfusion component appears on one, so a Fusion change cannot fail one and a framework defect cannot hide behind one.
 
-`tests/Alis.Reactive.PlanTests` arrange through the public surface but assert recorded plans (4, 7), and
-the runtime's vitest suites run in jsdom with stubs (3). They are feedback while coding, not proof.
+A test that references the code it gives feedback on (vitest beside the runtime, a recorded plan) is feedback while
+coding, never proof.
 
-## Component and journey tests
+## Where a test lives
 
-**Nested vertical slices.** Every suite derives from one senior-living journey and owns its slice: its own
-model, controller partial, view and fixture, under the same concern path in every tree, names aligned.
-Grid's `Billing` slice is the exemplar. A component with many use cases fans out into many journeys, each a
-full slice. The slice is the test's arrange; framework refactoring changes no slice, and a slice changes
-only with its own journey.
+Every browser test runs on one screen of the care home conformance app, in a world of its own:
+`spec/Reference/app.json` names each test's screen, hosts, parts and harness verbs. A test sits in the folder of the
+module whose test it is, under the screen it runs on, and no module's tests use another's helpers
+(`spec/REWRITE.md`, sections 2.3 and 2.4).
 
-1. Own model, referenced by no other journey.
-2. Own view: one route that no other fixture opens. Dialog and drawer flows on a page belong to its journey.
-3. Own data, unreachable from other journeys. No static mutable state, no shared fake-data class; immutable
-   option lists are fine.
-4. Own world: the fixture passes alone, in parallel and in any order.
-
-**Seven behaviors per input component.** It renders with its initial state; a user action runs its
-pipeline; invalid input shows its message inline; a condition turns a rule on and off; a valid correction
-clears the message without a resubmit; its value is gathered into the request; a valid form submits and the
-page shows the server's answer.
-
-**Names.** Folders are the concern (`**/Patterns/BedAssignment/`); the folder carries the vendor, so names
-carry no vendor prefix (`Components/Fusion/DatePicker/WhenDateSelected.cs`).
+A shipped slice's tests prove only what its declaration adds: its members' names and shapes, its browser facts and
+its own defects. A framework behavior is proven once, on the conformance library, and never again through a slice.
 
 ## Review
 

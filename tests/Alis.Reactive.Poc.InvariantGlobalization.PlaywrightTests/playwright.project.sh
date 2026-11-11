@@ -1,7 +1,5 @@
 playwright_project=poc-invariant-globalization
 
-playwright_runtime=own
-
 playwright_shards="poc-invariant-globalization"
 
 playwright_shard_filter() {

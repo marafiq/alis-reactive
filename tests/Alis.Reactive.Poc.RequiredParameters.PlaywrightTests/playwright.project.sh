@@ -1,7 +1,5 @@
 playwright_project=poc-required-parameters
 
-playwright_runtime=own
-
 playwright_shards="poc-required-parameters"
 
 playwright_shard_filter() {
