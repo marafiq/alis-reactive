@@ -22,13 +22,17 @@ STATE = SPEC / "STATE.json"
 MAIN_SHA = "623dd4a272f8134fb692985fd04ae7151954c9f0"
 BASE_SHA = "65fdf118d1498a8285db84a43c4da81dfaa0ea3e"
 MAIN_TIP = "7b9e987cc3b9991c1107aa782bc3f6e8486968f9"
-SPEC_BRANCH = "feature/spec-first"
-JAVA = "/opt/homebrew/opt/openjdk/bin/java"
-TLA_JAR = Path.home() / ".local/share/tlaplus/tla2tools.jar"
+SPEC_BRANCH = "feature/rewrite"
+JAVA = str(Path(os.environ["JAVA_HOME"]) / "bin" / "java") if os.environ.get("JAVA_HOME") else "/opt/homebrew/opt/openjdk/bin/java"
+TLA_JAR = Path(os.environ["TLA2TOOLS_JAR"]) if os.environ.get("TLA2TOOLS_JAR") else Path.home() / ".local/share/tlaplus/tla2tools.jar"
 TLA_LOCK = SPEC / "tools" / "tla2tools.lock"
 TLC_GREEN = "Model checking completed. No error has been found."
 LOCAL_SETTINGS = Path("/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.claude/settings.local.json")
-HOOK_COMMAND = "cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/spec-first; python3 spec/tools/check.py --orient"
+HOOK_COMMAND = "cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite; python3 spec/tools/check.py --orient"
+CI_SKIPPED = ("survival", "probes")
+CI_TOOLS = ("JAVA_HOME", "TLA2TOOLS_JAR")
+CI_CACHE = "TLC_CACHE"
+SKIPPED = ()
 HANDOFF = Path.home() / ".claude/projects/-Users-muhammadadnanrafiq-Documents-Code-alis-reactive-framework-1-0-Alis-Reactive/memory/project-spec-first-branch.md"
 OWNER_LINE = re.compile(r"^- The owner, (\d{4}-\d{2}-\d{2})")
 
@@ -3153,8 +3157,8 @@ def run_plants(sets):
 
 def check_plants():
     sets = plant_sets()
-    known = [check_id for check_id, _, _ in CHECKS if check_id not in PLANT_EXEMPT]
-    problems = [f"spec/plants/{name}.json names no check of check.py" for name in sets if name not in known]
+    known = [check_id for check_id, _, _ in CHECKS if check_id not in PLANT_EXEMPT and check_id not in SKIPPED]
+    problems = [f"spec/plants/{name}.json names no check of check.py" for name in sets if name not in known and name not in SKIPPED]
     for check_id, plants in sets.items():
         problems += plant_shape_problems(check_id, plants)
     if problems:
@@ -3234,6 +3238,8 @@ STEPS = [
 def run_checks(brief, previous):
     outcomes = {}
     for check_id, _, function in CHECKS:
+        if check_id in SKIPPED:
+            continue
         if check_id == "core_tlc":
             outcomes[check_id] = check_tlc(brief, previous, 4)
         elif check_id == "tlc":
@@ -3267,10 +3273,11 @@ def counts_text(counts):
 
 def report(outcomes, step, brief):
     passed = sum(1 for outcome in outcomes.values() if outcome["pass"])
-    lines = [f"spec check at {git('rev-parse', '--short', 'HEAD')}: {passed} of {len(outcomes)} checks pass",
-             f"phase {step['phase']}, step {step['number']}: {step['name']}",
-             f"next: {step['next']}"]
+    lines = [f"spec check at {git('rev-parse', '--short', 'HEAD')}: {passed} of {len(outcomes)} checks pass"]
+    lines += [f"phase {step['phase']}, step {step['number']}: {step['name']}", f"next: {step['next']}"] if step else []
     for check_id, title, _ in CHECKS:
+        if check_id not in outcomes:
+            continue
         outcome = outcomes[check_id]
         mark = "PASS" if outcome["pass"] else "FAIL"
         if brief:
@@ -3350,10 +3357,28 @@ def report_plants(names):
     return 0 if passed == len(verdicts) else 1
 
 
+def run_ci():
+    global SKIPPED
+    unset = [name for name in CI_TOOLS if not os.environ.get(name)]
+    if unset:
+        print(f"check.py --ci reads java from JAVA_HOME and the jar from TLA2TOOLS_JAR; {' and '.join(unset)} is not set")
+        return 1
+    SKIPPED = CI_SKIPPED
+    cache = Path(os.environ[CI_CACHE]) if os.environ.get(CI_CACHE) else None
+    previous = json.loads(cache.read_text()) if cache and cache.is_file() else {}
+    outcomes = run_checks(False, previous)
+    if cache:
+        cache.write_text(json.dumps({"checks": {"tlc": {"runs": outcomes["tlc"]["runs"]}}}, indent=2, sort_keys=True) + "\n")
+    report(outcomes, None, False)
+    return 0 if all(outcome["pass"] for outcome in outcomes.values()) else 1
+
+
 def main():
     if "--orient" in sys.argv[1:]:
         orient()
         return 0
+    if "--ci" in sys.argv[1:]:
+        return run_ci()
     if sys.argv[1:2] == ["--check"]:
         print(json.dumps(run_one(sys.argv[2])))
         return 0

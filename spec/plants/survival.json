@@ -4,8 +4,8 @@
   "edits": [
    {
     "file": "spec/tools/check.py",
-    "old": "spec-first; python3 spec/tools/check.py --orient\"",
-    "new": "spec-first; python3 spec/tools/check.py --brief\""
+    "old": "rewrite; python3 spec/tools/check.py --orient\"",
+    "new": "rewrite; python3 spec/tools/check.py --brief\""
    }
   ],
   "expect": "the compact|resume SessionStart hook is not installed"
@@ -26,8 +26,8 @@
   "edits": [
    {
     "file": "spec/tools/check.py",
-    "old": "HOOK_COMMAND = \"cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/spec-first; python3 spec/tools/check.py --orient\"",
-    "new": "HOOK_COMMAND = (\"cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/spec-first; \"\n                \"python3 spec/tools/check.py --orient\")"
+    "old": "HOOK_COMMAND = \"cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite; python3 spec/tools/check.py --orient\"",
+    "new": "HOOK_COMMAND = (\"cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/rewrite; \"\n                \"python3 spec/tools/check.py --orient\")"
    }
   ],
   "expect": null

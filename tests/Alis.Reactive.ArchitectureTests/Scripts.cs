@@ -6,15 +6,15 @@ namespace Alis.Reactive.ArchitectureTests;
 internal static class Scripts
 {
     private const string Reader = "tests/Alis.Reactive.ArchitectureTests/read-scripts.mjs";
-    private static readonly Lazy<ScriptsRead> Read = new(ReadTracked);
+    private static readonly Lazy<ScriptsRead> OfTheRepository = new(
+        () => Read(Repository.TrackedFiles.Where(file => Path.GetExtension(file) is ".ts" or ".mjs" or ".js").ToList()));
 
     internal sealed record ScriptsRead(IReadOnlyCollection<string> Identifiers, IReadOnlyList<string> Code, IReadOnlyList<string> Comments);
 
-    internal static ScriptsRead Tracked => Read.Value;
+    internal static ScriptsRead Tracked => OfTheRepository.Value;
 
-    private static ScriptsRead ReadTracked()
+    internal static ScriptsRead Read(IReadOnlyList<string> files)
     {
-        var files = Repository.TrackedFiles.Where(file => Path.GetExtension(file) is ".ts" or ".mjs" or ".js").ToList();
         var start = new ProcessStartInfo("node", [Path.Combine(Repository.Root, Reader)])
         {
             WorkingDirectory = Repository.Root,

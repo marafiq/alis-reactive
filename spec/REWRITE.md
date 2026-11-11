@@ -112,7 +112,7 @@ tests/
                                               helpers Repository, Scripts and read-scripts
                                               and its packages.lock.json; LintCases holds the lint's refused and
                                               accepted files; RefusedCaseAttribute and AcceptedCaseAttribute are
-                                              its two case marks
+                                              its two case marks, and WrittenFolder holds the files a case writes
 spec/                                         the design source: BRIEF.md, REWRITE.md (this file), CLAUDE.md,
                                               NOTES.md, STATE.json, history.tsv, Core/, Fluent/, api/, inventory/,
                                               plants/, probes/, Reference/, tools/, one folder per module
@@ -350,9 +350,10 @@ its case writes. U1 lands the presets, the ban on inline configuration and the t
 switch, the boolean conditions, the equality); the wide query's refusal and the import rows read a path of the
 runtime, and land in U3 with the file that finds a root's plans and the runtime's rows.
 
-Scripts: `scripts/check.sh` (the contract regenerated and diffed, `npm audit`, `tsc -b`, eslint,
-`dotnet build -c Release`, `dotnet format --verify-no-changes` over the solution, which today's gate holds, the
-architecture and analyzer tests, `check.py --ci`); `scripts/playwright.sh` (build, then run, with the selectors
+Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
+agreement in NuGet, npm and the lock; `tsc -b`; eslint; a locked `dotnet restore`; `dotnet build -c Release`;
+`dotnet format --verify-no-changes` over the solution; the architecture and analyzer tests; `check.py --ci`, which
+its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (build, then run, with the selectors
 below, the result line and the leftover-server check); `scripts/test.sh` (both); `scripts/build.sh`,
 `scripts/run.sh`, `scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,
 Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
@@ -361,9 +362,11 @@ Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by 
 MSBuild never runs npm; an app whose bundle is missing refuses to start.
 
 `check.py --ci`, which U1 adds, runs every check but survival, a spec session's own hook and branch, and probes,
-which run nightly and on a changed probe or pin. It runs a TLC config only when the CI cache holds no result for its
-hash, reads java from `JAVA_HOME` and the jar from `TLA2TOOLS_JAR`, refuses a jar whose SHA-256 is not the lock's,
-writes no `spec/STATE.json`, and exits 1 on any failure. The checks that read code keep reading the SHAs their cites
+which run nightly and on a changed probe or pin, and the plants of those two. It runs a TLC config only when the
+cache file the `TLC_CACHE` variable names holds no result for its hash, and writes every result back to that file;
+with no cache file every config runs, the nightly run's way. It reads java from `JAVA_HOME` and the jar from
+`TLA2TOOLS_JAR`, as every mode does where they are set, and refuses to run with either unset; it refuses a jar whose
+SHA-256 is not the lock's, writes no `spec/STATE.json`, and exits 1 on any failure. The checks that read code keep reading the SHAs their cites
 pin, except kinds, which from U3 on reads the rewrite's grammar at HEAD: a kind `spec/Core/schema.md` does not list
 fails, and from U26 on so does a kind it lists that HEAD lacks.
 

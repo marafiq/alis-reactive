@@ -15,4 +15,5 @@ does not carry, default a plan's field).
 ```bash
 npx tsc -b Alis.Reactive.Assets
 npx eslint Alis.Reactive.Assets --max-warnings 0
+scripts/check.sh --no-spec
 ```

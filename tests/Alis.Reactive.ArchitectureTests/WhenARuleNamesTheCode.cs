@@ -77,19 +77,103 @@ public class WhenARuleNamesTheCode
 
     [Test]
     public void every_listed_exception_is_cited_and_needed()
-    {
-        var audit = Findings.Value;
-        var problems = NotInTheRepo.Where(entry => !audit.Listed.Contains(entry))
-            .Select(entry => $"`{entry}` is cited by no rule; delete it from the list")
-            .Concat(NotInTheRepo.Except(WhatTheRulesForbid).Where(IsInTheRepo).Select(entry => $"`{entry}` is in the repo; delete it from the list"))
-            .Concat(WhatTheRulesForbid.Where(IsInTheRepo).Select(entry => $"`{entry}` is in the code, which a rule forbids; change the code, not the list"))
-            .ToList();
+        => AssertNone(
+            ListProblems(Findings.Value, NotInTheRepo, WhatTheRulesForbid),
+            "The list of what rules cite from outside the repo holds only what a rule cites and the repo lacks:");
 
-        AssertNone(problems, "The list of what rules cite from outside the repo holds only what a rule cites and the repo lacks:");
+    [RefusedCase]
+    public void a_fence_the_guard_does_not_read_and_a_rule_file_with_no_code_are_refused()
+    {
+        var fenced = AuditOf(Rule("CASE.md", "Run `scripts/playwright.sh`.", "```python", "print(1)", "```"), NotInTheRepo);
+        var bare = AuditOf(Rule("CASE.md", "A rule with no code in it."), NotInTheRepo);
+
+        Assert.That(fenced.Unread, Is.EqualTo(new[] { "CASE.md:2: a ```python block; this guard reads bash, csharp, csharp illustration" }));
+        Assert.That(bare.Unread, Is.EqualTo(new[] { "CASE.md: no code span or block was found in it" }));
+    }
+
+    [RefusedCase]
+    public void a_path_the_repo_does_not_hold_a_cited_line_and_a_missing_heading_are_refused()
+    {
+        var audit = AuditOf(Rule("CASE.md", "Run `scripts/gone.sh`, read `CLAUDE.md:12` and `CLAUDE.md#no-such-heading`."), NotInTheRepo);
+
+        Assert.That(audit.Paths, Is.EqualTo(new[]
+        {
+            "CASE.md:1: `scripts/gone.sh` is in neither the root nor any folder under it",
+            "CASE.md:1: `CLAUDE.md:12` cites a line; cite the file, since lines move",
+            "CASE.md:1: `CLAUDE.md#no-such-heading`: CLAUDE.md has no heading #no-such-heading",
+        }));
+    }
+
+    [RefusedCase]
+    public void a_glob_that_matches_no_file_is_refused()
+        => Assert.That(
+            AuditOf(Rule("CASE.md", "---", "paths:", "  - \"Nowhere/**\"", "---", "Run `scripts/playwright.sh`."), NotInTheRepo).Scopes,
+            Is.EqualTo(new[] { "CASE.md: \"Nowhere/**\" matches no tracked file" }));
+
+    [RefusedCase]
+    public void a_name_no_code_uses_and_text_no_source_holds_are_refused()
+    {
+        var audit = AuditOf(Rule("CASE.md", "`NoSuchTypeAnywhere` writes `\"no such text anywhere\"`."), NotInTheRepo);
+
+        Assert.That(audit.Names, Is.EqualTo(new[] { "CASE.md:1: `NoSuchTypeAnywhere` (in `NoSuchTypeAnywhere`)" }));
+        Assert.That(audit.Texts, Is.EqualTo(new[] { "CASE.md:1: `\"no such text anywhere\"`" }));
+    }
+
+    [RefusedCase]
+    public void a_member_no_declaration_matches_is_refused()
+        => Assert.That(
+            AuditOf(Rule("CASE.md", "```csharp", "public int NoSuchMember => 0;", "```"), NotInTheRepo).Members,
+            Is.EqualTo(new[] { "CASE.md:2: `public int NoSuchMember => 0;`" }));
+
+    [RefusedCase]
+    public void an_option_a_script_does_not_read_and_an_npm_script_the_manifest_lacks_are_refused()
+        => Assert.That(
+            AuditOf(Rule("CASE.md", "```bash", "scripts/playwright.sh --no-such-option", "npm run nothing", "```"), NotInTheRepo).Options,
+            Is.EqualTo(new[] { "CASE.md:2: scripts/playwright.sh reads no option --no-such-option", "CASE.md:3: package.json has no script \"nothing\"" }));
+
+    [RefusedCase]
+    public void a_listed_exception_no_rule_cites_or_the_repo_holds_is_refused()
+    {
+        string[] listed = ["NeverCited", "WhenCodeIsWritten", "Repository"];
+        var audit = AuditOf(Rule("CASE.md", "`WhenCodeIsWritten` and `Repository` are cited."), listed);
+
+        Assert.That(ListProblems(audit, listed, ["Repository"]), Is.EqualTo(new[]
+        {
+            "`NeverCited` is cited by no rule; delete it from the list",
+            "`WhenCodeIsWritten` is in the repo; delete it from the list",
+            "`Repository` is in the code, which a rule forbids; change the code, not the list",
+        }));
+    }
+
+    [AcceptedCase]
+    public void a_rule_that_names_the_code_as_it_is_is_accepted()
+    {
+        string[] listed = ["NeverInTheRepo"];
+        var audit = AuditOf(
+            Rule(
+                "CASE.md", "---", "paths:", "  - \"tests/**\"", "---",
+                "`WhenCodeIsWritten` reads `tests/Alis.Reactive.ArchitectureTests/Repository.cs` and `CLAUDE.md#spec-first`,",
+                "writes `\"build_property.AlisSliceTree\"` and cites `NeverInTheRepo`.",
+                "```bash", "scripts/playwright.sh --project poc", "```",
+                "```csharp", "internal static IReadOnlyList<string> TrackedFiles => Tracked.Value;", "```",
+                "```csharp illustration", "public int NoSuchMember => 0;", "```"),
+            listed);
+
+        Assert.That(audit.Unread.Concat(audit.Paths).Concat(audit.Scopes).Concat(audit.Names).Concat(audit.Texts).Concat(audit.Members).Concat(audit.Options), Is.Empty);
+        Assert.That(ListProblems(audit, listed, []), Is.Empty);
     }
 
     private static void AssertNone(IReadOnlyCollection<string> problems, string header)
         => Assert.That(problems, Is.Empty, header + "\n" + string.Join("\n", problems));
+
+    private static List<string> ListProblems(Audit audit, IReadOnlyList<string> notInTheRepo, IReadOnlyList<string> forbidden)
+        => notInTheRepo.Where(entry => !audit.Listed.Contains(entry))
+            .Select(entry => $"`{entry}` is cited by no rule; delete it from the list")
+            .Concat(notInTheRepo.Except(forbidden).Where(IsInTheRepo).Select(entry => $"`{entry}` is in the repo; delete it from the list"))
+            .Concat(forbidden.Where(IsInTheRepo).Select(entry => $"`{entry}` is in the code, which a rule forbids; change the code, not the list"))
+            .ToList();
+
+    private static RuleFile[] Rule(string path, params string[] lines) => [ReadRule(path, lines)];
 
     private sealed record Citation(string At, string Text, bool IsShellLine);
 
@@ -100,21 +184,27 @@ public class WhenARuleNamesTheCode
 
     private sealed record CodeIndex(HashSet<string> Names, Dictionary<string, HashSet<string>> Members, string Source);
 
-    private sealed class Audit
+    private sealed class Audit(IReadOnlyList<string> notInTheRepo)
     {
         public readonly List<string> Unread = [], Paths = [], Scopes = [], Names = [], Texts = [], Members = [], Options = [];
         public readonly HashSet<string> Listed = new(StringComparer.Ordinal);
+
+        public bool IsListed(string cited)
+        {
+            if (!notInTheRepo.Contains(cited)) return false;
+            Listed.Add(cited);
+            return true;
+        }
     }
 
     private static IReadOnlyList<RuleFile> ReadRules()
         => Repository.TrackedFiles
             .Where(path => Path.GetFileName(path) == "CLAUDE.md" || Regex.IsMatch(path, @"^\.claude/((rules|agents)/[^/]+|skills/[^/]+/SKILL)\.md$"))
-            .Select(ReadRule)
+            .Select(path => ReadRule(path, File.ReadAllLines(Path.Combine(Repository.Root, path))))
             .ToList();
 
-    private static RuleFile ReadRule(string path)
+    private static RuleFile ReadRule(string path, string[] lines)
     {
-        var lines = File.ReadAllLines(Path.Combine(Repository.Root, path));
         var globs = new List<string>();
         var citations = new List<Citation>();
         var quoted = new List<QuotedMember>();
@@ -174,11 +264,6 @@ public class WhenARuleNamesTheCode
 
     private static CodeIndex IndexCode()
     {
-        var quotedNames = Rules.Value.SelectMany(rule => rule.QuotedMembers)
-            .Select(member => SyntaxFactory.ParseMemberDeclaration(member.Text, options: ForNet10))
-            .OfType<MemberDeclarationSyntax>()
-            .Select(NameOf)
-            .ToHashSet(StringComparer.Ordinal);
         var names = new HashSet<string>(StringComparer.Ordinal);
         var members = new Dictionary<string, HashSet<string>>(StringComparer.Ordinal);
         var unparsed = new List<string>();
@@ -218,7 +303,7 @@ public class WhenARuleNamesTheCode
                 }
 
                 foreach (var member in root.DescendantNodes().OfType<MemberDeclarationSyntax>()
-                             .Where(member => member is PropertyDeclarationSyntax or MethodDeclarationSyntax && quotedNames.Contains(NameOf(member))))
+                             .Where(member => member is PropertyDeclarationSyntax or MethodDeclarationSyntax))
                 {
                     if (!members.TryGetValue(NameOf(member), out var declared)) members[NameOf(member)] = declared = new HashSet<string>(StringComparer.Ordinal);
                     declared.Add(Normal(member));
@@ -259,15 +344,23 @@ public class WhenARuleNamesTheCode
     private static HashSet<string> ReadNpmScripts()
     {
         using var package = JsonDocument.Parse(File.ReadAllText(Path.Combine(Repository.Root, "package.json")));
-        return package.RootElement.GetProperty("scripts").EnumerateObject().Select(script => script.Name).ToHashSet(StringComparer.Ordinal);
+        return package.RootElement.TryGetProperty("scripts", out var scripts)
+            ? scripts.EnumerateObject().Select(script => script.Name).ToHashSet(StringComparer.Ordinal)
+            : [];
     }
 
     private static Audit RunAudit()
     {
-        var audit = new Audit();
+        var audit = AuditOf(Rules.Value, NotInTheRepo);
         if (!Rules.Value.Any(rule => rule.Path == "CLAUDE.md")) audit.Unread.Add("the root CLAUDE.md was not found among the tracked files");
         if (!Rules.Value.Any(rule => rule.Path.StartsWith(".claude/rules/", StringComparison.Ordinal))) audit.Unread.Add("no file under .claude/rules was found");
-        foreach (var rule in Rules.Value)
+        return audit;
+    }
+
+    private static Audit AuditOf(IReadOnlyList<RuleFile> rules, IReadOnlyList<string> notInTheRepo)
+    {
+        var audit = new Audit(notInTheRepo);
+        foreach (var rule in rules)
         {
             audit.Unread.AddRange(rule.UnreadFences);
             foreach (var glob in rule.Globs.Where(glob => !MatchesATrackedFile(glob)))
@@ -288,7 +381,7 @@ public class WhenARuleNamesTheCode
 
     private static void Check(Citation citation, string folder, Audit audit)
     {
-        if (IsListed(citation.Text, audit)) return;
+        if (audit.IsListed(citation.Text)) return;
         var words = citation.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         foreach (var word in words.Where(IsPathShaped)) CheckPath(word, folder, citation.At, audit);
 
@@ -317,13 +410,6 @@ public class WhenARuleNamesTheCode
     private static bool IsShellCommand(string[] words)
         => ShellCommands.Contains(words[0]) || EnvironmentAssignment.IsMatch(words[0]) || words.Any(word => IsPathShaped(word) && Script.IsMatch(word));
 
-    private static bool IsListed(string cited, Audit audit)
-    {
-        if (!NotInTheRepo.Contains(cited)) return false;
-        audit.Listed.Add(cited);
-        return true;
-    }
-
     private static bool IsInTheRepo(string entry)
         => IsPathShaped(entry) ? Resolve(CitedPath.Match(entry).Groups["path"].Value, "").Count > 0
         : Identifier.IsMatch(entry) ? Code.Value.Names.Contains(entry)
@@ -331,7 +417,7 @@ public class WhenARuleNamesTheCode
 
     private static void CheckPath(string word, string folder, string at, Audit audit)
     {
-        if (IsListed(word, audit)) return;
+        if (audit.IsListed(word)) return;
         var cited = CitedPath.Match(word);
         var path = cited.Groups["path"].Value;
         var from = folder.Length == 0 ? "the root" : $"the root or {folder}";
@@ -436,7 +522,7 @@ public class WhenARuleNamesTheCode
                 if (!NpmScripts.Value.Contains(name)) audit.Options.Add($"{at}: package.json has no script \"{name}\"");
             }
             else if (EnvironmentAssignment.Match(word) is { Success: true } assignment
-                     && !IsListed(assignment.Groups[1].Value, audit)
+                     && !audit.IsListed(assignment.Groups[1].Value)
                      && !Code.Value.Names.Contains(assignment.Groups[1].Value))
             {
                 audit.Names.Add($"{at}: `{assignment.Groups[1].Value}` (in `{string.Join(' ', words)}`)");
@@ -456,7 +542,7 @@ public class WhenARuleNamesTheCode
             .Where(name => name.Length > 1 && name.Any(char.IsUpper));
         foreach (var name in names)
         {
-            if (!IsListed(name, audit) && !Code.Value.Names.Contains(name))
+            if (!audit.IsListed(name) && !Code.Value.Names.Contains(name))
                 audit.Names.Add($"{at}: `{name}` (in `{code}`)");
         }
     }
