@@ -8,7 +8,7 @@
   },
   "harness": {
     "seed": "writes the test's own data under its world key, through the world contract's typed builders: its records, the answers its endpoints script, and the sampler's decision for a request",
-    "gate": "holds a named TLA+ action of the test's world until the test releases it; the test waits until the harness reports it held",
+    "gate": "holds a named TLA+ action of the test's world until the test releases it; the test waits until the harness reports it held, and releases the held gate that wait returns, so a release before the gate is reached does not compile",
     "push": "makes the server push a stream or hub message to the test's world and reports how many connections it reached; the harness also reports the world's open connections of a stream or hub, which a test waits on before it pushes",
     "drop": "ends the test's stream or hub connection and holds the browser's next one until reopen, reporting it held",
     "refuse": "answers each of the test's stream or hub connections 503 until reopen, ending an open one first, and reports each connection it refuses; a stream gives up at its next connection and a hub's start or reconnection fails",
@@ -10581,47 +10581,25 @@
     },
     {
       "fixture": "WhenAGateHoldsAnAnswer",
-      "test": "the_answer_waits_until_the_test_releases_the_gate",
+      "test": "the_held_answer_reads_the_word_seeded_while_it_was_held",
       "unit": "U2",
-      "page": "The world's echo endpoint, a page of the app's World area that answers a GET with its query's word, no framework part on it.",
-      "gesture": "Arm the gate on the echo endpoint's answer, send the test's own GET with the word North, wait until the harness reports the gate held, read whether the GET has its answer, then release the gate.",
-      "outcome": "While the gate is held the GET has no answer; after the release it answers North.",
-      "opposite": "With no gate armed, the GET answers North and the harness reports no gate held.",
-      "defect": "The gate does not hold the endpoint's answer, so the GET has answered North when the harness reports the gate held, or the harness never reports it held.",
+      "page": "The world's word page, a page of the app's World area with no framework part on it: a link that opens, in the page's frame, the world's word endpoint, which answers with the word the world's seed holds as text the server writes.",
+      "gesture": "Seed the word North, arm the gate on the word endpoint's answer, click the link, wait until the harness reports the gate held, seed the word South, then release the gate the wait returned held.",
+      "outcome": "The frame shows South: the gate parked the request before its endpoint ran, so the answer was computed at the release, from the word the world held then.",
+      "opposite": "With no gate armed, seeding North and clicking the link shows North in the frame.",
+      "defect": "The gate does not hold the endpoint's answer until its release, so the endpoint reads North before the test seeds South and the frame shows North; or the harness never reports the gate held, so the wait fails.",
       "hosts": [
         "net10"
       ],
       "harness": [
+        "seed",
         "gate"
       ],
       "held": [
         {
           "verb": "gate",
           "action": "Composition.tla:Answer",
-          "on": "the echo endpoint's answer"
-        }
-      ]
-    },
-    {
-      "fixture": "WhenAGateIsReleasedBeforeItIsReached",
-      "test": "the_release_fails_the_test",
-      "unit": "U2",
-      "page": "The world's echo endpoint, a page of the app's World area that answers a GET with its query's word, no framework part on it.",
-      "gesture": "Arm the gate on the echo endpoint's answer and release it before the test sends its GET.",
-      "outcome": "The release fails the test with a message naming the gate Composition.Answer and saying it was released before it was reached.",
-      "opposite": "Released after the harness reports it held, the release succeeds and the GET answers North.",
-      "defect": "The harness accepts a release before its gate is reached, so the test passes on a gate it never observed.",
-      "hosts": [
-        "net10"
-      ],
-      "harness": [
-        "gate"
-      ],
-      "held": [
-        {
-          "verb": "gate",
-          "action": "Composition.tla:Answer",
-          "on": "the echo endpoint's answer"
+          "on": "the word endpoint's answer"
         }
       ]
     }

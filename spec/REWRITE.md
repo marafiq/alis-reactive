@@ -201,15 +201,17 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   data, gates, hub groups, stream filters and caches to the key; a document request with none gets a new world, so a
   person can run the app. Teardown ends the world and fails any gate still parked. The World area serves two pages of
   its own for the harness's tests, app.json's `harnessTests`, which use no framework door: a records page listing the
-  world's residents as text the server writes, and an echo endpoint that answers a GET with its query's word.
+  world's residents as text the server writes, and a word page whose link opens, in the page's frame, an endpoint that
+  answers with the word the world's seed holds.
 - **The verbs** are app.json's: seed, gate, push, drop, refuse, reopen, restart, clock, gc. A placement lists its
   verbs and its held steps, each held step with the TLA+ action it holds, and check_app refuses a verb with no step.
   Gates are generated from the `Next` of each spec a held step names into the world contract (`Gates.g.cs`, one enum
   per spec), so the app and the tests name a gate the same way without either seeing the other: the test arms a gate
-  before its gesture, waits until the harness reports it held, asserts the held state, then releases it by its own
-  request; a release before the gate is reached fails the test. Restart is the test app's host script on the harness's
-  word. Clock is `Page.Clock`, installed only by a test that names it. Gc is `Page.RequestGCAsync`, confirmed by the
-  page's own weak hold.
+  before its gesture, waits until the harness reports it held, asserts the held state, then releases, by its own
+  request, the held gate the wait returns, so a release before the gate is reached does not compile. A gate parks its
+  request before the endpoint runs, so a held answer is computed at its release, from the world as it is then. Restart
+  is the test app's host script on the harness's word. Clock is `Page.Clock`, installed only by a test that names it.
+  Gc is `Page.RequestGCAsync`, confirmed by the page's own weak hold.
 - **Bindings.** `Promises.g.cs` is generated from app.json and the features: a test carries `[FailsFor(...)]` naming its
   feature, defect and index, its cell, or its harness test. The bindings check fails when the generated files differ
   from what the spec writes, when a test names no test of the spec or a test of the spec has no test, when a test never
@@ -540,8 +542,9 @@ Features: none
 The app's areas, hosts, world, verbs, generated gates and bindings; the world contract; the Playwright project's
 harness, result line and leftover-server check; the test rules TEST001 to TEST013 with their cases (section 2.10),
 before any feature test is written; the CI workflows. Its own tests, app.json's `harnessTests`, prove the harness: two
-worlds isolated, a gate held then released, a release before reached failing; WhenAPlaywrightRunEnds's cases prove the
-runner, a run that selected no test failing among them. It measures and writes the waits, the budget and the
+worlds isolated, and a held answer that reads the world as it is at its release; the held gate's type keeps a release
+before reached from compiling, and WhenAPlaywrightRunEnds's cases prove the runner, a run that selected no test failing
+among them. It measures and writes the waits, the budget and the
 parallelism (section 2.5, 2.8).
 
 ### U3. The walking skeleton, the packs and delivery

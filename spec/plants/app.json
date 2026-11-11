@@ -86,5 +86,27 @@
    }
   ],
   "expect": null
+ },
+ {
+  "name": "a placement under no host",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"for\": \"M19.X5\",\n      \"index\": 1,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet48\"\n      ]",
+    "new": "\"for\": \"M19.X5\",\n      \"index\": 1,\n      \"screen\": \"fresh\",\n      \"hosts\": []"
+   }
+  ],
+  "expect": "M19.F1 M19.X5 #1 runs under no host"
+ },
+ {
+  "name": "a cell placed twice",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"cell\": \"prop.scalar.write\",",
+    "new": "\"cell\": \"prop.scalar.read\","
+   }
+  ],
+  "expect": "cell prop.scalar.read is placed 2 times"
  }
 ]

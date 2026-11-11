@@ -157,5 +157,16 @@
    }
   ],
   "expect": null
+ },
+ {
+  "name": "a part's door on no Doors line",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Doors: N14.2, M1.N1, M5.N5, M5.N1",
+    "new": "Doors: N14.2, M1.N1, M5.N5"
+   }
+  ],
+  "expect": "fresh's consumerStatus lists M5.N1, which no unit's Doors line brings"
  }
 ]

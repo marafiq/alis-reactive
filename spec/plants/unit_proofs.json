@@ -37,33 +37,33 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "\"test\": \"the_release_fails_the_test\",\n      \"unit\": \"U2\",",
-    "new": "\"test\": \"the_release_fails_the_test\",\n      \"unit\": \"U99\","
+    "old": "\"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",\n      \"unit\": \"U2\",",
+    "new": "\"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",\n      \"unit\": \"U99\","
    }
   ],
-  "expect": "harness test WhenAGateIsReleasedBeforeItIsReached.the_release_fails_the_test names 'U99', no unit of REWRITE.md"
+  "expect": "harness test WhenAGateHoldsAnAnswer.the_held_answer_reads_the_word_seeded_while_it_was_held names 'U99', no unit of REWRITE.md"
  },
  {
   "name": "a harness test with no opposite",
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "      \"opposite\": \"Released after the harness reports it held, the release succeeds and the GET answers North.\",\n",
+    "old": "      \"opposite\": \"With no gate armed, seeding North and clicking the link shows North in the frame.\",\n",
     "new": ""
    }
   ],
-  "expect": "harness test WhenAGateIsReleasedBeforeItIsReached.the_release_fails_the_test states no opposite"
+  "expect": "harness test WhenAGateHoldsAnAnswer.the_held_answer_reads_the_word_seeded_while_it_was_held states no opposite"
  },
  {
   "name": "a harness gate at an action no Next holds",
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "\"defect\": \"The harness accepts a release before its gate is reached, so the test passes on a gate it never observed.\",\n      \"hosts\": [\n        \"net10\"\n      ],\n      \"harness\": [\n        \"gate\"\n      ],\n      \"held\": [\n        {\n          \"verb\": \"gate\",\n          \"action\": \"Composition.tla:Answer\"",
-    "new": "\"defect\": \"The harness accepts a release before its gate is reached, so the test passes on a gate it never observed.\",\n      \"hosts\": [\n        \"net10\"\n      ],\n      \"harness\": [\n        \"gate\"\n      ],\n      \"held\": [\n        {\n          \"verb\": \"gate\",\n          \"action\": \"Composition.tla:Reply\""
+    "old": "\"action\": \"Composition.tla:Answer\",\n          \"on\": \"the word endpoint's answer\"",
+    "new": "\"action\": \"Composition.tla:Reply\",\n          \"on\": \"the word endpoint's answer\""
    }
   ],
-  "expect": "harness test WhenAGateIsReleasedBeforeItIsReached.the_release_fails_the_test holds Composition.tla:Reply, no action of Composition.tla's Next"
+  "expect": "harness test WhenAGateHoldsAnAnswer.the_held_answer_reads_the_word_seeded_while_it_was_held holds Composition.tla:Reply, no action of Composition.tla's Next"
  },
  {
   "name": "a harness test under a host app.json lacks",
@@ -81,8 +81,8 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "\"gesture\": \"Arm the gate on the echo endpoint's answer and release it before the test sends its GET.\",",
-    "new": "\"gesture\": \"Arm the gate on the echo endpoint's answer and release it at once, before the test sends its GET.\","
+    "old": "click the link, wait until the harness reports the gate held, seed the word South",
+    "new": "click the page's link, wait until the harness reports the gate held, seed the word South"
    }
   ],
   "expect": null
@@ -108,10 +108,43 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "\"test\": \"the_release_fails_the_test\",\n      \"unit\": \"U2\",",
-    "new": "\"test\": \"the_release_fails_the_test\",\n      \"unit\": \"U3\","
+    "old": "\"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",\n      \"unit\": \"U2\",",
+    "new": "\"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",\n      \"unit\": \"U3\","
    }
   ],
   "expect": null
+ },
+ {
+  "name": "a harness test under a fresh app's host",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"defect\": \"The world middleware scopes no seeded data to the world's key, so each records page lists both residents.\",\n      \"hosts\": [\n        \"net10\"",
+    "new": "\"defect\": \"The world middleware scopes no seeded data to the world's key, so each records page lists both residents.\",\n      \"hosts\": [\n        \"consumerNet10\""
+   }
+  ],
+  "expect": "harness test WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded runs under 'consumerNet10', a fresh app's server, which holds no world"
+ },
+ {
+  "name": "a harness test listed twice",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"fixture\": \"WhenAGateHoldsAnAnswer\",\n      \"test\": \"the_held_answer_reads_the_word_seeded_while_it_was_held\",",
+    "new": "\"fixture\": \"WhenTwoWorldsRun\",\n      \"test\": \"each_world_lists_only_the_residents_it_seeded\","
+   }
+  ],
+  "expect": "harness test WhenTwoWorldsRun.each_world_lists_only_the_residents_it_seeded is listed 2 times"
+ },
+ {
+  "name": "a harness fixture not named for its situation",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"fixture\": \"WhenTwoWorldsRun\",",
+    "new": "\"fixture\": \"TwoWorldsRun\","
+   }
+  ],
+  "expect": "harness test TwoWorldsRun.each_world_lists_only_the_residents_it_seeded's fixture is not named When and its situation"
  }
 ]

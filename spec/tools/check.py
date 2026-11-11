@@ -845,7 +845,6 @@ MAIN_SIDE = {"main-only", "both", "moved"}
 REDESIGN_SIDE = {"redesign-only", "both", "moved"}
 
 
-MODULE_ROW = re.compile(r"^\| (\d+) \| ([^|]+?) \| ([^|]+?) \|", re.MULTILINE)
 CONSUMER_SEEN = {"build", "built on the core"}
 
 
@@ -855,7 +854,10 @@ def module_folder(name):
 
 def module_rows():
     text = (SPEC / "CLAUDE.md").read_text()
-    return MODULE_ROW.findall(text[text.index("## Modules"):])
+    section = text[text.index("## Modules"):]
+    cells = [[cell.strip() for cell in line.strip().strip("|").split("|")] for line in section[:section.find("\n## ")].splitlines()
+             if line.startswith("|")]
+    return [(row[0], row[1], row[2]) for row in cells if row[0].isdigit()]
 
 
 def module_names():
@@ -867,9 +869,7 @@ def core_modules():
 
 
 def internal_modules():
-    text = (SPEC / "CLAUDE.md").read_text()
-    section = text[text.index("## Modules"):]
-    return {int(number) for number, seen in re.findall(r"^\| (\d+) \| [^|]+? \| ([^|]+?) \|", section, re.MULTILINE) if seen == "internal"}
+    return {int(number) for number, _, seen in module_rows() if seen == "internal"}
 
 
 def expected_status(model, feature_id):
@@ -2274,11 +2274,18 @@ def test_landings(app, home, module_unit, brought):
 HARNESS_TEST_TEXT = ("page", "gesture", "outcome", "opposite", "defect")
 
 
+def fresh_app_hosts(screens):
+    return {host for screen in screens if screen["area"] == "delivery" for host in screen.get("hosts", [])}
+
+
 def harness_test_problems(app, unit_ids):
-    hosts = {host["id"] for host in app["hosts"]}
-    problems = []
+    hosts, fresh = {host["id"] for host in app["hosts"]}, fresh_app_hosts(app["screens"])
+    named = Counter((entry.get("fixture"), entry.get("test")) for entry in app.get("harnessTests", []))
+    problems = [f"harness test {fixture}.{test} is listed {count} times" for (fixture, test), count in named.items() if count > 1]
     for entry in app.get("harnessTests", []):
         where = f"harness test {entry.get('fixture')}.{entry.get('test')}"
+        problems += [f"{where}'s fixture is not named When and its situation"] if not re.fullmatch(r"When[A-Z]\w*", entry.get("fixture") or "") else []
+        problems += [f"{where} runs under {host!r}, a fresh app's server, which holds no world" for host in entry.get("hosts", []) if host in fresh]
         problems += [f"{where} names {entry.get('unit')!r}, no unit of REWRITE.md"] if entry.get("unit") not in unit_ids else []
         problems += [f"{where} runs on its {key} {entry[key]!r}; a harness test runs on no framework part" for key in ("screen", "parts") if key in entry]
         problems += [f"{where} states no {field}" for field in HARNESS_TEST_TEXT if not is_prose(entry.get(field))]
@@ -2343,6 +2350,8 @@ def check_rewrite():
             brought.setdefault(door, unit["id"])
     problems += [f"{screen['id']}'s {part['id']} lists {door}, no core or module door"
                  for screen in app["screens"] for part in screen["parts"] for door in part.get("doors", []) if door not in known]
+    problems += [f"{screen['id']}'s {part['id']} lists {door}, which no unit's Doors line brings"
+                 for screen in app["screens"] for part in screen["parts"] for door in part.get("doors", []) if door in known and door not in brought]
     landed = test_landings(app, home, module_unit, door_units(units))
     detail = (f"{len(units)} units hold {len(home)} features once; the browser tests land "
               + ", ".join(f"{unit['id']} {landed[place]}" for place, unit in enumerate(units)))
@@ -2584,7 +2593,7 @@ def tree_blocks(text):
 
 
 def spec_line_names(text):
-    return set(re.findall(r"(?<![\w/])([\w.-]+\.\w+|[\w-]+/)(?=[,\s]|$)", tree_line(text, "spec").split(None, 1)[-1]))
+    return set(re.findall(r"(?<![\w/.])(\.?[\w-][\w.-]*\.\w+|\.[\w-]+|[\w-]+/)(?=[,\s]|$)", tree_line(text, "spec").split(None, 1)[-1]))
 
 
 def names_problems(text):
@@ -2602,6 +2611,8 @@ def names_problems(text):
     problems += [f"{name} is in {sliced[name]} SliceTree rows" for name in sorted(core) if sliced[name] != 1]
     listed = [(name, row[1]) for row in table_rows(rewrite_section(text, "### 2.6 TLA+")) for name in TLA_NAME.findall(row[0])]
     on_disk = {path.stem: path.parent.relative_to(SPEC).as_posix() for path in SPEC.glob("**/*.tla")}
+    shared = Counter(path.stem for path in SPEC.glob("**/*.tla"))
+    problems += [f"{name}.tla is the name of {count} specs under spec/; each TLA+ spec's file name is its own" for name, count in sorted(shared.items()) if count > 1]
     problems += [f"section 2.6's owner {owner} is no module" for owner in sorted({owner for _, owner in listed} - modules)]
     problems += [f"section 2.6 lists {name}.tla {count} times" for name, count in Counter(name for name, _ in listed).items() if count > 1]
     for name, owner in listed:
@@ -2798,7 +2809,8 @@ def app_placement_problems(app, where, entry, screens, hosts, module, rung):
     problems += [f"{where} runs on {host}, which {screen['id']} is not on" for host in entry["hosts"] if "hosts" in screen and host not in screen["hosts"]]
     problems += [f"{where} uses the harness verb {verb!r}, which app.json's harness lacks" for verb in entry["harness"] if verb not in app["harness"]]
     problems += [f"{where} uses a stream or hub on net48" for host in entry["hosts"] if kinds & APP_REALTIME and hosts.get(host, {}).get("framework") == "net48"]
-    fresh_hosts = {host for other in screens.values() if other["area"] == "delivery" for host in other.get("hosts", [])}
+    fresh_hosts = fresh_app_hosts(screens.values())
+    problems += [f"{where} runs under no host"] if not entry["hosts"] else []
     problems += [f"{where} runs on {host}, a fresh app's server, which serves only a fresh app's page" for host in entry["hosts"]
                  if host in fresh_hosts and screen["area"] != "delivery"]
     problems += [f"{where} uses the harness verb {verb!r} on {screen['id']}, a fresh app's page, which holds no world"
@@ -2941,6 +2953,7 @@ def check_app():
         page = native_cells.get(key[1], {}).get("promise", {}).get("page", "") if key[0] == "cell" else ""
         problems += app_named_part_problems(f"{key[0]} {key[1]}", page, entry, screens)
     problems += [f"{feature} {defect} #{index} is placed {count} times" for (feature, defect, index), count in placed.items() if count > 1]
+    problems += [f"{kind} {name} is placed {count} times" for (kind, name), count in reached.items() if count > 1]
     problems += [f"{feature} {defect} #{index} runs on no screen" for (feature, defect, index) in tests if (feature, defect, index) not in placed]
     problems += [f"{kind} {name} runs on no screen" for kind, name in sorted(references - set(reached))]
     problems += [f"{screen['id']}'s {part['id']} is used by no test" for screen in screens.values() for part in screen["parts"] if (screen["id"], part["id"]) not in used]
@@ -3018,7 +3031,7 @@ def plant_shape_problems(check_id, plants):
         if not isinstance(plant, dict) or not is_prose(plant.get("name")) or not isinstance(edits, list) or not edits:
             problems.append(f"spec/plants/{check_id}.json holds a plant with no name or no edits")
         elif any(not plant_edit_shaped(edit) for edit in edits):
-            problems.append(f"spec/plants/{check_id}.json: {plant['name']} has an edit outside the repository or neither file, old and new text nor file and remove")
+            problems.append(f"spec/plants/{check_id}.json: {plant['name']} has an edit outside the repository or none of file, old and new text, file and new text for a file it adds, or file and remove")
         elif plant.get("expect") is not None and not is_prose(plant.get("expect")):
             problems.append(f"spec/plants/{check_id}.json: {plant['name']} expects no text; an accepted plant expects null")
     return problems
@@ -3032,6 +3045,8 @@ def plant_edit_shaped(edit):
         return False
     if edit.get("remove") is True:
         return set(edit) == {"file", "remove"}
+    if set(edit) == {"file", "new"}:
+        return isinstance(edit["new"], str)
     return set(edit) == {"file", "old", "new"} and all(isinstance(edit[key], str) for key in ("old", "new")) and edit["old"] != ""
 
 
@@ -3064,6 +3079,12 @@ def planted_outcome(tree, check_id, plant):
     try:
         for edit in plant["edits"]:
             path = tree / edit["file"]
+            if set(edit) == {"file", "new"}:
+                if path.exists() or not path.parent.is_dir():
+                    return {"pass": None, "detail": f"{edit['file']} is already in the plant tree, or its folder is not"}
+                originals[path] = None
+                path.write_text(edit["new"])
+                continue
             if not path.is_file():
                 return {"pass": None, "detail": f"{edit['file']} is not a file in the plant tree"}
             text = path.read_text()
@@ -3085,7 +3106,7 @@ def planted_outcome(tree, check_id, plant):
         return outcome if isinstance(outcome.get("pass"), bool) else {"pass": None, "detail": f"{check_id} returned pass {outcome.get('pass')!r}"}
     finally:
         for path, text in originals.items():
-            path.write_text(text)
+            path.unlink(missing_ok=True) if text is None else path.write_text(text)
 
 
 def plant_verdict(plant, outcome):
