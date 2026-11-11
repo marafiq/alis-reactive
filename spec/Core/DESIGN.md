@@ -4675,9 +4675,9 @@ plans (Q19).
     (N18.11). ALIS007, a second `Chained`: the chain does not compile, since `Chained` ends the request's sentence
     (`SecondChained` in `spec/api/refused.sh`), and a request held and written twice is ALIS030's single use, which
     carries it (N18.7). ALIS008: kept, retargeted (D9.17, N9.9). ALIS009: kept (D18.5).
-    ALIS010 to ALIS013, the slice tree (a use of a slice above, a namespace other than the folder's, a public type
-    left unsealed, a table that disagrees with its package): kept for each package built on the core, since a module
-    is a namespace and a folder (the owner, 2026-11-06). ALIS014 to ALIS029 are the POC's, each at its own line.
+    ALIS010 to ALIS013, the slice tree (a use of a later row, a namespace other than the folder's, a public class
+    left unsealed, a table that disagrees with its project; M20.D2 to M20.D6): kept for each project that carries a
+    slice table, since a module is a namespace and a folder (the owner, 2026-11-06). ALIS014 to ALIS029 are the POC's, each at its own line.
 
 **Schema nodes.** None: type knowledge lives in C#, and the plan carries only what it decides: JSON names,
 shapes, starts and the payload's path of each event.

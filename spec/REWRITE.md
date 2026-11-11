@@ -45,7 +45,9 @@ in the line.
 
 ```
 Alis.Reactive.slnx                    the shipped projects, the generator and the net10 test projects
-Directory.Build.props                 LangVersion 14.0, warnings as errors, AlisSliceTree off by default
+Directory.Build.props                 LangVersion 14.0, nullable on, warnings as errors, AlisSliceTree off by default
+Directory.Build.targets               a project with AlisSliceTree on hands its SliceTree.txt and that property to the
+                                      compiler
 Directory.Packages.props              central package management: one exact version per package and framework, but
                                       Roslyn's second (2.7), which the projects that host the compiler take by
                                       VersionOverride
@@ -151,7 +153,8 @@ Realtime's files are wrapped whole in `#if NET10_0_OR_GREATER`, so the net48 bui
 
 ### 2.3 The SliceTree
 
-`Alis.Reactive/SliceTree.txt`, first row the foundation, each slice using only rows above it (ALIS010):
+`Alis.Reactive/SliceTree.txt`, first row the foundation, each slice using only the rows before its own (ALIS010; the
+table's syntax and the four rules that read it are M20.D2 to M20.D6):
 
 | Row | Slices | Why here |
 |---:|---|---|

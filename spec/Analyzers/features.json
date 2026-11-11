@@ -3,7 +3,7 @@
   "features": [
     {
       "id": "M20.F1",
-      "summary": "Analyzers: the build's rules, the C# compiler's rung of D18.6 below the type stage and above the render. The analyzer package ships inside the core package on both lines and runs in every compilation that references it. Every analyzer of both lines carries its verdict in D18.6: ALIS001, ALIS004 and ALIS008 kept and retargeted to every block of Pipeline<TModel> in every file, ALIS002 kept as ALIS008 on an action's block, ALIS003 refused, ALIS005 kept, ALIS006 kept as an error, ALIS007 carried by ALIS030's single use, ALIS009 kept, and the slice tree's ALIS010 to ALIS013 kept for each package built on the core. The rewrite adds the reflection analyzer (N18.1), the declaration analyzer (ALIS023, ALIS024), the override analyzer (ALIS025), the vendor contract analyzer (ALIS014 to ALIS022, ALIS037), the suppressors ALIS026, ALIS027 and ALIS036, and the families ALIS028 to ALIS035, ALIS038 and ALIS039. ALIS009's exemption is the redesign's public TypedDslExemptionAttribute, which an app's own component carries as Fusion's does, and no analyzer names a package built on the core. Main's exemption is internal and its ALIS009 checks only Fusion's and Native's Components namespaces; the redesign names Fusion, Native and NativeTagHelpers by assembly name and exempts a member whatever its reason says.",
+      "summary": "Analyzers: the build's rules, the C# compiler's rung of D18.6 below the type stage and above the render. The analyzer package ships inside the core package on both lines and runs in every compilation that references it. Every analyzer of both lines carries its verdict in D18.6: ALIS001, ALIS004 and ALIS008 kept and retargeted to every block of Pipeline<TModel> in every file, ALIS002 kept as ALIS008 on an action's block, ALIS003 refused, ALIS005 kept, ALIS006 kept as an error, ALIS007 carried by ALIS030's single use, ALIS009 kept, and the slice tree's ALIS010 to ALIS013 kept for each project that carries a slice table. The rewrite adds the reflection analyzer (N18.1), the declaration analyzer (ALIS023, ALIS024), the override analyzer (ALIS025), the vendor contract analyzer (ALIS014 to ALIS022, ALIS037), the suppressors ALIS026, ALIS027 and ALIS036, and the families ALIS028 to ALIS035, ALIS038 and ALIS039. ALIS009's exemption is the redesign's public TypedDslExemptionAttribute, which an app's own component carries as Fusion's does, and no analyzer names a package built on the core. Main's exemption is internal and its ALIS009 checks only Fusion's and Native's Components namespaces; the redesign names Fusion, Native and NativeTagHelpers by assembly name and exempts a member whatever its reason says.",
       "status": "redesign-only",
       "types": [
         "Alis.Reactive:TypedDslExemptionAttribute"
@@ -189,6 +189,26 @@
         {
           "id": "M20.D1",
           "meaning": "No analyzer names a package built on the core. ALIS009 checks the whole public surface of a compilation that carries a slice table, the table ALIS013 reads, and a component declaration and a render helper in every compilation, shipped or brought; a member a type takes from an assembly that references no Alis.Reactive is the vendor's shape and outside it. A shipped package's table is held by the repo's architecture test, which names the packages, since a test is not the core. An exemption, TypedDslExemptionAttribute, exempts its member only with a reason that is not empty or white space."
+        },
+        {
+          "id": "M20.D2",
+          "meaning": "A project's slice table is SliceTree.txt beside its project file, which a project built with AlisSliceTree on hands to the compiler as an additional file. Each line that holds an entry is a row, the first the foundation, and the entries of a row are parted by white space. An entry is a folder's path from the table's folder, written with /, and makes that one folder a slice; a dot is the files beside the table; Folder/* makes each folder directly under Folder a slice of its own, named by its path and holding every folder under it; a lone * does the same for the table's own folder. A file's slice is the slice of the folder it sits in. A file under bin or obj, or outside the table's folder, is in no slice, and none of the four rules reads it. The table has no other syntax."
+        },
+        {
+          "id": "M20.D3",
+          "meaning": "ALIS010: a slice uses its own files and the rows before its own, and a use of a slice on a later row or on its own row is refused. A use is every type and member a file names that its own project declares: a base type, an interface, a constraint, an attribute and a type its arguments name, the type of a field, a property, an event, a parameter, a return or a local, a call, a creation, a member read or written, an operator or a conversion the project declares, the operand of typeof, is, sizeof or a pattern, and a lambda's or a local function's signature, each with its type arguments, element types and pointed-at types. A type or member of another assembly is no use. The use is reported where it is written, and a declaration's at its name: \"'{slice}' uses '{symbol}' of slice '{its slice}', a later row in SliceTree.txt: a slice uses only the rows before its own\", with \"its own row\" for a slice of the same row."
+        },
+        {
+          "id": "M20.D4",
+          "meaning": "ALIS011: a file's namespace is its project's root namespace, the assembly's name, and its first folder; a file beside the table is in the root namespace alone. Any other namespace is refused at the namespace's name, and types declared in no namespace at the first type's name: \"'{file}' is in namespace '{found}'; a file's namespace is its project's root namespace and its first folder, '{expected}'\". The redesign's rule, the root namespace for a file that declares a public type and the folder's for any other, leaves: a module is one namespace and one folder (the owner, 2026-11-06)."
+        },
+        {
+          "id": "M20.D5",
+          "meaning": "ALIS012: a public class that is neither sealed, abstract nor static, and that no type of its project derives from, is refused at its name: \"'{class}' is public and nothing in the package derives from it; seal it\"."
+        },
+        {
+          "id": "M20.D6",
+          "meaning": "ALIS013: a table that disagrees with its project is refused where the disagreement is, each message opening \"SliceTree.txt and the package disagree: \". In the table, at the entry: \"entry '{entry}' names no folder\", \"folder '{folder}' falls under '{slice}' and '{slice}'\", \"slice '{slice}' is in two rows\". At a file's first token: \"folder '{folder}' has no row\". At a type's name: \"'{type}' is declared in slices '{slice}' and '{slice}'\", a type whose parts sit in two slices. With no location, at the compilation's end: \"'{assembly}' is built with AlisSliceTree on and holds no SliceTree.txt\", read from the AlisSliceTree build property, which the build hands the compiler, where the redesign named the shipped packages (M20.X1). A compilation that hands the compiler no table and has AlisSliceTree off is read by none of the four rules."
         }
       ],
       "oracle": "The C# compiler's analyzer and suppressor rung as Roslyn runs it in each compilation that references the analyzer package; the repo's analyzer tests (tests/Alis.Reactive.AnalyzerTests at 65fdf118d) and the POC's analyzer builds, whose planted diagnostics NOTES records per unit (13a to 13h, 16a, 17c); RS0030 over poc/BannedSymbols.txt for the namespace ban of D18.4; and the spec itself where the framework is the authority: D18.6's rungs and its verdict per analyzer.",
@@ -206,6 +226,26 @@
           "id": "M20.X2",
           "rung": "analyzer",
           "defect": "[TypedDslExemption(\"\")], or one whose reason is white space, exempts its member, since ALIS009 reads only the attribute's name (Alis.Reactive.Analyzers/TypedDsl/UntypedComponentApiAnalyzer.cs:124-133 at 65fdf118d): ALIS009 refuses the exemption, \"An exemption from ALIS009 says why; give TypedDslExemption its reason.\", so every exemption is auditable by its text (M20.D1, M20.N1)."
+        },
+        {
+          "id": "M20.X3",
+          "rung": "analyzer",
+          "defect": "A file of one slice names a type of a slice on a later row, or of another slice on its own row, and the project builds, so the layers the table states are a drawing the code leaves behind. ALIS010 refuses the use where it is written (M20.D2, M20.D3), as the redesign's does (Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs:303-312 at 65fdf118d)."
+        },
+        {
+          "id": "M20.X4",
+          "rung": "analyzer",
+          "defect": "A file's namespace is another module's, or a module's file sits in a namespace of its own making, so the namespace no longer says which module a type belongs to. ALIS011 refuses it at the namespace's name (M20.D2, M20.D4); the redesign expects the root namespace of a file with a public type and the folder's of any other (Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs:190-198 at 65fdf118d), which leaves."
+        },
+        {
+          "id": "M20.X5",
+          "rung": "analyzer",
+          "defect": "A public class that nothing derives from is left open, so an app derives from a type the framework never meant as a base and the next release breaks it. ALIS012 refuses the class at its name (M20.D5), as the redesign's does (Alis.Reactive.Analyzers/SliceTree/SliceTreeAnalyzer.cs:236-240 at 65fdf118d)."
+        },
+        {
+          "id": "M20.X6",
+          "rung": "analyzer",
+          "defect": "The table and its project drift apart: a folder no row holds, an entry that names no folder, a folder under two slices, a slice on two rows, a type whose parts sit in two slices, or a project built with AlisSliceTree on that hands the compiler no table, so ALIS010 reads a table that is not the project's and passes what it cannot place. ALIS013 refuses each where it is (M20.D2, M20.D6), as the redesign's table reader finds the first three (Alis.Reactive.Analyzers/SliceTree/SliceTable.cs:21-48 at 65fdf118d)."
         }
       ],
       "promises": [],

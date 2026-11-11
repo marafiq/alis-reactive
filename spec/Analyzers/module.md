@@ -61,8 +61,9 @@ Kept from the core, each the analyzer that holds its rule:
   name doors (`Alis.Reactive/Vendors/ComponentVendor.cs:77` and `:108` at 65fdf118d), and an app's brought component
   carries it as they do.
 
-The meaning `M20.D1` and the defects `M20.X1` and `M20.X2` are in `spec/Analyzers/features.json`, on the feature they
-give.
+The meanings `M20.D1` to `M20.D6` and the defects `M20.X1` to `M20.X6` are in `spec/Analyzers/features.json`, on the
+feature they give. `M20.D2` is the slice table's whole syntax, and `M20.D3` to `M20.D6` are the four rules that read
+it, each with its messages.
 
 One id, one rule. Each analyzer id of both lines and the rewrite:
 
@@ -77,7 +78,10 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS007 | a second `Chained` | the chain does not compile; ALIS030 carries a reuse (N18.7) |
 | ALIS008 | two requests in one block | kept, retargeted to every block and file (D9.17, N9.9) |
 | ALIS009 | an untyped public door | kept (D18.5), scoped by M20.D1, exempted by M20.N1 |
-| ALIS010 to ALIS013 | the slice tree | kept for each package with a slice table (D18.6) |
+| ALIS010 | a use of a slice on a later row, or on the file's own row | kept for each project that carries a slice table (D18.6, M20.D3) |
+| ALIS011 | a namespace other than the project's root namespace and the file's first folder | kept; the redesign's split by a file's public types leaves (M20.D4) |
+| ALIS012 | a public class nothing derives from, left unsealed | kept (M20.D5) |
+| ALIS013 | a slice table that disagrees with its project | kept; it reads the AlisSliceTree build property where the redesign names packages (M20.D6, M20.X1) |
 | ALIS014 to ALIS022, ALIS037 | the vendor contract | new (N17.2) |
 | ALIS023, ALIS024 | a declaration door's body and constants | new (N18.2) |
 | ALIS025 | an override's JSON name and ignore | new (N18.5) |
