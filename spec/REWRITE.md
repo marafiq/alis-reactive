@@ -466,7 +466,7 @@ is never the reason.
   `scripts/vstest-filter.mjs`, every `playwright.project.sh`, `check_ci_shard_matrix`.
 - `poc/`, the POC's test projects (`tests/Alis.Reactive.Poc.*`) and `tests/Alis.Reactive.Playwright.TestHost` they build
   on, last: each proof ported by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC's
-  analyzers rewritten in their modules' folders to `.claude/rules/analyzers.md`, their rules and cases the evidence,
+  analyzers rewritten in their modules' folders to section 2.10's authoring rules, their rules and cases the evidence,
   and its two architecture tests moved to the architecture tests,
   `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
   `spec/api/HttpSurface` retargeted to the core, and every cite of `poc/` pinned to a SHA.
