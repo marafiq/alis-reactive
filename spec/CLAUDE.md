@@ -539,11 +539,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   Both were scope creep and need a redesign later, or leave: the structure reserves nothing for them, and their future is
   the owner's decision.
 - The owner, 2026-11-10, asked what AlisReactive.FluentValidator ships, since the core implements the validation grammar
-  without the FluentValidation library: "if not needed remove it that is better". The rewrite packs five ids, not main's
-  six. Of main's 113 FluentValidator doors on each target, 8 moved into AlisReactive and M8.F1 gives the other 105 their
+  without the FluentValidation library: "if not needed remove it that is better". The rewrite packs five of main's six
+  ids. Of main's 113 FluentValidator doors on each target, 8 moved into AlisReactive and M8.F1 gives the other 105 their
   verdicts, 103 refused with their carriers and 2 kept (`spec/inventory/doors.tsv`). Main's `ReactiveValidator<T>` derives
   from FluentValidation's `AbstractValidator<T>`, so an app on main's release candidates drops the reference and moves
   each validator onto the core's `ReactiveValidator<T>`, whose `RuleFor` rules reach the browser in place of main's ClientRule calls.
+- The lead, 2026-11-10, within gate 1's C8 and gate 2's G13: N20.2's default ships the OpenTelemetry adapter as one more
+  id, AlisReactive.OpenTelemetry, beside the five of main's six that stay, since D20.2 keeps it out of the core, and the
+  core's net48 references take System.Diagnostics.DiagnosticSource (D20.8). Every pin in `spec/REWRITE.md` section 2.7 is
+  one exact version: the net48 references confirmed by a restore at those versions, the adapter's three npm packages by
+  an install with every peer met.
 - The owner, 2026-11-10: the Native components are great consumers and are written for real, with the dependency
   inverted: NativeToast, NativeDrawer (main's panel) and the common components (text box, check box, drop-down, radio
   group, check list, text area, button, hidden field, action link) are production components on the core's public

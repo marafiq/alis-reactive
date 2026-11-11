@@ -2149,6 +2149,131 @@ def check_rewrite():
                   tests=sum(landed.values()), problems=len(problems))
 
 
+TREE_NAME = re.compile(r"^[\w.<>*\-]+(?:/[\w.<>*\-]*)*$")
+TABLE_RULE = re.compile(r"^\|[-|: ]+\|$")
+PACKAGE_COUNT = re.compile(r"\*\*(\w+) packages, one version\.\*\*")
+PACKED_COUNT = re.compile(r"the (\w+) packages packed")
+COUNT_WORDS = {"four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8}
+PACKAGE_RETIRED = {"Alis.Reactive.FluentValidator": ("CLAUDE.md", "if not needed remove it that is better")}
+PACKAGE_ADDED = {"Alis.Reactive.OpenTelemetry": ("Tracing/module.md", "The default: the package `Alis.Reactive.OpenTelemetry`")}
+DECIDED_REFERENCES = {
+    "System.Text.Json": ("CLAUDE.md", "set beside System.Text.Json's 10.0.12"),
+    "Microsoft.Extensions.DependencyInjection.Abstractions": ("CLAUDE.md", "the DI abstractions take one exact version per target framework"),
+    "System.Diagnostics.DiagnosticSource": ("Core/DESIGN.md", "`System.Diagnostics.DiagnosticSource` package, pinned to one version"),
+}
+PINNED_PACKAGE = re.compile(r"(@?[A-Za-z][\w.\-/]*) \[?(\d+\.\d+\.\d+)\]?")
+SHIPPED_BUNDLE = re.compile(r"^alis-reactive(?:-[a-z0-9]+)*\.js$")
+TARGET_NAMES = re.compile(r"net48|net10\.0")
+
+
+def rewrite_section(text, heading):
+    start = text.find(heading)
+    if start < 0:
+        return ""
+    end = re.search(r"\n#{2,3} ", text[start + len(heading):])
+    return text[start:start + len(heading) + end.start()] if end else text[start:]
+
+
+def table_rows(section):
+    rows = [[cell.strip() for cell in line.strip()[1:-1].split(" | ")] for line in section.splitlines()
+            if line.startswith("| ") and not TABLE_RULE.match(line.strip())]
+    return rows[1:]
+
+
+def tree_names(part):
+    tokens = part.split(" ")
+    return tokens if all(TREE_NAME.match(token) and ("." in token or token.endswith("/")) for token in tokens) else []
+
+
+def rewrite_tree(text):
+    block = rewrite_section(text, "### 2.1 The tree")
+    block = block[block.find("```") + 3:]
+    block = block[:block.find("```")]
+    held, under_tests = set(), False
+    for line in block.splitlines():
+        if not line.strip():
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        names = []
+        for part in re.split(r"\s{2,}", line.strip()):
+            found = tree_names(part)
+            if not found:
+                break
+            names += found
+        if indent == 0:
+            under_tests = names == ["tests/"]
+            held |= {name.rstrip("/") for name in names}
+        elif indent == 2 and under_tests:
+            held |= {"tests/" + name.split("/<")[0].rstrip("/") for name in names}
+    return held
+
+
+def package_id(project):
+    return "AlisReactive" + project[len("Alis.Reactive"):]
+
+
+def stated(relative, phrase):
+    return " ".join(phrase.split()) in " ".join((SPEC / relative).read_text().split())
+
+
+def kept_references(held):
+    folders = sorted(path for path in held if path not in ("tests", "spec"))
+    references = {}
+    for path in git("ls-files", "*.csproj").splitlines():
+        if any(path.startswith(folder + "/") for folder in folders):
+            text = (REPO / path).read_text()
+            for name, version in re.findall(r'Include="([^"$]+)" Version="([^"]+)"', text) + re.findall(r'Sdk="([^"/]+)/([^"]+)"', text):
+                references.setdefault(name, set()).add((path, version))
+    return references
+
+
+def pin_problems(pins, name, version, where):
+    rows = [pin for pin in pins if re.search(r"(?<![\w.@/])" + re.escape(name) + r"(?![\w.\-/])", pin)]
+    if not rows:
+        return [f"{where} references {name}, which section 2.7 pins nowhere"]
+    exact = version.strip("[]")
+    if re.fullmatch(r"\d+\.\d+\.\d+", exact) and not any(re.search(r"(?<![\d.])" + re.escape(exact) + r"(?![\d.])", pin) for pin in rows):
+        return [f"{where} takes {name} {exact}, and section 2.7 pins another version"]
+    return []
+
+
+def check_packages():
+    path = SPEC / "REWRITE.md"
+    if not path.exists():
+        return not_started(path)
+    text = path.read_text()
+    rows = {row[0]: row for row in table_rows(rewrite_section(text, "### 2.9 Packages and delivery")) if row[0].startswith("AlisReactive")}
+    pin_rows = table_rows(rewrite_section(text, "### 2.7 Tools and pins"))
+    pins = [row[1] for row in pin_rows if len(row) > 1]
+    problems = [f"the decision {relative} states for {name} is no longer there" for decisions in (PACKAGE_RETIRED, PACKAGE_ADDED, DECIDED_REFERENCES)
+                for name, (relative, phrase) in decisions.items() if not stated(relative, phrase)]
+    expected = {package_id(name): MAIN_PACKAGES[name] for name in MAIN_PACKAGES if name not in PACKAGE_RETIRED}
+    expected.update({package_id(name): None for name in PACKAGE_ADDED})
+    problems += [f"section 2.9 has no row for {name}" for name in sorted(expected) if name not in rows]
+    problems += [f"section 2.9 packs {name}, which no decision keeps or adds" for name in sorted(rows) if name not in expected]
+    for name, row in sorted(rows.items()):
+        targets = set(TARGET_NAMES.findall(row[1]))
+        if (expected.get(name) and targets != set(expected[name])) or not targets:
+            problems.append(f"{name} targets {sorted(targets)}, and main ships it for {expected.get(name)}")
+        problems += [f"{name} ships {asset}, no {SHIPPED_BUNDLE.pattern} bundle" for asset in re.findall(r"`([^`]+)`", row[4]) if not SHIPPED_BUNDLE.match(asset)]
+        for reference, version in PINNED_PACKAGE.findall(row[5]):
+            problems += pin_problems(pins, reference, version, f"{name}'s dependencies")
+    core = rows.get("AlisReactive", ["", "", "", "", "", ""])[5]
+    problems += [f"AlisReactive's dependencies lack {name}, which {relative} decides" for name, (relative, _) in DECIDED_REFERENCES.items()
+                 if not re.search(re.escape(name) + r" \d+\.\d+\.\d+", core)]
+    problems += [f"section 2.7's {row[0]} pins no version" for row in pin_rows if len(row) > 1 and not re.search(r"\d+\.\d+|by SHA", row[1])]
+    references = kept_references(rewrite_tree(text))
+    for name, uses in sorted(references.items()):
+        for project, version in sorted(uses):
+            problems += pin_problems(pins, name, version, project)
+    counts = [(where, found) for where, pattern in (("section 1", PACKAGE_COUNT), ("U3", PACKED_COUNT)) for found in pattern.findall(text)]
+    problems += [f"{where} says {word} packages, and section 2.9 packs {len(rows)}" for where, word in counts if COUNT_WORDS.get(word.lower()) != len(rows)]
+    problems += [f"{where} states no package count" for where in ("section 1", "U3") if where not in {where for where, _ in counts}]
+    detail = (f"section 2.9 packs {len(rows)} ids, main's but {', '.join(PACKAGE_RETIRED)} and the decided {', '.join(PACKAGE_ADDED)}; "
+              f"each ships only bundles, each dependency and each of {len(references)} references the kept projects take is pinned in section 2.7 at its version")
+    return result(not problems, "; ".join(problems[:6]) or detail, packages=len(rows), pins=len(pin_rows), references=len(references), problems=len(problems))
+
+
 TEST_RULE = re.compile(r"^(\d+)\. \*\*(.+?)\.\*\*")
 TEST_SMELL = re.compile(r"^- (.+) \(\d+(?:, \d+)*\)\.$")
 TEST_ID_ROW = re.compile(r"^\| (TEST\d{3}) \| .+ \|$")
@@ -2538,6 +2663,7 @@ CHECKS = [
     ("carriers", "every D line and module meaning carried by a resolving defect, invariant, probe, check, cell or delivery test", check_carriers),
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
+    ("packages", "every package REWRITE.md packs is main's or a decided door's, ships bundles only, and every dependency and kept reference is pinned at its version", check_packages),
     ("test_rules", "every rule and smell of tests.md held by a test rule or a named check", check_test_rules),
     ("claude_md", "root CLAUDE.md and rules carry the spec-first order", check_claude_md),
     ("hedges", "zero hedge words", check_hedges),
@@ -2558,7 +2684,7 @@ STEPS = [
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
     (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests"], "Finish every check and make each pass."),
-    (11, "E", "REWRITE.md", ["rewrite_units"], "Write spec/REWRITE.md in SliceTree order."),
+    (11, "E", "REWRITE.md", ["rewrite_units", "packages"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]
 

@@ -7,10 +7,11 @@ in the line.
 
 ## 1. The view from above
 
-- **Five packages, one version.** AlisReactive (the core, its analyzers inside), AlisReactive.Native and
-  AlisReactive.Fusion ship code; AlisReactive.DesignSystem and AlisReactive.NativeTagHelpers ship empty, so their ids
-  stay, and nothing in the tree is kept for them. Main's sixth, AlisReactive.FluentValidator, is not packed: the core's validation
-  carries its doors (M8.F1; spec/CLAUDE.md, 2026-11-10).
+- **Six packages, one version.** AlisReactive (the core, its analyzers inside), AlisReactive.Native,
+  AlisReactive.Fusion and AlisReactive.OpenTelemetry, the trace sink a page registers (N20.2), ship code;
+  AlisReactive.DesignSystem and AlisReactive.NativeTagHelpers ship empty, so their ids stay, and nothing in the tree is
+  kept for them. Main's AlisReactive.FluentValidator is not packed: the core's validation carries its doors (M8.F1;
+  spec/CLAUDE.md, 2026-11-10).
 - **One app proves the framework.** The care home conformance app (`spec/Reference/app.json`): care screens a care
   home's staff use, the component bench with the conformance library's six declarations, and the refusal routes, run
   under 18 hosts. Every browser test runs on one of its screens. No core test loads Syncfusion.
@@ -43,7 +44,8 @@ in the line.
 ```
 Alis.Reactive.slnx                    the shipped projects, the generator and the net10 test projects
 Directory.Build.props                 LangVersion 14.0, warnings as errors, AlisSliceTree off by default
-Directory.Packages.props              central package management: one exact version per package and framework
+Directory.Packages.props              central package management: one exact version per package and framework, but
+                                      Roslyn's second (2.7), which the architecture tests take by VersionOverride
 global.json                           SDK 10.0.101, rollForward disable
 .node-version .python-version .java-version
 package.json  eslint.config.js        npm workspaces; the lint, its import order generated from each SliceTree.txt
@@ -65,6 +67,9 @@ Alis.Reactive.Native/                 net48;net10.0, PackageId AlisReactive.Nati
 Alis.Reactive.Fusion/                 net48;net10.0, PackageId AlisReactive.Fusion, Syncfusion [33.1.47] per host
   SliceTree.txt PublicAPI/ fusion.ts
   FusionComponents/ FusionComponents/<Slice>/ FusionTemplates/ FusionAppLevelObjects/<Slice>/
+Alis.Reactive.OpenTelemetry/          net48;net10.0, PackageId AlisReactive.OpenTelemetry, on the core alone
+  SliceTree.txt PublicAPI/ opentelemetry.ts
+  Tracing/                            the layout helper and the trace sink it registers (N20.2)
 build/EmptyPackage.proj  build/EmptyPackage.md   packed once per empty id
 
 tests/
@@ -143,7 +148,8 @@ Realtime's files are wrapped whole in `#if NET10_0_OR_GREATER`, so the net48 bui
 | 16 | RenderingAndDelivery | P3 |
 
 Native's table is `NativeComponents` over `NativeAppLevelObjects/* NativeComponents/*`; Fusion's is
-`FusionComponents FusionTemplates` over `FusionAppLevelObjects/* FusionComponents/*`. The runtime has its own table,
+`FusionComponents FusionTemplates` over `FusionAppLevelObjects/* FusionComponents/*`; OpenTelemetry's is `Tracing`
+alone. The runtime has its own table,
 `Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top. The test app
 holds `Components/*` over `World HostVariants` over `Care/* Bench/* Refusals/*`, so no screen reaches into another's
 model, and the Playwright project holds one row of module folders, so no module's tests use another's helpers.
@@ -232,20 +238,26 @@ actions its tests will observe. A change to an async lane is a spec change first
 | Tool | Pin | One job |
 |---|---|---|
 | .NET SDK | 10.0.101 (`global.json`, rollForward disable) | compile, test, pack |
-| NuGet | `Directory.Packages.props`, lock files restored locked in CI | restore; the DI abstractions exact per framework, beside System.Text.Json 10.0.12 |
+| NuGet | the SDK's, 10.0.101's; `Directory.Packages.props`, lock files restored locked in CI | restore |
+| net48 references | System.Text.Json 10.0.12, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.12, System.Diagnostics.DiagnosticSource 10.0.12, Microsoft.AspNet.Mvc 5.3.0 | the core's net48 dependencies (2.9), restored together at these exact versions; net10 takes the first three from the framework reference |
+| net48 build | PolySharp 1.16.0, Microsoft.NETFramework.ReferenceAssemblies 1.0.3, both private | the attributes C# 14's features need on net48, written as source, and the reference assemblies a build on any OS compiles against |
+| MSBuild SDK | Microsoft.Build.NoTargets 3.7.0 | the Assets project |
 | Node | 24.19.0 (`.node-version`) | esbuild, tsc, eslint, node probes |
 | TypeScript | 5.9.3 | `tsc -b`, no emit, the strictest options (strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature) |
 | esbuild | 0.28.2 | one root `build.mjs`, one bundle per package |
-| ESLint | eslint 9.39.4, typescript-eslint 8.70.1 | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, `--max-warnings 0`; `switch-exhaustiveness-check`, `no-floating-promises`, `no-unnecessary-condition`, and `no-restricted-syntax` on wide DOM queries |
+| ESLint | eslint 9.39.4, @eslint/js 9.39.5, typescript-eslint 8.70.1 | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, `--max-warnings 0`; `switch-exhaustiveness-check`, `no-floating-promises`, `no-unnecessary-condition`, and `no-restricted-syntax` on wide DOM queries |
 | Vitest | 3.2.7, node environment, no jsdom | feedback beside the runtime's code |
 | @microsoft/signalr | 10.0.11 | the hub's own asset |
-| Roslyn | Microsoft.CodeAnalysis.CSharp 4.12.0 | the analyzers |
-| PublicApi and BannedApi analyzers | 5.6.0 | the surface text; no run-time reflection |
-| NUnit, adapter, test SDK | 4.6.1, 5.2.0, 17.14.1 | tests |
+| OpenTelemetry | @opentelemetry/api 1.9.1, @opentelemetry/sdk-trace-web 2.12.1, @opentelemetry/exporter-trace-otlp-http 0.223.1 | the adapter's bundle (N20.2); the web SDK 2.12.1 takes the API below 1.10.0, so the three move together |
+| Roslyn | Microsoft.CodeAnalysis.CSharp 4.12.0; 5.0.0 for the architecture tests | the analyzers and their cases; the architecture tests parse C# 14 (`LanguageVersion.CSharp14`), which 4.12.0 does not know |
+| PublicApi and BannedApi analyzers | Microsoft.CodeAnalysis.PublicApiAnalyzers 5.6.0, Microsoft.CodeAnalysis.BannedApiAnalyzers 5.6.0 | the surface text; no run-time reflection |
+| NUnit, adapter, test SDK | NUnit 4.6.1, NUnit3TestAdapter 5.2.0, Microsoft.NET.Test.Sdk 17.14.1 | tests |
+| Plan schema | JsonSchema.Net 9.1.2 | PlanTests and the architecture tests read every plan against `plan.schema.json` |
+| App sweep | Microsoft.AspNetCore.Mvc.Testing 10.0.1 | the architecture tests' sweep of the conformance app's pages |
 | Playwright | Microsoft.Playwright 1.63.0, CI's image `mcr.microsoft.com/playwright/dotnet:v1.63.0-noble` by digest | every browser test and probe |
 | Java, TLC | OpenJDK 27.0.1, tla2tools v1.7.4 (TLC 2.19) by SHA-256 in `spec/tools/tla2tools.lock` | model checking |
 | Python | 3.14.7, standard library | `spec/tools/check.py` |
-| Syncfusion | 33.1.47, npm and NuGet together | `node scripts/pin-syncfusion.mjs <version>` moves both |
+| Syncfusion | 33.1.47: Syncfusion.EJ2.AspNet.Core on net10, Syncfusion.EJ2.MVC5 on net48, @syncfusion/ej2, together | `node scripts/pin-syncfusion.mjs <version>` moves both |
 | Actions | by SHA with Dependabot's version comment | CI |
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, `tsc -b`, eslint, `dotnet build -c Release`, the
@@ -281,16 +293,17 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 - **`nightly.yml`**: everything, every TLC config uncached, every probe; an issue on failure.
 - **`syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
   fusion pool.
-- **`nuget-publish.yml`**, on a `v*` tag: `verify-release-tag.sh`; ci on the tag; one pack job; verify-net48 and
+- **`nuget-publish.yml`**, on a `v*` tag: `verify-release-tag.sh`; ci on the tag; one pack job, its expected ids 2.9's six; verify-net48 and
   delivery-net10 restore those exact packages; publish pushes the same files by trusted publishing.
 
 ### 2.9 Packages and delivery
 
 | Package | lib | analyzers | build | browser files | dependencies |
 |---|---|---|---|---|---|
-| AlisReactive | net48, net10.0 | the ALIS analyzers and the validator generator, packed from the analyzer project's own output path | `build/net48` copies the browser files; the vendor contract target, opt-in | `alis-reactive.js`; `alis-reactive-hub.js` on net10 | net48: System.Text.Json 10.0.12, the DI abstractions exact, Microsoft.AspNet.Mvc 5.3.0; net10: the framework reference |
+| AlisReactive | net48, net10.0 | the ALIS analyzers and the validator generator, packed from the analyzer project's own output path | `build/net48` copies the browser files; the vendor contract target, opt-in | `alis-reactive.js`; `alis-reactive-hub.js` on net10 | net48: System.Text.Json 10.0.12, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.12, System.Diagnostics.DiagnosticSource 10.0.12 (D20.8), Microsoft.AspNet.Mvc 5.3.0; net10: the framework reference |
 | AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |
-| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion [33.1.47] |
+| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |
+| AlisReactive.OpenTelemetry | net48, net10.0 | none | `build/net48` copy | `alis-reactive-opentelemetry.js`, its bundle holding 2.7's OpenTelemetry pins | AlisReactive at the same version, exactly |
 | AlisReactive.DesignSystem | `lib/net48/_._`, `lib/net10.0/_._` | none | none | none | none |
 | AlisReactive.NativeTagHelpers | `lib/net10.0/_._` | none | none | none | none |
 
@@ -307,8 +320,8 @@ fails, and from U26 on so does a kind it lists that HEAD lacks.
 - The delivery tests run on both fresh apps: each link's version equals the hash of the bytes served, the plan boots, a
   gesture shows its outcome, a validator refuses in the browser and the server saves a valid post, two time zones each
   show their own day, and git lists no file the build wrote into the app (M19.D2).
-- Native and Fusion depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U3's delivery job reads it
-  back from each nuspec.
+- Native, Fusion and OpenTelemetry depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U3's
+  delivery job reads it back from each nuspec.
 
 ### 2.10 The test rules
 
@@ -439,7 +452,7 @@ budget and the parallelism (section 2.5, 2.8).
 Features: M19.F1
 
 One plan with a load trigger that sets an element's text, through every row, rendered by `Html.RenderPlan` on both
-hosts; the five packages packed; the delivery tests green on both fresh apps; the twin built.
+hosts; the six packages packed; the delivery tests green on both fresh apps; the twin built.
 
 ### U4. Triggers and pipelines
 Features: M1.F1, M1.F2
@@ -509,6 +522,10 @@ Features: M17.F1
 
 ### U22. Tracing
 Features: M26.F1, M26.F2, M26.F3
+
+AlisReactive.OpenTelemetry's trace sink and layout helper (N20.2), its bundle built on 2.7's OpenTelemetry pins; D20.8's
+net48 fact, joining an inbound traceparent through the app's ASP.NET instrumentation module, probed on verify-net48
+before the unit claims it.
 
 ### U23. Realtime
 Features: M10.F1, M10.F2
