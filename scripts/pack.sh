@@ -47,6 +47,7 @@ PACKAGES=(
   Alis.Reactive
   Alis.Reactive.Native
   Alis.Reactive.Fusion
+  Alis.Reactive.OpenTelemetry
 )
 
 mkdir -p "$OUTPUT_DIR"

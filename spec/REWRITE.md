@@ -187,6 +187,10 @@ model, and the Playwright project holds one row of module folders, so no module'
 ALIS011 expects `<assembly>.<first folder>` for every file; ALIS013 reads the `AlisSliceTree` build property in place
 of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-restricted-imports` from each table.
 
+A row enters a table with the first file of its folder, since ALIS013 refuses an entry that names no folder (M20.D6).
+U1 writes the four shipped projects' tables empty and builds each with AlisSliceTree on, so from then on a file in a
+folder with no row fails the build; U3's skeleton writes the core's 16 rows with their folders.
+
 ### 2.4 Naming
 
 1. A module's folder is its module-table name, the same in every tree; a folder exists only where its module has code.

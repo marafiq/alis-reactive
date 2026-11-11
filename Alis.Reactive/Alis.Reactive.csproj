@@ -7,6 +7,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive</PackageId>
         <IsPackable>true</IsPackable>
+        <AlisSliceTree>true</AlisSliceTree>
         <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized Reactive Plans, with validation rules written once in FluentValidation's grammar for the server and the browser.</PackageDescription>
         <PackageTags>reactive;aspnetcore;mvc;fluent-api;plan-driven</PackageTags>
     </PropertyGroup>
@@ -25,6 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />

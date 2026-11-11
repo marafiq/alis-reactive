@@ -6,6 +6,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive.Fusion</PackageId>
         <IsPackable>true</IsPackable>
+        <AlisSliceTree>true</AlisSliceTree>
         <PackageDescription>Syncfusion EJ2 component integration for Alis.Reactive; rich UI components through the Reactive Plan DSL.</PackageDescription>
         <PackageTags>reactive;aspnetcore;syncfusion;ej2;components</PackageTags>
     </PropertyGroup>
@@ -26,6 +27,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
+      <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
       <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
       <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
       <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />

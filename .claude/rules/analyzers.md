@@ -1,6 +1,8 @@
 ---
 paths:
+  - "Alis.Reactive.Analyzers/**"
   - "poc/Alis.Reactive.Poc.Analyzers/**"
+  - "tests/Alis.Reactive.AnalyzerTests/**"
   - "tests/Alis.Reactive.Poc.AnalyzerTests/**"
 ---
 
@@ -19,7 +21,8 @@ A test rule, TEST001 to TEST013 of `spec/REWRITE.md` section 2.10, is an analyze
    written. The id is a constant on the analyzer and opens its file's name. Its row, with its category and severity,
    is in the project's `AnalyzerReleases.Unshipped.md`, and the build compares that file with every descriptor: an id
    without its row fails the build (RS2000), as a public symbol without its PublicAPI line does. A project's rules
-   share one category, the project's name.
+   share one category, the project's name. A rule with several messages holds one descriptor for each, all under
+   its id.
 2. **The title states the rule as a fact; the message names the member and the cure.** One sentence, the developer's
    own names as its arguments, no final period. A rule of the spec is an error and is on by default; the one
    other severity is the one its line in `spec/Analyzers/module.md` names. A message its spec line quotes is written
@@ -35,15 +38,17 @@ A test rule, TEST001 to TEST013 of `spec/REWRITE.md` section 2.10, is an analyze
    compiler's own rules ask for (RS1013).
 4. **It reports what it proves.** Code the rule does not follow gets no report; where its spec line names a refusal
    at render, that holds it (D18.6). The location is the smallest text the developer edits, a member's name or one
-   argument. A rule about the compilation itself (a reference, a table the build did not hand over) has no text to
+   argument. A report about a line of an additional file is made from that file's own action, at the line's text.
+   A rule about the compilation itself (a reference, a table the build did not hand over) has no text to
    mark: it reports with no location, and its case expects none.
 5. **No state, any order, no throw.** `Initialize` opens with `ConfigureGeneratedCodeAnalysis` and
    `EnableConcurrentExecution`. The first is chosen by what the rule reads: a rule that reads views analyzes generated
    code and reports in it, since a view reaches the compiler through Razor's generator; every other rule passes
    `GeneratedCodeAnalysisFlags.None`. An analyzer has no instance field: what one compilation gathers lives in its
-   start action. It registers the symbol kinds and operation kinds its rule reads and no other, and reports from them:
-   a report at the compilation's end is kept for what the whole compilation alone shows (a project that hands the
-   compiler no table), since the editor shows it only after a build, and it carries the CompilationEnd tag. Every call that
+   start action. It registers the symbol kinds and operation kinds its rule reads and no other, a syntax kind only for
+   what is neither (a using directive), and reports from them: a report at the compilation's end is kept for what
+   the whole compilation alone shows (a project that hands the compiler no table, a class nothing derives from),
+   since the editor shows it only after a build, and it carries the CompilationEnd tag. Every call that
    takes a cancellation token gets the context's. Code that does not compile ends a check with no report and no
    exception: the editor runs every rule on it.
 6. **A suppressor is one compiler warning at the place its spec line names.** It finds that place through the

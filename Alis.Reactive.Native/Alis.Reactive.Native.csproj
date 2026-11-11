@@ -6,6 +6,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>AlisReactive.Native</PackageId>
         <IsPackable>true</IsPackable>
+        <AlisSliceTree>true</AlisSliceTree>
         <PackageDescription>Native HTML components for Alis.Reactive — textboxes, checkboxes, dropdowns, and more with zero vendor dependencies.</PackageDescription>
         <PackageTags>reactive;aspnetcore;native-components;html</PackageTags>
     </PropertyGroup>
@@ -23,6 +24,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
+        <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />

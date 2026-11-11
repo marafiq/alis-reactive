@@ -1,8 +1,11 @@
 <Solution>
   <Folder Name="/tests/">
+    <Project Path="tests/Alis.Reactive.AnalyzerTests/Alis.Reactive.AnalyzerTests.csproj" />
     <Project Path="tests/Alis.Reactive.ArchitectureTests/Alis.Reactive.ArchitectureTests.csproj" />
   </Folder>
   <Project Path="Alis.Reactive/Alis.Reactive.csproj" />
+  <Project Path="Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" />
   <Project Path="Alis.Reactive.Native/Alis.Reactive.Native.csproj" />
   <Project Path="Alis.Reactive.Fusion/Alis.Reactive.Fusion.csproj" />
+  <Project Path="Alis.Reactive.OpenTelemetry/Alis.Reactive.OpenTelemetry.csproj" />
 </Solution>

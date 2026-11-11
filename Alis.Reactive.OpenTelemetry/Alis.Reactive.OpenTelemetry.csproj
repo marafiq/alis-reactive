@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+    <PropertyGroup>
+        <TargetFrameworks>net48;net10.0</TargetFrameworks>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <PackageId>AlisReactive.OpenTelemetry</PackageId>
+        <IsPackable>true</IsPackable>
+        <PackageDescription>The OpenTelemetry trace sink for Alis.Reactive: a page registers it, and the framework's spans reach an OTLP endpoint.</PackageDescription>
+        <PackageTags>reactive;aspnetcore;opentelemetry;tracing</PackageTags>
+        <AlisSliceTree>true</AlisSliceTree>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+        <PackageReference Include="Microsoft.AspNet.Mvc" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="all" />
+        <PackageReference Include="PolySharp" PrivateAssets="all" />
+        <Reference Include="System.Web" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
+        <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
+        <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
+    </ItemGroup>
+
+</Project>
