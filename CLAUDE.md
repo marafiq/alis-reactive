@@ -36,9 +36,9 @@ The rewrite is spec-first: `spec/BRIEF.md` states its thesis (section 2), its cl
 stability rules every test keeps (section 10); `spec/REWRITE.md` holds the repository it builds and its units; the 26
 modules and the owner's decisions are `spec/CLAUDE.md`'s.
 - A defect is prevented on the highest rung that holds it: the type, an analyzer, a refusal where the view renders,
-  then behavior in the browser. A defect a type prevents gets no test.
-- A unit runs in this order: its spec lines, TLC green with each mutant failing, code, its Playwright tests failing on
-  the planted defect then passing, commit.
+  then behavior in the browser. A defect a type or an analyzer prevents gets no browser test.
+- A unit runs in this order: its spec lines, TLC green with each mutant failing, its Playwright tests written from
+  their promises and failing, the code until they pass, each test failing on its planted defect, commit.
 - The server decides when async work happens and the test releases it through the harness; a test waits for the
   state it names, never for time, in a world of its own, and asserts literal outcomes.
 

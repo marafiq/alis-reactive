@@ -2323,8 +2323,11 @@ CLAUDE_REPLACED = [
     ("CLAUDE.md", "never by analogy or an upfront grid"),
     (".claude/rules/tests.md", "no component library appears on a framework test's page"),
     (".claude/rules/tests.md", "Watch the behavior in a real browser before writing the test that pins it"),
+    ("CLAUDE.md", "code, its Playwright tests failing on the planted defect then passing"),
 ]
 CLAUDE_ADDED = ["## Spec-first", "`spec/BRIEF.md`", "`spec/REWRITE.md`", "`spec/CLAUDE.md`", "TLC green", "stability rules"]
+CLAUDE_ORDER = ["its spec lines", "TLC green", "written from their promises and failing", "the code until they pass",
+                "failing on its planted defect", "commit"]
 
 
 def check_claude_md():
@@ -2333,7 +2336,13 @@ def check_claude_md():
                 if " ".join(phrase.split()) in " ".join((root / name).read_text().split())]
     text = (root / "CLAUDE.md").read_text()
     problems += [f"CLAUDE.md lacks {needed!r}" for needed in CLAUDE_ADDED if needed not in text]
-    detail = "root CLAUDE.md is spec-first: the six lines replaced, and the thesis, principles, stability rules, unit order and modules named"
+    order = " ".join(text.split("A unit runs in this order:", 1)[1].split("\n- ", 1)[0].split()) if "A unit runs in this order:" in text else ""
+    places = [order.find(step) for step in CLAUDE_ORDER]
+    problems += [f"CLAUDE.md's unit order lacks {step!r}" for step, place in zip(CLAUDE_ORDER, places) if place < 0]
+    problems += [f"CLAUDE.md's unit order puts {CLAUDE_ORDER[index + 1]!r} before {CLAUDE_ORDER[index]!r}"
+                 for index in range(len(places) - 1) if min(places[index], places[index + 1]) >= 0 and places[index + 1] < places[index]]
+    detail = (f"root CLAUDE.md is spec-first: the {len(CLAUDE_REPLACED)} lines replaced, the thesis, principles, stability rules and modules named, "
+              "and a unit's order test-first: spec lines, TLC, tests from their promises failing, code, planted defects, commit")
     return result(not problems, "; ".join(problems) or detail, problems=len(problems))
 
 
