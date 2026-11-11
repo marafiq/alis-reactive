@@ -302,8 +302,9 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   `Promises`, and in it one class for each feature (`M4_F1`) and the classes `Cells`, `OwnCells` and `Harness`; each
   test of the spec is a text constant there, named for it with `_` in place of every character a name cannot hold
   (`X6_3_0`), its value the test's id in the spec ("M4.F1 X6.3 0"), and two tests that would take one constant stop
-  the generation. The world contract declares the two marks: `FailsForAttribute`, which takes one of those constants,
-  and `GestureAttribute`. The bindings check fails when the generated files differ
+  the generation. The world contract declares four marks: `FailsForAttribute`, which takes one of those constants;
+  `GestureAttribute`; `BesideThePageAttribute`, on what the harness collected beside the page (TEST006); and
+  `HoldsAttribute`, which `check.py --generate` writes on a constant once for each gate its test holds (TEST012). The bindings check fails when the generated files differ
   from what the spec writes, when a test names no test of the spec or a test of the spec has no test, when a test never
   reached the gate its held steps name, and when a screen's view uses a module namespace that neither the test's
   feature nor a part it lists belongs to, since check.py lands each test in the latest unit of those modules.
@@ -555,7 +556,7 @@ rule or a named check:
 |---|---|
 | TEST001 | a package, project or file reference of the project beyond the packages Microsoft.Playwright, NUnit, NUnit3TestAdapter and Microsoft.NET.Test.Sdk, the rules project, the framework's analyzers taken as an analyzer, which give a test no type, and the world contract: the framework, the app, a mocking or a snapshot library |
 | TEST002 | a member of Microsoft.Playwright outside the members a test takes, listed below the tables: script run in the page (`EvaluateAsync`, `WaitForFunctionAsync`), a stubbed network (`RouteAsync`), a one-shot read of the page (`InnerTextAsync`, `IsVisibleAsync`), an event no gesture raised (`DispatchEventAsync`) and every member a later version adds; and a literal that names `ej2_instances` or `window.alis` |
-| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait` |
+| TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait`, and outside `Harness/` a `Timeout` a test sets on a Playwright call, since every wait is the harness's, set from measurement (2.5) |
 | TEST004 | a skipped, repeated, ordered or parameterized test: an NUnit attribute outside `[Test]`, `[TestFixtureSource]` and `[Category]` (`[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `[TestCase]` among them), and a member of `Assert`, `Assume` or `Warn` outside `Assert.That` (`Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` among them) |
 | TEST005 | a branch or a loop in a test method: `if`, `switch` as a statement or an expression, `for`, `foreach`, `while`, `do`, `try`, `goto`, and a conditional operator, listed below the tables |
 | TEST006 | an `Assert.That` over anything but what the browser reports beside the page: a request the page sent, a console message, an uncaught error, a download and a page a gesture opened; the page itself is asserted through `Expect` alone |
@@ -564,7 +565,7 @@ rule or a named check:
 | TEST009 | an expected value equal to a constant the same test typed into the same locator |
 | TEST010 | a test whose every assertion is an absence (`ToBeHiddenAsync`, a `Not` matcher, `ToHaveCountAsync(0)`, `ToBeEmptyAsync`, an empty text) |
 | TEST011 | `Expect` or `Assert` outside a test method: a helper builds a page or performs a gesture, and never asserts |
-| TEST012 | a test method without exactly one `[FailsFor]` taking a generated promise constant, or a fixture not named `When` and its situation |
+| TEST012 | a test method without exactly one `[FailsFor]` taking a generated promise constant; a fixture not named `When` and its situation; a promise constant two tests take; a gate its promise holds that the test never arms; and, once every test is written, a promise constant no test takes |
 | TEST013 | a test method that performs no gesture itself: a gesture member of the list below the tables, or a harness release or push |
 
 | `.claude/rules/tests.md` | Held by |
@@ -624,14 +625,62 @@ and of NUnit `[SetUp]`, `[TearDown]`, `[OneTimeSetUp]`, `[OneTimeTearDown]`, `[S
 TEST005's conditional operators are C#'s: `?:`, `??`, `??=`, `?.`, `?[]`, `&&` and `||`.
 
 How the rules read a project and a test. The test rules run where a project takes them: the Playwright project
-references the rules project as an analyzer, and no rule asks whether its compilation is a Playwright project. TEST001
-reads the project's own reference items, which the rules project's build file hands the compiler as a property, so
-an assembly that an allowed package brings is no reference of the project's. A test method is a method marked
-`[Test]`. A gesture counts where it is written inside the test method's body, a lambda or a local function of it
-included, as a member of `IPage`, `ILocator`, `IKeyboard` or `IMouse`; a call of a helper that performs one counts as
-none. The harness's release and push carry `[Gesture]`, a mark of the world contract, and TEST013 counts a call of a
-member that carries it. A test rule's title and message are its author's, written to the rule file's second rule:
-this section gives what each rule refuses, never its words.
+imports the rules project's build file, `Alis.Reactive.TestRules.targets`, which adds the rules as an analyzer and hands
+the compiler two properties, and no rule asks whether its compilation is a Playwright project. A rule that reads a
+type it does not find, NUnit's, Playwright's or the world contract's, registers nothing.
+- **The project (TEST001).** The build file hands the compiler the project's own reference items as one property,
+  each with its kind: a package, a framework, a project that gives the test its types, a project taken as an
+  analyzer, a project named for its build alone (`ReferenceOutputAssembly="false"`), a file. An assembly that an
+  allowed package brings is no reference of the project's. The closed list: the four packages of the row; the
+  framework the target framework brings; the world contract for its types; the rules project and the framework's
+  analyzers as analyzers; the conformance app for its build alone. Each other item is reported with no location, by
+  its name, and so is a project that takes the rules and hands the compiler no list.
+- **A test method** is a method marked `[Test]`. What a rule reads in a test is the method's body, a lambda or a
+  local function of it included; a call of a helper is read as a call, never as what the helper does.
+- **A file of the harness** is one under the project's `Harness` folder; the members the harness takes besides, and
+  NUnit's set-up attributes, are accepted there alone.
+- **A member of Playwright (TEST002)** is a method, a property or an event of one of its interfaces or static
+  classes, called, read or subscribed anywhere in the project. An options object and an enum value are the data a
+  listed member takes and are not read, but for the two below. `Page.Keyboard`, `Page.Mouse` and, in the harness,
+  `Page.Clock` are read as the way to the members listed under them. `Locator` and `FrameLocator` take one id, `#`
+  and the id, as a constant: any other constant selector is refused by TEST002, and one that is no constant by
+  TEST007.
+- **A wait (TEST003)** is a call of a listed member, wherever it is written, and outside the harness a `Timeout`
+  assigned on a Playwright options object.
+- **NUnit (TEST004).** Every attribute of NUnit applied in the project is read, and every member of `Assert`,
+  `Assume` and `Warn` that is called or named.
+- **A branch (TEST005)** is read as the compiler reads it, by its operation, where the file writes it: a branch the
+  compiler adds for a `using` or an `await` is none. It is reported at its keyword or operator.
+- **What `Assert.That` reads (TEST006)** is its first argument: a listed member beside the page, or a member that
+  carries `[BesideThePage]`, the world contract's mark for what the harness collected of the page's requests,
+  console and uncaught errors; or a call or a member read whose receiver, an extension's first argument included,
+  leads to one (`request.Headers`, a projection of the console's messages). A local, a parameter and a value
+  computed from the page are refused: the fact is asserted where it is read.
+- **A constant (TEST007)** is what the compiler folds to one, a generated promise constant among them, and an array
+  or a collection expression of constants. The values read: each argument of a finding or an expecting member, each
+  text, number, boolean and enum an options object passed to one is given, and each argument inside the constraint
+  `Assert.That` takes second.
+- **A partial match (TEST008)** is `ToContainTextAsync`, and a `Regex` passed to a member of Playwright or assigned
+  to one of its options.
+- **The arrange (TEST009).** A test types with `FillAsync` and `PressSequentiallyAsync`. An expected value is the
+  arrange when it equals a constant the same test typed into the same locator, the same expression or the same
+  local, field or property.
+- **An absence (TEST010)** is `ToBeHiddenAsync`, a matcher reached through `Not`, `ToHaveCountAsync` of zero,
+  `ToBeEmptyAsync`, an expected text or value that is empty, and an `Assert.That` whose constraint is `Is.Empty` or
+  `Is.Null`. A test whose assertions are all absences is refused at its name, and so is a test that asserts nothing.
+- **Outside a test (TEST011)** is a method that carries no `[Test]`: a call of `Expect` or of a member of `Assert`
+  there is refused, in the harness too.
+- **The binding (TEST012).** The one `[FailsFor]` takes a constant declared in a class of `Promises`. A constant
+  whose test holds a gate carries `[Holds]`, the world contract's mark, once for each gate, and the test's body names
+  each of those gates. Two tests on one constant are reported at the compilation's end, at the later one's mark, and
+  so is a constant no test takes, with no location, in a project that does not set the build property
+  `TestsAreStillBeingWritten`; the Playwright project sets it until U3 writes its last test.
+- **A gesture (TEST013)** counts where it is written inside the test method's body, as a member of `IPage`,
+  `ILocator`, `IKeyboard` or `IMouse`; a call of a helper that performs one counts as none. The harness's release and
+  push carry `[Gesture]`, a mark of the world contract, and TEST013 counts a call of a member that carries it.
+
+A test rule's title and message are its author's, written to the rule file's second rule: this section gives what
+each rule refuses, never its words.
 
 The lists are read from the tests the spec holds and from the pinned packages. Of the gestures the promises
 describe, none drags, taps or scrolls; one hovers (M25.F5's X17.9); a right click (M21.F14's M21.X405), a click with
