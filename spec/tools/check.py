@@ -2226,6 +2226,77 @@ def rewrite_landing(app, module_unit, start, entry):
     return max([start] + needed)
 
 
+def unit_homes(units):
+    home = {}
+    for place, unit in enumerate(units):
+        for feature in unit["features"] or []:
+            home.setdefault(feature, place)
+    return home
+
+
+def module_units(home, modules):
+    module_unit = {}
+    for feature, place in home.items():
+        if feature in modules:
+            module_unit[modules[feature]] = min(place, module_unit.get(modules[feature], place))
+    return module_unit
+
+
+def test_landings(app, home, module_unit):
+    landed = Counter()
+    for entry in app["placements"]:
+        if entry["feature"] in home:
+            landed[rewrite_landing(app, module_unit, home[entry["feature"]], entry)] += 1
+    for entry in app["cells"]:
+        owner = module_unit.get("Vendors" if "cell" in entry else "FusionComponents")
+        if owner is not None:
+            landed[rewrite_landing(app, module_unit, owner, entry)] += 1
+    return landed
+
+
+HARNESS_TEST_TEXT = ("page", "gesture", "outcome", "opposite", "defect")
+
+
+def harness_test_problems(app, unit_ids):
+    hosts = {host["id"] for host in app["hosts"]}
+    problems = []
+    for entry in app.get("harnessTests", []):
+        where = f"harness test {entry.get('fixture')}.{entry.get('test')}"
+        problems += [f"{where} names {entry.get('unit')!r}, no unit of REWRITE.md"] if entry.get("unit") not in unit_ids else []
+        problems += [f"{where} runs on its {key} {entry[key]!r}; a harness test runs on no framework part" for key in ("screen", "parts") if key in entry]
+        problems += [f"{where} states no {field}" for field in HARNESS_TEST_TEXT if not is_prose(entry.get(field))]
+        problems += [f"{where} runs under {host!r}, no host of app.json" for host in entry.get("hosts", []) if host not in hosts]
+        problems += [f"{where} runs under no host"] if not entry.get("hosts") else []
+        problems += [f"{where} uses {verb!r}, no harness verb of app.json" for verb in entry.get("harness", []) if verb not in app["harness"]]
+        problems += app_held_problems(where, {**entry, "harness": entry.get("harness", [])})
+    return problems
+
+
+def check_unit_proofs():
+    path = SPEC / "REWRITE.md"
+    if not path.exists():
+        return not_started(path)
+    units = rewrite_units(path.read_text())
+    features = {feature["id"]: (feature_path.parent.name, feature) for feature_path in feature_files()
+                for feature in json.loads(feature_path.read_text()).get("features", [])}
+    home = unit_homes(units)
+    app = json.loads((SPEC / "Reference" / "app.json").read_text())
+    landed = test_landings(app, home, module_units(home, {name: module for name, (module, _) in features.items()}))
+    analyzer = Counter({place: 0 for place in range(len(units))})
+    for name, place in home.items():
+        if name in features:
+            analyzer[place] += sum(1 for defect in features[name][1].get("defects", []) if defect.get("rung") == "analyzer")
+    places = {unit["id"]: place for place, unit in enumerate(units)}
+    own = Counter(places[entry["unit"]] for entry in app.get("harnessTests", []) if entry.get("unit") in places)
+    problems = harness_test_problems(app, places)
+    problems += [f"{unit['id']} proves nothing: no browser test lands in it, none of its features has an analyzer defect, and app.json gives it no harness test"
+                 for place, unit in enumerate(units) if not (landed[place] or analyzer[place] or own[place])]
+    proofs = [f"{unit['id']} " + " ".join(f"{count}{mark}" for count, mark in ((landed[place], "b"), (analyzer[place], "a"), (own[place], "h")) if count)
+              for place, unit in enumerate(units)]
+    detail = f"each of {len(units)} units proves something, as browser tests (b), analyzer cases (a) or harness tests (h): " + ", ".join(proofs)
+    return result(not problems, "; ".join(problems[:6]) or detail, units=len(units), harness_tests=len(app.get("harnessTests", [])), problems=len(problems))
+
+
 def check_rewrite():
     path = SPEC / "REWRITE.md"
     if not path.exists():
@@ -2242,21 +2313,11 @@ def check_rewrite():
             problems += [f"{feature} is in {units[home[feature]]['id']} and {unit['id']}"] if feature in home else []
             home.setdefault(feature, place)
     problems += [f"{feature} is in no unit" for feature in sorted(modules) if feature not in home]
-    module_unit = {}
-    for feature, place in home.items():
-        if feature in modules:
-            module_unit[modules[feature]] = min(place, module_unit.get(modules[feature], place))
+    module_unit = module_units(home, modules)
     app = json.loads((SPEC / "Reference" / "app.json").read_text())
     problems += [f"{screen['id']}'s {part['id']} needs {part_module(app, part)!r}, the module of no unit"
                  for screen in app["screens"] for part in screen["parts"] if part_module(app, part) not in module_unit]
-    landed = Counter()
-    for entry in app["placements"]:
-        if entry["feature"] in home:
-            landed[rewrite_landing(app, module_unit, home[entry["feature"]], entry)] += 1
-    for entry in app["cells"]:
-        owner = module_unit.get("Vendors" if "cell" in entry else "FusionComponents")
-        if owner is not None:
-            landed[rewrite_landing(app, module_unit, owner, entry)] += 1
+    landed = test_landings(app, home, module_unit)
     detail = (f"{len(units)} units hold {len(home)} features once; the browser tests land "
               + ", ".join(f"{unit['id']} {landed[place]}" for place, unit in enumerate(units)))
     return result(not problems, "; ".join(problems[:6]) or detail, units=len(units), features=len(home),
@@ -3078,6 +3139,7 @@ CHECKS = [
     ("promises", "every refusal and behavior defect, every cell the native reference runs and each cell MultiSelect tests as its own, has a promise", check_promises),
     ("rewrite_units", "every feature in exactly one rewrite unit", check_rewrite),
     ("paths", "every path at HEAD and main's tip kept by REWRITE.md's section 2 or retired by its section 3, so the cut drops nothing by omission", check_paths),
+    ("unit_proofs", "every rewrite unit proves something: a browser test lands in it, an analyzer case of its features, or a harness test", check_unit_proofs),
     ("names", "every module named alike in the module table, REWRITE.md's tree, SliceTree and TLA+ table, and spec/", check_names),
     ("rewrite_cites", "every cite REWRITE.md makes names its SHA and resolves there", check_rewrite_cites),
     ("packages", "every package REWRITE.md packs is main's or a decided door's, ships bundles only, and every dependency and kept reference is pinned at its version", check_packages),
@@ -3102,7 +3164,7 @@ STEPS = [
     (8, "D", "The reference components", ["matrix"], "Write spec/Reference/matrix.json, syncfusion.json, native.json."),
     (9, "D", "The promises", ["defects", "promises"], "Give every refusal and behavior defect and every matrix cell its promise."),
     (10, "E", "check.py complete", ["hedges", "no_comments", "actions", "app", "carriers", "main_delta", "slice_tests", "plants"], "Finish every check and make each pass."),
-    (11, "E", "REWRITE.md", ["rewrite_units", "packages", "paths", "names", "rewrite_cites"], "Write spec/REWRITE.md in SliceTree order."),
+    (11, "E", "REWRITE.md", ["rewrite_units", "unit_proofs", "packages", "paths", "names", "rewrite_cites"], "Write spec/REWRITE.md in SliceTree order."),
     (12, "E", "Root CLAUDE.md on spec-first", ["claude_md"], "Add the thesis, principles and order; replace the five lines word for word."),
 ]
 

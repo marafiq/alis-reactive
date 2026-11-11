@@ -10496,5 +10496,83 @@
         "seed"
       ]
     }
+  ],
+  "harnessTests": [
+    {
+      "fixture": "WhenTwoWorldsRun",
+      "test": "each_world_lists_only_the_residents_it_seeded",
+      "unit": "U2",
+      "page": "The world's records page, a page of the app's World area that lists the residents of the request's world as text the server writes, no framework part on it.",
+      "gesture": "Seed the resident Ada in a first world and Ben in a second, each browser context with its own world cookie, and open the records page in each.",
+      "outcome": "The first world's page lists Ada and not Ben; the second world's lists Ben and not Ada.",
+      "opposite": "With Ada and Ben both seeded in the first world, its records page lists Ada and Ben.",
+      "defect": "The world middleware scopes no seeded data to the world's key, so each records page lists both residents.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "fixture": "WhenAGateHoldsAnAnswer",
+      "test": "the_answer_waits_until_the_test_releases_the_gate",
+      "unit": "U2",
+      "page": "The world's echo endpoint, a page of the app's World area that answers a GET with its query's word, no framework part on it.",
+      "gesture": "Arm the gate on the echo endpoint's answer, send the test's own GET with the word North, wait until the harness reports the gate held, read whether the GET has its answer, then release the gate.",
+      "outcome": "While the gate is held the GET has no answer; after the release it answers North.",
+      "opposite": "With no gate armed, the GET answers North and the harness reports no gate held.",
+      "defect": "The gate does not hold the endpoint's answer, so the GET has answered North when the harness reports the gate held, or the harness never reports it held.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the echo endpoint's answer"
+        }
+      ]
+    },
+    {
+      "fixture": "WhenAGateIsReleasedBeforeItIsReached",
+      "test": "the_release_fails_the_test",
+      "unit": "U2",
+      "page": "The world's echo endpoint, a page of the app's World area that answers a GET with its query's word, no framework part on it.",
+      "gesture": "Arm the gate on the echo endpoint's answer and release it before the test sends its GET.",
+      "outcome": "The release fails the test with a message naming the gate Composition.Answer and saying it was released before it was reached.",
+      "opposite": "Released after the harness reports it held, the release succeeds and the GET answers North.",
+      "defect": "The harness accepts a release before its gate is reached, so the test passes on a gate it never observed.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": [
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the echo endpoint's answer"
+        }
+      ]
+    },
+    {
+      "fixture": "WhenARunSelectsNoTest",
+      "test": "the_run_fails",
+      "unit": "U2",
+      "page": "scripts/playwright.sh on the Playwright project, with a filter that no test's name matches.",
+      "gesture": "Run it.",
+      "outcome": "It exits with a non-zero code, and its result line reads 0 selected, 0 ran.",
+      "opposite": "With a filter that matches WhenTwoWorldsRun's one test, it exits with 0, and its result line reads 1 selected, 1 ran, 1 passed, 0 failed.",
+      "defect": "The runner reads a run that selected no test as green, so a filter that names no test passes CI.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": []
+    }
   ]
 }

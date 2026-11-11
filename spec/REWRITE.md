@@ -196,7 +196,9 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
 - **The world.** Each test makes a key and sets it as the cookie `world` on its own browser context before it opens a
   page; every request, stream and hub negotiation carries it. The app's world middleware, in Development only, scopes
   data, gates, hub groups, stream filters and caches to the key; a document request with none gets a new world, so a
-  person can run the app. Teardown ends the world and fails any gate still parked.
+  person can run the app. Teardown ends the world and fails any gate still parked. The World area serves two pages of
+  its own for the harness's tests, app.json's `harnessTests`, which use no framework door: a records page listing the
+  world's residents as text the server writes, and an echo endpoint that answers a GET with its query's word.
 - **The verbs** are app.json's: seed, gate, push, drop, refuse, reopen, restart, clock, gc. A placement lists its
   verbs and its held steps, each held step with the TLA+ action it holds, and check_app refuses a verb with no step.
   Gates are generated from the `Next` of each spec a held step names into the world contract (`Gates.g.cs`, one enum
@@ -206,7 +208,7 @@ of a list of assembly names (M20.X1); `eslint.config.js` writes ESLint's `no-res
   word. Clock is `Page.Clock`, installed only by a test that names it. Gc is `Page.RequestGCAsync`, confirmed by the
   page's own weak hold.
 - **Bindings.** `Promises.g.cs` is generated from app.json and the features: a test carries `[FailsFor(...)]` naming its
-  feature, defect and index, or its cell. The bindings check fails when the generated files differ from what the spec
+  feature, defect and index, its cell, or its harness test. The bindings check fails when the generated files differ from what the spec
   writes, when a test names no test of the spec or a test of the spec has no test, when a test never reached the
   gate its held steps name, and when a screen's view uses a module namespace that neither the test's feature nor a
   part it lists belongs to, since check.py lands each test in the latest unit of those modules.
@@ -522,8 +524,8 @@ Features: none
 
 The app's areas, hosts, world, verbs, generated gates and bindings; the world contract; the Playwright project's
 harness, result line and leftover-server check; the test rules TEST001 to TEST013 with their cases (section 2.10),
-before any feature test is written; the CI workflows. Its own tests prove the harness: two worlds isolated, a gate
-held then released, a release before reached failing, a zero-test run failing. It measures and writes the waits, the
+before any feature test is written; the CI workflows. Its own tests, app.json's `harnessTests`, prove the harness: two
+worlds isolated, a gate held then released, a release before reached failing, a zero-test run failing. It measures and writes the waits, the
 budget and the parallelism (section 2.5, 2.8).
 
 ### U3. The walking skeleton, the packs and delivery
