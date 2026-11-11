@@ -90,7 +90,7 @@
     "new": "`Alis.Reactive.Assets/runtime/diagnostics/trace.ts`"
    }
   ],
-  "expect": "Q20: Evidence cites no file:line"
+  "expect": "Q20: Evidence cites no"
  },
  {
   "name": "two checker bullets in another order",

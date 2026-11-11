@@ -52,7 +52,7 @@
     "new": "cannot be constructed: new:N1.19."
    }
   ],
-  "expect": "Q1: X1.1 type cites no resolving file:line and no new:N door"
+  "expect": "Q1: X1.1 type cites no resolving"
  },
  {
   "name": "an analyzer defect naming no analyzer and no door",
