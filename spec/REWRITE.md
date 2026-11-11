@@ -670,7 +670,9 @@ What the cut leaves of a path section 2.1 holds:
   WhenAnAppRendersItsPages and SandboxStaticStateTests, in U2 with the conformance app.
 - Every other script and build file is reduced to what is true of the tree the cut leaves. `scripts/playwright.sh`
   runs the POC's suites, and from U2's harness on the conformance project by a descriptor of its own, until U2 writes
-  section 2.7's runner. `scripts/pin-syncfusion.mjs` reads the NuGet pin in
+  section 2.7's runner. That runner is the rewrite's alone and reads no descriptor: today's runner moves to `poc/`
+  with what it reads and leaves with it (section 3), since the rewrite wins where the two meet (the owner,
+  2026-11-11). `scripts/pin-syncfusion.mjs` reads the NuGet pin in
   `Directory.Packages.props` and the npm pin in the root `package.json`, which drops its workspaces and declares what
   the kept code loads, each at the version the tree held: TypeScript and esbuild for the POC's build and the rules
   test, and EJ2, SignalR, jsdom, parse5 and ws for the probes.

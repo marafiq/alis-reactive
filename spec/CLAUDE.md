@@ -674,6 +674,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `Alis.Reactive.Declarations.TypedDslExemptionAttribute`, on the row below Vendors and Plugins. The rule's reach to a
   declaration and a render helper in a compilation with no slice table lands in U7, with the types it reads. The owner
   can overrule each.
+- The owner, 2026-11-11 (verbatim in `spec/NOTES.md`): "With regard to merge, rewrite wins. I mean, I don't understand
+  the confusion here now." The lead had ended a turn before section 2.7's runner, since it touches the path the POC's
+  suites run through, and had read the conformance project as keeping the POC's descriptor until `poc/` leaves. So:
+  where the rewrite's design and an older line meet, the POC's runner and scripts today and main at the pull request
+  that lands the rewrite, the rewrite's piece is written as its spec states it and the older line gives way. The POC,
+  main and the redesign stay evidence; nothing of the rewrite is shaped to keep one of them running, and the lead
+  stops for none of them. That "merge" is every place the lines meet is the lead's reading, the owner's to correct.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
