@@ -15,8 +15,8 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": []",
-    "new": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]"
+    "old": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerPlan\",\n        \"consumerLoad\",\n        \"consumerStatus\"\n      ],\n      \"harness\": []",
+    "new": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerPlan\",\n        \"consumerLoad\",\n        \"consumerStatus\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]"
    }
   ],
   "expect": "M19.F1 M19.X5 #0 uses the harness verb 'seed' on fresh, a fresh app's page, which holds no world"
@@ -38,7 +38,7 @@
    {
     "file": "spec/Reference/app.json",
     "old": "      \"for\": \"X16.10\",\n      \"index\": 0,\n      \"screen\": \"admission\",\n      \"hosts\": [\n        \"net10\",\n        \"net48\"\n      ],\n      \"parts\": [\n        \"intakeForm\",\n        \"inputs\",\n        \"intakeEndpoint\"\n      ],\n      \"harness\": [\n        \"seed\"\n      ]",
-    "new": "      \"for\": \"X16.10\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": []"
+    "new": "      \"for\": \"X16.10\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerPlan\"\n      ],\n      \"harness\": []"
    }
   ],
   "expect": "M8.F1 X16.10 #0, a Validation test, runs on fresh, a fresh app's page, where only RenderingAndDelivery's tests run"
@@ -48,8 +48,8 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "      \"hosts\": [\n        \"consumerNet10\",\n        \"consumerNet48\"\n      ],\n      \"parts\": [\n        {\n          \"id\": \"consumerHome\",",
-    "new": "      \"parts\": [\n        {\n          \"id\": \"consumerHome\","
+    "old": "      \"hosts\": [\n        \"consumerNet10\",\n        \"consumerNet48\"\n      ],\n      \"parts\": [\n        {\n          \"id\": \"consumerPlan\",",
+    "new": "      \"parts\": [\n        {\n          \"id\": \"consumerPlan\","
    }
   ],
   "expect": "screen fresh is a fresh app's page and names no host it runs under"
@@ -81,8 +81,8 @@
   "edits": [
    {
     "file": "spec/Reference/app.json",
-    "old": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": []",
-    "new": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\",\n        \"consumerNet48\"\n      ],\n      \"parts\": [\n        \"consumerHome\"\n      ],\n      \"harness\": []"
+    "old": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\"\n      ],\n      \"parts\": [\n        \"consumerPlan\",\n        \"consumerLoad\",\n        \"consumerStatus\"\n      ],\n      \"harness\": []",
+    "new": "      \"for\": \"M19.X5\",\n      \"index\": 0,\n      \"screen\": \"fresh\",\n      \"hosts\": [\n        \"consumerNet10\",\n        \"consumerNet48\"\n      ],\n      \"parts\": [\n        \"consumerPlan\",\n        \"consumerLoad\",\n        \"consumerStatus\"\n      ],\n      \"harness\": []"
    }
   ],
   "expect": null

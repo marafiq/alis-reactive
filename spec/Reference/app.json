@@ -915,10 +915,32 @@
       ],
       "parts": [
         {
-          "id": "consumerHome",
+          "id": "consumerPlan",
           "kind": "native",
-          "role": "its layout and home view: one plan whose load step writes consumer-status",
-          "module": "RenderingAndDelivery"
+          "role": "its home view's plan, the block of the view (N14.2), in a layout that links the runtime",
+          "module": "RenderingAndDelivery",
+          "doors": [
+            "N14.2"
+          ]
+        },
+        {
+          "id": "consumerLoad",
+          "kind": "native",
+          "role": "the plan's load trigger (M1.N1)",
+          "module": "TriggersAndPipelines",
+          "doors": [
+            "M1.N1"
+          ]
+        },
+        {
+          "id": "consumerStatus",
+          "kind": "native",
+          "role": "consumer-status, whose text the load step writes (M5.N5, M5.N1)",
+          "module": "Elements",
+          "doors": [
+            "M5.N5",
+            "M5.N1"
+          ]
         }
       ]
     }
@@ -5484,7 +5506,9 @@
         "consumerNet10"
       ],
       "parts": [
-        "consumerHome"
+        "consumerPlan",
+        "consumerLoad",
+        "consumerStatus"
       ],
       "harness": []
     },
@@ -5497,7 +5521,9 @@
         "consumerNet48"
       ],
       "parts": [
-        "consumerHome"
+        "consumerPlan",
+        "consumerLoad",
+        "consumerStatus"
       ],
       "harness": []
     },

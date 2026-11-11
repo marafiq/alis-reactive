@@ -233,11 +233,11 @@
         },
         {
           "for": "M19.X2",
-          "page": "A net48 wards index with the link Open the ward, to a ward page whose layout links ~/Content/AlisReactive/js/alis-reactive.jss with Url.AppendVersion, a path at which no file is, and whose Show the ward button writes North into ward-name.",
+          "page": "A net48 wards index with the link Open the ward, to a ward page whose layout links ~/Content/AlisReactive/js/alis-reactive.jss with Url.AppendVersion, a path at which no file is, and whose plan's load step writes North into ward-name.",
           "gesture": "On the wards index, click Open the ward.",
           "outcome": "The ward page is refused where the view renders with the message that begins \"No file is at ~/Content/AlisReactive/js/alis-reactive.jss\" and names Content\\{PackageId}\\ and the build.",
-          "opposite": "With the layout linking ~/Content/AlisReactive/js/alis-reactive.js, the ward page renders, and Show the ward writes North into ward-name.",
-          "defect": "The URL is written with no check, so the ward page renders, its runtime never loads, and Show the ward writes nothing, with no word of the path."
+          "opposite": "With the layout linking ~/Content/AlisReactive/js/alis-reactive.js, the ward page renders, and its load step writes North into ward-name.",
+          "defect": "The URL is written with no check, so the ward page renders, its runtime never loads, and its load step writes nothing, with no word of the path."
         },
         {
           "for": "M19.X3",

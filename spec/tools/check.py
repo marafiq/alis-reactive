@@ -2193,26 +2193,28 @@ def check_matrix():
 
 REWRITE_UNIT = re.compile(r"^### (U(\d+))\. (.+)$")
 REWRITE_FEATURES = re.compile(r"^Features: (.+)$")
+REWRITE_LABEL = re.compile(r"^(Features|Doors): (.+)$")
 
 
 def rewrite_units(text):
     units, current, listing = [], None, None
     for line in text.splitlines():
         heading = REWRITE_UNIT.match(line)
+        labelled = REWRITE_LABEL.match(line)
         if heading:
-            current, listing = {"id": heading.group(1), "number": int(heading.group(2)), "features": None}, None
+            current, listing = {"id": heading.group(1), "number": int(heading.group(2)), "features": None, "doors": None}, None
             units.append(current)
-        elif listing is not None and line.strip() and not line.startswith("#"):
+        elif listing is not None and line.strip() and not line.startswith("#") and not labelled:
             listing.append(line.strip())
         else:
-            listed = REWRITE_FEATURES.match(line)
-            listing = [listed.group(1)] if listed and current is not None else None
+            listing = [labelled.group(2)] if labelled and current is not None else None
             if listing is not None:
-                current["features"] = listing
+                current[labelled.group(1).lower()] = listing
     for unit in units:
-        if unit["features"] is not None:
-            joined = " ".join(unit["features"])
-            unit["features"] = [] if joined == "none" else [name.strip() for name in joined.split(",")]
+        for label in ("features", "doors"):
+            if unit[label] is not None:
+                joined = " ".join(unit[label])
+                unit[label] = [] if joined == "none" else [name.strip() for name in joined.split(",")]
     return units
 
 
@@ -2220,10 +2222,25 @@ def part_module(app, part):
     return part.get("module") or app.get("partModules", {}).get(part["kind"])
 
 
-def rewrite_landing(app, module_unit, start, entry):
+def door_units(units):
+    brought = {}
+    for place, unit in enumerate(units):
+        for door in unit.get("doors") or []:
+            brought.setdefault(door, place)
+    return brought
+
+
+def part_unit(app, part, module_unit, brought):
+    doors = part.get("doors")
+    if doors and all(door in brought for door in doors):
+        return max(brought[door] for door in doors)
+    return module_unit.get(part_module(app, part))
+
+
+def rewrite_landing(app, module_unit, start, entry, brought):
     parts = {part["id"]: part for part in next(screen for screen in app["screens"] if screen["id"] == entry["screen"])["parts"]}
-    needed = [module_unit[module] for module in (part_module(app, parts[name]) for name in entry["parts"] if name in parts) if module in module_unit]
-    return max([start] + needed)
+    needed = [part_unit(app, parts[name], module_unit, brought) for name in entry["parts"] if name in parts]
+    return max([start] + [place for place in needed if place is not None])
 
 
 def unit_homes(units):
@@ -2242,15 +2259,15 @@ def module_units(home, modules):
     return module_unit
 
 
-def test_landings(app, home, module_unit):
+def test_landings(app, home, module_unit, brought):
     landed = Counter()
     for entry in app["placements"]:
         if entry["feature"] in home:
-            landed[rewrite_landing(app, module_unit, home[entry["feature"]], entry)] += 1
+            landed[rewrite_landing(app, module_unit, home[entry["feature"]], entry, brought)] += 1
     for entry in app["cells"]:
         owner = module_unit.get("Vendors" if "cell" in entry else "FusionComponents")
         if owner is not None:
-            landed[rewrite_landing(app, module_unit, owner, entry)] += 1
+            landed[rewrite_landing(app, module_unit, owner, entry, brought)] += 1
     return landed
 
 
@@ -2281,7 +2298,7 @@ def check_unit_proofs():
                 for feature in json.loads(feature_path.read_text()).get("features", [])}
     home = unit_homes(units)
     app = json.loads((SPEC / "Reference" / "app.json").read_text())
-    landed = test_landings(app, home, module_units(home, {name: module for name, (module, _) in features.items()}))
+    landed = test_landings(app, home, module_units(home, {name: module for name, (module, _) in features.items()}), door_units(units))
     analyzer = Counter({place: 0 for place in range(len(units))})
     for name, place in home.items():
         if name in features:
@@ -2317,7 +2334,16 @@ def check_rewrite():
     app = json.loads((SPEC / "Reference" / "app.json").read_text())
     problems += [f"{screen['id']}'s {part['id']} needs {part_module(app, part)!r}, the module of no unit"
                  for screen in app["screens"] for part in screen["parts"] if part_module(app, part) not in module_unit]
-    landed = test_landings(app, home, module_unit)
+    known = all_new_doors(design_sections() or {}) | module_doors()
+    brought = {}
+    for unit in units:
+        for door in unit["doors"] or []:
+            problems += [f"{unit['id']}'s Doors line names {door}, no core or module door"] if door not in known else []
+            problems += [f"{door} is on the Doors lines of {brought[door]} and {unit['id']}"] if door in brought else []
+            brought.setdefault(door, unit["id"])
+    problems += [f"{screen['id']}'s {part['id']} lists {door}, no core or module door"
+                 for screen in app["screens"] for part in screen["parts"] for door in part.get("doors", []) if door not in known]
+    landed = test_landings(app, home, module_unit, door_units(units))
     detail = (f"{len(units)} units hold {len(home)} features once; the browser tests land "
               + ", ".join(f"{unit['id']} {landed[place]}" for place, unit in enumerate(units)))
     return result(not problems, "; ".join(problems[:6]) or detail, units=len(units), features=len(home),

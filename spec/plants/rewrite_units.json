@@ -77,6 +77,39 @@
   "expect": "U25 lists M21.F99, no feature of spec/*/features.json"
  },
  {
+  "name": "a Doors line naming a door no module has",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Doors: N14.2, M1.N1, M5.N5, M5.N1\n",
+    "new": "Doors: N14.2, M1.N1, M5.N5, M5.N99\n"
+   }
+  ],
+  "expect": "U3's Doors line names M5.N99, no core or module door"
+ },
+ {
+  "name": "a door on two Doors lines",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "### U4. Triggers and pipelines\nFeatures: M1.F1, M1.F2\n",
+    "new": "### U4. Triggers and pipelines\nFeatures: M1.F1, M1.F2\nDoors: M1.N1\n"
+   }
+  ],
+  "expect": "M1.N1 is on the Doors lines of U3 and U4"
+ },
+ {
+  "name": "a part listing a door no module has",
+  "edits": [
+   {
+    "file": "spec/Reference/app.json",
+    "old": "\"doors\": [\n            \"M1.N1\"\n          ]",
+    "new": "\"doors\": [\n            \"M1.N99\"\n          ]"
+   }
+  ],
+  "expect": "fresh's consumerLoad lists M1.N99, no core or module door"
+ },
+ {
   "name": "a unit's features in another order",
   "edits": [
    {
@@ -110,6 +143,17 @@
     "file": "spec/REWRITE.md",
     "old": "Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14,\nM21.F15, M21.F16, M21.F17, M21.F18, M21.F19, M21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27,\nM21.F28, M21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37, M21.F38, M21.F39, M21.F40,\nM21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46, M21.F47, M21.F48, M21.F49, M21.F50, M21.F51, M21.F52\n",
     "new": "Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10,\nM21.F11, M21.F12, M21.F13, M21.F14, M21.F15, M21.F16, M21.F17, M21.F18, M21.F19,\nM21.F20, M21.F21, M21.F22, M21.F23, M21.F24, M21.F25, M21.F26, M21.F27, M21.F28,\nM21.F29, M21.F30, M21.F31, M21.F32, M21.F33, M21.F34, M21.F35, M21.F36, M21.F37,\nM21.F38, M21.F39, M21.F40, M21.F41, M21.F42, M21.F43, M21.F44, M21.F45, M21.F46,\nM21.F47, M21.F48, M21.F49, M21.F50, M21.F51, M21.F52\n"
+   }
+  ],
+  "expect": null
+ },
+ {
+  "name": "a Doors line in another order",
+  "edits": [
+   {
+    "file": "spec/REWRITE.md",
+    "old": "Doors: N14.2, M1.N1, M5.N5, M5.N1\n",
+    "new": "Doors: M5.N1, M5.N5, M1.N1, N14.2\n"
    }
   ],
   "expect": null

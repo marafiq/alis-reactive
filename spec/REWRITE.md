@@ -520,7 +520,8 @@ The order is the order pages need doors, not the SliceTree's. A unit for Schema 
 U3 is a walking skeleton that gives every row its folder and the thinnest door, and each unit after it widens the
 rows its features need; ALIS010 holds at every commit. A test lands in the unit that brings the last door its page
 uses: its feature's unit, or a later unit that holds the module of one of its screen parts (check.py prints each
-unit's tests).
+unit's tests). A unit's Doors line names the doors it brings ahead of their features' units, as U3's skeleton does, and
+a part that lists its doors, each on a Doors line, lands with the latest unit that brings one of them.
 
 ### U1. Tools, pins and tables
 Features: M20.F1
@@ -542,9 +543,10 @@ parallelism (section 2.5, 2.8).
 
 ### U3. The walking skeleton, the packs and delivery
 Features: M19.F1
+Doors: N14.2, M1.N1, M5.N5, M5.N1
 
-One plan with a load trigger that sets an element's text, through every row, rendered by `Html.RenderPlan` on both
-hosts; the six packages packed; the delivery tests green on both fresh apps; the twin built. README.md, every package's
+One plan, the block of its view (N14.2), with a load trigger (M1.N1) that sets an element's text (M5.N5, M5.N1),
+through every row, on both hosts; the six packages packed; the delivery tests green on both fresh apps; the twin built. README.md, every package's
 readme, holds what a fresh app of section 2.9 does on each host, a net48 app's move to PackageReference among it.
 
 ### U4. Triggers and pipelines
