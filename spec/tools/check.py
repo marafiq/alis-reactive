@@ -26,11 +26,9 @@ TLA_JAR = Path.home() / ".local/share/tlaplus/tla2tools.jar"
 TLA_LOCK = SPEC / "tools" / "tla2tools.lock"
 TLC_GREEN = "Model checking completed. No error has been found."
 LOCAL_SETTINGS = Path("/Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.claude/settings.local.json")
-HOOK_COMMAND = (
-    "cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/spec-first; "
-    "python3 spec/tools/check.py --brief; tail -20 spec/NOTES.md; "
-    'echo "Re-read spec/BRIEF.md for the current step before acting."'
-)
+HOOK_COMMAND = "cd /Users/muhammadadnanrafiq/Documents/Code/alis-reactive-framework-1-0/Alis.Reactive/.worktrees/spec-first; python3 spec/tools/check.py --orient"
+HANDOFF = Path.home() / ".claude/projects/-Users-muhammadadnanrafiq-Documents-Code-alis-reactive-framework-1-0-Alis-Reactive/memory/project-spec-first-branch.md"
+OWNER_LINE = re.compile(r"^- The owner, (\d{4}-\d{2}-\d{2})")
 
 MAIN_PACKAGES = {
     "Alis.Reactive": ["net48", "net10.0"],
@@ -127,6 +125,8 @@ def check_survival():
     ]
     if not installed:
         problems.append("the compact|resume SessionStart hook is not installed in " + str(LOCAL_SETTINGS))
+    if not HANDOFF.is_file():
+        problems.append(f"the handoff the compact hook prints, {HANDOFF}, is missing")
     if not git("rev-parse", "--verify", "-q", f"refs/remotes/origin/{SPEC_BRANCH}"):
         problems.append(f"origin/{SPEC_BRANCH} is not pushed")
     tracked = set(git("ls-files", "spec").splitlines())
@@ -2838,7 +2838,36 @@ def root_vision():
     return [line for line in section.strip().splitlines() if line.strip()]
 
 
+def orient():
+    head = git("rev-parse", "--short", "HEAD")
+    remote = git("rev-parse", "--short", "-q", "--verify", f"refs/remotes/origin/{SPEC_BRANCH}")
+    changed = [line.strip() for line in git("status", "--short", "--", ".", ":!examples/resident-intake").splitlines()]
+    state = json.loads(STATE.read_text()) if STATE.exists() else {}
+    read_at = state.get("read_at_head", "")[:9]
+    behind = git("rev-list", "--count", f"{read_at}..HEAD") if read_at else "every"
+    failing = [name for name, outcome in state.get("checks", {}).items() if not outcome.get("pass")]
+    dated = [(number, found.group(1)) for number, found in
+             ((number, OWNER_LINE.match(line)) for number, line in enumerate((SPEC / "CLAUDE.md").read_text().splitlines(), 1)) if found]
+    latest = max((date for _, date in dated), default="")
+    step = state.get("step", {})
+    print("\n".join([
+        f"orient: {git('rev-parse', '--abbrev-ref', 'HEAD')} at {head}; origin/{SPEC_BRANCH} at {remote or 'none'}"
+        + ("" if remote == head else "; they differ, so push or read why before acting"),
+        "uncommitted: " + (", ".join(changed[:12]) or "none"),
+        f"last committed STATE: read at {read_at or 'no commit'}, {behind} commits behind HEAD, {state.get('passed', 0)} of "
+        f"{state.get('total', 0)} pass, failing {', '.join(failing) or 'none'}, step {step.get('number', '?')} {step.get('name', '')}",
+        f"owner decisions dated {latest}: spec/CLAUDE.md lines {', '.join(str(number) for number, date in dated if date == latest)}",
+        f"handoff, {HANDOFF}:",
+        HANDOFF.read_text() if HANDOFF.is_file() else "MISSING: write the handoff before any other work",
+        "Before acting: read the handoff whole, the owner lines above and every file the next queue item touches; "
+        "a claim stands on what is run now, never on what is recalled.",
+    ]))
+
+
 def main():
+    if "--orient" in sys.argv[1:]:
+        orient()
+        return 0
     brief = "--brief" in sys.argv[1:]
     previous = json.loads(STATE.read_text()) if STATE.exists() else {}
     outcomes = run_checks(brief, previous)
