@@ -1,6 +1,6 @@
 {
-  "budgetSeconds": 2.24,
-  "slowestSeconds": 0.56,
+  "budgetSeconds": 3.04,
+  "slowestSeconds": 0.76,
   "slowest": "Alis.Reactive.Conformance.PlaywrightTests.Harness.WhenAGateHoldsAnAnswer(\"net10\").the_held_answer_reads_the_word_seeded_while_it_was_held",
   "actionWaitMilliseconds": 208,
   "slowestActionMilliseconds": 52,

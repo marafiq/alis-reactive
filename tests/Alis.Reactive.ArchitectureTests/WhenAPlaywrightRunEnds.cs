@@ -36,6 +36,18 @@ public class WhenAPlaywrightRunEnds
         Assert.That(read.ExitCode, Is.Zero);
     }
 
+    [AcceptedCase]
+    public void a_shards_green_run_names_its_pool_and_its_shard()
+    {
+        using var written = new WrittenFolder();
+        var selection = written.Write("selection.json", JsonSerializer.Serialize(new { label = "core", shard = "2/3", filter = "", cases = new[] { Listed } }));
+
+        var read = Run("--selection", selection, "--trx", Trx(written, [Ran(Listed, "Passed", 1)]), "--budget", Budget(written, 8, 2));
+
+        Assert.That(read.Said, Is.EqualTo(new[] { $"[playwright:result] core 2/3: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.00s {Listed}" }));
+        Assert.That(read.ExitCode, Is.Zero);
+    }
+
     [RefusedCase]
     public void a_run_that_wrote_no_trx_is_refused()
     {
@@ -249,6 +261,7 @@ public class WhenAPlaywrightRunEnds
         using var written = new WrittenFolder();
         var selection = Selection(written, [Listed, Opened]);
         var budget = written.Write("measured.json", JsonSerializer.Serialize(new { testsAtOnce = 1, wallSeconds = WallSeconds(200, 190, 185, 195) }));
+        written.Write("shard-weights.json", "{ \"Rounds\": 7, \"Harness\": 0.9 }");
         var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
         {
             Steps(
@@ -262,15 +275,17 @@ public class WhenAPlaywrightRunEnds
             return Trx(written, [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", run == 7 ? 2.125 : 1.5)], $"measure-{run}.trx");
         });
 
-        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, "--weights", Weights(selection), .. runs]);
 
         Assert.That(measured.Said, Is.EqualTo(new[]
         {
             $"[playwright:measured] budget 8.52s, four times the slowest test of 20 green runs of 2 tests, 2.13s {Opened}",
             $"[playwright:measured] action wait 284ms, four times the slowest action, 71ms Frame.expect in {Opened}",
             $"[playwright:measured] navigation wait 364ms, four times the slowest navigation, 91ms Page.reload in {Opened}",
+            "[playwright:measured] a run's seconds by shard unit: Residents 1.53s, Rounds 1s",
         }));
         Assert.That(measured.ExitCode, Is.Zero);
+        Assert.That(File.ReadAllText(Weights(selection)), Is.EqualTo("{\n  \"Harness\": 0.9,\n  \"Residents\": 1.53,\n  \"Rounds\": 1\n}\n"));
         using var held = JsonDocument.Parse(File.ReadAllText(budget));
         Assert.That(held.RootElement.GetProperty("budgetSeconds").GetDouble(), Is.EqualTo(8.52));
         Assert.That(held.RootElement.GetProperty("slowestSeconds").GetDouble(), Is.EqualTo(2.13));
@@ -300,7 +315,7 @@ public class WhenAPlaywrightRunEnds
             return Trx(written, [Ran(Listed, "Passed", 1)], $"measure-{run}.trx");
         });
 
-        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, "--weights", Weights(selection), .. runs]);
 
         Assert.That(measured.Said, Is.EqualTo(new[]
         {
@@ -454,7 +469,7 @@ public class WhenAPlaywrightRunEnds
             return Trx(written, [Ran(Listed, "Passed", 1)], $"measure-{run}.trx");
         }).ToList();
 
-        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, "--weights", Weights(selection), .. runs]);
 
         Assert.That(measured.Said, Is.EqualTo(new[]
         {
@@ -476,7 +491,7 @@ public class WhenAPlaywrightRunEnds
             return Trx(written, [Ran(Listed, "Passed", 1)], $"measure-{run}.trx");
         });
 
-        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, "--weights", Weights(selection), .. runs]);
 
         Assert.That(measured.Said, Is.EqualTo(new[]
         {
@@ -494,7 +509,7 @@ public class WhenAPlaywrightRunEnds
         var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
         var runs = Enumerable.Range(1, RunsOfABudget - 1).Select(run => Trx(written, [Ran(Listed, "Passed", 1)], $"measure-{run}.trx"));
 
-        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, "--weights", Weights(selection), .. runs]);
 
         Assert.That(measured.Errors, Does.Contain("a budget is measured over 20 green runs, and 19 TRX files were given."));
         Assert.That(measured.ExitCode, Is.EqualTo(2));
@@ -513,7 +528,7 @@ public class WhenAPlaywrightRunEnds
             return Trx(written, [Ran(Listed, run == 20 ? "Failed" : "Passed", 1)], $"measure-{run}.trx");
         }).ToList();
 
-        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, "--weights", Weights(selection), .. runs]);
 
         Assert.That(measured.Said, Is.EqualTo(new[]
         {
@@ -531,7 +546,16 @@ public class WhenAPlaywrightRunEnds
         => Run("--selection", Selection(written, selected), "--trx", Trx(written, ran), "--budget", budget);
 
     private static string Selection(WrittenFolder written, string[] cases)
-        => written.Write("selection.json", JsonSerializer.Serialize(new { label = "rounds", filter = "", cases }));
+        => written.Write("selection.json", JsonSerializer.Serialize(new
+        {
+            label = "rounds",
+            shard = "1/1",
+            filter = "",
+            cases,
+            units = cases.ToDictionary(test => test, test => test == Opened ? "Residents" : "Rounds"),
+        }));
+
+    private static string Weights(string selection) => Path.Combine(Path.GetDirectoryName(selection)!, "shard-weights.json");
 
     private static Dictionary<string, double> WallSeconds(double atOne, double atTwo, double atFour, double atEight)
         => new() { ["1"] = atOne, ["2"] = atTwo, ["4"] = atFour, ["8"] = atEight };

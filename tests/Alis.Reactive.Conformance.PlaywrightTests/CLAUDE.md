@@ -38,6 +38,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   a fixture's tests one after another, and the budget is measured at it. A hand never edits the file: the runner
   refuses a budget or a wait that is not four times what it measured, a count its wall times do not keep, and a
   budget measured at another count.
+- `shard-weights.json` holds the seconds each shard unit took in one run, which `--measure` writes: a module folder,
+  a slice under FusionComponents, and the host variants' tests as one unit. CI runs a pool in shards (`--pool`,
+  `--shard`), its units placed longest first, each on the lightest shard; a unit with no weight is placed last.
 - `Harness/WhenAGateHoldsAnAnswer.cs` is the pattern: the page, the gesture and the outcome are in the test's body,
   and the opposite case stands beside it.
 
@@ -123,6 +126,7 @@ scripts/playwright.sh --unit U2
 scripts/playwright.sh WhenTwoWorldsRun
 scripts/playwright.sh --measure-parallelism --all
 scripts/playwright.sh --measure --all
+scripts/playwright.sh --pool core --shard "1/1"
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace '<title>{Text(title)}</title>' --with '<title>{Text(title)}</title><script src=\"/js/ej2.min.js\"></script>'
 ```

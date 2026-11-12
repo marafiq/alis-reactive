@@ -33,6 +33,30 @@ public class WhenAPlaywrightRunStarts
         $"harness WhenTwoWorldsRun.each_world_lists_its_own\t{Worlds}\teach_world_lists_its_own",
     ];
 
+    private const string Grid = "Tests.FusionComponents.FusionGrid.Residents.WhenAGridSorts";
+    private const string MultiSelect = "Tests.FusionComponents.FusionMultiSelect.Bench.WhenAnItemIsPicked";
+    private const string Badge = "Tests.FusionTemplates.Residents.WhenABadgeRenders";
+
+    private static readonly string[] TheSpecWithFusion =
+    [
+        .. TheSpec,
+        "M1.F1 X1.1 0\tM1_F1.X1_1_0\tU3\tresidents\tsnakeCase\tpool",
+        "M9.F1 X9.1 0\tM9_F1.X9_1_0\tU21\tresidents\tnet10\tpool",
+        "M21.F3 M21.X1 0\tM21_F3.M21_X1_0\tU26\tresidents\tnet10\tpool",
+        "M21.F3 M21.X1 0\tM21_F3.M21_X1_0\tU26\tresidents\tfusionShell\tpool",
+        "M21.F2 M21.X2 0\tM21_F2.M21_X2_0\tU25\tbench\tnet10\tpool",
+        "M22.F1 M22.X1 0\tM22_F1.M22_X1_0\tU25\tresidents\tnet10\tpool",
+        "M22.F1 M22.X1 0\tM22_F1.M22_X1_0\tU25\tresidents\tnet48\ttwin",
+    ];
+
+    private static readonly string[] TheAssemblyWithFusion =
+    [
+        .. TheAssembly,
+        $"M21.F3 M21.X1 0\t{Grid}\tthe_grid_sorts",
+        $"M21.F2 M21.X2 0\t{MultiSelect}\tthe_item_is_picked",
+        $"M22.F1 M22.X1 0\t{Badge}\tthe_badge_renders",
+    ];
+
     [Test]
     public void every_test_of_the_spec_lands_in_one_unit_under_a_host_of_one_kind()
     {
@@ -132,8 +156,88 @@ public class WhenAPlaywrightRunStarts
         var selected = Select(written, TheSpec, TheAssembly, "--unit", "U4", "--host", "net48");
 
         Assert.That(selected.Cases, Is.EqualTo(new[] { $"{Residents}(\"net48\").the_resident_is_opened" }));
+        Assert.That(selected.Units, Is.EqualTo(new[] { "twin" }));
         Assert.That(selected.Filter, Is.EqualTo($"(FullyQualifiedName~{Residents}&Name=the_resident_is_opened)&TestCategory=net48"));
         Assert.That(selected.Label, Is.EqualTo("U4@net48"));
+    }
+
+    [AcceptedCase]
+    public void a_pool_takes_its_tests_of_the_assembly_under_the_hosts_a_pool_serves()
+    {
+        using var written = new WrittenFolder();
+
+        var core = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, "--pool", "core");
+        var hosts = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, "--pool", "hosts");
+        var fusion = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, "--pool", "fusion");
+
+        Assert.That(core.Cases, Is.EqualTo(new[]
+        {
+            $"{Worlds}(\"net10\").each_world_lists_its_own",
+            $"{Residents}(\"net10\").the_resident_is_listed",
+            $"{Residents}(\"net10\").the_resident_is_opened",
+        }));
+        Assert.That(core.Filter, Is.EqualTo($"(FullyQualifiedName~{Worlds}|FullyQualifiedName~{Residents})&TestCategory!=fusionShell&TestCategory!=net48&TestCategory!=snakeCase"));
+        Assert.That(hosts.Cases, Is.EqualTo(new[] { $"{Residents}(\"snakeCase\").the_resident_is_listed", $"{Rounds}(\"snakeCase\").the_round_is_listed" }));
+        Assert.That(hosts.Units.Distinct(), Is.EqualTo(new[] { "hosts" }));
+        Assert.That(fusion.Cases, Is.EqualTo(new[]
+        {
+            $"{Grid}(\"fusionShell\").the_grid_sorts",
+            $"{Grid}(\"net10\").the_grid_sorts",
+            $"{MultiSelect}(\"net10\").the_item_is_picked",
+            $"{Badge}(\"net10\").the_badge_renders",
+        }));
+        Assert.That(fusion.Filter, Is.EqualTo($"(FullyQualifiedName~{Grid}|FullyQualifiedName~{MultiSelect}|FullyQualifiedName~{Badge})&TestCategory!=net48&TestCategory!=snakeCase"));
+        Assert.That(new[] { core.Label, hosts.Label, fusion.Label, fusion.Shard }, Is.EqualTo(new[] { "core", "hosts", "fusion", "1/1" }));
+    }
+
+    [AcceptedCase]
+    public void a_shard_takes_its_units_longest_first_each_onto_the_lightest_shard()
+    {
+        using var written = new WrittenFolder();
+        const string weights = "{ \"FusionComponents.FusionGrid\": 10, \"FusionTemplates\": 25, \"FusionComponents.FusionMultiSelect\": 30, \"Residents\": 90 }";
+
+        var first = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, weights, "--pool", "fusion", "--shard", "1/2");
+        var second = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, weights, "--pool", "fusion", "--shard", "2/2");
+
+        Assert.That(first.Cases, Is.EqualTo(new[] { $"{MultiSelect}(\"net10\").the_item_is_picked" }));
+        Assert.That(first.Units, Is.EqualTo(new[] { "FusionComponents.FusionMultiSelect" }));
+        Assert.That(first.Filter, Is.EqualTo($"FullyQualifiedName~{MultiSelect}&TestCategory!=fusionShell&TestCategory!=net48&TestCategory!=snakeCase"));
+        Assert.That(second.Cases, Is.EqualTo(new[] { $"{Grid}(\"fusionShell\").the_grid_sorts", $"{Grid}(\"net10\").the_grid_sorts", $"{Badge}(\"net10\").the_badge_renders" }));
+        Assert.That(second.Units, Is.EqualTo(new[] { "FusionComponents.FusionGrid", "FusionComponents.FusionGrid", "FusionTemplates" }));
+        Assert.That(second.Filter, Is.EqualTo($"(FullyQualifiedName~{Grid}|FullyQualifiedName~{Badge})&TestCategory!=net48&TestCategory!=snakeCase"));
+        Assert.That(new[] { first.Shard, second.Shard }, Is.EqualTo(new[] { "1/2", "2/2" }));
+    }
+
+    [AcceptedCase]
+    public void a_unit_with_no_weight_is_placed_last_on_the_lightest_shard()
+    {
+        using var written = new WrittenFolder();
+        const string stale = "{ \"FusionComponents.FusionGrid\": 30, \"FusionTemplates\": 25 }";
+
+        var first = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, stale, "--pool", "fusion", "--shard", "1/2");
+        var second = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, stale, "--pool", "fusion", "--shard", "2/2");
+        var unweighed = Select(written, TheSpecWithFusion, TheAssemblyWithFusion, "--pool", "fusion", "--shard", "1/2");
+
+        Assert.That(first.Units.Distinct(), Is.EqualTo(new[] { "FusionComponents.FusionGrid" }));
+        Assert.That(second.Units, Is.EqualTo(new[] { "FusionComponents.FusionMultiSelect", "FusionTemplates" }));
+        Assert.That(unweighed.Units.Distinct(), Is.EqualTo(new[] { "FusionComponents.FusionGrid", "FusionComponents.FusionMultiSelect", "FusionTemplates" }));
+    }
+
+    [RefusedCase]
+    public void a_shard_that_takes_no_unit_a_shard_of_no_pool_and_a_pool_that_is_none_are_refused()
+    {
+        using var written = new WrittenFolder();
+
+        Assert.That(Select(written, TheSpecWithFusion, TheAssemblyWithFusion, "--pool", "hosts", "--shard", "2/2").Errors.Trim(),
+            Is.EqualTo("[playwright:select] shard 2/2 of the pool 'hosts' takes no unit; the pool holds 1."));
+        Assert.That(Select(written, TheSpecWithFusion, TheAssemblyWithFusion, "--pool", "fusion", "--shard", "2/2").Errors.Trim(),
+            Is.EqualTo("[playwright:select] shard 2/2 of the pool 'fusion' takes no unit; the pool holds 3."));
+        Assert.That(Select(written, TheSpec, TheAssembly, "--pool", "fusion").Errors.Trim(), Is.EqualTo("[playwright:select] the pool 'fusion' holds no test of the assembly."));
+        Assert.That(Select(written, TheSpec, TheAssembly, "--unit", "U4", "--shard", "1/2").Errors.Trim(),
+            Is.EqualTo("[playwright:select] --shard parts a pool, and 'U4' is none; a shard is taken with --pool."));
+        Assert.That(Select(written, TheSpec, TheAssembly, "--pool", "core", "--shard", "3/2").Errors.Trim(),
+            Is.EqualTo("[playwright:select] --shard takes <i>/<k>, the i-th of k shards, and '3/2' is not that."));
+        Assert.That(Select(written, TheSpec, TheAssembly, "--pool", "native").Errors.Trim(), Is.EqualTo("[playwright:select] 'native' is no pool; the pools are core, hosts, fusion."));
     }
 
     [RefusedCase]
@@ -191,21 +295,33 @@ public class WhenAPlaywrightRunStarts
         Assert.That(Select(written, TheSpec, TheAssembly).Errors, Does.StartWith("[playwright:select] a run takes one selector, and 0 were given."));
     }
 
-    private static (IReadOnlyList<string> Cases, string Filter, string Label, string Errors, int ExitCode) Select(
-        WrittenFolder written, string[] spec, string[] assembly, params string[] selector)
+    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, string Errors, int ExitCode);
+
+    private static Selected Select(WrittenFolder written, string[] spec, string[] assembly, params string[] selector)
     {
+        var holdsWeights = selector.Length > 0 && selector[0].StartsWith('{');
+        var weights = written.Write("shard-weights.json", holdsWeights ? selector[0] : "{}");
         var selection = written.Write("selection.json", "");
         var run = Run("node",
         [
             Path.Combine(Repository.Root, Selector), "--spec", written.Write("landings.tsv", string.Join("\n", spec) + "\n"),
-            "--assembly", written.Write("tests.tsv", string.Join("\n", assembly) + "\n"), "--root", "Tests", "--out", selection, .. selector,
+            "--assembly", written.Write("tests.tsv", string.Join("\n", assembly) + "\n"), "--root", "Tests", "--weights", weights, "--out", selection,
+            .. selector.Skip(holdsWeights ? 1 : 0),
         ]);
-        if (run.ExitCode != 0) return ([], "", "", run.Errors, run.ExitCode);
+        if (run.ExitCode != 0) return new Selected([], [], "", "", "", run.Errors, run.ExitCode);
 
         using var read = JsonDocument.Parse(File.ReadAllText(selection));
         var filter = read.RootElement.GetProperty("filter").GetString()!;
         Assert.That(run.Output.TrimEnd('\n'), Is.EqualTo(filter), "The selector prints one filter and writes another");
-        return (read.RootElement.GetProperty("cases").EnumerateArray().Select(one => one.GetString()!).ToList(), filter, read.RootElement.GetProperty("label").GetString()!, run.Errors, 0);
+        var cases = read.RootElement.GetProperty("cases").EnumerateArray().Select(one => one.GetString()!).ToList();
+        return new Selected(
+            cases,
+            cases.Select(one => read.RootElement.GetProperty("units").GetProperty(one).GetString()!).ToList(),
+            filter,
+            read.RootElement.GetProperty("label").GetString()!,
+            read.RootElement.GetProperty("shard").GetString()!,
+            run.Errors,
+            0);
     }
 
     private static (string Output, string Errors, int ExitCode) Run(string program, string[] arguments)

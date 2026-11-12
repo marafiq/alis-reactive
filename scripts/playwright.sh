@@ -7,12 +7,14 @@ project="tests/$name"
 app="Alis.Reactive.Conformance.App"
 assembly="$project/bin/Release/net10.0/$name.dll"
 budget="$project/Harness/measured.json"
+weights="$project/shard-weights.json"
 measured_runs=20
 
 usage() {
   cat <<'USAGE'
 Usage:
   scripts/playwright.sh <selector> [--host <name>]
+  scripts/playwright.sh --pool <name> [--shard <i>/<k>]
   scripts/playwright.sh --measure <selector>
   scripts/playwright.sh --measure-parallelism <selector>
 
@@ -28,13 +30,16 @@ Selectors, one a run:
   --feature M<n>.F<n>   the tests of that feature
   --screen <id>         the tests app.json places on that screen
   --test <constant>     one test, by its promise constant as a test writes it after Promises. (M3_F1.X8_27_2)
+  --pool <name>         one pool of the tests the project holds: core, hosts or fusion
   <name>                a folder or a fixture of the test project, by its name (RequestsAndResponses)
 
 Options:
   --host <name>   Take that host alone. Without it a run takes the hosts the conformance app serves on this machine.
+  --shard <i>/<k> Take the i-th of a pool's k shards, its units placed longest first by the weights --measure wrote.
   --measure       Run the selection 20 times, each green, and write to the harness's measured.json the budget,
                   four times the slowest test, and the action wait and the navigation wait, each four times the
-                  slowest step of its kind. A measured run sets no measured wait and records every step.
+                  slowest step of its kind, and to shard-weights.json the seconds each shard unit took in a run.
+                  A measured run sets no measured wait and records every step.
   --measure-parallelism
                   Run the selection 20 times at each of 1, 2, 4 and 8 tests at once, each a measured run, and write
                   to measured.json the count a run takes: the quickest of 2, 4 and 8 whose green runs took at most
@@ -53,17 +58,21 @@ refuse() {
 selector=()
 selectors=0
 host=()
+shard=()
 measure=0
 parallelism=0
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --all) selector=("$1"); selectors=$((selectors + 1)); shift ;;
-    --unit|--through|--feature|--screen|--test)
+    --unit|--through|--feature|--screen|--test|--pool)
       [ "$#" -ge 2 ] || refuse "$1 takes a value."
       selector=("$1" "$2"); selectors=$((selectors + 1)); shift 2 ;;
     --host)
       [ "$#" -ge 2 ] || refuse "--host takes a value."
       host=("$1" "$2"); shift 2 ;;
+    --shard)
+      [ "$#" -ge 2 ] || refuse "--shard takes a value."
+      shard=("$1" "$2"); shift 2 ;;
     --measure) measure=1; shift ;;
     --measure-parallelism) parallelism=1; shift ;;
     -h|--help) usage; exit 0 ;;
@@ -99,7 +108,8 @@ fi
 
 dotnet run scripts/list-tests.cs -p:RestorePackagesWithLockFile=false -- "$assembly" > "$run/tests.tsv"
 python3 spec/tools/landings.py > "$run/landings.tsv"
-filter="$(node scripts/playwright-select.mjs --spec "$run/landings.tsv" --assembly "$run/tests.tsv" --root "$name" --out "$run/selection.json" "${selector[@]}" ${host[@]+"${host[@]}"})"
+filter="$(node scripts/playwright-select.mjs --spec "$run/landings.tsv" --assembly "$run/tests.tsv" --root "$name" --weights "$weights" --out "$run/selection.json" \
+  "${selector[@]}" ${host[@]+"${host[@]}"} ${shard[@]+"${shard[@]}"})"
 echo "[playwright:runner] filter: ${filter:-every test}"
 
 run_the_tests() {
@@ -143,7 +153,7 @@ elif [ "$measure" -eq 1 ]; then
     run_measured "measure-$number" "$at_once"
     echo "[playwright:runner] measured run $number of $measured_runs"
   done
-  node scripts/playwright-result.mjs --measure --selection "$run/selection.json" --budget "$budget" "$run"/measure-*.trx
+  node scripts/playwright-result.mjs --measure --selection "$run/selection.json" --budget "$budget" --weights "$weights" "$run"/measure-*.trx
 else
   run_the_tests run "$at_once" | tee "$run/run.log"
   left="$(stop_servers_whose_test_process_ended "a server left alive after this run")"
