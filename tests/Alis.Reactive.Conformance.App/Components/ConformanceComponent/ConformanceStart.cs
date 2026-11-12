@@ -27,7 +27,19 @@ public sealed class ConformanceStart
 
     public string? CurrentItem { get; init; }
 
+    public bool CurrentItemLacksAct { get; init; }
+
+    public bool CurrentItemLacksValue { get; init; }
+
+    public bool Enabled { get; init; } = true;
+
+    public StartsStart Starts { get; init; } = new();
+
+    public IReadOnlyList<BindingStart> Bindings { get; init; } = [];
+
     public IReadOnlyList<ItemStart> Items { get; init; } = [];
+
+    public IReadOnlyList<ItemStart>? NullableItems { get; init; }
 
     public IReadOnlyList<RaiseStart> Raises { get; init; } = [];
 
@@ -44,4 +56,6 @@ public sealed class ConformanceStart
     public string TextEndpoint { get; init; } = WorldEndpoints.Text;
 
     public string HeldCountEndpoint { get; init; } = WorldEndpoints.HeldCount;
+
+    public string RecordEndpoint { get; init; } = WorldEndpoints.Record;
 }

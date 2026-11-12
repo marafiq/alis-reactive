@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardOnFile
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ward on file";
+    var plan = Html.ReactivePlan<WardOnFile>();
+}
+<h1>Ward on file</h1>
+<p>Ward: <span id="ward"></span></p>
+<p>Ward asked for in the query: <span id="queried-ward"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        pipeline.Element("ward").Text.Set(pipeline.PageUrl<WardOnFile>(CarePages.WardOnFile).Read(page => page.Ward));
+        pipeline.Element("queried-ward").Text.Set(pipeline.PageUrl<WardOnFile>().Read(page => page.Ward));
+    }));
+}
+@Html.RenderPlan(plan)

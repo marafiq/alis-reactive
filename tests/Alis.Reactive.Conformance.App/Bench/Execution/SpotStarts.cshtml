@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SpotStartsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Spots";
+    var plan = Html.ReactivePlan<SpotStartsBoard>();
+}
+<h1>Spots</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Starts = new StartsStart { PopulatedPlace = Model.Place, GetterOnlyPlace = Model.Place, ReplacedPlace = Model.Place } }))
+<button type="button" @Html.Raises(plan, SpotStartButtons.ShowTheSpots)>Show the spots</button>
+<dl>
+    <dt>Populated spot</dt>
+    <dd id="populated-place"></dd>
+    <dt>Getter-only spot</dt>
+    <dd id="getter-place"></dd>
+    <dt>Replaced spot</dt>
+    <dd id="replaced-place"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(SpotStartButtons.ShowTheSpots, pipeline =>
+    {
+        var conformance = pipeline.Component<ConformanceComponent>("conformance");
+        pipeline.Element("populated-place").Text.Set(conformance.Starts.Read(starts => starts.Populated.Place));
+        pipeline.Element("getter-place").Text.Set(conformance.Starts.Read(starts => starts.GetterOnly.Place));
+        pipeline.Element("replaced-place").Text.Set(conformance.Starts.Read(starts => starts.Replaced.Place));
+    }));
+}
+@Html.RenderPlan(plan)

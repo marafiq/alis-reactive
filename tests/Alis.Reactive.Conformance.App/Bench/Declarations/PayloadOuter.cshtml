@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PayloadOuterBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Handover";
+    var plan = Html.ReactivePlan<PayloadOuterBoard>();
+}
+<h1>Handover</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Outer = new OuterStart { Text = Model.OuterText } })
+    .Reactive(component => component.Raised, (raised, pipeline) =>
+    {
+        raised.Outer.Text.Set("seen at handover");
+        raised.Outer.Act();
+    }))
+@Html.RenderPlan(plan)

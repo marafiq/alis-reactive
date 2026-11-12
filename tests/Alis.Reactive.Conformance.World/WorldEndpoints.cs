@@ -14,4 +14,5 @@ public static class WorldEndpoints
     public const string Item = "/world/item";
     public const string Text = "/world/text";
     public const string HeldCount = "/world/held-count";
+    public const string Record = "/world/record";
 }

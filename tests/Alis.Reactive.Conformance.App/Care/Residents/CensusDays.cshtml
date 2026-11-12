@@ -1,0 +1,26 @@
+@using System.Globalization
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusDays
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission days";
+    var plan = Html.ReactivePlan<CensusDays>();
+    var cutoff = Model.Cutoff;
+}
+<h1>Admission days</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Records = Model.Admissions }))
+<p>Admitted before @Model.Cutoff.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture): <span id="earlier-count">-</span></p>
+<p>Count log: <span id="count-log"></span></p>
+<button type="button" @Html.Raises(plan, CensusDayEvents.Count)>Count</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusDayEvents.Count, pipeline =>
+    {
+        pipeline.Element("earlier-count").Text.Set(pipeline.Component<ConformanceComponent>("census").Records.Count(r => r.Day < cutoff));
+        pipeline.Element("count-log").Text.Set("checked");
+    }));
+}
+@Html.RenderPlan(plan)

@@ -15,4 +15,6 @@ public sealed class RaiseStart
     public bool Flag { get; init; }
 
     public int Count { get; init; }
+
+    public bool EmptyRecord { get; init; }
 }

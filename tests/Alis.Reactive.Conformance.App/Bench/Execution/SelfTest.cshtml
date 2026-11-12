@@ -1,0 +1,48 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model SelfTestBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Self-test";
+    var plan = Html.ReactivePlan<SelfTestBoard>();
+}
+<h1>Self-test</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart()))
+@(plan.ConformanceComponent("conformance-older", new ConformanceStart { Version = ComponentVersion.Older, Record = new RecordStart { Count = Model.OldersCount } }))
+<button type="button" @Html.Raises(plan, SelfTestButtons.RunTheSelfTest)>Run the self-test</button>
+<button type="button" @Html.Raises(plan, SelfTestButtons.ReadTheCount)>Read the count</button>
+<button type="button" @Html.Raises(plan, SelfTestButtons.ShowTheRemoteCode)>Show the remote code</button>
+<button type="button" @Html.Raises(plan, SelfTestButtons.ReadOldersCount)>Read older's count</button>
+<button type="button" @Html.Raises(plan, SelfTestButtons.TakeTheMissingRecord)>Take the missing record</button>
+<dl>
+    <dt>Self-test</dt>
+    <dd id="check-status"></dd>
+    <dt>Record count</dt>
+    <dd id="record-count"></dd>
+    <dt>Remote code</dt>
+    <dd id="record-code"></dd>
+    <dt>Older's count</dt>
+    <dd id="older-count"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(SelfTestButtons.RunTheSelfTest, pipeline =>
+        {
+            pipeline.Element("check-status").Text.Set("Testing");
+            pipeline.Component<ConformanceComponent>("conformance").Settle();
+            pipeline.Element("check-status").Text.Set("Self-test passed");
+        })
+        .CustomEvent(SelfTestButtons.ReadTheCount, pipeline => pipeline.Element("record-count").Text.Set(pipeline.Component<ConformanceComponent>("conformance").SettleRecord().Read(record => record.Count)))
+        .CustomEvent(SelfTestButtons.ShowTheRemoteCode, pipeline => pipeline.Element("record-code").Text.Set(pipeline.Component<ConformanceComponent>("conformance").SettleRecord().Read(record => record.Code)))
+        .CustomEvent(SelfTestButtons.ReadOldersCount, pipeline => pipeline.Element("older-count").Text.Set(pipeline.Component<ConformanceComponent>("conformance-older").SettleRecord().Read(record => record.Count)))
+        .CustomEvent(SelfTestButtons.TakeTheMissingRecord, pipeline =>
+        {
+            var conformance = pipeline.Component<ConformanceComponent>("conformance");
+            conformance.TakeText(conformance.SettleMaybe().Read(record => record!.Name).OrNull());
+        }));
+}
+@Html.RenderPlan(plan)

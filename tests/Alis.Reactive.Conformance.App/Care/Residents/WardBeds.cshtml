@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardPage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ward";
+    var plan = Html.ReactivePlan<WardPage>();
+}
+<h1>Ward</h1>
+<p>Beds: <span id="beds"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("beds").Text.Set(pipeline.PageUrl<WardPage>().Read(page => page.Beds))));
+}
+@Html.RenderPlan(plan)

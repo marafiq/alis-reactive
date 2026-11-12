@@ -1,0 +1,23 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitCounts
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visits";
+    var plan = Html.ReactivePlan<VisitCounts>();
+}
+<h1>Visits</h1>
+<p>Visits by Ruth or in the North ward: <span id="ruth-or-north">-</span></p>
+<p>Visits other than Ruth's in the South ward: <span id="not-ruth-in-south">-</span></p>
+<button type="button" @Html.Raises(plan, VisitCountEvents.Count)>Count</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(VisitCountEvents.Count, pipeline => pipeline.Get(Model.Visits)
+        .OnSuccess<List<CountedVisit>>((visits, pipeline) =>
+        {
+            pipeline.Element("ruth-or-north").Text.Set(visits.Body.Count(v => v.Carer!.Name == "Ruth" || v.Ward == "North"));
+            pipeline.Element("not-ruth-in-south").Text.Set(visits.Body.Count(v => !(v.Carer!.Name == "Ruth" && v.Ward == "South")));
+        })));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,23 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Declarations
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RecordCountBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Records counted";
+    var plan = Html.ReactivePlan<RecordCountBoard>();
+}
+<h1>Records counted</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Records = Model.Records }))
+<button type="button" @Html.Raises(plan, RecordCountButtons.Count)>Count</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RecordCountButtons.Count, pipeline =>
+    {
+        var conformance = pipeline.Component<ConformanceComponent>("conformance");
+        conformance.NullableCount.Set(conformance.Records.Count());
+    }));
+}
+@Html.RenderPlan(plan)

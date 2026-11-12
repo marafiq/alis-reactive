@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StaffRoster
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Staff roster";
+    var plan = Html.ReactivePlan<StaffRoster>();
+}
+<h1>Staff roster of ward @Model.Ward</h1>
+<button type="button" @Html.Raises(plan, StaffRosters.Send)>Send roster</button>
+<p>Roster received: <span id="roster-echo">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(StaffRosters.Send, pipeline => pipeline.Get(Model.Planned)
+        .OnSuccess<List<Shift?>>((planned, pipeline) => pipeline
+            .Get<SentRoster>(StaffRosterEndpoints.Sent, request => request.Set(r => r.Shifts, planned.Body))
+            .OnSuccess(Content.Text, (echoed, pipeline) => pipeline.Element("roster-echo").Text.Set(echoed.Body)))));
+}
+@Html.RenderPlan(plan)

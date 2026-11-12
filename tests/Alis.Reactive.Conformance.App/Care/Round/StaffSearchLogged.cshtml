@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StaffSearch
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Staff of the round";
+    var plan = Html.ReactivePlan<StaffSearch>();
+}
+<h1>@Model.Round round: find staff</h1>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner" }))
+<button type="button" @Html.Raises(plan, StaffSearches.Find)>Find staff</button>
+<p>Search log: <span id="search-log">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(StaffSearches.Find, pipeline =>
+    {
+        pipeline.Get<StaffQuery>(CareEndpoints.RoundStaff, request => request.Set(r => r.Choice, pipeline.Component<ConformanceComponent>("scanner").Choice));
+        pipeline.Element("search-log").Text.Set("Sent");
+    }));
+}
+@Html.RenderPlan(plan)

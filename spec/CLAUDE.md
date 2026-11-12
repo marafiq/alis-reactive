@@ -1025,6 +1025,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   lists Log and Names, an answer line of several answers as its items) is the forks' reading of
   `spec/Reference/native.json`, to be stated among its behaviors when U13 writes their TypeScript. A bench page's
   own plugin sits beside the page that calls it (`PageTally`, `BenchClock`). The owner can overrule each.
+- The lead, 2026-11-12, landing forty-five more pages, three forks' work, and settling what they read into. The
+  conformance component's start holds what each page starts it with, a member added with the first page that
+  needs it and written by the render helper as the plan writes a literal (records, items that lack a declared
+  member, a nullable list that holds null, bindings, raise buttons); two forks that add one member are joined
+  by hand. The world's record endpoint reaches the settle gate, and four seeds change what the bench's
+  component holds. A bench page whose plugins are scripts names them through its own layout,
+  `tests/Alis.Reactive.Conformance.App/Bench/Plugins/_ScriptedLayout.cshtml`, which links the files U13 writes. A
+  null literal at a `Set` or an argument is ambiguous to the compiler, so a view passes a null it holds as a
+  typed value. Three gaps are raised, none worked around: the result of a list operation, an
+  `IReadOnlyList<T>`, does not fit a property declared `List<T>` (M4.X3's sentence); M4.X2's promise needs a
+  record whose code holds null, which `spec/Reference/native.json` types a text; and no door writes a list as an
+  element's rows (X4.9). The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

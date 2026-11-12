@@ -52,6 +52,14 @@ public sealed class Seed
 
     public bool? BedsDropTheirConnection { get; set; }
 
+    public bool? ComponentHoldsNoRecords { get; set; }
+
+    public string? ComponentStartsPlace { get; set; }
+
+    public string? ComponentBetaConstructor { get; set; }
+
+    public int? RecordCount { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed TheWord(string word) => new() { Word = word };
@@ -99,6 +107,14 @@ public sealed class Seed
     public static Seed TheItemEndpointRefuses() => new() { ItemRefuses = true };
 
     public static Seed TheBedsEndpointDropsItsConnection() => new() { BedsDropTheirConnection = true };
+
+    public static Seed TheComponentHoldsNoRecords() => new() { ComponentHoldsNoRecords = true };
+
+    public static Seed TheComponentsStartsPlace(string place) => new() { ComponentStartsPlace = place };
+
+    public static Seed TheComponentsBetaConstructor(string constructor) => new() { ComponentBetaConstructor = constructor };
+
+    public static Seed TheRecordEndpointsCount(int count) => new() { RecordCount = count };
 
     public Seed AndResident(string name)
     {

@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NameFilterBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ward names";
+    var plan = Html.ReactivePlan<NameFilterBoard>();
+}
+<h1>@Model.Caption</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart())
+    .Reactive(component => component.Raised, (raised, pipeline) =>
+    {
+        raised.WriteOnlyText.Set("Filtered");
+        pipeline.Get<NameFilterQuery>(NameFilterEndpoints.Names, request => request.Query(query => query.Text, raised.Text))
+            .OnSuccess<IReadOnlyList<string>>((names, pipeline) => raised.Fill(names.Body));
+    }))
+@Html.RenderPlan(plan)

@@ -1,0 +1,67 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftLogDeskBoard
+@{
+    Layout = "/Bench/Plugins/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Shift log";
+    var plan = Html.ReactivePlan<ShiftLogDeskBoard>();
+    plan.Plugin<ShiftLog>().Reactive(log => log.Signed, pipeline => pipeline.Element("log-signed").Text.Set("signed"));
+    plan.Plugin<NightClock>().Reactive(clock => clock.Struck, pipeline => pipeline.Element("clock-struck").Text.Set("midnight"));
+    plan.Plugin<BedStore>().Reactive(store => store.Freed, (freed, pipeline) => pipeline.Element("bed-freed").Text.Set(freed.Bed));
+}
+<h1>Shift log</h1>
+<section aria-label="Night shift">
+    <button type="button" id="sign-the-log">Sign the log</button>
+    <button type="button" id="strike-midnight">Strike midnight</button>
+    <button type="button" id="free-bed-4">Free bed 4</button>
+</section>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Items = Model.Residents }))
+<button type="button" @Html.Raises(plan, ShiftLogDeskButtons.AddANote)>Add a note</button>
+<button type="button" @Html.Raises(plan, ShiftLogDeskButtons.SetTheEntriesToFive)>Set the entries to 5</button>
+<button type="button" @Html.Raises(plan, ShiftLogDeskButtons.CheckTheLog)>Check the log</button>
+<button type="button" @Html.Raises(plan, ShiftLogDeskButtons.AnswerTheItems)>Answer the items</button>
+<button type="button" @Html.Raises(plan, ShiftLogDeskButtons.ReadTheInitials)>Read the initials</button>
+<dl>
+    <dt>Entries</dt>
+    <dd id="entries"></dd>
+    <dt>Log</dt>
+    <dd id="log-state"></dd>
+    <dt>Initials</dt>
+    <dd id="initials-read"></dd>
+    <dt>Log signed</dt>
+    <dd id="log-signed"></dd>
+    <dt>Clock struck</dt>
+    <dd id="clock-struck"></dd>
+    <dt>Bed freed</dt>
+    <dd id="bed-freed"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ShiftLogDeskButtons.AddANote, pipeline =>
+        {
+            var log = pipeline.Plugin<ShiftLog>();
+            log.Add("fed");
+            pipeline.Element("entries").Text.Set(log.Entries);
+        })
+        .CustomEvent(ShiftLogDeskButtons.SetTheEntriesToFive, pipeline =>
+        {
+            var log = pipeline.Plugin<ShiftLog>();
+            log.Entries.Set(5);
+            pipeline.Element("entries").Text.Set(log.Entries);
+        })
+        .CustomEvent(ShiftLogDeskButtons.CheckTheLog, pipeline => pipeline.When(pipeline.Plugin<ShiftLog>().Entries.Gt(5))
+            .Then(pipeline =>
+            {
+                var log = pipeline.Plugin<ShiftLog>();
+                log.Add("checked");
+                pipeline.Element("entries").Text.Set(log.Entries);
+                pipeline.Element("log-state").Text.Set("busy");
+            })
+            .Else(pipeline => pipeline.Element("log-state").Text.Set("quiet")))
+        .CustomEvent(ShiftLogDeskButtons.AnswerTheItems, pipeline => pipeline.Component<ConformanceComponent>("conformance").Answer.Set(item => pipeline.Plugin<ShiftLog>().Label(item.Name)))
+        .CustomEvent(ShiftLogDeskButtons.ReadTheInitials, pipeline => pipeline.Element("initials-read").Text.Set(pipeline.Plugin<Initials>().Of("Ada Lovelace"))));
+}
+@Html.RenderPlan(plan)

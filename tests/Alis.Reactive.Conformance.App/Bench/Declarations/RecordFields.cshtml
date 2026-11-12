@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RecordFieldsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The record";
+    var plan = Html.ReactivePlan<RecordFieldsBoard>();
+    Record? noRecord = null;
+}
+<h1>The record</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Record = new RecordStart { Name = Model.RecordName } }))
+<button type="button" @Html.Raises(plan, RecordFieldButtons.ShowTheRecord)>Show the record</button>
+<button type="button" @Html.Raises(plan, RecordFieldButtons.ClearTheRecord)>Clear the record</button>
+<button type="button" @Html.Raises(plan, RecordFieldButtons.HoldTheEveningRecord)>Hold the evening record</button>
+<dl>
+    <dt>Record name</dt>
+    <dd id="record-name"></dd>
+    <dt>Record code</dt>
+    <dd id="record-code"></dd>
+    <dt>Times shown</dt>
+    <dd id="record-shown"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RecordFieldButtons.ShowTheRecord, pipeline =>
+        {
+            var conformance = pipeline.Component<ConformanceComponent>("conformance");
+            pipeline.Element("record-name").Text.Set(conformance.Record.Read(record => record.Name));
+            pipeline.Element("record-code").Text.Set(conformance.Record.Read(record => record.Code));
+            pipeline.Element("record-shown").Text.Set(pipeline.Plugin<RecordTally>().AddOne());
+        })
+        .CustomEvent(RecordFieldButtons.ClearTheRecord, pipeline => pipeline.Component<ConformanceComponent>("conformance").Record.Set(noRecord!))
+        .CustomEvent(RecordFieldButtons.HoldTheEveningRecord, pipeline => pipeline.Component<ConformanceComponent>("conformance").Record
+            .Set(pipeline.Object<Record>(evening => evening.Set(record => record.Name, "Evening").Set(record => record.Code, "C5")))));
+}
+@Html.RenderPlan(plan)

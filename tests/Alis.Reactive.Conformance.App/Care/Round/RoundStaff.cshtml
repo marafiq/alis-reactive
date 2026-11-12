@@ -1,0 +1,19 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundStaff
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Staff on the round";
+    var plan = Html.ReactivePlan<RoundStaff>();
+}
+<h1>@Model.Round round: the staff</h1>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner", Bindings = [new BindingStart { Name = "Ada", Renamed = Model.RoleOfAda }] }))
+<p>Ada's role: <span id="renamed"></span></p>
+<button type="button" @Html.Raises(plan, RoundStaffEvents.Show)>Show the renamed member</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoundStaffEvents.Show, pipeline => pipeline.Element("renamed").Text.Set(pipeline.Component<ConformanceComponent>("scanner").Bindings.Find(b => b.Name == "Ada", b => b.Renamed))));
+}
+@Html.RenderPlan(plan)

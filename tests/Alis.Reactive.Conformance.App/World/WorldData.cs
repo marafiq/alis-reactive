@@ -31,6 +31,10 @@ internal sealed class WorldData
     private volatile bool _countRefuses;
     private volatile bool _itemRefuses;
     private volatile bool _bedsDropTheirConnection;
+    private volatile bool _componentHoldsNoRecords;
+    private volatile string? _componentStartsPlace;
+    private volatile string? _componentBetaConstructor;
+    private volatile int _recordCount = 125;
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -78,6 +82,14 @@ internal sealed class WorldData
 
     internal bool BedsDropTheirConnection => _bedsDropTheirConnection;
 
+    internal bool ComponentHoldsNoRecords => _componentHoldsNoRecords;
+
+    internal string? ComponentStartsPlace => _componentStartsPlace;
+
+    internal string? ComponentBetaConstructor => _componentBetaConstructor;
+
+    internal int RecordCount => _recordCount;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
@@ -103,6 +115,10 @@ internal sealed class WorldData
         if (seed.CountRefuses is { } countRefuses) _countRefuses = countRefuses;
         if (seed.ItemRefuses is { } itemRefuses) _itemRefuses = itemRefuses;
         if (seed.BedsDropTheirConnection is { } bedsDropTheirConnection) _bedsDropTheirConnection = bedsDropTheirConnection;
+        if (seed.ComponentHoldsNoRecords is { } holdsNoRecords) _componentHoldsNoRecords = holdsNoRecords;
+        if (seed.ComponentStartsPlace is { } startsPlace) _componentStartsPlace = startsPlace;
+        if (seed.ComponentBetaConstructor is { } betaConstructor) _componentBetaConstructor = betaConstructor;
+        if (seed.RecordCount is { } recordCount) _recordCount = recordCount;
     }
 
     internal void Arm(GateOrder order) => _gates[(order.Gate, order.At)] = new WorldGate();

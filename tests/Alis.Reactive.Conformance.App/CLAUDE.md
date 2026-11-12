@@ -40,6 +40,9 @@ its views.
   render helper, for a field (`Components/ConformanceComponent/ConformanceComponentHtml.cs`). `Bench/Vendors/`
   holds the pages of module 12's feature tests, each on the conformance declaration that holds its vendor kind;
   each of those declarations has its render helper beside it (`Components/ConformanceStore/ConformanceStoreHtml.cs`).
+  `Bench/Declarations/`, `Bench/Plugins/` and `Bench/Execution/` hold the pages of the bench's other feature
+  tests, a folder a module; a page whose plugins are scripts takes `Bench/Plugins/_ScriptedLayout.cshtml`, which
+  links the scripts the page names before the framework's.
 - `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has
   its link there, and so does the page that renders beside it. A module's refusal pages sit in a folder named for
   it (`Refusals/ArrayLambdas/` holds ten): a controller for each screen with its models, the refused page and the

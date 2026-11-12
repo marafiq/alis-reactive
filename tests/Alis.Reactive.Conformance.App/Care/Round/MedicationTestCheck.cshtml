@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model MedicationTestCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Medication check";
+    var plan = Html.ReactivePlan<MedicationTestCheck>();
+}
+<h1>Medication of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, MedicationChecks.FindTheChart)>Find the chart</button>
+@(Html.InputField(plan, m => m.Test, options => options.Label("Test")).NativeCheckBox())
+<button type="button" @Html.Raises(plan, MedicationChecks.Check)>Check</button>
+<p>Chart searched for: <span id="chart-resident">-</span></p>
+<p>Dose: <span id="dose-badge">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(MedicationChecks.FindTheChart, pipeline => pipeline.Get(Model.Chart)
+            .OnSuccess<ChartSearch>((found, pipeline) => pipeline.Element("chart-resident").Text.Set(found.Body.Read(search => search.Resident))))
+        .CustomEvent(MedicationChecks.Check, pipeline => pipeline.Get(Model.Chart)
+            .OnSuccess<ChartSearch>((found, pipeline) => pipeline
+                .When(pipeline.Input(m => m.Test).Component<NativeCheckBox>().Checked.Choose(DoseStatus.Given, found.Body.Read(search => search.Chart!.Status)).Eq(DoseStatus.Given))
+                .Then(pipeline => pipeline.Element("dose-badge").Text.Set("Given"))
+                .Else(pipeline => pipeline.Element("dose-badge").Text.Set("Not given")))));
+}
+@Html.RenderPlan(plan)

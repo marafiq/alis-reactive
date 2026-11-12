@@ -1,4 +1,5 @@
 using System.Text.Encodings.Web;
+using Alis.Reactive.Conformance.App.Components;
 using Alis.Reactive.Conformance.World;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
@@ -61,6 +62,8 @@ internal static class WorldArea
         app.MapPost(WorldEndpoints.Text, (CurrentWorld world) => world.Data.TextRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.Json("Settled text"))
             .AddEndpointFilter(AtTheSettleGate);
         app.MapPost(WorldEndpoints.HeldCount, (CurrentWorld world) => world.Data.HeldCountRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.Json(42))
+            .AddEndpointFilter(AtTheSettleGate);
+        app.MapPost(WorldEndpoints.Record, (CurrentWorld world) => Results.Json(new Record { Count = world.Data.RecordCount, Code = "C-750" }))
             .AddEndpointFilter(AtTheSettleGate);
     }
 

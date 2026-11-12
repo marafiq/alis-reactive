@@ -1,0 +1,47 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ReadOnlyTextBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Read-only text";
+    var plan = Html.ReactivePlan<ReadOnlyTextBoard>();
+}
+<h1>Read-only text</h1>
+@(plan.ConformanceComponent("conformance-older", new ConformanceStart { Version = ComponentVersion.Older, Text = Model.Text }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, ReadOnlyText = Model.ReadOnlyText }))
+<button type="button" @Html.Raises(plan, ReadOnlyTextButtons.ReadOldersReadOnlyText)>Read older's read-only text</button>
+<button type="button" @Html.Raises(plan, ReadOnlyTextButtons.ReadTheReadOnlyText)>Read the read-only text</button>
+<button type="button" @Html.Raises(plan, ReadOnlyTextButtons.ShowOldersText)>Show older's text</button>
+<dl>
+    <dt>Older's read tried</dt>
+    <dd id="tried"></dd>
+    <dt>Older's read-only text</dt>
+    <dd id="read"></dd>
+    <dt>Older's read done</dt>
+    <dd id="done"></dd>
+    <dt>Read-only text</dt>
+    <dd id="b-read"></dd>
+    <dt>Read done</dt>
+    <dd id="b-done"></dd>
+    <dt>Older's text</dt>
+    <dd id="text-read"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ReadOnlyTextButtons.ReadOldersReadOnlyText, pipeline =>
+        {
+            pipeline.Element("tried").Text.Set("reading");
+            pipeline.Element("read").Text.Set(pipeline.Component<ConformanceComponent>("conformance-older").ReadOnlyText);
+            pipeline.Element("done").Text.Set("read");
+        })
+        .CustomEvent(ReadOnlyTextButtons.ReadTheReadOnlyText, pipeline =>
+        {
+            pipeline.Element("b-read").Text.Set(pipeline.Component<ConformanceComponent>("conformance").ReadOnlyText);
+            pipeline.Element("b-done").Text.Set("read");
+        })
+        .CustomEvent(ReadOnlyTextButtons.ShowOldersText, pipeline => pipeline.Element("text-read").Text.Set(pipeline.Component<ConformanceComponent>("conformance-older").Text)));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NurseCall
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Nurse call";
+    var plan = Html.ReactivePlan<NurseCall>();
+}
+<h1>Nurse call of @Model.Room</h1>
+@(plan.ConformanceComponent("scanner", new ConformanceStart { Text = "Dose scanner" }))
+<button type="button" @Html.Raises(plan, NurseCalls.Call)>Call the nurse</button>
+<p>Call: <span id="call">Idle</span></p>
+<p>Desk: <span id="desk">Waiting</span></p>
+<p>Pager: <span id="pager"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(NurseCalls.Call, pipeline =>
+        {
+            pipeline.Element("call").Text.Set("Heard");
+            pipeline.Component<ConformanceComponent>("scanner").Settle();
+            pipeline.Element("desk").Text.Set("Acknowledged");
+        })
+        .CustomEvent(NurseCalls.Call, pipeline => pipeline.Element("pager").Text.Set(pipeline.Element("call").Text)));
+}
+@Html.RenderPlan(plan)

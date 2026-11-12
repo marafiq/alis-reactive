@@ -1,0 +1,33 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose round";
+    var plan = Html.ReactivePlan<DoseRound>();
+}
+<h1>@Model.Name dose round</h1>
+<button type="button" @Html.Raises(plan, DoseRounds.Count)>Count</button>
+<dl>
+    <dt>Doses outside ward North</dt>
+    <dd id="outside-north-count">-</dd>
+    <dt>Doses not in ward North</dt>
+    <dd id="not-in-north-count">-</dd>
+    <dt>Doses of another priority than 2</dt>
+    <dd id="not-second-priority-count">-</dd>
+    <dt>Doses of priority 2 or under</dt>
+    <dd id="top-priority-count">-</dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DoseRounds.Count, pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<WardDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("outside-north-count").Text.Set(doses.Body.Count(d => d.Ward != "North"));
+            pipeline.Element("not-in-north-count").Text.Set(doses.Body.Count(d => !(d.Ward == "North")));
+            pipeline.Element("not-second-priority-count").Text.Set(doses.Body.Count(d => d.Priority != 2));
+            pipeline.Element("top-priority-count").Text.Set(doses.Body.Count(d => d.Priority <= 2));
+        })));
+}
+@Html.RenderPlan(plan)
