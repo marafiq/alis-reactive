@@ -1561,10 +1561,10 @@
     },
     "paths": {
       "counts": {
-        "paths": 174,
+        "paths": 175,
         "problems": 0
       },
-      "detail": "each of 174 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
+      "detail": "each of 175 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
       "pass": true
     },
     "plants": {
@@ -3717,7 +3717,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "e8e1d75a8a14ed1051049041267ba8fb42bb54fd",
+  "read_at_head": "ac57a22a86bc914efea75157d5e96da5a896248c",
   "step": {
     "failing": [],
     "name": "End of session",
