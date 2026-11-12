@@ -1001,6 +1001,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   item, a gap raised with that use. X7.6's fourth promise named a text and a number as `Choose`'s two arms, which
   the type refuses; it names 1000 and `Total()` now, shown before the unit. The conformance component's start
   gains `Raises` and a text that holds null, as its behaviors state. The owner can overrule each.
+- The lead, 2026-11-12, landing sixteen more pages, three forks' work, and settling what they read into. A
+  request that sends the member an input binds is written `request.Input(r => r.Member, pipeline.Input(m =>
+  m.Member))` (N9.3): X9.20's picker is a `NativeDropDown` bound to the page's enum, since a text source at an
+  enum member does not compile. A promise that says the network holds no request is read by the element the
+  answer would fill keeping what it showed, beside the opposite case that fills it, until the harness holds a
+  page's requests for a test to read. A route that takes a parameter is linked from a plain page of its screen,
+  so the sweep of the app's pages opens it. A page reaches another origin as the same host under its other
+  loopback name. A seed is added where a test changes what an endpoint does while its page is open
+  (`Seed.TheBedsEndpointDropsItsConnection`). The container block names no element kind, so a promise's fieldset
+  is the block's element with a heading inside; the kind is part of the form the owner decides. One fact for
+  U11: which `Contains` C# 14 binds for an array inside an expression lambda is not read yet, and the identity
+  table keys what the tree carries. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

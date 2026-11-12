@@ -30,6 +30,7 @@ internal sealed class WorldData
     private volatile bool _settleRefuses;
     private volatile bool _countRefuses;
     private volatile bool _itemRefuses;
+    private volatile bool _bedsDropTheirConnection;
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -75,6 +76,8 @@ internal sealed class WorldData
 
     internal bool ItemRefuses => _itemRefuses;
 
+    internal bool BedsDropTheirConnection => _bedsDropTheirConnection;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
@@ -99,6 +102,7 @@ internal sealed class WorldData
         if (seed.SettleRefuses is { } settleRefuses) _settleRefuses = settleRefuses;
         if (seed.CountRefuses is { } countRefuses) _countRefuses = countRefuses;
         if (seed.ItemRefuses is { } itemRefuses) _itemRefuses = itemRefuses;
+        if (seed.BedsDropTheirConnection is { } bedsDropTheirConnection) _bedsDropTheirConnection = bedsDropTheirConnection;
     }
 
     internal void Arm(GateOrder order) => _gates[(order.Gate, order.At)] = new WorldGate();

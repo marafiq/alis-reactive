@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentChartPanel
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents";
+    var plan = Html.ReactivePlan<ResidentChartPanel>();
+}
+<h1>Residents</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Record = new RecordStart { DetailName = Model.Resident } }))
+<button type="button" @Html.Raises(plan, ResidentCharts.Show)>Show chart</button>
+<p>Chart: <span id="chart-status">Waiting</span></p>
+<p>Chart log: <span id="chart-log">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentCharts.Show, pipeline =>
+    {
+        pipeline.Get<ResidentChartRequest>(CareEndpoints.ResidentChart, request => request.Path(r => r.ResidentName, pipeline.Component<ConformanceComponent>("census").Record.Read(record => record.Detail.Name)))
+            .WhileLoading(pipeline => pipeline.Element("chart-status").Text.Set("Loading"))
+            .Finally(pipeline => pipeline.Element("chart-status").Text.Set("Done"));
+        pipeline.Element("chart-log").Text.Set("After");
+    }));
+}
+@Html.RenderPlan(plan)

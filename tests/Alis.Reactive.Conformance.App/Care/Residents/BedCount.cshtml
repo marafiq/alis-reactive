@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedCountForm
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bed count";
+    var plan = Html.ReactivePlan<BedCountForm>();
+}
+<h1>Bed count</h1>
+<p>Census of: <span id="census-wing">-</span></p>
+<button type="button" @Html.Raises(plan, BedCounts.LoadCensus)>Load census</button>
+<button type="button" @Html.Raises(plan, BedCounts.Send)>Send</button>
+<p>Recorded: <span id="recorded-beds"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BedCounts.LoadCensus, pipeline => pipeline.Get(Model.Census)
+        .OnSuccess<WingCensus>((census, pipeline) => pipeline.Element("census-wing").Text.Set(census.Body.Read(c => c.Wing)))));
+    Html.On(plan, trigger => trigger.CustomEvent(BedCounts.Send, pipeline => pipeline.Get(Model.Census)
+        .OnSuccess<WingCensus>((census, pipeline) => pipeline
+            .Post<BedCount>(BedCountEndpoints.BedCounts, request => request.Json(body => body.Set(r => r.Beds, census.Body.Read(c => c.Ward!.Beds))))
+            .OnSuccess(Content.Text, (recorded, pipeline) => pipeline.Element("recorded-beds").Text.Set(recorded.Body)))));
+}
+@Html.RenderPlan(plan)

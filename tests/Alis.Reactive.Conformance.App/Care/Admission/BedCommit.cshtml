@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedAssignment
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Assign a bed";
+    var plan = Html.ReactivePlan<BedAssignment>();
+}
+<h1>A bed for @Model.Resident</h1>
+@using (var bed = Html.BeginRequestForm(plan, "bed"))
+{
+    @(Html.InputField(plan, m => m.Bed, options => options.Label("Bed")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, BedCommits.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(BedCommits.Save, pipeline => pipeline
+        .Post<BedAssignment>(BedCommitEndpoints.Beds, request => request.Form(bed.Form))
+        .OnError<CommitError>((failed, pipeline) =>
+        {
+            pipeline.Element("bed-error").Text.Set(failed.Body.Read(error => error.Message));
+            pipeline.Element("bed-outcome").Text.Set(failed.Outcome);
+        })));
+}
+<p>Error: <span id="bed-error"></span></p>
+<p>Outcome: <span id="bed-outcome">-</span></p>
+@Html.RenderPlan(plan)

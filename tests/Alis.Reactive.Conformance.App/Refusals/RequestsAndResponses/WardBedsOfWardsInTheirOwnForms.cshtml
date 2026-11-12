@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NamedBedSearch
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Beds by ward";
+    var plan = Html.ReactivePlan<NamedBedSearch>();
+}
+<h1>Beds by ward</h1>
+@(Html.InputField(plan, m => m.Ward, options => options.Label("Ward")).NativeDropDown(build => build.Items(Model.Wards)))
+<p id="beds"></p>
+<button type="button" @Html.Raises(plan, WardBedEvents.Find)>Find beds</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardBedEvents.Find, pipeline => pipeline
+        .Get<BedsOfANamedWard>(RefusalEndpoints.WardBeds, request => request.Input(r => r.Ward, pipeline.Input(m => m.Ward)))
+        .OnSuccess(Content.Text, (found, pipeline) => pipeline.Element("beds").Text.Set(found.Body))));
+}
+@Html.RenderPlan(plan)

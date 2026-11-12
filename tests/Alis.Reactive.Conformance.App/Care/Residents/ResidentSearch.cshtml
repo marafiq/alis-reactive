@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentSearch
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Find a resident";
+    var plan = Html.ReactivePlan<ResidentSearch>();
+}
+<h1>Find a resident</h1>
+@(Html.InputField(plan, m => m.Term, options => options.Label("Search residents")).NativeTextBox())
+<button type="button" @Html.Raises(plan, ResidentSearches.Search)>Search</button>
+<p>Searched for: <span id="searched-term"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentSearches.Search, pipeline => pipeline
+        .Get<ResidentSearchQuery>(ResidentSearchEndpoints.SearchedTerm, request => request.Query(r => r.Term, pipeline.Input(m => m.Term).Component<NativeTextBox>().Value))
+        .OnSuccess(Content.Text, (searched, pipeline) => pipeline.Element("searched-term").Text.Set(searched.Body))));
+}
+@Html.RenderPlan(plan)

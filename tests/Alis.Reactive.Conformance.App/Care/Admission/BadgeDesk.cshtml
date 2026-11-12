@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BadgeIntake
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admit a resident";
+    var plan = Html.ReactivePlan<BadgeIntake>();
+}
+<h1>Admit @Model.Resident</h1>
+@(Html.InputField(plan, m => m.PrintBadge, options => options.Label("Print badge")).NativeCheckBox())
+<button type="button" @Html.Raises(plan, BadgeDesks.Admit)>Admit</button>
+<p>Status: <span id="admit-status">Waiting</span></p>
+<p>Log: <span id="admit-log">-</span></p>
+<section id="badge" aria-label="Badge">No badge printed</section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BadgeDesks.Admit, pipeline =>
+    {
+        pipeline.Post<BadgeAdmission>(BadgeDeskEndpoints.Admissions, request => request.Set(admission => admission.Resident, Model.Resident))
+            .OnSuccess(pipeline => pipeline.Element("admit-status").Text.Set("Admitted"))
+            .Chained((admitted, pipeline) => pipeline.When(pipeline.Input(m => m.PrintBadge).Component<NativeCheckBox>().Checked)
+                .Then(pipeline => pipeline.Get(CareEndpoints.Badge).Into("badge")));
+        pipeline.Element("admit-log").Text.Set("After");
+    }));
+}
+@Html.RenderPlan(plan)

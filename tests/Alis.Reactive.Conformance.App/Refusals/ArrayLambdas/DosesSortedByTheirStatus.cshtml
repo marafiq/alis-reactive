@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SortedRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The round's doses";
+    var plan = Html.ReactivePlan<SortedRound>();
+}
+<h1>@Model.Name round: the doses by status</h1>
+<p>First dose of the round: <span id="first-dose"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(SortedDoseEndpoints.Doses)
+        .OnSuccess<List<SortedDose>>((doses, pipeline) => pipeline.Element("first-dose").Text.Set(doses.Body.OrderBy(d => d.Status).Find(d => true, d => d.Medicine)))));
+}
+@Html.RenderPlan(plan)

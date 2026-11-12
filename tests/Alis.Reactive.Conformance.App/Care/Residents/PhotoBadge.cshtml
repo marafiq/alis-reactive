@@ -1,0 +1,40 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PhotoBadge
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Photo badge";
+    var plan = Html.ReactivePlan<PhotoBadge>();
+}
+<h1>@Model.Resident's photo badge</h1>
+<dl>
+    <dt>Photo</dt>
+    <dd id="photo-status">-</dd>
+    <dt>Photo version</dt>
+    <dd id="photo-version">-</dd>
+    <dt>Photo size</dt>
+    <dd id="photo-size">-</dd>
+    <dt>Other photo</dt>
+    <dd id="other-photo-status">-</dd>
+</dl>
+<button type="button" @Html.Raises(plan, PhotoBadges.CheckPhoto)>Check photo</button>
+<button type="button" @Html.Raises(plan, PhotoBadges.CheckTheOther)>Check the other</button>
+<button type="button" @Html.Raises(plan, PhotoBadges.LoadPhoto)>Load photo</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PhotoBadges.CheckPhoto, pipeline => pipeline.Head(PhotoBadgeEndpoints.Photo)
+        .OnSuccess((photo, pipeline) =>
+        {
+            pipeline.Element("photo-status").Text.Set(photo.Status);
+            pipeline.Element("photo-version").Text.Set(photo.Headers.Get("ETag"));
+        })));
+    Html.On(plan, trigger => trigger.CustomEvent(PhotoBadges.CheckTheOther, pipeline => pipeline.Head(PhotoBadgeEndpoints.OtherPhoto)
+        .OnError(405, (refused, pipeline) => pipeline.Element("other-photo-status").Text.Set(refused.Status))));
+    Html.On(plan, trigger => trigger.CustomEvent(PhotoBadges.LoadPhoto, pipeline => pipeline.Get(PhotoBadgeEndpoints.Photo)
+        .OnSuccess<PhotoFacts>((photo, pipeline) =>
+        {
+            pipeline.Element("photo-status").Text.Set(photo.Status);
+            pipeline.Element("photo-size").Text.Set(photo.Body.Read(facts => facts.Size));
+        })));
+}
+@Html.RenderPlan(plan)

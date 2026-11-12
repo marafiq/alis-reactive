@@ -1,0 +1,45 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardLookups
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Doses of the round's wards";
+    var plan = Html.ReactivePlan<WardLookups>();
+    var wards = Model.Wards.ToArray();
+    var wardList = Model.Wards.ToList();
+    IEnumerable<string> wardSequence = Model.Wards.ToArray();
+    var wings = Model.Wings.ToArray();
+}
+<h1>Doses of the round's wards</h1>
+<dl>
+    <dt>Doses of the wards on the rota</dt>
+    <dd id="rota-ward-count">-</dd>
+    <dt>Doses of the wards on the list</dt>
+    <dd id="listed-ward-count">-</dd>
+    <dt>Doses of the wards on the route</dt>
+    <dd id="route-ward-count">-</dd>
+    <dt>Doses of the round's wings</dt>
+    <dd id="wing-count">-</dd>
+    <dt>Medicines spelled with an o</dt>
+    <dd id="letter-count">-</dd>
+    <dt>Doses given at two hours</dt>
+    <dd id="hours-count">-</dd>
+    <dt>Doses with two codes</dt>
+    <dd id="codes-count">-</dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(WardLookupEndpoints.Doses)
+        .OnSuccess<List<LookedUpDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("rota-ward-count").Text.Set(doses.Body.Count(d => wards.Contains(d.Ward)));
+            pipeline.Element("listed-ward-count").Text.Set(doses.Body.Count(d => wardList.Contains(d.Ward)));
+            pipeline.Element("route-ward-count").Text.Set(doses.Body.Count(d => wardSequence.Contains(d.Ward)));
+            pipeline.Element("wing-count").Text.Set(doses.Body.Count(d => wings.Contains(d.Wing)));
+            pipeline.Element("letter-count").Text.Set(doses.Body.Count(d => d.Medicine.Contains('o')));
+            pipeline.Element("hours-count").Text.Set(doses.Body.Count(d => d.Hours.Count == 2));
+            pipeline.Element("codes-count").Text.Set(doses.Body.Count(d => d.Codes.Length == 2));
+        })));
+}
+@Html.RenderPlan(plan)

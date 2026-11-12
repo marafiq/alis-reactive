@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DietNote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Diet note";
+    var plan = Html.ReactivePlan<DietNote>();
+}
+<h1>Diet note for @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, DietNotes.Load)>Load note</button>
+<p>Note: <span id="diet-note"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DietNotes.Load, pipeline => pipeline.Get(Model.NoteAddress)
+        .OnSuccess(Content.Text, (note, pipeline) => pipeline.Element("diet-note").Text.Set(note.Body))));
+}
+@Html.RenderPlan(plan)

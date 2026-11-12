@@ -50,6 +50,8 @@ public sealed class Seed
 
     public bool? ItemRefuses { get; set; }
 
+    public bool? BedsDropTheirConnection { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed TheWord(string word) => new() { Word = word };
@@ -95,6 +97,8 @@ public sealed class Seed
     public static Seed TheCountEndpointRefuses() => new() { CountRefuses = true };
 
     public static Seed TheItemEndpointRefuses() => new() { ItemRefuses = true };
+
+    public static Seed TheBedsEndpointDropsItsConnection() => new() { BedsDropTheirConnection = true };
 
     public Seed AndResident(string name)
     {
