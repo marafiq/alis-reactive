@@ -13,6 +13,10 @@ They prove no behavior in a browser: a Playwright test does.
   object. A test sets the culture its view renders under with NUnit's own attribute for it.
 - The expected plan is a literal in the test, written from the schema's lines: never a recorded output, and never
   built by the code under test. `PlanSchema.cs` reads a plan against the plan's JSON schema and names what fails.
+- A refusal a view meets where it renders is expected as its whole message, a literal. Where an analyzer refuses
+  the same defect at build, the test writes the defect in code the analyzer does not follow:
+  `PartialsAndSlots/WhenAViewsPlanHasRendered.cs` runs the second render and the late door from a lambda written
+  before the render, as a section runs.
 - A fixture is named `When` and its situation, in the folder of the module whose half it proves, and a test is its
   promise as a sentence. `SliceTree.txt` orders the folders: the files beside it, then one row of module folders.
 - A module's unit writes its tests before the half they prove and reads them failing first. A promise has both

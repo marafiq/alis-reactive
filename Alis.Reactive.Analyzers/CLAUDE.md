@@ -1,7 +1,8 @@
 # Alis.Reactive.Analyzers
 
 The compiler's rules, packed inside AlisReactive: each analyzer is one line of the spec that the build runs. A folder
-is named for the module whose lines its rules enforce; `Analyzers/` holds module 20's own, `ALIS009` to `ALIS013`.
+is named for the module whose lines its rules enforce; `Analyzers/` holds module 20's own, `ALIS009` to `ALIS013`,
+and `PartialsAndSlots/` holds `ALIS041`, the plan a view opens and renders.
 
 ## The standard
 

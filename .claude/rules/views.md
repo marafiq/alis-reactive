@@ -12,6 +12,11 @@ and a script URL in any tracked view, and a layout links a script by its file.
 - A view writes the doors its unit has landed, in the form `spec/Fluent/sentences.json` gives each and `spec/api/`
   compiles. A door a view needs and the DSL lacks is a gap to raise with its use case, never a workaround in the
   view.
+- A view opens its plan with `Html.ReactivePlan<TModel>()` and writes it with `Html.RenderPlan(plan)`, its last
+  line, after every door that takes the plan. `ALIS041` refuses at build a plan no line hands to `Html.RenderPlan`,
+  a plan rendered twice and a door that takes the plan after it rendered. Where the build does not follow a view's
+  code, a `@section` among it, rendering the view refuses the last two with the same sentence
+  (`spec/Core/DESIGN.md`, D14.7 and D18.6).
 - The framework controls every input's id; every other element a plan names has an id the developer chose.
 - A partial has a tight model of its own, and plan state never travels by weak typing: no `ViewData`, nothing stored
   on the request.

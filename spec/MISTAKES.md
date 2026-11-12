@@ -30,11 +30,12 @@ them, each marked as the lead's slip, and are not copied here.
 | A list a tool keeps was not read before the change that moves it | 2 | The tool, each time before the push: `WhenARuleNamesTheCode` for a listed exception, the hedges check for a hedge word. Since its second entry the tool runs sooner: a commit that edits the spec's prose runs `python3 spec/tools/check.py --check hedges` before its gate, and quotes its line. |
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
 | A claim of absence made from a search that did not cover the tree | 2 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. Since its second entry the step names what is searched for: an absence of a meaning in the spec is stated only after the page and the feature file of the module that owns the subject are read for that meaning, and the statement names both; a search for a name another line gave the thing proves nothing of the meaning. No tool reads a claim of absence, so the class stays on this rung. |
-| A rule the handoff states was not applied | 8 | A rule line: the handoff's own, scratch work runs in a subshell. Since its second entry, whose rule a rule file states, a step a command shows: a commit that edits a rule file runs `WhenARuleNamesTheCode` alone before its gate, as one that edits the spec's prose runs the hedges check. |
+| A rule the handoff states was not applied | 9 | A rule line: the handoff's own, scratch work runs in a subshell. Since its second entry, whose rule a rule file states, a step a command shows: a commit that edits a rule file runs `WhenARuleNamesTheCode` alone before its gate, as one that edits the spec's prose runs the hedges check. |
 | An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts the count of that text. |
 | A command written in another shell's syntax: the session's shell is zsh | 3 | Since its second entry, a step a command shows: an exit code is printed by `echo "exit $?"` written straight after its command, with no pipe between, and a search of the tree is `git grep`; the handoff's rules state both. Every result a commit rests on is printed by a script that runs under bash by its first line. Before that, the shell, which refuses an unmatched pattern. |
 | A rule written before its cases were listed | 2 | A rule line: `Alis.Reactive.Assets/CLAUDE.md`, a rule's refused and accepted cases are listed, one fact each, before the rule is written. Since its second entry, whose rule was the harness's, a step a commit shows: a change to the harness runs one test outside `Harness/` before its commit, and the commit quotes that run's line. |
 | A number written from an earlier run, not from the command that proves it | 5 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Since its third, the step covers a commit message and a handoff too. Since its fourth, it covers a path outside the repository: the session's folders are written once, in an environment file every command reads, which refuses to load when a folder it names is missing. Since its fifth, it covers a status to the owner: a count in a message is pasted from the output of a command run in that turn. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
+| A script read a session folder from its environment, which holds none | 1 | A rule line: the handoff's Tools section, a script takes the session's folders as its arguments, since the environment file sets them for the shell alone. |
 
 ## Waiting for the owner
 
@@ -205,3 +206,13 @@ them, each marked as the lead's slip, and are not copied here.
   so 15 were the session's. Caught in the next turn, by the count the handoff's script runs. Cost: two wrong
   numbers in one message to the owner, corrected in the next. The step covered a commit's message, a handoff and
   a path, and not a status: it covers one now, as the table states.
+- 2026-11-12, a rule the handoff states was not applied, the class's ninth entry, its rule
+  `tests/Alis.Reactive.ArchitectureTests/CLAUDE.md`'s: a planted defect that leaves an unread parameter does not
+  compile and proves nothing. One of twelve defects planted in ALIS041 dropped the one read of a parameter.
+  Caught by the sweep, which printed that the plant did not build. Cost: one plant redone as a mutation that
+  compiles, which a case then failed on. Held by the sweep's own line.
+- 2026-11-12, a script read a session folder from its environment, which holds none, a new class. A script of
+  one command read the scratch folder from the process's environment; the session's environment file sets it for
+  the shell and exports nothing, and every other script of the session takes the folders as arguments. Caught
+  by the script's own error, before anything was read from its result. Cost: one command run again. Held by a
+  rule line, the handoff's Tools section.

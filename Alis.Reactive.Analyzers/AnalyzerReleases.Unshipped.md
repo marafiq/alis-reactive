@@ -7,3 +7,4 @@ ALIS010 | Alis.Reactive.Analyzers | Error | A slice uses only the rows before it
 ALIS011 | Alis.Reactive.Analyzers | Error | A file's namespace is its project's root namespace and its first folder
 ALIS012 | Alis.Reactive.Analyzers | Error | A public class nothing derives from is sealed
 ALIS013 | Alis.Reactive.Analyzers | Error | SliceTree.txt and its project agree
+ALIS041 | Alis.Reactive.Analyzers | Error | A view renders the plan it opens once, after every door that takes it

@@ -31,7 +31,8 @@ public static class PlanHtml
     /// <summary>Writes the view's plan into the page, as the view's last line.</summary>
     /// <remarks>
     /// The build refuses a plan rendered twice and a door that takes the plan after it rendered, since the page
-    /// would run its handlers twice or never run what was written late.
+    /// would run its handlers twice or never run what was written late. Where the build cannot follow the view's
+    /// code, as inside a section, rendering the view fails with the same message.
     /// </remarks>
     /// <param name="html">The view's HTML helper.</param>
     /// <param name="plan">The plan the view opened.</param>

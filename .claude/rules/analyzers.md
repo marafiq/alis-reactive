@@ -45,7 +45,12 @@ A test rule, TEST001 to TEST013 of `spec/REWRITE.md` section 2.10, is an analyze
    argument. A member written in two declarations, a partial method or property, is reported once, where it is
    defined. A report about a line of an additional file is made from that file's own action, at the line's text.
    A rule about the compilation itself (a reference, a table the build did not hand over) has no text to
-   mark: it reports with no location, and its case expects none.
+   mark: it reports with no location, and its case expects none. A rule about the order of two calls reads the
+   body's control flow graph, a forward pass over its blocks that keeps what holds on some path, never the order
+   of the text: a call in each arm of a branch is no second call. A lambda's own graph is read from what holds
+   where the lambda is written, and what the lambda does changes nothing outside it, since the rule does not know
+   when it runs. A value is followed while every use of it is one the rule reads; a value a second variable
+   holds, or one handed by reference, is followed no further and gets no report.
 5. **No state, any order, no throw.** `Initialize` opens with `ConfigureGeneratedCodeAnalysis` and
    `EnableConcurrentExecution`. The first is chosen by what the rule reads: a rule that reads views analyzes generated
    code and reports in it, since a view reaches the compiler through Razor's generator; every other rule passes

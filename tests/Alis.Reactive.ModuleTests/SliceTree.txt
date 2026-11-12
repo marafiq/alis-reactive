@@ -1,2 +1,2 @@
 .
-Schema PathsAndWire
+Schema PathsAndWire PartialsAndSlots
