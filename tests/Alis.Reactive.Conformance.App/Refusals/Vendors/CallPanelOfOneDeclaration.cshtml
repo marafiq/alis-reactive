@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@model CallPanel
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The call panel";
+    var plan = Html.ReactivePlan<CallPanel>();
+}
+<h1>@Model.Ward call panel</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart()))
+<button type="button" @Html.Raises(plan, CallPanels.PingAndWrite)>Ping and write</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CallPanels.PingAndWrite, pipeline =>
+    {
+        pipeline.Component<ConformanceComponent>("conformance").Ping();
+        pipeline.Component<ConformanceComponent>("conformance").Ratio.Set(0.5);
+    }));
+}
+@Html.RenderPlan(plan)

@@ -644,8 +644,9 @@
           ]
         },
         {
-          "behavior": "Add adds the amount it is passed to Amount, which the component shows in a status named Amount.",
+          "behavior": "Add adds the amount it is passed to Amount, which the component shows in a status named Amount, as it shows its Ratio in a status named Ratio.",
           "tests": [
+            "M12.X2",
             "X7.13",
             "X7.14",
             "X17.4"
