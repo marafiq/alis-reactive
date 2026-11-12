@@ -103,6 +103,7 @@ nuget.config                          nuget.org alone, every other source cleare
 .node-version .python-version .java-version
 package.json  package-lock.json  eslint.config.js   npm workspaces, locked; the lint, its import order generated from
                                       each SliceTree.txt
+vitest.config.js                      the runtime's pure tests: node, the files that end in .test.ts under the runtime
 tools/PlanContractGenerator/          writes Alis.Reactive.Assets/runtime/Schema/plan.ts and plan.schema.json
 .editorconfig .gitignore AGENTS.md CLAUDE.md
 README.md                             every package's readme (Directory.Build.props packs it): the docs, beside the XML docs
@@ -255,7 +256,8 @@ table's syntax and the four rules that read it are M20.D2 to M20.D6):
 Native's table is `NativeComponents` over `NativeAppLevelObjects/* NativeComponents/*`; Fusion's is
 `FusionComponents FusionTemplates` over `FusionAppLevelObjects/* FusionComponents/*`; OpenTelemetry's is `Tracing`
 alone. The runtime has its own table,
-`Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top. The test app
+`Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top, and its last row is the dot, the bundle's entry beside
+the table. The test app
 holds `Components/*` over `World HostVariants` over `Care/* Bench/* Refusals/*`, so no screen reaches into another's
 model, and last the files beside the table, its entry point, a class in the app's namespace, since ALIS011 refuses a
 type in no namespace; the Playwright project holds `Harness` and then one row of module folders, so no module's tests
@@ -405,7 +407,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | TypeScript | 6.0.3 | `tsc -b`, no emit, every strictness option on: strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature, noImplicitReturns, noFallthroughCasesInSwitch, noUnusedLocals, noUnusedParameters, noUncheckedSideEffectImports, verbatimModuleSyntax, isolatedModules and erasableSyntaxOnly, which refuses an enum (S8), with allowUnreachableCode and allowUnusedLabels off; held by typescript-eslint 8.72.2, whose peer range ends below 6.1.0 (the latest is 7.0.2) |
 | esbuild | 0.28.2 | one root `build.mjs`, one bundle per package; `package.json` denies its install script, since its platform package holds the binary |
 | ESLint | eslint 10.14.0, @eslint/js 10.0.1, typescript-eslint 8.72.2, with minimatch 11.0.7 by an override of the 10.2.6 they bring, which npm's audit reports (GHSA-g3hv-75wg-m249) | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, each of their rules an error, `--max-warnings 0`, no rule turned off or down and no inline configuration (`noInlineConfig`); the rules beyond the presets are listed below the table |
-| Vitest | 5.1.0, node environment, no jsdom | a runtime module's pure tests of what its index exports (1.2); U3 lands it with the first of them |
+| Vitest | vitest 5.1.0, with vite 8.3.8, the peer it requires; node environment, no jsdom | a runtime module's pure tests of what its index exports (1.2): the files that end in .test.ts under the runtime, which the root's `vitest.config.js` names |
 | @microsoft/signalr | 10.0.11 | the hub's own asset; held on the 10.0 line, the line of the hub it talks to (the latest is 11.0.0) |
 | Probe packages | jsdom 31.0.0, parse5 8.1.1, ws 8.22.2 | what the node probes load beside the pins they read: a DOM for EJ2's code, HTML's parser and a WebSocket server; no test loads them |
 | OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.1 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
@@ -444,8 +446,12 @@ list only with its line, in the unit that brings that line's code:
 - `no-restricted-syntax` refuses a call of `querySelector`, `querySelectorAll`, `getElementsByClassName`,
   `getElementsByTagName`, `getElementsByName`, `closest` or `matches`: an element is found by its id (BRIEF.md,
   Principles 8; M5.N1). It is lifted in one file, the one of `runtime/Execution/` that finds a root's plans.
-- `no-restricted-imports`, which `eslint.config.js` writes from each `SliceTree.txt`, refuses an import from a later
-  row (section 2.3).
+- `no-restricted-imports`, which `eslint.config.js` writes from each `SliceTree.txt` of a TypeScript tree, the
+  runtime's today, refuses in a slice's file every relative import but one of a file of its own folder or of a
+  slice on a row before its own: a later row, a slice of its own row and a folder named in place of its file are
+  refused, and so is every relative import in a file whose folder has no row (section 2.3, M20.D3). It reads a
+  table's folder entries and its dot; an entry with a star is read from U23 on, with the first TypeScript tree that
+  writes one, and before that a file under one stands as a file with no row.
 - `no-restricted-imports`, over a module's pure tests, the files that end in .test.ts, refuses an import of the
   runtime other than the test's own module's index (`./index`), so a pure test reads a module's public surface and
   never its internals (1.2).
@@ -463,11 +469,12 @@ beside the runtime; a file that holds a comment, the inline disable's, is writte
 the three rules the presets carry for a spec line the same way, and the compiler's refusal of an enum (S8) by a file
 its case writes. U1 lands the presets, the ban on inline configuration and the three rules that read no path (the
 switch, the boolean conditions, the equality); the wide query's refusal and the import rows read a path of the
-runtime, and land in U3 with the file that finds a root's plans and the runtime's rows. The pure tests' import rule
+runtime, and land in U3: the import rows with the runtime's first row, and the wide query's refusal with the file
+that finds a root's plans, in the thin path. The pure tests' import rule
 is landed with its refused and accepted files, before U3 writes the first of them.
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
-agreement in NuGet, npm and the lock; `tsc -b`; eslint; a locked `dotnet restore`; `dotnet build -c Release`;
+agreement in NuGet, npm and the lock; `tsc -b`; eslint; vitest over the runtime's pure tests; a locked `dotnet restore`; `dotnet build -c Release`;
 `dotnet format --verify-no-changes` over the solution; the architecture tests, the analyzer cases and the test
 rules' cases; `check.py --ci`, which
 its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (build, then run, with the selectors
@@ -904,11 +911,13 @@ reading the rewrite's grammar. In work: the core's sixteen rows and every door a
 every door `spec/api` compiles for the core is declared, in eleven rows, the plan's two doors among them
 (`Html.ReactivePlan`, `Html.RenderPlan`; D14.7 as the owner corrected it on 2026-11-12). The rows of
 `TypeKnowledge`, `PathsAndWire`, `OwnershipAndState`, `Tracing`, `Execution`, `InputsAndIds`, `Realtime` and
-`PartialsAndSlots` hold no door `spec/api` compiles and enter the table with their first file. Open of it after
-that, in order: the
-runtime's rows and dispatch with vitest and the lint's two path-bound rules; the module tests' project; the thin
-path; every screen's view; every browser test, failing; the Playwright project's switch. The commit that lands a
-piece rewrites this paragraph.
+`PartialsAndSlots` hold no door `spec/api` compiles and enter the table with their first file. Landed after
+that: the runtime's first row, `Schema`, which reads a plan script's text into its plan or the error it is refused
+with (D19.10, M14.D1), with vitest, its first pure tests and its step in `scripts/check.sh`, and the lint's import
+rows, written from each slice table, with their cases. Open of it, in order: the module tests' project; the thin
+path, which brings the runtime's dispatch and its `Execution` row, with the file that finds a root's plans and the
+lint's refusal of a wide query; every screen's view; every browser test, failing; the Playwright project's switch.
+The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1

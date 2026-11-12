@@ -32,6 +32,8 @@ them, each marked as the lead's slip, and are not copied here.
 | A claim of absence made from a search that did not cover the tree | 1 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. |
 | A rule the handoff states was not applied | 1 | A rule line: the handoff's own, scratch work runs in a subshell. |
 | An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts the count of that text. |
+| A command written in another shell's syntax: the session's shell is zsh | 2 | Since its second entry, a step a command shows: an exit code is printed by `echo "exit $?"` written straight after its command, with no pipe between, and a search of the tree is `git grep`; the handoff's rules state both. Every result a commit rests on is printed by a script that runs under bash by its first line. Before that, the shell, which refuses an unmatched pattern. |
+| A rule written before its cases were listed | 1 | A rule line: `Alis.Reactive.Assets/CLAUDE.md`, a rule's refused and accepted cases are listed, one fact each, before the rule is written. |
 | A number written from an earlier run, not from the command that proves it | 3 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Since its third, the step covers a commit message and a handoff too. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
 
 ## Waiting for the owner
@@ -118,3 +120,18 @@ them, each marked as the lead's slip, and are not copied here.
   count in one pushed-to-be commit message, which stands, and in the handoff, which is corrected. The step the
   class moved to at its second entry was applied to the memory's line and not to a message: it covers both now,
   and this commit's counts are put in by the command that counts.
+- 2026-11-12, a rule written before its cases were listed. The lint's import rows were written, in
+  `eslint.config.js`, before their cases, and the first writing let a file beside the table import a slice by its
+  folder's name, `./second`, whatever that slice's row: a folder import reads as a file of the importer's own
+  folder. Caught before the first run of the lint, on reading the generated pattern against M20.D3. Cost: one
+  edit, and the two cases that name a slice by its folder. Held from this entry on by the rule line the table
+  states.
+- 2026-11-12, a command written in another shell's syntax. A search of the architecture tests was written as
+  `grep -rn` with an unquoted `--include` pattern; zsh refused the unmatched pattern after the command's first
+  half, the write of a case file, had run. Caught by the shell. Cost: one command run again as `git grep`. Held by
+  the shell.
+- 2026-11-12, a command written in another shell's syntax, the class's second entry. The exit codes of the
+  compiler and the lint were read through bash's `PIPESTATUS`, which zsh does not set, so the command printed
+  "tsc exit" and "eslint exit" with no code. Caught on reading that output, before any result was taken from it.
+  Cost: one command run again, which read "tsc exit 0" and "eslint exit 0". The class moved up a rung with this
+  entry, to the step the table states.

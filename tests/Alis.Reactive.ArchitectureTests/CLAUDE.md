@@ -22,7 +22,8 @@ expects none.
   file's time, and a stale build passes for the restored code (the lead's slips, 2026-11-11). The copy is built and
   read green before the first plant, with what the fixture runs beside the code, `node_modules` among it: a plant
   on a copy that already fails proves nothing (the lead's slip, 2026-11-11).
-- `LintCases` holds the lint's refused and accepted files, which `WhenTheLintIsConfigured` lints.
+- `LintCases` holds the lint's refused and accepted files, which `WhenTheLintIsConfigured` lints; `LintCases/rows` is
+  a slice table of its own, for the import rows.
 - `WhenAnAppRendersItsPages` and `WhenTheAppHoldsNoStaticState` read the conformance app as built, which this project
   references for the two of them. The first runs the app in this process and opens every address it answers to a
   GET, and every link its pages hold, as a browser opens a document; its cases sweep an app the case maps. The

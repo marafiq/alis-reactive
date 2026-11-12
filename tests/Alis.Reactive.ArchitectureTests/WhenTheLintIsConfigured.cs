@@ -90,6 +90,46 @@ public class WhenTheLintIsConfigured
     public void a_file_of_the_module_that_is_no_test_imports_its_internals() => AssertAccepted("module/reads-an-internal.accepted.ts");
 
     [RefusedCase]
+    public void a_slice_that_imports_a_later_row_is_refused() => AssertRefused("rows/first/reads-a-later-row.refused.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
+    public void a_slice_that_reaches_a_later_row_through_its_own_folder_is_refused()
+        => AssertRefused("rows/first/leaves-by-its-own-folder.refused.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
+    public void a_slice_that_imports_a_file_beside_the_table_on_a_later_row_is_refused()
+        => AssertRefused("rows/first/reads-the-files-beside-the-table.refused.ts", RestrictedImport, line: 1);
+
+    [AcceptedCase]
+    public void a_slice_that_imports_its_own_file_is_accepted() => AssertAccepted("rows/first/reads-its-own-file.accepted.ts");
+
+    [AcceptedCase]
+    public void a_slice_that_imports_the_rows_before_its_own_is_accepted() => AssertAccepted("rows/second/reads-the-rows-before-its-own.accepted.ts");
+
+    [RefusedCase]
+    public void a_slice_that_imports_a_slice_of_its_own_row_is_refused() => AssertRefused("rows/second/reads-its-own-row.refused.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
+    public void a_slice_that_imports_a_slice_of_its_own_row_by_its_folder_is_refused()
+        => AssertRefused("rows/second/reads-its-own-row-by-its-folder.refused.ts", RestrictedImport, line: 1);
+
+    [AcceptedCase]
+    public void a_file_beside_the_table_that_imports_an_earlier_row_is_accepted() => AssertAccepted("rows/reads-an-earlier-row.accepted.ts");
+
+    [AcceptedCase]
+    public void a_file_beside_the_table_that_imports_a_file_beside_it_is_accepted() => AssertAccepted("rows/reads-a-file-beside-it.accepted.ts");
+
+    [RefusedCase]
+    public void a_file_beside_the_table_that_imports_a_later_row_is_refused() => AssertRefused("rows/reads-a-later-row.refused.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
+    public void a_file_beside_the_table_that_imports_a_later_row_by_its_folder_is_refused()
+        => AssertRefused("rows/reads-a-later-row-by-its-folder.refused.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
+    public void a_file_whose_folder_has_no_row_that_imports_a_row_is_refused() => AssertRefused("rows/unlisted/reads-a-row.refused.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
     public void an_inline_disable_changes_no_result()
     {
         var written = Write("export function same(left: number, right: number): boolean {\n  // eslint-disable-next-line eqeqeq\n  return left == right;\n}\n");
