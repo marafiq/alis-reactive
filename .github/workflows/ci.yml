@@ -1,48 +1,223 @@
 name: CI
 
 on:
-  push:
-    branches: [main, 'release/*']
-    paths:
-      - 'Alis.Reactive/**'
-      - 'Alis.Reactive.Assets/**'
-      - 'Alis.Reactive.Native/**'
-      - 'Alis.Reactive.DesignSystem/**'
-      - 'Alis.Reactive.Fusion/**'
-      - 'Alis.Reactive.NativeTagHelpers/**'
-      - 'Alis.Reactive.Analyzers/**'
-      - 'Alis.Reactive.SandboxApp/**'
-      - 'tests/**'
-      - 'build/**'
-      - 'Alis.Reactive.slnx'
-      - 'Directory.Build.props'
-      - 'global.json'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'scripts/**'
-      - '.github/workflows/ci.yml'
-      - '.github/workflows/gate.yml'
-      - '.github/actions/**'
   pull_request:
-  workflow_dispatch:
+  push:
+    branches: [main]
+  workflow_call:
+    inputs:
+      version:
+        description: The version the packages are packed at; a run that is no release packs a version of its own.
+        type: string
+        default: ''
+    secrets:
+      SYNCFUSION_LICENSE_KEY:
+        required: false
 
 concurrency:
-  group: ci-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
 
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  PACKAGE_VERSION: ${{ inputs.version || format('0.0.0-ci.{0}', github.run_number) }}
+  TESTS: tests/Alis.Reactive.Conformance.PlaywrightTests
+
 jobs:
-  gate:
-    name: gate
-    uses: ./.github/workflows/gate.yml
-    permissions:
-      contents: read
-      checks: write
-    with:
-      configuration: Release
-      playwright: true
-      retry-failed: 1
-    secrets:
-      SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
+  checks:
+    name: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: Every check that needs no browser, but the spec's
+        run: scripts/check.sh --no-spec
+
+  spec:
+    name: spec
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TLA2TOOLS_JAR: ${{ github.workspace }}/.tools/tla2tools.jar
+      TLC_CACHE: ${{ github.workspace }}/.tools/tlc-cache.json
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-toolchain
+      - name: The Java of .java-version
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version-file: .java-version
+      - name: The TLC jar its lock pins, by its SHA-256
+        run: |
+          mkdir -p .tools
+          url="$(python3 -c "import json; print(json.load(open('spec/tools/tla2tools.lock'))['url'])")"
+          sha="$(python3 -c "import json; print(json.load(open('spec/tools/tla2tools.lock'))['sha256'])")"
+          curl --fail --location --silent --show-error --output "$TLA2TOOLS_JAR" "$url"
+          echo "$sha  $TLA2TOOLS_JAR" | sha256sum --check
+      - name: The TLC results of the specs that did not change
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .tools/tlc-cache.json
+          key: tlc-${{ hashFiles('spec/**/*.tla', 'spec/**/*.cfg', 'spec/tools/tla2tools.lock') }}
+          restore-keys: tlc-
+      - name: The spec's checks
+        run: python3 spec/tools/check.py --ci
+
+  playwright:
+    name: playwright ${{ matrix.pool }} ${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      image: mcr.microsoft.com/playwright/dotnet:v1.64.1-noble@sha256:6955861f6e17b2580c00f0970198e446f006cdae6c34fb8f9ad5318aaab50da0
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - pool: core
+            shard: 1/1
+            run: core-1-of-1
+          - pool: hosts
+            shard: 1/1
+            run: hosts-1-of-1
+          - pool: fusion
+            shard: 1/1
+            run: fusion-1-of-1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The pool's shard
+        env:
+          SYNCFUSION_LICENSE_KEY: ${{ matrix.pool == 'fusion' && secrets.SYNCFUSION_LICENSE_KEY || '' }}
+        run: scripts/playwright.sh --pool "${{ matrix.pool }}" --shard "${{ matrix.shard }}"
+      - name: The run's folder
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: run-${{ matrix.run }}
+          path: ${{ env.TESTS }}/TestResults/
+          if-no-files-found: error
+
+  pack:
+    name: pack
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The six packages at one version
+        run: scripts/pack.sh "$PACKAGE_VERSION"
+      - name: Each of the six ids is packed, and nothing else
+        run: |
+          expected=(AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.OpenTelemetry AlisReactive.DesignSystem AlisReactive.NativeTagHelpers)
+          for id in "${expected[@]}"; do
+            [ -f "nupkgs/$id.$PACKAGE_VERSION.nupkg" ] || { echo "::error::nupkgs/$id.$PACKAGE_VERSION.nupkg is not packed"; exit 1; }
+          done
+          packed="$(find nupkgs -name '*.nupkg' | wc -l)"
+          [ "$packed" -eq "${#expected[@]}" ] || { echo "::error::$packed packages are packed and ${#expected[@]} ids ship"; ls -1 nupkgs; exit 1; }
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: packages
+          path: |
+            nupkgs/*.nupkg
+            nupkgs/*.snupkg
+          if-no-files-found: error
+
+  verify-net48:
+    name: verify-net48
+    needs: [pack]
+    runs-on: windows-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The packed packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: nupkgs
+      - name: The twin, built against the packs with warnings as errors
+        run: dotnet build tests/Alis.Reactive.Conformance.App.Net48 -c Release -warnaserror
+      - name: The fresh MVC 5 app, built against the packs with warnings as errors
+        run: dotnet build tests/Alis.Reactive.Consumer.Net48 -c Release -warnaserror
+      - name: What a build wrote into the fresh app, and the analyzers that reach it
+        run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
+      - name: The tests under the twin
+        run: scripts/playwright.sh --all --host net48
+      - name: The tests under the fresh MVC 5 app
+        run: scripts/playwright.sh --all --host consumerNet48
+      - name: The runs' folders
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: run-net48
+          path: ${{ env.TESTS }}/TestResults/
+          if-no-files-found: error
+
+  delivery-net10:
+    name: delivery-net10
+    needs: [pack]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    container:
+      image: mcr.microsoft.com/playwright/dotnet:v1.64.1-noble@sha256:6955861f6e17b2580c00f0970198e446f006cdae6c34fb8f9ad5318aaab50da0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The packed packages
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: nupkgs
+      - name: The fresh net10 app, restored from the packs and built with warnings as errors
+        run: dotnet build tests/Alis.Reactive.Consumer.Net10 -c Release -warnaserror
+      - name: What a build wrote into the fresh app, the analyzers that reach it and the browser files it serves
+        run: dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
+      - name: The tests under the fresh net10 app
+        run: scripts/playwright.sh --all --host consumerNet10
+      - name: The run's folder
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: run-consumer-net10
+          path: ${{ env.TESTS }}/TestResults/
+          if-no-files-found: error
+
+  proof:
+    name: proof
+    if: always()
+    needs: [checks, spec, playwright, pack, verify-net48, delivery-net10]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Every job before this one passed
+        run: |
+          for result in ${{ join(needs.*.result, ' ') }}; do
+            [ "$result" = success ] || { echo "::error::a job this proof needs ended as $result"; exit 1; }
+          done
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: The Node of .node-version
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+      - name: Every run's folder
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: run-*
+          path: runs
+      - name: Every run is green, and the tests that ran are the full list, each once
+        run: |
+          set -- runs/*/*
+          node scripts/playwright-select.mjs --spec "$1/landings.tsv" --assembly "$1/tests.tsv" --root Alis.Reactive.Conformance.PlaywrightTests \
+            --weights "$TESTS/shard-weights.json" --out full.json --all --every-host > /dev/null
+          node scripts/playwright-result.mjs --proof --full full.json --budget "$TESTS/Harness/measured.json" "$@"

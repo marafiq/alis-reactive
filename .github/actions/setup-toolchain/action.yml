@@ -1,33 +1,35 @@
-name: Set up the Alis.Reactive toolchain
+name: Set up the toolchain
 description: >-
-  One definition of the build toolchain for every workflow: the .NET SDK pinned by global.json,
-  Node with the npm cache, and a NuGet package cache. Change a version here, never in a workflow.
-
-inputs:
-  node-version:
-    description: Node.js major used by every workflow. Bump it here, in one place.
-    required: false
-    default: '22'
+  The SDK global.json pins and the 10.0 runtime the net10 hosts run on, the Node and the Python their version files
+  pin, the NuGet package cache keyed by the lock files, and node_modules as package-lock.json locks it.
 
 runs:
   using: composite
   steps:
-    - name: Set up .NET (version pinned by global.json)
-      uses: actions/setup-dotnet@v6
+    - name: The .NET SDK of global.json, and the SDK that carries the 10.0 runtime
+      uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
       with:
         global-json-file: global.json
+        dotnet-version: 10.0.404
 
-    - name: Set up Node ${{ inputs.node-version }} with the npm cache
-      uses: actions/setup-node@v7
+    - name: The Node of .node-version, with the npm cache
+      uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
       with:
-        node-version: ${{ inputs.node-version }}
+        node-version-file: .node-version
         cache: npm
         cache-dependency-path: package-lock.json
 
-    - name: Cache the NuGet package folder
-      uses: actions/cache@v6
+    - name: The Python of .python-version
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      with:
+        python-version-file: .python-version
+
+    - name: The NuGet packages the lock files name
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ~/.nuget/packages
-        key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Build.props', 'global.json') }}
-        restore-keys: |
-          nuget-${{ runner.os }}-
+        key: nuget-${{ runner.os }}-${{ hashFiles('**/packages.lock.json') }}
+
+    - name: node_modules as the lock holds it
+      shell: bash
+      run: npm ci

@@ -3,58 +3,48 @@ name: Publish NuGet packages
 on:
   push:
     tags: ['v*']
-  workflow_dispatch:
 
 permissions:
   contents: read
 
 env:
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
   verify-tag:
-    name: Verify the release tag
-    if: startsWith(github.ref, 'refs/tags/v')
+    name: verify the release tag
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
       package_version: ${{ steps.tag.outputs.version }}
       prerelease: ${{ steps.tag.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-
-      - name: Re-fetch the tag object
-        run: git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
-
-      - name: Verify the tag (annotated, SemVer, reachable from main or release/*)
-        id: tag
+      - name: The tag as its object, and the branches a release is cut from
         run: |
+          git fetch --force origin "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME}"
           git fetch origin '+refs/heads/main:refs/remotes/origin/main' '+refs/heads/release/*:refs/remotes/origin/release/*'
-          scripts/verify-release-tag.sh "${GITHUB_REF_NAME}"
+      - name: The tag is annotated, a version, and on main or a release branch
+        id: tag
+        run: scripts/verify-release-tag.sh "${GITHUB_REF_NAME}"
 
-  gate:
-    name: gate
+  ci:
+    name: ci
     needs: [verify-tag]
-    if: ${{ !cancelled() && (needs.verify-tag.result == 'success' || needs.verify-tag.result == 'skipped') }}
-    uses: ./.github/workflows/gate.yml
-    permissions:
-      contents: read
-      checks: write
+    uses: ./.github/workflows/ci.yml
     with:
-      configuration: Release
-      playwright: true
-      retry-failed: 1
+      version: ${{ needs.verify-tag.outputs.package_version }}
     secrets:
       SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
 
-  pack-and-publish:
-    needs: [verify-tag, gate]
-    if: startsWith(github.ref, 'refs/tags/v')
+  publish:
+    name: publish
+    needs: [verify-tag, ci]
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     environment: nuget-release
     concurrency:
       group: nuget-release
@@ -66,78 +56,33 @@ jobs:
       PACKAGE_VERSION: ${{ needs.verify-tag.outputs.package_version }}
       PRERELEASE: ${{ needs.verify-tag.outputs.prerelease }}
     steps:
-      - uses: actions/checkout@v7
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: The .NET SDK of global.json
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           global-json-file: global.json
-
-      - uses: actions/setup-node@v7
+      - name: The packages ci packed and proved
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          node-version: 22
-          cache: npm
-          cache-dependency-path: package-lock.json
-
-      - name: Pack NuGet packages
-        run: scripts/pack.sh "${PACKAGE_VERSION}"
-
-      - name: Verify the five packages were produced at the tagged version
-        run: |
-          EXPECTED=(AlisReactive AlisReactive.Native AlisReactive.Fusion AlisReactive.DesignSystem AlisReactive.NativeTagHelpers)
-          fail=0
-          for id in "${EXPECTED[@]}"; do
-            if [ ! -f "./nupkgs/${id}.${PACKAGE_VERSION}.nupkg" ]; then
-              echo "::error::Missing expected package ./nupkgs/${id}.${PACKAGE_VERSION}.nupkg"; fail=1
-            fi
-          done
-          count=$(ls -1 ./nupkgs/*.nupkg 2>/dev/null | wc -l)
-          if [ "$count" -ne "${#EXPECTED[@]}" ]; then
-            echo "::error::Expected ${#EXPECTED[@]} .nupkg files, found ${count}. (If a package was added/removed, update this check.)"; fail=1
-          fi
-          if [ "$fail" -ne 0 ]; then echo "Pack output:"; ls -1 ./nupkgs/ || true; exit 1; fi
-          echo "All ${#EXPECTED[@]} packages present at ${PACKAGE_VERSION}."
-
-      - name: Upload NuGet artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: nuget-packages-${{ env.PACKAGE_VERSION }}
-          overwrite: true
-          path: |
-            ./nupkgs/*.nupkg
-            ./nupkgs/*.snupkg
-          retention-days: 30
-
-      - name: Log in to NuGet.org (Trusted Publishing)
+          name: packages
+          path: nupkgs
+      - name: A key of nuget.org for this run, by trusted publishing
         id: nuget-login
         uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
         with:
           user: madnan.rafiq
-
-      - name: Publish to NuGet.org
+      - name: Push the packages
         env:
           NUGET_API_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
-        run: |
-          dotnet nuget push ./nupkgs/*.nupkg \
-            --source "https://api.nuget.org/v3/index.json" \
-            --api-key "$NUGET_API_KEY" \
-            --skip-duplicate
-
-      - name: Create or update the GitHub Release (idempotent)
+        run: dotnet nuget push "nupkgs/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
+      - name: The GitHub release of the tag, with the packages
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PRERELEASE_FLAG=""
-          if [[ "${PRERELEASE}" == "true" ]]; then PRERELEASE_FLAG="--prerelease"; fi
-          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            echo "Release ${GITHUB_REF_NAME} already exists — refreshing its package assets."
-            gh release upload "${GITHUB_REF_NAME}" ./nupkgs/*.nupkg --clobber
+          if gh release view "${GITHUB_REF_NAME}" > /dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" nupkgs/*.nupkg --clobber
+          elif [ "${PRERELEASE}" = "true" ]; then
+            gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --verify-tag --generate-notes --prerelease nupkgs/*.nupkg
           else
-            gh release create "${GITHUB_REF_NAME}" \
-              --title "${GITHUB_REF_NAME}" \
-              --verify-tag \
-              --generate-notes \
-              $PRERELEASE_FLAG \
-              ./nupkgs/*.nupkg
+            gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --verify-tag --generate-notes nupkgs/*.nupkg
           fi
-          echo "Published ${PACKAGE_VERSION} (prerelease=${PRERELEASE}) from ${GITHUB_REF_NAME}: https://www.nuget.org/packages/AlisReactive/${PACKAGE_VERSION}" >> "$GITHUB_STEP_SUMMARY"

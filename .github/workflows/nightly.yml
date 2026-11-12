@@ -1,4 +1,4 @@
-name: Nightly browser gate
+name: Nightly
 
 on:
   schedule:
@@ -12,23 +12,71 @@ concurrency:
   group: nightly
   cancel-in-progress: false
 
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
 jobs:
-  gate:
-    name: gate
-    uses: ./.github/workflows/gate.yml
-    permissions:
-      contents: read
-      checks: write
-    with:
-      configuration: Release
-      playwright: true
-      retry-failed: 1
+  ci:
+    name: ci
+    uses: ./.github/workflows/ci.yml
     secrets:
       SYNCFUSION_LICENSE_KEY: ${{ secrets.SYNCFUSION_LICENSE_KEY }}
 
+  every-model-and-probe:
+    name: every TLC config uncached, every probe
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    container:
+      image: mcr.microsoft.com/playwright/dotnet:v1.64.1-noble@sha256:6955861f6e17b2580c00f0970198e446f006cdae6c34fb8f9ad5318aaab50da0
+    env:
+      TLA2TOOLS_JAR: ${{ github.workspace }}/.tools/tla2tools.jar
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup-toolchain
+      - name: The Java of .java-version
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version-file: .java-version
+      - name: The TLC jar its lock pins, by its SHA-256
+        run: |
+          mkdir -p .tools
+          url="$(python3 -c "import json; print(json.load(open('spec/tools/tla2tools.lock'))['url'])")"
+          sha="$(python3 -c "import json; print(json.load(open('spec/tools/tla2tools.lock'))['sha256'])")"
+          curl --fail --location --silent --show-error --output "$TLA2TOOLS_JAR" "$url"
+          echo "$sha  $TLA2TOOLS_JAR" | sha256sum --check
+      - name: The spec's checks, every TLC config run
+        run: python3 spec/tools/check.py --ci
+      - name: Every probe
+        run: python3 spec/tools/check.py --check probes
+
+  latest:
+    name: every tool against its registry's latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TLA2TOOLS_JAR: ${{ github.workspace }}/.tools/tla2tools.jar
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup-toolchain
+      - name: The Java of .java-version
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version-file: .java-version
+      - name: The TLC jar its lock pins
+        run: |
+          mkdir -p .tools
+          curl --fail --location --silent --show-error --output "$TLA2TOOLS_JAR" "$(python3 -c "import json; print(json.load(open('spec/tools/tla2tools.lock'))['url'])")"
+      - name: Every pin against this machine and against its registry
+        run: scripts/doctor.sh --latest
+
   report-failure:
-    name: Open or update the nightly-failure issue
-    needs: [gate]
+    name: an issue on failure
+    needs: [ci, every-model-and-probe, latest]
     if: ${{ failure() }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -36,22 +84,17 @@ jobs:
       contents: read
       issues: write
     steps:
-      - name: Open a new issue, or comment on the one already open
+      - name: Open an issue, or add to the one that is open
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           label="ci-nightly-failure"
-          gh label create "$label" --repo "$GITHUB_REPOSITORY" --force \
-            --color B60205 --description "The scheduled browser gate on main failed"
-          body="The nightly browser gate failed on \`${GITHUB_SHA}\`: ${RUN_URL}
-
-          Read the per-shard summaries and the uploaded failure artifacts (Playwright traces, screenshots, TRX, diagnostics). A test that fails twice in a row is a regression or a quarantine candidate."
-          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --label "$label" --state open --json number --jq '.[0].number // empty')"
-          if [ -n "$existing" ]; then
-            gh issue comment "$existing" --repo "$GITHUB_REPOSITORY" --body "$body"
-            echo "Commented on the open issue #$existing"
+          gh label create "$label" --repo "$GITHUB_REPOSITORY" --force --color B60205 --description "The nightly run failed"
+          body="The nightly run failed on \`${GITHUB_SHA}\`: ${RUN_URL}"
+          open="$(gh issue list --repo "$GITHUB_REPOSITORY" --label "$label" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$open" ]; then
+            gh issue comment "$open" --repo "$GITHUB_REPOSITORY" --body "$body"
           else
-            gh issue create --repo "$GITHUB_REPOSITORY" --label "$label" \
-              --title "Nightly browser gate failed on main" --body "$body"
+            gh issue create --repo "$GITHUB_REPOSITORY" --label "$label" --title "The nightly run failed" --body "$body"
           fi

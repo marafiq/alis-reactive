@@ -390,7 +390,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 
 | Tool | Pin | One job |
 |---|---|---|
-| .NET SDK | 11.0.100 (`global.json`, rollForward disable) | compile, test, pack, for net48 and net10.0; the net10 hosts run on the 10.0 runtime |
+| .NET SDK | 11.0.100 (`global.json`, rollForward disable) | compile, test, pack, for net48 and net10.0; the net10 hosts run on the 10.0 runtime, 10.0.15, which CI installs with SDK 10.0.404, that line's latest, beside the pinned one |
 | NuGet | the SDK's, 11.0.100's; `Directory.Packages.props`, lock files restored locked in CI, `nuget.config` with nuget.org alone | restore; a finding of its audit fails the restore, and so does a second source on a machine, which central package management refuses (NU1507) |
 | net48 references | System.Text.Json 10.0.15, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.15, System.Diagnostics.DiagnosticSource 10.0.15, Microsoft.AspNet.Mvc 5.3.0 | the core's net48 dependencies (2.9), restored together at these exact versions; net10 takes the first three from the framework reference; held on the 10.0 line, the net10 host's, so both hosts run one line of System.Text.Json (each one's latest is 11.0.0) |
 | net48 build | PolySharp 1.17.0, Microsoft.NETFramework.ReferenceAssemblies 1.0.3, both private | the attributes C# 14's features need on net48, written as source, and the reference assemblies a build on any OS compiles against |
@@ -508,7 +508,9 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
   Fixtures run beside each other and a fixture's tests one after another. Every run takes the kept count, and the
   budget and the waits are measured at it: the result reader refuses a count a hand chose and a budget measured at
   another count.
-- **`.github/workflows/ci.yml`** on every pull request and push to main: `checks` (`scripts/check.sh` without check.py); `spec`
+- **`.github/workflows/ci.yml`** on every pull request and push to main, and called by the nightly and the publish
+  workflows: `pack`, once, at the version its caller names or one of the run's own, its expected ids 2.9's six, whose
+  files verify-net48 and delivery-net10 restore; `checks` (`scripts/check.sh` without check.py); `spec`
   (`check.py --ci`, TLC only for a spec whose hash CI has not checked); `playwright` per pool and shard in the
   Playwright image; `verify-net48` on Windows (pack, the twin and the fresh MVC 5 app built against the packs with
   warnings as errors, WhenAConsumerAppIsBuilt over the fresh app, the tests under net48 and consumerNet48 under IIS
@@ -857,8 +859,11 @@ What the cut leaves of a path section 2.1 holds:
   test, and EJ2, SignalR, jsdom, parse5 and ws for the probes.
 - The hook that refuses a hand edit of the generated contract follows it to `Alis.Reactive.Assets/runtime/Schema/`,
   and WhenClaudeRunsAHook holds it there by the path, before U3 writes the two files.
-- `ci.yml`, `nightly.yml` and the publish workflow call the gate the cut removes, so each fails closed until U2
-  writes section 2.8's: no run reports green and no tag publishes in between.
+- `ci.yml`, `nightly.yml` and the publish workflow called the gate the cut removed, so each failed closed until U2
+  wrote section 2.8's. Since then `proof` stays red, and no tag publishes, until the units land what its jobs name:
+  the tests of the hosts and fusion pools from U3 on, and in U22 the two empty packages, the twin and the two fresh
+  apps. Each pool runs as one shard, and every run reads this Mac's budget and waits, until CI measures its own
+  when the rewrite is done (2.5); no run of a workflow gates a unit.
 
 A unit ends when every test check.py lands in it passes on `scripts/playwright.sh`, each written from its promise
 before the code it needs and failing then, and failing again on its planted defect; its module's pure tests pass, each
@@ -882,12 +887,12 @@ needs a later module, a Native input or a request among them, turns green in tha
 planted defect there. A unit's Doors line names the doors it makes real ahead of their features' units, as U3's thin
 path does, and a part that lists its doors, each on a Doors line, lands with the latest unit that brings one of them.
 
-**Where the rewrite stands.** U1 is landed. U2 is running. Landed of it: the world contract with the generated gates
-and promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
+**Where the rewrite stands.** U1 and U2 are landed. U2 left the world contract with the generated gates and
+promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
 TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget, waits and
-count of tests at once, a pool's shard in the runner with its weights, the two architecture tests over the app, and
-the harness's refusal of the EJ2 script. Open of it: the CI workflows. U3 is next. The commit that lands a piece
-rewrites this paragraph.
+count of tests at once, a pool's shard and CI's proof, the two architecture tests over the app, the harness's
+refusal of the EJ2 script, and section 2.8's four workflows, which no run has read. U3 is next. The commit that
+lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1
