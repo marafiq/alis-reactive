@@ -784,6 +784,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   gate's sweep of the app states that case when U3 writes the views. A signature's proof is the doc ids of the
   built core compared with the ids the fluent probe prints for `spec/api`, namespaces mapped by REWRITE 2.2. The
   owner can overrule it.
+- The owner, 2026-11-12 (verbatim in `spec/NOTES.md`): "keep the log of mistaks sir, and make sure u have a way a to
+  continusuly improve as we progress". So every mistake is an entry of `spec/MISTAKES.md`, written the turn it is
+  found: what was written or done, where it was caught, what it cost, its cause as a class, and what holds the
+  class. The way the work improves is the class: a class met a second time is held too low, so in that unit it moves
+  up a rung, from a rule line to a step whose result a commit shows, from that step to a tool with its cases, and a
+  rung that needs the owner's yes goes to the owner in one line with its cost. A piece begins by reading the
+  classes, and a handoff reports the entries since the last one by class. It replaces the line of root CLAUDE.md
+  that let a correction a rule already stated add nothing: two mistakes of 2026-11-11 and 2026-11-12 had one cause,
+  and that line recorded the second as no news.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
@@ -830,6 +839,7 @@ Alis.Reactive.Assets.
 |------|---------------|------------|
 | `spec/BRIEF.md` | the session brief, with the owner's corrections | the owner's words |
 | `spec/NOTES.md` | one entry per decision, fact or owner answer, two lines at most, with its evidence | appended by hand |
+| `spec/MISTAKES.md` | the log of mistakes: how it is kept and read, the classes with their counts and what holds each, what waits for the owner, and one entry a mistake | appended by hand, the turn a mistake is found |
 | `spec/tools/check.py` | every check the brief's section 1 names, and a brief mode for the compact hook | hand |
 | `spec/STATE.json` | the phase, the step, each check's result and counts, the next action | `spec/tools/check.py` only |
 | `spec/Elements/module.md`, one per module folder, named as the module table names it in PascalCase, hyphens dropped | the core questions the module uses; its doors, "M5.N1" for module 5's first, each with what it replaces, and each core door it keeps, so every core door is named by a module; the improvements it proposes, each with its evidence; every cite at the SHA it names ("at 623dd4a27"), or at HEAD, the redesign or main when it names none | hand |

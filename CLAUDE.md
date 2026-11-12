@@ -161,9 +161,9 @@ a fork's or an agent's mistake the lead corrected, and a slip of a session each 
 of the rule file that owns the subject: a test's in `.claude/rules/tests.md` or its project's own file, an analyzer's
 in `.claude/rules/analyzers.md`, C#'s in `.claude/rules/csharp.md` or its project's own file, the runtime's in
 `Alis.Reactive.Assets/CLAUDE.md`, the spec's and the owner's decisions in `spec/CLAUDE.md`, the plan's, the loop's, a
-session's and a fork's here. The line states the rule as a plain fact, with its date and whose words it is, and its
-record names that file: the commit, `spec/NOTES.md`, or the lead's flip log, a file of the lead's own outside the
-repository. A correction a line already states adds none: its record names the line.
+session's and a fork's here. The line states the rule as a plain fact, with its date and whose words it is. Every
+mistake is also an entry of `spec/MISTAKES.md`, written the turn it is found, with its class, its cost and what holds
+the class. A class met twice is held too low: it moves up a rung in that unit. A piece begins by reading the classes.
 
 ## Forks, agents and reviews
 
