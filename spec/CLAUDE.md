@@ -977,6 +977,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   no placeholder, so its message names no read; where two lists name one member, each lambda's parameter is the
   page's word for its item ("charted.Status"); the page of X4.13's and X18.8's opposite case reads the same
   shape from a response body of its own endpoint. The owner can overrule each.
+- The lead, 2026-11-12, landing the seven remaining component slices of module 24 as signatures, a fork's work
+  read at the source: `NativeButton`, `NativeCheckBox`, `NativeCheckList`, `NativeDropDown`, `NativeHiddenField`,
+  `NativeRadioGroup` and `NativeTextArea`, each from its line of `spec/NativeComponents/module.md`, to the text
+  box's exemplar. They are declared ahead of their first views, since the validation cells, the refusal pages
+  that wait and every care screen hold one. A member whose parameters no line states takes the form both older
+  lines share, a parameter named as the text box and the core name theirs. Three things are left out, each
+  reported, none invented: `Type` of the button and of the text box (N18.4, the owner's form); the three methods
+  of the click's payload, whose declared form no line gives; and `[Mirrors]` on the check list, whose element
+  type no line gives a TypeScript module. The click payload's numbers are `int` where the DOM
+  standards type a long and `double` elsewhere, lib.dom's `number`, to be held by the contract check in U23. The
+  owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

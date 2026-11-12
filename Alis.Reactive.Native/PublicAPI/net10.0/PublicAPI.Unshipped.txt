@@ -1,6 +1,151 @@
 #nullable enable
+Alis.Reactive.Native.NativeComponents.CheckListItem
+Alis.Reactive.Native.NativeComponents.CheckListItem.CheckListItem(string! value, string! text) -> void
+Alis.Reactive.Native.NativeComponents.CheckListItem.CheckListItem(string! value, string! text, string! description) -> void
+Alis.Reactive.Native.NativeComponents.CheckListItem.Description.get -> string?
+Alis.Reactive.Native.NativeComponents.CheckListItem.Text.get -> string!
+Alis.Reactive.Native.NativeComponents.CheckListItem.Value.get -> string!
+Alis.Reactive.Native.NativeComponents.NativeButton
+Alis.Reactive.Native.NativeComponents.NativeButton.Click.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeButton.Clicked!>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.AltKey.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.AltitudeAngle.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.AzimuthAngle.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Button.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Buttons.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Clicked() -> void
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.ClientX.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.ClientY.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.CtrlKey.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Detail.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Height.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.IsPrimary.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.LayerX.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.LayerY.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.MetaKey.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.MovementX.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.MovementY.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.OffsetX.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.OffsetY.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.PageX.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.PageY.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.PersistentDeviceId.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.PointerId.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.PointerType.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Pressure.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.ScreenX.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.ScreenY.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.ShiftKey.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.TangentialPressure.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.TiltX.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.TiltY.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.TimeStamp.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Twist.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Width.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.X.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Clicked.Y.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeButton.Focus() -> void
+Alis.Reactive.Native.NativeComponents.NativeButton.NativeButton() -> void
+Alis.Reactive.Native.NativeComponents.NativeButton.TextContent.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Native.NativeComponents.NativeButtonBuilder<TModel>
+Alis.Reactive.Native.NativeComponents.NativeButtonBuilder<TModel>.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeButtonBuilder<TModel>!
+Alis.Reactive.Native.NativeComponents.NativeButtonBuilder<TModel>.Reactive<TArgs>(Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Func<Alis.Reactive.Native.NativeComponents.NativeButton!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.Native.NativeComponents.NativeButtonBuilder<TModel>!
+Alis.Reactive.Native.NativeComponents.NativeButtonBuilder<TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void
+Alis.Reactive.Native.NativeComponents.NativeButtonHtml
+Alis.Reactive.Native.NativeComponents.NativeCheckBox
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeCheckBox.Changed!>!
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.Changed
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.Changed.Changed() -> void
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.Changed.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.Changed.TimeStamp.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.Changed.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.Checked.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.Focus() -> void
+Alis.Reactive.Native.NativeComponents.NativeCheckBox.NativeCheckBox() -> void
+Alis.Reactive.Native.NativeComponents.NativeCheckBoxBuilder
+Alis.Reactive.Native.NativeComponents.NativeCheckBoxBuilder.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeCheckBoxBuilder!
+Alis.Reactive.Native.NativeComponents.NativeCheckBoxHtml
+Alis.Reactive.Native.NativeComponents.NativeCheckList
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeCheckList.Changed!>!
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Changed
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Changed.Changed() -> void
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Changed.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Changed.TimeStamp.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Changed.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Focus() -> void
+Alis.Reactive.Native.NativeComponents.NativeCheckList.NativeCheckList() -> void
+Alis.Reactive.Native.NativeComponents.NativeCheckList.Value.get -> Alis.Reactive.Declarations.Property<string![]!>!
+Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder
+Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!
+Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder.Items(System.Collections.Generic.IEnumerable<Alis.Reactive.Native.NativeComponents.CheckListItem!>! items) -> Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!
+Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder.Option(string! value) -> Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!
+Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder.Option(string! value, string! text) -> Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!
+Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder.Option(string! value, string! text, string! description) -> Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!
+Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder.OptionCssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!
+Alis.Reactive.Native.NativeComponents.NativeCheckListHtml
 Alis.Reactive.Native.NativeComponents.NativeComponent
 Alis.Reactive.Native.NativeComponents.NativeComponent.NativeComponent() -> void
+Alis.Reactive.Native.NativeComponents.NativeDropDown
+Alis.Reactive.Native.NativeComponents.NativeDropDown.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeDropDown.Changed!>!
+Alis.Reactive.Native.NativeComponents.NativeDropDown.Changed
+Alis.Reactive.Native.NativeComponents.NativeDropDown.Changed.Changed() -> void
+Alis.Reactive.Native.NativeComponents.NativeDropDown.Changed.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeDropDown.Changed.TimeStamp.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeDropDown.Changed.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeDropDown.Focus() -> void
+Alis.Reactive.Native.NativeComponents.NativeDropDown.NativeDropDown() -> void
+Alis.Reactive.Native.NativeComponents.NativeDropDown.Value.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder
+Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder!
+Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder.Enabled(bool enabled) -> Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder!
+Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder.Items(System.Collections.Generic.IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem!>! items) -> Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder!
+Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder.Placeholder(string! optionLabel) -> Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder!
+Alis.Reactive.Native.NativeComponents.NativeDropDownHtml
+Alis.Reactive.Native.NativeComponents.NativeHiddenField
+Alis.Reactive.Native.NativeComponents.NativeHiddenField.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeHiddenField.Changed!>!
+Alis.Reactive.Native.NativeComponents.NativeHiddenField.Changed
+Alis.Reactive.Native.NativeComponents.NativeHiddenField.Changed.Changed() -> void
+Alis.Reactive.Native.NativeComponents.NativeHiddenField.Changed.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeHiddenField.Changed.TimeStamp.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeHiddenField.Changed.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeHiddenField.NativeHiddenField() -> void
+Alis.Reactive.Native.NativeComponents.NativeHiddenField.Value.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Native.NativeComponents.NativeHiddenFieldHtml
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Changed!>!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Changed
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Changed.Changed() -> void
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Changed.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Changed.TimeStamp.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Changed.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Focus() -> void
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.NativeRadioGroup() -> void
+Alis.Reactive.Native.NativeComponents.NativeRadioGroup.Value.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder
+Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder.Items(System.Collections.Generic.IEnumerable<Alis.Reactive.Native.NativeComponents.RadioButtonItem!>! items) -> Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder.Option(string! value) -> Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder.Option(string! value, string! text) -> Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder.Option(string! value, string! text, string! description) -> Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder.OptionCssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder!
+Alis.Reactive.Native.NativeComponents.NativeRadioGroupHtml
+Alis.Reactive.Native.NativeComponents.NativeTextArea
+Alis.Reactive.Native.NativeComponents.NativeTextArea.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeTextArea.Changed!>!
+Alis.Reactive.Native.NativeComponents.NativeTextArea.Changed
+Alis.Reactive.Native.NativeComponents.NativeTextArea.Changed.Changed() -> void
+Alis.Reactive.Native.NativeComponents.NativeTextArea.Changed.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeTextArea.Changed.TimeStamp.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeTextArea.Changed.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeTextArea.Focus() -> void
+Alis.Reactive.Native.NativeComponents.NativeTextArea.NativeTextArea() -> void
+Alis.Reactive.Native.NativeComponents.NativeTextArea.Value.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Native.NativeComponents.NativeTextAreaBuilder
+Alis.Reactive.Native.NativeComponents.NativeTextAreaBuilder.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeTextAreaBuilder!
+Alis.Reactive.Native.NativeComponents.NativeTextAreaBuilder.Placeholder(string! text) -> Alis.Reactive.Native.NativeComponents.NativeTextAreaBuilder!
+Alis.Reactive.Native.NativeComponents.NativeTextAreaBuilder.Rows(int rows) -> Alis.Reactive.Native.NativeComponents.NativeTextAreaBuilder!
+Alis.Reactive.Native.NativeComponents.NativeTextAreaHtml
 Alis.Reactive.Native.NativeComponents.NativeTextBox
 Alis.Reactive.Native.NativeComponents.NativeTextBox.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeTextBox.Changed!>!
 Alis.Reactive.Native.NativeComponents.NativeTextBox.Changed
@@ -15,6 +160,24 @@ Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder
 Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder!
 Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder.Placeholder(string! text) -> Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder!
 Alis.Reactive.Native.NativeComponents.NativeTextBoxHtml
+Alis.Reactive.Native.NativeComponents.RadioButtonItem
+Alis.Reactive.Native.NativeComponents.RadioButtonItem.Description.get -> string?
+Alis.Reactive.Native.NativeComponents.RadioButtonItem.RadioButtonItem(string! value, string! text) -> void
+Alis.Reactive.Native.NativeComponents.RadioButtonItem.RadioButtonItem(string! value, string! text, string! description) -> void
+Alis.Reactive.Native.NativeComponents.RadioButtonItem.Text.get -> string!
+Alis.Reactive.Native.NativeComponents.RadioButtonItem.Value.get -> string!
 override sealed Alis.Reactive.Native.NativeComponents.NativeComponent.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Native.NativeComponents.NativeButtonHtml.NativeButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, string! id, string! text) -> Alis.Reactive.Native.NativeComponents.NativeButtonBuilder<TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeCheckBoxHtml.NativeCheckBox<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, bool>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeCheckBox!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeCheckBoxHtml.NativeCheckBox<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, bool>! field, System.Action<Alis.Reactive.Native.NativeComponents.NativeCheckBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeCheckBox!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeCheckListHtml.NativeCheckList<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeCheckList!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeCheckListHtml.NativeCheckList<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Alis.Reactive.Native.NativeComponents.NativeCheckListBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeCheckList!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeDropDownHtml.NativeDropDown<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeDropDown!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeDropDownHtml.NativeDropDown<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Alis.Reactive.Native.NativeComponents.NativeDropDownBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeDropDown!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeHiddenFieldHtml.NativeHiddenField<TModel, TValue>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeHiddenField!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeRadioGroupHtml.NativeRadioGroup<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeRadioGroup!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeRadioGroupHtml.NativeRadioGroup<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Alis.Reactive.Native.NativeComponents.NativeRadioGroupBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeRadioGroup!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeTextAreaHtml.NativeTextArea<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeTextArea!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeTextAreaHtml.NativeTextArea<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Alis.Reactive.Native.NativeComponents.NativeTextAreaBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeTextArea!, TModel>!
 static Alis.Reactive.Native.NativeComponents.NativeTextBoxHtml.NativeTextBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeTextBox!, TModel>!
 static Alis.Reactive.Native.NativeComponents.NativeTextBoxHtml.NativeTextBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeTextBox!, TModel>!
