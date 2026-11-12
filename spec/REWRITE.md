@@ -150,8 +150,10 @@ tests/
   Alis.Reactive.AnalyzerTests/<Module>/       each analyzer's cases
   Alis.Reactive.ArchitectureTests/            WhenCodeIsWritten, WhenARuleNamesTheCode, WhenClaudeRunsAHook, the POC's
                                               WhenTheCoreIsCompiled and WhenAContractDriftIsSuppressed, over the
-                                              conformance app WhenAnAppRendersItsPages and SandboxStaticStateTests,
-                                              renamed WhenTheAppHoldsNoStaticState, over each fresh app's build
+                                              conformance app as built WhenAnAppRendersItsPages, which opens every
+                                              address it answers to a GET and every link its pages hold, and
+                                              SandboxStaticStateTests, renamed WhenTheAppHoldsNoStaticState, which
+                                              refuses a static a request can change, over each fresh app's build
                                               WhenAConsumerAppIsBuilt (section 2.9), and over the runner's selection
                                               and result WhenAPlaywrightRunStarts and WhenAPlaywrightRunEnds (section
                                               2.5), over the lint's rules
@@ -181,7 +183,10 @@ holds a CLAUDE.md of its own: its standard, its command and what it refuses.
 
 The Playwright project keeps the `PlaywrightTests` suffix, so the deny rule on a raw `dotnet test` of a Playwright
 project holds. It names the app with `ReferenceOutputAssembly="false"`, so the app builds first and none of its types
-reach a test, and the framework's analyzers the same way, as an analyzer, for its slice table; the app's `World/` holds the world's middleware and endpoints on the world contract. The consumer apps
+reach a test, and the framework's analyzers the same way, as an analyzer, for its slice table; the app's `World/` holds the world's middleware and endpoints on the world contract. The architecture
+tests reference the app whole, for the two rules that read it as built: WhenAnAppRendersItsPages runs it in their own
+process (Microsoft.AspNetCore.Mvc.Testing, 2.7), which takes a public type of the app, so its entry class is public,
+and WhenTheAppHoldsNoStaticState reads the statics of its assembly. The consumer apps
 and the twin each hold an empty `Directory.Build.props` and a `Directory.Packages.props` that turns central management
 off, so their builds see what a fresh app sees.
 
@@ -853,10 +858,10 @@ path does, and a part that lists its doors, each on a Doors line, lands with the
 
 **Where the rewrite stands.** U1 is landed. U2 is running. Landed of it: the world contract with the generated gates
 and promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
-TEST013 on the Playwright project, the bindings check, and section 2.7's runner with its measured budget. Open of
-it: the CI workflows with a pool's shard, the two architecture tests over the app, the harness's refusal of the EJ2
-script, and the measurements of the waits and of parallelism. U3 is next. The commit that lands a piece rewrites this
-paragraph.
+TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget, and the two
+architecture tests over the app. Open of it: the harness's refusal of the EJ2 script, the measurements of the waits
+and of parallelism, and the CI workflows with a pool's shard. U3 is next. The commit that lands a piece rewrites
+this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1
@@ -893,7 +898,11 @@ its promise, failing. The module tests land here with their first tests, the sch
 run of one block, sets an element's text (M5.N5, M5.N1), compiled for both hosts. The lint's two rules that read a
 path of the runtime land here, each with its refused and accepted file (section 2.7), and so do the core's banned
 symbols with WhenTheCoreIsCompiled, before the core's first code that reads a type. The bindings check gains its
-view clause with the first screen's view (section 2.5).
+view clause with the first screen's view (section 2.5). WhenAnAppRendersItsPages, which U2 lands over the World
+area's three addresses, meets its next cases here and states each with a refused and an accepted case: every plan a
+page renders read against `plan.schema.json` (JsonSchema.Net, 2.7), the address of an MVC action, the value of a
+route's parameter, which the sweep refuses as unopened until then, and the refusal routes, whose pages refuse by
+design.
 
 ### U4. Type knowledge
 Features: M16.F1

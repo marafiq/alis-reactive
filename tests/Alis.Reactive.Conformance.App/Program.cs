@@ -4,9 +4,13 @@ using Alis.Reactive.Conformance.App.World;
 
 namespace Alis.Reactive.Conformance.App;
 
-internal static class Program
+public sealed class Program
 {
     private const string TestHost = "test-host";
+
+    private Program()
+    {
+    }
 
     private static void Main(string[] args)
     {

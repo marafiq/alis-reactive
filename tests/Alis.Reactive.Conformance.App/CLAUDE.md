@@ -10,8 +10,15 @@ its views.
   its controllers and models as they read an app's.
 - The World area (`World/`) scopes data, gates and caches to a test's world by the cookie `"world"`, in Development
   alone. A document's request that carries no world gets a new one, so a person runs the app as a test does; any
-  other request with no world gets none. The app holds no static mutable state: what a test changes lives in its
-  world.
+  other request with no world gets none.
+- The app holds no static a request can change, since every world shares a static: none that can be assigned, and
+  no read-only one that holds an array, a collection that is neither a read-only view nor an immutable or frozen
+  one, or an object of the app's own that holds a member a request can assign. What a test changes lives in its
+  world; a list that never changes is declared as a read-only view. `WhenTheAppHoldsNoStaticState` refuses each by
+  its name.
+- Every address the app answers to a GET, and every link its pages hold, answers the person who opens it:
+  `WhenAnAppRendersItsPages` runs the app inside the architecture tests and opens each as a browser opens a
+  document. `Program` is public for that run alone.
 - An endpoint is written as an app writes one. What a test needs the server to decide, when an answer leaves or what
   it holds, goes through the harness's verbs, never through a control on a page.
 
