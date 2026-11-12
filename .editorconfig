@@ -195,3 +195,6 @@ dotnet_diagnostic.IDE2000.severity = warning
 dotnet_diagnostic.IDE2002.severity = warning
 dotnet_diagnostic.IDE2004.severity = warning
 dotnet_diagnostic.IDE2006.severity = warning
+
+[{poc,tests/Alis.Reactive.Poc.*,tests/Alis.Reactive.Playwright.TestHost}/**.cs]
+dotnet_diagnostic.IDE0051.severity = none
