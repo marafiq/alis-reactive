@@ -1,5 +1,6 @@
 using System;
 using Alis.Reactive.Declarations;
+using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 using Alis.Reactive.Vendors;
 
@@ -22,17 +23,46 @@ public sealed class Element : Component
     /// A value that cannot be read shows nothing when it is set. A set is refused on an element a slot loads
     /// into, since it would remove what the slot loaded while that content's plan still runs.
     /// </remarks>
-    public Property<string?> Text => Content<string?>("textContent");
+    public ElementContent Text => new(this, "textContent");
 
     /// <summary>Gets the element's HTML, <c>innerHTML</c>: a source of it that a step also sets.</summary>
     /// <remarks>
     /// A value that cannot be read shows nothing when it is set. A set is refused on an element a slot loads
     /// into, since it would remove what the slot loaded while that content's plan still runs.
     /// </remarks>
-    public Property<string?> Html => throw new NotImplementedException();
+    public ElementContent Html => throw new NotImplementedException();
 
     /// <summary>Gets the element's classes, <c>classList</c>.</summary>
     public ClassList Classes => throw new NotImplementedException();
+}
+
+/// <summary>
+/// An element's text or its HTML: a source of it that a step also sets, to a text or to a value shown as text.
+/// </summary>
+public sealed class ElementContent : ReadOnly<string?>
+{
+    private readonly Element _element;
+    private readonly PathStep _member;
+
+    internal ElementContent(Element element, string member)
+    {
+        _element = element;
+        _member = new MemberStep(member);
+    }
+
+    /// <summary>Sets the content to a text when the step runs.</summary>
+    /// <param name="text">The text, written into the plan where the view renders; null shows nothing.</param>
+    public void Set(string? text)
+        => _element.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, true, _element.Bound.Target, Literals.Of(text)));
+
+    /// <summary>Sets the content to what a source reads when the step runs, shown as text.</summary>
+    /// <remarks>
+    /// A number shows as the server writes it under the view's culture, and a date as its day, with its time when
+    /// that is not midnight. A source that cannot be read shows nothing.
+    /// </remarks>
+    /// <param name="source">The source of the value to show.</param>
+    /// <typeparam name="TValue">The type of the value the source reads.</typeparam>
+    public void Set<TValue>(ITypedSource<TValue> source) => throw new NotImplementedException();
 }
 
 /// <summary>

@@ -874,6 +874,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   writes inside a tag on each host. `pipeline.Object<T>` (N7.1) waits for the first view that builds a payload
   from sources. A door a module's page names and `spec/api` does not compile is declared the same way, from its
   line and its sentence, with the first view that calls it. The owner can overrule each.
+- The lead, 2026-11-12, declaring the door five bench cells, M5.F1's sentences and X3.8's page call, an element's
+  text set from a source that is no text: `Text` and `Html` are each an `ElementContent`, a class of `Elements`
+  that reads as a source of text and whose `Set` takes a text literal or a source of any type. M5.N1 named each a
+  string property "taking a literal or any source of D7.2", and a string property takes a source of text alone
+  (D7.3), so its own sentence did not compile; both older lines take a source of any type there, and an overload
+  on the string property would reach every component's. D7.3 and M5.N1 state it. A literal that is no text at an
+  element's text, X3.13's and X3.14's dates, is declared with the first of their pages. The same commit gives
+  the bench its component's builds: a world names one (`ComponentVersion` of the world contract, the versions
+  `spec/Reference/native.json` lists) and the page starts its component as that build. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -17,7 +17,8 @@ its views.
   its door as that file states them; none is edited by hand to differ from it.
 - A component's render helper sits beside its declaration and starts it from a class of its own
   (`Components/ConformanceComponent/ConformanceStart.cs`), written as the plan writes a literal; the class gains a
-  member when a page first needs the component to start with it. A page's layout is `Shared/_Layout.cshtml`, which
+  member when a page first needs the component to start with it. Its `Version` is the build of the component a
+  world names, `ComponentVersion` of the world contract, one of the versions `spec/Reference/native.json` lists. A page's layout is `Shared/_Layout.cshtml`, which
   links the framework's script, unless the page renders something of its own beside its body, as the ward's does.
 - `Bench/` holds the component bench, a folder for each family of cells of `spec/Reference/native.json`
   (`Bench/Properties/` the first): a controller with an action for each cell's page, the page's model, the app

@@ -18,6 +18,14 @@ public sealed class Seed
 
     public string? ComponentCurrentItem { get; set; }
 
+    public int? ComponentOuterCount { get; set; }
+
+    public int? ComponentActiveItems { get; set; }
+
+    public int? ComponentCount { get; set; }
+
+    public ComponentVersion? ComponentVersion { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed TheWord(string word) => new() { Word = word };
@@ -31,6 +39,14 @@ public sealed class Seed
     public static Seed TheComponentsReadOnlyText(string text) => new() { ComponentReadOnlyText = text };
 
     public static Seed TheComponentsCurrentItem(string name) => new() { ComponentCurrentItem = name };
+
+    public static Seed TheComponentsOuterCount(int count) => new() { ComponentOuterCount = count };
+
+    public static Seed TheComponentsActiveItems(int active) => new() { ComponentActiveItems = active };
+
+    public static Seed TheComponentsCount(int count) => new() { ComponentCount = count };
+
+    public static Seed TheComponentsVersion(ComponentVersion version) => new() { ComponentVersion = version };
 
     public Seed AndResident(string name)
     {

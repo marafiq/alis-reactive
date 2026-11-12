@@ -33,19 +33,17 @@ public sealed class Property<TValue> : ReadOnly<TValue>
 {
     private readonly JsObject _owner;
     private readonly PathStep _member;
-    private readonly bool _content;
 
-    internal Property(JsObject owner, string member, bool content)
+    internal Property(JsObject owner, string member)
     {
         _owner = owner;
         _member = new MemberStep(member);
-        _content = content;
     }
 
     /// <summary>Sets the property to a literal when the step runs.</summary>
     /// <param name="value">The value to set, written into the plan where the view renders.</param>
     public void Set(TValue value)
-        => _owner.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, _content, _owner.Bound.Target, Literals.Of(value)));
+        => _owner.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, false, _owner.Bound.Target, Literals.Of(value)));
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>

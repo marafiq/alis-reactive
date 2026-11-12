@@ -12,6 +12,10 @@ internal sealed class WorldData
     private volatile string _componentOuterText = "Gamma";
     private volatile string _componentReadOnlyText = "RO-2026-11-10";
     private volatile string _componentCurrentItem = "One";
+    private volatile int _componentOuterCount = 8;
+    private volatile int _componentActiveItems = 3;
+    private volatile int _componentCount = 3;
+    private volatile ComponentVersion _componentVersion = ComponentVersion.Current;
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -25,6 +29,14 @@ internal sealed class WorldData
 
     internal string ComponentCurrentItem => _componentCurrentItem;
 
+    internal int ComponentOuterCount => _componentOuterCount;
+
+    internal int ComponentActiveItems => _componentActiveItems;
+
+    internal int ComponentCount => _componentCount;
+
+    internal ComponentVersion ComponentVersion => _componentVersion;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
@@ -33,6 +45,10 @@ internal sealed class WorldData
         if (seed.ComponentOuterText is { } outerText) _componentOuterText = outerText;
         if (seed.ComponentReadOnlyText is { } readOnlyText) _componentReadOnlyText = readOnlyText;
         if (seed.ComponentCurrentItem is { } currentItem) _componentCurrentItem = currentItem;
+        if (seed.ComponentOuterCount is { } outerCount) _componentOuterCount = outerCount;
+        if (seed.ComponentActiveItems is { } activeItems) _componentActiveItems = activeItems;
+        if (seed.ComponentCount is { } count) _componentCount = count;
+        if (seed.ComponentVersion is { } version) _componentVersion = version;
     }
 
     internal void Arm(string gate) => _gates[gate] = new WorldGate();

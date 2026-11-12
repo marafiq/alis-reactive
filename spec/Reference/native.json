@@ -524,7 +524,7 @@
           ]
         },
         {
-          "behavior": "After each raise the component shows Raised and its count of raises, Raised 1 and on.",
+          "behavior": "After each raise the component shows Raised and its count of raises, Raised 1 and on, in a status named Raises.",
           "tests": [
             "X5.7",
             "X17.15"
@@ -611,7 +611,7 @@
           ]
         },
         {
-          "behavior": "The render helper takes the items and records the component holds, its Days in the live form (D7.7), an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
+          "behavior": "The render helper takes the version the component is built as, the items and records the component holds, its Days in the live form (D7.7), an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
           "tests": [
             "M4.X4",
             "M4.X6",

@@ -9,7 +9,8 @@ references no Alis.Reactive assembly, so a test that compiles against it cannot 
 - `FailsForAttribute` binds a test to its promise constant, and `GestureAttribute` marks a harness call that counts
   as a test's gesture. `BesideThePageAttribute` marks what the harness collected of a page's requests, console and
   uncaught errors, the one thing of the harness's that `Assert.That` reads.
-- A seed is written through the typed builders of `Seed.cs`; an endpoint and a page of the World area are named once,
+- A seed is written through the typed builders of `Seed.cs`, and `ComponentVersion.cs` names the builds of the
+  conformance component a seed chooses from; an endpoint and a page of the World area are named once,
   in `WorldEndpoints.cs` and `WorldPages.cs`; a bench cell's page is named for its cell in a part of `BenchPages`
   for its family (`BenchPages.Properties.cs`); a refusal route's page is named in `RefusalPages.cs`, under the
   area's root that file names, by which the sweep of the app's pages knows a page that refuses by design.

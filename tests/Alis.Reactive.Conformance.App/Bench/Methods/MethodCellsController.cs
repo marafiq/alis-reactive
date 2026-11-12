@@ -10,6 +10,9 @@ public sealed class MethodCellsController : Controller
     [HttpGet(BenchPages.MethodVoid)]
     public IActionResult MethodVoid() => View("/Bench/Methods/MethodVoid.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.MethodValue)]
+    public IActionResult MethodValue() => View("/Bench/Methods/MethodValue.cshtml", TheWorldsBoard());
+
     [HttpGet(BenchPages.MethodObjectMemberRead)]
     public IActionResult MethodObjectMemberRead() => View("/Bench/Methods/MethodObjectMemberRead.cshtml", TheWorldsBoard());
 
@@ -28,11 +31,14 @@ public sealed class MethodCellsController : Controller
     private MethodBoard TheWorldsBoard()
     {
         var world = HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data;
-        return new MethodBoard(world.ComponentText, "a-1", world.ComponentCurrentItem);
+        return new MethodBoard(world.ComponentText, "a-1", world.ComponentCurrentItem) { Count = world.ComponentCount };
     }
 }
 
-public sealed record MethodBoard(string Text, string Value, string CurrentItem);
+public sealed record MethodBoard(string Text, string Value, string CurrentItem)
+{
+    public int Count { get; init; }
+}
 
 public static class MethodCells
 {
