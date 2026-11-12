@@ -64,7 +64,7 @@ public sealed class WhenATestTakesAMemberOfPlaywright
             .RunAsync();
 
     [RefusedCase]
-    public Task a_member_of_a_static_class_of_playwrights_outside_the_lists_is_refused_at_its_name()
+    public Task a_member_of_a_static_class_of_playwrights_that_the_harness_takes_is_refused_in_a_test_at_its_name()
         => new Case<TEST002TestTakesTheListedMembersOfPlaywright>()
             .WithFile(
                 "WhenARoundStarts.cs",
@@ -73,7 +73,10 @@ public sealed class WhenATestTakesAMemberOfPlaywright
                 + "        Assertions.{|#1:SetDefaultExpectTimeout|}(1000);\n"
                 + "        using var playwright = await Playwright.{|#2:CreateAsync|}();"
                 + Closing)
-            .Expecting(Outside(0, "Assertions.SetDefaultExpectTimeout"), Outside(1, "Assertions.SetDefaultExpectTimeout"), TheHarnesss(2, "Playwright.CreateAsync"))
+            .Expecting(
+                TheHarnesss(0, "Assertions.SetDefaultExpectTimeout"),
+                TheHarnesss(1, "Assertions.SetDefaultExpectTimeout"),
+                TheHarnesss(2, "Playwright.CreateAsync"))
             .RunAsync();
 
     [AcceptedCase]
@@ -147,14 +150,21 @@ public sealed class WhenATestTakesAMemberOfPlaywright
                 + "        _page.{|#0:SetDefaultTimeout|}(1000);\n"
                 + "        _page.{|#1:Request|} += (_, _) => { };\n"
                 + "        await _page.{|#2:Clock|}.{|#3:InstallAsync|}();\n"
-                + "        await _page.{|#4:RequestGCAsync|}();"
+                + "        await _page.{|#4:RequestGCAsync|}();\n"
+                + "        IBrowserContext context = null!;\n"
+                + "        await context.{|#5:Tracing|}.{|#6:StartAsync|}();\n"
+                + "        await context.{|#7:Tracing|}.{|#8:StopAsync|}();"
                 + Closing)
             .Expecting(
                 TheHarnesss(0, "IPage.SetDefaultTimeout"),
                 TheHarnesss(1, "IPage.Request"),
                 TheHarnesss(2, "IPage.Clock"),
                 TheHarnesss(3, "IClock.InstallAsync"),
-                TheHarnesss(4, "IPage.RequestGCAsync"))
+                TheHarnesss(4, "IPage.RequestGCAsync"),
+                TheHarnesss(5, "IBrowserContext.Tracing"),
+                TheHarnesss(6, "ITracing.StartAsync"),
+                TheHarnesss(7, "IBrowserContext.Tracing"),
+                TheHarnesss(8, "ITracing.StopAsync"))
             .RunAsync();
 
     [AcceptedCase]
@@ -169,6 +179,9 @@ public sealed class WhenATestTakesAMemberOfPlaywright
                 + "        await context.AddCookiesAsync(new[] { new Cookie { Name = \"world\", Value = \"1\", Url = \"http://localhost\" } });\n"
                 + "        context.SetDefaultTimeout(1000);\n"
                 + "        context.SetDefaultNavigationTimeout(1000);\n"
+                + "        Assertions.SetDefaultExpectTimeout(1000);\n"
+                + "        await context.Tracing.StartAsync();\n"
+                + "        await context.Tracing.StopAsync(new() { Path = \"steps.zip\" });\n"
                 + "        var page = await context.NewPageAsync();\n"
                 + "        page.SetDefaultTimeout(1000);\n"
                 + "        page.SetDefaultNavigationTimeout(1000);\n"

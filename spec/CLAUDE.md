@@ -760,6 +760,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the first agent, either you or fork whoever writes that don't throw over the wall to one round we have, because
   that is all bad behaviors that that agent will check and I will fix. I expect quality work on the first run."
   Whoever writes a page or a piece of code, the lead or a fork, finishes it to the full bar before it is read.
+- The lead, 2026-11-11, within the decision above on the closed lists of the test rules: the harness's list takes
+  four more members of Playwright 1.64.1, which section 2.5's measured waits need and the list had left out.
+  `Assertions.SetDefaultExpectTimeout`, since an expectation's wait is a wait, and every wait is the harness's, set
+  from measurement; and a context's `Tracing` with its `StartAsync` and `StopAsync`, since Playwright's .NET surface
+  gives a call's start and end nowhere but in its trace, and the waits are four times the slowest step. A test
+  takes none of the four. Beside the same measurement, the lead's reading of section 2.8's parallelism: the count of
+  tests at once is measured apart from the budget, since four settings of 20 runs each cost four measurements, and
+  the budget is measured at the count the parallelism measurement kept. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

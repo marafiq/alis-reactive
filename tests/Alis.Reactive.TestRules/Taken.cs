@@ -49,6 +49,7 @@ internal static class Taken
         "IBrowserContext.NewPageAsync", "IBrowserContext.AddCookiesAsync",
         "IBrowser.CloseAsync", "IBrowserContext.CloseAsync", "IPage.CloseAsync",
         "IPage.SetDefaultTimeout", "IPage.SetDefaultNavigationTimeout", "IBrowserContext.SetDefaultTimeout", "IBrowserContext.SetDefaultNavigationTimeout",
+        "Assertions.SetDefaultExpectTimeout", "IBrowserContext.Tracing", "ITracing.StartAsync", "ITracing.StopAsync",
         "IPage.Request", "IPage.Console", "IPage.PageError", "IPage.Download", "IPage.Popup", "IPage.Close",
         "IPage.RequestGCAsync", "IPage.Clock",
         "IClock.InstallAsync", "IClock.PauseAtAsync", "IClock.FastForwardAsync", "IClock.RunForAsync", "IClock.ResumeAsync");

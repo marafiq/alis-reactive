@@ -10,10 +10,16 @@ Reads what one run of the browser tests wrote and prints its result line:
 It exits 1 when the run wrote no TRX, selected no test, ran other than it selected, failed a test, ran a test over
 the budget, or left a server alive, each said on a line of its own before the result line.
 
---measure reads the TRX of each of 20 green runs of one selection and writes the budget, four times the slowest test.`;
+--measure reads the TRX of each of 20 green runs of one selection, and beside each TRX the steps the harness wrote
+(<name>.steps.tsv: a test, the holder and the method of one call of Playwright, its milliseconds), and writes the
+budget, four times the slowest test, and the action wait and the navigation wait, each four times the slowest step
+of its kind: a navigation is goto, reload, goBack or goForward, an action every other call on a frame.`;
 
 const measuredRuns = 20;
 const timesTheSlowest = 4;
+const navigations = ["goto", "reload", "goBack", "goForward"];
+const holderOfAnAction = "Frame";
+const waits = ["action", "navigation"];
 
 function refuse(message) {
   console.error(`[playwright:result] ${message}`);
@@ -77,7 +83,30 @@ function budgetOf(path) {
   if (hundredths(measured.budgetSeconds) !== timesTheSlowest * hundredths(measured.slowestSeconds)) {
     return { problem: `the budget at ${path} is ${measured.budgetSeconds}s and its slowest test ${measured.slowestSeconds}s; a budget is four times the slowest test measured, never chosen` };
   }
+  for (const kind of waits) {
+    const wait = measured[`${kind}WaitMilliseconds`];
+    const slowest = measured[`${slowestOf(kind)}Milliseconds`];
+    if (wait === undefined || slowest === undefined) return { problem: `no ${kind} wait is measured at ${path}; scripts/playwright.sh --measure writes it` };
+    if (wait !== timesTheSlowest * slowest) {
+      return { problem: `the ${kind} wait at ${path} is ${wait}ms and its slowest step ${slowest}ms; a wait is four times the slowest step measured, never chosen` };
+    }
+  }
   return { seconds: measured.budgetSeconds };
+}
+
+function slowestOf(kind) {
+  return `slowest${kind[0].toUpperCase()}${kind.slice(1)}`;
+}
+
+function stepsBeside(trxPath) {
+  const path = trxPath.replace(/\.trx$/, ".steps.tsv");
+  if (!existsSync(path)) return { path, problem: `no steps at ${path}; the harness of a measured run writes them` };
+  const steps = readFileSync(path, "utf8").split("\n").filter(line => line !== "").map(line => {
+    const [test, holder, method, milliseconds] = line.split("\t");
+    const kind = navigations.includes(method) ? "navigation" : holder === holderOfAnAction ? "action" : "the harness's";
+    return { kind, milliseconds: Number(milliseconds), what: `${holder}.${method} in ${test}` };
+  });
+  return { path, steps };
 }
 
 function read(selection, trxPath, budget, serversLeft) {
@@ -115,6 +144,7 @@ function resultLine(label, shard, counts) {
 function measure(options, selection) {
   if (options.trxFiles.length < measuredRuns) refuse(`a budget is measured over ${measuredRuns} green runs, and ${options.trxFiles.length} TRX files were given.`);
   let slowest = { seconds: 0, id: "no test" };
+  const slowestStep = Object.fromEntries(waits.map(kind => [kind, { milliseconds: 0, what: "no step" }]));
   for (const trxPath of options.trxFiles) {
     const { said, counts } = read(selection, trxPath, {}, 0);
     if (said.length > 0) {
@@ -123,6 +153,18 @@ function measure(options, selection) {
       process.exit(1);
     }
     if (counts.slowest.seconds > slowest.seconds) slowest = counts.slowest;
+    const recorded = stepsBeside(trxPath);
+    if (recorded.problem !== undefined) {
+      console.log(`[playwright:measured] no budget is written: ${recorded.problem}`);
+      process.exit(1);
+    }
+    for (const step of recorded.steps.filter(one => waits.includes(one.kind))) {
+      if (step.milliseconds > slowestStep[step.kind].milliseconds) slowestStep[step.kind] = step;
+    }
+  }
+  for (const kind of waits.filter(one => slowestStep[one].milliseconds === 0)) {
+    console.log(`[playwright:measured] no budget is written: the ${options.trxFiles.length} runs hold no ${kind} step, so no ${kind} wait is measured`);
+    process.exit(1);
   }
   const slowestHundredths = Math.ceil(slowest.seconds * 100 - 1e-6);
   const slowestSeconds = slowestHundredths / 100;
@@ -131,6 +173,14 @@ function measure(options, selection) {
     budgetSeconds: (timesTheSlowest * slowestHundredths) / 100,
     slowestSeconds,
     slowest: slowest.id,
+    ...Object.fromEntries(waits.flatMap(kind => {
+      const milliseconds = Math.ceil(slowestStep[kind].milliseconds - 1e-6);
+      return [
+        [`${kind}WaitMilliseconds`, timesTheSlowest * milliseconds],
+        [`${slowestOf(kind)}Milliseconds`, milliseconds],
+        [slowestOf(kind), slowestStep[kind].what],
+      ];
+    })),
     runs: options.trxFiles.length,
     tests: selection.cases.length,
     selection: selection.label,
@@ -139,6 +189,9 @@ function measure(options, selection) {
   };
   writeFileSync(options.budget, `${JSON.stringify(measured, null, 2)}\n`);
   console.log(`[playwright:measured] budget ${measured.budgetSeconds}s, four times the slowest test of ${measured.runs} green runs of ${measured.tests} tests, ${slowestSeconds}s ${slowest.id}`);
+  for (const kind of waits) {
+    console.log(`[playwright:measured] ${kind} wait ${measured[`${kind}WaitMilliseconds`]}ms, four times the slowest ${kind}, ${measured[`${slowestOf(kind)}Milliseconds`]}ms ${measured[slowestOf(kind)]}`);
+  }
 }
 
 const options = parse(process.argv.slice(2));

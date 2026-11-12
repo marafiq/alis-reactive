@@ -17,6 +17,7 @@ public sealed class Run
     {
         _playwright = await Playwright.CreateAsync();
         _browser = await _playwright.Chromium.LaunchAsync();
+        Waits.SetOnEveryExpectation();
     }
 
     [OneTimeTearDown]

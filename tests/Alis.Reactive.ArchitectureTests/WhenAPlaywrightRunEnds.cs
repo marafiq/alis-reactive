@@ -208,27 +208,125 @@ public class WhenAPlaywrightRunEnds
         Assert.That(read.ExitCode, Is.EqualTo(1));
     }
 
+    [RefusedCase]
+    public void a_wait_a_hand_chose_is_refused()
+    {
+        using var written = new WrittenFolder();
+        var patient = Budget(written, 8, 2, actionWait: 1000);
+        var eager = Budget(written, 8, 2, navigationWait: 799, name: "eager.json");
+
+        Assert.That(Read(written, [Listed], [Ran(Listed, "Passed", 1)], patient).Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] the action wait at {patient} is 1000ms and its slowest step 100ms; a wait is four times the slowest step measured, never chosen",
+            $"[playwright:result] rounds 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.00s {Listed}",
+        }));
+        Assert.That(Read(written, [Listed], [Ran(Listed, "Passed", 1)], eager).Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] the navigation wait at {eager} is 799ms and its slowest step 200ms; a wait is four times the slowest step measured, never chosen",
+            $"[playwright:result] rounds 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.00s {Listed}",
+        }));
+    }
+
+    [RefusedCase]
+    public void a_budget_measured_with_no_waits_is_refused()
+    {
+        using var written = new WrittenFolder();
+        var budgetAlone = written.Write("budget.json", JsonSerializer.Serialize(new { budgetSeconds = 8, slowestSeconds = 2, slowest = Listed, runs = RunsOfABudget }));
+
+        var read = Read(written, [Listed], [Ran(Listed, "Passed", 1)], budgetAlone);
+
+        Assert.That(read.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] no action wait is measured at {budgetAlone}; scripts/playwright.sh --measure writes it",
+            $"[playwright:result] rounds 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.00s {Listed}",
+        }));
+        Assert.That(read.ExitCode, Is.EqualTo(1));
+    }
+
     [AcceptedCase]
-    public void twenty_green_runs_write_a_budget_of_four_times_their_slowest_test()
+    public void twenty_green_runs_write_a_budget_of_four_times_their_slowest_test_and_waits_of_four_times_their_slowest_steps()
     {
         using var written = new WrittenFolder();
         var selection = Selection(written, [Listed, Opened]);
         var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
-        var runs = Enumerable.Range(1, RunsOfABudget).Select(run => Trx(written, [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", run == 7 ? 2.125 : 1.5)], $"measure-{run}.trx"));
+        var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
+        {
+            Steps(
+                written, run,
+                (Listed, "BrowserContext", "newPage", 500),
+                (Listed, "Frame", "goto", 80),
+                (Listed, "Frame", "click", run == 3 ? 60.2 : 41),
+                (Opened, "Page", "reload", run == 7 ? 90.4 : 45.5),
+                (Opened, "Frame", "expect", run == 11 ? 70.1 : 12.5),
+                (Opened, "Page", "close", 300));
+            return Trx(written, [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", run == 7 ? 2.125 : 1.5)], $"measure-{run}.trx");
+        });
 
         var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
 
         Assert.That(measured.Said, Is.EqualTo(new[]
         {
             $"[playwright:measured] budget 8.52s, four times the slowest test of 20 green runs of 2 tests, 2.13s {Opened}",
+            $"[playwright:measured] action wait 284ms, four times the slowest action, 71ms Frame.expect in {Opened}",
+            $"[playwright:measured] navigation wait 364ms, four times the slowest navigation, 91ms Page.reload in {Opened}",
         }));
         Assert.That(measured.ExitCode, Is.Zero);
         using var held = JsonDocument.Parse(File.ReadAllText(budget));
         Assert.That(held.RootElement.GetProperty("budgetSeconds").GetDouble(), Is.EqualTo(8.52));
         Assert.That(held.RootElement.GetProperty("slowestSeconds").GetDouble(), Is.EqualTo(2.13));
         Assert.That(held.RootElement.GetProperty("slowest").GetString(), Is.EqualTo(Opened));
+        Assert.That(held.RootElement.GetProperty("actionWaitMilliseconds").GetInt32(), Is.EqualTo(284));
+        Assert.That(held.RootElement.GetProperty("slowestActionMilliseconds").GetInt32(), Is.EqualTo(71));
+        Assert.That(held.RootElement.GetProperty("slowestAction").GetString(), Is.EqualTo("Frame.expect in " + Opened));
+        Assert.That(held.RootElement.GetProperty("navigationWaitMilliseconds").GetInt32(), Is.EqualTo(364));
+        Assert.That(held.RootElement.GetProperty("slowestNavigationMilliseconds").GetInt32(), Is.EqualTo(91));
+        Assert.That(held.RootElement.GetProperty("slowestNavigation").GetString(), Is.EqualTo("Page.reload in " + Opened));
         Assert.That(held.RootElement.GetProperty("runs").GetInt32(), Is.EqualTo(20));
         Assert.That(Read(written, [Listed, Opened], [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", 8.52)], budget).ExitCode, Is.Zero);
+    }
+
+    [RefusedCase]
+    public void a_measured_run_with_no_steps_beside_it_writes_no_budget()
+    {
+        using var written = new WrittenFolder();
+        var selection = Selection(written, [Listed]);
+        var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
+        var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
+        {
+            if (run != 20) Steps(written, run, (Listed, "Frame", "goto", 80), (Listed, "Frame", "click", 41));
+            return Trx(written, [Ran(Listed, "Passed", 1)], $"measure-{run}.trx");
+        }).ToList();
+
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+
+        Assert.That(measured.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:measured] no budget is written: no steps at {Path.ChangeExtension(runs[19], ".steps.tsv")}; the harness of a measured run writes them",
+        }));
+        Assert.That(measured.ExitCode, Is.EqualTo(1));
+        Assert.That(File.Exists(budget), Is.False);
+    }
+
+    [RefusedCase]
+    public void measured_runs_that_hold_no_step_of_a_kind_write_no_budget()
+    {
+        using var written = new WrittenFolder();
+        var selection = Selection(written, [Listed]);
+        var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
+        var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
+        {
+            Steps(written, run, (Listed, "Frame", "click", 41), (Listed, "Page", "close", 300));
+            return Trx(written, [Ran(Listed, "Passed", 1)], $"measure-{run}.trx");
+        });
+
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+
+        Assert.That(measured.Said, Is.EqualTo(new[]
+        {
+            "[playwright:measured] no budget is written: the 20 runs hold no navigation step, so no navigation wait is measured",
+        }));
+        Assert.That(measured.ExitCode, Is.EqualTo(1));
+        Assert.That(File.Exists(budget), Is.False);
     }
 
     [RefusedCase]
@@ -252,7 +350,11 @@ public class WhenAPlaywrightRunEnds
         using var written = new WrittenFolder();
         var selection = Selection(written, [Listed]);
         var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
-        var runs = Enumerable.Range(1, RunsOfABudget).Select(run => Trx(written, [Ran(Listed, run == 20 ? "Failed" : "Passed", 1)], $"measure-{run}.trx")).ToList();
+        var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
+        {
+            Steps(written, run, (Listed, "Frame", "goto", 80), (Listed, "Frame", "click", 41));
+            return Trx(written, [Ran(Listed, run == 20 ? "Failed" : "Passed", 1)], $"measure-{run}.trx");
+        }).ToList();
 
         var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
 
@@ -274,8 +376,26 @@ public class WhenAPlaywrightRunEnds
     private static string Selection(WrittenFolder written, string[] cases)
         => written.Write("selection.json", JsonSerializer.Serialize(new { label = "rounds", filter = "", cases }));
 
-    private static string Budget(WrittenFolder written, double budgetSeconds, double slowestSeconds, int runs = RunsOfABudget)
-        => written.Write("budget.json", JsonSerializer.Serialize(new { budgetSeconds, slowestSeconds, slowest = Listed, runs }));
+    private static string Budget(
+        WrittenFolder written, double budgetSeconds, double slowestSeconds, int runs = RunsOfABudget, int actionWait = 400, int navigationWait = 800, string name = "budget.json")
+        => written.Write(name, JsonSerializer.Serialize(new
+        {
+            budgetSeconds,
+            slowestSeconds,
+            slowest = Listed,
+            actionWaitMilliseconds = actionWait,
+            slowestActionMilliseconds = 100,
+            slowestAction = "Frame.click in " + Listed,
+            navigationWaitMilliseconds = navigationWait,
+            slowestNavigationMilliseconds = 200,
+            slowestNavigation = "Frame.goto in " + Listed,
+            runs,
+        }));
+
+    private static void Steps(WrittenFolder written, int run, params (string Test, string Holder, string Method, double Milliseconds)[] calls)
+        => written.Write(
+            $"measure-{run}.steps.tsv",
+            string.Concat(calls.Select(call => string.Join('\t', call.Test, call.Holder, call.Method, call.Milliseconds.ToString("0.###", CultureInfo.InvariantCulture)) + "\n")));
 
     private static string Trx(WrittenFolder written, (string Id, string Outcome, double Seconds)[] ran, string name = "run.trx")
     {

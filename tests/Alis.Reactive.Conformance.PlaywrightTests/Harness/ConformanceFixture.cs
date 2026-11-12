@@ -35,7 +35,7 @@ public abstract class ConformanceFixture(string host)
         var test = TestContext.CurrentContext.Test.ID;
         if (_people.TryRemove(test, out var people))
         {
-            foreach (var person in people) await person.CloseAsync();
+            foreach (var person in people) await Waits.Close(person);
         }
 
         var parked = new List<string>();

@@ -342,10 +342,18 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   on the machine the delivery loop runs on, this Mac (the owner, 2026-11-11): unit U2 runs the suite 20 times there
   and sets the budget at four times the slowest test it measured, the waits at four times the slowest step, and
   writes both into the harness with the run that measured them: `scripts/playwright.sh --measure` writes the budget
-  to `Harness/measured.json` with its slowest test, its runs, its day and its machine. A test over the budget fails
-  its run, and the budget moves only by a new measurement of 20 green runs, written with that run: the result reader
-  refuses a budget that is not four times its slowest test or that fewer than 20 runs measured. CI measures its own numbers the same way
-  when the rewrite is done; no number measured there gates a unit.
+  and the two waits to `Harness/measured.json`, each with what set it, the slowest test and the slowest step of its
+  kind, and the runs, the day and the machine. A step is one call of Playwright that a wait bounds: a navigation
+  (`goto`, `reload`, `goBack`, `goForward`) under the navigation wait, and every other call on a frame, a gesture's
+  and an expectation's, under the action wait. In a measured run the harness records each browser context with
+  Playwright's own trace, which holds every call's start and end, and writes the calls beside that run's TRX; the
+  reader takes the slowest step of each kind over the 20 runs. Outside a measured run the harness sets the action
+  wait on every context and on every expectation and the navigation wait on every context; a measured run sets
+  neither, so a suite that has grown slower is measured under Playwright's own waits. A test over the budget fails
+  its run, and the budget and the waits move only by a new measurement of 20 green runs, written with that run: the
+  result reader refuses a budget that is not four times its slowest test, a wait that is not four times its slowest
+  step, and a measurement of fewer than 20 runs. CI measures its own numbers the same way when the rewrite is done;
+  no number measured there gates a unit.
 - **Syncfusion.** Only the Fusion pool's job receives the licence key; the app registers it at startup when its host
   serves a Fusion screen, and a Fusion screen refuses to render without it. A core test also fails at run time if its
   page requests the EJ2 script: the harness reads every request of a test's pages, a world's and a person's, and at
@@ -480,7 +488,7 @@ through one (`--through U8`), a feature (`--feature M6.F1`), a screen (`--screen
 constant (`--test M3_F1.X8_27_2`), a folder or a fixture of the project by its name (`RequestsAndResponses`), or
 everything the project holds (`--all`). `--host snakeCase` narrows any of them to one host; without it a run takes
 the hosts the conformance app serves on the machine, never the twin's or a fresh app's. A pool's shard (`--pool core
---shard 1/2`) lands with section 2.8's workflows, its one caller. `--measure` writes the budget (2.5).
+--shard 1/2`) lands with section 2.8's workflows, its one caller. `--measure` writes the budget and the waits (2.5).
 
 ### 2.8 Shards and CI
 
@@ -651,7 +659,9 @@ alone.
 
 The project's `Harness/` takes besides: `Playwright.CreateAsync`, `Chromium`, `LaunchAsync`, `NewContextAsync` with its
 locale and time zone, `NewPageAsync`, `AddCookiesAsync`, `CloseAsync`, `SetDefaultTimeout`,
-`SetDefaultNavigationTimeout`, the page's events `Request`, `Console`, `PageError`, `Download`, `Popup` and `Close`,
+`SetDefaultNavigationTimeout`, `Assertions.SetDefaultExpectTimeout`, a context's `Tracing` with its `StartAsync` and
+`StopAsync`, which a measured run records its steps with (2.5), the page's events `Request`, `Console`, `PageError`,
+`Download`, `Popup` and `Close`,
 `RequestGCAsync`, and the clock's `InstallAsync`, `PauseAtAsync`, `FastForwardAsync`, `RunForAsync` and `ResumeAsync`;
 and of NUnit `[SetUp]`, `[TearDown]`, `[OneTimeSetUp]`, `[OneTimeTearDown]`, `[SetUpFixture]` and `[Parallelizable]`.
 TEST005's conditional operators are C#'s: `?:`, `??`, `??=`, `?.`, `?[]`, `&&` and `||`.
@@ -676,7 +686,7 @@ of the rule does: with no world contract TEST013 still counts Playwright's gestu
   classes, called, named, read or subscribed anywhere in the project: a method named and never called, a method
   group, is read by TEST002 as a call is. An options object and an enum value are the data a listed member takes
   and are not read, but for the two below. `Page.Keyboard`, `Page.Mouse` and, in the harness,
-  `Page.Clock` are read as the way to the members listed under them. `Locator` and `FrameLocator` take one id, `#`
+  `Page.Clock` and a context's `Tracing` are read as the way to the members listed under them. `Locator` and `FrameLocator` take one id, `#`
   and the id's letters, digits, `_` and `-`, as a constant: any other constant selector is refused by TEST002, and
   one that is no constant by TEST007.
 - **A wait (TEST003)** is a call of a listed member, wherever it is written, and outside the harness a `Timeout`
@@ -860,10 +870,10 @@ path does, and a part that lists its doors, each on a Doors line, lands with the
 
 **Where the rewrite stands.** U1 is landed. U2 is running. Landed of it: the world contract with the generated gates
 and promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
-TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget, the two
-architecture tests over the app, and the harness's refusal of the EJ2 script. Open of it: the measurements of the
-waits and of parallelism, and the CI workflows with a pool's shard. U3 is next. The commit that lands a piece
-rewrites this paragraph.
+TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget and waits, the
+two architecture tests over the app, and the harness's refusal of the EJ2 script. Open of it: the measurement of
+parallelism, and the CI workflows with a pool's shard. U3 is next. The commit that lands a piece rewrites this
+paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1

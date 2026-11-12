@@ -28,9 +28,12 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
 - A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits
   until the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
   provokes an ordering by timing, by a stubbed network or by a control on the page.
-- `Harness/measured.json` holds the budget of one test, four times the slowest test of 20 green runs. The runner
-  writes it (`--measure`) and fails a run that holds a test over it; a hand never edits it, and the runner refuses a
-  budget that is not four times its slowest test.
+- `Harness/measured.json` holds what 20 green runs measured: the budget of one test, four times the slowest test,
+  and the two waits, each four times the slowest step of its kind, a navigation's and every other step's. The runner
+  writes it (`--measure`) and fails a run that holds a test over the budget. `Harness/Waits.cs` sets the waits on
+  every browser context and on every expectation, so a test sets no wait of its own; in a measured run it sets none
+  and records each step from Playwright's trace. A hand never edits the file: the runner refuses a budget or a wait
+  that is not four times what it measured.
 - `Harness/WhenAGateHoldsAnAnswer.cs` is the pattern: the page, the gesture and the outcome are in the test's body,
   and the opposite case stands beside it.
 

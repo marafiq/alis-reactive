@@ -31,8 +31,9 @@ Selectors, one a run:
 
 Options:
   --host <name>   Take that host alone. Without it a run takes the hosts the conformance app serves on this machine.
-  --measure       Run the selection 20 times, each green, and write the budget, four times the slowest test, to
-                  the harness's measured.json.
+  --measure       Run the selection 20 times, each green, and write to the harness's measured.json the budget,
+                  four times the slowest test, and the action wait and the navigation wait, each four times the
+                  slowest step of its kind. A measured run sets no measured wait and records every step.
   -h, --help      Show this help.
 
 A run's files are under tests/Alis.Reactive.Conformance.PlaywrightTests/TestResults/<its stamp>/.
@@ -104,7 +105,9 @@ stop_servers_whose_test_process_ended "stopped a server an earlier run left aliv
 
 if [ "$measure" -eq 1 ]; then
   for number in $(seq 1 "$measured_runs"); do
+    export ALIS_MEASURED_STEPS="$PWD/$run/measure-$number.steps.tsv"
     run_the_tests "measure-$number" > "$run/measure-$number.log"
+    unset ALIS_MEASURED_STEPS
     left="$(stop_servers_whose_test_process_ended "a server left alive after measured run $number")"
     [ "$left" -eq 0 ] || refuse "measured run $number left $left server alive; no budget is written."
     echo "[playwright:runner] measured run $number of $measured_runs"

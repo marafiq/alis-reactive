@@ -21,6 +21,10 @@
         <ProjectReference Include="..\Alis.Reactive.Conformance.App\Alis.Reactive.Conformance.App.csproj" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="Harness\measured.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
     <Import Project="..\Alis.Reactive.TestRules\Alis.Reactive.TestRules.targets" />
 
 </Project>

@@ -38,12 +38,16 @@ public sealed class TestWorld
         return new TestWorld(harness, context, await context.NewPageAsync());
     }
 
-    internal static Task<IBrowserContext> NewContext(ConformanceHost host)
-        => Run.Browser.NewContextAsync(new BrowserNewContextOptions { BaseURL = host.Address.ToString(), Locale = "en-US", TimezoneId = "America/Los_Angeles" });
+    internal static async Task<IBrowserContext> NewContext(ConformanceHost host)
+    {
+        var context = await Run.Browser.NewContextAsync(new BrowserNewContextOptions { BaseURL = host.Address.ToString(), Locale = "en-US", TimezoneId = "America/Los_Angeles" });
+        await Waits.Open(context);
+        return context;
+    }
 
     internal async Task<IList<string>> End()
     {
-        await _context.CloseAsync();
+        await Waits.Close(_context);
         using var answer = await _harness.PostAsync(WorldEndpoints.End, content: null);
         answer.EnsureSuccessStatusCode();
         var end = await answer.Content.ReadFromJsonAsync<WorldEnd>();
