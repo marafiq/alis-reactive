@@ -29,6 +29,10 @@ expects none.
   GET, and every link its pages hold, as a browser opens a document; its cases sweep an app the case maps. The
   second reads every static of the types the app's authors wrote; its cases read an assembly built from their text.
   What the app holds as it runs is read from its assembly, the one place a view's and a generator's statics are.
+- `WhenTheCoreIsCompiled` compiles the core's tracked C# as its net10 host does, against the references this
+  project's build writes beside the tests, and holds every read of type information to the owner's list, by file
+  and member; its cases compile small sources the same way. Its last two cases run the build's own analyzer over
+  `Alis.Reactive/BannedSymbols.txt`, so an entry that names no symbol fails the case of its use.
 - `WhenThePlanContractIsGenerated` runs the contract generator's reader, which this project references for it, over
   small grammars its cases declare, and expects each refusal's own words and the TypeScript and the schema of an
   accepted one as literals. The core's own contract is held by the first step of `scripts/check.sh`.

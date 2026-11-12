@@ -22,8 +22,13 @@ uses only the rows before its own. `spec/REWRITE.md` section 2.3 says why each r
 - The TypeScript contract and the plan's JSON schema are generated from the grammar as System.Text.Json writes it
   (`tools/PlanContractGenerator`), never edited by hand, and `scripts/check.sh` fails on a grammar the tracked
   contract differs from.
-- The core discovers and invokes no member at run time. A read of type information is on the owner's list
-  (`spec/CLAUDE.md`); U3 lands the tool that refuses any other, with the core's first code that reads a type.
+- The core discovers and invokes no member at run time. `BannedSymbols.txt` is what the build refuses in both hosts:
+  a use of `System.Reflection`, `Activator`, a type found by its name, a compiled expression and a regular
+  expression. A read of a type's identity is the owner's, listed by file and member in
+  `tests/Alis.Reactive.ArchitectureTests/WhenTheCoreIsCompiled.cs`, which fails on any other and on an entry the
+  core no longer reads; a read enters that list with the owner's yes (`spec/CLAUDE.md`). The ban reads uses, so a
+  reflection type named in a declaration is the list's to refuse. The list reads the files the net10 host
+  compiles; a file of the net48 host alone is read from U4 on, by N18.1's analyzer in each host's build.
 - A module's two halves are written against the schema (`spec/Core/schema.md`): this folder writes the nodes, and
   the folder of the same name under `Alis.Reactive.Assets/runtime/` executes them.
 
@@ -56,5 +61,7 @@ scripts/check.sh --no-spec
 | A public symbol outside the PublicAPI text | the build (RS0016, RS0017) |
 | A conditional directive inside a file | `WhenCodeCompilesForBothHosts` |
 | A comment; an XML doc off the public surface | `WhenCodeIsWritten` |
+| A use of reflection, of `Activator`, of a type found by its name, of a compiled expression or of a regular expression | the build (RS0030, `BannedSymbols.txt`), each entry held by `WhenTheCoreIsCompiled` |
+| A read of type information off the owner's list | `WhenTheCoreIsCompiled` |
 | A node left open, a nullable field, a field typed as a kind's class, a kind written twice or by a class not named for it, a choice a case of which can be made outside it | the contract generator, held by `WhenThePlanContractIsGenerated` |
 | A grammar the tracked contract differs from | `scripts/check.sh`, its first step |

@@ -113,7 +113,7 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | A friend assembly: an internal opened to a test or to a consumer | `WhenAnInternalIsExposed` |
 | JavaScript in a view: an inline script, a handler attribute, a script URL | `WhenAViewIsWritten` |
 | In a shipped project, a conditional directive inside a file: one host's code is a file of its own | `WhenCodeCompilesForBothHosts` |
-| A public symbol outside the PublicAPI text, or a line with no symbol; an analyzer off its release row, or one that reads a file or the environment | the build (RS0016, RS0017, RS2000, RS1035) |
+| A public symbol outside the PublicAPI text, or a line with no symbol; an analyzer off its release row, or one that reads a file or the environment; in the core, reflection, a compiled expression, a regular expression, a read of type information off the owner's list | the build (RS0016, RS0017, RS2000, RS1035, RS0030); `WhenTheCoreIsCompiled` |
 | In a browser test: a reference, a member of Playwright or an attribute of NUnit beyond what a test takes; a wait on time; a branch or a loop; an expected value that is computed, partial, what the test typed or only an absence; an assertion in a helper; no promise or no gesture of its own | `TEST001` to `TEST013` (`spec/REWRITE.md`, section 2.10) |
 | In the runtime: a default for plan data, a floating promise, a switch that misses a kind, a condition that is no boolean, a loose equality, an enum, an inline lint directive, an import of a later row of its slice table, a pure test that imports past its module's index | the lint and the TypeScript compiler, held by `WhenTheLintIsConfigured` |
 | A rule with no refused or no accepted case | `WhenAnArchitectureTestIsWritten`; `spec/plants` for a check |

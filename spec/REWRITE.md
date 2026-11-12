@@ -914,7 +914,8 @@ every door `spec/api` compiles for the core is declared, in eleven rows, the pla
 `PartialsAndSlots` hold no door `spec/api` compiles and enter the table with their first file. Landed after
 that: the runtime's first row, `Schema`, which reads a plan script's text into its plan or the error it is refused
 with (D19.10, M14.D1), with vitest, its first pure tests and its step in `scripts/check.sh`, and the lint's import
-rows, written from each slice table, with their cases. Open of it, in order: the module tests' project; the thin
+rows, written from each slice table, with their cases; and the core's banned symbols with WhenTheCoreIsCompiled,
+whose list of the owner's type reads is empty. Open of it, in order: the module tests' project; the thin
 path, which brings the runtime's dispatch and its `Execution` row, with the file that finds a root's plans and the
 lint's refusal of a wide query; every screen's view; every browser test, failing; the Playwright project's switch.
 The commit that lands a piece rewrites this paragraph.

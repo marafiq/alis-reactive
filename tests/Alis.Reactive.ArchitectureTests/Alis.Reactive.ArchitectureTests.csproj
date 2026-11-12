@@ -10,6 +10,7 @@
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+        <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" GeneratePathProperty="true" ExcludeAssets="all" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" VersionOverride="5.9.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="NUnit" />
@@ -20,5 +21,19 @@
         <ProjectReference Include="..\Alis.Reactive.Conformance.App\Alis.Reactive.Conformance.App.csproj" />
         <ProjectReference Include="..\..\tools\PlanContractGenerator\PlanContractGenerator.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+        <Reference Include="$(PkgMicrosoft_CodeAnalysis_BannedApiAnalyzers)/analyzers/dotnet/cs/Microsoft.CodeAnalysis.BannedApiAnalyzers.dll" />
+        <Reference Include="$(PkgMicrosoft_CodeAnalysis_BannedApiAnalyzers)/analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.BannedApiAnalyzers.dll" />
+    </ItemGroup>
+
+    <Target Name="WriteTheCoresReferences" AfterTargets="FindReferenceAssembliesForReferences">
+        <ItemGroup>
+            <CoreReference Include="@(ReferencePathWithRefAssemblies->WithMetadataValue('FrameworkReferenceName', 'Microsoft.NETCore.App'))" />
+            <CoreReference Include="@(ReferencePathWithRefAssemblies->WithMetadataValue('FrameworkReferenceName', 'Microsoft.AspNetCore.App'))" />
+        </ItemGroup>
+        <MakeDir Directories="$(OutDir)" />
+        <WriteLinesToFile File="$(OutDir)core-references.txt" Lines="@(CoreReference)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    </Target>
 
 </Project>
