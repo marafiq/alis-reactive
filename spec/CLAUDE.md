@@ -893,6 +893,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   whose promises set a text without null from the component's Value, a nullable text: the compiler refuses the
   sentence (CS8620, which D7.3 and N18.14 keep an error), and D7.3 names the cure, so each promise reads the
   value through `IfNull("none")`. The position still receives the component's member. The owner can overrule it.
+- The lead, 2026-11-12, on four promises of the bench's requests that stated what the design does not: three
+  wrote a query's key in lower case, where D2.5 makes a key the member's C# name, so each reads `?Code=` and
+  `&Day=`; and http.whileLoading's opposite stopped the request "in its guard" with the heading unchanged, where
+  D10.23 runs a request's WhileLoading before its guard, so the opposite is a request whose argument stops when
+  it is read. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

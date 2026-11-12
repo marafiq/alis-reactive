@@ -32,6 +32,12 @@ public sealed class Seed
 
     public ComponentVersion? ComponentVersion { get; set; }
 
+    public string? NotesGroup { get; set; }
+
+    public int? MoveStatus { get; set; }
+
+    public bool? CodeRefuses { get; set; }
+
     public int? HeldMatchingItems { get; set; }
 
     public bool? TextRefuses { get; set; }
@@ -71,6 +77,12 @@ public sealed class Seed
     public static Seed TheComponentsRecordDetail(string name) => new() { ComponentRecordDetail = name };
 
     public static Seed TheComponentsVersion(ComponentVersion version) => new() { ComponentVersion = version };
+
+    public static Seed TheNotesGroup(string group) => new() { NotesGroup = group };
+
+    public static Seed TheMoveEndpointAnswers(int status) => new() { MoveStatus = status };
+
+    public static Seed TheCodeEndpointRefuses() => new() { CodeRefuses = true };
 
     public static Seed TheHeldObjectsMatchingItems(int matching) => new() { HeldMatchingItems = matching };
 

@@ -18,7 +18,7 @@ public sealed class WhenAGetSendsAComponentsMemberInItsQuery(string host) : Conf
         await bench.Page.GotoAsync(BenchPages.HttpGet);
         var sent = await bench.Page.RunAndWaitForRequestAsync(() => bench.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Load" }).ClickAsync(), "**/items**");
         Assert.That(sent.Method, Is.EqualTo("GET"));
-        Assert.That(sent.Url, Does.EndWith("/items?code=a-1"));
+        Assert.That(sent.Url, Does.EndWith("/items?Code=a-1"));
         await Expect(bench.Page.Locator("#shown")).ToHaveTextAsync("3 items for a-1");
 
         var picked = await NewWorld();
@@ -26,7 +26,7 @@ public sealed class WhenAGetSendsAComponentsMemberInItsQuery(string host) : Conf
         await picked.Page.GetByRole(AriaRole.Listbox, new PageGetByRoleOptions { Name = "Value", Exact = true }).PressAsync("ArrowDown");
         await picked.Page.GetByRole(AriaRole.Listbox, new PageGetByRoleOptions { Name = "Value", Exact = true }).PressAsync("Enter");
         var sentAgain = await picked.Page.RunAndWaitForRequestAsync(() => picked.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Load" }).ClickAsync(), "**/items**");
-        Assert.That(sentAgain.Url, Does.EndWith("/items?code=a-2"));
+        Assert.That(sentAgain.Url, Does.EndWith("/items?Code=a-2"));
         await Expect(picked.Page.Locator("#shown")).ToHaveTextAsync("3 items for a-2");
     }
 }

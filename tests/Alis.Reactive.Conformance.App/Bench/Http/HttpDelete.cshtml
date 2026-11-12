@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HttpBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<HttpBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Options = Model.Codes }))
+<p id="shown"></p>
+<button type="button" @Html.Raises(plan, HttpCells.Load)>Load</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(HttpCells.Load, pipeline => pipeline
+        .Delete<ItemCode>(BenchEndpoints.Item, request => request.Json(body => body.Set(item => item.Code, pipeline.Component<ConformanceComponent>("conformance").Value)))
+        .OnSuccess(Content.Json<ItemsSummary>(), (answered, pipeline) => pipeline.Element("shown").Text.Set(answered.Body.Read(summary => summary.Summary)))));
+}
+@Html.RenderPlan(plan)

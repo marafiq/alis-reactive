@@ -625,7 +625,7 @@
           ]
         },
         {
-          "behavior": "Its own controls: a day field setting Day or NullableDay; a list of the options its render helper gives, none, residential and nursing on a care screen and a-1 and a-2 on the bench, a listbox named Value, picked with the arrow keys and Enter, setting Value and raising change; Low, High and Hold medium setting Choice, medium a text no value of Choice is held as; Hold 129 setting Days to 129, a number no value of CareDays names; Sort and Edit first over Records; Deactivate last over Items; Paged and Clear over NullableRecords; Free and Busy setting Count to 1 and 0; Destroy; Remove the read-only text.",
+          "behavior": "Its own controls: a day field setting Day or NullableDay; a list of the options its render helper gives, none, residential and nursing on a care screen and a-1 and a-2 on the bench, a listbox named Value, picked with the arrow keys and Enter, setting Value and raising change, beside its value line, a status named Value; Low, High and Hold medium setting Choice, medium a text no value of Choice is held as; Hold 129 setting Days to 129, a number no value of CareDays names; Sort and Edit first over Records; Deactivate last over Items; Paged and Clear over NullableRecords; Free and Busy setting Count to 1 and 0; Destroy; Remove the read-only text.",
           "tests": [
             "X8.27 #0",
             "X8.27 #1",
@@ -2802,7 +2802,7 @@
       "promise": {
         "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the test app's items endpoint with conformance.Value as its query's code, its success setting shown's text to the body's summary.",
         "gesture": "Click Load.",
-        "outcome": "The request is GET /items?code=a-1 and shown reads 3 items for a-1.",
+        "outcome": "The request is GET /items?Code=a-1, its key the member's C# name (D2.5), and shown reads 3 items for a-1.",
         "opposite": "With a-2 picked in the component the same click sends a-2 and shows its summary for a-2.",
         "defect": "The request reads the element's value attribute instead of the component's value, so it sends an empty code.",
         "observes": "Request.tla:Route"
@@ -2872,8 +2872,8 @@
       "promise": {
         "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the items endpoint with conformance.Value as code and the literal 2026-11-10 as day.",
         "gesture": "Click Load.",
-        "outcome": "The request is GET /items?code=a-1&day=2026-11-10.",
-        "opposite": "Without the day the request is GET /items?code=a-1.",
+        "outcome": "The request is GET /items?Code=a-1&Day=2026-11-10.",
+        "opposite": "Without the day the request is GET /items?Code=a-1.",
         "defect": "The query keeps only the last member, so the request is GET /items?day=2026-11-10.",
         "observes": "Request.tla:Route"
       }
@@ -2943,7 +2943,7 @@
         "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a GET to the items endpoint whose WhileLoading sets conformance.Text to Loading items and whose success sets it to Alpha, 3 items.",
         "gesture": "Click Load.",
         "outcome": "While the items endpoint is held the heading reads Loading items; once it answers it reads Alpha, 3 items.",
-        "opposite": "A request that stops in its guard sends nothing and the heading keeps Alpha.",
+        "opposite": "A request whose argument stops when it is read, its code read from a member the older version lacks, sends nothing and the heading keeps Alpha: the read comes before WhileLoading (D10.23).",
         "defect": "WhileLoading runs after the response, so the heading never reads Loading items.",
         "observes": "Request.tla:Loading"
       }
@@ -2984,9 +2984,9 @@
       "promise": {
         "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to the move endpoint whose success sets conformance.Value to a-2, then Chained a GET to the items endpoint with conformance.Value as code.",
         "gesture": "Click Load.",
-        "outcome": "The chained request is GET /items?code=a-2.",
+        "outcome": "The chained request is GET /items?Code=a-2.",
         "opposite": "When the move answers 409 no chained request is sent.",
-        "defect": "The chained request reads conformance.Value before the first success route ran, so it sends code=a-1.",
+        "defect": "The chained request reads conformance.Value before the first success route ran, so it sends Code=a-1.",
         "observes": "Request.tla:Chained"
       }
     },

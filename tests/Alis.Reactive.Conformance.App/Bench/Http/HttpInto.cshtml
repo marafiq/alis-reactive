@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HttpBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<HttpBoard>();
+}
+<h1>The bench</h1>
+<section id="card"></section>
+<button type="button" @Html.Raises(plan, HttpCells.OpenCard)>Open card</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(HttpCells.OpenCard, pipeline => pipeline.Get(BenchEndpoints.Card).Into("card")));
+}
+@Html.RenderPlan(plan)

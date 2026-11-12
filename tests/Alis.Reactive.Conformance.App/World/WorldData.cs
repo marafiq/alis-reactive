@@ -21,6 +21,9 @@ internal sealed class WorldData
     private volatile int _componentCount = 3;
     private volatile string? _componentRecordDetail;
     private volatile ComponentVersion _componentVersion = ComponentVersion.Current;
+    private volatile string _notesGroup = "Alpha";
+    private volatile int _moveStatus = StatusCodes.Status200OK;
+    private volatile bool _codeRefuses;
     private volatile int _heldMatchingItems = 1;
     private volatile bool _textRefuses;
     private volatile bool _heldCountRefuses;
@@ -54,6 +57,12 @@ internal sealed class WorldData
 
     internal ComponentVersion ComponentVersion => _componentVersion;
 
+    internal string NotesGroup => _notesGroup;
+
+    internal int MoveStatus => _moveStatus;
+
+    internal bool CodeRefuses => _codeRefuses;
+
     internal int HeldMatchingItems => _heldMatchingItems;
 
     internal bool TextRefuses => _textRefuses;
@@ -81,6 +90,9 @@ internal sealed class WorldData
         if (seed.ComponentCount is { } count) _componentCount = count;
         if (seed.ComponentRecordDetail is { } recordDetail) _componentRecordDetail = recordDetail;
         if (seed.ComponentVersion is { } version) _componentVersion = version;
+        if (seed.NotesGroup is { } notesGroup) _notesGroup = notesGroup;
+        if (seed.MoveStatus is { } moveStatus) _moveStatus = moveStatus;
+        if (seed.CodeRefuses is { } codeRefuses) _codeRefuses = codeRefuses;
         if (seed.HeldMatchingItems is { } heldMatchingItems) _heldMatchingItems = heldMatchingItems;
         if (seed.TextRefuses is { } textRefuses) _textRefuses = textRefuses;
         if (seed.HeldCountRefuses is { } heldCountRefuses) _heldCountRefuses = heldCountRefuses;
