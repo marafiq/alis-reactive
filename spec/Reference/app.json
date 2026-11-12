@@ -10654,12 +10654,12 @@
         {
           "verb": "gate",
           "action": "Composition.tla:Answer",
-          "on": "the word endpoint's answer"
+          "on": "the words page's first answer"
         },
         {
           "verb": "gate",
           "action": "Composition.tla:Answer",
-          "on": "the second word endpoint's answer"
+          "on": "the words page's second answer"
         }
       ]
     }

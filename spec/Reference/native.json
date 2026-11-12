@@ -709,10 +709,19 @@
       "what": "the component ConformanceComponent's payloads hand over, on an element of its own, holding that element at element so a listen on it tells when its host destroyed it",
       "behaviors": [
         {
-          "behavior": "Its own Change button raises its Change, and it shows its Ratio after the word Ratio in a status named Ratio, inside a region named Peer.",
+          "behavior": "Its own Change button raises its Change.",
           "tests": [
             "X12.9",
             "X12.10"
+          ]
+        },
+        {
+          "behavior": "It shows its Ratio after the word Ratio in a status named Ratio, inside a region named Peer.",
+          "tests": [
+            "event.poc15.component.payload.before",
+            "event.poc15.component.payload.after",
+            "event.poc15.component.held.before",
+            "event.poc15.component.held.after"
           ]
         }
       ]
