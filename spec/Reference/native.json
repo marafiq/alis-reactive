@@ -587,7 +587,7 @@
           ]
         },
         {
-          "behavior": "The Raise buttons the test's render options name raise Raised with the payload each names: no text, no optional text, a null nullable text, a record or none, Flag true or false, or no argument; the component shows its payload line, a status named Payload, once its listeners return, and what a handler wrote into the payload's held object in a status named Held, Held: none as it starts.",
+          "behavior": "The Raise buttons the test's render options name raise Raised with the payload each names: no text, no optional text, a null nullable text, a record or none, Flag true or false, or no argument; the component shows its payload line, a status named Payload, once its listeners return, what a handler wrote into the payload's held object in a status named Held, Held: none as it starts and acted for with what the held object's Answer gives once a handler calls its Act(), and what its payload's Answer gives for its current item in a status named Answer, the item's name with unanswered where a handler set no answer.",
           "tests": [
             "M3.X1",
             "M5.X3",
@@ -2445,9 +2445,9 @@
       "version": "current",
       "door": "ConformanceComponent.raised.answer",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Answer to the answer item => item.Name + \" answered by Kappa\".",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Answer to the answer item => item.Name.",
         "gesture": "Click the component's Raise button.",
-        "outcome": "The component's answer line reads One answered by Kappa, which the component asks for when the handler returns.",
+        "outcome": "The component's answer line reads One, the name the answer gives for its current item, which the component asks for when the handler returns.",
         "opposite": "A handler that sets no answer leaves One unanswered.",
         "defect": "The callback is set on a copy of the payload, so the component asks nothing and the line reads One unanswered."
       }
@@ -2467,11 +2467,11 @@
       "version": "current",
       "door": "ConformanceComponent.raised.held.answer",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Held.Answer to the answer item => item.Name + \" by Kappa\", then calls args.Held.Act().",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets args.Held.Answer to the answer item => item.Name, then calls args.Held.Act().",
         "gesture": "Click the component's Raise button.",
-        "outcome": "The held line reads Held acted for One by Kappa.",
-        "opposite": "Before the click it reads Held not acted.",
-        "defect": "The callback is set on the payload instead of the held object, so the held object acts with no answer and reads Held not acted."
+        "outcome": "The held line reads Held: acted for One.",
+        "opposite": "Before the click it reads Held: none.",
+        "defect": "The callback is set on the payload instead of the held object, so the held object acts with no answer and the line keeps Held: none."
       }
     },
     "event.poc15.callback.held.after": {
@@ -2482,11 +2482,11 @@
       "version": "current",
       "door": "ConformanceComponent.raised.held.answer",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Held.Answer to the answer item => item.Name + \" by Kappa\", then calls args.Held.Act().",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that first awaits conformance.SettleCount(), which the test app's count endpoint answers with 3 when the test releases it, then sets args.Held.Answer to the answer item => item.Name, then calls args.Held.Act().",
         "gesture": "Click the component's Raise button.",
-        "outcome": "Once the count endpoint answers the held line reads Held acted for One by Kappa.",
-        "opposite": "While the endpoint is held it reads Held not acted.",
-        "defect": "The run drops a callback set on an object the payload holds after the await as it drops a payload write, so the line keeps Held not acted.",
+        "outcome": "Once the count endpoint answers the held line reads Held: acted for One.",
+        "opposite": "While the endpoint is held it reads Held: none.",
+        "defect": "The run drops a callback set on an object the payload holds after the await as it drops a payload write, so the line keeps Held: none.",
         "observes": "Run.tla:Settle"
       }
     },

@@ -883,6 +883,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   element's text, X3.13's and X3.14's dates, is declared with the first of their pages. The same commit gives
   the bench its component's builds: a world names one (`ComponentVersion` of the world contract, the versions
   `spec/Reference/native.json` lists) and the page starts its component as that build. The owner can overrule each.
+- The lead, 2026-11-12, on the three callback cells of event.poc15, whose promises set an answer that joined an
+  item's name and a literal: no door joins text, the grammar's operators hold no join, and no line names the
+  capability, so the sentence could not be written. The promises are reworded to an answer that reads a source
+  alone, `item => item.Name`, as every other answer sentence of the spec does (D17.12), and the lines they read
+  are restated to match: the held line reads "Held: acted for One". A door that joins text is a new production
+  and waits for the owner's word; nothing is built toward it. The owner can overrule the rewording.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
