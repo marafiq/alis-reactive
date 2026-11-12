@@ -7,6 +7,7 @@ internal sealed class WrittenFolder : IDisposable
     internal string Write(string name, string text)
     {
         var path = Path.Combine(_folder, name);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         File.WriteAllText(path, text);
         return path;
     }

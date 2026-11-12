@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
-const usage = `usage: node scripts/playwright-select.mjs --spec <file> --assembly <file> --root <namespace> --weights <file> --out <file> <selector> [--host <name>] [--shard <i>/<k>]
+const usage = `usage: node scripts/playwright-select.mjs --spec <file> --assembly <file> --root <namespace> --weights <file> --out <file> <selector> [--host <name> | --every-host] [--shard <i>/<k>]
 
 Joins the tests the spec lands (spec/tools/landings.py) with the tests an assembly holds (scripts/list-tests.cs),
 writes the cases one run must run to --out and prints the VSTest filter that selects them.
@@ -18,6 +18,8 @@ Selectors, one a run:
   <name>                a folder or a fixture of the test project, by its name
 
 --host <name> takes that host alone. Without it a run takes the hosts the conformance app serves on this machine.
+--every-host takes every host the spec lands a test under, the twin's and a fresh app's among them: the full list
+CI's proof reads its runs against.
 --shard <i>/<k> takes the i-th of a pool's k shards. A shard unit is a module folder, a slice under FusionComponents,
 and the hosts pool whole; units go longest first, each onto the lightest shard, by the seconds --weights holds.`;
 
@@ -41,6 +43,7 @@ function parse(argv) {
     if (["--spec", "--assembly", "--root", "--weights", "--out", "--host", "--shard"].includes(word)) options[word.slice(2)] = argv[(index += 1)];
     else if (selectorsWithAValue.includes(word)) options.selectors.push({ kind: word.slice(2), value: argv[(index += 1)] });
     else if (word === "--all") options.selectors.push({ kind: "all", value: "all" });
+    else if (word === "--every-host") options.everyHost = true;
     else if (word.startsWith("-")) refuse(`${word} is no option.\n${usage}`);
     else options.selectors.push({ kind: "name", value: word });
   }
@@ -48,6 +51,7 @@ function parse(argv) {
     if (options[needed] === undefined) refuse(`--${needed} is missing.\n${usage}`);
   }
   if (options.selectors.length !== 1) refuse(`a run takes one selector, and ${options.selectors.length} were given.\n${usage}`);
+  if (options.everyHost === true && options.host !== undefined) refuse(`--every-host and --host '${options.host}' name two sets of hosts; a selection takes one.`);
   return options;
 }
 
@@ -138,7 +142,7 @@ const unitOf = (row, test) => {
   return folder === folderPartedBySlice ? `${folder}.${slice}` : folder;
 };
 const shard = shardOf(options, selector);
-const served = row => (options.host === undefined ? row.served === "pool" : row.host === options.host);
+const served = row => options.everyHost === true || (options.host === undefined ? row.served === "pool" : row.host === options.host);
 const ofThePool = row => selector.kind !== "pool" || poolOf(row, written.get(row.promise)) === selector.value;
 const inReach = landed.filter(row => selected.has(row.promise) && served(row) && ofThePool(row));
 const weights = existsSync(options.weights) ? JSON.parse(readFileSync(options.weights, "utf8")) : {};
@@ -178,7 +182,7 @@ const tests = everyTest ? [] : [clauses.length === 1 ? clauses[0] : `(${clauses.
 const filter = [...tests, ...hosts].join("&");
 
 const selection = selector.kind === "through" ? `through ${selector.value}` : selector.value;
-const label = options.host === undefined ? selection : `${selection}@${options.host}`;
+const label = options.everyHost === true ? `${selection}@every host` : options.host === undefined ? selection : `${selection}@${options.host}`;
 const units = Object.fromEntries(cases.map(one => [one.id, one.unit]).sort(([one], [other]) => (one < other ? -1 : 1)));
 writeFileSync(options.out, `${JSON.stringify({ label, shard: `${shard.index}/${shard.count}`, filter, cases: cases.map(one => one.id).sort(), units }, null, 2)}\n`);
 console.log(filter);

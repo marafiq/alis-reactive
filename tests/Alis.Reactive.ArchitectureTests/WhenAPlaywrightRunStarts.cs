@@ -240,6 +240,35 @@ public class WhenAPlaywrightRunStarts
         Assert.That(Select(written, TheSpec, TheAssembly, "--pool", "native").Errors.Trim(), Is.EqualTo("[playwright:select] 'native' is no pool; the pools are core, hosts, fusion."));
     }
 
+    [AcceptedCase]
+    public void every_host_takes_the_full_list_the_twins_tests_among_it()
+    {
+        using var written = new WrittenFolder();
+
+        var full = Select(written, TheSpec, TheAssembly, "--all", "--every-host");
+
+        Assert.That(full.Cases, Is.EqualTo(new[]
+        {
+            $"{Worlds}(\"net10\").each_world_lists_its_own",
+            $"{Residents}(\"net10\").the_resident_is_listed",
+            $"{Residents}(\"net10\").the_resident_is_opened",
+            $"{Residents}(\"net48\").the_resident_is_opened",
+            $"{Rounds}(\"net48\").the_round_is_signed",
+            $"{Rounds}(\"snakeCase\").the_round_is_listed",
+        }));
+        Assert.That(full.Filter, Is.Empty);
+        Assert.That(full.Label, Is.EqualTo("all@every host"));
+    }
+
+    [RefusedCase]
+    public void every_host_beside_one_host_is_refused()
+    {
+        using var written = new WrittenFolder();
+
+        Assert.That(Select(written, TheSpec, TheAssembly, "--all", "--every-host", "--host", "net48").Errors.Trim(),
+            Is.EqualTo("[playwright:select] --every-host and --host 'net48' name two sets of hosts; a selection takes one."));
+    }
+
     [RefusedCase]
     public void a_test_the_spec_lands_and_nobody_wrote_is_refused()
     {

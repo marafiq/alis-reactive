@@ -6,6 +6,7 @@ const usage = `usage: node scripts/playwright-result.mjs --selection <file> --tr
        node scripts/playwright-result.mjs --measure --selection <file> --budget <file> --weights <file> <file.trx>...
        node scripts/playwright-result.mjs --measure-parallelism --selection <file> --budget <file> --at 1 <file.trx>... --at 2 <file.trx>... --at 4 <file.trx>... --at 8 <file.trx>...
        node scripts/playwright-result.mjs --at-once --budget <file>
+       node scripts/playwright-result.mjs --proof --full <selection file> --budget <file> <run folder>...
 
 Reads what one run of the browser tests wrote and prints its result line:
   [playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>
@@ -20,7 +21,12 @@ to --weights, for each shard unit the selection names, the seconds its tests too
 
 --measure-parallelism reads 20 runs at each of 1, 2, 4 and 8 tests at once, each run's wall time from its TRX, and
 writes the count a run takes: the quickest of 2, 4 and 8 whose runs are green and took, together, no more than the
-runs at 1 divided by 1.6, else 1. --at-once prints the count the budget file holds.`;
+runs at 1 divided by 1.6, else 1. --at-once prints the count the budget file holds.
+
+--proof reads many runs against the full list, the selection --full names: each run folder holds its selection.json
+and its run.trx. It exits 1 when a run is no green run, when a test of the full list ran in no run or in more than
+one, or when a run ran a test the full list lacks, and prints
+  [playwright:proof] <k> runs: N of the full list, N ran, each once`;
 
 const measuredRuns = 20;
 const timesTheSlowest = 4;
@@ -36,24 +42,29 @@ function refuse(message) {
 }
 
 function parse(argv) {
-  const options = { "servers-left": "0", measure: false, parallelism: false, atOnce: false, trxFiles: [], runsAt: new Map() };
+  const options = { "servers-left": "0", measure: false, parallelism: false, atOnce: false, proof: false, trxFiles: [], runsAt: new Map() };
   let files = options.trxFiles;
   for (let index = 0; index < argv.length; index += 1) {
     const word = argv[index];
     if (word === "--measure") options.measure = true;
     else if (word === "--measure-parallelism") options.parallelism = true;
     else if (word === "--at-once") options.atOnce = true;
+    else if (word === "--proof") options.proof = true;
     else if (word === "--at") {
       if (index + 1 >= argv.length) refuse(`${word} takes a value.\n${usage}`);
       files = [];
       options.runsAt.set(argv[(index += 1)], files);
-    } else if (["--selection", "--trx", "--budget", "--weights", "--servers-left"].includes(word)) {
+    } else if (["--selection", "--trx", "--budget", "--weights", "--full", "--servers-left"].includes(word)) {
       if (index + 1 >= argv.length) refuse(`${word} takes a value.\n${usage}`);
       options[word.slice(2)] = argv[(index += 1)];
     } else if (word.startsWith("-")) refuse(`${word} is no option.\n${usage}`);
     else files.push(word);
   }
-  const needed = options.atOnce ? ["budget"] : options.measure ? ["selection", "budget", "weights"] : options.parallelism ? ["selection", "budget"] : ["selection", "trx", "budget"];
+  const needed = options.atOnce ? ["budget"]
+    : options.proof ? ["full", "budget"]
+    : options.measure ? ["selection", "budget", "weights"]
+    : options.parallelism ? ["selection", "budget"]
+    : ["selection", "trx", "budget"];
   for (const name of needed) {
     if (options[name] === undefined) refuse(`--${name} is missing.\n${usage}`);
   }
@@ -151,7 +162,7 @@ function stepsBeside(trxPath) {
 
 function read(selection, trxPath, budget, serversLeft) {
   const said = [];
-  if (!existsSync(trxPath)) return { said: [`no TRX at ${trxPath}; the test process wrote no result`], counts: undefined };
+  if (!existsSync(trxPath)) return { said: [`no TRX at ${trxPath}; the test process wrote no result`], counts: undefined, ran: [] };
 
   const results = resultsOf(trxPath);
   const ran = results.filter(result => result.outcome !== "NotExecuted");
@@ -281,7 +292,37 @@ function measure(options, selection) {
   console.log(`[playwright:measured] a run's seconds by shard unit: ${[...secondsOf.keys()].sort().map(unit => `${unit} ${weights[unit]}s`).join(", ")}`);
 }
 
+function prove(options) {
+  if (options.trxFiles.length === 0) refuse(`a proof reads at least one run folder.\n${usage}`);
+  if (!existsSync(options.full)) refuse(`no full list at ${options.full}; scripts/playwright-select.mjs --all --every-host writes it.`);
+  const full = JSON.parse(readFileSync(options.full, "utf8")).cases;
+  const budget = budgetOf(options.budget);
+  const said = [];
+  const ranIn = new Map();
+  for (const folder of options.trxFiles) {
+    const selectionPath = `${folder}/selection.json`;
+    if (!existsSync(selectionPath)) {
+      said.push(`${folder}: no selection.json; the run selected nothing`);
+      continue;
+    }
+    const run = read(JSON.parse(readFileSync(selectionPath, "utf8")), `${folder}/run.trx`, budget, 0);
+    for (const line of run.said) said.push(`${folder}: ${line}`);
+    for (const result of run.ran) ranIn.set(result.id, [...(ranIn.get(result.id) ?? []), folder]);
+  }
+  const ofTheFullList = new Set(full);
+  for (const id of full.filter(one => !ranIn.has(one))) said.push(`in no run: ${id}`);
+  for (const [id, folders] of ranIn) {
+    if (!ofTheFullList.has(id)) said.push(`run in ${folders[0]} and not of the full list: ${id}`);
+    else if (folders.length > 1) said.push(`run in ${folders.length} runs, ${folders.join(" and ")}: ${id}`);
+  }
+  for (const line of said) console.log(`[playwright:proof] ${line}`);
+  const ran = [...ranIn.keys()].filter(id => ofTheFullList.has(id)).length;
+  console.log(`[playwright:proof] ${options.trxFiles.length} runs: ${full.length} of the full list, ${ran} ran${said.length === 0 ? ", each once" : ""}`);
+  process.exit(said.length === 0 ? 0 : 1);
+}
+
 const options = parse(process.argv.slice(2));
+if (options.proof) prove(options);
 if (options.atOnce) {
   const { testsAtOnce } = heldAt(options.budget);
   if (testsAtOnce === undefined) process.exit(1);

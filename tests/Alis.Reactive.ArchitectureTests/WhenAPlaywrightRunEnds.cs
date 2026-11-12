@@ -12,6 +12,7 @@ public class WhenAPlaywrightRunEnds
     private const string TheRepositorysBudget = "tests/Alis.Reactive.Conformance.PlaywrightTests/Harness/measured.json";
     private const string Listed = "Rounds.WhenARoundStarts(\"net10\").the_round_is_listed";
     private const string Opened = "Rounds.WhenARoundStarts(\"net10\").the_round_is_opened";
+    private const string Signed = "Rounds.WhenARoundStarts(\"net48\").the_round_is_signed";
     private const int RunsOfABudget = 20;
 
     [Test]
@@ -538,6 +539,81 @@ public class WhenAPlaywrightRunEnds
         Assert.That(measured.ExitCode, Is.EqualTo(1));
         Assert.That(File.Exists(budget), Is.False);
     }
+
+    [AcceptedCase]
+    public void runs_that_ran_every_test_of_the_full_list_once_are_proven()
+    {
+        using var written = new WrittenFolder();
+        var core = ARun(written, "core-1-of-1", [Listed], [Ran(Listed, "Passed", 1)]);
+        var twin = ARun(written, "net48", [Signed], [Ran(Signed, "Passed", 2)]);
+
+        var proven = Run("--proof", "--full", FullList(written, [Listed, Signed]), "--budget", Budget(written, 8, 2), core, twin);
+
+        Assert.That(proven.Said, Is.EqualTo(new[] { "[playwright:proof] 2 runs: 2 of the full list, 2 ran, each once" }));
+        Assert.That(proven.ExitCode, Is.Zero);
+    }
+
+    [RefusedCase]
+    public void a_test_of_the_full_list_that_ran_in_no_run_or_in_two_is_refused()
+    {
+        using var written = new WrittenFolder();
+        var first = ARun(written, "core-1-of-2", [Listed], [Ran(Listed, "Passed", 1)]);
+        var second = ARun(written, "core-2-of-2", [Listed], [Ran(Listed, "Passed", 1)]);
+
+        var proven = Run("--proof", "--full", FullList(written, [Listed, Signed]), "--budget", Budget(written, 8, 2), first, second);
+
+        Assert.That(proven.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:proof] in no run: {Signed}",
+            $"[playwright:proof] run in 2 runs, {first} and {second}: {Listed}",
+            "[playwright:proof] 2 runs: 2 of the full list, 1 ran",
+        }));
+        Assert.That(proven.ExitCode, Is.EqualTo(1));
+    }
+
+    [RefusedCase]
+    public void a_run_that_is_not_green_a_run_with_no_result_and_a_test_outside_the_full_list_are_refused()
+    {
+        using var written = new WrittenFolder();
+        var red = ARun(written, "core-1-of-2", [Listed], [Ran(Listed, "Failed", 1)]);
+        var slow = ARun(written, "core-2-of-2", [Signed], [Ran(Signed, "Passed", 8.5)]);
+        var stray = ARun(written, "fusion-1-of-1", [Opened], [Ran(Opened, "Passed", 1)]);
+        var silent = Path.GetDirectoryName(written.Write("hosts-1-of-1/selection.json", JsonSerializer.Serialize(new { label = "hosts", shard = "1/1", filter = "", cases = new[] { Listed } })))!;
+        var empty = Path.GetDirectoryName(written.Write("delivery/readme.txt", "no run was written here"))!;
+
+        var proven = Run("--proof", "--full", FullList(written, [Listed, Signed]), "--budget", Budget(written, 8, 2), red, slow, stray, silent, empty);
+
+        Assert.That(proven.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:proof] {red}: failed (Failed): {Listed}",
+            $"[playwright:proof] {slow}: over budget, 8.50s of 8s: {Signed}",
+            $"[playwright:proof] {silent}: no TRX at {silent}/run.trx; the test process wrote no result",
+            $"[playwright:proof] {empty}: no selection.json; the run selected nothing",
+            $"[playwright:proof] run in {stray} and not of the full list: {Opened}",
+            "[playwright:proof] 5 runs: 2 of the full list, 2 ran",
+        }));
+        Assert.That(proven.ExitCode, Is.EqualTo(1));
+    }
+
+    [RefusedCase]
+    public void a_proof_of_no_run_is_refused()
+    {
+        using var written = new WrittenFolder();
+
+        var proven = Run("--proof", "--full", FullList(written, [Listed]), "--budget", Budget(written, 8, 2));
+
+        Assert.That(proven.Errors, Does.StartWith("[playwright:result] a proof reads at least one run folder."));
+        Assert.That(proven.ExitCode, Is.EqualTo(2));
+    }
+
+    private static string ARun(WrittenFolder written, string folder, string[] selected, (string Id, string Outcome, double Seconds)[] ran)
+    {
+        written.Write($"{folder}/selection.json", JsonSerializer.Serialize(new { label = folder, shard = "1/1", filter = "", cases = selected }));
+        return Path.GetDirectoryName(Trx(written, ran, $"{folder}/run.trx"))!;
+    }
+
+    private static string FullList(WrittenFolder written, string[] cases)
+        => written.Write("full.json", JsonSerializer.Serialize(new { label = "all@every host", shard = "1/1", filter = "", cases }));
 
     private static (string Id, string Outcome, double Seconds) Ran(string id, string outcome, double seconds) => (id, outcome, seconds);
 

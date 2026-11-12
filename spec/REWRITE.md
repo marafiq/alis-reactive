@@ -514,7 +514,10 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
   warnings as errors, WhenAConsumerAppIsBuilt over the fresh app, the tests under net48 and consumerNet48 under IIS
   Express); `delivery-net10` (pack, the fresh net10 app restored from the packs, WhenAConsumerAppIsBuilt over it, the
   tests under consumerNet10); `proof`, the one required status: every shard has a TRX with tests, none failed, none
-  over budget, and the executed names equal the full list, each once.
+  over budget, and the executed names equal the full list, each once. Each run uploads its folder, its selection
+  and its TRX; `proof` reads them with `scripts/playwright-result.mjs --proof` against the full list, which
+  `scripts/playwright-select.mjs --all --every-host` writes: every case the spec lands that a test carries, the
+  twin's and a fresh app's among them.
 - **`.github/workflows/nightly.yml`**: everything, every TLC config uncached, every probe, `scripts/doctor.sh --latest`; an issue on failure.
 - **`.github/workflows/syncfusion-upgrade.yml`**, on a change to the pins: `pin-syncfusion.mjs --check`, the EJ2 browser probes, then the
   fusion pool.
