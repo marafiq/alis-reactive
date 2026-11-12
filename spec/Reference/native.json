@@ -2773,7 +2773,7 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, the page plugin pageLog, and a Log button whose click calls pageLog.Log(conformance.Value).",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, the page plugin pageLog, a plugin of the bench that writes each text it is passed as a line of the list the page names Page log, and a Log button whose click calls pageLog.Log(conformance.Value).",
         "gesture": "Click the page's button.",
         "outcome": "The page log's last line reads a-1.",
         "opposite": "Before the click the page log is empty.",

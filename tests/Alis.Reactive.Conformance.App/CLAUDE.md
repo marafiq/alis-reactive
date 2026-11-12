@@ -26,7 +26,8 @@ its views.
 - `Bench/` holds the component bench, a folder for each family of cells of `spec/Reference/native.json`
   (`Bench/Properties/` the first; `Bench/Poc15/` holds a controller for each member the event.poc15 cells reach):
   a controller with an action for each cell's page, and for each endpoint of the test app its cells call, named in
-  `BenchEndpoints` of the world contract (`Bench/Http/HttpCellsController.cs`), the page's model, the app
+  `BenchEndpoints` of the world contract (`Bench/Http/HttpCellsController.cs`), a plugin of the bench a cell calls
+  beside the cell that calls it (`Bench/Sources/PageLog.cs`), the page's model, the app
   events its buttons raise, declared as static members, and a view for each cell, named for it. A page starts its
   component from what its world holds, so one page serves a cell and its opposite case.
 - `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has

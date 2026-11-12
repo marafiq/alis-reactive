@@ -12,4 +12,5 @@ public static partial class BenchPages
     public const string SourceHeader = Area + "source.Header";
     public const string SourceDispatchPayloadMember = Area + "source.DispatchPayloadMember";
     public const string SourceMethodArgument = Area + "source.MethodArgument";
+    public const string SourcePluginArgument = Area + "source.PluginArgument";
 }
