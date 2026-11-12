@@ -11,7 +11,8 @@ references no Alis.Reactive assembly, so a test that compiles against it cannot 
   uncaught errors, the one thing of the harness's that `Assert.That` reads.
 - A seed is written through the typed builders of `Seed.cs`, and `ComponentVersion.cs` names the builds of the
   conformance component a seed chooses from; an endpoint and a page of the World area are named once,
-  in `WorldEndpoints.cs` and `WorldPages.cs`; a bench cell's page is named for its cell in a part of `BenchPages`
+  in `WorldEndpoints.cs` and `WorldPages.cs`, and `GateOrder.cs` carries a hold's action and, where it names one, its
+  endpoint; a bench cell's page is named for its cell in a part of `BenchPages`
   for its family (`BenchPages.Properties.cs`); a refusal route's page is named in `RefusalPages.cs`, under the
   area's root that file names, by which the sweep of the app's pages knows a page that refuses by design.
 - It compiles for `net48` and `net10.0`, since the twin serves the same world.

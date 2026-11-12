@@ -47,7 +47,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   pages and reads the refusal; the same plant with another script's name passes.
 - A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits
   until the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
-  provokes an ordering by timing, by a stubbed network or by a control on the page.
+  provokes an ordering by timing, by a stubbed network or by a control on the page. A test that holds one action at
+  two endpoints arms a hold for each, naming the endpoint by its constant of the world contract, and releases each
+  on its own (`Harness/WhenAGateIsHeldAtTwoEndpoints.cs`).
 - `Harness/measured.json` holds what 20 green runs measured: the budget of one test, four times the slowest test,
   and the two waits, each four times the slowest step of its kind, a navigation's and every other step's. The runner
   writes it (`--measure`) and fails a run that holds a test over the budget. `Harness/Waits.cs` sets the waits on
@@ -150,5 +152,6 @@ scripts/playwright.sh --measure --all
 scripts/playwright.sh --pool core --shard "1/1"
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
 scripts/plant-defect.sh --test M14_F1.X19_3_0 --in Alis.Reactive.Assets/runtime/Schema/read-plan.ts --replace "plan.version === pageVersion" --with "plan.version > 0"
+scripts/plant-defect.sh --test Harness.WhenAGateIsHeldAtTwoEndpoints_each_endpoints_answer_waits_for_its_own_release --in tests/Alis.Reactive.Conformance.App/World/WorldData.cs --replace '(order.Gate, order.At)] = new' --with '(order.Gate, Anywhere)] = new'
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace '<title>{Text(title)}</title>' --with '<title>{Text(title)}</title><script src=\"/js/ej2.min.js\"></script>'
 ```

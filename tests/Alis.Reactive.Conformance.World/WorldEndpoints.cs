@@ -8,6 +8,7 @@ public static class WorldEndpoints
     public const string HeldGate = "/world/gates/held";
     public const string ReleaseGate = "/world/gates/release";
     public const string WordAnswer = "/world/word/answer";
+    public const string WordAnswerAgain = "/world/word/answer-again";
     public const string Settle = "/world/settle";
     public const string Count = "/world/count";
     public const string Item = "/world/item";

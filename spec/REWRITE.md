@@ -297,10 +297,11 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
 - **The world.** Each test makes a key and sets it as the cookie `world` on its own browser context before it opens a
   page; every request, stream and hub negotiation carries it. The app's world middleware, in Development only, scopes
   data, gates, hub groups, stream filters and caches to the key; a document request with none gets a new world, so a
-  person can run the app. Teardown ends the world and fails any gate still parked. The World area serves two pages of
+  person can run the app. Teardown ends the world and fails any gate still parked. The World area serves three pages of
   its own for the harness's tests, app.json's `harnessTests`, which use no framework door: a records page listing the
-  world's residents as text the server writes, and a word page whose link opens, in the page's frame, an endpoint that
-  answers with the word the world's seed holds.
+  world's residents as text the server writes, a word page whose link opens, in the page's frame, an endpoint that
+  answers with the word the world's seed holds, and a words page whose two links open, each in a frame of its own,
+  two endpoints that answer with that word at one gate, which a test holds at each by naming the endpoint.
 - **The verbs** are app.json's: seed, gate, push, drop, refuse, reopen, restart, clock, gc. A placement lists its
   verbs and its held steps, each held step with the TLA+ action it holds, and check_app refuses a verb with no step.
   Gates are generated from the `Next` of each spec a held step names into the world contract (`Gates.g.cs`, one enum
@@ -958,7 +959,9 @@ The refusals index and X3.12's linked record page stand, its test red, and so do
 named by two declarations. Of the bench, twenty-four cells stand, each test red: nine of its properties, nine of
 its methods and six of its events. An element's text and HTML are an `ElementContent`, whose `Set` takes a source
 of any type (M5.N1, D7.3), and a world names the version its component is built as. The app's settle, count and item
-endpoints stand, each at the settle gate, and a seed makes one refuse.
+endpoints stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its
+action where a test holds one action at two endpoints, and the harness's test of it is green and fails on each of
+its two planted defects.
 Open of it, in order: the doors a view meets that are not yet declared, each with that view; every screen's view;
 every browser test, failing; the Playwright project's switch. The bindings check takes no view clause (section
 2.5).

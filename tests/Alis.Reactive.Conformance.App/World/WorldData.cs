@@ -5,8 +5,10 @@ namespace Alis.Reactive.Conformance.App.World;
 
 internal sealed class WorldData
 {
+    private const string Anywhere = "";
+
     private readonly ConcurrentQueue<string> _residents = new();
-    private readonly ConcurrentDictionary<string, WorldGate> _gates = new(StringComparer.Ordinal);
+    private readonly ConcurrentDictionary<(string Gate, string At), WorldGate> _gates = new();
     private volatile string _word = "";
     private volatile string _componentText = "Alpha";
     private volatile string _componentOuterText = "Gamma";
@@ -63,15 +65,19 @@ internal sealed class WorldData
         if (seed.ItemRefuses is { } itemRefuses) _itemRefuses = itemRefuses;
     }
 
-    internal void Arm(string gate) => _gates[gate] = new WorldGate();
+    internal void Arm(GateOrder order) => _gates[(order.Gate, order.At)] = new WorldGate();
 
-    internal Task Reach(string gate) => _gates.TryGetValue(gate, out var armed) && !armed.Held.IsCompleted ? armed.Park() : Task.CompletedTask;
-
-    internal Task? Held(string gate) => _gates.TryGetValue(gate, out var armed) ? armed.Held : null;
-
-    internal bool Release(string gate)
+    internal Task Reach(string gate, string at)
     {
-        if (!_gates.TryGetValue(gate, out var armed) || !armed.IsParked) return false;
+        var armed = NotYetHeld(gate, at) ?? NotYetHeld(gate, Anywhere);
+        return armed is null ? Task.CompletedTask : armed.Park();
+    }
+
+    internal Task? Held(GateOrder order) => _gates.TryGetValue((order.Gate, order.At), out var armed) ? armed.Held : null;
+
+    internal bool Release(GateOrder order)
+    {
+        if (!_gates.TryGetValue((order.Gate, order.At), out var armed) || !armed.IsParked) return false;
 
         armed.Release();
         return true;
@@ -79,8 +85,12 @@ internal sealed class WorldData
 
     internal IList<string> End()
     {
-        var parked = _gates.Where(gate => gate.Value.IsParked).Select(gate => gate.Key).Order(StringComparer.Ordinal).ToList();
+        var parked = _gates.Where(gate => gate.Value.IsParked).Select(gate => Named(gate.Key.Gate, gate.Key.At)).Order(StringComparer.Ordinal).ToList();
         foreach (var gate in _gates.Values) gate.EndWithItsWorld();
         return parked;
     }
+
+    internal static string Named(string gate, string at) => at == Anywhere ? gate : $"{gate} at {at}";
+
+    private WorldGate? NotYetHeld(string gate, string at) => _gates.TryGetValue((gate, at), out var armed) && !armed.Held.IsCompleted ? armed : null;
 }

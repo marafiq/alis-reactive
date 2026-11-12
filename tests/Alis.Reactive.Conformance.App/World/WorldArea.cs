@@ -37,24 +37,21 @@ internal static class WorldArea
             if (seed.CachedRoundsPlanVersion is { } version) await cache.SetStringAsync(CachedRounds.Key, CachedRounds.AsRenderedAtPlanVersion(version));
         });
         app.MapPost(WorldEndpoints.End, (CurrentWorld world, Worlds worlds) => new WorldEnd { GatesStillParked = worlds.End(world.Key) });
-        app.MapPost(WorldEndpoints.ArmGate, (GateOrder order, CurrentWorld world) => world.Data.Arm(order.Gate));
+        app.MapPost(WorldEndpoints.ArmGate, (GateOrder order, CurrentWorld world) => world.Data.Arm(order));
         app.MapPost(WorldEndpoints.HeldGate, async (GateOrder order, CurrentWorld world, HttpContext context) =>
         {
-            if (world.Data.Held(order.Gate) is not { } held) return Results.NotFound($"No gate {order.Gate} is armed in this world.");
+            if (world.Data.Held(order) is not { } held) return Results.NotFound($"No gate {WorldData.Named(order.Gate, order.At)} is armed in this world.");
 
             await held.WaitAsync(context.RequestAborted);
             return Results.Ok();
         });
         app.MapPost(WorldEndpoints.ReleaseGate, (GateOrder order, CurrentWorld world)
-            => world.Data.Release(order.Gate) ? Results.Ok() : Results.Conflict($"The gate {order.Gate} holds no request in this world."));
+            => world.Data.Release(order) ? Results.Ok() : Results.Conflict($"The gate {WorldData.Named(order.Gate, order.At)} holds no request in this world."));
         app.MapGet(WorldPages.Records, (CurrentWorld world) => Results.Content(RecordsPage(world.Data), Html));
         app.MapGet(WorldPages.Word, () => Results.Content(WordPage(), Html));
-        app.MapGet(WorldEndpoints.WordAnswer, (CurrentWorld world) => Results.Content(Page("The word", $"<p>{Text(world.Data.Word)}</p>"), Html))
-            .AddEndpointFilter(async (context, next) =>
-            {
-                await context.HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data.Reach(GateName.Of(CompositionGate.Answer));
-                return await next(context);
-            });
+        app.MapGet(WorldPages.Words, () => Results.Content(WordsPage(), Html));
+        app.MapGet(WorldEndpoints.WordAnswer, TheWorldsWord).AddEndpointFilter(AtTheAnswerGate);
+        app.MapGet(WorldEndpoints.WordAnswerAgain, TheWorldsWord).AddEndpointFilter(AtTheAnswerGate);
         app.MapPost(WorldEndpoints.Settle, (CurrentWorld world) => world.Data.SettleRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.NoContent())
             .AddEndpointFilter(AtTheSettleGate);
         app.MapPost(WorldEndpoints.Count, (CurrentWorld world) => world.Data.CountRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.Json(3))
@@ -63,9 +60,18 @@ internal static class WorldArea
             .AddEndpointFilter(AtTheSettleGate);
     }
 
-    private static async ValueTask<object?> AtTheSettleGate(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    private static IResult TheWorldsWord(CurrentWorld world) => Results.Content(Page("The word", $"<p>{Text(world.Data.Word)}</p>"), Html);
+
+    private static ValueTask<object?> AtTheAnswerGate(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+        => AtTheGate(GateName.Of(CompositionGate.Answer), context, next);
+
+    private static ValueTask<object?> AtTheSettleGate(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+        => AtTheGate(GateName.Of(RunGate.Settle), context, next);
+
+    private static async ValueTask<object?> AtTheGate(string gate, EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {
-        await context.HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data.Reach(GateName.Of(RunGate.Settle));
+        var http = context.HttpContext;
+        await http.RequestServices.GetRequiredService<CurrentWorld>().Data.Reach(gate, http.Request.Path);
         return await next(context);
     }
 
@@ -87,6 +93,11 @@ internal static class WorldArea
 
     private static string WordPage()
         => Page("The word", $"<a href=\"{WorldEndpoints.WordAnswer}\" target=\"answer\">Read the word</a><iframe id=\"answer\" name=\"answer\" title=\"The word's answer\"></iframe>");
+
+    private static string WordsPage()
+        => Page("The words",
+            $"<a href=\"{WorldEndpoints.WordAnswer}\" target=\"answer\">Read the word</a><iframe id=\"answer\" name=\"answer\" title=\"The word's answer\"></iframe>"
+            + $"<a href=\"{WorldEndpoints.WordAnswerAgain}\" target=\"again\">Read it again</a><iframe id=\"again\" name=\"again\" title=\"The word's answer again\"></iframe>");
 
     private static string Page(string title, string body)
         => $"<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>{Text(title)}</title></head><body>{body}</body></html>";

@@ -26,10 +26,16 @@ public sealed class TestWorld
 
     public async Task Seed(Seed seed) => (await _harness.PostAsJsonAsync(WorldEndpoints.Seed, seed)).EnsureSuccessStatusCode();
 
-    public async Task<ArmedGate> Arm<TGate>(TGate gate)
+    public Task<ArmedGate> Arm<TGate>(TGate gate)
         where TGate : struct, Enum
+        => Arm(new GateOrder { Gate = GateName.Of(gate) });
+
+    public Task<ArmedGate> Arm<TGate>(TGate gate, string endpoint)
+        where TGate : struct, Enum
+        => Arm(new GateOrder { Gate = GateName.Of(gate), At = endpoint });
+
+    private async Task<ArmedGate> Arm(GateOrder order)
     {
-        var order = new GateOrder { Gate = GateName.Of(gate) };
         (await _harness.PostAsJsonAsync(WorldEndpoints.ArmGate, order)).EnsureSuccessStatusCode();
         return new ArmedGate(_harness, order);
     }
