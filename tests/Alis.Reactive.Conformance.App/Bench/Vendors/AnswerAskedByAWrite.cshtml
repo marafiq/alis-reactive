@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AnswerAskedByAWriteBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<AnswerAskedByAWriteBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance-source", new ConformanceStart { ReadOnlyText = Model.Ward }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Items = Model.Items }))
+<button type="button" @Html.Raises(plan, WardTextButtons.SetTheTextNorth)>Set the text North</button>
+<button type="button" @Html.Raises(plan, WardTextButtons.SetTheTextSouth)>Set the text South</button>
+<dl>
+    <dt>North</dt>
+    <dd id="north-done"></dd>
+    <dt>South tried</dt>
+    <dd id="south-tried"></dd>
+    <dt>South</dt>
+    <dd id="south-done"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Component<ConformanceComponent>("conformance").Answer.Set(_ => pipeline.Component<ConformanceComponent>("conformance-source").ReadOnlyText))
+        .CustomEvent(WardTextButtons.SetTheTextNorth, pipeline =>
+        {
+            pipeline.Component<ConformanceComponent>("conformance").Text.Set("North");
+            pipeline.Element("north-done").Text.Set("set");
+        })
+        .CustomEvent(WardTextButtons.SetTheTextSouth, pipeline =>
+        {
+            pipeline.Element("south-tried").Text.Set("trying");
+            pipeline.Component<ConformanceComponent>("conformance").Text.Set("South");
+            pipeline.Element("south-done").Text.Set("set");
+        }));
+}
+@Html.RenderPlan(plan)

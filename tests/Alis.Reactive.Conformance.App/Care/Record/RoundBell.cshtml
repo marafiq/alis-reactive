@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundBell
+@{
+    var plan = Html.ReactivePlan<RoundBell>();
+}
+<p>Shift: @Model.Shift</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Dispatch(RoundBoards.RoundStarted)));
+}
+@Html.RenderPlan(plan)

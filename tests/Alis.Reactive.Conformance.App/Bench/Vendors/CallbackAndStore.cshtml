@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CallbackAndStoreBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<CallbackAndStoreBoard>();
+}
+<h1>The bench</h1>
+<h2>@Model.Caption</h2>
+@(plan.ConformanceCallbacks("callbacks")
+    .Reactive(callbacks => callbacks.OnRaised, (raised, pipeline) => pipeline.Element("raised-room").Text.Set(raised.Room)))
+@(plan.ConformanceStore("store")
+    .Reactive(store => store.Posted, (posted, pipeline) => pipeline.Element("posted-message").Text.Set(posted.Message)))
+<dl>
+    <dt>Room raised</dt>
+    <dd id="raised-room"></dd>
+    <dt>Update posted</dt>
+    <dd id="posted-message"></dd>
+</dl>
+@Html.RenderPlan(plan)

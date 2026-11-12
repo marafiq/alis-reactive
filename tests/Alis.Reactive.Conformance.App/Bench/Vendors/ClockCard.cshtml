@@ -1,0 +1,10 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ClockListeningCard
+@{
+    var plan = Html.ReactivePlan<ClockListeningCard>();
+    plan.Plugin<BenchClock>().Reactive(clock => clock.Tick, pipeline => pipeline.Element("ticks-heard").Text.Set(pipeline.Plugin<PageTally>().AddOne()));
+}
+<p>@Model.Note</p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model SignInGuest
+@{
+    var plan = Html.ReactivePlan<SignInGuest>();
+}
+@(Html.InputField(plan, m => m.Name, options => options.Label("Guest name")).NativeTextBox())
+@Html.RenderPlan(plan)

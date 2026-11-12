@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Reception
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Reception";
+    var plan = Html.ReactivePlan<Reception>();
+}
+<h1>Reception</h1>
+@(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+<button type="button" @Html.Raises(plan, Receptions.Load)>Load</button>
+<section id="section" aria-label="Section"></section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(Receptions.Load, pipeline => pipeline.Get(Model.Section).Into("section")));
+}
+@Html.RenderPlan(plan)

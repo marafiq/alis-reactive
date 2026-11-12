@@ -37,7 +37,9 @@ its views.
   it by (`Bench/Sources/SourceConditionRight.cshtml`). A cell that sends a form renders it as a block,
   `Html.BeginRequestForm`, ended by `using`, with the pipeline that sends it inside the block
   (`Bench/Http/HttpBesideHidden.cshtml`); the conformance component bound to a member is rendered by its second
-  render helper, for a field (`Components/ConformanceComponent/ConformanceComponentHtml.cs`).
+  render helper, for a field (`Components/ConformanceComponent/ConformanceComponentHtml.cs`). `Bench/Vendors/`
+  holds the pages of module 12's feature tests, each on the conformance declaration that holds its vendor kind;
+  each of those declarations has its render helper beside it (`Components/ConformanceStore/ConformanceStoreHtml.cs`).
 - `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has
   its link there, and so does the page that renders beside it. A module's refusal pages sit in a folder named for
   it (`Refusals/ArrayLambdas/` holds ten): a controller for each screen with its models, the refused page and the

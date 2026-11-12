@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StoreListeningCard
+@{
+    var plan = Html.ReactivePlan<StoreListeningCard>();
+}
+<p>@Model.Note</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Listen(
+        pipeline.Component<ConformanceStore>("store"),
+        store => store.Posted,
+        (posted, pipeline) => pipeline.Element("card-heard").Text.Set(pipeline.Plugin<PageTally>().AddOne()))));
+}
+@Html.RenderPlan(plan)

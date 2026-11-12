@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model KinMoveIn
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Move in";
+    var plan = Html.ReactivePlan<KinMoveIn>();
+}
+<h1>Move in</h1>
+@using (var moveIn = Html.BeginRequestForm(plan, "move-in"))
+{
+    <section aria-label="Next of kin">
+        <h2>Next of kin</h2>
+        @await Html.PartialFor(m => m.NextOfKin, "/Care/Admission/KinContactCard.cshtml")
+    </section>
+    <section aria-label="Alternate">
+        <h2>Alternate</h2>
+        @await Html.PartialFor(m => m.Alternate, "/Care/Admission/KinContactCard.cshtml")
+    </section>
+    <button type="button" @Html.Raises(plan, KinMoveIns.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(KinMoveIns.Save, pipeline => pipeline
+        .Post<KinMoveIn>(KinMoveInEndpoints.MoveIns, request => request.Form(moveIn.Form))
+        .OnSuccess(Content.Text, (bound, pipeline) => pipeline.Element("bound").Text.Set(bound.Body))));
+}
+<p>Saved contacts: <span id="bound">-</span></p>
+@Html.RenderPlan(plan)

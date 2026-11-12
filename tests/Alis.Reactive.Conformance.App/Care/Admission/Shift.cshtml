@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftTimes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "A shift";
+    var plan = Html.ReactivePlan<ShiftTimes>();
+}
+<h1>A shift</h1>
+<p>The shift: <span id="shift"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.When(pipeline.PageUrl<ShiftTimes>().Read(times => times.Starts).Lt(new TimeOnly(12, 0)))
+        .Then(pipeline => pipeline.Element("shift").Text.Set("a morning shift"))
+        .Else(pipeline => pipeline.Element("shift").Text.Set("not a morning shift"))));
+}
+@Html.RenderPlan(plan)

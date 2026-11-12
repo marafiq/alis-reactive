@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NotesDeskTools
+@{
+    var plan = Html.ReactivePlan<NotesDeskTools>();
+}
+<h2>@Model.Shift</h2>
+<button type="button" @Html.Raises(plan, NotesDesks.LoadTheCard)>Load the card</button>
+<button type="button" @Html.Raises(plan, NotesDesks.CloseTheCard)>Close the card</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(NotesDesks.LoadTheCard, pipeline => pipeline.Get(NotesDeskEndpoints.Card).Into("note-card"))
+        .CustomEvent(NotesDesks.CloseTheCard, pipeline => pipeline.Unload("note-card")));
+}
+@Html.RenderPlan(plan)

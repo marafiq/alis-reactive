@@ -1,0 +1,33 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitorList
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visitor list";
+    var plan = Html.ReactivePlan<VisitorList>();
+}
+<h1>Visitors of @Model.Resident</h1>
+<ul>
+    <li @Html.Raises(plan, VisitorLists.Announced, Model.Arrival)>
+        <span>@Model.Party</span>
+        <button type="button" @Html.Raises(plan, VisitorLists.Announced, new Announcement { PartySize = 1, Capacity = 9, Type = "a visitor" })>Driver</button>
+    </li>
+</ul>
+<p>Choose a party to announce it at the gate.</p>
+<h2>At the gate</h2>
+<p>Party: <span id="announced-type"></span></p>
+<p>Size: <span id="announced-size"></span></p>
+<p>Gate: <span id="announced-capacity"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(VisitorLists.Announced, (announced, pipeline) =>
+    {
+        pipeline.Element("announced-type").Text.Set(announced.Read(arrival => arrival.Type));
+        pipeline.Element("announced-size").Text.Set(announced.Read(arrival => arrival.PartySize));
+        pipeline.When(announced.Read(arrival => arrival.PartySize).Gt(announced.Read(arrival => arrival.Capacity)))
+            .Then(pipeline => pipeline.Element("announced-capacity").Text.Set("Over capacity"))
+            .Else(pipeline => pipeline.Element("announced-capacity").Text.Set("Within capacity"));
+    }));
+}
+@Html.RenderPlan(plan)

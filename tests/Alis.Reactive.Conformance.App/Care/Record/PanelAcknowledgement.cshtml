@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PanelAcknowledgement
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Panel acknowledgement";
+    var plan = Html.ReactivePlan<PanelAcknowledgement>();
+}
+<h1>Care panel of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Round, Outer = new OuterStart { Text = Model.Outer } })
+    .Reactive(panel => panel.Raised, (raised, pipeline) =>
+    {
+        pipeline.Component<ConformanceComponent>("care-panel").Settle();
+        raised.Outer.Text.Set("acknowledged");
+    }))
+@Html.RenderPlan(plan)

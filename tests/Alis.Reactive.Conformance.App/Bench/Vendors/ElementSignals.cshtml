@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ElementSignalsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<ElementSignalsBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceElement("element", new ElementStart { Room = Model.Room })
+    .Reactive(element => element.Opened, (signal, pipeline) =>
+    {
+        pipeline.Element("opened-type").Text.Set(signal.Type);
+        pipeline.Element("opened-room").Text.Set(signal.Detail.Read(detail => detail!.Room));
+    }))
+<dl>
+    <dt>Signal</dt>
+    <dd id="opened-type"></dd>
+    <dt>Room</dt>
+    <dd id="opened-room"></dd>
+</dl>
+@Html.RenderPlan(plan)

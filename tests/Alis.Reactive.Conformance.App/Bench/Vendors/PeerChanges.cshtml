@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PeerChangesBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<PeerChangesBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart())
+    .Reactive(component => component.Raised, (raised, pipeline) => pipeline.Listen(
+        raised.Peer,
+        peer => peer.Change,
+        (change, pipeline) => pipeline.Element("changed-count").Text.Set(pipeline.Plugin<PageTally>().AddOne()))))
+<dl>
+    <dt>@Model.Caption</dt>
+    <dd id="changed-count"></dd>
+</dl>
+@Html.RenderPlan(plan)

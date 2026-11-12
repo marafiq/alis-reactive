@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NameSearchBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<NameSearchBoard>();
+    string[] names = [.. Model.Names];
+}
+<h1>The bench</h1>
+@(plan.ConformanceCallbacks("callbacks")
+    .Reactive(callbacks => callbacks.OnSearch, (search, pipeline) =>
+    {
+        pipeline.Element("searched-for").Text.Set(search.Query);
+        search.Show(names);
+    }))
+<dl>
+    <dt>Searched for</dt>
+    <dd id="searched-for"></dd>
+</dl>
+@Html.RenderPlan(plan)

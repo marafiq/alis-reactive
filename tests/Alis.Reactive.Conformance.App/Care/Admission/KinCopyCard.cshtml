@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model KinCardContact
+@{
+    var plan = Html.ReactivePlan<KinCardContact>();
+    var copy = Html.Id("copy");
+    var echo = Html.Id("echo");
+}
+@(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+@(Html.NativeButton(copy, "Copy")
+    .Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline.Element(echo).Text.Set(pipeline.Input(m => m.Name).Component<NativeTextBox>().Value)))
+<p>Copied: <output id="@echo" aria-label="Copied"></output></p>
+@Html.RenderPlan(plan)

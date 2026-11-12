@@ -31,6 +31,10 @@ public sealed class ConformanceStart
 
     public IReadOnlyList<RaiseStart> Raises { get; init; } = [];
 
+    public IReadOnlyList<RecordStart> Records { get; init; } = [];
+
+    public string? BuiltBy { get; init; }
+
     public string SettleEndpoint { get; init; } = WorldEndpoints.Settle;
 
     public string CountEndpoint { get; init; } = WorldEndpoints.Count;

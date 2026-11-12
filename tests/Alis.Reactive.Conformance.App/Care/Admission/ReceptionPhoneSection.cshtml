@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Reception
+@{
+    var plan = Html.ReactivePlan<Reception>();
+}
+@(Html.InputField(plan, m => m.Phone, options => options.Label("Phone")).NativeTextBox()
+    .Reactive(box => box.Change, (changed, pipeline) => pipeline.Element("section-note").Text.Set(pipeline.Input(m => m.Phone).Component<NativeTextBox>().Value)))
+<p id="section-note"></p>
+@Html.RenderPlan(plan)

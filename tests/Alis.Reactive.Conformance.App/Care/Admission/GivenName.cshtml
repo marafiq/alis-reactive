@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeName
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Next of kin";
+    var plan = Html.ReactivePlan<IntakeName>();
+}
+<h1>Next of kin</h1>
+@(Html.InputField(plan, m => m.GivenName, options => options.Label("Given name")).NativeTextBox())
+<button type="button" @Html.Raises(plan, GivenNames.Save)>Save</button>
+<p>Saved name: <span id="saved-name"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(GivenNames.Save, pipeline => pipeline
+        .Post<IntakeName>(GivenNameEndpoints.Names, request => request.Json(body => body.Input(r => r.GivenName, pipeline.Input(m => m.GivenName))))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved-name").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

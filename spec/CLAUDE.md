@@ -1013,6 +1013,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   is the block's element with a heading inside; the kind is part of the form the owner decides. One fact for
   U11: which `Contains` C# 14 binds for an array inside an expression lambda is not read yet, and the identity
   table keys what the tree carries. The owner can overrule each.
+- The lead, 2026-11-12, landing thirty-six more pages, three forks' work, and settling what they read into. A
+  promise that says the console holds one error whose words no line states is read by the count of the
+  console's errors, one, beside its visible outcome; its words join the assertion when a line states them. A
+  container's inputs sent alone as JSON, and a form's sent URL-encoded, are written with an empty body,
+  `request.Json(container, body => { })`: no door sends either with nothing beside it, a gap raised with these
+  two uses. X17.22's error line is read as holding a message; its words are fixed by its test when U13 builds
+  the component. The four other conformance declarations have a render helper each, and the component's
+  start classes hold what the pages start them with (`RaiseStart`, `RecordStart`, `ItemStart`, `ElementStart`,
+  `RegisteredStart`); what each of those components shows (the statuses Threshold, Alarm and Subscribers, the
+  lists Log and Names, an answer line of several answers as its items) is the forks' reading of
+  `spec/Reference/native.json`, to be stated among its behaviors when U13 writes their TypeScript. A bench page's
+  own plugin sits beside the page that calls it (`PageTally`, `BenchClock`). The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

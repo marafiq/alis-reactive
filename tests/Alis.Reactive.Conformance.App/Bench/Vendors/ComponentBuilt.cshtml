@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ComponentBuiltBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<ComponentBuiltBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { BuiltBy = Model.BuiltOnMount ? null : "build-the-component" })
+    .Reactive(component => component.Raised, (raised, pipeline) => pipeline.Element("raised-heard").Text.Set("raised")))
+@if (!Model.BuiltOnMount)
+{
+    <button type="button" id="build-the-component">Build the component</button>
+}
+<button type="button" @Html.Raises(plan, GreetingButtons.SayHello)>Say hello</button>
+<dl>
+    <dt>Greeting</dt>
+    <dd id="greeting"></dd>
+    <dt>Raise heard</dt>
+    <dd id="raised-heard"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(GreetingButtons.SayHello, pipeline => pipeline.Element("greeting").Text.Set("hello")));
+}
+@Html.RenderPlan(plan)

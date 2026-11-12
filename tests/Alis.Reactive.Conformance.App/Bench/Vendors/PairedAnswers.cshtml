@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PairedAnswersBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<PairedAnswersBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance-records", new ConformanceStart { Records = Model.Records }))
+@(plan.ConformanceComponent("conformance-keys", new ConformanceStart { Records = Model.Records }))
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        pipeline.Component<ConformanceComponent>("conformance-records").Pair.Set(args => args.Record.Read(record => record.Name));
+        pipeline.Component<ConformanceComponent>("conformance-keys").Pair.Set(args => args.Key);
+    }));
+}
+@Html.RenderPlan(plan)

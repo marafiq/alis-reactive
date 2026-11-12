@@ -963,17 +963,23 @@ refusal page reads is a response body of the page's own endpoint. Of the refusal
 six wait: X6.12 and X8.22's first promise need another host (enums as numbers for an opposite case; numbers
 as text), X6.36 a request culture, X7.11, twice, a typed read of a select's value (N13.1), and X1.4 a number
 box. Ten more are placed under hosts the harness does not hold yet. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
-refusal's is, and forty-one care pages stand, each test red: twenty-six of the residents screen's (eighteen
-of module 4's, eight of module 6's), eleven of the record screen's (seven of module 2's, three of module 3's,
-one of module 6's) and four of the admission screen's, module 6's. The net10 host writes enum names in camel
-case, as app.json defines it. Of those five families, thirty-eight promises wait: twelve need a call of the
-app's startup that throws until its unit (request defaults, antiforgery, the flags enums, a registered
-validator, the busy indicator); seven the conformance component to start with records or items its start does
-not hold; six a number a person types, read as a source, which no declared door reads (N13.1); three a console
-error's words, which no line states; three a door no line declares (the endpoint's error answer, N16.1; a
-condition on a part a request sends, N10.4; an append to an element's text); two a browser zone the harness
-does not set; two the harness's clock verb; and one each a request culture, the value tests (M3.N1) and
-another host for its opposite case. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
+refusal's is, and sixty-two care pages stand, each test red: twenty-six of the residents screen's (eighteen
+of module 4's, eight of module 6's), twenty-two of the record screen's (three of module 1's, seven of module
+2's, three each of modules 3 and 5, one each of modules 6 and 15, four of module 17's) and fourteen of the
+admission screen's (two each of modules 3 and 15, four of module 6's, six of module 7's). Fifteen feature
+tests of module 12 stand on the bench, their pages in `Bench/Vendors/`, with a render helper for each of the
+four other conformance declarations. The net10 host writes enum names in camel case, as app.json defines it.
+Of the care families attempted, fifty-three promises wait: sixteen need a call of the app's startup that
+throws until its unit (request defaults, antiforgery, the flags enums, a registered validator, the busy
+indicator); seven the conformance component to start with records or items, whose start members now stand;
+seven a door the core does not declare (the endpoint's error answer, N16.1; a condition on a part a request
+sends, N10.4; an append to an element's text; an element's `Show`, `Hide` and `Hidden`, M5.N1; a handler's
+policy, N11.1; a typed event raised from markup with no payload; a text joined from a source and a literal);
+six a number a person types, read as a source (N13.1); four a request culture; four the value or membership
+tests (M3.N1); three a console error's words, which no line states; three a browser zone or the view's time
+zone; two the harness's clock verb; and one another host for its opposite case. Of the bench's module 12,
+nine wait: six need an append to the callbacks object's log line, which neither native.json nor a core door
+gives, and three the harness's restart or gc verb. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
 its properties, nine of its methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen
 of its sources, its three absences, its sixteen requests and two of its lanes, a slot loaded on start and a
 slot's listener gone at its unload. The sixteenth request cell, http.beside.hidden, sends a form's inputs: a

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundNote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Round note";
+    var plan = Html.ReactivePlan<RoundNote>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "No text" },
+        new RaiseStart { Button = "Ward round", OptionalText = "Ward round" },
+    };
+}
+<h1>Round notes of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Round, Raises = raises })
+    .Reactive(panel => panel.Raised, (raised, pipeline) =>
+    {
+        pipeline.Element("round-note").Text.Set(raised.OptionalText);
+        pipeline.Element("note-saved").Text.Set("Saved");
+    }))
+<p id="round-note">No round yet</p>
+<p id="note-saved">Not saved</p>
+@Html.RenderPlan(plan)

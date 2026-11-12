@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ClockTicksBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<ClockTicksBoard>();
+}
+<h1>The bench</h1>
+<section aria-label="Bench clock">
+    <button type="button" id="break-off">Break off</button>
+    <button type="button" id="tick">Tick</button>
+</section>
+<button type="button" @Html.Raises(plan, ClockCardButtons.OpenTheCard)>Open the card</button>
+<button type="button" @Html.Raises(plan, ClockCardButtons.CloseTheCard)>Close the card</button>
+<dl>
+    <dt>@Model.Caption</dt>
+    <dd id="ticks-heard"></dd>
+</dl>
+<section id="card"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ClockCardButtons.OpenTheCard, pipeline => pipeline.Get(VendorCards.ClockCard).Into("card"))
+        .CustomEvent(ClockCardButtons.CloseTheCard, pipeline => pipeline.Unload("card")));
+}
+@Html.RenderPlan(plan)

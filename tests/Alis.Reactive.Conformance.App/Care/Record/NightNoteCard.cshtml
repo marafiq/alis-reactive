@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NightNoteCard
+@{
+    var plan = Html.ReactivePlan<NightNoteCard>();
+}
+<h2>Night note</h2>
+<p>@Model.Note</p>
+<button type="button" @Html.Raises(plan, NotesDesks.Acknowledge)>Acknowledge</button>
+<p id="note-acknowledged">Not acknowledged</p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NotesDesks.Acknowledge, pipeline => pipeline.Element("note-acknowledged").Text.Set("Acknowledged")));
+}
+@Html.RenderPlan(plan)

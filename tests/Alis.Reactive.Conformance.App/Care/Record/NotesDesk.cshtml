@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NotesDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Notes desk";
+    var plan = Html.ReactivePlan<NotesDesk>();
+}
+<h1>Notes of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, NotesDesks.OpenTheDesk)>Open the desk</button>
+<button type="button" @Html.Raises(plan, NotesDesks.CloseTheDesk)>Close the desk</button>
+<button type="button" @Html.Raises(plan, NotesDesks.MarkNoCardOpen)>Mark no card open</button>
+<section id="desk" aria-label="Desk"></section>
+<section id="note-card" aria-label="Card"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(NotesDesks.OpenTheDesk, pipeline => pipeline.Get(NotesDeskEndpoints.Tools).Into("desk"))
+        .CustomEvent(NotesDesks.CloseTheDesk, pipeline => pipeline.Unload("desk"))
+        .CustomEvent(NotesDesks.MarkNoCardOpen, pipeline => pipeline.Element("note-card").Text.Set("No card open")));
+}
+@Html.RenderPlan(plan)

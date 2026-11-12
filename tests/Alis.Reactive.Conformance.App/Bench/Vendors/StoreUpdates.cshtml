@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StoreUpdatesBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<StoreUpdatesBoard>();
+}
+<h1>The bench</h1>
+<h2>@Model.Caption</h2>
+@(plan.ConformanceStore("store")
+    .Reactive(store => store.Posted, (posted, pipeline) => pipeline.Element("last-update").Text.Set(posted.Message)))
+<dl>
+    <dt>Last update</dt>
+    <dd id="last-update"></dd>
+    <dt>Updates the card heard</dt>
+    <dd id="card-heard"></dd>
+</dl>
+<button type="button" @Html.Raises(plan, StoreCardButtons.OpenTheCard)>Open the card</button>
+<button type="button" @Html.Raises(plan, StoreCardButtons.CloseTheCard)>Close the card</button>
+<section id="store-card"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(StoreCardButtons.OpenTheCard, pipeline => pipeline.Get(VendorCards.StoreCard).Into("store-card"))
+        .CustomEvent(StoreCardButtons.CloseTheCard, pipeline => pipeline.Unload("store-card")));
+}
+@Html.RenderPlan(plan)

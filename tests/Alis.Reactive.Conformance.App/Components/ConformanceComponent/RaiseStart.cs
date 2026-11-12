@@ -7,4 +7,12 @@ public sealed class RaiseStart
     public string? NullableText { get; init; }
 
     public string? OptionalText { get; init; }
+
+    public string? Text { get; init; }
+
+    public bool NoArgument { get; init; }
+
+    public bool Flag { get; init; }
+
+    public int Count { get; init; }
 }

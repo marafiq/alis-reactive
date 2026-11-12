@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CountedAlarm
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Counted alarm";
+    var plan = Html.ReactivePlan<CountedAlarm>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "Raise unflagged", Count = 1 },
+    };
+}
+<h1>Alarm of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Alarm, Raises = raises })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.When(raised.Count.Gt(2))
+        .Then(pipeline => pipeline.Component<ConformanceComponent>("care-panel").Settle())
+        .ElseIf(raised.Flag)
+        .Then(pipeline => pipeline.Element("panel-note").Text.Set("Watching"))
+        .Else(pipeline => raised.WriteOnlyText.Set("Kappa"))))
+<p>Note: <span id="panel-note"></span></p>
+<p><a href="@CarePages.CountedAlarmWrittenAfterAnAwaitedCheck">Write after an awaited check</a></p>
+@Html.RenderPlan(plan)

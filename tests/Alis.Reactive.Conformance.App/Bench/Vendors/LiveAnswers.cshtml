@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LiveAnswersBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<LiveAnswersBoard>();
+}
+<h1>The bench</h1>
+@(Html.InputField(plan, m => m.UnitName, options => options.Label("Unit name")).NativeTextBox())
+@(plan.ConformanceComponent("conformance-caption", new ConformanceStart { Items = Model.CaptionItems }))
+@(plan.ConformanceComponent("conformance-footer", new ConformanceStart { Items = Model.FooterItems }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Shift }))
+<button type="button" @Html.Raises(plan, LiveAnswerButtons.SetTheTextToNight)>Set the text to Night</button>
+<button type="button" @Html.Raises(plan, LiveAnswerButtons.SortByValue)>Sort by value</button>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline =>
+        {
+            pipeline.Component<ConformanceComponent>("conformance-caption").Answer.Set(_ => pipeline.Input(m => m.UnitName).Component<NativeTextBox>().Value);
+            pipeline.Component<ConformanceComponent>("conformance-footer").Answer.Set(_ => pipeline.Component<ConformanceComponent>("conformance").Text);
+        })
+        .CustomEvent(LiveAnswerButtons.SetTheTextToNight, pipeline => pipeline.Component<ConformanceComponent>("conformance").Text.Set("Night"))
+        .CustomEvent(LiveAnswerButtons.SortByValue, pipeline => pipeline.Component<ConformanceComponent>("conformance-caption").SortItems(item => item.Value)));
+}
+@Html.RenderPlan(plan)

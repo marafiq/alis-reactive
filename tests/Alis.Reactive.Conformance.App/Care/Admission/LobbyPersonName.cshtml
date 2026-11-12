@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model LobbyPerson
+@{
+    var plan = Html.ReactivePlan<LobbyPerson>();
+}
+@(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+@Html.RenderPlan(plan)

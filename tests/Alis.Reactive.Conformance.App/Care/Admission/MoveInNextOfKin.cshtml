@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model MoveInKin
+@{
+    var plan = Html.ReactivePlan<MoveInKin>();
+}
+@(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+@Html.RenderPlan(plan)
