@@ -28,6 +28,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A doc sentence written from memory of the design, not from its line | 2 | A step a `spec/NOTES.md` entry shows: the entry of a piece that writes XML docs lists the D, N and X lines the docs rest on, each read before the build. `.claude/rules/docs.md`, XML docs, rule 4 states it. |
 | A signature typed from memory, not from the source | 1 | A step a commit shows: the doc ids of the built core compared with the ids the fluent probe prints for `spec/api`, the count of missing ids quoted in the commit. |
 | A list a tool keeps was not read before the change that moves it | 1 | The tool: `WhenARuleNamesTheCode` refuses a listed exception the repository now holds. |
+| A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
 
 ## Waiting for the owner
 
@@ -65,3 +66,9 @@ them, each marked as the lead's slip, and are not copied here.
   request reads, the requests module's. Caught after the push, while reading N10.7 for the pipeline's row. Cost: a
   wrong placement on the remote for ten minutes, one correction commit (d07e7900e), one more gate and one more full
   check. The class moved up a rung with this entry, to the step the table states.
+- 2026-11-12, a report left out what its writer knew was open. The commit of the reply types (a95ca34d6) listed
+  what it did not declare and left out `Response<TRequest>.Request`, which N10.7 names a member of the reply and
+  which `spec/api` compiles as a stand-in beside the GET stages; the lead had put it off to the pipeline's row and
+  did not say so. Caught after the push, by the comparison of doc ids over the pipeline's row, which read one id
+  missing. Cost: none to the code, since the member is declared with the row that found it; a commit message that
+  claims less than was open. Held by root CLAUDE.md's loop, step 7.

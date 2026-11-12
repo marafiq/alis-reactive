@@ -18,6 +18,10 @@ public class Response<TRequest> : JsObject
 
     /// <summary>Gets the headers of the server's answer, as the browser hands them to the page.</summary>
     public ResponseHeaders Headers => throw new NotImplementedException();
+
+    /// <summary>Gets the request's members as it sent them; <c>Read</c> reads one.</summary>
+    /// <remarks>A read of an input cannot give what was sent once the user edits the input during the send.</remarks>
+    public ReadOnly<TRequest> Request => throw new NotImplementedException();
 }
 
 /// <summary>
