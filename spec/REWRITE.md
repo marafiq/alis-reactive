@@ -104,6 +104,7 @@ nuget.config                          nuget.org alone, every other source cleare
 package.json  package-lock.json  eslint.config.js   npm workspaces, locked; the lint, its import order generated from
                                       each SliceTree.txt
 vitest.config.js                      the runtime's pure tests: node, the files that end in .test.ts under the runtime
+build.mjs                             esbuild: one bundle a package, written into its project's static web assets
 tools/PlanContractGenerator/          writes Alis.Reactive.Assets/runtime/Schema/plan.ts and plan.schema.json
 .editorconfig .gitignore AGENTS.md CLAUDE.md
 README.md                             every package's readme (Directory.Build.props packs it): the docs, beside the XML docs
@@ -475,10 +476,10 @@ that finds a root's plans, `runtime/Execution/plan-scripts.ts`, the one file it 
 is landed with its refused and accepted files, before U3 writes the first of them.
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
-agreement in NuGet, npm and the lock; `tsc -b`; eslint; vitest over the runtime's pure tests; a locked `dotnet restore`; `dotnet build -c Release`;
+agreement in NuGet, npm and the lock; `tsc -b`; eslint; vitest over the runtime's pure tests; the browser bundle, `node build.mjs`; a locked `dotnet restore`; `dotnet build -c Release`;
 `dotnet format --verify-no-changes` over the solution; the architecture tests, the analyzer cases, the test
 rules' cases and the module tests; `check.py --ci`, which
-its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (build, then run, with the selectors
+its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (the bundle and the build, then run, with the selectors
 below, the result line and the leftover-server check), with `scripts/list-tests.cs`, `scripts/playwright-select.mjs`
 and `scripts/playwright-result.mjs`, which list the built tests, select a run's cases and read its result;
 `scripts/test.sh` (both, its browser leg every test or, with `--through`, the tests landed through a unit); `scripts/build.sh`,
@@ -486,7 +487,10 @@ and `scripts/playwright-result.mjs`, which list the built tests, select a run's 
 Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
 `scripts/plant-defect.sh`, which plants one defect and reads the runner's result line for its one test,
 `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`.
-MSBuild never runs npm; an app whose bundle is missing refuses to start.
+MSBuild never runs npm or node: `build.mjs` writes each bundle, the core's to `Alis.Reactive/wwwroot/js/alis-reactive.js`,
+which git ignores and the core's static web assets serve at `_content/AlisReactive/js/alis-reactive.js`, and each
+script that builds runs it first (`scripts/check.sh`, `scripts/playwright.sh`, `scripts/build.sh`, `scripts/run.sh`).
+An app whose bundle is missing refuses to start.
 
 `check.py --ci`, which U1 adds, runs every check but survival, a spec session's own hook and branch, and probes,
 which run nightly and on a changed probe or pin, and the plants of those two. It runs a TLC config only when the
@@ -926,7 +930,8 @@ path's runtime is written under the compiler and the lint, and no browser test h
 `Alis.Reactive.Assets/runtime` and its entry, the evaluator's two switches with a case for every statement and
 expression kind, an unbuilt kind failing loud, the one switch of the object locators, of a vendor's listening and of
 a handler's policy, the file that finds a root's plans, and the lint's refusal of a wide query in every other.
-Open of it, in order: the thin path's delivery, its page and its one test; ALIS041; every screen's view; every browser test, failing; the Playwright project's switch.
+The core's bundle is built by `build.mjs` at the root, which each script that builds runs first.
+Open of it, in order: the thin path's page and its one test; ALIS041; every screen's view; every browser test, failing; the Playwright project's switch.
 The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables

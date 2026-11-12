@@ -32,6 +32,12 @@ as the C# module whose nodes it executes, and `runtime/SliceTree.txt` is its sli
   `runtime/index.ts` beside it. A folder enters the table with its first file: the lint refuses every relative
   import in a file whose folder has no row.
 
+## The bundle
+
+The runtime ships as one classic script: `build.mjs` at the root bundles `runtime/index.ts` with esbuild into
+`"Alis.Reactive/wwwroot/js/alis-reactive.js"`, the core's static web assets, a file git ignores. MSBuild runs
+neither npm nor node, so each script that builds runs `build.mjs` first.
+
 ## A module's pure tests
 
 A runtime module's pure tests sit beside its code, in files named for it that end in .test.ts, and vitest runs
@@ -45,5 +51,6 @@ never a recorded output. What touches the DOM has no pure test: a Playwright tes
 npx tsc -b Alis.Reactive.Assets
 npx eslint Alis.Reactive.Assets --max-warnings 0
 npx vitest run
+node build.mjs
 scripts/check.sh --no-spec
 ```

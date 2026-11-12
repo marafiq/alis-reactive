@@ -12,7 +12,7 @@ Runs every check that needs no browser, in order, and stops at the first that fa
   1. the plan contract, generated from the grammar and compared with the tracked plan.ts and plan.schema.json
   2. npm ci when node_modules is missing, then npm audit
   3. the Syncfusion pin's agreement in NuGet, npm and the lock
-  4. tsc -b over the runtime, eslint with --max-warnings 0, then vitest over the runtime's pure tests
+  4. tsc -b over the runtime, eslint with --max-warnings 0, vitest over the runtime's pure tests, then the browser bundle
   5. dotnet restore in locked mode, then dotnet build -c Release
   6. dotnet format --verify-no-changes over the solution
   7. the architecture tests, the analyzer cases, the test rules' cases and the module tests
@@ -60,6 +60,9 @@ node node_modules/eslint/bin/eslint.js Alis.Reactive.Assets --max-warnings 0
 
 step "vitest over the runtime's pure tests"
 node node_modules/vitest/vitest.mjs run
+
+step "the browser bundle"
+node build.mjs
 
 step "dotnet restore, locked"
 dotnet restore Alis.Reactive.slnx --locked-mode

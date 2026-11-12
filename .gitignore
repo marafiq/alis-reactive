@@ -14,4 +14,6 @@ node_modules/
 .DS_Store
 TestResults/
 tests/Alis.Reactive.ArchitectureTests/LintCases/written/
+Alis.Reactive.Assets/runtime/Execution/written-*.ts
+Alis.Reactive/wwwroot/js/alis-reactive.js
 *.tsbuildinfo

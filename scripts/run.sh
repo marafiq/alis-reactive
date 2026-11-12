@@ -7,7 +7,7 @@ usage() {
 Usage:
   scripts/run.sh
 
-Builds and starts the conformance app in Development:
+Builds the browser bundle and the conformance app, and starts the app in Development:
   http://localhost:5220
 
 A browser that opens a page with no world gets a world of its own, so the app runs for a person as it does
@@ -30,4 +30,5 @@ case "${1:-}" in
     ;;
 esac
 
+node build.mjs
 ASPNETCORE_ENVIRONMENT=Development exec dotnet run --project tests/Alis.Reactive.Conformance.App -- --urls http://localhost:5220

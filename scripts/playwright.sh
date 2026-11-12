@@ -100,8 +100,8 @@ stop_servers_whose_test_process_ended() {
 run="$project/TestResults/$(date +%Y%m%d-%H%M%S)-$$"
 mkdir -p "$run"
 
-echo "[playwright:runner] building $project"
-if ! dotnet build "$project" -c Release --nologo; then
+echo "[playwright:runner] building the browser bundle, then $project"
+if ! node build.mjs || ! dotnet build "$project" -c Release --nologo; then
   echo "[playwright:runner] the build failed; no test ran." >&2
   exit 4
 fi
