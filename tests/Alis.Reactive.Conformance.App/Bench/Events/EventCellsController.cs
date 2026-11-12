@@ -21,6 +21,9 @@ public sealed class EventCellsController : Controller
     [HttpGet(BenchPages.EventPromise)]
     public IActionResult EventPromise() => View("/Bench/Events/EventPromise.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.EventDeepAsync)]
+    public IActionResult EventDeepAsync() => View("/Bench/Events/EventDeepAsync.cshtml", TheWorldsBoard());
+
     private EventBoard TheWorldsBoard()
     {
         var world = HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data;

@@ -16,6 +16,9 @@ internal sealed class WorldData
     private volatile int _componentActiveItems = 3;
     private volatile int _componentCount = 3;
     private volatile ComponentVersion _componentVersion = ComponentVersion.Current;
+    private volatile bool _settleRefuses;
+    private volatile bool _countRefuses;
+    private volatile bool _itemRefuses;
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -37,6 +40,12 @@ internal sealed class WorldData
 
     internal ComponentVersion ComponentVersion => _componentVersion;
 
+    internal bool SettleRefuses => _settleRefuses;
+
+    internal bool CountRefuses => _countRefuses;
+
+    internal bool ItemRefuses => _itemRefuses;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
@@ -49,6 +58,9 @@ internal sealed class WorldData
         if (seed.ComponentActiveItems is { } activeItems) _componentActiveItems = activeItems;
         if (seed.ComponentCount is { } count) _componentCount = count;
         if (seed.ComponentVersion is { } version) _componentVersion = version;
+        if (seed.SettleRefuses is { } settleRefuses) _settleRefuses = settleRefuses;
+        if (seed.CountRefuses is { } countRefuses) _countRefuses = countRefuses;
+        if (seed.ItemRefuses is { } itemRefuses) _itemRefuses = itemRefuses;
     }
 
     internal void Arm(string gate) => _gates[gate] = new WorldGate();

@@ -955,10 +955,10 @@ app's pages lists it apart.
 The app event family is declared, M1.N2 to M1.N5 with the data a handler reads (N5.6), doors `spec/api` compiles
 no sentence with, and the bench's first cell, prop.scalar.read, stands on them with its test red.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
-named by two declarations. Of the bench, twenty-one cells stand, each test red: nine of its properties, seven of
-its methods and five of its events. An element's text and HTML are an `ElementContent`, whose `Set` takes a source
-of any type (M5.N1, D7.3), and a world names the version its component is built as. Three cells of those families
-wait for the app's settle, count and item endpoints and their seeds.
+named by two declarations. Of the bench, twenty-four cells stand, each test red: nine of its properties, nine of
+its methods and six of its events. An element's text and HTML are an `ElementContent`, whose `Set` takes a source
+of any type (M5.N1, D7.3), and a world names the version its component is built as. The app's settle, count and item
+endpoints stand, each at the settle gate, and a seed makes one refuse.
 Open of it, in order: the doors a view meets that are not yet declared, each with that view; every screen's view;
 every browser test, failing; the Playwright project's switch. The bindings check takes no view clause (section
 2.5).

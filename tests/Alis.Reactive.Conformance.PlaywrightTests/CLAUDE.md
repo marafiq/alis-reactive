@@ -34,7 +34,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   line the promise names, a status named for the line with its first letter a capital (the raise line is the
   status Raise, the count of raises the status Raises). A name that opens another's is matched whole. An outcome
   that an element stays empty is read after the status that shows the handler returned, and stands beside the
-  opposite case that fills it (`Vendors/Bench/WhenAnEventsPayloadHoldsAPromiseWhereAValueWasDeclared.cs`). The opposite case runs in a second world, seeded through a
+  opposite case that fills it (`Vendors/Bench/WhenAnEventsPayloadHoldsAPromiseWhereAValueWasDeclared.cs`). A cell that holds the settle gate
+  arms it before its gesture and reads the held state before its release; its refused case runs ungated and reads
+  the status Settle first (`Vendors/Bench/WhenAStepAwaitsAComponentsMethod.cs`). The opposite case runs in a second world, seeded through a
   typed builder of the world contract where the promise changes what the component holds.
 - A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace

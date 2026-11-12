@@ -515,7 +515,7 @@
           ]
         },
         {
-          "behavior": "Settle() awaits the test app's settle endpoint, resolves on its success and rejects when it answers a 500 the harness seeds.",
+          "behavior": "Settle() awaits the test app's settle endpoint, resolves on its success and rejects when it answers a 500 the harness seeds; SettleCount() awaits its count endpoint and an item's Settle() its item endpoint the same way, each address given by the render helper, and once an endpoint answers the component shows Answered, or Refused for a 500, in a status named Settle.",
           "tests": [
             "X4.11",
             "X11.4",

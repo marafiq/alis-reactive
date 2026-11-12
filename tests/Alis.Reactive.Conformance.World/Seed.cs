@@ -26,6 +26,12 @@ public sealed class Seed
 
     public ComponentVersion? ComponentVersion { get; set; }
 
+    public bool? SettleRefuses { get; set; }
+
+    public bool? CountRefuses { get; set; }
+
+    public bool? ItemRefuses { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed TheWord(string word) => new() { Word = word };
@@ -47,6 +53,12 @@ public sealed class Seed
     public static Seed TheComponentsCount(int count) => new() { ComponentCount = count };
 
     public static Seed TheComponentsVersion(ComponentVersion version) => new() { ComponentVersion = version };
+
+    public static Seed TheSettleEndpointRefuses() => new() { SettleRefuses = true };
+
+    public static Seed TheCountEndpointRefuses() => new() { CountRefuses = true };
+
+    public static Seed TheItemEndpointRefuses() => new() { ItemRefuses = true };
 
     public Seed AndResident(string name)
     {

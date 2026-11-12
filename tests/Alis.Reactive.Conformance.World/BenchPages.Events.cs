@@ -7,4 +7,5 @@ public static partial class BenchPages
     public const string EventList = Area + "event.list";
     public const string EventMethod = Area + "event.method";
     public const string EventPromise = Area + "event.promise";
+    public const string EventDeepAsync = Area + "event.deepAsync";
 }

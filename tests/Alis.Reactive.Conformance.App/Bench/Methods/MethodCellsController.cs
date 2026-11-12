@@ -13,6 +13,12 @@ public sealed class MethodCellsController : Controller
     [HttpGet(BenchPages.MethodValue)]
     public IActionResult MethodValue() => View("/Bench/Methods/MethodValue.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.MethodAsyncVoid)]
+    public IActionResult MethodAsyncVoid() => View("/Bench/Methods/MethodAsyncVoid.cshtml", TheWorldsBoard());
+
+    [HttpGet(BenchPages.MethodAsyncValue)]
+    public IActionResult MethodAsyncValue() => View("/Bench/Methods/MethodAsyncValue.cshtml", TheWorldsBoard());
+
     [HttpGet(BenchPages.MethodObjectMemberRead)]
     public IActionResult MethodObjectMemberRead() => View("/Bench/Methods/MethodObjectMemberRead.cshtml", TheWorldsBoard());
 
@@ -53,4 +59,6 @@ public static class MethodCells
     public static readonly AppEvent Take = AppEvent.Declare();
 
     public static readonly AppEvent TakeBoth = AppEvent.Declare();
+
+    public static readonly AppEvent Settle = AppEvent.Declare();
 }

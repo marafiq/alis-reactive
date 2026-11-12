@@ -55,6 +55,18 @@ internal static class WorldArea
                 await context.HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data.Reach(GateName.Of(CompositionGate.Answer));
                 return await next(context);
             });
+        app.MapPost(WorldEndpoints.Settle, (CurrentWorld world) => world.Data.SettleRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.NoContent())
+            .AddEndpointFilter(AtTheSettleGate);
+        app.MapPost(WorldEndpoints.Count, (CurrentWorld world) => world.Data.CountRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.Json(3))
+            .AddEndpointFilter(AtTheSettleGate);
+        app.MapPost(WorldEndpoints.Item, (CurrentWorld world) => world.Data.ItemRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.Json("Item settled"))
+            .AddEndpointFilter(AtTheSettleGate);
+    }
+
+    private static async ValueTask<object?> AtTheSettleGate(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
+    {
+        await context.HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data.Reach(GateName.Of(RunGate.Settle));
+        return await next(context);
     }
 
     private static string? WorldOf(HttpContext context)

@@ -22,4 +22,10 @@ public sealed class ConformanceStart
     public string? CurrentItem { get; init; }
 
     public IReadOnlyList<ItemStart> Items { get; init; } = [];
+
+    public string SettleEndpoint { get; init; } = WorldEndpoints.Settle;
+
+    public string CountEndpoint { get; init; } = WorldEndpoints.Count;
+
+    public string ItemEndpoint { get; init; } = WorldEndpoints.Item;
 }

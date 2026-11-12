@@ -4,6 +4,8 @@ public static partial class BenchPages
 {
     public const string MethodVoid = Area + "method.void";
     public const string MethodValue = Area + "method.value";
+    public const string MethodAsyncVoid = Area + "method.async.void";
+    public const string MethodAsyncValue = Area + "method.async.value";
     public const string MethodObjectMemberRead = Area + "method.object.memberRead";
     public const string MethodObjectMethodCall = Area + "method.object.methodCall";
     public const string MethodArgScalar = Area + "method.arg.scalar";
