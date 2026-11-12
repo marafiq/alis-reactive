@@ -17,6 +17,8 @@ public sealed class ConformanceStart
 
     public OuterStart Outer { get; init; } = new();
 
+    public HeldStart Held { get; init; } = new();
+
     public string ReadOnlyText { get; init; } = "";
 
     public string? CurrentItem { get; init; }
@@ -28,4 +30,8 @@ public sealed class ConformanceStart
     public string CountEndpoint { get; init; } = WorldEndpoints.Count;
 
     public string ItemEndpoint { get; init; } = WorldEndpoints.Item;
+
+    public string TextEndpoint { get; init; } = WorldEndpoints.Text;
+
+    public string HeldCountEndpoint { get; init; } = WorldEndpoints.HeldCount;
 }

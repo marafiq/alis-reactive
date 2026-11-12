@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Poc15ReturnedObjectsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<Poc15ReturnedObjectsBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value })
+    .Reactive(component => component.Raised, (raised, pipeline) =>
+    {
+        pipeline.Component<ConformanceComponent>("conformance").SettleCount();
+        pipeline.Element("shown").Text.Set(raised.Matching().Count());
+    }))
+<p id="shown"></p>
+@Html.RenderPlan(plan)

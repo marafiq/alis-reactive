@@ -32,7 +32,8 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   `Vendors/Bench/WhenAStepReadsAComponentsProperty.cs` is the pattern. The page's own element is found by the id
   the promise names, a button by its role and name, and what the component shows by its role: its heading, and a
   line the promise names, a status named for the line with its first letter a capital (the raise line is the
-  status Raise, the count of raises the status Raises). A name that opens another's is matched whole. An outcome
+  status Raise, the count of raises the status Raises, the payload line the status Payload, the held line the
+  status Held; a peer's ratio is the status Ratio inside the region Peer). A name that opens another's is matched whole. An outcome
   that an element stays empty is read after the status that shows the handler returned, and stands beside the
   opposite case that fills it (`Vendors/Bench/WhenAnEventsPayloadHoldsAPromiseWhereAValueWasDeclared.cs`). A cell that holds the settle gate
   arms it before its gesture and reads the held state before its release; its refused case runs ungated and reads

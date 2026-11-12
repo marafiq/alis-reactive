@@ -12,4 +12,6 @@ public static class WorldEndpoints
     public const string Settle = "/world/settle";
     public const string Count = "/world/count";
     public const string Item = "/world/item";
+    public const string Text = "/world/text";
+    public const string HeldCount = "/world/held-count";
 }

@@ -515,7 +515,7 @@
           ]
         },
         {
-          "behavior": "Settle() awaits the test app's settle endpoint, resolves on its success and rejects when it answers a 500 the harness seeds; SettleCount() awaits its count endpoint and an item's Settle() its item endpoint the same way, each address given by the render helper, and once an endpoint answers the component shows Answered, or Refused for a 500, in a status named Settle.",
+          "behavior": "Settle() awaits the test app's settle endpoint, resolves on its success and rejects when it answers a 500 the harness seeds; SettleCount() awaits its count endpoint, an item's Settle() its item endpoint, a payload's Settle() the text endpoint, which answers Settled text, and a held object's SettleCount() the held count endpoint, which answers 42, the same way, each address given by the render helper, and once an endpoint answers the component shows Answered, or Refused for a 500, in a status named Settle.",
           "tests": [
             "X4.11",
             "X11.4",
@@ -587,7 +587,7 @@
           ]
         },
         {
-          "behavior": "The Raise buttons the test's render options name raise Raised with the payload each names: no text, no optional text, a null nullable text, a record or none, Flag true or false, or no argument; the component shows its payload line once its listeners return.",
+          "behavior": "The Raise buttons the test's render options name raise Raised with the payload each names: no text, no optional text, a null nullable text, a record or none, Flag true or false, or no argument; the component shows its payload line, a status named Payload, once its listeners return, and what a handler wrote into the payload's held object in a status named Held, Held: none as it starts.",
           "tests": [
             "M3.X1",
             "M5.X3",
@@ -611,7 +611,7 @@
           ]
         },
         {
-          "behavior": "The render helper takes the version the component is built as, the items and records the component holds, its Days in the live form (D7.7), an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
+          "behavior": "The render helper takes the version the component is built as, the items and records the component holds, the items, the total and the count of matching items its payload's held object holds, its Days in the live form (D7.7), an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
           "tests": [
             "M4.X4",
             "M4.X6",
@@ -709,7 +709,7 @@
       "what": "the component ConformanceComponent's payloads hand over, on an element of its own, holding that element at element so a listen on it tells when its host destroyed it",
       "behaviors": [
         {
-          "behavior": "Its own Change button raises its Change.",
+          "behavior": "Its own Change button raises its Change, and it shows its Ratio after the word Ratio in a status named Ratio, inside a region named Peer.",
           "tests": [
             "X12.9",
             "X12.10"
@@ -2048,7 +2048,7 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Items.Count(i => i.Name != \"Done\"); Raise hands the items Pending A, Pending B and Done.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Raised handler that sets shown's text to args.Items.Count(i => i.Name != \"Done\"); Raise hands the items Missed, Missed and Done.",
         "gesture": "Click the component's Raise button.",
         "outcome": "shown reads 2.",
         "opposite": "Raise plain, whose items are all named Done, shows 0.",

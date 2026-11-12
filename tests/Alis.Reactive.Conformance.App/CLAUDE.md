@@ -17,13 +17,15 @@ its views.
   its door as that file states them; none is edited by hand to differ from it.
 - A component's render helper sits beside its declaration and starts it from a class of its own
   (`Components/ConformanceComponent/ConformanceStart.cs`), written as the plan writes a literal; the class gains a
-  member when a page first needs the component to start with it. Its `Version` is the build of the component a
+  member when a page first needs the component to start with it, and what its payload's held object holds is
+  `Components/ConformanceComponent/HeldStart.cs`. Its `Version` is the build of the component a
   world names, `ComponentVersion` of the world contract, one of the versions `spec/Reference/native.json` lists, and its three endpoint members name the settle, count
   and item endpoints of `World/WorldArea.cs`, which the component's methods await: each reaches the settle gate
   and answers a 500 where a seed says so. A page's layout is `Shared/_Layout.cshtml`, which
   links the framework's script, unless the page renders something of its own beside its body, as the ward's does.
 - `Bench/` holds the component bench, a folder for each family of cells of `spec/Reference/native.json`
-  (`Bench/Properties/` the first): a controller with an action for each cell's page, the page's model, the app
+  (`Bench/Properties/` the first; `Bench/Poc15/` holds a controller for each member the event.poc15 cells reach):
+  a controller with an action for each cell's page, the page's model, the app
   events its buttons raise, declared as static members, and a view for each cell, named for it. A page starts its
   component from what its world holds, so one page serves a cell and its opposite case.
 - `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has

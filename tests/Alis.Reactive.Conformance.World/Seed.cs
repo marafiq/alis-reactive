@@ -18,6 +18,10 @@ public sealed class Seed
 
     public string? ComponentCurrentItem { get; set; }
 
+    public int? HeldNamedItems { get; set; }
+
+    public int? HeldTotal { get; set; }
+
     public int? ComponentOuterCount { get; set; }
 
     public int? ComponentActiveItems { get; set; }
@@ -25,6 +29,12 @@ public sealed class Seed
     public int? ComponentCount { get; set; }
 
     public ComponentVersion? ComponentVersion { get; set; }
+
+    public int? HeldMatchingItems { get; set; }
+
+    public bool? TextRefuses { get; set; }
+
+    public bool? HeldCountRefuses { get; set; }
 
     public bool? SettleRefuses { get; set; }
 
@@ -46,6 +56,10 @@ public sealed class Seed
 
     public static Seed TheComponentsCurrentItem(string name) => new() { ComponentCurrentItem = name };
 
+    public static Seed TheHeldObjectsNamedItems(int named) => new() { HeldNamedItems = named };
+
+    public static Seed TheHeldObjectsTotal(int total) => new() { HeldTotal = total };
+
     public static Seed TheComponentsOuterCount(int count) => new() { ComponentOuterCount = count };
 
     public static Seed TheComponentsActiveItems(int active) => new() { ComponentActiveItems = active };
@@ -53,6 +67,12 @@ public sealed class Seed
     public static Seed TheComponentsCount(int count) => new() { ComponentCount = count };
 
     public static Seed TheComponentsVersion(ComponentVersion version) => new() { ComponentVersion = version };
+
+    public static Seed TheHeldObjectsMatchingItems(int matching) => new() { HeldMatchingItems = matching };
+
+    public static Seed TheTextEndpointRefuses() => new() { TextRefuses = true };
+
+    public static Seed TheHeldCountEndpointRefuses() => new() { HeldCountRefuses = true };
 
     public static Seed TheSettleEndpointRefuses() => new() { SettleRefuses = true };
 

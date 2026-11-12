@@ -58,6 +58,10 @@ internal static class WorldArea
             .AddEndpointFilter(AtTheSettleGate);
         app.MapPost(WorldEndpoints.Item, (CurrentWorld world) => world.Data.ItemRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.Json("Item settled"))
             .AddEndpointFilter(AtTheSettleGate);
+        app.MapPost(WorldEndpoints.Text, (CurrentWorld world) => world.Data.TextRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.Json("Settled text"))
+            .AddEndpointFilter(AtTheSettleGate);
+        app.MapPost(WorldEndpoints.HeldCount, (CurrentWorld world) => world.Data.HeldCountRefuses ? Results.StatusCode(StatusCodes.Status500InternalServerError) : Results.Json(42))
+            .AddEndpointFilter(AtTheSettleGate);
     }
 
     private static IResult TheWorldsWord(CurrentWorld world) => Results.Content(Page("The word", $"<p>{Text(world.Data.Word)}</p>"), Html);

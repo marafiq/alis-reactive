@@ -14,10 +14,15 @@ internal sealed class WorldData
     private volatile string _componentOuterText = "Gamma";
     private volatile string _componentReadOnlyText = "RO-2026-11-10";
     private volatile string _componentCurrentItem = "One";
+    private volatile int _heldNamedItems = 4;
+    private volatile int _heldTotal = 14;
     private volatile int _componentOuterCount = 8;
     private volatile int _componentActiveItems = 3;
     private volatile int _componentCount = 3;
     private volatile ComponentVersion _componentVersion = ComponentVersion.Current;
+    private volatile int _heldMatchingItems = 1;
+    private volatile bool _textRefuses;
+    private volatile bool _heldCountRefuses;
     private volatile bool _settleRefuses;
     private volatile bool _countRefuses;
     private volatile bool _itemRefuses;
@@ -34,6 +39,10 @@ internal sealed class WorldData
 
     internal string ComponentCurrentItem => _componentCurrentItem;
 
+    internal int HeldNamedItems => _heldNamedItems;
+
+    internal int HeldTotal => _heldTotal;
+
     internal int ComponentOuterCount => _componentOuterCount;
 
     internal int ComponentActiveItems => _componentActiveItems;
@@ -41,6 +50,12 @@ internal sealed class WorldData
     internal int ComponentCount => _componentCount;
 
     internal ComponentVersion ComponentVersion => _componentVersion;
+
+    internal int HeldMatchingItems => _heldMatchingItems;
+
+    internal bool TextRefuses => _textRefuses;
+
+    internal bool HeldCountRefuses => _heldCountRefuses;
 
     internal bool SettleRefuses => _settleRefuses;
 
@@ -56,10 +71,15 @@ internal sealed class WorldData
         if (seed.ComponentOuterText is { } outerText) _componentOuterText = outerText;
         if (seed.ComponentReadOnlyText is { } readOnlyText) _componentReadOnlyText = readOnlyText;
         if (seed.ComponentCurrentItem is { } currentItem) _componentCurrentItem = currentItem;
+        if (seed.HeldNamedItems is { } heldNamedItems) _heldNamedItems = heldNamedItems;
+        if (seed.HeldTotal is { } heldTotal) _heldTotal = heldTotal;
         if (seed.ComponentOuterCount is { } outerCount) _componentOuterCount = outerCount;
         if (seed.ComponentActiveItems is { } activeItems) _componentActiveItems = activeItems;
         if (seed.ComponentCount is { } count) _componentCount = count;
         if (seed.ComponentVersion is { } version) _componentVersion = version;
+        if (seed.HeldMatchingItems is { } heldMatchingItems) _heldMatchingItems = heldMatchingItems;
+        if (seed.TextRefuses is { } textRefuses) _textRefuses = textRefuses;
+        if (seed.HeldCountRefuses is { } heldCountRefuses) _heldCountRefuses = heldCountRefuses;
         if (seed.SettleRefuses is { } settleRefuses) _settleRefuses = settleRefuses;
         if (seed.CountRefuses is { } countRefuses) _countRefuses = countRefuses;
         if (seed.ItemRefuses is { } itemRefuses) _itemRefuses = itemRefuses;
