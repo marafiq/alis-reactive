@@ -214,8 +214,10 @@ the file it moved to:
 
 The folder and namespace names are the module table's (spec/CLAUDE.md). DESIGN.md's `Grammar`, `Pipelines`,
 `Requests` and `Hosting` read `Schema`, `TriggersAndPipelines`, `RequestsAndResponses` and `RenderingAndDelivery`: the
-grammar's classes, every node, choice and contract, are `Schema`'s, and a module's folder holds the nodes its builders
-write as instances. The block writer, the POC's
+grammar's classes, every node and closed choice, are `Schema`'s, and a module's folder holds the nodes its builders
+write as instances. A typed contract is its module's, generated beside the grammar when that module's unit writes
+it (D19.9): `HttpSend` and `HttpResponse` are `RequestsAndResponses`' (N9.1, N10.2), and `FormCheck` and `FormPlace`
+land with the unit that builds the form's check (D16.5, D16.13). The block writer, the POC's
 `Writing/PlanBuild.cs`, goes to `Execution/` and reads no module above it: the view's name prefix is text it holds.
 A file of a shipped project compiles for both hosts or for one: a one-host file is named `.Net48.cs` or `.Net10.cs` and
 wrapped whole in `#if NET48` or `#if NET10_0_OR_GREATER`, and no other conditional directive is written; a member that
@@ -897,10 +899,10 @@ count of tests at once, a pool's shard and CI's proof, the two architecture test
 refusal of the EJ2 script, and section 2.8's four workflows, which no run has read. U3 is in work. Landed of it:
 the schema's nodes, the 51 kinds as sealed classes of `Alis.Reactive/Schema`, with the contract generator, its
 cases, its step in `scripts/check.sh` and the generated `plan.ts` and `plan.schema.json`, and the kinds check
-reading the rewrite's grammar. Open of it, in order: the contracts `HttpSend`, `HttpResponse`, `FormCheck` and
-`FormPlace`; the core's sixteen rows and every door as a signature; the runtime's rows and dispatch with vitest
-and the lint's two path-bound rules; the module tests' project; the thin path; every screen's view; every browser
-test, failing; the Playwright project's switch. The commit that lands a piece rewrites this paragraph.
+reading the rewrite's grammar. Open of it, in order: the core's sixteen rows and every door as a signature; the
+runtime's rows and dispatch with vitest and the lint's two path-bound rules; the module tests' project; the thin
+path; every screen's view; every browser test, failing; the Playwright project's switch. The commit that lands a
+piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1
