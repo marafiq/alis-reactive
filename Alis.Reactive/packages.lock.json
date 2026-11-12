@@ -49,6 +49,16 @@
         "resolved": "1.17.0",
         "contentHash": "hpdcKtrgf4AUYGEDuOuF0uvQN1tTuRkvu0e55JyEU/a8UrU152vheAvCjgisLpyRP6NvJO8EumLlMIu5+ZXg5w=="
       },
+      "System.Diagnostics.DiagnosticSource": {
+        "type": "Direct",
+        "requested": "[10.0.15, )",
+        "resolved": "10.0.15",
+        "contentHash": "FiaK64a1hYTWYZTxr98yieZxO6aBujVr2SGuYQURv0AKzz0bsIENYTm8On/s70Llp+JXzgtW8jg6kf59zDZwuw==",
+        "dependencies": {
+          "System.Memory": "4.6.3",
+          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
+        }
+      },
       "System.Text.Json": {
         "type": "Direct",
         "requested": "[10.0.15, )",

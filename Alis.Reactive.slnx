@@ -5,6 +5,7 @@
     <Project Path="tests/Alis.Reactive.Conformance.App/Alis.Reactive.Conformance.App.csproj" />
     <Project Path="tests/Alis.Reactive.Conformance.PlaywrightTests/Alis.Reactive.Conformance.PlaywrightTests.csproj" />
     <Project Path="tests/Alis.Reactive.Conformance.World/Alis.Reactive.Conformance.World.csproj" />
+    <Project Path="tests/Alis.Reactive.ModuleTests/Alis.Reactive.ModuleTests.csproj" />
     <Project Path="tests/Alis.Reactive.TestRules/Alis.Reactive.TestRules.csproj" />
     <Project Path="tests/Alis.Reactive.TestRules.AnalyzerTests/Alis.Reactive.TestRules.AnalyzerTests.csproj" />
   </Folder>

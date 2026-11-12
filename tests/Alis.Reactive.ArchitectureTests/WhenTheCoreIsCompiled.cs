@@ -16,7 +16,10 @@ public class WhenTheCoreIsCompiled
     private const string Banned = "RS0030";
     private const string OnlyWhereListed = "the core reads type information only where the owner's list names the file and the member (spec/Core/DESIGN.md, D18.1)";
 
-    private static readonly string[] TypeReadsTheOwnerLists = [];
+    private static readonly string[] TypeReadsTheOwnerLists =
+    [
+        "RenderingAndDelivery/ViewPlans.cs System.Type.FullName",
+    ];
 
     private static readonly string[] HoldersOfTypeInformation =
     [

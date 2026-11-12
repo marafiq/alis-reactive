@@ -475,8 +475,8 @@ is landed with its refused and accepted files, before U3 writes the first of the
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
 agreement in NuGet, npm and the lock; `tsc -b`; eslint; vitest over the runtime's pure tests; a locked `dotnet restore`; `dotnet build -c Release`;
-`dotnet format --verify-no-changes` over the solution; the architecture tests, the analyzer cases and the test
-rules' cases; `check.py --ci`, which
+`dotnet format --verify-no-changes` over the solution; the architecture tests, the analyzer cases, the test
+rules' cases and the module tests; `check.py --ci`, which
 its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (build, then run, with the selectors
 below, the result line and the leftover-server check), with `scripts/list-tests.cs`, `scripts/playwright-select.mjs`
 and `scripts/playwright-result.mjs`, which list the built tests, select a run's cases and read its result;
@@ -910,13 +910,16 @@ cases, its step in `scripts/check.sh` and the generated `plan.ts` and `plan.sche
 reading the rewrite's grammar. In work: the core's sixteen rows and every door as a signature, of which
 every door `spec/api` compiles for the core is declared, in eleven rows, the plan's two doors among them
 (`Html.ReactivePlan`, `Html.RenderPlan`; D14.7 as the owner corrected it on 2026-11-12). The rows of
-`TypeKnowledge`, `PathsAndWire`, `OwnershipAndState`, `Tracing`, `Execution`, `InputsAndIds`, `Realtime` and
-`PartialsAndSlots` hold no door `spec/api` compiles and enter the table with their first file. Landed after
+`TypeKnowledge`, `Execution`, `InputsAndIds`, `Realtime` and `PartialsAndSlots` hold no door `spec/api` compiles and
+enter the table with their first file, as `PathsAndWire`, `OwnershipAndState` and `Tracing` did with the plan's
+two doors. Landed after
 that: the runtime's first row, `Schema`, which reads a plan script's text into its plan or the error it is refused
 with (D19.10, M14.D1), with vitest, its first pure tests and its step in `scripts/check.sh`, and the lint's import
 rows, written from each slice table, with their cases; and the core's banned symbols with WhenTheCoreIsCompiled,
-whose list of the owner's type reads is empty. Open of it, in order: the module tests' project; the thin
-path, which brings the runtime's dispatch and its `Execution` row, with the file that finds a root's plans and the
+whose list of the owner's type reads holds the plan's id; the module tests' project,
+`tests/Alis.Reactive.ModuleTests`, with its first tests; and the first of the thin path, the plan's two doors built
+for a plan with no handler, which a view renders as M19.D3's script with the document's every field. Open of it,
+in order: the rest of the thin path, its load trigger and element in C#, and its runtime, which brings the runtime's dispatch and its `Execution` row, with the file that finds a root's plans and the
 lint's refusal of a wide query; every screen's view; every browser test, failing; the Playwright project's switch.
 The commit that lands a piece rewrites this paragraph.
 

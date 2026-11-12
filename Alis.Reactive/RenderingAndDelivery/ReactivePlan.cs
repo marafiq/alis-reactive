@@ -1,5 +1,6 @@
 using System;
 using Alis.Reactive.Declarations;
+using Alis.Reactive.OwnershipAndState;
 using Alis.Reactive.Plugins;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.Vendors;
@@ -12,9 +13,12 @@ namespace Alis.Reactive.RenderingAndDelivery;
 /// <typeparam name="TModel">The model of the view that writes the plan.</typeparam>
 public sealed partial class ReactivePlan<TModel>
 {
-    internal ReactivePlan()
+    internal ReactivePlan(PlanContent content)
     {
+        Content = content;
     }
+
+    internal PlanContent Content { get; }
 
     /// <summary>Reaches a plugin the page registers, to handle its events.</summary>
     /// <typeparam name="TPlugin">The plugin's declaration.</typeparam>

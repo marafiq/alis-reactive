@@ -1,5 +1,4 @@
 #if NET48
-using System;
 using System.Web;
 using System.Web.Mvc;
 
@@ -16,7 +15,8 @@ public static class PlanHtml
     /// a plan that is opened and never rendered.
     /// </remarks>
     /// <returns>The plan.</returns>
-    public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html) => throw new NotImplementedException();
+    public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
+        => ViewPlans.Open<TModel>();
 
     /// <summary>Writes the view's plan into the page, as the view's last line.</summary>
     /// <remarks>
@@ -26,6 +26,7 @@ public static class PlanHtml
     /// <param name="html">The view's HTML helper.</param>
     /// <param name="plan">The plan the view opened.</param>
     /// <returns>The plan's script.</returns>
-    public static IHtmlString RenderPlan<TModel>(this HtmlHelper html, ReactivePlan<TModel> plan) => throw new NotImplementedException();
+    public static IHtmlString RenderPlan<TModel>(this HtmlHelper html, ReactivePlan<TModel> plan)
+        => new HtmlString(ViewPlans.ScriptOf(plan));
 }
 #endif
