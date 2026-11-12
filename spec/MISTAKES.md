@@ -31,6 +31,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
 | A claim of absence made from a search that did not cover the tree | 1 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. |
 | A rule the handoff states was not applied | 1 | A rule line: the handoff's own, scratch work runs in a subshell. |
+| An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts how often that text stands. |
 | A number written from an earlier run, not from the command that proves it | 2 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
 
 ## Waiting for the owner
@@ -100,3 +101,8 @@ them, each marked as the lead's slip, and are not copied here.
   on 2026-11-11, and four earlier index lines of this session carried typed times too. Caught at once, by the
   command's own last line. Cost: one line corrected, outside the repository. The class moved up a rung with this
   entry, to the step the table states.
+- 2026-11-12, an edit by pattern removed text beside its target. A regular expression that rewrites the handoff's
+  "Written at" line, in the session's file outside the repository, took the rest of that line with it: the
+  sentence that says the rewrite resumes from that file. Every other edit of the session named its exact text and
+  asserted its count. Caught by reading the clipboard back. Cost: one sentence restored. Held from this entry on by
+  the step the table states.
