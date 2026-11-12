@@ -27,12 +27,12 @@ them, each marked as the lead's slip, and are not copied here.
 | Placed before its line was read: a type, a folder or a unit named in the spec or in code before the design line that names it was read | 2 | Since 2026-11-12, a step a commit shows: a commit that places a type names the line that places it, "placed by" and the line's id. A type `spec/api` declares is placed by the namespace `spec/api` gives it under `spec/REWRITE.md` 2.2's map, and an exception names P1 to P4 by its number. Before that, root CLAUDE.md's loop, step 2, a rule line, which did not hold. |
 | A doc sentence written from memory of the design, not from its line | 2 | A step a `spec/NOTES.md` entry shows: the entry of a piece that writes XML docs lists the D, N and X lines the docs rest on, each read before the build. `.claude/rules/docs.md`, XML docs, rule 4 states it. |
 | A signature typed from memory, not from the source | 1 | A step a commit shows: the doc ids of the built core compared with the ids the fluent probe prints for `spec/api`, the count of missing ids quoted in the commit. |
-| A list a tool keeps was not read before the change that moves it | 1 | The tool: `WhenARuleNamesTheCode` refuses a listed exception the repository now holds. |
+| A list a tool keeps was not read before the change that moves it | 2 | The tool, each time before the push: `WhenARuleNamesTheCode` for a listed exception, the hedges check for a hedge word. Since its second entry the tool runs sooner: a commit that edits the spec's prose runs `python3 spec/tools/check.py --check hedges` before its gate, and quotes its line. |
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
 | A claim of absence made from a search that did not cover the tree | 1 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. |
 | A rule the handoff states was not applied | 1 | A rule line: the handoff's own, scratch work runs in a subshell. |
-| An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts how often that text stands. |
-| A number written from an earlier run, not from the command that proves it | 2 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
+| An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts the count of that text. |
+| A number written from an earlier run, not from the command that proves it | 3 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Since its third, the step covers a commit message and a handoff too. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
 
 ## Waiting for the owner
 
@@ -106,3 +106,15 @@ them, each marked as the lead's slip, and are not copied here.
   sentence that says the rewrite resumes from that file. Every other edit of the session named its exact text and
   asserted its count. Caught by reading the clipboard back. Cost: one sentence restored. Held from this entry on by
   the step the table states.
+- 2026-11-12, a list a tool keeps was not read before the change that moves it, the class's second entry. The
+  entry above this one wrote a word of the spec's hedge list into the classes table, in "asserts how" and the
+  word that follows it there. The gate does not run the spec's checks, so the commit (97897e655) passed it, and the
+  full check at that head read "38 of 40 checks pass": the hedges check, and the plants that rest on it. Caught
+  by the tool, before the push. Cost: one more commit, one more gate and one more full check. The tool already
+  holds the class; what moves is when it runs, as the table states.
+- 2026-11-12, a number written from an earlier run, not from the command that proves it, the class's third entry.
+  The message of 97897e655 says this log holds eight classes and the handoff said seven, each typed; the classes
+  table held nine and eight. Caught by the count a command printed beside the next commit's message. Cost: a wrong
+  count in one pushed-to-be commit message, which stands, and in the handoff, which is corrected. The step the
+  class moved to at its second entry was applied to the memory's line and not to a message: it covers both now,
+  and this commit's counts are put in by the command that counts.
