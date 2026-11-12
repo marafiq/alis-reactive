@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LaneCard
+@{
+    var plan = Html.ReactivePlan<LaneCard>();
+}
+<p>@Model.Note</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Listen(
+        pipeline.Component<ConformanceComponent>("conformance"),
+        component => component.Change,
+        (change, pipeline) => pipeline.Element("log").Text.Set(pipeline.Component<ConformanceComponent>("conformance").Value))));
+}
+@Html.RenderPlan(plan)

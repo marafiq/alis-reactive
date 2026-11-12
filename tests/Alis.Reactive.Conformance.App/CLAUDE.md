@@ -24,7 +24,8 @@ its views.
   and answers a 500 where a seed says so. A page's layout is `Shared/_Layout.cshtml`, which
   links the framework's script, unless the page renders something of its own beside its body, as the ward's does.
 - `Bench/` holds the component bench, a folder for each family of cells of `spec/Reference/native.json`
-  (`Bench/Properties/` the first; `Bench/Poc15/` holds a controller for each member the event.poc15 cells reach):
+  (`Bench/Properties/` the first; `Bench/Poc15/` holds a controller for each member the event.poc15 cells reach; a
+  page reaches another family's endpoint by its constant of `BenchEndpoints` alone, as `Bench/Lanes/` loads the card):
   a controller with an action for each cell's page, and for each endpoint of the test app its cells call, named in
   `BenchEndpoints` of the world contract (`Bench/Http/HttpCellsController.cs`), a plugin of the bench a cell calls
   beside the cell that calls it (`Bench/Sources/PageLog.cs`), the page's model, the app

@@ -9,6 +9,7 @@ public static class BenchEndpoints
     public const string Move = "/move";
     public const string Code = "/code";
     public const string Card = "/card";
+    public const string ListeningCard = "/card/listening";
     public const string Echo = "/echo";
     public const string EchoHeader = "/echo/header";
 }

@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LaneBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<LaneBoard>();
+}
+<h1>The bench</h1>
+<section id="card"></section>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(BenchEndpoints.Card).Into("card")));
+}
+@Html.RenderPlan(plan)

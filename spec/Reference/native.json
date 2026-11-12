@@ -3054,7 +3054,7 @@
       "version": "current",
       "promise": {
         "page": "A page whose card slot is loaded on start by a GET to the test app's card endpoint; the card's partial renders a ConformanceComponent and a Change handler that sets the card's picked text to the component's Value.",
-        "gesture": "Click Pick a-2 in the card's component.",
+        "gesture": "Pick a-2 in the card's component.",
         "outcome": "picked reads a-2.",
         "opposite": "Before the click picked is empty.",
         "defect": "The slot's plan subscribes before the component mounts, so Pick a-2 runs no handler.",
