@@ -31,6 +31,9 @@ public sealed class HttpCellsController : Controller
     [HttpGet(BenchPages.HttpBesideStatic)]
     public IActionResult HttpBesideStatic() => View("/Bench/Http/HttpBesideStatic.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.HttpBesideHidden)]
+    public IActionResult HttpBesideHidden() => View("/Bench/Http/HttpBesideHidden.cshtml", new BatchNotes(TheWorldsBoard(), "B-2026-11-10", "a-1"));
+
     [HttpGet(BenchPages.HttpInto)]
     public IActionResult HttpInto() => View("/Bench/Http/HttpInto.cshtml", TheWorldsBoard());
 
@@ -75,6 +78,9 @@ public sealed class HttpCellsController : Controller
     [HttpPost(BenchEndpoints.Notes)]
     public IActionResult Notes([FromBody] Note note)
         => Content(Request.Headers.TryGetValue("X-Mode", out var mode) ? $"X-Mode {mode}" : "X-Mode none");
+
+    [HttpPost(BenchEndpoints.BatchNotes)]
+    public IActionResult BatchNotes([FromForm] BatchNote note) => Content($"{note.Batch}: {note.Code}");
 
     [HttpPost(BenchEndpoints.Move)]
     public IActionResult Move() => World.MoveStatus switch
@@ -128,6 +134,15 @@ public sealed class ItemCode
 public sealed class GroupNote
 {
     public string? Group { get; set; }
+
+    public string? Code { get; set; }
+}
+
+public sealed record BatchNotes(HttpBoard Board, string Batch, string Code);
+
+public sealed class BatchNote
+{
+    public string? Batch { get; set; }
 
     public string? Code { get; set; }
 }

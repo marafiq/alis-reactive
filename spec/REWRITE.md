@@ -956,11 +956,14 @@ app's pages lists it apart.
 The app event family is declared, M1.N2 to M1.N5 with the data a handler reads (N5.6), doors `spec/api` compiles
 no sentence with, and the bench's first cell, prop.scalar.read, stands on them with its test red.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
-named by two declarations. Of the bench's ninety-eight placed cells, eighty-seven stand, each test red: nine of
+named by two declarations. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
 its properties, nine of its methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen
-of its sources, its three absences, fifteen of its requests and two of its lanes, a slot loaded on start and a
-slot's listener gone at its unload. The sixteenth request cell, http.beside.hidden, sends a form's inputs, and the
-core declares no door for a view's form (N14.3). One source cell waits: it calls a hub (N21.1).
+of its sources, its three absences, its sixteen requests and two of its lanes, a slot loaded on start and a
+slot's listener gone at its unload. The sixteenth request cell, http.beside.hidden, sends a form's inputs: a
+view's request container is declared as the lead proposes it, `Html.BeginRequestForm` and
+`Html.BeginRequestContainer`, each a block a view ends by `using` (N14.3), a form the owner decides before the
+unit that builds it, and the conformance component is declared an input. One source cell waits: it calls a hub
+(N21.1).
 source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so a source at its pattern is refused
 by the type (D7.5, X7.4). `NativeTextBox` is declared in `Alis.Reactive.Native`, the first Native slice (M24.N1,
 M24.N9), its render helper a signature until U23, on the core's `IInputComponent`, `ComponentInput` and the

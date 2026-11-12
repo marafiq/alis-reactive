@@ -32,7 +32,10 @@ its views.
   events its buttons raise, declared as static members, and a view for each cell, named for it. A page starts its
   component from what its world holds, so one page serves a cell and its opposite case. A cell that holds a
   Native input binds it to a member of the page's model through `Html.InputField`, with the label a person finds
-  it by (`Bench/Sources/SourceConditionRight.cshtml`).
+  it by (`Bench/Sources/SourceConditionRight.cshtml`). A cell that sends a form renders it as a block,
+  `Html.BeginRequestForm`, ended by `using`, with the pipeline that sends it inside the block
+  (`Bench/Http/HttpBesideHidden.cshtml`); the conformance component bound to a member is rendered by its second
+  render helper, for a field (`Components/ConformanceComponent/ConformanceComponentHtml.cs`).
 - `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has
   its link there, and so does the page that renders beside it.
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view

@@ -10,6 +10,7 @@ public static partial class BenchPages
     public const string HttpBesideQuery = Area + "http.beside.query";
     public const string HttpBesideHeader = Area + "http.beside.header";
     public const string HttpBesideStatic = Area + "http.beside.static";
+    public const string HttpBesideHidden = Area + "http.beside.hidden";
     public const string HttpInto = Area + "http.into";
     public const string HttpWhileLoading = Area + "http.whileLoading";
     public const string HttpResponseSuccess = Area + "http.response.success";

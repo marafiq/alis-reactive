@@ -41,7 +41,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   is two presses on its listbox named Value, the down arrow and Enter
   (`Vendors/Bench/WhenAComponentsMemberIsSetAsAnElementsText.cs`). A text box is found by its role and its
   label's name, matched whole, and typed into by a fill
-  (`Vendors/Bench/WhenAConditionComparesATextBoxWithAComponentsMember.cs`). A request a promise states is read as it leaves the
+  (`Vendors/Bench/WhenAConditionComparesATextBoxWithAComponentsMember.cs`). A form's submission set leaves as
+  multipart, whose text no literal states, so its test reads what the endpoint bound, shown by the page
+  (`Vendors/Bench/WhenAFormSendsAHiddenInputBesideAComponentsMember.cs`). A request a promise states is read as it leaves the
   page: the test waits for it around its gesture and asserts its method, the end of its address, the path and
   query the promise states, since its origin is the host's, and its body
   (`Vendors/Bench/WhenAGetSendsAComponentsMemberInItsQuery.cs`). The opposite case runs in a second world, seeded through a

@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Alis.Reactive.Declarations;
+using Alis.Reactive.InputsAndIds;
 using Alis.Reactive.ValuesAndSources;
 using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.Conformance.App.Components;
 
-public sealed class ConformanceComponent : Component
+public sealed class ConformanceComponent : Component, IInputComponent
 {
     public static ComponentVendor Declared { get; } = ComponentVendor.Define("conformance-component", objectPath: "conformanceComponent", subscribe: "addEventListener", unsubscribe: "removeEventListener");
 
@@ -133,4 +134,6 @@ public sealed class ConformanceComponent : Component
     public Event<Raised> Raised => Event<Raised>();
 
     public Event<ConformancePeer> Handed => Event<ConformancePeer>();
+
+    ComponentInput IInputComponent.Input => ComponentInput.Of(Value, committedBy: Change);
 }

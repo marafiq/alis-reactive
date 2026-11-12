@@ -3343,7 +3343,10 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   what is new is the rule that holds them, ALIS041 (N18.15).
 - `N14.3` new: the request container as a block of its view, which renders the container's element and its summary
   and returns its typed handle (D14.8), and `pipeline.Container<TModel>(containerId)` for another view; their forms go
-  to gate 2.
+  to gate 2. No line and no compiled sentence wrote the block's form, so it is the owner's to decide (G13); U3
+  declares the lead's proposal as signatures, for the views to be written on: `Html.BeginRequestForm(plan,
+  containerId)` and `Html.BeginRequestContainer(plan, containerId)`, each a block a view ends by `using`, as it
+  ends MVC's own `Html.BeginForm`, whose `Form` or `Container` is the handle (the lead, 2026-11-12, `spec/CLAUDE.md`).
 - `N14.4` new: `pipeline.Input(m => m.Member)`, the input a member binds, typed by the member's value as
   `BoundInput<TValue>`, which a request sends (`Input`, D9.15) and whose `.Component<T>()` reaches the component by the
   id D14.3 gives it. It replaces both lines' `Component<TComponent>(Expression<Func<TModel, object?>>)`, whose

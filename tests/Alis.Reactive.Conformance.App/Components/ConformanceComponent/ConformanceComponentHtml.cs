@@ -12,4 +12,12 @@ public static class ConformanceComponentHtml
         host.Attributes["data-conformance-component"] = plan.Json(start);
         return plan.Render<ConformanceComponent>(id, host);
     }
+
+    public static Rendered<ConformanceComponent, TModel> ConformanceComponent<TModel, TValue>(this InputField<TModel, TValue> field, ConformanceStart start)
+    {
+        var host = new TagBuilder("section");
+        host.Attributes["id"] = field.Id;
+        host.Attributes["data-conformance-component"] = field.Json(start);
+        return field.Render<ConformanceComponent>(host);
+    }
 }

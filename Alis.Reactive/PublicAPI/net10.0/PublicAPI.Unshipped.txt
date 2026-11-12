@@ -123,6 +123,13 @@ Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>
 Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void
+Alis.Reactive.RenderingAndDelivery.RequestBlocks
+Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>
+Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>.Container.get -> Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>!
+Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>.Dispose() -> void
+Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>
+Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>.Dispose() -> void
+Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>.Form.get -> Alis.Reactive.RequestsAndResponses.RequestForm<TModel>!
 Alis.Reactive.RenderingAndDelivery.RequestServices
 Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>
 Alis.Reactive.RequestsAndResponses.BrowserFile
@@ -604,6 +611,8 @@ static Alis.Reactive.RenderingAndDelivery.PlanHtml.Raises<TModel, TPayload>(this
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.Raises<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, Alis.Reactive.TriggersAndPipelines.AppEvent! appEvent) -> Microsoft.AspNetCore.Html.IHtmlContent!
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.ReactivePlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html) -> Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>!
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.RenderPlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestContainer<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>!
+static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestForm<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>!
 static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RequestsAndResponses.Content.File.get -> Alis.Reactive.RequestsAndResponses.SuccessContent<Alis.Reactive.RequestsAndResponses.ResponseFile!>!
 static Alis.Reactive.RequestsAndResponses.Content.Html.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<Alis.Reactive.RequestsAndResponses.Markup!>!

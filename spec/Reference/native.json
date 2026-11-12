@@ -2906,11 +2906,11 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends the form's inputs, a hidden Batch of B-2026-11-10 and the ConformanceComponent bound to Code, to the notes endpoint as form data.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends the form's inputs, a hidden Batch of B-2026-11-10 and the ConformanceComponent bound to Code, to the batch notes endpoint as form data, and sets shown's text to the endpoint's answer, the batch and the code it bound.",
         "gesture": "Click Load.",
-        "outcome": "The form data sent holds Batch=B-2026-11-10 and Code=a-1.",
-        "opposite": "With a-2 picked in the component the same click sends Code=a-2 beside the same Batch.",
-        "defect": "The hidden input is skipped as a non-component input, so the form data holds Code=a-1 alone.",
+        "outcome": "shown reads B-2026-11-10: a-1: the form data sent held Batch=B-2026-11-10 and Code=a-1.",
+        "opposite": "With a-2 picked in the component the same click shows B-2026-11-10: a-2.",
+        "defect": "The hidden input is skipped as a non-component input, so the form data holds Code=a-1 alone and shown reads : a-1.",
         "observes": "Request.tla:Route"
       }
     },

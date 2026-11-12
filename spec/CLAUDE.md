@@ -924,6 +924,26 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   keeps its row of `spec/Reference/matrix.json` with D7.5 and X7.4, and holds no promise, no placement and no
   browser test. The text `Matches` tests is a condition's left operand, which source.ConditionLeft proves. The
   bench places ninety-eight cells. The owner can overrule it.
+- The lead, 2026-11-12, on the C# form of a view's request container, which D14.8 states as a block and N14.3
+  sent to gate 2. No line writes it, and no sentence of `spec/api`, of a module's features, of the POC or of the
+  redesign compiles it: the handles are parameters in `spec/api`, and the POC's nine forms are MVC's own
+  BeginForm helper, none sent by a pipeline. By G13 the form is the owner's before the unit that builds it. Seven
+  bench cells and every care screen's form are views U3 writes, so U3 declares the lead's proposal as signatures
+  and puts it to the owner in the handoff: `Html.BeginRequestForm(plan, containerId)` and
+  `Html.BeginRequestContainer(plan, containerId)`, doors of `RenderingAndDelivery` on each host, each returning a
+  block a view ends by `using`, as it ends MVC's own BeginForm helper: `RequestFormBlock<TModel>`, whose `Form` is
+  the `RequestForm<TModel>`, and `RequestContainerBlock<TModel>`, whose `Container` is the
+  `RequestContainer<TModel>`. A pipeline that sends the form is written inside the block, and another view
+  reaches the container by `pipeline.Container<TModel>(containerId)`. The live check a block names (D16.15) is
+  declared with the first view that names one. The cost of another form: one line of each view that holds a
+  container. The owner decides it.
+- The lead, 2026-11-12, on the cell http.beside.hidden, whose promise read the form data as it leaves the page:
+  `Form(form)` on a request with a body sends the submission set as multipart, whose text holds a boundary the
+  browser makes, so no test reads it whole as a literal. The promise reads what the endpoint bound, which the
+  page shows: the test app's batch notes endpoint answers the batch and the code, and shown reads
+  "B-2026-11-10: a-1". The conformance component is an input by `spec/Reference/native.json`'s `input`, so its
+  declaration is an `IInputComponent`, and a second render helper renders it for a field. The owner can overrule
+  it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
