@@ -24,6 +24,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
 - A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits
   until the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
   provokes an ordering by timing, by a stubbed network or by a control on the page.
+- `Harness/measured.json` holds the budget of one test, four times the slowest test of 20 green runs. The runner
+  writes it (`--measure`) and fails a run that holds a test over it; a hand never edits it, and the runner refuses a
+  budget that is not four times its slowest test.
 - `Harness/WhenAGateHoldsAnAnswer.cs` is the pattern: the page, the gesture and the outcome are in the test's body,
   and the opposite case stands beside it.
 
@@ -105,6 +108,8 @@ await Expect(Dialog).ToContainTextAsync("Discharge the resident?");
 ## Commands
 
 ```bash
-scripts/playwright.sh --project conformance
-scripts/plant-defect.sh --project conformance --filter "FullyQualifiedName~WhenTwoWorldsRun" --test each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
+scripts/playwright.sh --unit U2
+scripts/playwright.sh WhenTwoWorldsRun
+scripts/playwright.sh --measure --all
+scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
 ```

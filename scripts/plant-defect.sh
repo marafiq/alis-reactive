@@ -3,9 +3,20 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+tests="tests/Alis.Reactive.Conformance.PlaywrightTests"
+
 usage() {
-  echo "usage: scripts/plant-defect.sh --project <name> --filter <expression> --test <method> --in <file> --replace <text> --with <text>" >&2
-  echo "Plants one defect in <file>, runs the filtered Playwright tests, says whether <method> failed, and restores <file>." >&2
+  cat >&2 <<'USAGE'
+usage: scripts/plant-defect.sh --test <constant> --in <file> --replace <text> --with <text>
+
+Plants one defect in <file>, the text to replace found once, runs the one test through scripts/playwright.sh, says
+whether the test failed, and restores <file> on every exit, an interrupt included.
+  --test <constant>   the test's promise constant as the test writes it after Promises. (M3_F1.X8_27_2)
+
+  [plant] caught: ...    the test failed with the defect in place; its failure follows
+  [plant] ESCAPED: ...   the test passed with the defect in place
+Anything else is no verdict: a defect the build refuses is held by the compiler and needs no test.
+USAGE
   exit 2
 }
 
@@ -14,9 +25,7 @@ refuse() {
   exit 2
 }
 
-project=""
-filter=""
-test_name=""
+constant=""
 file=""
 anchor=""
 replacement=""
@@ -24,9 +33,7 @@ replacement_given=0
 while [ "$#" -gt 0 ]; do
   [ "$#" -ge 2 ] || usage
   case "$1" in
-    --project) project="$2" ;;
-    --filter) filter="$2" ;;
-    --test) test_name="$2" ;;
+    --test) constant="$2" ;;
     --in) file="$2" ;;
     --replace) anchor="$2" ;;
     --with) replacement="$2"; replacement_given=1 ;;
@@ -34,28 +41,14 @@ while [ "$#" -gt 0 ]; do
   esac
   shift 2
 done
-if [ -z "$project" ] || [ -z "$filter" ] || [ -z "$file" ] || [ -z "$anchor" ] || [ "$replacement_given" -eq 0 ]; then usage; fi
-[[ "$test_name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || refuse "--test takes the test's method name, a C# identifier; '$test_name' is not one."
+if [ -z "$constant" ] || [ -z "$file" ] || [ -z "$anchor" ] || [ "$replacement_given" -eq 0 ]; then usage; fi
+[[ "$constant" =~ ^[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*$ ]] \
+  || refuse "--test takes a promise constant as a test writes it after Promises., its class and its name; '$constant' is not one."
 
 repo="$(pwd -P)"
 case "$file" in "$repo"/*) file="${file#"$repo"/}" ;; esac
 [ -f "$file" ] || refuse "no file '$file'."
-
-descriptor=""
-for candidate in tests/*/playwright.project.sh; do
-  if (source "$candidate" && [ "${playwright_project:-}" = "$project" ]); then descriptor="$candidate"; break; fi
-done
-[ -n "$descriptor" ] || refuse "no tests/*/playwright.project.sh declares the project '$project'."
-project_dir="$(dirname "$descriptor")"
-results_dir="$project_dir/TestResults/observable"
-
-case "$file" in "$project_dir"/*) refuse "'$file' is in the test project; a defect goes in the code the test proves." ;; esac
-(source "$descriptor" && declare -F playwright_build_assets >/dev/null) \
-  || refuse "$descriptor declares no playwright_build_assets, so a defect planted in a source cannot reach the page."
-
-build_assets() {
-  (source "$descriptor" && playwright_build_assets)
-}
+case "$file" in "$tests"/*) refuse "'$file' is in the test project; a defect goes in the code the test proves." ;; esac
 
 stop_tree() {
   local child_pid
@@ -64,6 +57,7 @@ stop_tree() {
 }
 
 backup="$(mktemp "${TMPDIR:-/tmp}/plant-defect.XXXXXX")"
+log="$(mktemp "${TMPDIR:-/tmp}/plant-defect-run.XXXXXX")"
 cp -p "$file" "$backup"
 child=""
 
@@ -72,10 +66,6 @@ restore() {
   trap - EXIT
   cp "$backup" "$file"
   touch "$file"
-  if ! build_assets >/dev/null 2>&1; then
-    echo "[plant] ERROR: the assets did not build after the restore." >&2
-    status=3
-  fi
   if cmp -s "$backup" "$file"; then
     rm -f "$backup"
     echo "[plant] restored $file"
@@ -83,7 +73,6 @@ restore() {
     echo "[plant] RESTORE FAILED: $file differs from its text before the plant, kept in $backup" >&2
     status=3
   fi
-  echo "[plant] dotnet listeners: $(lsof -nP -iTCP -sTCP:LISTEN 2>/dev/null | grep -ci dotnet || true)"
   exit "$status"
 }
 
@@ -114,35 +103,32 @@ PY
 then
   exit 2
 fi
-build_assets >/dev/null || refuse "the assets did not build with the defect planted; the build refuses it, so no test is needed for it."
 
-stamp="plant-$(date +%Y%m%d-%H%M%S)-$$"
-trx="$results_dir/playwright-$stamp.trx"
-mkdir -p "$results_dir"
-log="$results_dir/plant-$stamp.log"
-echo "[plant] planted in $file; running project $project, filter $filter"
-ALIS_PLAYWRIGHT_RUN_STAMP="$stamp" scripts/playwright.sh --project "$project" --filter "$filter" >"$log" 2>&1 &
+echo "[plant] planted in $file; running the test $constant"
+scripts/playwright.sh --test "$constant" >"$log" 2>&1 &
 child=$!
 run_status=0
 wait "$child" || run_status=$?
 child=""
 
-[ -f "$trx" ] || refuse "no test ran (scripts/playwright.sh exit $run_status); its output is $log"
-grep -E '^Total tests:' "$log" | sed 's/^/[plant] /' || true
+if [ "$run_status" -eq 4 ]; then
+  refuse "the build refuses the defect, so the compiler holds it and no test is needed for it. The run's output is $log"
+fi
+result="$(grep -E '^\[playwright:result\] .*: [0-9]+ selected, [0-9]+ ran, [0-9]+ passed, [0-9]+ failed, ' "$log" | tail -1 || true)"
+[[ "$result" =~ :\ ([0-9]+)\ selected,\ ([0-9]+)\ ran,\ ([0-9]+)\ passed,\ ([0-9]+)\ failed, ]] \
+  || refuse "the run printed no result line (scripts/playwright.sh exit $run_status); its output is $log"
+selected="${BASH_REMATCH[1]}"
+ran="${BASH_REMATCH[2]}"
+passed="${BASH_REMATCH[3]}"
+failed="${BASH_REMATCH[4]}"
+[ "$selected" -gt 0 ] && [ "$ran" -eq "$selected" ] || refuse "the run selected $selected and ran $ran; its output is $log"
 
-failed="$(node scripts/trx-failed-tests.mjs "$trx" failed)"
-passed="$(node scripts/trx-failed-tests.mjs "$trx" passed)"
-named_failed="$(printf '%s\n' "$failed" | grep -E "\.$test_name\$" || true)"
-named_passed="$(printf '%s\n' "$passed" | grep -E "\.$test_name\$" || true)"
-named_count="$(printf '%s\n%s\n' "$named_failed" "$named_passed" | grep -c . || true)"
-[ "$named_count" -eq 1 ] || refuse "the run holds $named_count tests named $test_name; the filter must run it once. Its output is $log"
-
-if [ -z "$named_failed" ]; then
-  echo "[plant] ESCAPED: $named_passed passed with the defect in place."
+echo "[plant] $result"
+if [ "$passed" -gt 0 ]; then
+  echo "[plant] ESCAPED: $constant passed with the defect in place ($passed of $ran)."
   exit 1
 fi
 
-echo "[plant] caught: $named_failed failed."
-grep -A3 -E "^  Failed $test_name " "$log" | sed '1d; s/^/[plant]   /' || true
-printf '%s\n' "$failed" | grep -vE "\.$test_name\$" | grep . | sed 's/^/[plant] also failed: /' || true
-echo "[plant] passed: $(printf '%s\n' "$passed" | grep -c . || true) other test(s)."
+echo "[plant] caught: $constant failed with the defect in place ($failed of $ran)."
+awk '/^[[:space:]]*Error Message:/ { showing = 1; next } /^[[:space:]]*Stack Trace:/ { showing = 0 } showing && NF { print "[plant]   " $0 }' "$log"
+rm -f "$log"

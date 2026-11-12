@@ -4,8 +4,8 @@ import { existsSync, readFileSync } from "node:fs";
 const modes = ["failed", "passed", "annotations", "summary", "flaky"];
 const [trxPath, mode = "failed", rerunTrxPath] = process.argv.slice(2);
 if (!trxPath || !modes.includes(mode) || (mode === "flaky") !== Boolean(rerunTrxPath)) {
-  console.error(`usage: node scripts/trx-failed-tests.mjs <file.trx> [${modes.filter(m => m !== "flaky").join("|")}]`);
-  console.error("       node scripts/trx-failed-tests.mjs <file.trx> flaky <rerun.trx>");
+  console.error(`usage: node poc/trx-failed-tests.mjs <file.trx> [${modes.filter(m => m !== "flaky").join("|")}]`);
+  console.error("       node poc/trx-failed-tests.mjs <file.trx> flaky <rerun.trx>");
   process.exit(2);
 }
 if (!existsSync(trxPath)) process.exit(0);

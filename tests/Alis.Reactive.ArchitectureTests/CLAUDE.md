@@ -20,6 +20,8 @@ an `AcceptedCaseAttribute` case one fact away that expects none.
   nothing: it is redone as a mutation that compiles. A copy the sweep restores is touched, since the build reads a
   file's time, and a stale build passes for the restored code (the lead's slips, 2026-11-11).
 - `LintCases` holds the lint's refused and accepted files, which `WhenTheLintIsConfigured` lints.
+- `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
+  result, over the tables and TRX files their cases write, and expect each refusal's own line.
 
 ```bash
 dotnet test tests/Alis.Reactive.ArchitectureTests

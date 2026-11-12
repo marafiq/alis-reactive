@@ -7,11 +7,12 @@ description: Prove that a Playwright test fails for the defect it names, by choo
 
 A test keeps the rules in `.claude/rules/tests.md`. This skill is how to show it keeps rule 5 (it fails for the
 defect it names) and rule 6 (both sides of the promise). `scripts/plant-defect.sh` does the mechanics: it replaces
-one text found once, rebuilds the project's assets, runs the filtered tests, says whether the named test failed,
-and restores the file on every exit, an interrupt included.
+one text found once, runs the one test through `scripts/playwright.sh`, which builds first, says whether the test
+failed, and restores the file on every exit, an interrupt included. The test is named by its promise constant, as
+the test writes it after `Promises`.
 
 ```bash
-scripts/plant-defect.sh --project poc --filter "FullyQualifiedName~Properties" --test a_wrong_code_leaves_the_board_locked --in poc/runtime/src/execute.ts --replace "<text found once>" --with "<the defect>"
+scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "<text found once>" --with "<the defect>"
 ```
 
 ## Choose the defect
@@ -39,8 +40,8 @@ scripts/plant-defect.sh --project poc --filter "FullyQualifiedName~Properties" -
   test gets a positive control or an exact value, or the defect changes nothing anyone can observe. Then the planted
   code is not a behavior: record the finding in `spec/NOTES.md`, and the code either gains a meaning a real case
   raises or leaves.
-- A refusal or "no test ran" is no verdict. A defect the build refuses is held by the compiler and needs no test; a
-  filter that runs no test proves nothing.
+- A refusal or a run with no result line is no verdict. A defect the build refuses is held by the compiler and needs
+  no test; a constant that selects no test proves nothing.
 
 ## Report
 

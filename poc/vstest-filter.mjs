@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 
 const expression = process.argv[2];
 if (!expression) {
-  console.error("usage: node scripts/vstest-filter.mjs '<filter expression>' < fully-qualified-names.txt");
+  console.error("usage: node poc/vstest-filter.mjs '<filter expression>' < fully-qualified-names.txt");
   process.exit(2);
 }
 

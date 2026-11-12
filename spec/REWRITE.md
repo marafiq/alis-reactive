@@ -152,8 +152,9 @@ tests/
                                               WhenTheCoreIsCompiled and WhenAContractDriftIsSuppressed, over the
                                               conformance app WhenAnAppRendersItsPages and SandboxStaticStateTests,
                                               renamed WhenTheAppHoldsNoStaticState, over each fresh app's build
-                                              WhenAConsumerAppIsBuilt (section 2.9), and over the runner's result
-                                              WhenAPlaywrightRunEnds (section 2.5), over the lint's rules
+                                              WhenAConsumerAppIsBuilt (section 2.9), and over the runner's selection
+                                              and result WhenAPlaywrightRunStarts and WhenAPlaywrightRunEnds (section
+                                              2.5), over the lint's rules
                                               WhenTheLintIsConfigured (section 2.7), and over the shipped packages
                                               and their slice tables WhenAPackageShips (M20.D1), each rule with its
                                               refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; over
@@ -320,16 +321,25 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   America/Los_Angeles, so a date read in the wrong zone shows. The hosts consumerNet10 and consumerNet48 are the fresh
   apps' own servers, which hold no World area: a test under one runs on app.json's `fresh` screen, sets no world and
   uses no harness verb.
-- **A run proves it ran.** Each test process ends with
-  `[playwright:result] <pool> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s> <name>` and
-  fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive.
-  WhenAPlaywrightRunEnds runs that reading over the TRX and the result line each case gives: a refused case for each
-  failure, and an accepted case for a green run. No retries, anywhere.
+- **A run proves it ran.** Each run ends with
+  `[playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>`,
+  its selection the selector's own word (`U8`, `all`, a pool's name) and its shard `1/1` when the run is whole, and
+  fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive,
+  each said on a line before it. What a run runs is decided before it starts. The runner joins the tests the spec
+  lands (`spec/tools/landings.py`, which reads the spec through check.py: each test's promise, its unit, its screen
+  and its hosts) with the tests the built assembly holds (`scripts/list-tests.cs`, each test's promise read from its
+  `[FailsFor]`), refuses a selected test of the spec that nobody wrote, and writes the cases the run must run, each a
+  fixture under one host with its test. The result is read against that list by name, so a test that ran twice, a
+  test that was skipped and a fixture that runs under a host its placement does not list each fail the run.
+  WhenAPlaywrightRunStarts holds the selection and WhenAPlaywrightRunEnds the reading, each over files its cases
+  write: a refused case for each failure, and an accepted case for a green run. No retries, anywhere.
 - **Waits and budget.** Action waits, navigation waits and the per-test budget are set from measurement, never chosen,
   on the machine the delivery loop runs on, this Mac (the owner, 2026-11-11): unit U2 runs the suite 20 times there
   and sets the budget at four times the slowest test it measured, the waits at four times the slowest step, and
-  writes both into the harness with the run that measured them. A test over the budget fails its run, and the budget
-  moves only by a new measurement of 20 green runs, written with that run. CI measures its own numbers the same way
+  writes both into the harness with the run that measured them: `scripts/playwright.sh --measure` writes the budget
+  to `Harness/measured.json` with its slowest test, its runs, its day and its machine. A test over the budget fails
+  its run, and the budget moves only by a new measurement of 20 green runs, written with that run: the result reader
+  refuses a budget that is not four times its slowest test or that fewer than 20 runs measured. CI measures its own numbers the same way
   when the rewrite is done; no number measured there gates a unit.
 - **Syncfusion.** Only the Fusion pool's job receives the licence key; the app registers it at startup when its host
   serves a Fusion screen, and a Fusion screen refuses to render without it. A core test also fails at run time if its
@@ -387,7 +397,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | App sweep | Microsoft.AspNetCore.Mvc.Testing 10.0.15 | the architecture tests' sweep of the conformance app's pages; held by net10.0, which its 11.0.0 does not support (NU1202) |
 | Playwright | Microsoft.Playwright 1.64.1, CI's image `mcr.microsoft.com/playwright/dotnet:v1.64.1-noble` by digest | every browser test and probe |
 | Java, TLC | OpenJDK 27.0.1, tla2tools v1.7.4 (TLC 2.19) by SHA-256 in `spec/tools/tla2tools.lock` | model checking; v1.8.0 is a prerelease |
-| Python | 3.15.2, standard library | `spec/tools/check.py` |
+| Python | 3.15.2, standard library | `spec/tools/check.py`, and `spec/tools/landings.py`, which prints where the spec lands each test |
 | Syncfusion | 33.1.47: Syncfusion.EJ2.AspNet.Core on net10, Syncfusion.EJ2.MVC5 on net48, @syncfusion/ej2, together | `node scripts/pin-syncfusion.mjs <version>` moves both; the owner's hold (the latest is 35.1.43) |
 | Actions | by SHA with Dependabot's version comment | CI |
 
@@ -436,10 +446,12 @@ agreement in NuGet, npm and the lock; `tsc -b`; eslint; a locked `dotnet restore
 `dotnet format --verify-no-changes` over the solution; the architecture tests, the analyzer cases and the test
 rules' cases; `check.py --ci`, which
 its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (build, then run, with the selectors
-below, the result line and the leftover-server check); `scripts/test.sh` (both); `scripts/build.sh`,
+below, the result line and the leftover-server check), with `scripts/list-tests.cs`, `scripts/playwright-select.mjs`
+and `scripts/playwright-result.mjs`, which list the built tests, select a run's cases and read its result;
+`scripts/test.sh` (both, its browser leg every test or, with `--through`, the tests landed through a unit); `scripts/build.sh`,
 `scripts/run.sh`, `scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,
 Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
-`scripts/plant-defect.sh` with `scripts/trx-failed-tests.mjs`, which reads a TRX's failed and passed tests,
+`scripts/plant-defect.sh`, which plants one defect and reads the runner's result line for its one test,
 `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`.
 MSBuild never runs npm; an app whose bundle is missing refuses to start.
 
@@ -452,9 +464,12 @@ SHA-256 is not the lock's, writes no `spec/STATE.json`, and exits 1 on any failu
 pin, except kinds, which from U3 on reads the rewrite's grammar at HEAD: a kind `spec/Core/schema.md` does not list
 fails, and from U27 on so does a kind it lists that HEAD lacks.
 
-`scripts/playwright.sh` selects a module (`RequestsAndResponses`), a screen (`--screen Residents`), a feature
-(`--feature M6.F1`), one test (`--test M3_F1_X8_27_2`), one fixture, one host (`--host snakeCase`), a pool's shard
-(`--pool core --shard 1/2`) or everything (`--all`).
+`scripts/playwright.sh` takes one selector a run: a unit (`--unit U8`, the tests check.py lands in it), every unit
+through one (`--through U8`), a feature (`--feature M6.F1`), a screen (`--screen residents`), one test by its promise
+constant (`--test M3_F1.X8_27_2`), a folder or a fixture of the project by its name (`RequestsAndResponses`), or
+everything the project holds (`--all`). `--host snakeCase` narrows any of them to one host; without it a run takes
+the hosts the conformance app serves on the machine, never the twin's or a fresh app's. A pool's shard (`--pool core
+--shard 1/2`) lands with section 2.8's workflows, its one caller. `--measure` writes the budget (2.5).
 
 ### 2.8 Shards and CI
 
@@ -719,8 +734,9 @@ is never the reason.
   `tests/Alis.Reactive.ClassNames.PlaywrightTests`, now the host `classNames`; `scripts/framework-coverage.*`,
   `check_ci_shard_matrix`.
 - `poc/`, the POC's test projects (`tests/Alis.Reactive.Poc.*`) and `tests/Alis.Reactive.Playwright.TestHost` they build
-  on, with what today's runner reads to run them, `scripts/vstest-filter.mjs` and each `playwright.project.sh`,
-  last: each proof ported by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC's
+  on, with the runner that runs them and what it reads, `poc/playwright.sh`, `poc/vstest-filter.mjs` and
+  `poc/trx-failed-tests.mjs` (main's `scripts/vstest-filter.mjs` and `scripts/trx-failed-tests.mjs`), and each
+  `playwright.project.sh`, last: each proof ported by its unit, TestHost's harness merged into the Playwright project's `Harness/`, the POC's
   analyzers rewritten in their modules' folders to section 2.10's authoring rules, their rules and cases the evidence,
   and its two architecture tests moved to the architecture tests,
   `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
@@ -798,10 +814,9 @@ What the cut leaves of a path section 2.1 holds:
   lint; `scripts/test.sh` with `scripts/check.sh`; `scripts/run.sh` and the two architecture tests that sweep an app,
   WhenAnAppRendersItsPages and SandboxStaticStateTests, in U2 with the conformance app.
 - Every other script and build file is reduced to what is true of the tree the cut leaves. `scripts/playwright.sh`
-  runs the POC's suites, and from U2's harness on the conformance project by a descriptor of its own, until U2 writes
-  section 2.7's runner. That runner is the rewrite's alone and reads no descriptor: today's runner moves to `poc/`
-  with what it reads and leaves with it (section 3), since the rewrite wins where the two meet (the owner,
-  2026-11-11). `scripts/pin-syncfusion.mjs` reads the NuGet pin in
+  is section 2.7's runner since U2 wrote it, the rewrite's alone, and reads no descriptor: the runner the cut kept
+  for the POC's suites is `poc/playwright.sh`, with what it reads, and leaves with `poc/` (above), since the rewrite
+  wins where the two meet (the owner, 2026-11-11). `scripts/pin-syncfusion.mjs` reads the NuGet pin in
   `Directory.Packages.props` and the npm pin in the root `package.json`, which drops its workspaces and declares what
   the kept code loads, each at the version the tree held: TypeScript and esbuild for the POC's build and the rules
   test, and EJ2, SignalR, jsdom, parse5 and ws for the probes.
@@ -834,8 +849,9 @@ path does, and a part that lists its doors, each on a Doors line, lands with the
 
 **Where the rewrite stands.** U1 is landed. U2 is running. Landed of it: the world contract with the generated gates
 and promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
-TEST013 on the Playwright project and the bindings check. Open of it: section 2.7's runner, then the CI workflows,
-the two architecture tests over the app, the harness's refusal of the EJ2 script, and the measurements. U3 is next. The commit that lands a piece rewrites this
+TEST013 on the Playwright project, the bindings check, and section 2.7's runner with its measured budget. Open of
+it: the CI workflows with a pool's shard, the two architecture tests over the app, the harness's refusal of the EJ2
+script, and the measurements of the waits and of parallelism. U3 is next. The commit that lands a piece rewrites this
 paragraph.
 
 ### U1. Tools, pins and tables
@@ -856,8 +872,8 @@ harness, result line and leftover-server check; the test rules TEST001 to TEST01
 before any feature test is written; the CI workflows; `scripts/run.sh` and the two architecture tests over the app
 (section 2.1). Its own tests, app.json's `harnessTests`, prove the harness: two
 worlds isolated, and a held answer that reads the world as it is at its release; the held gate's type keeps a release
-before reached from compiling, and WhenAPlaywrightRunEnds's cases prove the runner, a run that selected no test failing
-among them. It measures and writes the waits, the budget and the
+before reached from compiling, and the cases of WhenAPlaywrightRunStarts and WhenAPlaywrightRunEnds prove the runner's
+selection and its reading, a run that selected no test failing among them. It measures and writes the waits, the budget and the
 parallelism (section 2.5, 2.8).
 
 ### U3. The seam, the surface, every view, every test and one thin path

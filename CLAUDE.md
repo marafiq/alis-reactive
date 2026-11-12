@@ -87,15 +87,15 @@ keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s
 ```bash
 python3 spec/tools/check.py
 python3 spec/tools/check.py --orient
-scripts/playwright.sh --project poc --filter "FullyQualifiedName~Properties"
+scripts/playwright.sh --unit U2
 ```
 
 Behavior is done when a Playwright test proves it in a real browser, and not before: a real gesture and a visible
 outcome, on a page a developer would write. A test finds an element as a user does and expects a literal: no
 `page.evaluate()`, no read of a component's object, no DOM poking (`.claude/rules/tests.md`). A build, a typecheck and
 a module's pure tests are no proof of behavior. A non-browser project runs when it is named first
-(`dotnet test tests/Alis.Reactive.ArchitectureTests`). The POC's suites run through `scripts/playwright.sh --project poc`
-until U2 lands the rewrite's runner; a unit ports each proof it replaces, and `poc/` leaves last.
+(`dotnet test tests/Alis.Reactive.ArchitectureTests`). A unit runs the tests the spec lands in it (`--unit`) and, before
+its commit, every test landed through it (`--through`). `poc/playwright.sh` runs the POC's suites, and `poc/` leaves last.
 
 ## What is forbidden, and what refuses it
 
@@ -120,8 +120,8 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | A door or a feature lost; a defect below its rung; a meaning with no carrier; a kind outside the grammar; a unit that proves nothing; a path with no verdict; a pin off its version; a generated binding off the spec; a hedge word in the spec | `spec/tools/check.py`, each check with its plants |
 | C# off the formatter; an unread private member or parameter | `dotnet format --verify-no-changes` and the build, in `scripts/check.sh` |
 | A package off its lock, a tool off its pin, a package with a known vulnerability | the locked restore, `scripts/doctor.sh` and both audits |
-| A raw `dotnet test` of a Playwright project or the solution; `git stash`; a listing of user secrets | the deny rules of `.claude/settings.json` |
-| A commit on `main` | the pre-commit hook `scripts/install-git-hooks.sh` installs |
+| A browser run that ran other than the spec selected, retried a test, ran one over the measured budget or left a server alive | `scripts/playwright.sh`, held by `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` |
+| A raw `dotnet test` of a Playwright project or the solution; `git stash`; a listing of user secrets; a commit on `main` | the deny rules of `.claude/settings.json`; the pre-commit hook `scripts/install-git-hooks.sh` installs |
 
 Kept by the loop, with no tool: a new direction without the owner's yes; a gap worked around by an invented member,
 syntax or runtime behavior, where the gap is raised with its use case and a member's real shape is read from the
@@ -184,7 +184,7 @@ none: its record names the line.
 - The rewrite runs on `feature/rewrite` and lands on `main` by pull request; other work branches from `origin/main` in
   a worktree (`feature/`, `fix/`, `chore/`): `git worktree add .worktrees/<name> -b feature/<name> origin/main`. A
   SessionStart hook installs the pre-commit guard. `git stash` is never run: `stash@{0}` holds work that stays put.
-- `scripts/check.sh` (every check that needs no browser), `scripts/test.sh` (that, then every browser test),
+- `scripts/check.sh` (every check that needs no browser), `scripts/test.sh` (that, then the browser tests),
   `scripts/doctor.sh` (every pin against this machine), `scripts/build.sh`, `scripts/run.sh` (the conformance app at
   http://localhost:5220), `scripts/pack.sh <version>`. A script joins this list with the commit that writes it.
 - Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a hold names its

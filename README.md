@@ -17,4 +17,4 @@ packages are built from `main`.
 ## Working on the framework
 
 `scripts/doctor.sh` checks the tools, `scripts/build.sh` builds, and `scripts/playwright.sh` runs the browser
-tests. `CLAUDE.md` holds the rules every contributor and coding agent follows.
+tests one selector names (`scripts/playwright.sh --help` lists them). `CLAUDE.md` holds the rules every contributor and coding agent follows.

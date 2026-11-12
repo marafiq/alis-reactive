@@ -154,7 +154,7 @@ public class WhenARuleNamesTheCode
                 "CASE.md", "---", "paths:", "  - \"tests/**\"", "---",
                 "`WhenCodeIsWritten` reads `tests/Alis.Reactive.ArchitectureTests/Repository.cs` and `CLAUDE.md#spec-first`,",
                 "writes `\"build_property.AlisSliceTree\"` and cites `NeverInTheRepo`.",
-                "```bash", "scripts/playwright.sh --project poc", "```",
+                "```bash", "scripts/playwright.sh --unit U2", "```",
                 "```csharp", "internal static IReadOnlyList<string> TrackedFiles => Tracked.Value;", "```",
                 "```csharp illustration", "public int NoSuchMember => 0;", "```"),
             listed);
