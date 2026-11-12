@@ -141,17 +141,18 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
 ## Sessions
 
 - A session starts and ends at a stable state: every unit pushed, `git ls-remote` equal to HEAD, nothing uncommitted.
-  The lead says so in one line after each push. The owner starts a new session; the lead ends none.
+  The owner starts a new session; the lead ends none, and a reply to continue, given to a go or no-go ask, is the go:
+  work that needs no answer never waits. A status to the owner says what is completed and what is open, in the plan's
+  own words, never where a head is (the owner, 2026-11-11). A long run is wrapped in `caffeinate`.
 - A handoff is written after every push, never only at a session's end, since the harness compacts without warning
   and a session does not always reach its end. It holds the head, what landed with its proof line and what is next;
-  the lead's memory names its folder.
+  the lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.
 - To begin: `scripts/doctor.sh`, then the orient command above, which prints the branch against its remote, what is
   uncommitted, the last committed STATE, the owner's latest decisions and the handoff. Then read this file,
   `spec/REWRITE.md` sections 1 and 4, `spec/CLAUDE.md`'s standing decisions, the latest first, and the rule file of
   what the unit touches. Section 4 says where the rewrite stands and which unit is next.
-- To reorient after a compaction: read what the compact hook printed, the same orient output, whole; re-read the
-  owner's latest decisions and the rule file of the file in hand before the next edit. A claim stands on what is run
-  now, never on what is recalled.
+- To reorient after a compaction: read what the compact hook printed, the same orient output, whole, then the owner's
+  latest decisions and the rule file of the file in hand, before the next edit. A claim stands on what is run now.
 
 ## Corrections
 
@@ -194,7 +195,6 @@ none: its record names the line.
 ## Local guidance
 
 The spec is the reference for a door that is not built; the code and its XML docs are the reference for one that is.
-Rules for one kind of file live in `.claude/rules/` and load when you open such a file: `tests.md` (files under
-`tests/`), `views.md` (`.cshtml`), `csharp.md` (`.cs`), `analyzers.md` (an analyzer project and its cases) and
-`docs.md` (docs, Markdown and XML docs). A project's own `CLAUDE.md` holds its standard, its command and what it
-refuses. This file wins on conflict. `AGENTS.md` is a symlink to this file.
+Rules for one kind of file live in `.claude/rules/` and load with such a file: `tests.md` (`tests/`), `views.md`
+(`.cshtml`), `csharp.md` (`.cs`), `analyzers.md` (an analyzer project and its cases) and `docs.md` (docs). A project's
+own `CLAUDE.md` holds its standard, its command and what it refuses. This file wins. `AGENTS.md` is a symlink to it.

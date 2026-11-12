@@ -819,3 +819,6 @@ Alis.Reactive.Assets.
 A spec unit closes the loop of root CLAUDE.md's Spec-first section: re-read the step's section of `spec/BRIEF.md`,
 change it, append what was decided to `spec/NOTES.md`, commit by path, run `python3 spec/tools/check.py` at that head,
 and push the spec branch the one way section 16 of the brief allows, then `spec/STATE.json` as that run wrote it.
+A plant names the text it replaces, so a commit that rewrites a line of the spec moves the anchor of each plant that
+names it in the same commit, and the plants of the checks that read the line run before the full check (the lead's
+slips, 2026-11-11).

@@ -101,8 +101,9 @@ its own defects. A framework behavior is proven once, on the conformance library
 
 ## Review
 
-A test is reviewed blind: a reviewer given only these rules and the test opens the page and flags each
-violation with the test's name, the rule, the evidence (the quoted assertion or name) and the test it should
-be. The author fixes it or answers with evidence: a screenshot, the quoted assertion, the defect it catches.
-The domain names the stakes, not the scope: this is a UI framework, so a reviewer does not reason about
-HIPAA or PHI.
+No review is planned behind a test's writer: the test rules refuse at build what a reader used to find, and the
+planted defect proves the rest. A review that does run is blind and bounded, as root CLAUDE.md's section on forks,
+agents and reviews states it: a reviewer given only these rules and the test answers a fixed list of questions,
+each with the answer that passes, and a finding names the test, the rule, the evidence (the quoted assertion or
+name) and the test it should be. One fix, one second reading, then it ends (the owner, 2026-11-11). The domain names
+the stakes, not the scope: this is a UI framework, so a reviewer does not reason about HIPAA or PHI.
