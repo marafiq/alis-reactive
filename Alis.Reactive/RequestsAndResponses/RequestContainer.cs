@@ -1,4 +1,4 @@
-namespace Alis.Reactive.InputsAndIds;
+namespace Alis.Reactive.RequestsAndResponses;
 
 /// <summary>
 /// A request container of a view: the element whose inputs a request sends and whose summary shows that request's failures.

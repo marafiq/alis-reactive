@@ -81,8 +81,6 @@ Alis.Reactive.Elements.Element.Classes.get -> Alis.Reactive.Elements.ClassList!
 Alis.Reactive.Elements.Element.Element() -> void
 Alis.Reactive.Elements.Element.Html.get -> Alis.Reactive.Declarations.Property<string?>!
 Alis.Reactive.Elements.Element.Text.get -> Alis.Reactive.Declarations.Property<string?>!
-Alis.Reactive.InputsAndIds.RequestContainer<TModel>
-Alis.Reactive.InputsAndIds.RequestForm<TModel>
 Alis.Reactive.Plugins.Plugin
 Alis.Reactive.Plugins.Plugin.Name.get -> string!
 Alis.Reactive.Plugins.Plugin.Plugin(string! name) -> void
@@ -118,6 +116,8 @@ Alis.Reactive.RequestsAndResponses.Notice.Warning(Alis.Reactive.ValuesAndSources
 Alis.Reactive.RequestsAndResponses.Notice.Warning(string! text) -> void
 Alis.Reactive.RequestsAndResponses.PageUrl<TPage>
 Alis.Reactive.RequestsAndResponses.PageUrl<TPage>.Read<TValue>(System.Linq.Expressions.Expression<System.Func<TPage, TValue>!>! member) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>
+Alis.Reactive.RequestsAndResponses.RequestForm<TModel>
 Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>
 Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>.Body.get -> Alis.Reactive.Declarations.ReadOnly<TBody>!
 Alis.Reactive.RequestsAndResponses.Response<TRequest>
