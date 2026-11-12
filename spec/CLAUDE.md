@@ -889,6 +889,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   alone, `item => item.Name`, as every other answer sentence of the spec does (D17.12), and the lines they read
   are restated to match: the held line reads "Held: acted for One". A door that joins text is a new production
   and waits for the owner's word; nothing is built toward it. The owner can overrule the rewording.
+- The lead, 2026-11-12, on three source cells, source.PropertySet, source.WriteOnlySet and source.MethodArgument,
+  whose promises set a text without null from the component's Value, a nullable text: the compiler refuses the
+  sentence (CS8620, which D7.3 and N18.14 keep an error), and D7.3 names the cure, so each promise reads the
+  value through `IfNull("none")`. The position still receives the component's member. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

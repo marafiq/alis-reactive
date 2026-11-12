@@ -28,6 +28,8 @@ public sealed class Seed
 
     public int? ComponentCount { get; set; }
 
+    public string? ComponentRecordDetail { get; set; }
+
     public ComponentVersion? ComponentVersion { get; set; }
 
     public int? HeldMatchingItems { get; set; }
@@ -65,6 +67,8 @@ public sealed class Seed
     public static Seed TheComponentsActiveItems(int active) => new() { ComponentActiveItems = active };
 
     public static Seed TheComponentsCount(int count) => new() { ComponentCount = count };
+
+    public static Seed TheComponentsRecordDetail(string name) => new() { ComponentRecordDetail = name };
 
     public static Seed TheComponentsVersion(ComponentVersion version) => new() { ComponentVersion = version };
 

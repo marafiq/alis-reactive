@@ -2602,7 +2602,7 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Copy button whose click sets conformance.Text to conformance.Value.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Copy button whose click sets conformance.Text to conformance.Value.IfNull(\"none\"), since a text without null takes a nullable source through IfNull (D7.3).",
         "gesture": "Click the page's button.",
         "outcome": "The component's heading reads a-1.",
         "opposite": "Before the click it reads Alpha.",
@@ -2615,7 +2615,7 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Write button whose click sets conformance.WriteOnlyText to conformance.Value.",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Write button whose click sets conformance.WriteOnlyText to conformance.Value.IfNull(\"none\"), since a text without null takes a nullable source through IfNull (D7.3).",
         "gesture": "Click the page's button.",
         "outcome": "The write-only line reads Written a-1.",
         "opposite": "Before the click it reads Unwritten.",
@@ -2760,7 +2760,7 @@
       ],
       "version": "current",
       "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Log button whose click calls conformance.Log(conformance.Value).",
+        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Log button whose click calls conformance.Log(conformance.Value.IfNull(\"none\")), since a text without null takes a nullable source through IfNull (D7.3).",
         "gesture": "Click the page's button.",
         "outcome": "The component's log line reads a-1.",
         "opposite": "Before the click the log line is empty.",

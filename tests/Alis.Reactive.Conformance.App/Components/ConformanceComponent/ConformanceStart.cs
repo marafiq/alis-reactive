@@ -15,6 +15,8 @@ public sealed class ConformanceStart
 
     public int Count { get; init; }
 
+    public RecordStart Record { get; init; } = new();
+
     public decimal Amount { get; init; }
 
     public OuterStart Outer { get; init; } = new();

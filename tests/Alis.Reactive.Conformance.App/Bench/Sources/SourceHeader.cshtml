@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SourceBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<SourceBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Options = Model.Codes }))
+<p id="shown"></p>
+<button type="button" @Html.Raises(plan, SourceCells.Send)>Send</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(SourceCells.Send, pipeline => pipeline
+        .Post<NoModel>(BenchEndpoints.EchoHeader, request => request.Header("X-Code", pipeline.Component<ConformanceComponent>("conformance").Value))
+        .OnSuccess(Content.Text, (echoed, pipeline) => pipeline.Element("shown").Text.Set(echoed.Body))));
+}
+@Html.RenderPlan(plan)

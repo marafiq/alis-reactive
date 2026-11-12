@@ -19,6 +19,7 @@ internal sealed class WorldData
     private volatile int _componentOuterCount = 8;
     private volatile int _componentActiveItems = 3;
     private volatile int _componentCount = 3;
+    private volatile string? _componentRecordDetail;
     private volatile ComponentVersion _componentVersion = ComponentVersion.Current;
     private volatile int _heldMatchingItems = 1;
     private volatile bool _textRefuses;
@@ -49,6 +50,8 @@ internal sealed class WorldData
 
     internal int ComponentCount => _componentCount;
 
+    internal string? ComponentRecordDetail => _componentRecordDetail;
+
     internal ComponentVersion ComponentVersion => _componentVersion;
 
     internal int HeldMatchingItems => _heldMatchingItems;
@@ -76,6 +79,7 @@ internal sealed class WorldData
         if (seed.ComponentOuterCount is { } outerCount) _componentOuterCount = outerCount;
         if (seed.ComponentActiveItems is { } activeItems) _componentActiveItems = activeItems;
         if (seed.ComponentCount is { } count) _componentCount = count;
+        if (seed.ComponentRecordDetail is { } recordDetail) _componentRecordDetail = recordDetail;
         if (seed.ComponentVersion is { } version) _componentVersion = version;
         if (seed.HeldMatchingItems is { } heldMatchingItems) _heldMatchingItems = heldMatchingItems;
         if (seed.TextRefuses is { } textRefuses) _textRefuses = textRefuses;

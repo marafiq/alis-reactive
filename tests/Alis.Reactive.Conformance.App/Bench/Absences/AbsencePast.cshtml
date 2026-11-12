@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AbsenceBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<AbsenceBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Record = new RecordStart { DetailName = Model.RecordDetail } }))
+<p id="shown"></p>
+<button type="button" @Html.Raises(plan, AbsenceCells.Show)>Show</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AbsenceCells.Show, pipeline => pipeline.Element("shown").Text.Set(pipeline.Component<ConformanceComponent>("conformance").Record.Read(record => record.Detail.Name))));
+}
+@Html.RenderPlan(plan)
