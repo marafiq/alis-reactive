@@ -611,7 +611,7 @@
           ]
         },
         {
-          "behavior": "The render helper takes the version the component is built as, the items and records the component holds, the items, the total and the count of matching items its payload's held object holds, its Days in the live form (D7.7), an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
+          "behavior": "The render helper takes the version the component is built as, the options its list holds, the items and records the component holds, the items, the total and the count of matching items its payload's held object holds, its Days in the live form (D7.7), an item that lacks a declared member among them, and whether Current() and MaybeItem() answer an item.",
           "tests": [
             "M4.X4",
             "M4.X6",
@@ -625,7 +625,7 @@
           ]
         },
         {
-          "behavior": "Its own controls: a day field setting Day or NullableDay; a list of none, residential and nursing picked with the arrow keys and Enter, setting Value and raising change; Low, High and Hold medium setting Choice, medium a text no value of Choice is held as; Hold 129 setting Days to 129, a number no value of CareDays names; Sort and Edit first over Records; Deactivate last over Items; Paged and Clear over NullableRecords; Free and Busy setting Count to 1 and 0; Destroy; Remove the read-only text.",
+          "behavior": "Its own controls: a day field setting Day or NullableDay; a list of the options its render helper gives, none, residential and nursing on a care screen and a-1 and a-2 on the bench, a listbox named Value, picked with the arrow keys and Enter, setting Value and raising change; Low, High and Hold medium setting Choice, medium a text no value of Choice is held as; Hold 129 setting Days to 129, a number no value of CareDays names; Sort and Edit first over Records; Deactivate last over Items; Paged and Clear over NullableRecords; Free and Busy setting Count to 1 and 0; Destroy; Remove the read-only text.",
           "tests": [
             "X8.27 #0",
             "X8.27 #1",

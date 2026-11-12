@@ -11,6 +11,8 @@ public sealed class ConformanceStart
 
     public string? Value { get; init; }
 
+    public IReadOnlyList<string> Options { get; init; } = [];
+
     public int Count { get; init; }
 
     public decimal Amount { get; init; }

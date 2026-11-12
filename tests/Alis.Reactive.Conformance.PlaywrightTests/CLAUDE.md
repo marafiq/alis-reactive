@@ -37,7 +37,12 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   that an element stays empty is read after the status that shows the handler returned, and stands beside the
   opposite case that fills it (`Vendors/Bench/WhenAnEventsPayloadHoldsAPromiseWhereAValueWasDeclared.cs`). A cell that holds the settle gate
   arms it before its gesture and reads the held state before its release; its refused case runs ungated and reads
-  the status Settle first (`Vendors/Bench/WhenAStepAwaitsAComponentsMethod.cs`). The opposite case runs in a second world, seeded through a
+  the status Settle first (`Vendors/Bench/WhenAStepAwaitsAComponentsMethod.cs`). A value picked in the component
+  is two presses on its listbox named Value, the down arrow and Enter
+  (`Vendors/Bench/WhenAComponentsMemberIsSetAsAnElementsText.cs`). A request a promise states is read as it leaves the
+  page: the test waits for it around its gesture and asserts its method, the end of its address, the path and
+  query the promise states, since its origin is the host's, and its body
+  (`Vendors/Bench/WhenAGetSendsAComponentsMemberInItsQuery.cs`). The opposite case runs in a second world, seeded through a
   typed builder of the world contract where the promise changes what the component holds.
 - A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
