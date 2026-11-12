@@ -2,15 +2,90 @@
 Alis.Reactive.ArrayLambdas.DataLists
 Alis.Reactive.Conditions.Choices
 Alis.Reactive.Conditions.Comparisons
+Alis.Reactive.Declarations.Callback<TArgs, TResult>
+Alis.Reactive.Declarations.Callback<TArgs, TResult>.Set(System.Func<TArgs!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! answer) -> void
+Alis.Reactive.Declarations.Event
+Alis.Reactive.Declarations.Event<TArgs>
+Alis.Reactive.Declarations.EventListening
+Alis.Reactive.Declarations.EventedObject
+Alis.Reactive.Declarations.EventedObject.EventedObject() -> void
+Alis.Reactive.Declarations.JsObject
+Alis.Reactive.Declarations.JsObject.Argument<TValue>(int position) -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Declarations.JsObject.CallItself() -> void
+Alis.Reactive.Declarations.JsObject.CallItself(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments) -> void
+Alis.Reactive.Declarations.JsObject.CallItself<TResult>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments) -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.Callback<TArgs, TResult>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.Callback<TArgs!, TResult>!
+Alis.Reactive.Declarations.JsObject.Event(string? name = null, string! declaredBy = "") -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Declarations.JsObject.Event<TArgs>(string? name = null, string! declaredBy = "") -> Alis.Reactive.Declarations.Event<TArgs!>!
+Alis.Reactive.Declarations.JsObject.JsObject() -> void
+Alis.Reactive.Declarations.JsObject.LiveObject<TObject>(string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> TObject!
+Alis.Reactive.Declarations.JsObject.LiveObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.JsObject.Method(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, string! declaredBy = "") -> void
+Alis.Reactive.Declarations.JsObject.Method(string? name = null, bool optional = false, string! declaredBy = "") -> void
+Alis.Reactive.Declarations.JsObject.Method<TResult>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.Method<TResult>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.MethodAsync(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, string! declaredBy = "") -> void
+Alis.Reactive.Declarations.JsObject.MethodAsync(string? name = null, bool optional = false, string! declaredBy = "") -> void
+Alis.Reactive.Declarations.JsObject.MethodAsync<TResult>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.MethodAsync<TResult>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.MethodResult<TResult>!
+Alis.Reactive.Declarations.JsObject.MethodAt(int position) -> void
+Alis.Reactive.Declarations.JsObject.MethodAt(int position, System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments) -> void
+Alis.Reactive.Declarations.JsObject.Property<TValue>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.Property<TValue>!
+Alis.Reactive.Declarations.JsObject.ReadOnly<TValue>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Declarations.JsObject.ReturnedObject<TObject>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> TObject!
+Alis.Reactive.Declarations.JsObject.ReturnedObject<TObject>(string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> TObject!
+Alis.Reactive.Declarations.JsObject.ReturnedObjects<TItem>(System.Collections.Generic.IReadOnlyList<Alis.Reactive.ValuesAndSources.Arg!>! arguments, string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.JsObject.ReturnedObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, string! declaredBy = "") -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.JsObject.WriteOnly<TValue>(string? name = null, bool optional = false, string! declaredBy = "") -> Alis.Reactive.Declarations.WriteOnly<TValue>!
+Alis.Reactive.Declarations.LiveObjects<TItem>
+Alis.Reactive.Declarations.LiveObjects<TItem>.All(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Any() -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Any(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.At(int position) -> TItem!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Count() -> Alis.Reactive.ValuesAndSources.TypedSource<int>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Count(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<int>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Find(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate) -> TItem!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Find<TResult>(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! predicate, System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! field) -> Alis.Reactive.ValuesAndSources.TypedSource<TResult>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Select<TResult>(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! field) -> Alis.Reactive.ValuesAndSources.TypedSource<System.Collections.Generic.IReadOnlyList<TResult>!>!
+Alis.Reactive.Declarations.LiveObjects<TItem>.Where(System.Func<TItem!, Alis.Reactive.ValuesAndSources.TypedSource<bool>!>! keep) -> Alis.Reactive.Declarations.LiveObjects<TItem!>!
+Alis.Reactive.Declarations.MethodResult<TResult>
+Alis.Reactive.Declarations.MethodResult<TResult>.Read<TRead>(System.Linq.Expressions.Expression<System.Func<TResult, TRead>!>! path) -> Alis.Reactive.ValuesAndSources.TypedSource<TRead>!
+Alis.Reactive.Declarations.MirrorsAttribute
+Alis.Reactive.Declarations.MirrorsAttribute.MirrorsAttribute(string! module, string! name) -> void
+Alis.Reactive.Declarations.MirrorsAttribute.Module.get -> string!
+Alis.Reactive.Declarations.MirrorsAttribute.Name.get -> string!
+Alis.Reactive.Declarations.NoPayload
+Alis.Reactive.Declarations.NoPayload.NoPayload() -> void
+Alis.Reactive.Declarations.NullableWrites
+Alis.Reactive.Declarations.Property<TValue>
+Alis.Reactive.Declarations.Property<TValue>.Set(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+Alis.Reactive.Declarations.Property<TValue>.Set(TValue value) -> void
+Alis.Reactive.Declarations.ReadOnly<TValue>
+Alis.Reactive.Declarations.ReadOnly<TValue>.Read<TResult>(System.Linq.Expressions.Expression<System.Func<TValue, TResult>!>! path) -> Alis.Reactive.ValuesAndSources.TypedSource<TResult>!
 Alis.Reactive.Declarations.TypedDslExemptionAttribute
 Alis.Reactive.Declarations.TypedDslExemptionAttribute.Reason.get -> string!
 Alis.Reactive.Declarations.TypedDslExemptionAttribute.TypedDslExemptionAttribute(string! reason) -> void
+Alis.Reactive.Declarations.WriteOnly<TValue>
+Alis.Reactive.Declarations.WriteOnly<TValue>.Set(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+Alis.Reactive.Declarations.WriteOnly<TValue>.Set(TValue value) -> void
+Alis.Reactive.Plugins.Plugin
+Alis.Reactive.Plugins.Plugin.Name.get -> string!
+Alis.Reactive.Plugins.Plugin.Plugin(string! name) -> void
+Alis.Reactive.Plugins.Plugin.Plugin(string! name, Alis.Reactive.Declarations.EventListening! events) -> void
 Alis.Reactive.ValuesAndSources.Arg
 Alis.Reactive.ValuesAndSources.Arg<T>
 Alis.Reactive.ValuesAndSources.ITypedSource<T>
 Alis.Reactive.ValuesAndSources.NullableReferences
 Alis.Reactive.ValuesAndSources.NullableValues
 Alis.Reactive.ValuesAndSources.TypedSource<T>
+Alis.Reactive.Vendors.Component
+Alis.Reactive.Vendors.Component.Component() -> void
+Alis.Reactive.Vendors.ComponentVendor
+Alis.Reactive.Vendors.ComponentVendor.Name.get -> string!
+Alis.Reactive.Vendors.VendorLookup
+abstract Alis.Reactive.Declarations.EventedObject.Listening.get -> Alis.Reactive.Declarations.EventListening!
+abstract Alis.Reactive.Vendors.Component.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+override sealed Alis.Reactive.Vendors.Component.Listening.get -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.ArrayLambdas.DataLists.All(this Alis.Reactive.ValuesAndSources.ITypedSource<string!>! text, System.Linq.Expressions.Expression<System.Func<char, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.ArrayLambdas.DataLists.All<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.ArrayLambdas.DataLists.Any(this Alis.Reactive.ValuesAndSources.ITypedSource<string!>! text) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
@@ -72,7 +147,24 @@ static Alis.Reactive.Conditions.Comparisons.Not(this Alis.Reactive.ValuesAndSour
 static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.Comparisons.Or(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! left, Alis.Reactive.ValuesAndSources.TypedSource<bool>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Declarations.EventListening.CallbackProperties.get -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.Declarations.EventListening.EventTarget.get -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.Declarations.EventListening.Methods(string! subscribe, string! unsubscribe) -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.Declarations.EventListening.ReturnedUnsubscriber(string! subscribe) -> Alis.Reactive.Declarations.EventListening!
+static Alis.Reactive.Declarations.JsObject.Answer<TArgs, TResult>(System.Func<TArgs!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! answer) -> Alis.Reactive.ValuesAndSources.Arg!
+static Alis.Reactive.Declarations.JsObject.Fixed<TValue>(TValue value) -> Alis.Reactive.ValuesAndSources.Arg!
+static Alis.Reactive.Declarations.JsObject.Pass<TDeclared, TSource>(Alis.Reactive.ValuesAndSources.TypedSource<TSource>! value) -> Alis.Reactive.ValuesAndSources.Arg!
+static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.Property<TValue?>! property, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(Alis.Reactive.ValuesAndSources.TypedSource<T>! source) -> Alis.Reactive.ValuesAndSources.Arg<T>!
 static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(T value) -> Alis.Reactive.ValuesAndSources.Arg<T>!
 static Alis.Reactive.ValuesAndSources.NullableReferences.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue!>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
 static Alis.Reactive.ValuesAndSources.NullableValues.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
+static Alis.Reactive.Vendors.ComponentVendor.Define(string! name, Alis.Reactive.Vendors.VendorLookup! lookup, string! subscribe, string! unsubscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.Define(string! name, string! objectPath, string! subscribe, string! unsubscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.DefineCallbackProperties(string! name, Alis.Reactive.Vendors.VendorLookup! lookup, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.DefineCallbackProperties(string! name, string! objectPath, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.DefineReturnedUnsubscriber(string! name, Alis.Reactive.Vendors.VendorLookup! lookup, string! subscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.DefineReturnedUnsubscriber(string! name, string! objectPath, string! subscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.ComponentVendor.Native.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Vendors.VendorLookup.ByPlugin(string! name) -> Alis.Reactive.Vendors.VendorLookup!
