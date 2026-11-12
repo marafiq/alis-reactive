@@ -36,6 +36,12 @@ public sealed class SourceCellsController : Controller
     [HttpGet(BenchPages.SourceConditionLeft)]
     public IActionResult SourceConditionLeft() => View("/Bench/Sources/SourceConditionLeft.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.SourceConditionRight)]
+    public IActionResult SourceConditionRight() => View("/Bench/Sources/SourceConditionRight.cshtml", new TypedBoard(TheWorldsBoard(), "a-1"));
+
+    [HttpGet(BenchPages.SourceTextTestOperand)]
+    public IActionResult SourceTextTestOperand() => View("/Bench/Sources/SourceTextTestOperand.cshtml", new NotedBoard(TheWorldsBoard(), "a-1: checked"));
+
     [HttpGet(BenchPages.SourceRequestMember)]
     public IActionResult SourceRequestMember() => View("/Bench/Sources/SourceRequestMember.cshtml", TheWorldsBoard());
 
@@ -52,6 +58,10 @@ public sealed class SourceCellsController : Controller
 }
 
 public sealed record SourceBoard(string Text, string Value, IReadOnlyList<string> Codes);
+
+public sealed record TypedBoard(SourceBoard Board, string Typed);
+
+public sealed record NotedBoard(SourceBoard Board, string Note);
 
 public sealed class EchoRequest
 {

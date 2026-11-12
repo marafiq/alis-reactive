@@ -7,6 +7,12 @@
       },
       "AlisReactive": {
         "type": "Project"
+      },
+      "AlisReactive.Native": {
+        "type": "Project",
+        "dependencies": {
+          "AlisReactive": "[1.0.0, )"
+        }
       }
     }
   }

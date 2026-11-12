@@ -1216,7 +1216,8 @@ Terms used throughout:
   left operand is the one position that takes no literal: it is the source the operator tests, as `p.When(source)`
   reads (D8.2), and the literal stands on the right (`Positions.ConditionLeft`, gate 2's G9). A set takes a source
   as `ITypedSource<out T>`, and so does an element's class name, `ClassList`'s `Add`, `Remove` and `Toggle` (M5.N2,
-  gate 2's G9), so a narrower reference type and a text without null reach them as they are. An element's text
+  gate 2's G9), so a narrower reference type and a text without null reach them as they are. A text test takes
+  the text it tests and its operand the same way (M3.N1). An element's text
   and HTML are the one position that takes a source of any type, `ElementContent`'s `Set` (M5.N1): what the source
   reads is shown as the string table of `spec/Core/conversions.md` writes it (D3.11, X3.8). C# converts a
   method's `Arg<T>` only from a `TypedSource<T>`: it refuses a conversion from the covariant interface (CS0552), warns

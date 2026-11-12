@@ -1,1 +1,20 @@
 #nullable enable
+Alis.Reactive.Native.NativeComponents.NativeComponent
+Alis.Reactive.Native.NativeComponents.NativeComponent.NativeComponent() -> void
+Alis.Reactive.Native.NativeComponents.NativeTextBox
+Alis.Reactive.Native.NativeComponents.NativeTextBox.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeComponents.NativeTextBox.Changed!>!
+Alis.Reactive.Native.NativeComponents.NativeTextBox.Changed
+Alis.Reactive.Native.NativeComponents.NativeTextBox.Changed.Changed() -> void
+Alis.Reactive.Native.NativeComponents.NativeTextBox.Changed.IsTrusted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Native.NativeComponents.NativeTextBox.Changed.TimeStamp.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Native.NativeComponents.NativeTextBox.Changed.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Native.NativeComponents.NativeTextBox.Focus() -> void
+Alis.Reactive.Native.NativeComponents.NativeTextBox.NativeTextBox() -> void
+Alis.Reactive.Native.NativeComponents.NativeTextBox.Value.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder
+Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder.CssClass(string! names) -> Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder!
+Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder.Placeholder(string! text) -> Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder!
+Alis.Reactive.Native.NativeComponents.NativeTextBoxHtml
+override sealed Alis.Reactive.Native.NativeComponents.NativeComponent.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Native.NativeComponents.NativeTextBoxHtml.NativeTextBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeTextBox!, TModel>!
+static Alis.Reactive.Native.NativeComponents.NativeTextBoxHtml.NativeTextBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Alis.Reactive.Native.NativeComponents.NativeTextBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeTextBox!, TModel>!

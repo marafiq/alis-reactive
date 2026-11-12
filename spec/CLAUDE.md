@@ -903,6 +903,27 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   pipeline's and returns a source of the object; its members are an `ObjectMembers<T>`, a class of
   `ValuesAndSources`, whose `Set` takes a literal or a source and returns the members, the three forms the JSON
   body's `Set` has. Its callback's parameter is the app's word for what it holds. The owner can overrule it.
+- The lead, 2026-11-12, where two more lines of the plan meet: U3 writes every screen's view, and U23 writes the
+  Native components. A view that holds a Native component does not compile without its declaration and its
+  render helper, so U3 declares each slice with the first view that holds it: the declaration member for member
+  from its line of `spec/NativeComponents/module.md` and its feature's proposed sentences, the render helper as
+  a signature that throws until U23 builds it, as a core door does. `NativeTextBox` is the first (M24.N1, M24.N9),
+  with the core's doors it stands on: `IInputComponent` and `ComponentInput.Of` (M7.N3) and the field's options,
+  `InputFieldOptions` (M7.N2), in `InputsAndIds`, placed by P1; a field's `Render<TComponent>` takes an input
+  only (M7.X2). The text box's `Type` is not declared: N18.4 sent its form to gate 2, its line writes none and
+  neither the POC nor `spec/api` compiles one, so by G13 it comes to the owner with a form before U23. The owner
+  can overrule each.
+- The lead, 2026-11-12, declaring M3.N1's text tests with the first views that call them: `Contains`,
+  `StartsWith` and `EndsWith`, each with a literal or a source (N7.3), `Matches` with a literal pattern alone
+  (D7.5), and `MinLength`, each an extension on `ITypedSource<string?>`, so a text without null is tested as it
+  is, as a set takes one (D7.3 states it). The value tests and the membership tests are declared with the first view that
+  calls each. The owner can overrule it.
+- The lead, 2026-11-12, on the cell source.MatchesPattern, whose promise read the pattern from the component:
+  D7.5 gives `Matches` a literal pattern alone and X7.4 puts a source there on the type rung, so no sentence
+  writes it. The cell is refused by the type, as the matrix's two cells ALIS032 refuses are refused at build: it
+  keeps its row of `spec/Reference/matrix.json` with D7.5 and X7.4, and holds no promise, no placement and no
+  browser test. The text `Matches` tests is a condition's left operand, which source.ConditionLeft proves. The
+  bench places ninety-eight cells. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

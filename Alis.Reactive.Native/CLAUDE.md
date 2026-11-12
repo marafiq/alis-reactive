@@ -16,6 +16,13 @@ no other consumer.
 - A slice's tests prove only what its declaration adds: its members' names and shapes, its browser facts and its
   own defects.
 - A file compiles for both hosts or for one, by the core's rule (`Alis.Reactive/CLAUDE.md`).
+- U3 declares a slice with the first view that holds its component, and U23 builds it: the declaration is written
+  member for member from its line of `spec/NativeComponents/module.md`, and its render helper throws
+  `NotImplementedException` until then (`spec/CLAUDE.md`, the lead's line of 2026-11-12). The text box is the
+  first: its declaration is `NativeComponents/NativeTextBox/NativeTextBox.cs`, and its render helpers with their
+  builder are `NativeComponents/NativeTextBox/NativeTextBoxHtml.cs`. A file's namespace is its first folder's, so
+  every slice is in the namespace of `NativeComponents/`, whose own file is the base the slices share,
+  `NativeComponents/NativeComponent.cs`.
 
 ## Commands
 

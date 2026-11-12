@@ -956,12 +956,16 @@ app's pages lists it apart.
 The app event family is declared, M1.N2 to M1.N5 with the data a handler reads (N5.6), doors `spec/api` compiles
 no sentence with, and the bench's first cell, prop.scalar.read, stands on them with its test red.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
-named by two declarations. Of the bench, eighty-five cells stand, each test red: nine of its properties, nine of
-its methods, thirty-six of its events, thirty of them the cells of event.poc15, eleven of its sources, its three
-absences, fifteen of its requests and two of its lanes, a slot loaded on start and a slot's listener gone at its
-unload. The sixteenth, http.beside.hidden, sends a form's inputs, and the core
-declares no door for a view's form (N14.3). Four source cells wait: three hold a NativeTextBox and two of those a
-text test the core does not declare, and one calls a hub (N21.1). `pipeline.Object<T>` is declared (N7.1). An element's text and HTML are an `ElementContent`, whose `Set` takes a source
+named by two declarations. Of the bench's ninety-eight placed cells, eighty-seven stand, each test red: nine of
+its properties, nine of its methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen
+of its sources, its three absences, fifteen of its requests and two of its lanes, a slot loaded on start and a
+slot's listener gone at its unload. The sixteenth request cell, http.beside.hidden, sends a form's inputs, and the
+core declares no door for a view's form (N14.3). One source cell waits: it calls a hub (N21.1).
+source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so a source at its pattern is refused
+by the type (D7.5, X7.4). `NativeTextBox` is declared in `Alis.Reactive.Native`, the first Native slice (M24.N1,
+M24.N9), its render helper a signature until U23, on the core's `IInputComponent`, `ComponentInput` and the
+field's options (M7.N3, M7.N2), which enter the core's table as `InputsAndIds`; the text tests are declared
+(M3.N1, N7.3). `pipeline.Object<T>` is declared (N7.1). An element's text and HTML are an `ElementContent`, whose `Set` takes a source
 of any type (M5.N1, D7.3), and a world names the version its component is built as. The app's settle, count and item
 endpoints stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its
 action where a test holds one action at two endpoints, and the harness's test of it is green and fails on each of

@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NotedBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<NotedBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Board.Text, Value = Model.Board.Value, Options = Model.Board.Codes }))
+@(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+<p id="shown"></p>
+<button type="button" @Html.Raises(plan, SourceCells.Check)>Check</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(SourceCells.Check, pipeline => pipeline.When(pipeline.Input(m => m.Note).Component<NativeTextBox>().Value.StartsWith(pipeline.Component<ConformanceComponent>("conformance").Value))
+        .Then(pipeline => pipeline.Element("shown").Text.Set("Note matches"))
+        .Else(pipeline => pipeline.Element("shown").Text.Set("No match"))));
+}
+@Html.RenderPlan(plan)

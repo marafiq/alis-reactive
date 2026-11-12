@@ -175,7 +175,8 @@
         "type": "Project",
         "dependencies": {
           "Alis.Reactive.Conformance.World": "[1.0.0, )",
-          "AlisReactive": "[1.0.0, )"
+          "AlisReactive": "[1.0.0, )",
+          "AlisReactive.Native": "[1.0.0, )"
         }
       },
       "alis.reactive.conformance.world": {
@@ -189,6 +190,12 @@
       },
       "AlisReactive": {
         "type": "Project"
+      },
+      "AlisReactive.Native": {
+        "type": "Project",
+        "dependencies": {
+          "AlisReactive": "[1.0.0, )"
+        }
       },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "CentralTransitive",

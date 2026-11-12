@@ -2705,13 +2705,7 @@
         "ConformanceComponent.value"
       ],
       "version": "current",
-      "promise": {
-        "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value ^a-[0-9]$, with an element shown, a NativeTextBox code holding a-1, and a Check button whose click sets shown's text to Valid when the code matches conformance.Value, else Invalid, through M3.N1's Matches.",
-        "gesture": "Click the page's button.",
-        "outcome": "shown reads Valid.",
-        "opposite": "With x-1 in the box the same click shows Invalid.",
-        "defect": "The component's member read at Positions.MatchesPattern reads its name instead of its value, so every click shows Invalid."
-      }
+      "door": "ConformanceComponent.value"
     },
     "source.RequestMember": {
       "members": [

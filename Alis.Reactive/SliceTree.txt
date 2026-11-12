@@ -7,7 +7,7 @@ Conditions
 ArrayLambdas
 Declarations
 Vendors Plugins
-Elements
+Elements InputsAndIds
 Validation
 RequestsAndResponses
 TriggersAndPipelines

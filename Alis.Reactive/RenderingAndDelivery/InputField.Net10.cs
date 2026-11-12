@@ -1,6 +1,7 @@
 #if NET10_0_OR_GREATER
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.InputsAndIds;
 using Alis.Reactive.Vendors;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,6 +20,15 @@ public static class InputFields
     /// <returns>The input field.</returns>
     public static InputField<TModel, TValue> InputField<TModel, TValue>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, Expression<Func<TModel, TValue>> member)
         => throw new NotImplementedException();
+
+    /// <summary>Binds an input to a member of the view's model and says what the field renders around it.</summary>
+    /// <param name="html">The view's HTML helper.</param>
+    /// <param name="plan">The view's plan.</param>
+    /// <param name="member">The member the input binds, as a member path.</param>
+    /// <param name="options">The field's label and required marker, or its hidden form.</param>
+    /// <returns>The input field.</returns>
+    public static InputField<TModel, TValue> InputField<TModel, TValue>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, Expression<Func<TModel, TValue>> member, Action<InputFieldOptions> options)
+        => throw new NotImplementedException();
 }
 
 public sealed partial class InputField<TModel, TValue>
@@ -28,10 +38,10 @@ public sealed partial class InputField<TModel, TValue>
 
     /// <summary>Renders the input's element under the field's id and declares its component on it.</summary>
     /// <param name="html">The element's markup.</param>
-    /// <typeparam name="TComponent">The component's declaration.</typeparam>
+    /// <typeparam name="TComponent">The component's declaration, an input.</typeparam>
     /// <returns>The rendered component, which writes its markup where the view puts it.</returns>
     public Rendered<TComponent, TModel> Render<TComponent>(IHtmlContent html)
-        where TComponent : Component, new()
+        where TComponent : Component, IInputComponent, new()
         => throw new NotImplementedException();
 }
 #endif

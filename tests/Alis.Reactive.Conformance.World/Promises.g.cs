@@ -1003,7 +1003,6 @@ public static class Promises
         public const string source_ConditionLeft = "cell source.ConditionLeft";
         public const string source_ConditionRight = "cell source.ConditionRight";
         public const string source_TextTestOperand = "cell source.TextTestOperand";
-        public const string source_MatchesPattern = "cell source.MatchesPattern";
         public const string source_RequestMember = "cell source.RequestMember";
         public const string source_Header = "cell source.Header";
         public const string source_DispatchPayloadMember = "cell source.DispatchPayloadMember";

@@ -2,6 +2,7 @@
 Alis.Reactive.ArrayLambdas.DataLists
 Alis.Reactive.Conditions.Choices
 Alis.Reactive.Conditions.Comparisons
+Alis.Reactive.Conditions.TextTests
 Alis.Reactive.Declarations.Callback<TArgs, TResult>
 Alis.Reactive.Declarations.Callback<TArgs, TResult>.Set(System.Func<TArgs!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! answer) -> void
 Alis.Reactive.Declarations.Data<T>
@@ -88,6 +89,13 @@ Alis.Reactive.Elements.Element.Text.get -> Alis.Reactive.Elements.ElementContent
 Alis.Reactive.Elements.ElementContent
 Alis.Reactive.Elements.ElementContent.Set(string? text) -> void
 Alis.Reactive.Elements.ElementContent.Set<TValue>(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+Alis.Reactive.InputsAndIds.ComponentInput
+Alis.Reactive.InputsAndIds.IInputComponent
+Alis.Reactive.InputsAndIds.IInputComponent.Input.get -> Alis.Reactive.InputsAndIds.ComponentInput!
+Alis.Reactive.InputsAndIds.InputFieldOptions
+Alis.Reactive.InputsAndIds.InputFieldOptions.Hidden() -> Alis.Reactive.InputsAndIds.InputFieldOptions!
+Alis.Reactive.InputsAndIds.InputFieldOptions.Label(string! text) -> Alis.Reactive.InputsAndIds.InputFieldOptions!
+Alis.Reactive.InputsAndIds.InputFieldOptions.Required() -> Alis.Reactive.InputsAndIds.InputFieldOptions!
 Alis.Reactive.Plugins.Plugin
 Alis.Reactive.Plugins.Plugin.Name.get -> string!
 Alis.Reactive.Plugins.Plugin.Plugin(string! name) -> void
@@ -364,6 +372,7 @@ Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Head(string! url) -> Alis.Re
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Head<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Input<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Listen<TObject, TArgs>(TObject! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> void
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Object<T>(System.Action<Alis.Reactive.ValuesAndSources.ObjectMembers<T>!>! members) -> Alis.Reactive.ValuesAndSources.TypedSource<T>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Options(string! url) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Options<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.PageUrl<TPage>() -> Alis.Reactive.RequestsAndResponses.PageUrl<TPage>!
@@ -495,6 +504,10 @@ Alis.Reactive.ValuesAndSources.Arg<T>
 Alis.Reactive.ValuesAndSources.ITypedSource<T>
 Alis.Reactive.ValuesAndSources.NullableReferences
 Alis.Reactive.ValuesAndSources.NullableValues
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, TValue value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
 Alis.Reactive.ValuesAndSources.TypedSource<T>
 Alis.Reactive.Vendors.Component
 Alis.Reactive.Vendors.Component.Component() -> void
@@ -566,6 +579,15 @@ static Alis.Reactive.Conditions.Comparisons.Not(this Alis.Reactive.ValuesAndSour
 static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.Comparisons.Or(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! left, Alis.Reactive.ValuesAndSources.TypedSource<bool>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.Contains(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.Contains(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.EndsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.EndsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.Matches(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! pattern) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.MinLength(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<int>! length) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.MinLength(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, int length) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.StartsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.TextTests.StartsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Declarations.EventListening.CallbackProperties.get -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.Declarations.EventListening.EventTarget.get -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.Declarations.EventListening.Methods(string! subscribe, string! unsubscribe) -> Alis.Reactive.Declarations.EventListening!
@@ -576,7 +598,9 @@ static Alis.Reactive.Declarations.JsObject.Fixed<TValue>(TValue value) -> Alis.R
 static Alis.Reactive.Declarations.JsObject.Pass<TDeclared, TSource>(Alis.Reactive.ValuesAndSources.TypedSource<TSource>! value) -> Alis.Reactive.ValuesAndSources.Arg!
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.Property<TValue?>! property, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+static Alis.Reactive.InputsAndIds.ComponentInput.Of<TValue, TArgs>(Alis.Reactive.Declarations.ReadOnly<TValue>! value, Alis.Reactive.Declarations.Event<TArgs!>! committedBy) -> Alis.Reactive.InputsAndIds.ComponentInput!
 static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
+static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member, System.Action<Alis.Reactive.InputsAndIds.InputFieldOptions!>! options) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
 static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this System.Web.Mvc.HtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member, string! viewName) -> System.Web.Mvc.MvcHtmlString!
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.On<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Action<Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!>! trigger) -> void
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.Raises<TModel, TPayload>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, TPayload payload) -> System.Web.IHtmlString!
@@ -655,8 +679,3 @@ static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Redirect -> Al
 static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Status -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
 static readonly Alis.Reactive.TriggersAndPipelines.AntiforgeryIn.FormField -> Alis.Reactive.TriggersAndPipelines.AntiforgeryIn!
 static readonly Alis.Reactive.TriggersAndPipelines.AntiforgeryIn.Header -> Alis.Reactive.TriggersAndPipelines.AntiforgeryIn!
-Alis.Reactive.ValuesAndSources.ObjectMembers<T>
-Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
-Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, TValue value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
-Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
-Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Object<T>(System.Action<Alis.Reactive.ValuesAndSources.ObjectMembers<T>!>! members) -> Alis.Reactive.ValuesAndSources.TypedSource<T>!

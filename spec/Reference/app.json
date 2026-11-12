@@ -844,7 +844,7 @@
         {
           "id": "benchInputs",
           "kind": "nativeSlice",
-          "role": "the NativeTextBox inputs the bench reads as sources: typed, note, code and unit-name",
+          "role": "the NativeTextBox inputs the bench reads as sources: typed, note and unit-name",
           "module": "NativeComponents"
         },
         {
@@ -9789,20 +9789,6 @@
     },
     {
       "cell": "source.TextTestOperand",
-      "screen": "bench",
-      "hosts": [
-        "net10"
-      ],
-      "parts": [
-        "conformance",
-        "benchInputs"
-      ],
-      "harness": [
-        "seed"
-      ]
-    },
-    {
-      "cell": "source.MatchesPattern",
       "screen": "bench",
       "hosts": [
         "net10"

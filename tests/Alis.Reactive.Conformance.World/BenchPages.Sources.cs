@@ -8,6 +8,8 @@ public static partial class BenchPages
     public const string SourceElementHtml = Area + "source.ElementHtml";
     public const string SourceElementClass = Area + "source.ElementClass";
     public const string SourceConditionLeft = Area + "source.ConditionLeft";
+    public const string SourceConditionRight = Area + "source.ConditionRight";
+    public const string SourceTextTestOperand = Area + "source.TextTestOperand";
     public const string SourceRequestMember = Area + "source.RequestMember";
     public const string SourceHeader = Area + "source.Header";
     public const string SourceDispatchPayloadMember = Area + "source.DispatchPayloadMember";

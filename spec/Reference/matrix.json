@@ -1403,15 +1403,17 @@
     {
       "id": "source.MatchesPattern",
       "group": "source",
-      "cell": "the component's member as the source at `Positions.MatchesPattern`",
+      "cell": "the component's member as the source at `Positions.MatchesPattern`, refused by the type: `Matches` takes a literal pattern only",
       "meaning": [
         "D7.1",
-        "D7.2"
+        "D7.2",
+        "D7.5",
+        "X7.4"
       ],
       "kinds": [
         "get"
       ],
-      "outcome": "runs",
+      "outcome": "refused",
       "position": "MatchesPattern",
       "gap": "M3.N1"
     },
