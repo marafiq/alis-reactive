@@ -962,7 +962,8 @@ each test red, four forks' work read at the source and landed: ten of module 4's
 response body of the page's own endpoint. Of the refusal promises placed under net10, eight wait: four need a
 host that sets JSON options or a request culture (X6.12, X6.28, X6.36 and X8.22's first promise), and four a
 Native input, a drop-down or a number box (X7.11 twice, X1.4, X9.20). Ten more are placed under hosts the
-harness does not hold yet. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
+harness does not hold yet. The first care page stands, the residents screen's census (X6.5), its test red: a
+promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a refusal's is. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
 its properties, nine of its methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen
 of its sources, its three absences, its sixteen requests and two of its lanes, a slot loaded on start and a
 slot's listener gone at its unload. The sixteenth request cell, http.beside.hidden, sends a form's inputs: a

@@ -1,0 +1,30 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Census
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Census";
+    var plan = Html.ReactivePlan<Census>();
+    var ward = Model.Ward;
+}
+<h1>Census of the @Model.Ward ward</h1>
+<dl>
+    <dt>Residents of this ward</dt>
+    <dd id="ward-count"></dd>
+    <dt>Residents on this ward's round</dt>
+    <dd id="round-count"></dd>
+    <dt>Residents of the East ward</dt>
+    <dd id="east-count"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ResidentsEndpoints.CensusResidents)
+        .OnSuccess<List<CensusResident>>((residents, pipeline) =>
+        {
+            pipeline.Element("ward-count").Text.Set(residents.Body.Count(r => r.Ward == Model.Ward));
+            pipeline.Element("round-count").Text.Set(residents.Body.Count(r => r.Ward == ward));
+            pipeline.Element("east-count").Text.Set(residents.Body.Count(r => r.Ward == "East"));
+        })));
+}
+@Html.RenderPlan(plan)

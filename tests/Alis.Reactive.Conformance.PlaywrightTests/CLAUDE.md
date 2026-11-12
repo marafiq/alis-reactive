@@ -48,6 +48,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   query the promise states, since its origin is the host's, and its body
   (`Vendors/Bench/WhenAGetSendsAComponentsMemberInItsQuery.cs`). The opposite case runs in a second world, seeded through a
   typed builder of the world contract where the promise changes what the component holds.
+- A care screen's test sits in its module's folder under the screen it runs on, and reads its page by its
+  address of `CarePages` in the world contract: `ArrayLambdas/Residents/WhenALambdaComparesWithAValueTheViewHolds.cs`
+  is the pattern, the page of the opposite case opened in a second world.
 - A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
   alone and a module's tests sit in the module's.

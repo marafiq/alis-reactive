@@ -42,6 +42,13 @@ its views.
   page of its opposite case, one view where only the data differs. An endpoint a page alone names is a constant
   beside its controller (`Refusals/ArrayLambdas/ArrayLambdaEndpoints.cs`); one a test names is a constant of
   `RefusalEndpoints` in the world contract.
+- `Care/` holds the care screens, a folder for each screen of `spec/Reference/app.json` (`Care/Residents/` the
+  first): a promise placed on a screen is a page of its own there, as a refusal's is, with its controller, its
+  models and its view, named for what a person does on it (`Care/Residents/CensusController.cs`,
+  `Care/Residents/Census.cshtml`). Where the promise changes what the page or its server holds, the opposite
+  case is a second address of the same view; a seed is for what a test changes while its page is open. A list a
+  page reads is a response body of the page's own endpoint, named beside its controller
+  (`Care/Residents/ResidentsEndpoints.cs`) unless a test names it.
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.
