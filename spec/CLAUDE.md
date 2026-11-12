@@ -833,6 +833,22 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   link a page holds, and a route no page links to is refused as unopened. A page of the refusals area that
   answers 500 with an `InvalidOperationException` is refused by design, and the same answer on any other page is
   a problem. The sweep's own host hears what a page threw; nothing of the app changes. The owner can overrule each.
+- The owner, 2026-11-12 (verbatim in `spec/NOTES.md`), after the lead had put ALIS041's reach on MVC 5 to the owner
+  three times: "I think it's a non-issue at this point", "I am not understanding why you are fussing over it. The
+  MVC5 is compiled the way the documentation says." On MVC 5 ASP.NET compiles a view where it first renders, so no
+  analyzer reads it at build. A view there that never renders its plan shows a page whose handlers do nothing, the
+  first time its developer opens it, as on both older lines today; README says so with the net48 delivery, and it
+  is no work of the rewrite. The lead's rule from it: a limit that shows itself the first time a developer opens
+  the page, and that both older lines share, is stated once, in the notes and in the unit that documents it, and
+  is no item for the owner.
+- The lead, 2026-11-12, on the clause REWRITE 2.5 had U3 add to the bindings check, a view's module namespaces held
+  to its test's feature and parts: it is left out. As worded it refuses the view of 430 of the 452 placed tests,
+  since every view that opens a plan names the two namespaces P2 and P3 fill with every module's doors, and
+  app.json names no view for a test, so it reads a screen and one test's part clears every view. A test landed
+  before a door its page calls fails its unit's run, since a door that is not built throws, and the cure is a part
+  in its placement. It was put to the owner as one line and not taken up, and it is no principle, closed rule or
+  scope: a guard no view needs yet. The exact form, a page named by each placement and a reader of the doors each
+  view calls, is a new check and waits for the owner's yes. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -325,10 +325,11 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   edit, and a spec that moved without its constants, are both refused. TEST012 fails the build of a test that names
   no test of the spec, of two tests on one constant, of a test that never arms a gate its held steps name and, once
   every test is written, of a project that leaves a test of the spec unwritten (2.10). The harness releases a gate
-  only through the held gate its wait returns, and its teardown fails a gate still parked. From U3 on the check
-  also fails when a screen's view uses a module namespace that neither its test's feature nor a part the test lists
-  belongs to, since check.py lands each test in the latest unit of those modules: no view exists before U3, so U3
-  lands that clause with the first one, with its refused and its accepted plant.
+  only through the held gate its wait returns, and its teardown fails a gate still parked. The check reads no
+  view. A clause that held a view's module namespaces to its test's feature and parts stood here and is left out
+  (the lead, 2026-11-12, `spec/CLAUDE.md`): every view that opens a plan names the two namespaces that hold every
+  module's doors (2.2's P2 and P3), and app.json names no view for a test. A test landed before a door its page
+  calls fails its unit's run, and its placement then lists the part that needs it.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
   host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
   "Now listening on:" line; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
@@ -944,8 +945,7 @@ MVC action is opened at its route, a route's parameter takes the value a link gi
 area that refuses is accepted as refused by design, and a page whose door is not built is listed apart from a
 problem until U27.
 Open of it, in order: every screen's view; every browser test, failing; the Playwright project's switch. The
-bindings check's view clause is not built: it waits for the owner's word on what it reads (`spec/NOTES.md`,
-2026-11-12).
+bindings check takes no view clause (section 2.5).
 The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
@@ -983,8 +983,7 @@ its promise, failing. The module tests land here with their first tests, the sch
 (N18.15), with a load trigger (M1.N1) whose pipeline, one
 run of one block, sets an element's text (M5.N5, M5.N1), compiled for both hosts. The lint's two rules that read a
 path of the runtime land here, each with its refused and accepted file (section 2.7), and so do the core's banned
-symbols with WhenTheCoreIsCompiled, before the core's first code that reads a type. The bindings check gains its
-view clause with the first screen's view (section 2.5). WhenAnAppRendersItsPages, which U2 lands over the World
+symbols with WhenTheCoreIsCompiled, before the core's first code that reads a type. WhenAnAppRendersItsPages, which U2 lands over the World
 area's three addresses, meets its next cases here and states each with a refused and an accepted case: every plan a
 page renders read against `plan.schema.json` (JsonSchema.Net, 2.7), the address of an MVC action, the value of a
 route's parameter, which the sweep refuses as unopened until then, and the refusal routes, whose pages refuse by

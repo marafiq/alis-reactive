@@ -30,12 +30,13 @@ them, each marked as the lead's slip, and are not copied here.
 | A list a tool keeps was not read before the change that moves it | 2 | The tool, each time before the push: `WhenARuleNamesTheCode` for a listed exception, the hedges check for a hedge word. Since its second entry the tool runs sooner: a commit that edits the spec's prose runs `python3 spec/tools/check.py --check hedges` before its gate, and quotes its line. |
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
 | A claim of absence made from a search that did not cover the tree | 2 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. Since its second entry the step names what is searched for: an absence of a meaning in the spec is stated only after the page and the feature file of the module that owns the subject are read for that meaning, and the statement names both; a search for a name another line gave the thing proves nothing of the meaning. No tool reads a claim of absence, so the class stays on this rung. |
-| A rule the handoff states was not applied | 10 | A rule line: the handoff's own, scratch work runs in a subshell. Since its second entry, whose rule a rule file states, a step a command shows: a commit that edits a rule file runs `WhenARuleNamesTheCode` alone before its gate, as one that edits the spec's prose runs the hedges check. Since its tenth entry, whose cause its ninth had met the same day, a step a script shows for a sweep: the commit's message is written by a script that reads the sweep's log and stops on a plant that did not build, so a sweep is quoted only whole. |
+| A rule the handoff states was not applied | 11 | A rule line: the handoff's own, scratch work runs in a subshell. Since its second entry, whose rule a rule file states, a step a command shows: a commit that edits a rule file runs `WhenARuleNamesTheCode` alone before its gate, as one that edits the spec's prose runs the hedges check. Since its tenth entry, whose cause its ninth had met the same day, a step a script shows for a sweep: the commit's message is written by a script that reads the sweep's log and stops on a plant that did not build, so a sweep is quoted only whole. |
 | An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts the count of that text. |
 | A command written in another shell's syntax: the session's shell is zsh | 3 | Since its second entry, a step a command shows: an exit code is printed by `echo "exit $?"` written straight after its command, with no pipe between, and a search of the tree is `git grep`; the handoff's rules state both. Every result a commit rests on is printed by a script that runs under bash by its first line. Before that, the shell, which refuses an unmatched pattern. |
 | A rule written before its cases were listed | 2 | A rule line: `Alis.Reactive.Assets/CLAUDE.md`, a rule's refused and accepted cases are listed, one fact each, before the rule is written. Since its second entry, whose rule was the harness's, a step a commit shows: a change to the harness runs one test outside `Harness/` before its commit, and the commit quotes that run's line. |
 | A number written from an earlier run, not from the command that proves it | 5 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Since its third, the step covers a commit message and a handoff too. Since its fourth, it covers a path outside the repository: the session's folders are written once, in an environment file every command reads, which refuses to load when a folder it names is missing. Since its fifth, it covers a status to the owner: a count in a message is pasted from the output of a command run in that turn. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
 | A script read a session folder from its environment, which holds none | 1 | A rule line: the handoff's Tools section, a script takes the session's folders as its arguments, since the environment file sets them for the shell alone. |
+| A limit put to the owner at more weight than the facts in hand give it | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12, a limit that shows itself the first time a developer opens the page and that both older lines share is stated once and is no item for the owner. |
 
 ## Waiting for the owner
 
@@ -221,3 +222,17 @@ them, each marked as the lead's slip, and are not copied here.
   dropped the one use of a helper. Caught by the sweep, which printed that the plant did not build. Cost: the
   sweep run a second time. The cause met twice in a day, so the class moved up a rung for a sweep, to the step
   the table states.
+- 2026-11-12, a rule the handoff states was not applied, the class's eleventh entry, and the third mistake to
+  reach the owner. Its rule is root CLAUDE.md's loop, step 3: a decision on a principle, a closed rule or the
+  scope goes to the owner as one line with its cost and its risk, and no other does. A status listed five items
+  under decisions for the owner; one was the owner's, the bindings check's view clause, and four were the lead's
+  own, already made. Caught by the owner, who asked what decision was needed. Cost: one message the owner could
+  not act on, and a question back. Held from this entry on by a step a status shows: it asks only what step 3
+  names, one line with one recommendation, and states what the lead decided as decided.
+- 2026-11-12, a limit put to the owner at more weight than the facts in hand give it, a new class, and the fourth
+  mistake to reach the owner. ALIS041 reads no MVC 5 view, since ASP.NET compiles one where it first renders. The
+  lead put that to the owner three times, once as a decision and once as a fact it lacked, and proposed a probe.
+  The lead held, each time, that the page shows dead handlers the first time its developer opens it and that
+  both older lines behave so. Caught by the owner: "I am not understanding why you are fussing over it." Cost:
+  three messages of the owner's and a reversal, logged in the lead's flip log. Held by the rule line the table
+  states.
