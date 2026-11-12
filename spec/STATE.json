@@ -1469,9 +1469,10 @@
         "proposed": 51,
         "removed": 1,
         "several_handlers_today": 11,
-        "today": 33
+        "today": 33,
+        "written": 51
       },
-      "detail": "grammar, plan.schema.json and schema.md agree on today's 33; proposed 51 equals Schema.tla's node set, one handler each; diff +answer,clock,data,each,file,held,listen,living,nothing,off,on,request,returned,signal,start,stop,stream,unbound,zone -try; 11 kinds have two handlers today",
+      "detail": "grammar, plan.schema.json and schema.md agree on today's 33; proposed 51 equals Schema.tla's node set, one handler each; diff +answer,clock,data,each,file,held,listen,living,nothing,off,on,request,returned,signal,start,stop,stream,unbound,zone -try; 11 kinds have two handlers today; the rewrite's grammar writes 51 of the proposed set and no other",
       "pass": true
     },
     "main_delta": {
@@ -1560,23 +1561,23 @@
     },
     "paths": {
       "counts": {
-        "paths": 173,
+        "paths": 174,
         "problems": 0
       },
-      "detail": "each of 173 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
+      "detail": "each of 174 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
       "pass": true
     },
     "plants": {
       "counts": {
-        "caught": 244,
+        "caught": 245,
         "checks": 39,
         "failed": 0,
-        "kept": 84,
+        "kept": 85,
         "proven": 39,
         "unaccepted": 0,
         "unrefused": 0
       },
-      "detail": "244 refused plants caught and 84 accepted plants kept green; 39 of 39 checks proven both ways",
+      "detail": "245 refused plants caught and 85 accepted plants kept green; 39 of 39 checks proven both ways",
       "pass": true
     },
     "probes": {
@@ -3716,7 +3717,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "897b5376b54cc47d2f6947a80160b99a0cd8b430",
+  "read_at_head": "ccd4a369d6ea20e44480821bcdef50b731ef4afb",
   "step": {
     "failing": [],
     "name": "End of session",
