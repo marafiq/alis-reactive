@@ -1,5 +1,6 @@
 using System;
 using Alis.Reactive.Declarations;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.Vendors;
 
@@ -14,15 +15,21 @@ public sealed class ComponentVendor
 {
     private const string NamesTheVendorsOwnApi = "The object's path and its methods are named by their JavaScript names: this door describes a library's own API to the framework.";
 
-    private ComponentVendor()
+    private const string TheElement = "element";
+
+    private ComponentVendor(string name, Vendor grammar)
     {
+        Name = name;
+        Grammar = grammar;
     }
 
     /// <summary>Gets the vendor of an element that is its own object, such as a custom element, listened to as the DOM listens.</summary>
-    public static ComponentVendor Native => throw new NotImplementedException();
+    public static ComponentVendor Native { get; } = new("native", new Vendor(new FnExpression([TheElement], new RefExpression(TheElement)), VendorListening.OfAnEventTarget));
 
     /// <summary>Gets the vendor's name, by which every plan of a page names it.</summary>
-    public string Name => throw new NotImplementedException();
+    public string Name { get; }
+
+    internal Vendor Grammar { get; }
 
     /// <summary>Defines a vendor whose object is at a path from its element, with one method that adds a listener and one that removes it.</summary>
     /// <param name="name">The vendor's name, one for each library.</param>

@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Declarations;
@@ -30,13 +31,21 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 /// <typeparam name="TValue">The type the object's API gives the property, nullable where the API's is.</typeparam>
 public sealed class Property<TValue> : ReadOnly<TValue>
 {
-    internal Property()
+    private readonly JsObject _owner;
+    private readonly PathStep _member;
+    private readonly bool _content;
+
+    internal Property(JsObject owner, string member, bool content)
     {
+        _owner = owner;
+        _member = new MemberStep(member);
+        _content = content;
     }
 
     /// <summary>Sets the property to a literal when the step runs.</summary>
     /// <param name="value">The value to set, written into the plan where the view renders.</param>
-    public void Set(TValue value) => throw new NotImplementedException();
+    public void Set(TValue value)
+        => _owner.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, _content, _owner.Bound.Target, Literals.Of(value)));
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>

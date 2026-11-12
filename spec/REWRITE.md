@@ -910,16 +910,18 @@ cases, its step in `scripts/check.sh` and the generated `plan.ts` and `plan.sche
 reading the rewrite's grammar. In work: the core's sixteen rows and every door as a signature, of which
 every door `spec/api` compiles for the core is declared, in eleven rows, the plan's two doors among them
 (`Html.ReactivePlan`, `Html.RenderPlan`; D14.7 as the owner corrected it on 2026-11-12). The rows of
-`TypeKnowledge`, `Execution`, `InputsAndIds`, `Realtime` and `PartialsAndSlots` hold no door `spec/api` compiles and
-enter the table with their first file, as `PathsAndWire`, `OwnershipAndState` and `Tracing` did with the plan's
-two doors. Landed after
+`TypeKnowledge`, `InputsAndIds`, `Realtime` and `PartialsAndSlots` hold no door `spec/api` compiles and
+enter the table with their first file, as `PathsAndWire`, `OwnershipAndState`, `Tracing` and `Execution` did with
+the thin path. Landed after
 that: the runtime's first row, `Schema`, which reads a plan script's text into its plan or the error it is refused
 with (D19.10, M14.D1), with vitest, its first pure tests and its step in `scripts/check.sh`, and the lint's import
 rows, written from each slice table, with their cases; and the core's banned symbols with WhenTheCoreIsCompiled,
 whose list of the owner's type reads holds the plan's id; the module tests' project,
-`tests/Alis.Reactive.ModuleTests`, with its first tests; and the first of the thin path, the plan's two doors built
-for a plan with no handler, which a view renders as M19.D3's script with the document's every field. Open of it,
-in order: the rest of the thin path, its load trigger and element in C#, and its runtime, which brings the runtime's dispatch and its `Execution` row, with the file that finds a root's plans and the
+`tests/Alis.Reactive.ModuleTests`, with its first tests; and the thin path's C# half: the plan's two doors,
+which a view renders as M19.D3's script with the document's every field, the load trigger (M1.N1), `pipeline.Element(id)`
+(M5.N5) and a set of an element's text to a text literal (M5.N1), written by the block writer of `Execution`. What
+the sentence does not need of those declarations stays unbuilt. Open of it,
+in order: the thin path's runtime, which brings the runtime's dispatch and its `Execution` row, with the file that finds a root's plans and the
 lint's refusal of a wide query; every screen's view; every browser test, failing; the Playwright project's switch.
 The commit that lands a piece rewrites this paragraph.
 

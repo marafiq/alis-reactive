@@ -803,6 +803,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   refuses a plan rendered twice and a door that takes the plan after it rendered, the two defects the block was
   written for (M9.X1). A design line that no POC and no compiled sentence carries is a bug, raised as one with the
   search that found it, and never a form to invent.
+- The lead, 2026-11-12, building the thin path's load trigger within gate 2's G13 and the owner's decision of the
+  same day that a design line no POC and no compiled sentence carries is a bug, never a form to invent. Two lines
+  were missing. How the plan carries on load: no line stated it and the POC has no on load, so it is as the
+  redesign writes it at the State SHA, which `spec/Core/schema.md` is a diff against and changes in nothing here: a
+  handler of the event `ready` on the document plugin's object, `$document` (M1.D1 and schema.md state it now, with
+  the redesign's lines). The name of the type M1.F1's sentence hands its `trigger`: the sentence fixes the two
+  doors, `Html.On` and `DomReady`, and names no type; it is `Trigger<TModel>`, as both lines' pipeline builder is
+  `Pipeline<TModel>` in every door `spec/api` compiles. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

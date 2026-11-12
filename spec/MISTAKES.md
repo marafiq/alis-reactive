@@ -30,9 +30,9 @@ them, each marked as the lead's slip, and are not copied here.
 | A list a tool keeps was not read before the change that moves it | 2 | The tool, each time before the push: `WhenARuleNamesTheCode` for a listed exception, the hedges check for a hedge word. Since its second entry the tool runs sooner: a commit that edits the spec's prose runs `python3 spec/tools/check.py --check hedges` before its gate, and quotes its line. |
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
 | A claim of absence made from a search that did not cover the tree | 2 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. Since its second entry the step names what is searched for: an absence of a meaning in the spec is stated only after the page and the feature file of the module that owns the subject are read for that meaning, and the statement names both; a search for a name another line gave the thing proves nothing of the meaning. No tool reads a claim of absence, so the class stays on this rung. |
-| A rule the handoff states was not applied | 3 | A rule line: the handoff's own, scratch work runs in a subshell. Since its second entry, whose rule a rule file states, a step a command shows: a commit that edits a rule file runs `WhenARuleNamesTheCode` alone before its gate, as one that edits the spec's prose runs the hedges check. |
+| A rule the handoff states was not applied | 4 | A rule line: the handoff's own, scratch work runs in a subshell. Since its second entry, whose rule a rule file states, a step a command shows: a commit that edits a rule file runs `WhenARuleNamesTheCode` alone before its gate, as one that edits the spec's prose runs the hedges check. |
 | An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts the count of that text. |
-| A command written in another shell's syntax: the session's shell is zsh | 2 | Since its second entry, a step a command shows: an exit code is printed by `echo "exit $?"` written straight after its command, with no pipe between, and a search of the tree is `git grep`; the handoff's rules state both. Every result a commit rests on is printed by a script that runs under bash by its first line. Before that, the shell, which refuses an unmatched pattern. |
+| A command written in another shell's syntax: the session's shell is zsh | 3 | Since its second entry, a step a command shows: an exit code is printed by `echo "exit $?"` written straight after its command, with no pipe between, and a search of the tree is `git grep`; the handoff's rules state both. Every result a commit rests on is printed by a script that runs under bash by its first line. Before that, the shell, which refuses an unmatched pattern. |
 | A rule written before its cases were listed | 1 | A rule line: `Alis.Reactive.Assets/CLAUDE.md`, a rule's refused and accepted cases are listed, one fact each, before the rule is written. |
 | A number written from an earlier run, not from the command that proves it | 4 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Since its third, the step covers a commit message and a handoff too. Since its fourth, it covers a path outside the repository: the session's folders are written once, in an environment file every command reads, which refuses to load when a folder it names is missing. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
 
@@ -42,6 +42,10 @@ them, each marked as the lead's slip, and are not copied here.
   `spec/api`, under `spec/REWRITE.md` 2.2's map, each exception a line of the check's own table with its P number.
   It moves the first class to the tool rung for every door. Cost: one check of `spec/tools/check.py` with a refused
   and an accepted plant, about ten seconds a run; the comparison exists today as a scratch script of thirty lines.
+
+- A deny rule of `.claude/settings.json` for `grep -r` and for `grep --include`, so that a search of the tree is
+  `git grep` by the tool. The class "a command written in another shell's syntax" met its third entry on the step's
+  rung. Cost: two lines of settings, each proven live both ways.
 
 ## Entries
 
@@ -162,3 +166,13 @@ them, each marked as the lead's slip, and are not copied here.
   non-browser project runs when it is named first. A command ran the module tests through a shell variable that
   held the project's path. Caught by the tool, the deny rule of `.claude/settings.json`, which refused the
   command. Cost: one command run again with the path written out. Held by the tool.
+- 2026-11-12, a command written in another shell's syntax, the class's third entry. A search of the POC was again
+  written as `grep -rn` with an unquoted `--include` pattern, an hour after the step that names `git grep` was
+  written; zsh refused it. Caught by the shell. Cost: one search not run, its answer read from a file instead.
+  The step did not hold, so the class asks for the tool's rung, which is the owner's: the line under "Waiting for
+  the owner".
+- 2026-11-12, a rule the handoff states was not applied, the class's fourth entry, its rule `.claude/rules/docs.md`'s:
+  what a rule cites from outside the repository is no name in backticks. A decision added to `spec/CLAUDE.md` named
+  both older lines' pipeline builder by its type's name in backticks. Caught by the step the class moved to at its
+  second entry, `WhenARuleNamesTheCode` run alone before the gate. Cost: one edit, and no gate run. Held by that
+  step.

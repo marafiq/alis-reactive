@@ -44,5 +44,5 @@ public static class ElementSteps
     /// <param name="pipeline">The pipeline the step is written in.</param>
     /// <param name="id">The element's id.</param>
     /// <returns>The element.</returns>
-    public static Element Element<TModel>(this Pipeline<TModel> pipeline, string id) => throw new NotImplementedException();
+    public static Element Element<TModel>(this Pipeline<TModel> pipeline, string id) => pipeline.Component<Element>(id);
 }

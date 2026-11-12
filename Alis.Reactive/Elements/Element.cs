@@ -15,14 +15,14 @@ namespace Alis.Reactive.Elements;
 public sealed class Element : Component
 {
     /// <inheritdoc />
-    public override ComponentVendor Vendor => throw new NotImplementedException();
+    public override ComponentVendor Vendor => ComponentVendor.Native;
 
     /// <summary>Gets the element's text, <c>textContent</c>: a source of it that a step also sets.</summary>
     /// <remarks>
     /// A value that cannot be read shows nothing when it is set. A set is refused on an element a slot loads
     /// into, since it would remove what the slot loaded while that content's plan still runs.
     /// </remarks>
-    public Property<string?> Text => throw new NotImplementedException();
+    public Property<string?> Text => Content<string?>("textContent");
 
     /// <summary>Gets the element's HTML, <c>innerHTML</c>: a source of it that a step also sets.</summary>
     /// <remarks>

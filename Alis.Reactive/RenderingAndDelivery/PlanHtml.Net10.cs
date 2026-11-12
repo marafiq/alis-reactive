@@ -1,4 +1,6 @@
 #if NET10_0_OR_GREATER
+using System;
+using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -17,6 +19,14 @@ public static class PlanHtml
     /// <returns>The plan.</returns>
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
         => ViewPlans.Open<TModel>();
+
+    /// <summary>Handles a trigger in the view's plan.</summary>
+    /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>
+    /// <param name="html">The view's HTML helper.</param>
+    /// <param name="plan">The plan the view opened.</param>
+    /// <param name="trigger">Names the trigger and the pipeline it runs.</param>
+    public static void On<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, Action<Trigger<TModel>> trigger)
+        => ViewPlans.On(plan, trigger);
 
     /// <summary>Writes the view's plan into the page, as the view's last line.</summary>
     /// <remarks>

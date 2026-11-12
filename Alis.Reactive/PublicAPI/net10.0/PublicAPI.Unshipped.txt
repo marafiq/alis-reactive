@@ -454,6 +454,8 @@ Alis.Reactive.TriggersAndPipelines.RequestDefaults.ShowBusy() -> Alis.Reactive.T
 Alis.Reactive.TriggersAndPipelines.RequestDefaults.ShowValidationErrors() -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
 Alis.Reactive.TriggersAndPipelines.RequestDefaults.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
 Alis.Reactive.TriggersAndPipelines.RequestSteps
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.DomReady(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>
 Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Input<TMember, TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
 Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Input<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
@@ -558,6 +560,7 @@ static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
 static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member, string! viewName) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Html.IHtmlContent!>!
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.On<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Action<Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!>! trigger) -> void
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.ReactivePlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html) -> Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>!
 static Alis.Reactive.RenderingAndDelivery.PlanHtml.RenderPlan<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan) -> Microsoft.AspNetCore.Html.IHtmlContent!
 static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

@@ -1,8 +1,10 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Declarations;
+using Alis.Reactive.Execution;
 using Alis.Reactive.Plugins;
 using Alis.Reactive.RequestsAndResponses;
+using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 using Alis.Reactive.Vendors;
 
@@ -18,8 +20,11 @@ namespace Alis.Reactive.TriggersAndPipelines;
 /// <typeparam name="TModel">The model of the view that writes the pipeline.</typeparam>
 public sealed class Pipeline<TModel>
 {
-    internal Pipeline()
+    private readonly BlockWriter _writer;
+
+    internal Pipeline(BlockWriter writer)
     {
+        _writer = writer;
     }
 
     /// <summary>Reaches the component an element holds, to read, set, call and listen to its declared members.</summary>
@@ -28,7 +33,14 @@ public sealed class Pipeline<TModel>
     /// <returns>The component.</returns>
     public TComponent Component<TComponent>(string id)
         where TComponent : Component, new()
-        => throw new NotImplementedException();
+    {
+        var component = new TComponent();
+        var vendor = component.Vendor;
+        _writer.Content.Uses(vendor.Name, vendor.Grammar);
+        _writer.Content.Declares(id, new ElementLocator(id, vendor.Name));
+        component.Reach(new Reached(new ObjExpression(id), _writer));
+        return component;
+    }
 
     /// <summary>Reaches a plugin the page registers, to read, set, call and listen to its declared members.</summary>
     /// <typeparam name="TPlugin">The plugin's declaration.</typeparam>
