@@ -348,7 +348,9 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   when the rewrite is done; no number measured there gates a unit.
 - **Syncfusion.** Only the Fusion pool's job receives the licence key; the app registers it at startup when its host
   serves a Fusion screen, and a Fusion screen refuses to render without it. A core test also fails at run time if its
-  page requests the EJ2 script.
+  page requests the EJ2 script: the harness reads every request of a test's pages, a world's and a person's, and at
+  the test's teardown fails a test whose page asked for `ej2.min.js`, naming the address. Through U24 that is every
+  test; U25 lands, with the first test of a Fusion slice, the one way such a fixture takes the script.
 
 ### 2.6 TLA+
 
@@ -858,10 +860,10 @@ path does, and a part that lists its doors, each on a Doors line, lands with the
 
 **Where the rewrite stands.** U1 is landed. U2 is running. Landed of it: the world contract with the generated gates
 and promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
-TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget, and the two
-architecture tests over the app. Open of it: the harness's refusal of the EJ2 script, the measurements of the waits
-and of parallelism, and the CI workflows with a pool's shard. U3 is next. The commit that lands a piece rewrites
-this paragraph.
+TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget, the two
+architecture tests over the app, and the harness's refusal of the EJ2 script. Open of it: the measurements of the
+waits and of parallelism, and the CI workflows with a pool's shard. U3 is next. The commit that lands a piece
+rewrites this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1
@@ -997,7 +999,8 @@ the target a legacy layout holds by the helper the layout calls once; the same r
 ### U25. Fusion's package, its reference and templates
 Features: M21.F1, M21.F2, M22.F1, M22.F2, M22.F3
 
-FusionMultiSelect's own tests, syncfusion.json's `own`, and the templates.
+FusionMultiSelect's own tests, syncfusion.json's `own`, and the templates. The harness's refusal of the EJ2 script
+(section 2.5) gains here, with the first of those tests, the one way a Fusion slice's fixture takes that script.
 
 ### U26. The Fusion slices
 Features: M21.F3, M21.F4, M21.F5, M21.F6, M21.F7, M21.F8, M21.F9, M21.F10, M21.F11, M21.F12, M21.F13, M21.F14,

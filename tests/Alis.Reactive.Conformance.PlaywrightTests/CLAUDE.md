@@ -21,6 +21,10 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   fails the build.
 - Each test runs in a world of its own: `ConformanceFixture` opens it, and `TestWorld` seeds it through the world
   contract's typed builders. Teardown ends the world and fails a gate still parked.
+- A test whose page asks for Syncfusion's script, an address that ends in `"/ej2.min.js"`, fails at its teardown,
+  which names the address: a core test's page holds no component library, and `ConformanceFixture` reads every
+  request of a world's page and of a person's. The last command below plants that script's link on the World area's
+  pages and reads the refusal; the same plant with another script's name passes.
 - A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits
   until the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
   provokes an ordering by timing, by a stubbed network or by a control on the page.
@@ -112,4 +116,5 @@ scripts/playwright.sh --unit U2
 scripts/playwright.sh WhenTwoWorldsRun
 scripts/playwright.sh --measure --all
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
+scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace '<title>{Text(title)}</title>' --with '<title>{Text(title)}</title><script src=\"/js/ej2.min.js\"></script>'
 ```
