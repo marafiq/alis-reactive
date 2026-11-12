@@ -24,12 +24,12 @@
     },
     "bindings": {
       "counts": {
-        "constants": 573,
+        "constants": 574,
         "gates": 73,
-        "marks": 57,
+        "marks": 58,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 573 constants, 57 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 574 constants, 58 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -1536,10 +1536,10 @@
     },
     "native_behaviors": {
       "counts": {
-        "behaviors": 25,
+        "behaviors": 26,
         "problems": 0
       },
-      "detail": "25 behaviors on 9 declarations of native.json, each naming tests of the spec",
+      "detail": "26 behaviors on 9 declarations of native.json, each naming tests of the spec",
       "pass": true
     },
     "no_comments": {
@@ -3695,11 +3695,11 @@
     },
     "unit_proofs": {
       "counts": {
-        "harness_tests": 3,
+        "harness_tests": 4,
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 51m, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 14m 1a, U10 5b 16m 10a, U11 16b 22m 23a, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 27b 12m 1a, U16 13m 4a, U17 21m 9a, U18 76b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 45b 14m 1a, U22 7b 4m, U23 125b, U24 28b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 51m 1h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 14m 1a, U10 5b 16m 10a, U11 16b 22m 23a, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 27b 12m 1a, U16 13m 4a, U17 21m 9a, U18 76b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 45b 14m 1a, U22 7b 4m, U23 125b, U24 28b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -3717,7 +3717,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "01dcd94152775aa85f05673f1061dabb77f0ce5c",
+  "read_at_head": "48d6872ad6f9f72cc0fb5af8de1b4dc0953c5711",
   "step": {
     "failing": [],
     "name": "End of session",
