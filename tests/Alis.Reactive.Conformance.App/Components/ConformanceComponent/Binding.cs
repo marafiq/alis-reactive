@@ -18,6 +18,7 @@ public sealed record Binding(string Name, string Code) : BindingBase
 
     public string? Constructor { get; init; }
 
+    [JsonConverter(typeof(ConvertedSpotAsItsName))]
     public ConvertedSpot Converted { get; init; } = new();
 
     [JsonPropertyName("renamed_member")]

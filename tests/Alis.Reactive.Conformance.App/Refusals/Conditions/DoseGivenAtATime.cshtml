@@ -1,0 +1,22 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model GivenCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The round's time";
+    var plan = Html.ReactivePlan<GivenCheck>();
+    var medicine = Model.Medicine;
+    var round = Model.Round;
+}
+<h1>The round's time</h1>
+<p>@Model.Medicine: <span id="given"></span></p>
+<button type="button" @Html.Raises(plan, GivenChecks.Check)>Check the time</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(GivenChecks.Check, pipeline => pipeline.Get(ConditionEndpoints.DosesGivenAtTimes)
+        .OnSuccess<List<DoseGivenAtATime>>((doses, pipeline) => pipeline.When(doses.Body.Find(d => d.Medicine == medicine, d => d.Given).Eq(round))
+            .Then(pipeline => pipeline.Element("given").Text.Set("given with the round")))));
+}
+@Html.RenderPlan(plan)

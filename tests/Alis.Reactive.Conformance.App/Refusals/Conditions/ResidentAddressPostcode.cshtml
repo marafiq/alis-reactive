@@ -1,0 +1,22 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AddressCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The address check";
+    var plan = Html.ReactivePlan<AddressCheck>();
+    var resident = Model.Resident;
+    var postcode = Model.Address.Postcode;
+}
+<h1>The address check</h1>
+<p>@Model.Resident, @Model.Address.Street, @Model.Address.Postcode: <span id="address"></span></p>
+<button type="button" @Html.Raises(plan, AddressChecks.Check)>Check the address</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(AddressChecks.Check, pipeline => pipeline.Get(ConditionEndpoints.ResidentsAtAddresses)
+        .OnSuccess<List<ResidentAtAnAddress>>((residents, pipeline) => pipeline.When(residents.Body.Find(r => r.Name == resident, r => r.Address.Postcode).Eq(postcode))
+            .Then(pipeline => pipeline.Element("address").Text.Set("the postcode on file")))));
+}
+@Html.RenderPlan(plan)

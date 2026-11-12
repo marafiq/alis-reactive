@@ -969,6 +969,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   reaches, as both older lines have it, so RS0022 is suppressed on the typed validator's constructor with its
   reason: the first suppression in the rewrite's shipped code, which the owner approves or replaces by an open
   constructor or by no untyped base.
+- The lead, 2026-11-12, landing seven more refusal pages, a fork's work, with one correction of the conformance
+  library. X4.13 refuses a path past a member its own converter writes, "`[JsonConverter]` on the member", and D4.2
+  gives a converter on the member's type another refusal; the library carried `ConvertedSpot`'s converter on the
+  type, so X4.13's pages would have met the other message. `Binding`'s `Converted` carries the converter now, and
+  `spec/Reference/native.json` says so. The forms the fork read into stand as it wrote them: X8.22's line holds
+  no placeholder, so its message names no read; where two lists name one member, each lambda's parameter is the
+  page's word for its item ("charted.Status"); the page of X4.13's and X18.8's opposite case reads the same
+  shape from a response body of its own endpoint. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -1586,7 +1586,7 @@
     {
       "name": "ConvertedSpot",
       "kind": "data",
-      "what": "the app's C# class ConvertedSpot, whose own [JsonConverter] writes it as its Name, a text in the data (D7.7, X4.13)",
+      "what": "the app's C# class ConvertedSpot, which Binding's Converted writes through that member's own [JsonConverter], as its Name, a text in the data (D4.2, D7.7, X4.13)",
       "members": [
         {
           "js": "name",

@@ -1,0 +1,22 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StatusCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The round's statuses";
+    var plan = Html.ReactivePlan<StatusCheck>();
+    var medicine = Model.Medicine;
+}
+<h1>The round's statuses</h1>
+<p>@Model.Medicine: <span id="statuses"></span></p>
+<button type="button" @Html.Raises(plan, StatusChecks.Compare)>Compare the statuses</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(StatusChecks.Compare, pipeline => pipeline.Get(ConditionEndpoints.StatusesInOneForm)
+        .OnSuccess<StatusesInOneForm>((round, pipeline) => pipeline.When(round.Body.Read(lists => lists.Charted).Find(charted => charted.Medicine == medicine, charted => charted.Status)
+                .Eq(round.Body.Read(lists => lists.Planned).Find(planned => planned.Medicine == medicine, planned => planned.Status)))
+            .Then(pipeline => pipeline.Element("statuses").Text.Set("charted as planned")))));
+}
+@Html.RenderPlan(plan)

@@ -4,7 +4,6 @@ using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Conformance.App.Components;
 
-[JsonConverter(typeof(ConvertedSpotAsItsName))]
 public sealed class ConvertedSpot
 {
     public string Name { get; set; } = "";
