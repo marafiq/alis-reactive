@@ -1,0 +1,31 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CopayRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Copays of the round";
+    var plan = Html.ReactivePlan<CopayRound>();
+}
+<h1>Copays of the round</h1>
+<dl>
+    <dt>Doses on the round</dt>
+    <dd id="dose-count">-</dd>
+    <dt>Doses with a copay of 0.10</dt>
+    <dd id="equal-count">-</dd>
+    <dt>Doses with another copay</dt>
+    <dd id="unequal-count">-</dd>
+</dl>
+<p id="copay-status">Waiting</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<CopayDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("dose-count").Text.Set(doses.Body.Count());
+            pipeline.Element("equal-count").Text.Set(doses.Body.Count(d => d.Billing!.Copay == 0.10m));
+            pipeline.Element("unequal-count").Text.Set(doses.Body.Count(d => d.Billing!.Copay != 0.10m));
+            pipeline.Element("copay-status").Text.Set("Counted");
+        })));
+}
+@Html.RenderPlan(plan)

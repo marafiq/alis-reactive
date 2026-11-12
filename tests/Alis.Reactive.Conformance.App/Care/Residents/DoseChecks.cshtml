@@ -1,0 +1,29 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseChecks
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose checks";
+    var plan = Html.ReactivePlan<DoseChecks>();
+}
+<h1>@Model.Round round: dose checks</h1>
+<dl>
+    <dt>Doses their own carer checked</dt>
+    <dd id="checked-by-carer-count">-</dd>
+    <dt>Doses with every check signed</dt>
+    <dd id="all-signed-count">-</dd>
+    <dt>Doses with a check</dt>
+    <dd id="checked-count">-</dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<CheckedDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("checked-by-carer-count").Text.Set(doses.Body.Count(d => d.Carer != null && d.Checks.Any(c => c.Name == d.Carer.Name)));
+            pipeline.Element("all-signed-count").Text.Set(doses.Body.Count(d => d.Checks.All(c => c.Signed)));
+            pipeline.Element("checked-count").Text.Set(doses.Body.Count(d => d.Checks.Any()));
+        })));
+}
+@Html.RenderPlan(plan)

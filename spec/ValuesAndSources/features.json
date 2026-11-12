@@ -213,9 +213,9 @@
         },
         {
           "for": "X7.6",
-          "page": "The resident record whose Set target button sets the target from Choose on the order's restriction flag, 1000 ml when it holds and the care panel's Total() when it reads nothing; the care panel, the record's ConformanceComponent, answers Total() with its count, 850, and shows its calls, the count of its method calls.",
+          "page": "The resident record whose Set target button sets the target, shown before its unit ml, from Choose on the order's restriction flag, 1000 when it holds and the care panel's Total() when it reads nothing; the care panel, the record's ConformanceComponent, answers Total() with its count, 850, and shows its calls, the count of its method calls.",
           "gesture": "Click Set target on an order whose flag holds, then on an order whose flag reads nothing.",
-          "outcome": "The target shows 1000 ml, then 850, and the panel's calls show 1.",
+          "outcome": "The target shows 1000, then 850, and the panel's calls show 1.",
           "opposite": "Set on the flagged order alone, the calls stay 0.",
           "defect": "Both arms are read each time, so the calls show 2, or the flag that reads nothing takes the first arm and shows 1000 ml."
         },

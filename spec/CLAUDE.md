@@ -988,6 +988,19 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   type no line gives a TypeScript module. The click payload's numbers are `int` where the DOM
   standards type a long and `double` elsewhere, lib.dom's `number`, to be held by the contract check in U23. The
   owner can overrule each.
+- The lead, 2026-11-12, landing twenty-six care pages, three forks' work read at the source, and settling what
+  they read into. The net10 host's JSON options are `spec/Reference/app.json`'s, camel-case members and enum
+  names, which `tests/Alis.Reactive.Conformance.App/Program.cs` now sets: it is ASP.NET's own configuration and needs
+  no door. The lead
+  had told the forks the host sets no JSON options, from the app's code and not from that definition, so four
+  promises that need enum names stood unwritten (X6.12, X6.16, X6.26, X6.28); they are pages to write now. The
+  rest of that host's definition (Fusion, the busy and reconnect components, the request defaults, the flags
+  enums, a request culture) lands with the doors and the pages that need each. A data lambda that reads a
+  member past one that holds null is written with `!` until D6.14's suppressor is built, and loses the mark
+  then. X6.32's first item of an order is written `Find(d => true, d => d.Name)`: no door reads a list's first
+  item, a gap raised with that use. X7.6's fourth promise named a text and a number as `Choose`'s two arms, which
+  the type refuses; it names 1000 and `Total()` now, shown before the unit. The conformance component's start
+  gains `Raises` and a text that holds null, as its behaviors state. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

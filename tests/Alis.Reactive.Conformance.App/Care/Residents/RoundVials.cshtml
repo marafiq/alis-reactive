@@ -1,0 +1,28 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VialRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Vials of the round";
+    var plan = Html.ReactivePlan<VialRound>();
+}
+<h1>Vials of the round</h1>
+<dl>
+    <dt>Doses with no supply</dt>
+    <dd id="unsupplied-count">-</dd>
+    <dt>Supplies counted</dt>
+    <dd id="supply-count">-</dd>
+</dl>
+<p id="vial-status">Waiting</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<VialDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("unsupplied-count").Text.Set(doses.Body.Select(d => (int?)d.Supply!.Vials).Count(v => v == null));
+            pipeline.Element("supply-count").Text.Set(doses.Body.Select(d => d.Supply!.Vials).Count());
+            pipeline.Element("vial-status").Text.Set("Counted");
+        })));
+}
+@Html.RenderPlan(plan)

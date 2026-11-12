@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FluidOrders
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Fluid orders";
+    var plan = Html.ReactivePlan<FluidOrders>();
+}
+<h1>Fluid orders</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Measured intake", Count = Model.MeasuredIntake }))
+<section aria-label="Order for @Model.Restricted">
+    <h2>@Model.Restricted</h2>
+    <button type="button" @Html.Raises(plan, FluidOrderEvents.SetTheRestrictedTarget)>Set target</button>
+</section>
+<section aria-label="Order for @Model.Unrestricted">
+    <h2>@Model.Unrestricted</h2>
+    <button type="button" @Html.Raises(plan, FluidOrderEvents.SetTheUnrestrictedTarget)>Set target</button>
+</section>
+<p>Target: <span id="fluid-target"></span> ml</p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(FluidOrderEvents.SetTheRestrictedTarget, pipeline => pipeline.Get(FluidOrderEndpoints.RestrictedOrder)
+        .OnSuccess<FluidOrder>((order, pipeline) => pipeline.Element("fluid-target").Text.Set(
+            order.Body.Read(ordered => ordered.Restriction!.Applies).Choose(1000, pipeline.Component<ConformanceComponent>("care-panel").Total())))));
+    Html.On(plan, trigger => trigger.CustomEvent(FluidOrderEvents.SetTheUnrestrictedTarget, pipeline => pipeline.Get(FluidOrderEndpoints.UnrestrictedOrder)
+        .OnSuccess<FluidOrder>((order, pipeline) => pipeline.Element("fluid-target").Text.Set(
+            order.Body.Read(ordered => ordered.Restriction!.Applies).Choose(1000, pipeline.Component<ConformanceComponent>("care-panel").Total())))));
+}
+@Html.RenderPlan(plan)

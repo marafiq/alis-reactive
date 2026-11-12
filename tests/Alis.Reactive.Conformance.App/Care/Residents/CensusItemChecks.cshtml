@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusItemChecks
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Census checks";
+    var plan = Html.ReactivePlan<CensusItemChecks>();
+}
+<h1>Census checks</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Items = Model.Census }))
+<p id="census-status"></p>
+<button type="button" @Html.Raises(plan, CensusChecks.Census)>Check the census</button>
+@(plan.ConformanceComponent("census-north", new ConformanceStart { Text = "North wing census", Items = Model.North }))
+<p id="census-north-status"></p>
+<button type="button" @Html.Raises(plan, CensusChecks.North)>Check the north wing census</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusChecks.Census, pipeline =>
+    {
+        pipeline.Element("census-status").Text.Set("Checking");
+        pipeline.Component<ConformanceComponent>("census").Items.Find(item => item.Active).Value.Set(1);
+        pipeline.Element("census-status").Text.Set("Checked");
+    }));
+    Html.On(plan, trigger => trigger.CustomEvent(CensusChecks.North, pipeline =>
+    {
+        pipeline.Element("census-north-status").Text.Set("Checking");
+        pipeline.Component<ConformanceComponent>("census-north").Items.Find(item => item.Active).Value.Set(1);
+        pipeline.Element("census-north-status").Text.Set("Checked");
+    }));
+}
+@Html.RenderPlan(plan)

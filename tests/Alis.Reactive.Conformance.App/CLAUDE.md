@@ -8,6 +8,8 @@ its views.
   nothing that exists only to be asserted.
 - `SliceTree.txt` orders its slices, so no screen reaches into another's model, and the framework's analyzers read
   its controllers and models as they read an app's.
+- `Program.cs` sets the JSON options `spec/Reference/app.json` gives the net10 host, camel-case members and enum
+  names; what else that host's definition names lands with the door or the page that needs it.
 - The World area (`World/`) scopes data, gates and caches to a test's world by the cookie `"world"`, in Development
   alone. A document's request that carries no world gets a new one, so a person runs the app as a test does; any
   other request with no world gets none.

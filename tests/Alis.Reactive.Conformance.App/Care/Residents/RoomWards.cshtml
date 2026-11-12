@@ -1,0 +1,18 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomWards
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Doses by ward";
+    var plan = Html.ReactivePlan<RoomWards>();
+    var wards = Model.Wards.ToArray();
+}
+<h1>Doses by ward</h1>
+<p>Doses in the wards looked up: <span id="ward-dose-count">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(RoomWardsEndpoints.Doses)
+        .OnSuccess<List<RoomedDose>>((doses, pipeline) => pipeline.Element("ward-dose-count").Text.Set(doses.Body.Count(d => wards.Contains(d.Room!.Ward))))));
+}
+@Html.RenderPlan(plan)

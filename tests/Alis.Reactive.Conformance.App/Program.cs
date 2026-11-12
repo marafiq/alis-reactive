@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Alis.Reactive.Conformance.App.World;
 
 namespace Alis.Reactive.Conformance.App;
@@ -15,7 +17,7 @@ public sealed class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddControllersWithViews().AddJsonOptions(json => json.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
         builder.Services.AddDistributedMemoryCache();
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();
 

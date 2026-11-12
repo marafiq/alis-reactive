@@ -1,0 +1,24 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusPanel
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents";
+    var plan = Html.ReactivePlan<CensusPanel>();
+}
+<h1>Residents</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = Model.Title }))
+<p>Records on the panel: <span id="record-count">-</span></p>
+<p id="panel-status">Waiting</p>
+<button type="button" @Html.Raises(plan, CensusPanels.Count)>Count the records</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusPanels.Count, pipeline =>
+    {
+        pipeline.Element("record-count").Text.Set(pipeline.Component<ConformanceComponent>("census").NullableRecords!.Count());
+        pipeline.Element("panel-status").Text.Set("Counted");
+    }));
+}
+@Html.RenderPlan(plan)

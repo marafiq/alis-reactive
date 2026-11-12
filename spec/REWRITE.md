@@ -962,8 +962,14 @@ each test red, four forks' work read at the source and landed: ten of module 4's
 response body of the page's own endpoint. Of the refusal promises placed under net10, eight wait: four need a
 host that sets JSON options or a request culture (X6.12, X6.28, X6.36 and X8.22's first promise), and four a
 Native input, a drop-down or a number box (X7.11 twice, X1.4, X9.20). Ten more are placed under hosts the
-harness does not hold yet. The first care page stands, the residents screen's census (X6.5), its test red: a
-promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a refusal's is. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
+harness does not hold yet. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
+refusal's is, and twenty-seven care pages stand, each test red: seventeen of the residents screen's, module
+4's, and ten of the record screen's, seven of module 2's and three of module 3's. The net10 host writes enum
+names in camel case, as app.json defines it. Of those two families, twenty promises wait: seven need the
+conformance component to start with records or items its start does not hold, six a number a person types,
+which no declared door reads, two a browser zone the harness does not set, and one each a request culture, the
+value tests (M3.N1) and a console error's words; two, X6.16 and X6.26, need enum names, which the host writes
+now, so they are pages to write. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
 its properties, nine of its methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen
 of its sources, its three absences, its sixteen requests and two of its lanes, a slot loaded on start and a
 slot's listener gone at its unload. The sixteenth request cell, http.beside.hidden, sends a form's inputs: a

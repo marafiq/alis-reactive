@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ChartedRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Given charts";
+    var plan = Html.ReactivePlan<ChartedRound>();
+}
+<h1>@Model.Round round: the charts</h1>
+<p>Charts that read given: <span id="given-chart-count">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<RoundDose>>((doses, pipeline) => pipeline.Element("given-chart-count").Text.Set(doses.Body.Select(d => d.Charted).Count(s => s == RoundChartStatus.Given)))));
+}
+@Html.RenderPlan(plan)

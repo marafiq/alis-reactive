@@ -1,0 +1,23 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model UnnamedRoster
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Roster";
+    var plan = Html.ReactivePlan<UnnamedRoster>();
+}
+<h1>Roster of the @Model.Ward ward</h1>
+<p>Beds with no name on file: <span id="unnamed-count">-</span></p>
+<p id="roster-status">Waiting</p>
+<button type="button" @Html.Raises(plan, UnnamedRosters.Count)>Count the unnamed</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(UnnamedRosters.Count, pipeline => pipeline.Get(Model.Beds)
+        .OnSuccess<List<RosterBed>>((roster, pipeline) =>
+        {
+            pipeline.Element("unnamed-count").Text.Set(roster.Body.Count(r => r.Name!.Trim() == ""));
+            pipeline.Element("roster-status").Text.Set("Counted");
+        })));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,38 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AssignedDoses
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Assigned doses";
+    var plan = Html.ReactivePlan<AssignedDoses>();
+}
+<h1>@Model.Round round: assigned doses</h1>
+<dl>
+    <dt>Doses with a priority</dt>
+    <dd id="prioritised-count">-</dd>
+    <dt>Doses whose priority is on file and not 2</dt>
+    <dd id="on-file-off-routine-count">-</dd>
+    <dt>Doses whose priority is not 2</dt>
+    <dd id="off-routine-count">-</dd>
+    <dt>Doses with no carer</dt>
+    <dd id="unassigned-count">-</dd>
+    <dt>Doses with no ward</dt>
+    <dd id="no-ward-count">-</dd>
+    <dt>Doses of low priority</dt>
+    <dd id="low-count">-</dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<AssignedDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("prioritised-count").Text.Set(doses.Body.Count(d => d.Priority.HasValue));
+            pipeline.Element("on-file-off-routine-count").Text.Set(doses.Body.Count(d => d.Priority!.Value != 2));
+            pipeline.Element("off-routine-count").Text.Set(doses.Body.Count(d => d.Priority != 2));
+            pipeline.Element("unassigned-count").Text.Set(doses.Body.Count(d => (d.Carer!.Name ?? "unassigned") == "unassigned"));
+            pipeline.Element("no-ward-count").Text.Set(doses.Body.Count(d => (d.Ward ?? "none") == "none"));
+            pipeline.Element("low-count").Text.Set(doses.Body.Count(d => (d.Priority > 2 ? d.Carer!.Name : "low") == "low"));
+        })));
+}
+@Html.RenderPlan(plan)

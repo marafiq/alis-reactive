@@ -1,0 +1,32 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ChartedRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Charted round";
+    var plan = Html.ReactivePlan<ChartedRound>();
+}
+<h1>@Model.Round round: the chart</h1>
+<dl>
+    <dt>Doses given</dt>
+    <dd id="given-count">-</dd>
+    <dt>Doses not given</dt>
+    <dd id="not-given-count">-</dd>
+    <dt>Doses due</dt>
+    <dd id="due-count">-</dd>
+    <dt>Doses with two vials in supply</dt>
+    <dd id="two-vial-count">-</dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
+        .OnSuccess<List<RoundDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("given-count").Text.Set(doses.Body.Count(d => d.Charted == RoundChartStatus.Given));
+            pipeline.Element("not-given-count").Text.Set(doses.Body.Count(d => d.Charted != RoundChartStatus.Given));
+            pipeline.Element("due-count").Text.Set(doses.Body.Count(d => d.Charted == RoundChartStatus.Due));
+            pipeline.Element("two-vial-count").Text.Set(doses.Body.Count(d => d.Supply.Vials == 2));
+        })));
+}
+@Html.RenderPlan(plan)

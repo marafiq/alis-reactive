@@ -7,7 +7,7 @@ public sealed class ConformanceStart
 {
     public ComponentVersion Version { get; init; }
 
-    public string Text { get; init; } = "";
+    public string? Text { get; init; } = "";
 
     public string? Value { get; init; }
 
@@ -28,6 +28,8 @@ public sealed class ConformanceStart
     public string? CurrentItem { get; init; }
 
     public IReadOnlyList<ItemStart> Items { get; init; } = [];
+
+    public IReadOnlyList<RaiseStart> Raises { get; init; } = [];
 
     public string SettleEndpoint { get; init; } = WorldEndpoints.Settle;
 

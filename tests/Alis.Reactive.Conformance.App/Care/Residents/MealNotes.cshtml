@@ -1,0 +1,34 @@
+@using System.Text.RegularExpressions
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MealNotes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Meal notes";
+    var plan = Html.ReactivePlan<MealNotes>();
+    var endsInFood = "food$";
+}
+<h1>@Model.Round round: meal notes</h1>
+<dl>
+    <dt>Notes that end in food</dt>
+    <dd id="ends-in-food-count">-</dd>
+    <dt>Notes that name a price</dt>
+    <dd id="priced-count">-</dd>
+    <dt>Notes the round's pattern matches</dt>
+    <dd id="pattern-count">-</dd>
+    <dt>Notes to give after food</dt>
+    <dd id="after-food-count">-</dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Notes)
+        .OnSuccess<List<MealNote>>((notes, pipeline) =>
+        {
+            pipeline.Element("ends-in-food-count").Text.Set(notes.Body.Count(n => Regex.IsMatch(n.Text!, "food$")));
+            pipeline.Element("priced-count").Text.Set(notes.Body.Count(n => Regex.IsMatch(n.Text!, @"\$")));
+            pipeline.Element("pattern-count").Text.Set(notes.Body.Count(n => Regex.IsMatch(n.Text!, endsInFood)));
+            pipeline.Element("after-food-count").Text.Set(notes.Body.Count(n => Regex.IsMatch(n.Text!, "(?<=after )food", RegexOptions.CultureInvariant)));
+        })));
+}
+@Html.RenderPlan(plan)

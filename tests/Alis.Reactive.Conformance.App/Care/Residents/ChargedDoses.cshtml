@@ -1,0 +1,18 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ChargeRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Charged doses";
+    var plan = Html.ReactivePlan<ChargeRound>();
+    var freeCharge = Model.FreeCharge;
+}
+<h1>Charged doses</h1>
+<p>Doses charged above @freeCharge: <span id="charged-count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ChargedDoseEndpoints.Doses)
+        .OnSuccess<List<ChargedDose>>((doses, pipeline) => pipeline.Element("charged-count").Text.Set(doses.Body.Count(d => d.Charge > freeCharge)))));
+}
+@Html.RenderPlan(plan)

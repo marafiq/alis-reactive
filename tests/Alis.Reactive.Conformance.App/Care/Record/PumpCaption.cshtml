@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model PumpCaption
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Pump caption";
+    var plan = Html.ReactivePlan<PumpCaption>();
+}
+<h1>Pump of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Round }))
+<button type="button" @Html.Raises(plan, PumpCaptions.TakeText)>Take text</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PumpCaptions.TakeText, pipeline =>
+    {
+        var panel = pipeline.Component<ConformanceComponent>("care-panel");
+        panel.TakeText(panel.Text.OrNull());
+    }));
+}
+@Html.RenderPlan(plan)

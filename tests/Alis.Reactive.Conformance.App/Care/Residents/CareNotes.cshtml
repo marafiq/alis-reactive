@@ -1,0 +1,41 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CareNotes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care notes";
+    var plan = Html.ReactivePlan<CareNotes>();
+    var lookedFor = Model.LookedFor;
+}
+<h1>Care notes</h1>
+<dl>
+    <dt>Notes of one character</dt>
+    <dd id="one-character-count">-</dd>
+    <dt>Notes that read STRAßE in capitals</dt>
+    <dd id="capitals-count">-</dd>
+    <dt>Notes that read οδοσ in small letters</dt>
+    <dd id="small-letters-count">-</dd>
+    <dt>Notes with no text</dt>
+    <dd id="no-text-count">-</dd>
+    <dt>Notes with nothing to read</dt>
+    <dd id="blank-count">-</dd>
+    <dt>Notes that hold the text looked for</dt>
+    <dd id="looked-for-count">-</dd>
+</dl>
+<p id="notes-status">Waiting</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(CareNotesEndpoints.Notes)
+        .OnSuccess<List<CareNote>>((notes, pipeline) =>
+        {
+            pipeline.Element("one-character-count").Text.Set(notes.Body.Count(n => n.Detail!.Text.Trim().Length == 1));
+            pipeline.Element("capitals-count").Text.Set(notes.Body.Count(n => n.Detail!.Text.ToUpperInvariant() == "STRAßE"));
+            pipeline.Element("small-letters-count").Text.Set(notes.Body.Count(n => n.Detail!.Text.ToLowerInvariant() == "οδοσ"));
+            pipeline.Element("no-text-count").Text.Set(notes.Body.Count(n => string.IsNullOrEmpty(n.Detail!.Text)));
+            pipeline.Element("blank-count").Text.Set(notes.Body.Count(n => string.IsNullOrWhiteSpace(n.Detail!.Text)));
+            pipeline.Element("looked-for-count").Text.Set(notes.Body.Count(n => n.Detail!.Text.Contains(lookedFor!)));
+            pipeline.Element("notes-status").Text.Set("Looked");
+        })));
+}
+@Html.RenderPlan(plan)

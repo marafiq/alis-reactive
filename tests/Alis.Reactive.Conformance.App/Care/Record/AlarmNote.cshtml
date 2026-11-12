@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AlarmNote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Alarm note";
+    var plan = Html.ReactivePlan<AlarmNote>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "Raise Line occluded", NullableText = "Line occluded" },
+        new RaiseStart { Button = "Raise a null text" },
+    };
+}
+<h1>Notes of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Round, Raises = raises })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.Element("note-text").Text.Set(raised.NullableText.IfNull(pipeline.Component<ConformanceComponent>("care-panel").Text))))
+<p id="note-text"></p>
+@Html.RenderPlan(plan)

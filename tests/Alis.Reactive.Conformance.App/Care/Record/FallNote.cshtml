@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FallNote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Fall note";
+    var plan = Html.ReactivePlan<FallNote>();
+    var raises = new[]
+    {
+        new RaiseStart { Button = "Raise without optional text" },
+        new RaiseStart { Button = "Raise with optional text", OptionalText = "Fall at 3am" },
+    };
+}
+<h1>Notes of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Round, Raises = raises })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.Element("note-text").Text.Set(raised.OptionalText)))
+<p id="note-text">No note yet</p>
+@Html.RenderPlan(plan)

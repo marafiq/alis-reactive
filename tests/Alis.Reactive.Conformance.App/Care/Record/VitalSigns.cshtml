@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VitalSigns
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Vital signs";
+    var plan = Html.ReactivePlan<VitalSigns>();
+}
+<h1>Vital signs of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, VitalSignsEvents.NoPulse)>No pulse</button>
+<button type="button" @Html.Raises(plan, VitalSignsEvents.PulseOfSeventy)>Pulse 70</button>
+<p>Pulse: <span id="pulse-status"></span></p>
+<p>Round log: <span id="pulse-log"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(VitalSignsEvents.NoPulse, pipeline => pipeline.Dispatch(VitalSignsEvents.ReadingTaken, new PulseReading())));
+    Html.On(plan, trigger => trigger.CustomEvent(VitalSignsEvents.PulseOfSeventy, pipeline => pipeline.Dispatch(VitalSignsEvents.ReadingTaken, new PulseReading { Pulse = 70 })));
+    Html.On(plan, trigger => trigger.CustomEvent(VitalSignsEvents.ReadingTaken, (reading, pipeline) => pipeline.When(reading.Read(taken => taken.Pulse).Lt(80))
+        .Then(pipeline =>
+        {
+            pipeline.Element("pulse-status").Text.Set("Calm");
+            pipeline.Element("pulse-log").Text.Set("checked");
+        })
+        .Else(pipeline => pipeline.Element("pulse-status").Text.Set("Unknown"))));
+}
+@Html.RenderPlan(plan)
