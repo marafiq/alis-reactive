@@ -10,6 +10,9 @@ uses only the rows before its own. `spec/REWRITE.md` section 2.3 says why each r
   `internal`. A new door is a line of `PublicAPI/<tfm>/PublicAPI.Unshipped.txt` in the commit that writes it, with its
   XML doc (`.claude/rules/docs.md`).
 - A door is typed. A deliberate exception carries `Declarations/TypedDslExemptionAttribute.cs` with its reason.
+- U3 declares every door `spec/api` compiles, and a door's module's unit builds it. A door that is declared and not
+  built throws `NotImplementedException`, so it is built or it fails loud: none renders a page it wrote no plan
+  for. Its XML doc states what the spec decides for it, and its unit holds the doc true of what it builds.
 - The grammar's nodes are sealed, with `internal` constructors, and a unit never changes the grammar. They are
   `Schema/`'s, written from `spec/Core/schema.md`: a union is an abstract class that names each kind's class, a
   kind's class is its kind and then its union (`SetStatement`), a constructor takes every field and none is

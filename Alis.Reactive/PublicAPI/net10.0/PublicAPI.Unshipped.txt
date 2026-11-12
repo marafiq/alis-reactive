@@ -1,4 +1,47 @@
 #nullable enable
+Alis.Reactive.Conditions.Choices
+Alis.Reactive.Conditions.Comparisons
 Alis.Reactive.Declarations.TypedDslExemptionAttribute
 Alis.Reactive.Declarations.TypedDslExemptionAttribute.Reason.get -> string!
 Alis.Reactive.Declarations.TypedDslExemptionAttribute.TypedDslExemptionAttribute(string! reason) -> void
+Alis.Reactive.ValuesAndSources.Arg
+Alis.Reactive.ValuesAndSources.Arg<T>
+Alis.Reactive.ValuesAndSources.ITypedSource<T>
+Alis.Reactive.ValuesAndSources.NullableReferences
+Alis.Reactive.ValuesAndSources.NullableValues
+Alis.Reactive.ValuesAndSources.TypedSource<T>
+static Alis.Reactive.Conditions.Choices.Choose<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! test, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! whenTrue, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! whenFalse) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.Choose<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! test, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! whenTrue, TValue whenFalse) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.Choose<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! test, TValue whenTrue, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! whenFalse) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.Choose<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! test, TValue whenTrue, TValue whenFalse) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.IfNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, Alis.Reactive.ValuesAndSources.TypedSource<TValue!>! fallback) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue!>!
+static Alis.Reactive.Conditions.Choices.IfNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! fallback) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.IfNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, TValue fallback) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+static Alis.Reactive.Conditions.Choices.IfNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, TValue! fallback) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue!>!
+static Alis.Reactive.Conditions.Comparisons.And(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! left, Alis.Reactive.ValuesAndSources.TypedSource<bool>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Eq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Eq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Gte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lt<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Lte<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Not(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.Comparisons.Or(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! left, Alis.Reactive.ValuesAndSources.TypedSource<bool>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(Alis.Reactive.ValuesAndSources.TypedSource<T>! source) -> Alis.Reactive.ValuesAndSources.Arg<T>!
+static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(T value) -> Alis.Reactive.ValuesAndSources.Arg<T>!
+static Alis.Reactive.ValuesAndSources.NullableReferences.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue!>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
+static Alis.Reactive.ValuesAndSources.NullableValues.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!

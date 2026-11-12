@@ -899,7 +899,8 @@ count of tests at once, a pool's shard and CI's proof, the two architecture test
 refusal of the EJ2 script, and section 2.8's four workflows, which no run has read. U3 is in work. Landed of it:
 the schema's nodes, the 51 kinds as sealed classes of `Alis.Reactive/Schema`, with the contract generator, its
 cases, its step in `scripts/check.sh` and the generated `plan.ts` and `plan.schema.json`, and the kinds check
-reading the rewrite's grammar. Open of it, in order: the core's sixteen rows and every door as a signature; the
+reading the rewrite's grammar. In work: the core's sixteen rows and every door as a signature, of which
+`ValuesAndSources` and `Conditions` are declared. Open of it after that, in order: the
 runtime's rows and dispatch with vitest and the lint's two path-bound rules; the module tests' project; the thin
 path; every screen's view; every browser test, failing; the Playwright project's switch. The commit that lands a
 piece rewrites this paragraph.

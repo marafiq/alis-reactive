@@ -777,6 +777,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the owner's to settle, each built at the reading that adds no kind and no null: a `lit`'s value is the JSON C#
   wrote, since schema.md's `includes` writes the view's list as a `lit` where the `lit` row says a scalar or null;
   and a container's `live`, "none, or the `Live`", is a list of at most one `Live` (S2). The owner can overrule each.
+- The lead, 2026-11-11, within the owner's order of the same day (the surface as signatures, then one module a
+  unit) and the owner's decision of 2026-11-06 (fail loudly, no fallback): a door U3 declares ahead of its module's
+  unit throws `NotImplementedException` until that unit builds it. An inert door, one that renders its page and
+  writes no plan, is a default no line states. Its cost: a screen whose doors are not built answers 500, so the
+  gate's sweep of the app states that case when U3 writes the views. A signature's proof is the doc ids of the
+  built core compared with the ids the fluent probe prints for `spec/api`, namespaces mapped by REWRITE 2.2. The
+  owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
