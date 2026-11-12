@@ -826,6 +826,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   harness's own tests, U2's, all sit in its namespace. A test action on the assembly opens the run once for every
   fixture and closes it at the assembly's end. Outside the harness the rule refuses it as it refuses a setup
   attribute. The owner can overrule it.
+- The lead, 2026-11-12, stating the next cases of WhenAnAppRendersItsPages within the decision of 2026-11-11 on a
+  door that is not built, which sent a page that answers 500 for one to the sweep. The plan names the cases and no
+  line says how the sweep reads each. A page whose door is not built is listed apart from a problem, until U27
+  builds the last door; the page's browser test stays red meanwhile. A route's parameter takes its value from a
+  link a page holds, and a route no page links to is refused as unopened. A page of the refusals area that
+  answers 500 with an `InvalidOperationException` is refused by design, and the same answer on any other page is
+  a problem. The sweep's own host hears what a page threw; nothing of the app changes. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

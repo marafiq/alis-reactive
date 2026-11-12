@@ -939,9 +939,13 @@ ALIS041 holds the plan's two doors at build, in a view through the code Razor's 
 view's own line: a plan no line hands to `Html.RenderPlan`, a plan rendered twice and a door that takes the plan
 after it rendered. Where the build does not follow a view's code, a section among it, the render refuses the last
 two with the same sentence (D18.6).
-Open of it, in order: the page sweep's next cases; every screen's view; every browser test, failing; the Playwright
-project's switch. The bindings check's view clause is not built: it waits for the owner's word on what it reads
-(`spec/NOTES.md`, 2026-11-12).
+WhenAnAppRendersItsPages states its next cases: each plan a page renders is read against `plan.schema.json`, an
+MVC action is opened at its route, a route's parameter takes the value a link gives it, a page of the refusals
+area that refuses is accepted as refused by design, and a page whose door is not built is listed apart from a
+problem until U27.
+Open of it, in order: every screen's view; every browser test, failing; the Playwright project's switch. The
+bindings check's view clause is not built: it waits for the owner's word on what it reads (`spec/NOTES.md`,
+2026-11-12).
 The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
@@ -1092,3 +1096,7 @@ One commit per slice, each with its own tests, which `slice_tests` holds.
 
 ### U27. Fusion's app-level objects
 Features: M23.F1, M23.F2
+
+FusionConfirm and FusionToast, each with its own tests. This unit builds the last door, so from it on
+WhenAnAppRendersItsPages takes a page whose door is not built as a problem; until it the sweep lists such a page
+apart.

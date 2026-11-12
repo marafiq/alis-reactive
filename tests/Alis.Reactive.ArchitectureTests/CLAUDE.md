@@ -26,7 +26,12 @@ expects none.
   a slice table of its own, for the import rows.
 - `WhenAnAppRendersItsPages` and `WhenTheAppHoldsNoStaticState` read the conformance app as built, which this project
   references for the two of them. The first runs the app in this process and opens every address it answers to a
-  GET, and every link its pages hold, as a browser opens a document; its cases sweep an app the case maps. The
+  GET, and every link its pages hold, as a browser opens a document; its cases sweep an app the case maps. A
+  route with a parameter is opened by the address a link gives it, and one no page links to is refused. Every plan
+  a page renders is read against `Alis.Reactive.Assets/runtime/Schema/plan.schema.json`. The sweep's own host hears
+  what a page threw from the developer exception page: a page of the refusals area that refuses is accepted as
+  refused by design, and a page whose door is not built is listed apart from a problem until the last unit builds
+  the last door (`spec/REWRITE.md`, U27). The
   second reads every static of the types the app's authors wrote; its cases read an assembly built from their text.
   What the app holds as it runs is read from its assembly, the one place a view's and a generator's statics are.
 - `WhenTheCoreIsCompiled` compiles the core's tracked C# as its net10 host does, against the references this
