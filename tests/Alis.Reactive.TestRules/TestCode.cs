@@ -10,9 +10,12 @@ internal static class TestCode
 {
     internal const string Category = "Alis.Reactive.TestRules";
     internal const string NUnitsTest = "NUnit.Framework.TestAttribute";
+    internal const string NUnitsAssert = "NUnit.Framework.Assert";
+    internal const string NUnitsConstraint = "NUnit.Framework.Constraints.IResolveConstraint";
 
     private const string Playwright = "Microsoft.Playwright";
     private const string Harness = "Harness";
+    private const string That = "That";
 
     private static readonly char[] Separators = ['/', '\\'];
 
@@ -34,6 +37,18 @@ internal static class TestCode
             method = method.ContainingSymbol as IMethodSymbol;
         return method;
     }
+
+    internal static IOperation Written(IOperation value)
+    {
+        while (value is IConversionOperation { IsImplicit: true } converted) value = converted.Operand;
+        return value;
+    }
+
+    internal static bool IsAssertThat(IInvocationOperation called, INamedTypeSymbol assert)
+        => called.TargetMethod.Name == That && SymbolEqualityComparer.Default.Equals(called.TargetMethod.ContainingType, assert);
+
+    internal static IOperation? ConstraintOf(IInvocationOperation that, INamedTypeSymbol constraint)
+        => that.Arguments.FirstOrDefault(given => SymbolEqualityComparer.Default.Equals(given.Parameter?.Type, constraint))?.Value;
 
     internal static Location NameOf(IInvocationOperation called) => called.Syntax switch
     {
