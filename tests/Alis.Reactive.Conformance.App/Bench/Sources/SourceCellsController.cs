@@ -15,6 +15,9 @@ public sealed class SourceCellsController : Controller
     [HttpGet(BenchPages.SourceWriteOnlySet)]
     public IActionResult SourceWriteOnlySet() => View("/Bench/Sources/SourceWriteOnlySet.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.SourceDispatchPayloadMember)]
+    public IActionResult SourceDispatchPayloadMember() => View("/Bench/Sources/SourceDispatchPayloadMember.cshtml", TheWorldsBoard());
+
     [HttpGet(BenchPages.SourceMethodArgument)]
     public IActionResult SourceMethodArgument() => View("/Bench/Sources/SourceMethodArgument.cshtml", TheWorldsBoard());
 
@@ -52,6 +55,11 @@ public sealed class EchoRequest
     public string? Code { get; set; }
 }
 
+public sealed class PickedCode
+{
+    public string? Code { get; set; }
+}
+
 public static class SourceCells
 {
     public static readonly AppEvent Show = AppEvent.Declare();
@@ -67,4 +75,8 @@ public static class SourceCells
     public static readonly AppEvent Write = AppEvent.Declare();
 
     public static readonly AppEvent Log = AppEvent.Declare();
+
+    public static readonly AppEvent Tell = AppEvent.Declare();
+
+    public static readonly AppEvent<PickedCode> Picked = AppEvent.Declare<PickedCode>();
 }

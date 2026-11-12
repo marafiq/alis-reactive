@@ -148,6 +148,13 @@ public sealed class Pipeline<TModel>
     /// <returns>The request, which takes its routes.</returns>
     public DeleteRequest<TModel, TRequest> Delete<TRequest>(string url, Action<BodyParts<TRequest>> request) => throw new NotImplementedException();
 
+    /// <summary>Builds an object from sources when the step runs, member by member.</summary>
+    /// <remarks>The object is a source wherever one of its class goes: an app event's payload, an argument, a property.</remarks>
+    /// <param name="members">The members the object holds, each a literal or a source.</param>
+    /// <typeparam name="T">The class of the object built.</typeparam>
+    /// <returns>A source of the object.</returns>
+    public TypedSource<T> Object<T>(Action<ObjectMembers<T>> members) => throw new NotImplementedException();
+
     /// <summary>Reaches the page's own URL, read as the action that rendered the page bound it.</summary>
     /// <typeparam name="TPage">The type the page's action binds its URL to.</typeparam>
     /// <returns>The URL, whose members are sources.</returns>

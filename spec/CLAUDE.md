@@ -898,6 +898,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `&Day=`; and http.whileLoading's opposite stopped the request "in its guard" with the heading unchanged, where
   D10.23 runs a request's WhileLoading before its guard, so the opposite is a request whose argument stops when
   it is read. The owner can overrule each.
+- The lead, 2026-11-12, declaring `pipeline.Object<T>` (N7.1), which `spec/api` compiles no sentence with, from
+  its line, D7.4 and M1.F2's proposed sentence, with source.DispatchPayloadMember's view: the door is the
+  pipeline's and returns a source of the object; its members are an `ObjectMembers<T>`, a class of
+  `ValuesAndSources`, whose `Set` takes a literal or a source and returns the members, the three forms the JSON
+  body's `Set` has. Its callback's parameter is the app's word for what it holds. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

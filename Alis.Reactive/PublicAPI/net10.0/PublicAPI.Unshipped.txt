@@ -652,3 +652,8 @@ static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Redirect -> Al
 static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Status -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
 static readonly Alis.Reactive.TriggersAndPipelines.AntiforgeryIn.FormField -> Alis.Reactive.TriggersAndPipelines.AntiforgeryIn!
 static readonly Alis.Reactive.TriggersAndPipelines.AntiforgeryIn.Header -> Alis.Reactive.TriggersAndPipelines.AntiforgeryIn!
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, TValue value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Object<T>(System.Action<Alis.Reactive.ValuesAndSources.ObjectMembers<T>!>! members) -> Alis.Reactive.ValuesAndSources.TypedSource<T>!

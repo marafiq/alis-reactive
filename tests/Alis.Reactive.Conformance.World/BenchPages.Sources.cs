@@ -10,5 +10,6 @@ public static partial class BenchPages
     public const string SourceConditionLeft = Area + "source.ConditionLeft";
     public const string SourceRequestMember = Area + "source.RequestMember";
     public const string SourceHeader = Area + "source.Header";
+    public const string SourceDispatchPayloadMember = Area + "source.DispatchPayloadMember";
     public const string SourceMethodArgument = Area + "source.MethodArgument";
 }

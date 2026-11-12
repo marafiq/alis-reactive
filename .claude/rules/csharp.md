@@ -37,6 +37,7 @@ Callback parameter naming convention (locked):
 | `Response<TRequest, TReply>` | the app's word for what it holds |
 | `Failure<TError>` | the app's word for what it holds |
 | `RowActivated<TRow>` | the app's word for what it holds |
+| `ObjectMembers<T>` | the app's word for what it holds |
 
 The rows name the types the callbacks hand (gate 2, `spec/NOTES.md`). A nested callback's `pipeline` hides the
 enclosing one, since every pipeline writes to the block it is written in; no other parameter hides an enclosing

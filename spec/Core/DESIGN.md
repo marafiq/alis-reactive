@@ -1296,7 +1296,9 @@ Terms used throughout:
 - kept: `TypedSource<T>` (`Alis.Reactive/Components/TypedSource.cs:1`) and each position's literal and source
   doors, as `GatherBuilder.Set` writes them (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`).
 - `N7.1` new: `p.Object<T>(o => o.Set(x => x.Member, source))`, a `TypedSource<T>` built member by member,
-  replacing `DispatchPayloadBuilder<TPayload, TModel>` as a builder of its own.
+  replacing `DispatchPayloadBuilder<TPayload, TModel>` as a builder of its own. Its members are an
+  `ObjectMembers<T>`, whose `Set` takes a literal or a source of the member's type, and a source of the type
+  itself for a member of a nullable value type (N7.6).
 - `N7.2` new: `p.List<T>([first, second])`, a `TypedSource<IReadOnlyList<T>>` built from sources.
 - `N7.3` new: a source overload on `Contains`, `StartsWith`, `EndsWith`, `MinLength`, `Between`, `In` and `NotIn`,
   module 3's tests (`M3.N1` in `spec/Conditions/module.md`).
