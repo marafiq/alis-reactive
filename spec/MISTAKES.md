@@ -34,7 +34,7 @@ them, each marked as the lead's slip, and are not copied here.
 | An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts the count of that text. |
 | A command written in another shell's syntax: the session's shell is zsh | 3 | Since its second entry, a step a command shows: an exit code is printed by `echo "exit $?"` written straight after its command, with no pipe between, and a search of the tree is `git grep`; the handoff's rules state both. Every result a commit rests on is printed by a script that runs under bash by its first line. Before that, the shell, which refuses an unmatched pattern. |
 | A rule written before its cases were listed | 2 | A rule line: `Alis.Reactive.Assets/CLAUDE.md`, a rule's refused and accepted cases are listed, one fact each, before the rule is written. Since its second entry, whose rule was the harness's, a step a commit shows: a change to the harness runs one test outside `Harness/` before its commit, and the commit quotes that run's line. |
-| A number written from an earlier run, not from the command that proves it | 4 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Since its third, the step covers a commit message and a handoff too. Since its fourth, it covers a path outside the repository: the session's folders are written once, in an environment file every command reads, which refuses to load when a folder it names is missing. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
+| A number written from an earlier run, not from the command that proves it | 5 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Since its third, the step covers a commit message and a handoff too. Since its fourth, it covers a path outside the repository: the session's folders are written once, in an environment file every command reads, which refuses to load when a folder it names is missing. Since its fifth, it covers a status to the owner: a count in a message is pasted from the output of a command run in that turn. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
 
 ## Waiting for the owner
 
@@ -199,3 +199,9 @@ them, each marked as the lead's slip, and are not copied here.
   a path is written from the root or from the rule's folder. A decision added to `spec/CLAUDE.md` named the
   harness's folder from the Playwright project's. Caught by the step, `WhenARuleNamesTheCode` run alone before
   the gate. Cost: one edit, and no gate run. Held by that step.
+- 2026-11-12, a number written from an earlier run, not from the command that proves it, the class's fifth entry,
+  and the second mistake to reach the owner. A status to the owner said this log holds 30 entries, 17 of them the
+  session's; no command had counted them in that turn. The command reads 29, and 14 at the session's first head,
+  so 15 were the session's. Caught in the next turn, by the count the handoff's script runs. Cost: two wrong
+  numbers in one message to the owner, corrected in the next. The step covered a commit's message, a handoff and
+  a path, and not a status: it covers one now, as the table states.

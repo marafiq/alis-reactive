@@ -935,7 +935,8 @@ The core's bundle is built by `build.mjs` at the root, which each script that bu
 test, X19.3's, is green on the refusals screen's ward page, whose layout renders a fragment the app's cache holds,
 and fails on each of its two planted defects; it proves the runtime's thin path in a browser through a click
 handler of a seeded plan, and no test of U3 asserts the load trigger there.
-Open of it, in order: the bindings check's view clause; ALIS041; every screen's view; every browser test, failing; the Playwright project's switch.
+Open of it, in order: ALIS041; every screen's view; every browser test, failing; the Playwright project's switch. The bindings
+check's view clause is not built: it waits for the owner's word on what it reads (`spec/NOTES.md`, 2026-11-12).
 The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
