@@ -10,6 +10,7 @@ TEST005 | Alis.Reactive.TestRules | Error | A test has no branch and no loop
 TEST006 | Alis.Reactive.TestRules | Error | Assert.That reads what the browser reports beside the page
 TEST007 | Alis.Reactive.TestRules | Error | An expected value and what finds an element are constants
 TEST008 | Alis.Reactive.TestRules | Error | A page is matched by its whole text, never by a part
+TEST009 | Alis.Reactive.TestRules | Error | An expected value is not what the test typed
 TEST011 | Alis.Reactive.TestRules | Error | Only a test method asserts
 TEST012 | Alis.Reactive.TestRules | Error | A test carries the one promise it proves
 TEST013 | Alis.Reactive.TestRules | Error | A test performs its gesture itself
