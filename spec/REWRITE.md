@@ -260,8 +260,9 @@ alone. The runtime has its own table,
 `Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top, and its last row is the dot, the bundle's entry beside
 the table: `Schema`, `ValuesAndSources`, `OwnershipAndState`, `Plugins`, `Vendors`, `TriggersAndPipelines`,
 `Execution` and the dot today, a row entering with its first file. The test app
-holds `Components/*` over `World HostVariants` over `Care/* Bench/* Refusals/*`, so no screen reaches into another's
-model, and last the files beside the table, its entry point, a class in the app's namespace, since ALIS011 refuses a
+holds `Components`, what its components share, over `Components/ConformancePeer`, which ConformanceComponent's
+events hand over, over the other components' folders, over `World HostVariants` over `Care/* Bench/* Refusals/*`, so
+no screen reaches into another's model, and last the files beside the table, its entry point, a class in the app's namespace, since ALIS011 refuses a
 type in no namespace; the Playwright project holds `Harness` and then one row of module folders, so no module's tests
 use another's helpers; the analyzer cases and the module tests hold the files beside the table and then one row of
 module folders. Every project of the solution that holds a folder of C# builds with its table, which
@@ -944,6 +945,10 @@ WhenAnAppRendersItsPages states its next cases: each plan a page renders is read
 MVC action is opened at its route, a route's parameter takes the value a link gives it, a page of the refusals
 area that refuses is accepted as refused by design, and a page whose door is not built is listed apart from a
 problem until U27.
+The conformance library is declared in the app, `Components/` and a folder for each component: its six components,
+their payloads and live objects, written member for member from `spec/Reference/native.json`, and the app's data
+classes and enums the members name; no door of them is built, and their TypeScript is U13's. `Field`, the typed
+member name a declared method takes (M11.F1), is declared with them.
 Open of it, in order: every screen's view; every browser test, failing; the Playwright project's switch. The
 bindings check takes no view clause (section 2.5).
 The commit that lands a piece rewrites this paragraph.

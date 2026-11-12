@@ -11,6 +11,10 @@ its views.
 - The World area (`World/`) scopes data, gates and caches to a test's world by the cookie `"world"`, in Development
   alone. A document's request that carries no world gets a new one, so a person runs the app as a test does; any
   other request with no world gets none.
+- `Components/` holds the conformance library (`spec/Reference/native.json`), a folder for each component with its
+  declaration, its payloads, its live objects and the data classes its members name; what several components
+  reach sits in `Components/` itself. A declaration mirrors its component member for member, each by its C# name and
+  its door as that file states them; none is edited by hand to differ from it.
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.

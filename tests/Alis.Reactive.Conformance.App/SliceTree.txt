@@ -1,3 +1,6 @@
+Components
+Components/ConformancePeer
+Components/ConformanceComponent Components/ConformanceElement Components/ConformanceRegistered Components/ConformanceStore Components/ConformanceCallbacks
 World
 Refusals/*
 .

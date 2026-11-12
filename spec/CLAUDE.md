@@ -849,6 +849,23 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   in its placement. It was put to the owner as one line and not taken up, and it is no principle, closed rule or
   scope: a guard no view needs yet. The exact form, a page named by each placement and a reader of the doors each
   view calls, is a new check and waits for the owner's yes. The owner can overrule it.
+- The owner, 2026-11-12 (verbatim in `spec/NOTES.md`), after the lead had called the conformance app many sessions
+  of work: "My expectation is that TLA plus proves the schema, POCs, main, everything is in place, and you sort of
+  taking hell of a time." Then: "Quality has to stay. Quality comes from action, not too much thinking. Too much
+  thinking just slows you down. That is what fear-based behavior is." The design is in place and what is left is
+  execution: a line is read, the code is written and its proof is run. No status counts sessions or calls the size
+  of the work a problem, and a question the lines answer is not turned over twice. The gate, the proofs and the
+  commit's discipline stay as they are.
+- The lead, 2026-11-12, where two lines of the plan meet: U3 writes every screen's view, and U13's paragraph lands
+  the conformance library's declarations with the doors that reach them. A view that holds a component does not
+  compile without its declaration, so U3 writes each declaration's C#, member for member from
+  `spec/Reference/native.json`, with the app's data classes and enums its members name, and U13 writes its
+  TypeScript, builds the doors and turns its cells green. A payload is a class of its own beside its component,
+  since native.json names it as its event is named and C# refuses a nested type of a member's name; a type one
+  component reaches sits in that component's folder, and one several reach sits in
+  `tests/Alis.Reactive.Conformance.App/Components`. `Field` and
+  `Field<TValue>`, M11.F1's types, are declared in `Declarations` with `Field.Of`; the redesign's public `Name` is
+  not, since M11.X2 gives the name to the app's options, known where the view renders. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
