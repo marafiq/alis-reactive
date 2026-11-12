@@ -85,6 +85,30 @@ Alis.Reactive.Plugins.Plugin
 Alis.Reactive.Plugins.Plugin.Name.get -> string!
 Alis.Reactive.Plugins.Plugin.Plugin(string! name) -> void
 Alis.Reactive.Plugins.Plugin.Plugin(string! name, Alis.Reactive.Declarations.EventListening! events) -> void
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Html.get -> Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Id.get -> string!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Json<TOptions>(TOptions options) -> string!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Member.get -> System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Name.get -> string!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Render<TComponent>(Microsoft.AspNetCore.Html.IHtmlContent! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.ValueJson.get -> string!
+Alis.Reactive.RenderingAndDelivery.InputFields
+Alis.Reactive.RenderingAndDelivery.MemberPartials
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Json<TValue>(TValue value) -> string!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Plugin<TPlugin>() -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Render<TComponent>(string! id, Microsoft.AspNetCore.Html.IHtmlContent! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Rows<TRow>(string! rowsId) -> Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive(System.Func<TPlugin!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive<TArgs>(System.Func<TPlugin!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void
+Alis.Reactive.RenderingAndDelivery.RequestServices
+Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>
 Alis.Reactive.RequestsAndResponses.BrowserFile
 Alis.Reactive.RequestsAndResponses.BrowserFile.BrowserFile() -> void
 Alis.Reactive.RequestsAndResponses.BrowserFile.LastModified.get -> Alis.Reactive.Declarations.ReadOnly<long>!
@@ -531,6 +555,9 @@ static Alis.Reactive.Declarations.JsObject.Fixed<TValue>(TValue value) -> Alis.R
 static Alis.Reactive.Declarations.JsObject.Pass<TDeclared, TSource>(Alis.Reactive.ValuesAndSources.TypedSource<TSource>! value) -> Alis.Reactive.ValuesAndSources.Arg!
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.Property<TValue?>! property, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
+static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member, string! viewName) -> System.Threading.Tasks.Task<Microsoft.AspNetCore.Html.IHtmlContent!>!
+static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RequestsAndResponses.Content.File.get -> Alis.Reactive.RequestsAndResponses.SuccessContent<Alis.Reactive.RequestsAndResponses.ResponseFile!>!
 static Alis.Reactive.RequestsAndResponses.Content.Html.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<Alis.Reactive.RequestsAndResponses.Markup!>!
 static Alis.Reactive.RequestsAndResponses.Content.Json<TBody>() -> Alis.Reactive.RequestsAndResponses.ErrorContent<TBody>!

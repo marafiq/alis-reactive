@@ -8,3 +8,4 @@ Elements
 Validation
 RequestsAndResponses
 TriggersAndPipelines
+RenderingAndDelivery
