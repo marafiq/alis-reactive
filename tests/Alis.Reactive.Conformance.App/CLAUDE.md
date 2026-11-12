@@ -15,6 +15,10 @@ its views.
   declaration, its payloads, its live objects and the data classes its members name; what several components
   reach sits in `Components/` itself. A declaration mirrors its component member for member, each by its C# name and
   its door as that file states them; none is edited by hand to differ from it.
+- A component's render helper sits beside its declaration and starts it from a class of its own
+  (`Components/ConformanceComponent/ConformanceStart.cs`), written as the plan writes a literal; the class gains a
+  member when a page first needs the component to start with it. A page's layout is `Shared/_Layout.cshtml`, which
+  links the framework's script, unless the page renders something of its own beside its body, as the ward's does.
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.

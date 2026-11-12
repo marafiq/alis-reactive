@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@model Ledger
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ledger";
+    var plan = Html.ReactivePlan<Ledger>();
+}
+<h1>@Model.Resident's ledger</h1>
+@(plan.ConformanceComponent("ledger", new ConformanceStart()))
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Component<ConformanceComponent>("ledger").Amount.Set(Model.Balance)));
+}
+@Html.RenderPlan(plan)

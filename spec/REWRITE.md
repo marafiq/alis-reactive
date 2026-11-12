@@ -949,6 +949,9 @@ The conformance library is declared in the app, `Components/` and a folder for e
 their payloads and live objects, written member for member from `spec/Reference/native.json`, and the app's data
 classes and enums the members name; no door of them is built, and their TypeScript is U13's. `Field`, the typed
 member name a declared method takes (M11.F1), is declared with them.
+The first view on the doors is the ledger of `Refusals/ValuesAndSources`, with the conformance component's render
+helper and X7.13's test, which is red: its page answers 500 for a door that is not built, and the sweep of the
+app's pages lists it apart.
 Open of it, in order: every screen's view; every browser test, failing; the Playwright project's switch. The
 bindings check takes no view clause (section 2.5).
 The commit that lands a piece rewrites this paragraph.

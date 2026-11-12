@@ -10,7 +10,7 @@ public sealed record Binding(string Name, string Code) : BindingBase
 
     public StrictSpot Strict { get; init; } = new();
 
-    public SealedSpot? Sealed { get; init; }
+    public SealedSpot Sealed { get; init; } = null!;
 
     public PolySpot Polymorphic { get; init; } = new();
 

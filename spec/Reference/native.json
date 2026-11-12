@@ -644,8 +644,9 @@
           ]
         },
         {
-          "behavior": "Add adds the amount it is passed to Amount, which the component shows.",
+          "behavior": "Add adds the amount it is passed to Amount, which the component shows in a status named Amount.",
           "tests": [
+            "X7.13",
             "X7.14",
             "X17.4"
           ]

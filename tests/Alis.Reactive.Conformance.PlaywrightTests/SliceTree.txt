@@ -1,2 +1,2 @@
 Harness
-Schema/*
+Schema/* ValuesAndSources/*

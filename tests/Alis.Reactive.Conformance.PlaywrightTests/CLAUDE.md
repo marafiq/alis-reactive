@@ -23,6 +23,11 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
 - Each test runs in a world of its own: `ConformanceFixture` opens it, and `TestWorld` seeds it through the world
   contract's typed builders and keeps the errors its page's console holds, which a test reads with `Assert.That`.
   Teardown ends the world and fails a gate still parked.
+- A refusal where the view renders is read as its developer reads it: the heading of the page ASP.NET shows for
+  an exception, the exception's name, a colon and the whole message, found by its role and its exact name.
+  `ValuesAndSources/Refusals/WhenALiteralIsPastTheNumbersJavaScriptHolds.cs` is the pattern, the page that renders
+  beside it in a second world. A message names a component's member as its declaration does, the class, a dot and
+  the member.
 - A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
   alone and a module's tests sit in the module's.
