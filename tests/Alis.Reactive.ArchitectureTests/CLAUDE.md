@@ -19,7 +19,9 @@ expects none.
 - A defect planted in a rule's reader fails a case named for it; one that no case fails on names a missing case.
   The build refuses an unread member or parameter, so a planted defect that leaves one does not compile and proves
   nothing: it is redone as a mutation that compiles. A copy the sweep restores is touched, since the build reads a
-  file's time, and a stale build passes for the restored code (the lead's slips, 2026-11-11).
+  file's time, and a stale build passes for the restored code (the lead's slips, 2026-11-11). The copy is built and
+  read green before the first plant, with what the fixture runs beside the code, `node_modules` among it: a plant
+  on a copy that already fails proves nothing (the lead's slip, 2026-11-11).
 - `LintCases` holds the lint's refused and accepted files, which `WhenTheLintIsConfigured` lints.
 - `WhenAnAppRendersItsPages` and `WhenTheAppHoldsNoStaticState` read the conformance app as built, which this project
   references for the two of them. The first runs the app in this process and opens every address it answers to a

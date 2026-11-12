@@ -132,6 +132,45 @@ public class WhenARuleNamesTheCode
             Is.EqualTo(new[] { "CASE.md:2: scripts/playwright.sh reads no option --no-such-option", "CASE.md:3: package.json has no script \"nothing\"" }));
 
     [RefusedCase]
+    public void a_path_and_an_option_a_command_writes_outside_its_quotes_are_refused()
+    {
+        var audit = AuditOf(
+            Rule(
+                "CASE.md", "```bash",
+                "scripts/plant-defect.sh --with gone/away.md --no-such-option",
+                "scripts/plant-defect.sh --no-flag='a ward' --with 'a ward\\' gone/aside.md --replace \"a \\\"round\\\"\" gone/after.md --no-option=\"a ward\"",
+                "```"),
+            NotInTheRepo);
+
+        Assert.That(audit.Paths, Is.EqualTo(new[]
+        {
+            "CASE.md:2: `gone/away.md` is in neither the root nor any folder under it",
+            "CASE.md:3: `gone/aside.md` is in neither the root nor any folder under it",
+            "CASE.md:3: `gone/after.md` is in neither the root nor any folder under it",
+        }));
+        Assert.That(audit.Options, Is.EqualTo(new[]
+        {
+            "CASE.md:2: scripts/plant-defect.sh reads no option --no-such-option",
+            "CASE.md:3: scripts/plant-defect.sh reads no option --no-flag",
+            "CASE.md:3: scripts/plant-defect.sh reads no option --no-option",
+        }));
+    }
+
+    [AcceptedCase]
+    public void what_a_command_writes_inside_quotes_is_text_and_what_stands_before_a_quote_is_read()
+    {
+        var audit = AuditOf(
+            Rule(
+                "CASE.md", "```bash",
+                "scripts/plant-defect.sh --replace '<title>{Text(title)}</title>' --with '<title>a</title><script src=\\\"gone/away.js\\\"></script> --no-such-option'",
+                "scripts/plant-defect.sh --with \"say \\\"gone/away.sh --no-such-option\\\" twice\" --in=\"gone/aside.sh\" --test 'a ward'gone/after.md",
+                "```"),
+            NotInTheRepo);
+
+        Assert.That(audit.Unread.Concat(audit.Paths).Concat(audit.Scopes).Concat(audit.Names).Concat(audit.Texts).Concat(audit.Members).Concat(audit.Options), Is.Empty);
+    }
+
+    [RefusedCase]
     public void a_listed_exception_no_rule_cites_or_the_repo_holds_is_refused()
     {
         string[] listed = ["NeverCited", "WhenCodeIsWritten", "Repository"];
@@ -382,10 +421,12 @@ public class WhenARuleNamesTheCode
     private static void Check(Citation citation, string folder, Audit audit)
     {
         if (audit.IsListed(citation.Text)) return;
-        var words = citation.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var written = citation.Text.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        var isACommand = citation.IsShellLine || IsShellCommand(written);
+        var words = isACommand ? WordsOutsideQuotes(citation.Text) : written;
         foreach (var word in words.Where(IsPathShaped)) CheckPath(word, folder, citation.At, audit);
 
-        if (citation.IsShellLine || IsShellCommand(words))
+        if (isACommand)
         {
             CheckShell(words, folder, citation.At, audit);
             return;
@@ -402,6 +443,46 @@ public class WhenARuleNamesTheCode
         {
             CheckNames(code, citation.At, audit);
         }
+    }
+
+    private static string[] WordsOutsideQuotes(string command)
+    {
+        var words = new List<string>();
+        var word = new StringBuilder();
+        var holdsAQuote = false;
+        char? openedBy = null;
+        for (var at = 0; at < command.Length; at++)
+        {
+            var read = command[at];
+            var escapesTheNext = read == '\\' && openedBy != '\'' && at + 1 < command.Length;
+            if (escapesTheNext)
+            {
+                at++;
+                if (!holdsAQuote) word.Append(command[at]);
+            }
+            else if (openedBy == read)
+            {
+                openedBy = null;
+            }
+            else if (openedBy == null && read is '\'' or '"')
+            {
+                openedBy = read;
+                holdsAQuote = true;
+            }
+            else if (openedBy == null && read == ' ')
+            {
+                if (word.Length > 0) words.Add(word.ToString());
+                word.Clear();
+                holdsAQuote = false;
+            }
+            else if (!holdsAQuote)
+            {
+                word.Append(read);
+            }
+        }
+
+        if (word.Length > 0) words.Add(word.ToString());
+        return [.. words];
     }
 
     private static bool IsPathShaped(string word)
