@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@model LinkedRounds
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The linked rounds";
+    var plan = Html.ReactivePlan<LinkedRounds>();
+}
+<h1>The linked rounds</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart()))
+<button type="button" @Html.Raises(plan, LinkedRecords.TakeTheLinked)>Take the linked</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(LinkedRecords.TakeTheLinked, pipeline => pipeline.Component<ConformanceComponent>("conformance").TakeDays(Model.Days)));
+}
+@Html.RenderPlan(plan)

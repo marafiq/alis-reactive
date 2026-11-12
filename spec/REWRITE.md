@@ -954,6 +954,7 @@ helper and X7.13's test, which is red: its page answers 500 for a door that is n
 app's pages lists it apart.
 The app event family is declared, M1.N2 to M1.N5 with the data a handler reads (N5.6), doors `spec/api` compiles
 no sentence with, and the bench's first cell, prop.scalar.read, stands on them with its test red.
+The refusals index and X3.12's linked record page stand, its test red.
 Open of it, in order: the doors a view meets that are not yet declared, each with that view; every screen's view;
 every browser test, failing; the Playwright project's switch. The bindings check takes no view clause (section
 2.5).

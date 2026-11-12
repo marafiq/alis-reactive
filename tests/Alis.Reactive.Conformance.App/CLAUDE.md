@@ -23,6 +23,8 @@ its views.
   (`Bench/Properties/` the first): a controller with an action for each cell's page, the page's model, the app
   events its buttons raise, declared as static members, and a view for each cell, named for it. A page starts its
   component from what its world holds, so one page serves a cell and its opposite case.
+- `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has
+  its link there, and so does the page that renders beside it.
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.

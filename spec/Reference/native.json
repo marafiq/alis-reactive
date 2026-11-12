@@ -539,7 +539,7 @@
           ]
         },
         {
-          "behavior": "The component writes a line into its log for each value it receives: Date and the value's local yyyy-MM-dd HH:mm, TakeMoment's toISOString, null, same record when Take receives the object Snapshot() returned, or text and the text, Log's own text among them.",
+          "behavior": "The component writes a line into its log, a list named Log with an item for each line, for each value it receives: Date and the value's local yyyy-MM-dd HH:mm, TakeMoment's toISOString, null, same record when Take receives the object Snapshot() returned, or text and the text, Log's own text among them.",
           "tests": [
             "X3.10",
             "X3.12",

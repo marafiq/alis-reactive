@@ -1,2 +1,2 @@
 Harness
-Schema/* ValuesAndSources/* Vendors/*
+Schema/* ValuesAndSources/* Vendors/* PathsAndWire/*
