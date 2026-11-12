@@ -866,6 +866,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `tests/Alis.Reactive.Conformance.App/Components`. `Field` and
   `Field<TValue>`, M11.F1's types, are declared in `Declarations` with `Field.Of`; the redesign's public `Name` is
   not, since M11.X2 gives the name to the app's options, known where the view renders. The owner can overrule each.
+- The lead, 2026-11-12, declaring the app event family, which `spec/api` compiles no sentence with, from M1.N2 to
+  M1.N5 and M1.F2's proposed sentences: `AppEvent.Declare()` and `AppEvent.Declare<TPayload>()`, each with the
+  `name:` its line states and no constraint on the payload's class, since no line states one;
+  `trigger.CustomEvent`, its payload a `Data<TPayload>` as M1.N3 words it, a class of `Declarations` with `Read`
+  (N5.6, D5.2); `pipeline.Dispatch` with a literal or a source; and `Html.Raises`, which returns what a view
+  writes inside a tag on each host. `pipeline.Object<T>` (N7.1) waits for the first view that builds a payload
+  from sources. A door a module's page names and `spec/api` does not compile is declared the same way, from its
+  line and its sentence, with the first view that calls it. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

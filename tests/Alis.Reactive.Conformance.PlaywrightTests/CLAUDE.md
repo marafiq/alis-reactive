@@ -28,6 +28,11 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   `ValuesAndSources/Refusals/WhenALiteralIsPastTheNumbersJavaScriptHolds.cs` is the pattern, the page that renders
   beside it in a second world. A message names a component's member as its declaration does, the class, a dot and
   the member.
+- A bench cell's test is written from its cell's promise in `spec/Reference/native.json`, in `Vendors/Bench/`:
+  `Vendors/Bench/WhenAStepReadsAComponentsProperty.cs` is the pattern. The page's own element is found by the id
+  the promise names, a button by its role and name, and what the component shows by its role: its heading, and a
+  line the promise names, a status named for the line. The opposite case runs in a second world, seeded through a
+  typed builder of the world contract where the promise changes what the component holds.
 - A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
   alone and a module's tests sit in the module's.

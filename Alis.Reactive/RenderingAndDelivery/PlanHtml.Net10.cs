@@ -28,6 +28,25 @@ public static class PlanHtml
     public static void On<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, Action<Trigger<TModel>> trigger)
         => ViewPlans.On(plan, trigger);
 
+    /// <summary>Marks an element so that a click at or inside it raises an app event that carries no payload.</summary>
+    /// <remarks>Write it inside the element's tag: <c>&lt;button type="button" @Html.Raises(plan, WardEvents.Opened)&gt;</c>.</remarks>
+    /// <param name="html">The view's HTML helper.</param>
+    /// <param name="plan">The plan the view opened.</param>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <returns>The attributes that mark the element.</returns>
+    public static IHtmlContent Raises<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, AppEvent appEvent) => throw new NotImplementedException();
+
+    /// <summary>Marks an element so that a click at or inside it raises an app event with a payload.</summary>
+    /// <remarks>Write it inside the element's tag. The payload is written as the app's JSON writes it.</remarks>
+    /// <typeparam name="TModel">The model of the view.</typeparam>
+    /// <typeparam name="TPayload">The class of the payload.</typeparam>
+    /// <param name="html">The view's HTML helper.</param>
+    /// <param name="plan">The plan the view opened.</param>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <param name="payload">The payload each click raises the event with.</param>
+    /// <returns>The attributes that mark the element.</returns>
+    public static IHtmlContent Raises<TModel, TPayload>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, AppEvent<TPayload> appEvent, TPayload payload) => throw new NotImplementedException();
+
     /// <summary>Writes the view's plan into the page, as the view's last line.</summary>
     /// <remarks>
     /// The build refuses a plan rendered twice and a door that takes the plan after it rendered, since the page

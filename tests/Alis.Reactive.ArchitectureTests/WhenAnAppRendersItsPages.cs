@@ -144,6 +144,25 @@ public class WhenAnAppRendersItsPages
         Assert.That(swept.NotBuilt, Is.EqualTo(new[] { "/ward" }));
     }
 
+    [AcceptedCase]
+    public async Task a_page_whose_type_fails_to_start_on_a_door_that_is_not_built_is_listed_apart()
+    {
+        await using var app = await AnApp(ward => ward.MapGet("/ward", string () => throw new TypeInitializationException("Ward.Events", new NotImplementedException())));
+
+        var swept = await Sweep(app.GetTestServer());
+
+        Assert.That(swept.Problems, Is.Empty);
+        Assert.That(swept.NotBuilt, Is.EqualTo(new[] { "/ward" }));
+    }
+
+    [RefusedCase]
+    public async Task a_page_whose_type_fails_to_start_on_anything_else_is_refused_by_its_address()
+    {
+        await using var app = await AnApp(ward => ward.MapGet("/ward", string () => throw new TypeInitializationException("Ward.Events", new FormatException("The census holds no number."))));
+
+        Assert.That((await Sweep(app.GetTestServer())).Problems, Is.EqualTo(new[] { "GET /ward answered 500" }));
+    }
+
     [RefusedCase]
     public async Task a_page_that_fails_beside_one_whose_door_is_not_built_is_refused_by_its_address()
     {
@@ -251,7 +270,7 @@ public class WhenAnAppRendersItsPages
 
             opened.Add(next.Address);
             var answer = await Open(browser, watched, next.Address);
-            if (answer.Thrown.OfType<NotImplementedException>().Any())
+            if (answer.Thrown.Any(HoldsADoorThatIsNotBuilt))
                 notBuilt.Add(next.Address);
             else if (IsARefusalPage(next.Address) && answer.Thrown.OfType<InvalidOperationException>().Any())
                 refusedByDesign.Add(next.Address);
@@ -308,6 +327,9 @@ public class WhenAnAppRendersItsPages
     }
 
     private static bool IsARefusalPage(string address) => address.StartsWith(RefusalPages.Area, StringComparison.Ordinal);
+
+    private static bool HoldsADoorThatIsNotBuilt(Exception thrown)
+        => thrown is NotImplementedException || (thrown.InnerException is { } inner && HoldsADoorThatIsNotBuilt(inner));
 
     private static string AddressOf(RouteEndpoint route) => "/" + RouteOf(route).TrimStart('/');
 

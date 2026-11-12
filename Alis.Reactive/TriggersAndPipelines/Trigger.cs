@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.Declarations;
 using Alis.Reactive.Execution;
 using Alis.Reactive.Schema;
 
@@ -30,4 +31,17 @@ public sealed class Trigger<TModel>
         _writer.Content.Handles(new Handler(document, [], DocumentPlugin.Ready, [], PathMembers.Required, Policy.Overlap, steps));
         return this;
     }
+
+    /// <summary>Runs a pipeline each time an app event that carries no payload is raised.</summary>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <returns>The trigger, to handle another.</returns>
+    public Trigger<TModel> CustomEvent(AppEvent appEvent, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time an app event is raised, with the event's payload.</summary>
+    /// <typeparam name="TPayload">The class of the payload.</typeparam>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <param name="pipeline">The steps to run on each raise, with the payload the raise carries.</param>
+    /// <returns>The trigger, to handle another.</returns>
+    public Trigger<TModel> CustomEvent<TPayload>(AppEvent<TPayload> appEvent, Action<Data<TPayload>, Pipeline<TModel>> pipeline) => throw new NotImplementedException();
 }

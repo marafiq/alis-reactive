@@ -54,6 +54,23 @@ public sealed class Pipeline<TModel>
     /// <returns>The input, typed by the member's value.</returns>
     public BoundInput<TValue> Input<TValue>(Expression<Func<TModel, TValue>> member) => throw new NotImplementedException();
 
+    /// <summary>Raises an app event that carries no payload.</summary>
+    /// <remarks>Each handler of the event runs up to its first awaited step before the step after this one runs.</remarks>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    public void Dispatch(AppEvent appEvent) => throw new NotImplementedException();
+
+    /// <summary>Raises an app event with a payload the view writes.</summary>
+    /// <typeparam name="TPayload">The class of the payload.</typeparam>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <param name="payload">The payload, written into the plan where the view renders.</param>
+    public void Dispatch<TPayload>(AppEvent<TPayload> appEvent, TPayload payload) => throw new NotImplementedException();
+
+    /// <summary>Raises an app event with a payload read when the step runs.</summary>
+    /// <typeparam name="TPayload">The class of the payload.</typeparam>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <param name="payload">The source the payload is read from.</param>
+    public void Dispatch<TPayload>(AppEvent<TPayload> appEvent, TypedSource<TPayload> payload) => throw new NotImplementedException();
+
     /// <summary>Starts a condition, read when the pipeline reaches it.</summary>
     /// <param name="condition">The condition; its branch runs only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>

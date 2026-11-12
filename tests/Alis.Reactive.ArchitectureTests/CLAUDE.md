@@ -31,7 +31,7 @@ expects none.
   a page renders is read against `Alis.Reactive.Assets/runtime/Schema/plan.schema.json`. The sweep's own host hears
   what a page threw from the developer exception page: a page of the refusals area that refuses is accepted as
   refused by design, and a page whose door is not built is listed apart from a problem until the last unit builds
-  the last door (`spec/REWRITE.md`, U27). The
+  the last door (`spec/REWRITE.md`, U27), a door's exception read through a type that failed to start on it. The
   second reads every static of the types the app's authors wrote; its cases read an assembly built from their text.
   What the app holds as it runs is read from its assembly, the one place a view's and a generator's statics are.
 - `WhenTheCoreIsCompiled` compiles the core's tracked C# as its net10 host does, against the references this

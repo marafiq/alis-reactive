@@ -19,6 +19,10 @@ its views.
   (`Components/ConformanceComponent/ConformanceStart.cs`), written as the plan writes a literal; the class gains a
   member when a page first needs the component to start with it. A page's layout is `Shared/_Layout.cshtml`, which
   links the framework's script, unless the page renders something of its own beside its body, as the ward's does.
+- `Bench/` holds the component bench, a folder for each family of cells of `spec/Reference/native.json`
+  (`Bench/Properties/` the first): a controller with an action for each cell's page, the page's model, the app
+  events its buttons raise, declared as static members, and a view for each cell, named for it. A page starts its
+  component from what its world holds, so one page serves a cell and its opposite case.
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.

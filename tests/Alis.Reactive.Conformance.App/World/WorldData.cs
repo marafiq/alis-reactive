@@ -8,15 +8,19 @@ internal sealed class WorldData
     private readonly ConcurrentQueue<string> _residents = new();
     private readonly ConcurrentDictionary<string, WorldGate> _gates = new(StringComparer.Ordinal);
     private volatile string _word = "";
+    private volatile string _componentText = "Alpha";
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
     internal string Word => _word;
 
+    internal string ComponentText => _componentText;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
         if (seed.Word is { } word) _word = word;
+        if (seed.ComponentText is { } text) _componentText = text;
     }
 
     internal void Arm(string gate) => _gates[gate] = new WorldGate();

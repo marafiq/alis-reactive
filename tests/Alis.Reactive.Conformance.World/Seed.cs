@@ -10,11 +10,15 @@ public sealed class Seed
 
     public int? CachedRoundsPlanVersion { get; set; }
 
+    public string? ComponentText { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed TheWord(string word) => new() { Word = word };
 
     public static Seed CachedRoundsOfPlanVersion(int version) => new() { CachedRoundsPlanVersion = version };
+
+    public static Seed TheComponentsText(string text) => new() { ComponentText = text };
 
     public Seed AndResident(string name)
     {
