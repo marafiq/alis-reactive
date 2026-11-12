@@ -182,6 +182,7 @@ csharp_preserve_single_line_statements = true
 
 dotnet_diagnostic.IDE0011.severity = warning
 dotnet_diagnostic.IDE0040.severity = warning
+dotnet_diagnostic.IDE0051.severity = warning
 dotnet_diagnostic.IDE0052.severity = warning
 dotnet_diagnostic.IDE0059.severity = warning
 dotnet_diagnostic.IDE0060.severity = warning

@@ -118,7 +118,7 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | In the runtime: a default for plan data, a floating promise, a switch that misses a kind, a condition that is no boolean, a loose equality, an enum, an inline lint directive, a pure test that imports past its module's index | the lint and the TypeScript compiler, held by `WhenTheLintIsConfigured` |
 | A rule with no refused or no accepted case | `WhenAnArchitectureTestIsWritten`; `spec/plants` for a check |
 | A door or a feature lost; a defect below its rung; a meaning with no carrier; a kind outside the grammar; a unit that proves nothing; a path with no verdict; a pin off its version; a generated binding off the spec; a hedge word in the spec | `spec/tools/check.py`, each check with its plants |
-| C# off the formatter; an unread private member or parameter | `dotnet format --verify-no-changes` and the build, in `scripts/check.sh` |
+| C# off the formatter; a private member nothing uses or reads; an unread parameter | `dotnet format --verify-no-changes` and the build, in `scripts/check.sh` |
 | A package off its lock, a tool off its pin, a package with a known vulnerability | the locked restore, `scripts/doctor.sh` and both audits |
 | A browser run that ran other than the spec selected, retried a test, ran one over the measured budget or left a server alive | `scripts/playwright.sh`, held by `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` |
 | A raw `dotnet test` of a Playwright project or the solution; `git stash`; a listing of user secrets; a commit on `main` | the deny rules of `.claude/settings.json`; the pre-commit hook `scripts/install-git-hooks.sh` installs |
