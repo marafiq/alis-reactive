@@ -8,3 +8,4 @@ TEST004 | Alis.Reactive.TestRules | Error | A test is never skipped, repeated, o
 TEST005 | Alis.Reactive.TestRules | Error | A test has no branch and no loop
 TEST011 | Alis.Reactive.TestRules | Error | Only a test method asserts
 TEST012 | Alis.Reactive.TestRules | Error | A test carries the one promise it proves
+TEST013 | Alis.Reactive.TestRules | Error | A test performs its gesture itself
