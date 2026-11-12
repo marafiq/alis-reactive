@@ -9,6 +9,9 @@ as the C# module whose nodes it executes, and `runtime/SliceTree.txt` is its sli
   or nullable, so plan data takes no default. It trusts a framework-generated plan: no validator, fallback, registry
   or defensive throw for a shape the C# controls. It fails loud only at real boundaries: DOM lookup, browser APIs,
   the network, component or plugin lookup, and JSON the framework did not produce.
+- `runtime/Schema/plan.ts` and `runtime/Schema/plan.schema.json` are the plan's contract, generated from the C#
+  grammar (`tools/PlanContractGenerator`): the runtime declares no type of the plan's own, a hook refuses a hand
+  edit of either file, and `scripts/check.sh` fails when the grammar generates another.
 - It never guesses: it reads no intent from the DOM, takes an element by its id alone, and retries nothing another
   way. What it needs to know, the plan carries.
 - The compiler holds every strictness option `spec/REWRITE.md` section 2.7 lists, in `tsconfig.json`; an enum is

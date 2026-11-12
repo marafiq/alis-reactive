@@ -146,6 +146,15 @@
       "alis.reactive.conformance.world": {
         "type": "Project"
       },
+      "Alis.Reactive.PlanContractGenerator": {
+        "type": "Project",
+        "dependencies": {
+          "AlisReactive": "[1.0.0, )"
+        }
+      },
+      "AlisReactive": {
+        "type": "Project"
+      },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "CentralTransitive",
         "requested": "[5.9.0, )",

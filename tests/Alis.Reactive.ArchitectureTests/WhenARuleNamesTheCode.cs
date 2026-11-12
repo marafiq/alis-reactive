@@ -22,9 +22,8 @@ public class WhenARuleNamesTheCode
         ["page.evaluate()", "writes_a_let_statement", "set_prop_mutation_writes_value_to_ej2_instance"];
     private static readonly string[] VendorTypes = ["EmitType", "ChangeEventArgs"];
     private static readonly string[] PlatformMembers = ["Year", "Application_Start", "FlagsAttribute", "Clock"];
-    private static readonly string[] OperatorsTheSpecDecides = ["eqDecimal"];
     private static readonly string[] NotInTheRepo =
-        [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. PlatformMembers, .. OperatorsTheSpecDecides];
+        [.. Branches, .. OutsideWhatGitTracks, .. Placeholders, .. WhatTheRulesForbid, .. VendorTypes, .. PlatformMembers];
 
     private static readonly CSharpParseOptions ForNet10 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols(Hosts.SymbolsOfNet10);
     private static readonly CSharpParseOptions ForNet48 = new CSharpParseOptions(LanguageVersion.CSharp14).WithPreprocessorSymbols(Hosts.SymbolsOfNet48);

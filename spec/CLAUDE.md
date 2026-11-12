@@ -768,6 +768,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   takes none of the four. Beside the same measurement, the lead's reading of section 2.8's parallelism: the count of
   tests at once is measured apart from the budget, since four settings of 20 runs each cost four measurements, and
   the budget is measured at the count the parallelism measurement kept. The owner can overrule each.
+- The lead, 2026-11-11, landing the grammar (U3) within D19.1 to D19.9 and the owner's decision of the same day
+  that the schema is done and only its bugs are addressed. The grammar's classes are `Alis.Reactive/Schema`'s, the
+  module table's name, where N19.1 and N19.2 name the redesign's `Grammar`. A kind's class is its kind and then its
+  union (`SetStatement`, `LitExpression`), which the contract generator holds. A path that takes no `each` is a list
+  of `PathStep`, a member or an index, and a registration's path is a list of `RegistrationStep`, which adds `each`:
+  one type for both would give `each` a second handler in every path walk (S4, S5). Two gaps met in schema.md are
+  the owner's to settle, each built at the reading that adds no kind and no null: a `lit`'s value is the JSON C#
+  wrote, since schema.md's `includes` writes the view's list as a `lit` where the `lit` row says a scalar or null;
+  and a container's `live`, "none, or the `Live`", is a list of at most one `Live` (S2). The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -716,6 +716,29 @@ def schema_json_kinds(sha):
             if "const" in definition.get("properties", {}).get("kind", {})}
 
 
+HEAD_CONTRACT = REPO / "Alis.Reactive.Assets" / "runtime" / "Schema" / "plan.schema.json"
+
+
+def contract_kinds(document):
+    definitions, followed, kinds, pending = document["$defs"], set(), set(), [{"$ref": document["$ref"]}]
+    while pending:
+        node = pending.pop()
+        if isinstance(node, list):
+            pending += node
+        if not isinstance(node, dict):
+            continue
+        name = node["$ref"].rsplit("/", 1)[1] if isinstance(node.get("$ref"), str) else None
+        if name is not None and name not in followed:
+            followed.add(name)
+            pending.append(definitions[name])
+        properties = node.get("properties")
+        kind = properties.get("kind") if isinstance(properties, dict) else None
+        if isinstance(kind, dict) and "const" in kind:
+            kinds.add(kind["const"])
+        pending += node.values()
+    return kinds
+
+
 def table_cells(line):
     return [cell.strip() for cell in line.strip().strip("|").split("|")]
 
@@ -797,12 +820,18 @@ def check_kinds():
     added = sorted(row["Kind"] for row in rows if row["Proposed"] == "added")
     removed = sorted(row["Kind"] for row in rows if row["Proposed"] == "removed")
     problems += closed_set_problems(len(proposed), len(grammar), added, removed)
+    written = contract_kinds(json.loads(HEAD_CONTRACT.read_text())) if HEAD_CONTRACT.is_file() else set()
+    if not HEAD_CONTRACT.is_file():
+        problems.append(f"{HEAD_CONTRACT.relative_to(REPO)}, the contract the rewrite's grammar generates, is not in the tree")
+    unlisted = sorted(written - proposed)
+    if unlisted:
+        problems.append(f"the rewrite's grammar writes a kind schema.md does not list: {unlisted}")
     detail = "; ".join(problems[:6]) or (
         f"grammar, plan.schema.json and schema.md agree on today's {len(grammar)}; proposed {len(proposed)} equals Schema.tla's"
         f" node set, one handler each; diff +{','.join(added)} -{','.join(removed) or 'none'};"
-        f" {len(several_today)} kinds have two handlers today")
+        f" {len(several_today)} kinds have two handlers today; the rewrite's grammar writes {len(written)} of the proposed set and no other")
     return result(not problems, detail, today=len(grammar), proposed=len(proposed), added=len(added), removed=len(removed),
-                  several_handlers_today=len(several_today))
+                  several_handlers_today=len(several_today), written=len(written))
 
 
 CLOSED_SET = re.compile(r"closed at (\d+) kinds: today's (\d+) but (.*?), and (.*?), the (\d+) `spec/Core/schema\.md` marks added")

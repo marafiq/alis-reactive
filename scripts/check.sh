@@ -9,16 +9,17 @@ Usage:
   scripts/check.sh --no-spec
 
 Runs every check that needs no browser, in order, and stops at the first that fails:
-  1. npm ci when node_modules is missing, then npm audit
-  2. the Syncfusion pin's agreement in NuGet, npm and the lock
-  3. tsc -b over the runtime, then eslint with --max-warnings 0
-  4. dotnet restore in locked mode, then dotnet build -c Release
-  5. dotnet format --verify-no-changes over the solution
-  6. the architecture tests, the analyzer cases and the test rules' cases
-  7. python3 spec/tools/check.py --ci, which reads JAVA_HOME and TLA2TOOLS_JAR
+  1. the plan contract, generated from the grammar and compared with the tracked plan.ts and plan.schema.json
+  2. npm ci when node_modules is missing, then npm audit
+  3. the Syncfusion pin's agreement in NuGet, npm and the lock
+  4. tsc -b over the runtime, then eslint with --max-warnings 0
+  5. dotnet restore in locked mode, then dotnet build -c Release
+  6. dotnet format --verify-no-changes over the solution
+  7. the architecture tests, the analyzer cases and the test rules' cases
+  8. python3 spec/tools/check.py --ci, which reads JAVA_HOME and TLA2TOOLS_JAR
 
 Options:
-  --no-spec   Leave step 7 out: CI runs it as a job of its own.
+  --no-spec   Leave step 8 out: CI runs it as a job of its own.
   -h, --help  Show this help.
 USAGE
 }
@@ -34,6 +35,15 @@ esac
 step() {
   echo "[check] $1"
 }
+
+contract=Alis.Reactive.Assets/runtime/Schema
+step "the plan contract, generated from the grammar"
+dotnet run --project tools/PlanContractGenerator -c Release --property:RestoreLockedMode=true -- "$contract"
+git ls-files --error-unmatch "$contract/plan.ts" "$contract/plan.schema.json" > /dev/null
+if ! git diff --exit-code -- "$contract/plan.ts" "$contract/plan.schema.json"; then
+  echo "[check] The grammar generates another contract than the tracked one: stage the plan.ts and plan.schema.json it wrote." >&2
+  exit 1
+fi
 
 step "npm audit"
 [ -d node_modules ] || npm ci

@@ -163,5 +163,27 @@
    }
   ],
   "expect": null
+ },
+ {
+  "name": "a kind the rewrite's grammar writes and schema.md does not list",
+  "edits": [
+   {
+    "file": "Alis.Reactive.Assets/runtime/Schema/plan.schema.json",
+    "old": "\"const\": \"stop\"",
+    "new": "\"const\": \"halt\""
+   }
+  ],
+  "expect": "the rewrite's grammar writes a kind schema.md does not list: ['halt']"
+ },
+ {
+  "name": "a kind of a contract the plan's root does not reach",
+  "edits": [
+   {
+    "file": "Alis.Reactive.Assets/runtime/Schema/plan.schema.json",
+    "old": "  \"$defs\": {\n",
+    "new": "  \"$defs\": {\n    \"WrittenForm\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"kind\": {\n          \"const\": \"written\"\n        }\n      }\n    },\n"
+   }
+  ],
+  "expect": null
  }
 ]

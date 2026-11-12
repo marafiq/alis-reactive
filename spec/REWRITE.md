@@ -163,7 +163,8 @@ tests/
                                               the shipped projects' files WhenCodeCompilesForBothHosts (2.2); over
                                               every assembly WhenAnInternalIsExposed, which refuses a friend
                                               assembly; over the solution's projects WhenAProjectHoldsFolders
-                                              (2.3); over every view WhenAViewIsWritten, which refuses script
+                                              (2.3); over the contract generator's reader
+                                              WhenThePlanContractIsGenerated; over every view WhenAViewIsWritten, which refuses script
                                               in one; their
                                               helpers Repository, Hosts, Scripts and read-scripts
                                               and its packages.lock.json and CLAUDE.md; LintCases holds the lint's refused and
@@ -211,8 +212,10 @@ the file it moved to:
 - P4. A type whose module sits below a type it needs moves to the lowest module that can hold it: `PageUrl` and
   `BrowserFile` to `RequestsAndResponses`, `IAppLevelComponent` to `Vendors`.
 
-The folder and namespace names are the module table's (spec/CLAUDE.md). DESIGN.md's `Pipelines`, `Requests` and
-`Hosting` read `TriggersAndPipelines`, `RequestsAndResponses` and `RenderingAndDelivery`. The block writer, the POC's
+The folder and namespace names are the module table's (spec/CLAUDE.md). DESIGN.md's `Grammar`, `Pipelines`,
+`Requests` and `Hosting` read `Schema`, `TriggersAndPipelines`, `RequestsAndResponses` and `RenderingAndDelivery`: the
+grammar's classes, every node, choice and contract, are `Schema`'s, and a module's folder holds the nodes its builders
+write as instances. The block writer, the POC's
 `Writing/PlanBuild.cs`, goes to `Execution/` and reads no module above it: the view's name prefix is text it holds.
 A file of a shipped project compiles for both hosts or for one: a one-host file is named `.Net48.cs` or `.Net10.cs` and
 wrapped whole in `#if NET48` or `#if NET10_0_OR_GREATER`, and no other conditional directive is written; a member that
@@ -891,8 +894,13 @@ path does, and a part that lists its doors, each on a Doors line, lands with the
 promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
 TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget, waits and
 count of tests at once, a pool's shard and CI's proof, the two architecture tests over the app, the harness's
-refusal of the EJ2 script, and section 2.8's four workflows, which no run has read. U3 is next. The commit that
-lands a piece rewrites this paragraph.
+refusal of the EJ2 script, and section 2.8's four workflows, which no run has read. U3 is in work. Landed of it:
+the schema's nodes, the 51 kinds as sealed classes of `Alis.Reactive/Schema`, with the contract generator, its
+cases, its step in `scripts/check.sh` and the generated `plan.ts` and `plan.schema.json`, and the kinds check
+reading the rewrite's grammar. Open of it, in order: the contracts `HttpSend`, `HttpResponse`, `FormCheck` and
+`FormPlace`; the core's sixteen rows and every door as a signature; the runtime's rows and dispatch with vitest
+and the lint's two path-bound rules; the module tests' project; the thin path; every screen's view; every browser
+test, failing; the Playwright project's switch. The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1

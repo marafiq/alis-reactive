@@ -28,6 +28,9 @@ expects none.
   GET, and every link its pages hold, as a browser opens a document; its cases sweep an app the case maps. The
   second reads every static of the types the app's authors wrote; its cases read an assembly built from their text.
   What the app holds as it runs is read from its assembly, the one place a view's and a generator's statics are.
+- `WhenThePlanContractIsGenerated` runs the contract generator's reader, which this project references for it, over
+  small grammars its cases declare, and expects each refusal's own words and the TypeScript and the schema of an
+  accepted one as literals. The core's own contract is held by the first step of `scripts/check.sh`.
 - `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
   result, over the tables and TRX files their cases write, and expect each refusal's own line.
 

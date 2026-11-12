@@ -18,6 +18,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Alis.Reactive.Conformance.App\Alis.Reactive.Conformance.App.csproj" />
+        <ProjectReference Include="..\..\tools\PlanContractGenerator\PlanContractGenerator.csproj" />
     </ItemGroup>
 
 </Project>

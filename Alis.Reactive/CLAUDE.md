@@ -10,7 +10,15 @@ uses only the rows before its own. `spec/REWRITE.md` section 2.3 says why each r
   `internal`. A new door is a line of `PublicAPI/<tfm>/PublicAPI.Unshipped.txt` in the commit that writes it, with its
   XML doc (`.claude/rules/docs.md`).
 - A door is typed. A deliberate exception carries `Declarations/TypedDslExemptionAttribute.cs` with its reason.
-- The grammar's nodes are sealed, with `internal` constructors, and a unit never changes the grammar.
+- The grammar's nodes are sealed, with `internal` constructors, and a unit never changes the grammar. They are
+  `Schema/`'s, written from `spec/Core/schema.md`: a union is an abstract class that names each kind's class, a
+  kind's class is its kind and then its union (`SetStatement`), a constructor takes every field and none is
+  nullable, and a closed choice is a sealed class with a private constructor and one instance a case, written as
+  its text (`Schema/Choice.cs`). A member that holds a kind is typed as its union, so the plan writes its kind.
+  `Schema/PlanJson.cs` holds the options the plan is written with.
+- The TypeScript contract and the plan's JSON schema are generated from the grammar as System.Text.Json writes it
+  (`tools/PlanContractGenerator`), never edited by hand, and `scripts/check.sh` fails on a grammar the tracked
+  contract differs from.
 - The core discovers and invokes no member at run time. A read of type information is on the owner's list
   (`spec/CLAUDE.md`); U3 lands the tool that refuses any other, with the core's first code that reads a type.
 - A module's two halves are written against the schema (`spec/Core/schema.md`): this folder writes the nodes, and
@@ -45,3 +53,5 @@ scripts/check.sh --no-spec
 | A public symbol outside the PublicAPI text | the build (RS0016, RS0017) |
 | A conditional directive inside a file | `WhenCodeCompilesForBothHosts` |
 | A comment; an XML doc off the public surface | `WhenCodeIsWritten` |
+| A node left open, a nullable field, a field typed as a kind's class, a kind written twice or by a class not named for it, a choice a case of which can be made outside it | the contract generator, held by `WhenThePlanContractIsGenerated` |
+| A grammar the tracked contract differs from | `scripts/check.sh`, its first step |

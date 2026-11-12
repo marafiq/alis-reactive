@@ -1,0 +1,1933 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$ref": "#/$defs/PlanDocument",
+  "$defs": {
+    "PlanDocument": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 7
+        },
+        "planId": {
+          "type": "string"
+        },
+        "culture": {
+          "$ref": "#/$defs/Culture"
+        },
+        "timeZone": {
+          "$ref": "#/$defs/TimeZone"
+        },
+        "trace": {
+          "$ref": "#/$defs/Trace"
+        },
+        "vendors": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Vendor"
+          }
+        },
+        "objects": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Locator"
+          }
+        },
+        "handlers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Handler"
+          }
+        }
+      },
+      "required": [
+        "version",
+        "planId",
+        "culture",
+        "timeZone",
+        "trace",
+        "vendors",
+        "objects",
+        "handlers"
+      ],
+      "additionalProperties": false
+    },
+    "Culture": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "collation": {
+          "type": "string"
+        },
+        "decimal": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "integer": {
+          "$ref": "#/$defs/NumberText"
+        },
+        "fraction": {
+          "$ref": "#/$defs/NumberText"
+        }
+      },
+      "required": [
+        "name",
+        "collation",
+        "decimal",
+        "group",
+        "integer",
+        "fraction"
+      ],
+      "additionalProperties": false
+    },
+    "NumberText": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "boolean"
+        },
+        "exponent": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "group",
+        "exponent"
+      ],
+      "additionalProperties": false
+    },
+    "TimeZone": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ClockTimeZone"
+        },
+        {
+          "$ref": "#/$defs/ZoneTimeZone"
+        }
+      ]
+    },
+    "ClockTimeZone": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "clock"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "ZoneTimeZone": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "zone"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "Trace": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/OffTrace"
+        },
+        {
+          "$ref": "#/$defs/OnTrace"
+        }
+      ]
+    },
+    "OffTrace": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "off"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "OnTrace": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "on"
+        },
+        "traceparent": {
+          "type": "string"
+        },
+        "tracestate": {
+          "type": "string"
+        },
+        "console": {
+          "type": "boolean"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Source"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "traceparent",
+        "tracestate",
+        "console",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "Source": {
+      "type": "object",
+      "properties": {
+        "view": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "view",
+        "line"
+      ],
+      "additionalProperties": false
+    },
+    "Vendor": {
+      "type": "object",
+      "properties": {
+        "locate": {
+          "$ref": "#/$defs/Expression"
+        },
+        "listen": {
+          "$ref": "#/$defs/Listening"
+        }
+      },
+      "required": [
+        "locate",
+        "listen"
+      ],
+      "additionalProperties": false
+    },
+    "Expression": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/LitExpression"
+        },
+        {
+          "$ref": "#/$defs/ObjExpression"
+        },
+        {
+          "$ref": "#/$defs/RefExpression"
+        },
+        {
+          "$ref": "#/$defs/GetExpression"
+        },
+        {
+          "$ref": "#/$defs/DataExpression"
+        },
+        {
+          "$ref": "#/$defs/AsExpression"
+        },
+        {
+          "$ref": "#/$defs/CallExpression"
+        },
+        {
+          "$ref": "#/$defs/FnExpression"
+        },
+        {
+          "$ref": "#/$defs/AnswerExpression"
+        },
+        {
+          "$ref": "#/$defs/RecordExpression"
+        },
+        {
+          "$ref": "#/$defs/ListExpression"
+        },
+        {
+          "$ref": "#/$defs/OpExpression"
+        },
+        {
+          "$ref": "#/$defs/SignalExpression"
+        }
+      ]
+    },
+    "LitExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "lit"
+        },
+        "value": {}
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "ObjExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "obj"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "additionalProperties": false
+    },
+    "RefExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "ref"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "GetExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "get"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
+        "members": {
+          "$ref": "#/$defs/PathMembers"
+        },
+        "target": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "kind",
+        "path",
+        "members",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "PathStep": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "integer",
+          "minimum": 0
+        }
+      ]
+    },
+    "PathMembers": {
+      "enum": [
+        "required",
+        "optional",
+        "requiredIfHeld",
+        "optionalMember"
+      ]
+    },
+    "DataExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "data"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DataStep"
+          }
+        },
+        "target": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "kind",
+        "path",
+        "target"
+      ],
+      "additionalProperties": false
+    },
+    "DataStep": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "requires": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "absent": {
+          "$ref": "#/$defs/Absence"
+        }
+      },
+      "required": [
+        "name",
+        "requires",
+        "absent"
+      ],
+      "additionalProperties": false
+    },
+    "Absence": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/StartAbsence"
+        },
+        {
+          "$ref": "#/$defs/NothingAbsence"
+        },
+        {
+          "$ref": "#/$defs/UnboundAbsence"
+        }
+      ]
+    },
+    "StartAbsence": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "start"
+        },
+        "value": {}
+      },
+      "required": [
+        "kind",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "NothingAbsence": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "nothing"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "UnboundAbsence": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "unbound"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "AsExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "as"
+        },
+        "expr": {
+          "$ref": "#/$defs/Expression"
+        },
+        "shape": {
+          "$ref": "#/$defs/Shape"
+        }
+      },
+      "required": [
+        "kind",
+        "expr",
+        "shape"
+      ],
+      "additionalProperties": false
+    },
+    "Shape": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/StringShape"
+        },
+        {
+          "$ref": "#/$defs/NumberShape"
+        },
+        {
+          "$ref": "#/$defs/BooleanShape"
+        },
+        {
+          "$ref": "#/$defs/DateShape"
+        },
+        {
+          "$ref": "#/$defs/InstantShape"
+        },
+        {
+          "$ref": "#/$defs/FileShape"
+        },
+        {
+          "$ref": "#/$defs/AnyShape"
+        },
+        {
+          "$ref": "#/$defs/ArrayShape"
+        },
+        {
+          "$ref": "#/$defs/NullableShape"
+        },
+        {
+          "$ref": "#/$defs/ObjectShape"
+        }
+      ]
+    },
+    "StringShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "string"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "NumberShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "number"
+        },
+        "of": {
+          "$ref": "#/$defs/NumberOf"
+        },
+        "text": {
+          "$ref": "#/$defs/NumberCulture"
+        }
+      },
+      "required": [
+        "kind",
+        "of",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "NumberOf": {
+      "enum": [
+        "integer",
+        "fraction"
+      ]
+    },
+    "NumberCulture": {
+      "enum": [
+        "view",
+        "invariant"
+      ]
+    },
+    "BooleanShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "boolean"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "DateShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "date"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "InstantShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "instant"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "FileShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "file"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "AnyShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "any"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "ArrayShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "array"
+        },
+        "item": {
+          "$ref": "#/$defs/Shape"
+        }
+      },
+      "required": [
+        "kind",
+        "item"
+      ],
+      "additionalProperties": false
+    },
+    "NullableShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "nullable"
+        },
+        "inner": {
+          "$ref": "#/$defs/Shape"
+        }
+      },
+      "required": [
+        "kind",
+        "inner"
+      ],
+      "additionalProperties": false
+    },
+    "ObjectShape": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "object"
+        },
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Shape"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "CallExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "call"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
+        "members": {
+          "$ref": "#/$defs/PathMembers"
+        },
+        "target": {
+          "$ref": "#/$defs/Expression"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Expression"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "path",
+        "members",
+        "target",
+        "args"
+      ],
+      "additionalProperties": false
+    },
+    "FnExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "fn"
+        },
+        "params": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "body": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "kind",
+        "params",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "AnswerExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "answer"
+        },
+        "arguments": {
+          "type": "string"
+        },
+        "body": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "kind",
+        "arguments",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "RecordExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "record"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RecordField"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "RecordField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "ListExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "list"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Expression"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "OpExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "op"
+        },
+        "op": {
+          "$ref": "#/$defs/Operator"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Expression"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "op",
+        "args"
+      ],
+      "additionalProperties": false
+    },
+    "Operator": {
+      "enum": [
+        "eq",
+        "neq",
+        "lt",
+        "lte",
+        "gt",
+        "gte",
+        "and",
+        "or",
+        "not",
+        "add",
+        "sub",
+        "mul",
+        "mod",
+        "neg",
+        "coalesce",
+        "cond",
+        "nullableValue",
+        "nonNull",
+        "empty",
+        "matches",
+        "toArray",
+        "finite",
+        "compareNumbers",
+        "compareOrdinal",
+        "compareBooleans",
+        "compareCulture",
+        "merge",
+        "trim",
+        "trimStart",
+        "trimEnd",
+        "upperInvariant",
+        "lowerInvariant",
+        "upper",
+        "lower",
+        "upperTurkic",
+        "lowerTurkic",
+        "contains",
+        "startsWith",
+        "endsWith",
+        "nullOrEmpty",
+        "includes",
+        "sumInt",
+        "sumDouble",
+        "sumDecimal",
+        "eqDecimal",
+        "dateKey",
+        "wallKey",
+        "instantKey",
+        "dayKey",
+        "timeKey",
+        "spanKey"
+      ]
+    },
+    "SignalExpression": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "signal"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "Listening": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/MethodListening"
+        },
+        {
+          "$ref": "#/$defs/AssignmentListening"
+        },
+        {
+          "$ref": "#/$defs/ReturnedListening"
+        }
+      ]
+    },
+    "MethodListening": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "method"
+        },
+        "subscribe": {
+          "type": "string"
+        },
+        "unsubscribe": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "subscribe",
+        "unsubscribe"
+      ],
+      "additionalProperties": false
+    },
+    "AssignmentListening": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "assignment"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "ReturnedListening": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "returned"
+        },
+        "subscribe": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "subscribe"
+      ],
+      "additionalProperties": false
+    },
+    "Locator": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ElementLocator"
+        },
+        {
+          "$ref": "#/$defs/PluginLocator"
+        }
+      ]
+    },
+    "ElementLocator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "element"
+        },
+        "id": {
+          "type": "string"
+        },
+        "vendor": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id",
+        "vendor"
+      ],
+      "additionalProperties": false
+    },
+    "PluginLocator": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "plugin"
+        },
+        "name": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "listen": {
+          "$ref": "#/$defs/Listening"
+        },
+        "data": {
+          "$ref": "#/$defs/PluginData"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "key",
+        "listen",
+        "data"
+      ],
+      "additionalProperties": false
+    },
+    "PluginData": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/NonePluginData"
+        },
+        {
+          "$ref": "#/$defs/HubPluginData"
+        },
+        {
+          "$ref": "#/$defs/StreamPluginData"
+        },
+        {
+          "$ref": "#/$defs/ModelPluginData"
+        },
+        {
+          "$ref": "#/$defs/FormPluginData"
+        }
+      ]
+    },
+    "NonePluginData": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "none"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "HubPluginData": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "hub"
+        },
+        "offer": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "offer"
+      ],
+      "additionalProperties": false
+    },
+    "StreamPluginData": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "stream"
+        },
+        "offer": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "offer"
+      ],
+      "additionalProperties": false
+    },
+    "ModelPluginData": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "model"
+        },
+        "inputs": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/InputBinding"
+          }
+        },
+        "containers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Container"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "inputs",
+        "containers"
+      ],
+      "additionalProperties": false
+    },
+    "InputBinding": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
+        "value": {
+          "$ref": "#/$defs/Expression"
+        },
+        "committed": {
+          "type": "string"
+        },
+        "invalidClass": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "path",
+        "value",
+        "committed",
+        "invalidClass",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "Container": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ContainerKind"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "live": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Live"
+          }
+        }
+      },
+      "required": [
+        "model",
+        "kind",
+        "summary",
+        "live"
+      ],
+      "additionalProperties": false
+    },
+    "ContainerKind": {
+      "enum": [
+        "form",
+        "element"
+      ]
+    },
+    "Live": {
+      "type": "object",
+      "properties": {
+        "validator": {
+          "type": "string"
+        },
+        "ruleSet": {
+          "type": "string"
+        },
+        "body": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "validator",
+        "ruleSet",
+        "body"
+      ],
+      "additionalProperties": false
+    },
+    "FormPluginData": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "form"
+        },
+        "registration": {
+          "$ref": "#/$defs/Registration"
+        }
+      },
+      "required": [
+        "kind",
+        "registration"
+      ],
+      "additionalProperties": false
+    },
+    "Registration": {
+      "type": "object",
+      "properties": {
+        "validator": {
+          "type": "string"
+        },
+        "ruleSet": {
+          "type": "string"
+        },
+        "start": {},
+        "scalars": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BoundScalar"
+          }
+        },
+        "objects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BoundObject"
+          }
+        },
+        "lists": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/BoundList"
+          }
+        },
+        "rules": {
+          "$ref": "#/$defs/RuleGroup"
+        }
+      },
+      "required": [
+        "validator",
+        "ruleSet",
+        "start",
+        "scalars",
+        "objects",
+        "lists",
+        "rules"
+      ],
+      "additionalProperties": false
+    },
+    "BoundScalar": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RegistrationStep"
+          }
+        },
+        "shape": {
+          "$ref": "#/$defs/Shape"
+        },
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "shape",
+        "before",
+        "after"
+      ],
+      "additionalProperties": false
+    },
+    "RegistrationStep": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/PathStep"
+        },
+        {
+          "$ref": "#/$defs/EachRegistrationStep"
+        }
+      ]
+    },
+    "EachRegistrationStep": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "each"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "BoundObject": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RegistrationStep"
+          }
+        },
+        "start": {},
+        "json": {
+          "$ref": "#/$defs/BoundObjectJson"
+        }
+      },
+      "required": [
+        "path",
+        "start",
+        "json"
+      ],
+      "additionalProperties": false
+    },
+    "BoundObjectJson": {
+      "enum": [
+        "fill",
+        "replace"
+      ]
+    },
+    "BoundList": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RegistrationStep"
+          }
+        },
+        "item": {},
+        "json": {
+          "$ref": "#/$defs/BoundListJson"
+        }
+      },
+      "required": [
+        "path",
+        "item",
+        "json"
+      ],
+      "additionalProperties": false
+    },
+    "BoundListJson": {
+      "enum": [
+        "append",
+        "replace"
+      ]
+    },
+    "RuleGroup": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RegistrationStep"
+          }
+        },
+        "when": {
+          "$ref": "#/$defs/Expression"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RuleField"
+          }
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RuleGroup"
+          }
+        }
+      },
+      "required": [
+        "path",
+        "when",
+        "fields",
+        "groups"
+      ],
+      "additionalProperties": false
+    },
+    "RuleField": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RegistrationStep"
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RuleTest"
+          }
+        }
+      },
+      "required": [
+        "path",
+        "tests"
+      ],
+      "additionalProperties": false
+    },
+    "RuleTest": {
+      "type": "object",
+      "properties": {
+        "check": {
+          "$ref": "#/$defs/Expression"
+        },
+        "when": {
+          "$ref": "#/$defs/Expression"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "check",
+        "when",
+        "message"
+      ],
+      "additionalProperties": false
+    },
+    "Handler": {
+      "type": "object",
+      "properties": {
+        "on": {
+          "type": "string"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
+        "event": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
+        "members": {
+          "$ref": "#/$defs/PathMembers"
+        },
+        "policy": {
+          "$ref": "#/$defs/Policy"
+        },
+        "do": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        }
+      },
+      "required": [
+        "on",
+        "path",
+        "event",
+        "payload",
+        "members",
+        "policy",
+        "do"
+      ],
+      "additionalProperties": false
+    },
+    "Policy": {
+      "enum": [
+        "overlap",
+        "replace",
+        "skip"
+      ]
+    },
+    "Statement": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SetStatement"
+        },
+        {
+          "$ref": "#/$defs/DoStatement"
+        },
+        {
+          "$ref": "#/$defs/LetStatement"
+        },
+        {
+          "$ref": "#/$defs/IfStatement"
+        },
+        {
+          "$ref": "#/$defs/AllStatement"
+        },
+        {
+          "$ref": "#/$defs/RequestStatement"
+        },
+        {
+          "$ref": "#/$defs/ListenStatement"
+        },
+        {
+          "$ref": "#/$defs/StopStatement"
+        }
+      ]
+    },
+    "SetStatement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "set"
+        },
+        "path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
+        "members": {
+          "$ref": "#/$defs/SetMembers"
+        },
+        "content": {
+          "type": "boolean"
+        },
+        "target": {
+          "$ref": "#/$defs/Expression"
+        },
+        "value": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "kind",
+        "path",
+        "members",
+        "content",
+        "target",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "SetMembers": {
+      "enum": [
+        "required",
+        "optional"
+      ]
+    },
+    "DoStatement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "do"
+        },
+        "await": {
+          "type": "boolean"
+        },
+        "expr": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "kind",
+        "await",
+        "expr"
+      ],
+      "additionalProperties": false
+    },
+    "LetStatement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "let"
+        },
+        "name": {
+          "type": "string"
+        },
+        "await": {
+          "type": "boolean"
+        },
+        "binds": {
+          "$ref": "#/$defs/LetBinds"
+        },
+        "expr": {
+          "$ref": "#/$defs/Expression"
+        }
+      },
+      "required": [
+        "kind",
+        "name",
+        "await",
+        "binds",
+        "expr"
+      ],
+      "additionalProperties": false
+    },
+    "LetBinds": {
+      "enum": [
+        "line",
+        "read"
+      ]
+    },
+    "IfStatement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "if"
+        },
+        "when": {
+          "$ref": "#/$defs/Expression"
+        },
+        "then": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        },
+        "else": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "when",
+        "then",
+        "else"
+      ],
+      "additionalProperties": false
+    },
+    "AllStatement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "all"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Statement"
+            }
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "blocks"
+      ],
+      "additionalProperties": false
+    },
+    "RequestStatement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "request"
+        },
+        "argument": {
+          "type": "string"
+        },
+        "reply": {
+          "type": "string"
+        },
+        "send": {
+          "$ref": "#/$defs/Expression"
+        },
+        "check": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        },
+        "layers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Layer"
+          }
+        },
+        "success": {
+          "$ref": "#/$defs/Route"
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StatusRoute"
+          }
+        },
+        "otherwise": {
+          "$ref": "#/$defs/OtherwiseRoute"
+        },
+        "chained": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "argument",
+        "reply",
+        "send",
+        "check",
+        "layers",
+        "success",
+        "statuses",
+        "otherwise",
+        "chained"
+      ],
+      "additionalProperties": false
+    },
+    "Layer": {
+      "type": "object",
+      "properties": {
+        "whileLoading": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        },
+        "finally": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        }
+      },
+      "required": [
+        "whileLoading",
+        "finally"
+      ],
+      "additionalProperties": false
+    },
+    "Route": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/SuccessBody"
+        },
+        "do": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "do"
+      ],
+      "additionalProperties": false
+    },
+    "SuccessBody": {
+      "enum": [
+        "none",
+        "json",
+        "text",
+        "html",
+        "file"
+      ]
+    },
+    "StatusRoute": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer"
+        },
+        "kind": {
+          "$ref": "#/$defs/ErrorBody"
+        },
+        "do": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "kind",
+        "do"
+      ],
+      "additionalProperties": false
+    },
+    "ErrorBody": {
+      "enum": [
+        "none",
+        "json",
+        "text",
+        "html"
+      ]
+    },
+    "OtherwiseRoute": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/OtherwiseBody"
+        },
+        "do": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "do"
+      ],
+      "additionalProperties": false
+    },
+    "OtherwiseBody": {
+      "enum": [
+        "none",
+        "json"
+      ]
+    },
+    "ListenStatement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "listen"
+        },
+        "event": {
+          "type": "string"
+        },
+        "listen": {
+          "$ref": "#/$defs/Listening"
+        },
+        "release": {
+          "$ref": "#/$defs/Release"
+        },
+        "payload": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        },
+        "members": {
+          "$ref": "#/$defs/PathMembers"
+        },
+        "policy": {
+          "$ref": "#/$defs/Policy"
+        },
+        "payloadName": {
+          "type": "string"
+        },
+        "argumentsName": {
+          "type": "string"
+        },
+        "object": {
+          "$ref": "#/$defs/Expression"
+        },
+        "do": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Statement"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "event",
+        "listen",
+        "release",
+        "payload",
+        "members",
+        "policy",
+        "payloadName",
+        "argumentsName",
+        "object",
+        "do"
+      ],
+      "additionalProperties": false
+    },
+    "Release": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/LivingRelease"
+        },
+        {
+          "$ref": "#/$defs/HeldRelease"
+        }
+      ]
+    },
+    "LivingRelease": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "living"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "HeldRelease": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "held"
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "element": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PathStep"
+          }
+        }
+      },
+      "required": [
+        "kind",
+        "vendor",
+        "element"
+      ],
+      "additionalProperties": false
+    },
+    "StopStatement": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "stop"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

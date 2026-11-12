@@ -56,6 +56,25 @@ public class WhenClaudeRunsAHook
         Assert.That(refused, Is.Empty, "A hook refused an edit to a hand-written file:\n" + string.Join("\n", refused));
     }
 
+    [Test]
+    public void the_generated_plan_contract_is_tracked_where_a_hook_refuses_an_edit()
+        => Assert.That(
+            ContractFilesNotTracked(Repository.TrackedFiles),
+            Is.Empty,
+            "A hook refuses an edit to the generated plan contract at a path the repository tracks no such file at, so it protects nothing:");
+
+    [RefusedCase]
+    public void a_plan_contract_generated_into_another_folder_is_refused()
+        => Assert.That(
+            ContractFilesNotTracked(["Alis.Reactive.Assets/runtime/Execution/plan.ts", ContractFolder + "plan.schema.json"]),
+            Is.EqualTo(new[] { ContractFolder + "plan.ts" }));
+
+    [AcceptedCase]
+    public void a_plan_contract_tracked_in_the_folder_a_hook_refuses_is_accepted()
+        => Assert.That(ContractFilesNotTracked([ContractFolder + "index.ts", .. GeneratedContract]), Is.Empty);
+
+    private static List<string> ContractFilesNotTracked(IReadOnlyList<string> tracked) => GeneratedContract.Except(tracked).ToList();
+
     private static string TheRepositorysSettings() => File.ReadAllText(Path.Combine(Repository.Root, ".claude/settings.json"));
 
     private static string SettingsRunning(string file)
