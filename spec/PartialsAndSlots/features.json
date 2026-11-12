@@ -153,8 +153,8 @@
       "defects": [
         {
           "id": "M9.X1",
-          "rung": "type",
-          "defect": "A plan rendered twice, so every handler it holds runs twice, or a behavior written to a plan after it rendered, which the page never runs: the plan is a variable of its view's block, whose end writes it once (N14.2), so neither compiles. The redesign refuses both where the view renders (Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:52-57, Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:68-75), and main renders whatever the plan holds when RenderPlan runs (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:113)."
+          "rung": "analyzer",
+          "defect": "A plan rendered twice, so every handler it holds runs twice, a behavior written to a plan after it rendered, which the page never runs, or a plan a view opens and never renders, whose handlers the page never holds: a view renders the plan it opens once, after every door that takes it (D14.7, N14.2), and the plan analyzer refuses each at build (N18.15). The redesign refuses the first two where the view renders (Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:52-57, Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:68-75), and main renders whatever the plan holds when RenderPlan runs (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:113)."
         }
       ],
       "promises": [],
@@ -182,7 +182,7 @@
         {
           "door": "ReactivePlan<TModel>.PlanId.get -> string!",
           "verdict": "refused",
-          "reason": "An implementation detail: the model's full name, which keys main's merge of every plan of one model into one (applied-plans.ts:119-128 at 623dd4a27) and names the plan's script and its validation summary (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:97, Alis.Reactive/Razor/Extensions/PlanExtensions.cs:129-134 at 623dd4a27). The rewrite keys nothing by it (D14.2, D13.2): the block's end writes the plan's script and a container renders its own summary.",
+          "reason": "An implementation detail: the model's full name, which keys main's merge of every plan of one model into one (applied-plans.ts:119-128 at 623dd4a27) and names the plan's script and its validation summary (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:97, Alis.Reactive/Razor/Extensions/PlanExtensions.cs:129-134 at 623dd4a27). The rewrite keys nothing by it (D14.2, D13.2): `Html.RenderPlan` writes the plan's script and a container renders its own summary.",
           "carriers": [
             "N14.2",
             "N14.3"
@@ -191,7 +191,7 @@
         {
           "door": "ReactivePlan<TModel>.IsPartial.get -> bool",
           "verdict": "refused",
-          "reason": "An implementation detail: whether the plan merges into the owning view's plan. No plan of the rewrite is partial; every view's plan is its own block, and its owner is the slot whose container holds its script, else the page (D12.1), which no door names.",
+          "reason": "An implementation detail: whether the plan merges into the owning view's plan. No plan of the rewrite is partial; every view's plan is its own, and its owner is the slot whose container holds its script, else the page (D12.1), which no door names.",
           "carriers": [
             "N14.2"
           ]
@@ -199,7 +199,7 @@
         {
           "door": "ReactivePlan<TModel>.Render() -> string!",
           "verdict": "refused",
-          "reason": "An implementation detail: the plan's JSON as a string, which main's RenderPlan writes into the plan's script (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:96 at 623dd4a27). The block's end writes the plan.",
+          "reason": "An implementation detail: the plan's JSON as a string, which main's RenderPlan writes into the plan's script (Alis.Reactive/Razor/Extensions/PlanExtensions.cs:96 at 623dd4a27). `Html.RenderPlan` writes the plan.",
           "carriers": [
             "N14.2"
           ]
@@ -207,7 +207,7 @@
         {
           "door": "ReactivePlan<TModel>.Render(System.IServiceProvider! services) -> string!",
           "verdict": "refused",
-          "reason": "An implementation detail: the plan's JSON as a string, its validators' browser rules resolved from services the caller hands over. The block's end writes the plan, its rules resolved from the services the view renders with, as the redesign takes the request's (Alis.Reactive/Razor/PlanExtensions.cs:48 at 65fdf118d).",
+          "reason": "An implementation detail: the plan's JSON as a string, its validators' browser rules resolved from services the caller hands over. `Html.RenderPlan` writes the plan, its rules resolved from the services the view renders with, as the redesign takes the request's (Alis.Reactive/Razor/PlanExtensions.cs:48 at 65fdf118d).",
           "carriers": [
             "N14.2"
           ]
@@ -215,7 +215,7 @@
         {
           "door": "ReactivePlan<TModel>.RenderFormatted() -> string!",
           "verdict": "refused",
-          "reason": "Indented plan JSON for a view that prints its own plan, which only the framework's sandbox pages do, each in a pre element (AIAssistView/Index.cshtml:125 at 623dd4a27). No view author needs the plan as text: the block's end writes the plan's script into the page, where the browser's developer tools show it. No door hands a view its plan indented; the sandbox's plan panel goes.",
+          "reason": "Indented plan JSON for a view that prints its own plan, which only the framework's sandbox pages do, each in a pre element (AIAssistView/Index.cshtml:125 at 623dd4a27). No view author needs the plan as text: `Html.RenderPlan` writes the plan's script into the page, where the browser's developer tools show it. No door hands a view its plan indented; the sandbox's plan panel goes.",
           "carriers": [
             "N14.2"
           ]
@@ -223,7 +223,7 @@
         {
           "door": "ReactivePlan<TModel>.RenderFormatted(System.IServiceProvider! services) -> string!",
           "verdict": "refused",
-          "reason": "Indented plan JSON for a view that prints its own plan, which only the framework's sandbox pages do, each in a pre element (AIAssistView/Index.cshtml:125 at 623dd4a27). No view author needs the plan as text: the block's end writes the plan's script into the page, where the browser's developer tools show it. No door hands a view its plan indented; the sandbox's plan panel goes.",
+          "reason": "Indented plan JSON for a view that prints its own plan, which only the framework's sandbox pages do, each in a pre element (AIAssistView/Index.cshtml:125 at 623dd4a27). No view author needs the plan as text: `Html.RenderPlan` writes the plan's script into the page, where the browser's developer tools show it. No door hands a view its plan indented; the sandbox's plan panel goes.",
           "carriers": [
             "N14.2"
           ]

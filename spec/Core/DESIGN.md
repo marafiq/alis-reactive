@@ -3005,8 +3005,8 @@ plans name.
 - `probe:ej2-event-put-back-after-destroy`
 
 **Doors.**
-- kept: `Into(element)`, `Unload(element)`, and the hub's and stream's triggers; `Html.RenderPlan` leaves, since the
-  plan block's end writes the plan (N14.2).
+- kept: `Into(element)`, `Unload(element)`, the hub's and stream's triggers, and `Html.RenderPlan`, which writes the
+  plan where its view ends (N14.2).
 - No door names an owner: a developer chooses where a plan renders, and ownership follows.
 - `N12.1` new: `listen`, the handler of an event of a live object a pipeline reaches (D12.8); its form goes to
   gate 2. It replaces the refusal of an event declared on an object a method returns, and the refusal of a listen on
@@ -3261,8 +3261,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - It replaces the idiom of copying `ViewData` and setting `TemplateInfo.HtmlFieldPrefix` (16 view lines at
     65fdf118d). On net48 that idiom moves the view's own prefix, since a copy shares `TemplateInfo`
     (`probe:mvc5-viewdata-copy-shares-template-info`); on net10 a copy has its own
-    (`probe:core-viewdata-copy-template-info`). Inside a plan's block on net48 the idiom is refused where the block
-    ends (R14.2, X14.16).
+    (`probe:core-viewdata-copy-template-info`). In a view that holds a plan, on net48, the idiom is refused where the plan
+    renders (R14.2, X14.16).
 - D14.5 A dictionary entry keyed by a number has no JSON form, since JSON reads a number in the prefix as a list
   position. A JSON request whose body carries a member under such a prefix is refused where the view renders,
   and form data sends it.
@@ -3286,11 +3286,14 @@ and a request's state, which no node holds: it is its `request` statement's, in 
       both plans' views. A slot's content that renders an id the page holds is the same case.
     - R14.7 a step that sets the text or HTML of an element a live plan holds as a slot, or of an element that holds
       one, stops, with one error naming the slot (X12.12).
-- D14.7 A plan is a block in its view: the plan door opens the block and the block's end writes the plan
-  (N14.2).
-  - The plan is a variable of the block, so an input outside the block cannot name it, and a plan that is
-    never rendered cannot be written.
-  - A block written whole inside a partial's `@section` renders nothing, inputs included, since MVC drops a
+- D14.7 A plan is a variable of its view: `Html.ReactivePlan<TModel>()` opens it, each door of the view that writes
+  into it takes it, and `Html.RenderPlan(plan)`, the view's last line, writes it (N14.2). Every view of the POC is
+  written so, and the view's markup stays flat, since no door wraps it. A block that nests the whole view and writes
+  the plan at its end stood here and was never built: the miss is a bug (the owner, 2026-11-12).
+  - The plan is a local of its view, so an input of another view cannot name it (X14.1).
+  - A view renders the plan it opens once, after every door that takes it. A plan a view opens and never renders,
+    renders twice, or hands to a door after it rendered is refused at build (ALIS041, N18.15).
+  - A plan opened and rendered whole inside a partial's `@section` renders nothing, inputs included, since MVC drops a
     partial's sections on both hosts (`probe:core-partial-section-dropped`,
     `probe:mvc5-sections-checked-in-layouts-only`). The page shows that defect.
   - A refusal by render order is refused: three commits guessed it, narrowed it and removed it.
@@ -3330,8 +3333,9 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   the public surface.
 - `N14.1` new: `Html.PartialFor(m => m.Member)` and `Html.PartialFor(m => m.Member, view)`, the typed partial for a
   member, on both hosts; the first renders the view named after the member's type (D14.4).
-- `N14.2` new: the plan as a block of its view, whose end renders it; it replaces `Html.RenderPlan` on both lines;
-  its form goes to gate 2.
+- `N14.2` new: the plan's two doors as every view of the POC writes them, `Html.ReactivePlan<TModel>()`, which opens a
+  view's plan, and `Html.RenderPlan(plan)`, the view's last line, which writes it. Both lines carry the two doors;
+  what is new is the rule that holds them, ALIS041 (N18.15).
 - `N14.3` new: the request container as a block of its view, which renders the container's element and its summary
   and returns its typed handle (D14.8), and `pipeline.Container<TModel>(containerId)` for another view; their forms go
   to gate 2.
@@ -3396,7 +3400,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   (`Partials.violates.ReachInheritedPrefixMisnames.cfg`). That stop is the owner's to take.
 
 **Defects.**
-- `X14.1` type: an input outside its plan's block does not compile: new:N14.2.
+- `X14.1` type: an input written where no plan is in scope does not compile, since the input's door takes the plan: new:N14.2.
 - `X14.2` type: a partial for a member takes the member as a typed lambda, so no prefix is written as text:
   new:N14.1.
 - `X14.3` analyzer: an input bound to `m => m` is refused with "Input 'm => m' names no member of {model}: bind
@@ -3434,7 +3438,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `X14.15` refusal (D14.3, R14.1, D18.2): an input of `m => m.Items.Count` is refused with "Input 'm => m.Items.Count' binds
   Count, which {List<Item>} declares, and the app's JSON options write {List<Item>} as {a list | one value}, so the
   input has no body path: bind a member of a class they write as an object."
-- `X14.16` refusal (R14.2): a plan's block that ends with its view's prefix moved is refused with "The field prefix of
+- `X14.16` refusal (R14.2): a plan rendered after its view's prefix moved is refused with "The field prefix of
   {view} changed from {old} to {new} inside its plan, so what the view renders after the change posts under names its
   plan does not send or check: render a member's view with Html.PartialFor, which leaves the view's prefix as it is."
 
@@ -4272,7 +4276,7 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   - Native's browser code, the plugin `native-row-actions`, finds each control by `getElementById` and raises
     `activated` with its entry's row and its element. The core reads no data attribute and walks no DOM.
   - Compiler rules: a row of another type does not compile (`RowOfAnotherType` in `spec/api/refused.sh`), nor a render
-    outside the plan's block (N14.2); ALIS008 holds one request per block at its own level; ALIS035 refuses a link
+    where no plan is in scope (N14.2); ALIS008 holds one request per block at its own level; ALIS035 refuses a link
     whose block's one request is no GET, whose route or query value is neither a C# value nor its row's member, or
     that sends a container, an input or a header, since a navigation carries none of them (N18.13). Refused where the
     view renders, by what only the render sees: an id two controls render (D14.6) and D9.4's checks on a URL the view
@@ -4739,6 +4743,9 @@ shapes, starts and the payload's path of each event.
   gate 2's G8). No overload can refuse it, since nullability is no part of a C# signature. The analyzer reads the
   annotations the compiler reads, so where a file's nullable context is disabled the two types are one and the source
   is passed as held. `OrNull()` (N7.5) widens a source to its nullable type, and `IfNull` (N7.4) narrows one.
+- `N18.15` new: ALIS041, the plan analyzer: a plan a view opens with `Html.ReactivePlan` and never renders, renders
+  twice, or hands to a door after `Html.RenderPlan` (D14.7, M9.X1). The redesign refuses the last two where the view
+  renders, and neither line refuses the first; the owner chose the rule on 2026-11-12, over a block that nests the view.
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4), two constant definitions of one vendor name whose data differ in one compilation

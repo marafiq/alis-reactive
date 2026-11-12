@@ -18,7 +18,7 @@ unload release. Module 9 of `spec/CLAUDE.md`.
   slot's plan listens to a component the page rendered through the component's element id (D12.8, gate 1's P5).
 - Q13: the plan id keys nothing (D13.2).
 - Q14: each view's plan is its own, and nothing carries plan state between views on the server (D14.1); plans compose
-  in the browser without merging (D14.2); the plan is a block of its view (D14.7, N14.2); a step that writes over a
+  in the browser without merging (D14.2); the plan is a variable of its view, rendered once (D14.7, N14.2); a step that writes over a
   slot its own plan loads or unloads is refused where the view renders (R14.4), and across plans it stops in the
   browser (R14.7).
 - Q16: a container's live check runs on the inputs a load puts in it, since nothing is wired per element (D12.7,
@@ -43,8 +43,8 @@ the partial for a member (N14.1) are module 7's.
 
 Each name is gate 2's; each door is the capability it carries.
 
-This module adds no door. Its doors are the core's: `Html.ReactivePlan`, kept; the plan as a block of its view, whose
-end writes the plan and which replaces `Html.RenderPlan` (N14.2); a request's `Into` (N10.7, D10.11);
+This module adds no door. Its doors are the core's: `Html.ReactivePlan` and `Html.RenderPlan`, kept, the plan's two doors
+(N14.2); a request's `Into` (N10.7, D10.11);
 `Unload(element)`, kept (D12.9); and `listen` (N12.1).
 
 The meanings `M9.D1` and `M9.D2` are in `spec/PartialsAndSlots/features.json`, on the feature they give.
@@ -60,10 +60,10 @@ The meanings `M9.D1` and `M9.D2` are in `spec/PartialsAndSlots/features.json`, o
   `HttpContext.Items` of ids, summaries, slots and contents set (`Alis.Reactive/Razor/RenderedPage.cs:27-38` at
   65fdf118d), which D14.1 refuses; its checks move to where the page composes its plans in the browser (R14.6, R14.7)
   and to the container's block (N14.3).
-- A plan renders once by type (M9.X1). The redesign refuses a second render and a write after the render where the
+- A plan renders once, held at build (M9.X1). The redesign refuses a second render and a write after the render where the
   view renders (`Alis.Reactive/PlanModel/Document/PlanBuildContext.cs:50-75` at 65fdf118d); main renders what the plan
   holds when `RenderPlan` runs and refuses neither (`Alis.Reactive/Razor/Extensions/PlanExtensions.cs:110-125` at
-  623dd4a27). The block of N14.2 writes the plan at its end, so neither compiles.
+  623dd4a27). The plan analyzer refuses both at build, and a plan a view opens and never renders (N18.15).
 - A load releases what the slot held before it replaces the content (D12.4). Main empties the container and appends the
   new content before it aborts the slot's old listeners
   (`Alis.Reactive.Assets/runtime/execution/partials/inject.ts:30-42` at 623dd4a27); the redesign announces the unmount

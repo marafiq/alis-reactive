@@ -29,6 +29,9 @@ them, each marked as the lead's slip, and are not copied here.
 | A signature typed from memory, not from the source | 1 | A step a commit shows: the doc ids of the built core compared with the ids the fluent probe prints for `spec/api`, the count of missing ids quoted in the commit. |
 | A list a tool keeps was not read before the change that moves it | 1 | The tool: `WhenARuleNamesTheCode` refuses a listed exception the repository now holds. |
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
+| A claim of absence made from a search that did not cover the tree | 1 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. |
+| A rule the handoff states was not applied | 1 | A rule line: the handoff's own, scratch work runs in a subshell. |
+| A number written from an earlier run, not from the command that proves it | 1 | A rule line: root CLAUDE.md, Confidence, a result is the line its command printed, read when it printed. |
 
 ## Waiting for the owner
 
@@ -72,3 +75,22 @@ them, each marked as the lead's slip, and are not copied here.
   did not say so. Caught after the push, by the comparison of doc ids over the pipeline's row, which read one id
   missing. Cost: none to the code, since the member is declared with the row that found it; a commit message that
   claims less than was open. Held by root CLAUDE.md's loop, step 7.
+- 2026-11-12, a claim of absence made from a search that did not cover the tree. The lead told the owner that no C#
+  form of the plan's door was written anywhere, and put two forms of its own to him, a `using` block and a lambda.
+  The search had covered `spec/` and `poc/Alis.Reactive.Poc.TestApp`, a folder that does not exist. The POC's app is
+  `tests/Alis.Reactive.Poc.App`, and each of its 266 views that open a plan opens it with `Html.ReactivePlan<TModel>()`
+  and writes it with `Html.RenderPlan(plan)`, as `spec/api`'s view does. Caught by the owner: "there were more than 100+ POCs done
+  hows that possible - if its miss, its bug". Cost: a wrong statement and a needless question to the owner; a commit
+  (17cf9126d, held back from the remote) that left the plan's two doors undeclared and wrote the claim into
+  `spec/NOTES.md` and `spec/REWRITE.md`; two forms proposed, of which the lambda does not compile on net10 and the
+  `using` block nests the whole view. What the search did find was the spec's own bug: D14.7 and N14.2 described a
+  block no POC built. Held from this entry on by the step the table states.
+- 2026-11-12, a rule the handoff states was not applied. The commands of an authoring experiment changed directory to
+  the scratchpad in the session's own shell, where the handoff says scratch work runs in a subshell, and the harness
+  reset the shell to the main checkout's root. Caught by the harness's message. Cost: none, since every command opens
+  with a cd to the worktree. Held by the handoff's line.
+- 2026-11-12, a number written from an earlier run, not from the command that proves it. The lead wrote "267 views
+  of the POC" to the owner, into the owner's decision in `spec/CLAUDE.md`, into this log and into `spec/NOTES.md`,
+  from a count of every tracked view's `RenderPlan` line. The command the notes quote reads 266 views of the POC's
+  app and one of `spec/api`. Caught before the commit, by running that command for the notes' evidence. Cost: four
+  sentences corrected before they were committed, and two messages to the owner that said 267 of the POC.

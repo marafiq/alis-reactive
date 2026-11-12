@@ -901,8 +901,8 @@ refusal of the EJ2 script, and section 2.8's four workflows, which no run has re
 the schema's nodes, the 51 kinds as sealed classes of `Alis.Reactive/Schema`, with the contract generator, its
 cases, its step in `scripts/check.sh` and the generated `plan.ts` and `plan.schema.json`, and the kinds check
 reading the rewrite's grammar. In work: the core's sixteen rows and every door as a signature, of which
-every door `spec/api` compiles for the core is declared, in eleven rows, but the plan's own door: N14.2's block has
-no C# form written, so its form goes to the owner before the thin path builds it (gate 2's G13). The rows of
+every door `spec/api` compiles for the core is declared, in eleven rows, the plan's two doors among them
+(`Html.ReactivePlan`, `Html.RenderPlan`; D14.7 as the owner corrected it on 2026-11-12). The rows of
 `TypeKnowledge`, `PathsAndWire`, `OwnershipAndState`, `Tracing`, `Execution`, `InputsAndIds`, `Realtime` and
 `PartialsAndSlots` hold no door `spec/api` compiles and enter the table with their first file. Open of it after
 that, in order: the
@@ -941,7 +941,8 @@ with their folders; every door of the public surface as a signature, as `spec/ap
 and its dispatch, a case for every kind; the harness's remaining verbs; every screen's view; every browser test, from
 its promise, failing. The module tests land here with their first tests, the schema's: the project
 `tests/Alis.Reactive.ModuleTests` with its rule file and its slice table, and vitest with the runtime's first
-`*.test.ts`. The thin path: one plan, the block of its view (N14.2), with a load trigger (M1.N1) whose pipeline, one
+`*.test.ts`. The thin path: one plan, opened and rendered by its view's two doors (N14.2), which ALIS041 holds and lands here
+(N18.15), with a load trigger (M1.N1) whose pipeline, one
 run of one block, sets an element's text (M5.N5, M5.N1), compiled for both hosts. The lint's two rules that read a
 path of the runtime land here, each with its refused and accepted file (section 2.7), and so do the core's banned
 symbols with WhenTheCoreIsCompiled, before the core's first code that reads a type. The bindings check gains its

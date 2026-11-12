@@ -95,6 +95,7 @@ Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Render<TComponent>
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.ValueJson.get -> string!
 Alis.Reactive.RenderingAndDelivery.InputFields
 Alis.Reactive.RenderingAndDelivery.MemberPartials
+Alis.Reactive.RenderingAndDelivery.PlanHtml
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Json<TValue>(TValue value) -> string!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Plugin<TPlugin>() -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
@@ -560,6 +561,8 @@ static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
 static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this System.Web.Mvc.HtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member, string! viewName) -> System.Web.Mvc.MvcHtmlString!
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.ReactivePlan<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html) -> Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>!
+static Alis.Reactive.RenderingAndDelivery.PlanHtml.RenderPlan<TModel>(this System.Web.Mvc.HtmlHelper! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan) -> System.Web.IHtmlString!
 static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RequestsAndResponses.Content.File.get -> Alis.Reactive.RequestsAndResponses.SuccessContent<Alis.Reactive.RequestsAndResponses.ResponseFile!>!
 static Alis.Reactive.RequestsAndResponses.Content.Html.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<Alis.Reactive.RequestsAndResponses.Markup!>!

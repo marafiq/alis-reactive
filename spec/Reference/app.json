@@ -917,7 +917,7 @@
         {
           "id": "consumerPlan",
           "kind": "native",
-          "role": "its home view's plan, the block of the view (N14.2), in a layout that links the runtime",
+          "role": "its home view's plan, opened by Html.ReactivePlan and written by Html.RenderPlan (N14.2), in a layout that links the runtime",
           "module": "RenderingAndDelivery",
           "doors": [
             "N14.2"

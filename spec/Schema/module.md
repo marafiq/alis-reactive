@@ -14,7 +14,7 @@ The plan grammar: its closed node set, how C# writes it and the TypeScript contr
   and `text` (D19.8); the plan carries its culture, time zone and trace (N19.3); `HttpSend`, `HttpResponse`,
   `FormCheck` and `FormPlace` are typed contracts generated beside the grammar, not kinds (D19.9); the plan's version
   is 7, and a plan of another version is refused at boot with one error (D19.10, X19.3).
-- Q14: a plan is a block of its view, whose end writes the plan (D14.7, N14.2); plans compose in the browser without
+- Q14: a plan is a variable of its view, which `Html.RenderPlan` writes (D14.7, N14.2); plans compose in the browser without
   merging, each its owner's (D14.2).
 - Q17: a listener's arguments and the payload's place in them are each handler's (D17.4), which D19.6 rests on.
 
@@ -35,7 +35,7 @@ a refused plan script is and what it leaves started. A slot's load is module 9's
 Each name is gate 2's; each door is the capability it carries.
 
 Kept from the core (Q19): the sealed choice classes (N19.1); the registration, its bound members, its rule tree and
-the container (N19.2); the plan's culture, time zone and trace (N19.3). The plan's writer is the plan block's end
+the container (N19.2); the plan's culture, time zone and trace (N19.3). The plan's writer is `Html.RenderPlan`
 (N14.2), whose rows module 7 carries. This module adds no door: every door it needs is a core door.
 
 Refused: main's public `PlanNodeDiscriminator<T>`, its constructor, `Write` and `Read`, the plan writer's inside, which

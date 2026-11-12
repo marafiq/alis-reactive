@@ -8,13 +8,13 @@ app's project only into a folder git ignores, and the app's registrations a view
 ## Core questions
 
 - Q14: each view's plan is its own, started in the view and carried between views by no server state (D14.1); the
-  plan is a block of its view, whose end writes the plan (D14.7, N14.2); plans compose in the browser without merging
-  (D14.2). This module says what the block's end writes into the page, and how the page gets the files that read it.
+  plan is a variable of its view, which `Html.RenderPlan` writes as the view's last line (D14.7, N14.2); plans compose in the browser without merging
+  (D14.2). This module says what `Html.RenderPlan` writes into the page, and how the page gets the files that read it.
 
 ## Boundaries
 
 The plan's own types, `ReactivePlan<TModel>` and `PlanExtensions`, with the verdicts on `Html.RenderPlan`, `Render`
-and `ResolvePlan`, are module 9's (M9.F1), and the plan block's rows are module 7's (N14.2). The plan's grammar and
+and `ResolvePlan`, are module 9's (M9.F1), and the rows of the plan's two doors are module 7's (N14.2). The plan's grammar and
 its version are module 14's, and so is M14.D1's refusal of a script that is no plan; the boot that finds each plan
 script is module 17's. Markup raise is module 1's (M1.D3), and a plan's trace context module 26's (N19.3). Each door's
 two host forms, `HtmlHelper<TModel>` and `IHtmlString` on net48 and `IHtmlHelper<TModel>` and `IHtmlContent` on net10,

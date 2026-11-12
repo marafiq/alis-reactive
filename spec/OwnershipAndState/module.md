@@ -41,7 +41,7 @@ This module holds X13.4, where a failure the server sends shows, and M18.X1, whe
 
 Each name is gate 2's; each door is the capability it carries.
 
-This module adds no door, and every door it rests on is a core door: the plan as a block of its view (N14.2), a
+This module adds no door, and every door it rests on is a core door: the plan's two doors (N14.2), a
 request's `Into` (N10.7), `listen` (N12.1), a container's read of a member (N13.1), the container's block and its
 summary (N14.3) and the view's time zone (N3.5). It owns no door of either line, so it gives no verdict, and its
 feature's status is `internal`.

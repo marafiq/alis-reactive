@@ -50,6 +50,8 @@ Kept from the core, each the analyzer that holds its rule:
 - `N16.5` ALIS038, the flags analyzer; `M1.N6` ALIS039, the app event analyzer.
 - `N18.14` ALIS040, the nullable source analyzer: a source whose nullability differs from its argument's or operand's
   is an error in every app (D7.3).
+- `N18.15` ALIS041, the plan analyzer: a plan a view opens and never renders, renders twice, or hands to a door after
+  it rendered (D14.7).
 - `N6.3` `ReadsNothingSuppressor`, ALIS026 and ALIS027, and `N9.5` `RequestKeysSuppressor`, ALIS036, the two
   suppressors whose meanings are modules 4's and 6's; `N9.4` ALIS029, a file-shaped member in a GET or a JSON body;
   ALIS028, `ITypedSource<T>`'s analyzer (N6.4).
@@ -93,6 +95,7 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS030 to ALIS035 | the request, `ShowValidationErrors`, blocks, lambdas, declarations, a row's link | new (N18.7 to N18.13) |
 | ALIS038, ALIS039 | the flags door; two app events of one name | new (N16.5, M1.N6) |
 | ALIS040 | a source whose nullability differs from its argument's or operand's | new (N18.14) |
+| ALIS041 | a plan a view opens and does not render once, last | new (N18.15) |
 
 ## Improvements
 

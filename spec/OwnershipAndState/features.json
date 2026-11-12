@@ -85,7 +85,7 @@
         },
         {
           "line": "proposed",
-          "text": "A view's plan is a block of the view, and the plan belongs to the slot whose container is the innermost around its script, else the page; no door names an owner.",
+          "text": "A view's plan is a variable of the view, written where the view calls Html.RenderPlan, and the plan belongs to the slot whose container is the innermost around its script, else the page; no door names an owner.",
           "doors": [
             "N14.2"
           ]

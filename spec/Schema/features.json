@@ -107,7 +107,7 @@
         },
         {
           "line": "proposed",
-          "text": "The plan block's end writes the plan at version 7, every node of the 51 kinds with its kind.",
+          "text": "Html.RenderPlan(plan) writes the plan at version 7, every node of the 51 kinds with its kind.",
           "doors": [
             "N14.2"
           ]
@@ -313,7 +313,7 @@
         {
           "door": "PlanNodeDiscriminator<T>",
           "verdict": "refused",
-          "reason": "The plan writer's inside, which no view, validator or component author writes or reads. Main made it public, yet only its own seventeen internal node bases name it, in twelve files of Alis.Reactive/PlanModel (Alis.Reactive/PlanModel/Reactions/ReactionGraph.cs:12-13 at 623dd4a27 among them), and the redesign made it internal (Alis.Reactive/Grammar/PlanNodeDiscriminator.cs:7 at 65fdf118d). Its capability, each node written as its concrete class with its kind, is the plan block's end, which writes every node of the closed set with its kind (N14.2, D19.2).",
+          "reason": "The plan writer's inside, which no view, validator or component author writes or reads. Main made it public, yet only its own seventeen internal node bases name it, in twelve files of Alis.Reactive/PlanModel (Alis.Reactive/PlanModel/Reactions/ReactionGraph.cs:12-13 at 623dd4a27 among them), and the redesign made it internal (Alis.Reactive/Grammar/PlanNodeDiscriminator.cs:7 at 65fdf118d). Its capability, each node written as its concrete class with its kind, is `Html.RenderPlan`, which writes every node of the closed set with its kind (N14.2, D19.2).",
           "carriers": [
             "N14.2"
           ]
@@ -321,7 +321,7 @@
         {
           "door": "PlanNodeDiscriminator<T>.PlanNodeDiscriminator() -> void",
           "verdict": "refused",
-          "reason": "The plan writer's inside, which no view, validator or component author writes or reads. Main made it public, yet only its own seventeen internal node bases name it, in twelve files of Alis.Reactive/PlanModel (Alis.Reactive/PlanModel/Reactions/ReactionGraph.cs:12-13 at 623dd4a27 among them), and the redesign made it internal (Alis.Reactive/Grammar/PlanNodeDiscriminator.cs:7 at 65fdf118d). A converter's constructor is System.Text.Json's to call, through the attribute on a node's base; the plan block's end writes the plan (N14.2).",
+          "reason": "The plan writer's inside, which no view, validator or component author writes or reads. Main made it public, yet only its own seventeen internal node bases name it, in twelve files of Alis.Reactive/PlanModel (Alis.Reactive/PlanModel/Reactions/ReactionGraph.cs:12-13 at 623dd4a27 among them), and the redesign made it internal (Alis.Reactive/Grammar/PlanNodeDiscriminator.cs:7 at 65fdf118d). A converter's constructor is System.Text.Json's to call, through the attribute on a node's base; `Html.RenderPlan` writes the plan (N14.2).",
           "carriers": [
             "N14.2"
           ]
@@ -329,7 +329,7 @@
         {
           "door": "override PlanNodeDiscriminator<T>.Write(System.Text.Json.Utf8JsonWriter! writer, T value, System.Text.Json.JsonSerializerOptions! options) -> void",
           "verdict": "refused",
-          "reason": "The plan writer's inside, which no view, validator or component author writes or reads. Main made it public, yet only its own seventeen internal node bases name it, in twelve files of Alis.Reactive/PlanModel (Alis.Reactive/PlanModel/Reactions/ReactionGraph.cs:12-13 at 623dd4a27 among them), and the redesign made it internal (Alis.Reactive/Grammar/PlanNodeDiscriminator.cs:7 at 65fdf118d). It writes a node by its run-time class, so the node's own kind is its JSON tag; the plan block's end writes every node of the closed set with its kind (N14.2, D19.2).",
+          "reason": "The plan writer's inside, which no view, validator or component author writes or reads. Main made it public, yet only its own seventeen internal node bases name it, in twelve files of Alis.Reactive/PlanModel (Alis.Reactive/PlanModel/Reactions/ReactionGraph.cs:12-13 at 623dd4a27 among them), and the redesign made it internal (Alis.Reactive/Grammar/PlanNodeDiscriminator.cs:7 at 65fdf118d). It writes a node by its run-time class, so the node's own kind is its JSON tag; `Html.RenderPlan` writes every node of the closed set with its kind (N14.2, D19.2).",
           "carriers": [
             "N14.2"
           ]
@@ -337,7 +337,7 @@
         {
           "door": "override PlanNodeDiscriminator<T>.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> T",
           "verdict": "refused",
-          "reason": "The plan writer's inside, which no view, validator or component author writes or reads. Main made it public, yet only its own seventeen internal node bases name it, in twelve files of Alis.Reactive/PlanModel (Alis.Reactive/PlanModel/Reactions/ReactionGraph.cs:12-13 at 623dd4a27 among them), and the redesign made it internal (Alis.Reactive/Grammar/PlanNodeDiscriminator.cs:7 at 65fdf118d). Its one behavior is a refusal, \"Plan types are write-only.\", and it carries no capability: C# never reads a plan, since the contract runs one way, from C# to the plan's JSON to the TypeScript that runs it. The plan block's end is the plan's one writer (N14.2).",
+          "reason": "The plan writer's inside, which no view, validator or component author writes or reads. Main made it public, yet only its own seventeen internal node bases name it, in twelve files of Alis.Reactive/PlanModel (Alis.Reactive/PlanModel/Reactions/ReactionGraph.cs:12-13 at 623dd4a27 among them), and the redesign made it internal (Alis.Reactive/Grammar/PlanNodeDiscriminator.cs:7 at 65fdf118d). Its one behavior is a refusal, \"Plan types are write-only.\", and it carries no capability: C# never reads a plan, since the contract runs one way, from C# to the plan's JSON to the TypeScript that runs it. `Html.RenderPlan` is the plan's one writer (N14.2).",
           "carriers": [
             "N14.2"
           ]

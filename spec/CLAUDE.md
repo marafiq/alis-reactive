@@ -793,6 +793,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   classes, and a handoff reports the entries since the last one by class. It replaces the line of root CLAUDE.md
   that let a correction a rule already stated add nothing: two mistakes of 2026-11-11 and 2026-11-12 had one cause,
   and that line recorded the second as no news.
+- The owner, 2026-11-12 (verbatim in `spec/NOTES.md`), when the lead asked for the C# form of the plan's block: "there
+  were more than 100+ POCs done hows that possible - if its miss, its bug", and of a `using` block, "using will nest
+  the whole html". Each of the 266 views of the POC's app that open a plan, and the one of `spec/api`, opens it with
+  `Html.ReactivePlan<TModel>()` and writes it with `Html.RenderPlan(plan)` as its last line, its markup flat. D14.7 and N14.2 had replaced that by a block no POC
+  built: the miss is the spec's bug, fixed in every line that carried it. The owner chose how a view that forgets
+  `RenderPlan` is caught: one analyzer rule, ALIS041 (N18.15), which refuses at build a plan a view opens and never
+  renders, landed with the thin path. The lead's line within that choice, the owner's to overrule: the same rule
+  refuses a plan rendered twice and a door that takes the plan after it rendered, the two defects the block was
+  written for (M9.X1). A design line that no POC and no compiled sentence carries is a bug, raised as one with the
+  search that found it, and never a form to invent.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

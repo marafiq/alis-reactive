@@ -3,7 +3,7 @@
   "features": [
     {
       "id": "M19.F1",
-      "summary": "Rendering and delivery: how a view's plan and the framework's browser files reach the page on each host. A view's plan renders at its block's end as one application/json script marked data-reactive-plan, its text escaped so no text it carries ends the element. Every file a framework package ships is linked by a URL that carries the file's content hash, by ASP.NET Core's asp-append-version over the package's static web asset on net10 and by Url.AppendVersion over the copy under Content\\{PackageId}\\ on net48. A package writes into an app's project only on net48, into its own folder beside a .gitignore holding *, so the app's git lists nothing. A view reads the app's startup registrations through the request's services on net10 and MVC 5's DependencyResolver on net48. The one door of either line here is the redesign's UrlVersionExtensions, kept as M19.N1. Main copies each file under a name holding the package's version, which every view links, writes no ignore file, and names each plan script by its plan id.",
+      "summary": "Rendering and delivery: how a view's plan and the framework's browser files reach the page on each host. A view's plan renders where the view calls Html.RenderPlan, its last line, as one application/json script marked data-reactive-plan, its text escaped so no text it carries ends the element. Every file a framework package ships is linked by a URL that carries the file's content hash, by ASP.NET Core's asp-append-version over the package's static web asset on net10 and by Url.AppendVersion over the copy under Content\\{PackageId}\\ on net48. A package writes into an app's project only on net48, into its own folder beside a .gitignore holding *, so the app's git lists nothing. A view reads the app's startup registrations through the request's services on net10 and MVC 5's DependencyResolver on net48. The one door of either line here is the redesign's UrlVersionExtensions, kept as M19.N1. Main copies each file under a name holding the package's version, which every view links, writes no ignore file, and names each plan script by its plan id.",
       "status": "redesign-only",
       "types": [
         "Alis.Reactive:UrlVersionExtensions"
@@ -99,7 +99,7 @@
         },
         {
           "line": "proposed",
-          "text": "A view's plan block writes the plan at its end as one application/json script marked data-reactive-plan, with no text that ends it.",
+          "text": "Html.RenderPlan(plan), a view's last line, writes the plan as one application/json script marked data-reactive-plan, with no text that ends it.",
           "doors": [
             "N14.2"
           ]
@@ -184,7 +184,7 @@
         },
         {
           "id": "M19.D3",
-          "meaning": "A view's plan renders at its block's end (N14.2) as one script element of type application/json marked data-reactive-plan. Its text is the plan's JSON with <, > and & written as the JSON escapes \\u003C, \\u003E and \\u0026, so no text a plan carries, a literal or a value the view holds with </script> in it, ends the element or starts markup, and the browser's JSON.parse reads each text back unchanged (probe:core-stj-default-encoder-html, probe:html-script-text-ends-at-close-tag). The element carries no other attribute: a plan id keys nothing (D13.2), and the plan carries its own trace context (N19.3)."
+          "meaning": "A view's plan renders where the view calls Html.RenderPlan (N14.2) as one script element of type application/json marked data-reactive-plan. Its text is the plan's JSON with <, > and & written as the JSON escapes \\u003C, \\u003E and \\u0026, so no text a plan carries, a literal or a value the view holds with </script> in it, ends the element or starts markup, and the browser's JSON.parse reads each text back unchanged (probe:core-stj-default-encoder-html, probe:html-script-text-ends-at-close-tag). The element carries no other attribute: a plan id keys nothing (D13.2), and the plan carries its own trace context (N19.3)."
         },
         {
           "id": "M19.D4",

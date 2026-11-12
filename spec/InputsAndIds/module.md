@@ -23,7 +23,7 @@ renders and where the page composes its plans. Module 7 of `spec/CLAUDE.md`.
 
 ## Boundaries
 
-`Html.PartialFor` (N14.1), the plan as a block (N14.2), the request container (N14.3) and `pipeline.Input` (N14.4) are
+`Html.PartialFor` (N14.1), the plan's two doors (N14.2), the request container (N14.3) and `pipeline.Input` (N14.4) are
 the core's doors, and this module's rows carry them. The plan's own types (`ReactivePlan<TModel>`, `PlanExtensions`)
 are module 9's. A component's render helper is its slice's, Fusion's in module 21 and Native's in module 24.
 `RenderedComponent<TComponent, TModel>`, which `Render<TComponent>` returns and whose `Reactive` runs a pipeline on
