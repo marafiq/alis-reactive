@@ -31,7 +31,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
 | A claim of absence made from a search that did not cover the tree | 1 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. |
 | A rule the handoff states was not applied | 1 | A rule line: the handoff's own, scratch work runs in a subshell. |
-| A number written from an earlier run, not from the command that proves it | 1 | A rule line: root CLAUDE.md, Confidence, a result is the line its command printed, read when it printed. |
+| A number written from an earlier run, not from the command that proves it | 2 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
 
 ## Waiting for the owner
 
@@ -94,3 +94,9 @@ them, each marked as the lead's slip, and are not copied here.
   from a count of every tracked view's `RenderPlan` line. The command the notes quote reads 266 views of the POC's
   app and one of `spec/api`. Caught before the commit, by running that command for the notes' evidence. Cost: four
   sentences corrected before they were committed, and two messages to the owner that said 267 of the POC.
+- 2026-11-12, a number written from an earlier run, not from the command that proves it, the class's second entry.
+  The lead typed "01:35 EST" into the line of its memory's index that says when the state was written; `date`
+  printed 01:19 in the same command. Root CLAUDE.md's Sessions states the rule for a handoff, after the same slip
+  on 2026-11-11, and four earlier index lines of this session carried typed times too. Caught at once, by the
+  command's own last line. Cost: one line corrected, outside the repository. The class moved up a rung with this
+  entry, to the step the table states.
