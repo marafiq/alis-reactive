@@ -88,6 +88,7 @@ public class WhenAPlaywrightRunStarts
         var selected = Select(written, TheSpec, TheAssembly, "--through", "U3");
 
         Assert.That(selected.Cases, Is.EqualTo(new[] { $"{Worlds}(\"net10\").each_world_lists_its_own", $"{Residents}(\"net10\").the_resident_is_listed" }));
+        Assert.That(selected.Label, Is.EqualTo("through U3"));
     }
 
     [AcceptedCase]

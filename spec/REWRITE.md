@@ -323,7 +323,7 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   uses no harness verb.
 - **A run proves it ran.** Each run ends with
   `[playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>`,
-  its selection the selector's own word (`U8`, `all`, a pool's name) and its shard `1/1` when the run is whole, and
+  its selection the selector's own words (`U8`, `through U8`, `all`, a pool's name), its shard `1/1` when whole, and
   fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive,
   each said on a line before it. What a run runs is decided before it starts. The runner joins the tests the spec
   lands (`spec/tools/landings.py`, which reads the spec through check.py: each test's promise, its unit, its screen

@@ -127,6 +127,7 @@ const hosts = options.host === undefined ? otherHosts.map(host => `TestCategory!
 const tests = everyTest ? [] : [clauses.length === 1 ? clauses[0] : `(${clauses.join("|")})`];
 const filter = [...tests, ...hosts].join("&");
 
-const label = options.host === undefined ? selector.value : `${selector.value}@${options.host}`;
+const selection = selector.kind === "through" ? `through ${selector.value}` : selector.value;
+const label = options.host === undefined ? selection : `${selection}@${options.host}`;
 writeFileSync(options.out, `${JSON.stringify({ label, filter, cases: cases.map(one => one.id).sort() }, null, 2)}\n`);
 console.log(filter);
