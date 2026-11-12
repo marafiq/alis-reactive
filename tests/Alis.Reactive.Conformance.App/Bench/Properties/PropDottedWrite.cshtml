@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@model ConformanceBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<ConformanceBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Outer = new OuterStart { Count = Model.OuterCount } }))
+<p id="shown"></p>
+<button type="button" @Html.Raises(plan, PropertyCells.SetToFour)>Set to 4</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PropertyCells.SetToFour, pipeline => pipeline.Component<ConformanceComponent>("conformance").Outer.Count.Set(4)));
+}
+@Html.RenderPlan(plan)

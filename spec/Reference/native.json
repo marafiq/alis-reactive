@@ -1064,7 +1064,7 @@
       ],
       "behaviors": [
         {
-          "behavior": "The component shows its outer's text as Outer: and the text, and Outer acted once the outer's Act() is called.",
+          "behavior": "The component shows its outer's text as Outer: and the text in a status named Outer, its outer's count as Outer count: and the count in a status named Outer count, and Outer acted once the outer's Act() is called.",
           "tests": [
             "X5.10"
           ]

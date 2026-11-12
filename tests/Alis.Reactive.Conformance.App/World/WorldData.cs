@@ -9,6 +9,9 @@ internal sealed class WorldData
     private readonly ConcurrentDictionary<string, WorldGate> _gates = new(StringComparer.Ordinal);
     private volatile string _word = "";
     private volatile string _componentText = "Alpha";
+    private volatile string _componentOuterText = "Gamma";
+    private volatile string _componentReadOnlyText = "RO-2026-11-10";
+    private volatile string _componentCurrentItem = "One";
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -16,11 +19,20 @@ internal sealed class WorldData
 
     internal string ComponentText => _componentText;
 
+    internal string ComponentOuterText => _componentOuterText;
+
+    internal string ComponentReadOnlyText => _componentReadOnlyText;
+
+    internal string ComponentCurrentItem => _componentCurrentItem;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
         if (seed.Word is { } word) _word = word;
         if (seed.ComponentText is { } text) _componentText = text;
+        if (seed.ComponentOuterText is { } outerText) _componentOuterText = outerText;
+        if (seed.ComponentReadOnlyText is { } readOnlyText) _componentReadOnlyText = readOnlyText;
+        if (seed.ComponentCurrentItem is { } currentItem) _componentCurrentItem = currentItem;
     }
 
     internal void Arm(string gate) => _gates[gate] = new WorldGate();
