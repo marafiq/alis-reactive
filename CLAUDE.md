@@ -162,8 +162,8 @@ of the rule file that owns the subject: a test's in `.claude/rules/tests.md` or 
 in `.claude/rules/analyzers.md`, C#'s in `.claude/rules/csharp.md` or its project's own file, the runtime's in
 `Alis.Reactive.Assets/CLAUDE.md`, the spec's and the owner's decisions in `spec/CLAUDE.md`, the plan's, the loop's, a
 session's and a fork's here. The line states the rule as a plain fact, with its date and whose words it is, and its
-record (the lead's flip log, `spec/NOTES.md`, the commit) names that file. A correction a line already states adds
-none: its record names the line.
+record names that file: the commit, `spec/NOTES.md`, or the lead's flip log, a file of the lead's own outside the
+repository. A correction a line already states adds none: its record names the line.
 
 ## Forks, agents and reviews
 
