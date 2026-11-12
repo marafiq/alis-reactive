@@ -144,9 +144,9 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
   The owner starts a new session; the lead ends none, and a reply to continue, given to a go or no-go ask, is the go:
   work that needs no answer never waits. A status to the owner says what is completed and what is open, in the plan's
   own words, never where a head is (the owner, 2026-11-11). A long run is wrapped in `caffeinate`.
-- A handoff is written after every push, never only at a session's end, since the harness compacts without warning
-  and a session does not always reach its end. It holds the head, what landed with its proof line and what is next;
-  the lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.
+- A handoff is written after every push, since the harness compacts without warning. It holds the head, what landed
+  with its proof line, what is next, and no time but one `date` printed then (the lead's slip, 2026-11-11); the
+  lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.
 - To begin: `scripts/doctor.sh`, then the orient command above, which prints the branch against its remote, what is
   uncommitted, the last committed STATE, the owner's latest decisions and the handoff. Then read this file,
   `spec/REWRITE.md` sections 1 and 4, `spec/CLAUDE.md`'s standing decisions, the latest first, and the rule file of
