@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PassDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Pass desk";
+    var plan = Html.ReactivePlan<PassDesk>();
+}
+<h1>@Model.Name</h1>
+<section id="card"></section>
+<p id="card-note"></p>
+<button type="button" @Html.Raises(plan, PassDesks.ShowTheCard)>Show the card</button>
+<button type="button" @Html.Raises(plan, PassDesks.SignOut)>Sign out</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(PassDesks.ShowTheCard, pipeline => pipeline.Get(PassDesks.VisitorCard).Into("card"))
+        .CustomEvent(PassDesks.SignOut, pipeline => pipeline.Element("card-note").Text.Set("Signed out")));
+}
+@Html.RenderPlan(plan)

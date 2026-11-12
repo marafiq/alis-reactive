@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StaffingRounds
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Rounds by staffing";
+    var plan = Html.ReactivePlan<StaffingRounds>();
+}
+<h1>@Model.Ward rounds by staffing</h1>
+@(plan.ConformanceComponent("staffing", new ConformanceStart()))
+<p id="rounds"></p>
+<button type="button" @Html.Raises(plan, StaffingRoundEvents.Find)>Find rounds</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(StaffingRoundEvents.Find, pipeline => pipeline
+        .Get<RoundsOfCodedStaffing>(RefusalEndpoints.StaffingRounds, request => request.Set(r => r.Choice, pipeline.Component<ConformanceComponent>("staffing").Choice))
+        .OnSuccess(Content.Text, (found, pipeline) => pipeline.Element("rounds").Text.Set(found.Body))));
+}
+@Html.RenderPlan(plan)

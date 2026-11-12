@@ -956,7 +956,13 @@ app's pages lists it apart.
 The app event family is declared, M1.N2 to M1.N5 with the data a handler reads (N5.6), doors `spec/api` compiles
 no sentence with, and the bench's first cell, prop.scalar.read, stands on them with its test red.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
-named by two declarations. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
+named by two declarations. Twenty more refusal pages stand, each beside the page of its opposite case and each
+test red, three forks' work read at the source and landed: ten of module 4's, four of module 7's, two of module
+6's, two of module 1's and one each of modules 2 and 9. Of the refusal promises placed under net10, fifteen
+wait: seven need a data class the conformance library does not declare or a list the page's own data holds
+(X4.13 twice, X18.8, X8.19, X8.20, X8.21 and X8.22's second promise), four a host that sets JSON options or a
+request culture (X6.12, X6.28, X6.36 and X8.22's first promise), and four a Native input not declared, a
+drop-down or a number box (X7.11 twice, X1.4, X9.20). Ten more are placed under hosts the harness does not hold yet. Of the bench's ninety-eight placed cells, eighty-eight stand, each test red: nine of
 its properties, nine of its methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen
 of its sources, its three absences, its sixteen requests and two of its lanes, a slot loaded on start and a
 slot's listener gone at its unload. The sixteenth request cell, http.beside.hidden, sends a form's inputs: a

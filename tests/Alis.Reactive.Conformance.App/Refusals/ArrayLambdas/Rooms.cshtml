@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomPick
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The rooms";
+    var plan = Html.ReactivePlan<RoomPick>();
+    var position = Model.Position;
+}
+<h1>The rooms</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Items = Model.Rooms }))
+<p>The room picked: <span id="item"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Element("item").Text.Set(pipeline.Component<ConformanceComponent>("conformance").Items.At(position).Name)));
+}
+@Html.RenderPlan(plan)

@@ -37,7 +37,11 @@ its views.
   (`Bench/Http/HttpBesideHidden.cshtml`); the conformance component bound to a member is rendered by its second
   render helper, for a field (`Components/ConformanceComponent/ConformanceComponentHtml.cs`).
 - `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has
-  its link there, and so does the page that renders beside it.
+  its link there, and so does the page that renders beside it. A module's refusal pages sit in a folder named for
+  it (`Refusals/ArrayLambdas/` holds ten): a controller for each screen with its models, the refused page and the
+  page of its opposite case, one view where only the data differs. An endpoint a page alone names is a constant
+  beside its controller (`Refusals/ArrayLambdas/ArrayLambdaEndpoints.cs`); one a test names is a constant of
+  `RefusalEndpoints` in the world contract.
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.

@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseOrder
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose order";
+    var plan = Html.ReactivePlan<DoseOrder>();
+}
+<h1>Dose order</h1>
+@(Html.InputField(plan, m => m.Items[0].Name, options => options.Label("First item")).NativeTextBox())
+<p id="saved"></p>
+<button type="button" @Html.Raises(plan, DoseOrders.Save)>Save</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DoseOrders.Save, pipeline => pipeline
+        .Post<DoseOrder>(RefusalEndpoints.DoseOrders, request => request.UrlEncoded(body => body.Input(r => r.Items[0].Name, pipeline.Input(m => m.Items[0].Name))))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

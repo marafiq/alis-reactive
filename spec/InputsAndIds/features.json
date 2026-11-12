@@ -528,9 +528,9 @@
       "promises": [
         {
           "for": "X14.5",
-          "page": "A departure view whose one plan renders Html.InputField(plan, m => m.Room) twice; its model is DeparturePage in the namespace Alis.Reactive.Framework.App.Inputs.",
+          "page": "A departure view whose one plan renders Html.InputField(plan, m => m.Room) twice; its model is DeparturePage in the namespace Alis.Reactive.Conformance.App.Refusals.",
           "gesture": "Open the page.",
-          "outcome": "The page is refused where the view renders with \"Input 'Room' renders element id 'Alis_Reactive_Framework_App_Inputs_DeparturePage__Room' a second time in this plan: render the field once, or each copy for its own member with Html.PartialFor.\"",
+          "outcome": "The page is refused where the view renders with \"Input 'Room' renders element id 'Alis_Reactive_Conformance_App_Refusals_DeparturePage__Room' a second time in this plan: render the field once, or each copy for its own member with Html.PartialFor.\"",
           "opposite": "With the field rendered once, the page renders, and its save sends the room typed into it.",
           "defect": "Both copies render one id, so a room typed into the second is read through the first's id, the save sends the first copy's empty value, and the endpoint binds no room.",
           "existing_test": "redesign WhenAFieldIsRenderedTwice.a_field_rendered_twice_on_one_plan_is_refused_naming_its_element_id"

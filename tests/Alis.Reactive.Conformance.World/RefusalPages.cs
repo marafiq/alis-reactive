@@ -1,6 +1,6 @@
 namespace Alis.Reactive.Conformance.World;
 
-public static class RefusalPages
+public static partial class RefusalPages
 {
     public const string Area = "/refusals/";
     public const string Index = "/refusals";

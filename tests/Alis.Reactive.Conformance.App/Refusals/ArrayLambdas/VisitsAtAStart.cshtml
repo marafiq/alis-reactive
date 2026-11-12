@@ -1,0 +1,18 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitingHour
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The visiting hour";
+    var plan = Html.ReactivePlan<VisitingHour>();
+    var start = Model.Start;
+}
+<h1>The visiting hour</h1>
+<p>Visits that start with the hour: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ArrayLambdaEndpoints.Visits)
+        .OnSuccess<List<StartedVisit>>((visits, pipeline) => pipeline.Element("count").Text.Set(visits.Body.Count(v => v.At == start)))));
+}
+@Html.RenderPlan(plan)

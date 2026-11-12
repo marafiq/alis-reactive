@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DeparturePage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Departure";
+    var plan = Html.ReactivePlan<DeparturePage>();
+}
+<h1>Departure</h1>
+@(Html.InputField(plan, m => m.Room, options => options.Label("Room")).NativeTextBox())
+<p id="saved"></p>
+<button type="button" @Html.Raises(plan, Departures.Save)>Save</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(Departures.Save, pipeline => pipeline
+        .Post<DeparturePage>(RefusalEndpoints.Departures, request => request.UrlEncoded(body => body.Input(r => r.Room, pipeline.Input(m => m.Room))))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

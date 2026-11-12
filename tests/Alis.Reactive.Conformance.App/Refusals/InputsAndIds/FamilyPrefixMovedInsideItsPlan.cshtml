@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Family
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Family";
+    var plan = Html.ReactivePlan<Family>();
+    ViewData.TemplateInfo.HtmlFieldPrefix = "NextOfKin";
+}
+<h1>Family</h1>
+@Html.EditorFor(m => m.Guardian, "/Refusals/InputsAndIds/GuardianEditor.cshtml")
+<p id="saved"></p>
+<button type="button" @Html.Raises(plan, Families.Save)>Save</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(Families.Save, pipeline => pipeline
+        .Post<Family>(RefusalEndpoints.Families, request => request.UrlEncoded(body => body.Input(r => r.Guardian.Name, pipeline.Input(m => m.Guardian.Name))))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

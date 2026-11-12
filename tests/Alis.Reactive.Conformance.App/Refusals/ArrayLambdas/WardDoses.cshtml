@@ -1,0 +1,18 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardRound
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The round's doses";
+    var plan = Html.ReactivePlan<WardRound>();
+    var wards = Model.Wards;
+}
+<h1>The round's doses</h1>
+<p>Doses of the round's wards: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ArrayLambdaEndpoints.DosesByWard)
+        .OnSuccess<List<WardDose>>((doses, pipeline) => pipeline.Element("count").Text.Set(doses.Body.Count(d => wards.Contains(d.Ward))))));
+}
+@Html.RenderPlan(plan)

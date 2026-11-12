@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftRota
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The rota";
+    var plan = Html.ReactivePlan<ShiftRota>();
+    var shift = (Shift)Model.ShiftOfTheDay;
+}
+<h1>@Model.Ward rota</h1>
+<p id="rota"></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline
+        .Get<RotaOfShift>(RefusalEndpoints.Rota, request => request.Set(r => r.Shift, shift))
+        .OnSuccess(Content.Text, (found, pipeline) => pipeline.Element("rota").Text.Set(found.Body))));
+}
+@Html.RenderPlan(plan)

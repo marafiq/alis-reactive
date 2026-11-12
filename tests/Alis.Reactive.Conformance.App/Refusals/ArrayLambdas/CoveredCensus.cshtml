@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CoveredCensus
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Census";
+    var plan = Html.ReactivePlan<CoveredCensus>();
+}
+<h1>Census</h1>
+<p>Residents the cover leads: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ArrayLambdaEndpoints.CensusResidents)
+        .OnSuccess<List<CensusResident>>((census, pipeline) => pipeline.Element("count").Text.Set(census.Body.Count(r => r.Lead == Model.Cover.Name)))));
+}
+@Html.RenderPlan(plan)

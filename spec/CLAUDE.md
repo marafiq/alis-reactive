@@ -944,6 +944,19 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   "B-2026-11-10: a-1". The conformance component is an input by `spec/Reference/native.json`'s `input`, so its
   declaration is an `IInputComponent`, and a second render helper renders it for a field. The owner can overrule
   it.
+- The lead, 2026-11-12, settling what three forks read into while writing twenty refusal pages, each form fixed
+  by its test. A message is its X line's text with each placeholder filled as the view writes the thing: `{term}`
+  is the lambda's body ("d.Seal == seal"), `{member}` and `{read}` a lambda's path ("d.Seal", "owed.Due"),
+  `{value}` the view's own expression ("Model.Cover.Name"), `{type}` the C# keyword ("decimal"), `{view}` the
+  view's path from the app's root, unquoted, and `{cause}` and `{base}` the words D6.12 lists ("the app's options"
+  for a list the server wrote). A list a refusal page's lambda reads is a response body of the page's own
+  endpoint, so its base is the app's. X6.48's sentence is written `(int)none!`, since CS8629 stays on a value the
+  view holds (D6.14). X14.5's promise named its model in the redesign's test app; it names the conformance
+  app's namespace now, and five more promises of module 7 that name that app are corrected as their tests are
+  written. An endpoint a test names is a constant of the world contract (`RefusalEndpoints`, a part a module); one
+  only its page names is a constant beside its controller. M1.X8's and M1.X9's messages are the redesign's whole
+  text, as their lines say, and name `p.Dispatch`, where the rewrite's locked parameter name is `pipeline`: the
+  wording is the owner's, put in the handoff. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -1,2 +1,2 @@
 Harness
-Schema/* ValuesAndSources/* Vendors/* PathsAndWire/*
+Schema/* ValuesAndSources/* Vendors/* PathsAndWire/* PartialsAndSlots/* TriggersAndPipelines/* ArrayLambdas/* RequestsAndResponses/* InputsAndIds/*

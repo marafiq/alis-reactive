@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model DoseOrder
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose order";
+    var plan = Html.ReactivePlan<DoseOrder>();
+}
+<h1>Dose order</h1>
+@(Html.InputField(plan, m => m.Items.Count, options => options.Label("Items")).NativeTextBox())
+@Html.RenderPlan(plan)

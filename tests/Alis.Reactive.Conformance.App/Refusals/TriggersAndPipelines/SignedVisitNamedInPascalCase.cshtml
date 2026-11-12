@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SignedVisit
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Signed visit";
+    var plan = Html.ReactivePlan<SignedVisit>();
+}
+<h1>Signed visit</h1>
+<p id="signed-by"></p>
+<button type="button" @Html.Raises(plan, PascalNamedVisits.Signed, new PascalNamedSignature { Visitor = Model.Visitor })>Sign the visit</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PascalNamedVisits.Signed, (signature, pipeline) => pipeline.Element("signed-by").Text.Set(signature.Read(signed => signed.Visitor))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,17 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SealCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The seal check";
+    var plan = Html.ReactivePlan<SealCheck>();
+}
+<h1>The seal check</h1>
+<p>Doses sealed @Model.Seal.Tag: <span id="count"></span></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(ArrayLambdaEndpoints.TaggedDoses)
+        .OnSuccess<List<TaggedDose>>((doses, pipeline) => pipeline.Element("count").Text.Set(doses.Body.Count(d => d.Seal.Tag == "S4")))));
+}
+@Html.RenderPlan(plan)
