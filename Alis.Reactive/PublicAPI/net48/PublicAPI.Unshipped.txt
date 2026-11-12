@@ -68,10 +68,76 @@ Alis.Reactive.Declarations.TypedDslExemptionAttribute.TypedDslExemptionAttribute
 Alis.Reactive.Declarations.WriteOnly<TValue>
 Alis.Reactive.Declarations.WriteOnly<TValue>.Set(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 Alis.Reactive.Declarations.WriteOnly<TValue>.Set(TValue value) -> void
+Alis.Reactive.Elements.ClassList
+Alis.Reactive.Elements.ClassList.Add(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! name) -> void
+Alis.Reactive.Elements.ClassList.Add(string? name) -> void
+Alis.Reactive.Elements.ClassList.ClassList() -> void
+Alis.Reactive.Elements.ClassList.Remove(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! name) -> void
+Alis.Reactive.Elements.ClassList.Remove(string? name) -> void
+Alis.Reactive.Elements.ClassList.Toggle(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! name) -> void
+Alis.Reactive.Elements.ClassList.Toggle(string? name) -> void
+Alis.Reactive.Elements.Element
+Alis.Reactive.Elements.Element.Classes.get -> Alis.Reactive.Elements.ClassList!
+Alis.Reactive.Elements.Element.Element() -> void
+Alis.Reactive.Elements.Element.Html.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Elements.Element.Text.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.InputsAndIds.RequestContainer<TModel>
+Alis.Reactive.InputsAndIds.RequestForm<TModel>
 Alis.Reactive.Plugins.Plugin
 Alis.Reactive.Plugins.Plugin.Name.get -> string!
 Alis.Reactive.Plugins.Plugin.Plugin(string! name) -> void
 Alis.Reactive.Plugins.Plugin.Plugin(string! name, Alis.Reactive.Declarations.EventListening! events) -> void
+Alis.Reactive.RequestsAndResponses.BrowserFile
+Alis.Reactive.RequestsAndResponses.BrowserFile.BrowserFile() -> void
+Alis.Reactive.RequestsAndResponses.BrowserFile.LastModified.get -> Alis.Reactive.Declarations.ReadOnly<long>!
+Alis.Reactive.RequestsAndResponses.BrowserFile.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.RequestsAndResponses.BrowserFile.Size.get -> Alis.Reactive.Declarations.ReadOnly<long>!
+Alis.Reactive.RequestsAndResponses.BrowserFile.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.RequestsAndResponses.Content
+Alis.Reactive.RequestsAndResponses.ErrorContent<TBody>
+Alis.Reactive.RequestsAndResponses.Failure
+Alis.Reactive.RequestsAndResponses.Failure.Headers.get -> Alis.Reactive.RequestsAndResponses.ResponseHeaders!
+Alis.Reactive.RequestsAndResponses.Failure.Outcome.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.RequestsAndResponses.FailureOutcome!>!
+Alis.Reactive.RequestsAndResponses.Failure.Status.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.RequestsAndResponses.Failure<TError>
+Alis.Reactive.RequestsAndResponses.Failure<TError>.Body.get -> Alis.Reactive.Declarations.ReadOnly<TError>!
+Alis.Reactive.RequestsAndResponses.Failure<TError>.Headers.get -> Alis.Reactive.RequestsAndResponses.ResponseHeaders!
+Alis.Reactive.RequestsAndResponses.Failure<TError>.Outcome.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.RequestsAndResponses.FailureOutcome!>!
+Alis.Reactive.RequestsAndResponses.Failure<TError>.Status.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.RequestsAndResponses.FailureOutcome
+Alis.Reactive.RequestsAndResponses.Markup
+Alis.Reactive.RequestsAndResponses.NoContent
+Alis.Reactive.RequestsAndResponses.Notice
+Alis.Reactive.RequestsAndResponses.Notice.Error(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Error(string! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Info(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Info(string! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Success(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Success(string! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Warning(Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> void
+Alis.Reactive.RequestsAndResponses.Notice.Warning(string! text) -> void
+Alis.Reactive.RequestsAndResponses.PageUrl<TPage>
+Alis.Reactive.RequestsAndResponses.PageUrl<TPage>.Read<TValue>(System.Linq.Expressions.Expression<System.Func<TPage, TValue>!>! member) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
+Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>
+Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>.Body.get -> Alis.Reactive.Declarations.ReadOnly<TBody>!
+Alis.Reactive.RequestsAndResponses.Response<TRequest>
+Alis.Reactive.RequestsAndResponses.Response<TRequest>.Headers.get -> Alis.Reactive.RequestsAndResponses.ResponseHeaders!
+Alis.Reactive.RequestsAndResponses.Response<TRequest>.Status.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.RequestsAndResponses.ResponseFile
+Alis.Reactive.RequestsAndResponses.ResponseFile.Name.get -> string!
+Alis.Reactive.RequestsAndResponses.ResponseFile.Name.init -> void
+Alis.Reactive.RequestsAndResponses.ResponseFile.ResponseFile() -> void
+Alis.Reactive.RequestsAndResponses.ResponseFile.Size.get -> long
+Alis.Reactive.RequestsAndResponses.ResponseFile.Size.init -> void
+Alis.Reactive.RequestsAndResponses.ResponseFile.Type.get -> string!
+Alis.Reactive.RequestsAndResponses.ResponseFile.Type.init -> void
+Alis.Reactive.RequestsAndResponses.ResponseHeaders
+Alis.Reactive.RequestsAndResponses.ResponseHeaders.Get(string! name) -> Alis.Reactive.Declarations.MethodResult<string?>!
+Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>
+Alis.Reactive.RequestsAndResponses.ValidationProblem
+Alis.Reactive.RequestsAndResponses.ValidationProblem.Errors.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<string!>!>!
+Alis.Reactive.RequestsAndResponses.ValidationProblem.Errors.init -> void
+Alis.Reactive.RequestsAndResponses.ValidationProblem.ValidationProblem() -> void
 Alis.Reactive.ValuesAndSources.Arg
 Alis.Reactive.ValuesAndSources.Arg<T>
 Alis.Reactive.ValuesAndSources.ITypedSource<T>
@@ -85,6 +151,7 @@ Alis.Reactive.Vendors.ComponentVendor.Name.get -> string!
 Alis.Reactive.Vendors.VendorLookup
 abstract Alis.Reactive.Declarations.EventedObject.Listening.get -> Alis.Reactive.Declarations.EventListening!
 abstract Alis.Reactive.Vendors.Component.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+override Alis.Reactive.Elements.Element.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
 override sealed Alis.Reactive.Vendors.Component.Listening.get -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.ArrayLambdas.DataLists.All(this Alis.Reactive.ValuesAndSources.ITypedSource<string!>! text, System.Linq.Expressions.Expression<System.Func<char, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.ArrayLambdas.DataLists.All<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
@@ -156,6 +223,11 @@ static Alis.Reactive.Declarations.JsObject.Fixed<TValue>(TValue value) -> Alis.R
 static Alis.Reactive.Declarations.JsObject.Pass<TDeclared, TSource>(Alis.Reactive.ValuesAndSources.TypedSource<TSource>! value) -> Alis.Reactive.ValuesAndSources.Arg!
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.Property<TValue?>! property, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
+static Alis.Reactive.RequestsAndResponses.Content.File.get -> Alis.Reactive.RequestsAndResponses.SuccessContent<Alis.Reactive.RequestsAndResponses.ResponseFile!>!
+static Alis.Reactive.RequestsAndResponses.Content.Html.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<Alis.Reactive.RequestsAndResponses.Markup!>!
+static Alis.Reactive.RequestsAndResponses.Content.Json<TBody>() -> Alis.Reactive.RequestsAndResponses.ErrorContent<TBody>!
+static Alis.Reactive.RequestsAndResponses.Content.None.get -> Alis.Reactive.RequestsAndResponses.NoContent!
+static Alis.Reactive.RequestsAndResponses.Content.Text.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<string!>!
 static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(Alis.Reactive.ValuesAndSources.TypedSource<T>! source) -> Alis.Reactive.ValuesAndSources.Arg<T>!
 static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(T value) -> Alis.Reactive.ValuesAndSources.Arg<T>!
 static Alis.Reactive.ValuesAndSources.NullableReferences.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue!>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
@@ -168,3 +240,7 @@ static Alis.Reactive.Vendors.ComponentVendor.DefineReturnedUnsubscriber(string! 
 static Alis.Reactive.Vendors.ComponentVendor.DefineReturnedUnsubscriber(string! name, string! objectPath, string! subscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
 static Alis.Reactive.Vendors.ComponentVendor.Native.get -> Alis.Reactive.Vendors.ComponentVendor!
 static Alis.Reactive.Vendors.VendorLookup.ByPlugin(string! name) -> Alis.Reactive.Vendors.VendorLookup!
+static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Content -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
+static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Network -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
+static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Redirect -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
+static readonly Alis.Reactive.RequestsAndResponses.FailureOutcome.Status -> Alis.Reactive.RequestsAndResponses.FailureOutcome!
