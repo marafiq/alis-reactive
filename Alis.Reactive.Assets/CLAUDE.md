@@ -23,7 +23,7 @@ as the C# module whose nodes it executes, and `runtime/SliceTree.txt` is its sli
 
 A runtime module's pure tests sit beside its code, in files named for it that end in .test.ts, and U3 lands the
 first with vitest. A test imports its own module's index and nothing else of the runtime, so it reads the module's public
-surface and never its internals. It runs in node with no DOM and expects literals written from the schema's lines,
+surface and never its internals: the lint refuses any other import of the runtime there (`no-restricted-imports`). It runs in node with no DOM and expects literals written from the schema's lines,
 never a recorded output. What touches the DOM has no pure test: a Playwright test proves it.
 
 ## Commands

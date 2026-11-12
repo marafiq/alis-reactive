@@ -425,6 +425,9 @@ list only with its line, in the unit that brings that line's code:
   Principles 8; M5.N1). It is lifted in one file, the one of `runtime/Execution/` that finds a root's plans.
 - `no-restricted-imports`, which `eslint.config.js` writes from each `SliceTree.txt`, refuses an import from a later
   row (section 2.3).
+- `no-restricted-imports`, over a module's pure tests, the files that end in .test.ts, refuses an import of the
+  runtime other than the test's own module's index (`./index`), so a pure test reads a module's public surface and
+  never its internals (1.2).
 
 The presets already hold `no-floating-promises` (D4.4), `no-unnecessary-condition` and `no-non-null-assertion` (S2):
 since no field of the plan is optional or nullable, a default for plan data is a condition the types call unnecessary.
@@ -439,7 +442,8 @@ beside the runtime; a file that holds a comment, the inline disable's, is writte
 the three rules the presets carry for a spec line the same way, and the compiler's refusal of an enum (S8) by a file
 its case writes. U1 lands the presets, the ban on inline configuration and the three rules that read no path (the
 switch, the boolean conditions, the equality); the wide query's refusal and the import rows read a path of the
-runtime, and land in U3 with the file that finds a root's plans and the runtime's rows.
+runtime, and land in U3 with the file that finds a root's plans and the runtime's rows. The pure tests' import rule
+is landed with its refused and accepted files, before U3 writes the first of them.
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
 agreement in NuGet, npm and the lock; `tsc -b`; eslint; a locked `dotnet restore`; `dotnet build -c Release`;

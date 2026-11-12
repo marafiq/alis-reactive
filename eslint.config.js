@@ -2,6 +2,8 @@ import eslint from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
+const beyondItsModulesIndex = "^(\\.\\./|\\./(?!index(\\.ts)?$))";
+
 export default defineConfig({
   files: ["Alis.Reactive.Assets/runtime/**/*.ts", "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.ts"],
   extends: [eslint.configs.recommended, tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
@@ -23,5 +25,13 @@ export default defineConfig({
       },
     ],
     eqeqeq: ["error", "always"],
+  },
+}, {
+  files: ["Alis.Reactive.Assets/runtime/**/*.test.ts", "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.test.ts"],
+  rules: {
+    "no-restricted-imports": [
+      "error",
+      { patterns: [{ regex: beyondItsModulesIndex, message: "A module's pure test imports its own module's index and nothing else of the runtime." }] },
+    ],
   },
 });

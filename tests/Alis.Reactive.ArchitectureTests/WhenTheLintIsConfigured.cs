@@ -14,6 +14,7 @@ public class WhenTheLintIsConfigured
     private const string FloatingPromise = "@typescript-eslint/no-floating-promises";
     private const string UnnecessaryCondition = "@typescript-eslint/no-unnecessary-condition";
     private const string NonNullAssertion = "@typescript-eslint/no-non-null-assertion";
+    private const string RestrictedImport = "no-restricted-imports";
     private const int Error = 2;
     private const int Warning = 1;
 
@@ -73,6 +74,20 @@ public class WhenTheLintIsConfigured
 
     [AcceptedCase]
     public void a_default_for_a_value_that_can_be_missing_is_accepted() => AssertAccepted("default-for-a-value-that-can-be-missing.accepted.ts");
+
+    [RefusedCase]
+    public void a_modules_pure_test_that_imports_an_internal_of_its_module_is_refused()
+        => AssertRefused("module/reads-an-internal.refused.test.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
+    public void a_modules_pure_test_that_imports_through_another_folder_is_refused()
+        => AssertRefused("module/reads-another-modules-index.refused.test.ts", RestrictedImport, line: 1);
+
+    [AcceptedCase]
+    public void a_modules_pure_test_that_imports_its_own_index_is_accepted() => AssertAccepted("module/reads-its-index.accepted.test.ts");
+
+    [AcceptedCase]
+    public void a_file_of_the_module_that_is_no_test_imports_its_internals() => AssertAccepted("module/reads-an-internal.accepted.ts");
 
     [RefusedCase]
     public void an_inline_disable_changes_no_result()
