@@ -488,7 +488,8 @@ through one (`--through U8`), a feature (`--feature M6.F1`), a screen (`--screen
 constant (`--test M3_F1.X8_27_2`), a folder or a fixture of the project by its name (`RequestsAndResponses`), or
 everything the project holds (`--all`). `--host snakeCase` narrows any of them to one host; without it a run takes
 the hosts the conformance app serves on the machine, never the twin's or a fresh app's. A pool's shard (`--pool core
---shard 1/2`) lands with section 2.8's workflows, its one caller. `--measure` writes the budget and the waits (2.5).
+--shard 1/2`) lands with section 2.8's workflows, its one caller. `--measure` writes the budget and the waits (2.5),
+and `--measure-parallelism` the count of tests a run takes at once (2.8).
 
 ### 2.8 Shards and CI
 
@@ -496,7 +497,13 @@ the hosts the conformance app serves on the machine, never the twin's or a fresh
   once per run; FusionComponents splits by slice. Pools: core, hosts and fusion; a test under a fresh app's host runs in its delivery job, never in a pool. Shards are balanced longest-first
   from the TRX-measured weights in `shard-weights.json`, so a stale weight unbalances and never drops a test. Unit U2
   measures, on this Mac, one test at a time against 2, 4 and 8 per process, 20 runs each, and keeps parallelism only
-  when every run is green and the wall time falls by at least 1.6 times.
+  when every run is green and the wall time falls by at least 1.6 times: `scripts/playwright.sh
+  --measure-parallelism` runs them, each a measured run under no measured wait, reads a run's wall time from its
+  TRX, and writes to `Harness/measured.json` the count it keeps with the wall time of each count: the quickest of
+  2, 4 and 8 whose 20 runs are green and took, together, no more than the 20 runs at one divided by 1.6, else one.
+  Fixtures run beside each other and a fixture's tests one after another. Every run takes the kept count, and the
+  budget and the waits are measured at it: the result reader refuses a count a hand chose and a budget measured at
+  another count.
 - **`.github/workflows/ci.yml`** on every pull request and push to main: `checks` (`scripts/check.sh` without check.py); `spec`
   (`check.py --ci`, TLC only for a spec whose hash CI has not checked); `playwright` per pool and shard in the
   Playwright image; `verify-net48` on Windows (pack, the twin and the fresh MVC 5 app built against the packs with
@@ -870,10 +877,9 @@ path does, and a part that lists its doors, each on a Doors line, lands with the
 
 **Where the rewrite stands.** U1 is landed. U2 is running. Landed of it: the world contract with the generated gates
 and promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
-TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget and waits, the
-two architecture tests over the app, and the harness's refusal of the EJ2 script. Open of it: the measurement of
-parallelism, and the CI workflows with a pool's shard. U3 is next. The commit that lands a piece rewrites this
-paragraph.
+TEST013 on the Playwright project, the bindings check, section 2.7's runner with its measured budget, waits and
+count of tests at once, the two architecture tests over the app, and the harness's refusal of the EJ2 script. Open
+of it: the CI workflows with a pool's shard. U3 is next. The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1

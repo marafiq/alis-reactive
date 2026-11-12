@@ -248,7 +248,7 @@ public class WhenAPlaywrightRunEnds
     {
         using var written = new WrittenFolder();
         var selection = Selection(written, [Listed, Opened]);
-        var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
+        var budget = written.Write("measured.json", JsonSerializer.Serialize(new { testsAtOnce = 1, wallSeconds = WallSeconds(200, 190, 185, 195) }));
         var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
         {
             Steps(
@@ -282,7 +282,164 @@ public class WhenAPlaywrightRunEnds
         Assert.That(held.RootElement.GetProperty("slowestNavigationMilliseconds").GetInt32(), Is.EqualTo(91));
         Assert.That(held.RootElement.GetProperty("slowestNavigation").GetString(), Is.EqualTo("Page.reload in " + Opened));
         Assert.That(held.RootElement.GetProperty("runs").GetInt32(), Is.EqualTo(20));
+        Assert.That(held.RootElement.GetProperty("budgetAtOnce").GetInt32(), Is.EqualTo(1));
+        Assert.That(held.RootElement.GetProperty("testsAtOnce").GetInt32(), Is.EqualTo(1));
+        Assert.That(held.RootElement.GetProperty("wallSeconds").GetProperty("4").GetDouble(), Is.EqualTo(185));
         Assert.That(Read(written, [Listed, Opened], [Ran(Listed, "Passed", 1), Ran(Opened, "Passed", 8.52)], budget).ExitCode, Is.Zero);
+    }
+
+    [RefusedCase]
+    public void green_runs_write_no_budget_before_the_count_of_tests_at_once_is_measured()
+    {
+        using var written = new WrittenFolder();
+        var selection = Selection(written, [Listed]);
+        var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
+        var runs = Enumerable.Range(1, RunsOfABudget).Select(run =>
+        {
+            Steps(written, run, (Listed, "Frame", "goto", 80), (Listed, "Frame", "click", 41));
+            return Trx(written, [Ran(Listed, "Passed", 1)], $"measure-{run}.trx");
+        });
+
+        var measured = Run(["--measure", "--selection", selection, "--budget", budget, .. runs]);
+
+        Assert.That(measured.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:measured] no budget is written: no count of tests at once is measured at {budget}; scripts/playwright.sh --measure-parallelism writes it first",
+        }));
+        Assert.That(measured.ExitCode, Is.EqualTo(1));
+        Assert.That(File.Exists(budget), Is.False);
+    }
+
+    [AcceptedCase]
+    public void twenty_green_runs_at_each_count_keep_the_quickest_count_that_is_quick_enough()
+    {
+        using var written = new WrittenFolder();
+        var budget = Budget(written, 8, 2);
+
+        var measured = Run(["--measure-parallelism", "--selection", Selection(written, [Listed]), "--budget", budget, .. RunsAt(written, 10, 6.2, 4, 4.5)]);
+
+        Assert.That(measured.Said, Is.EqualTo(new[]
+        {
+            "[playwright:measured] 4 at once: 20 runs took 200s at 1, 124s at 2, 80s at 4 and 90s at 8; 4 is the quickest that took as little as the runs at 1 divided by 1.6",
+        }));
+        Assert.That(measured.ExitCode, Is.Zero);
+        using var held = JsonDocument.Parse(File.ReadAllText(budget));
+        Assert.That(held.RootElement.GetProperty("testsAtOnce").GetInt32(), Is.EqualTo(4));
+        Assert.That(held.RootElement.GetProperty("wallSeconds").GetRawText(), Is.EqualTo("{\n    \"1\": 200,\n    \"2\": 124,\n    \"4\": 80,\n    \"8\": 90\n  }"));
+        Assert.That(held.RootElement.GetProperty("budgetSeconds").GetDouble(), Is.EqualTo(8));
+        Assert.That(Read(written, [Listed], [Ran(Listed, "Passed", 1)], budget).Said[0], Is.EqualTo(
+            $"[playwright:result] the budget at {budget} is measured at 1 at once and a run takes 4; scripts/playwright.sh --measure measures it again"));
+    }
+
+    [AcceptedCase]
+    public void counts_that_are_not_quick_enough_keep_one_test_at_a_time()
+    {
+        using var written = new WrittenFolder();
+        var budget = Budget(written, 8, 2);
+
+        var measured = Run(["--measure-parallelism", "--selection", Selection(written, [Listed]), "--budget", budget, .. RunsAt(written, 10, 6.3, 6.5, 7)]);
+
+        Assert.That(measured.Said, Is.EqualTo(new[]
+        {
+            "[playwright:measured] 1 at once: 20 runs took 200s at 1, 126s at 2, 130s at 4 and 140s at 8; none took as little as the runs at 1 divided by 1.6",
+        }));
+        Assert.That(measured.ExitCode, Is.Zero);
+        Assert.That(Read(written, [Listed], [Ran(Listed, "Passed", 1)], budget).ExitCode, Is.Zero);
+    }
+
+    [RefusedCase]
+    public void a_count_with_a_red_run_is_not_kept()
+    {
+        using var written = new WrittenFolder();
+        var budget = Budget(written, 8, 2);
+        var runs = RunsAt(written, 10, 6.2, 4, 3, redAt: 8);
+        var red = runs[^16];
+
+        var measured = Run(["--measure-parallelism", "--selection", Selection(written, [Listed]), "--budget", budget, .. runs]);
+
+        Assert.That(measured.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] {red}: failed (Failed): {Listed}",
+            $"[playwright:measured] 8 at once is not kept: {red} is no green run of 'rounds'",
+            "[playwright:measured] 4 at once: 20 runs took 200s at 1, 124s at 2, 80s at 4 and a red run at 8; 4 is the quickest that took as little as the runs at 1 divided by 1.6",
+        }));
+        Assert.That(measured.ExitCode, Is.Zero);
+        using var held = JsonDocument.Parse(File.ReadAllText(budget));
+        Assert.That(held.RootElement.GetProperty("wallSeconds").TryGetProperty("8", out _), Is.False);
+    }
+
+    [RefusedCase]
+    public void a_red_run_at_one_test_at_a_time_writes_no_count()
+    {
+        using var written = new WrittenFolder();
+        var selection = Selection(written, [Listed]);
+        var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
+        var runs = RunsAt(written, 10, 6.2, 4, 4.5, redAt: 1);
+        var red = runs[6];
+
+        var measured = Run(["--measure-parallelism", "--selection", selection, "--budget", budget, .. runs]);
+
+        Assert.That(measured.Said, Is.EqualTo(new[]
+        {
+            $"[playwright:result] {red}: failed (Failed): {Listed}",
+            $"[playwright:measured] no count is written: {red} is no green run of 'rounds' at 1 at once",
+        }));
+        Assert.That(measured.ExitCode, Is.EqualTo(1));
+        Assert.That(File.Exists(budget), Is.False);
+    }
+
+    [RefusedCase]
+    public void nineteen_runs_at_a_count_write_no_count()
+    {
+        using var written = new WrittenFolder();
+        var selection = Selection(written, [Listed]);
+        var budget = Path.Combine(Path.GetDirectoryName(selection)!, "measured.json");
+        var runs = RunsAt(written, 10, 6.2, 4, 4.5);
+
+        var measured = Run(["--measure-parallelism", "--selection", selection, "--budget", budget, .. runs.Take(runs.Count - 1)]);
+
+        Assert.That(measured.Errors, Does.Contain("a count of tests at once is measured over 20 runs at each of 1, 2, 4, 8, and 19 were given at 8."));
+        Assert.That(measured.ExitCode, Is.EqualTo(2));
+        Assert.That(File.Exists(budget), Is.False);
+    }
+
+    [RefusedCase]
+    public void a_count_a_hand_chose_a_budget_measured_at_another_count_and_no_count_are_refused()
+    {
+        using var written = new WrittenFolder();
+        var chosen = Budget(written, 8, 2, atOnce: 8, name: "chosen.json");
+        var stale = Budget(written, 8, 2, atOnce: 4, budgetAtOnce: 1, wallSeconds: WallSeconds(200, 124, 80, 90), name: "stale.json");
+        var uncounted = written.Write("uncounted.json", JsonSerializer.Serialize(new
+        {
+            budgetSeconds = 8,
+            slowestSeconds = 2,
+            actionWaitMilliseconds = 400,
+            slowestActionMilliseconds = 100,
+            navigationWaitMilliseconds = 800,
+            slowestNavigationMilliseconds = 200,
+            runs = RunsOfABudget,
+        }));
+
+        Assert.That(Read(written, [Listed], [Ran(Listed, "Passed", 1)], chosen).Said[0], Is.EqualTo(
+            $"[playwright:result] the count of tests at once at {chosen} is 8 and its wall times keep 1; a count is measured, never chosen"));
+        Assert.That(Read(written, [Listed], [Ran(Listed, "Passed", 1)], stale).Said[0], Is.EqualTo(
+            $"[playwright:result] the budget at {stale} is measured at 1 at once and a run takes 4; scripts/playwright.sh --measure measures it again"));
+        Assert.That(Read(written, [Listed], [Ran(Listed, "Passed", 1)], uncounted).Said[0], Is.EqualTo(
+            $"[playwright:result] no count of tests at once is measured at {uncounted}; scripts/playwright.sh --measure-parallelism writes it"));
+        Assert.That(Run("--at-once", "--budget", uncounted).ExitCode, Is.EqualTo(1));
+    }
+
+    [AcceptedCase]
+    public void the_count_a_run_takes_is_read_from_what_was_measured()
+    {
+        using var written = new WrittenFolder();
+        var kept = Budget(written, 8, 2, atOnce: 4, budgetAtOnce: 4, wallSeconds: WallSeconds(200, 124, 80, 90));
+
+        var read = Run("--at-once", "--budget", kept);
+
+        Assert.That(read.Said, Is.EqualTo(new[] { "4" }));
+        Assert.That(read.ExitCode, Is.Zero);
+        Assert.That(Read(written, [Listed], [Ran(Listed, "Passed", 1)], kept).ExitCode, Is.Zero);
     }
 
     [RefusedCase]
@@ -376,8 +533,20 @@ public class WhenAPlaywrightRunEnds
     private static string Selection(WrittenFolder written, string[] cases)
         => written.Write("selection.json", JsonSerializer.Serialize(new { label = "rounds", filter = "", cases }));
 
+    private static Dictionary<string, double> WallSeconds(double atOne, double atTwo, double atFour, double atEight)
+        => new() { ["1"] = atOne, ["2"] = atTwo, ["4"] = atFour, ["8"] = atEight };
+
+    private static List<string> RunsAt(WrittenFolder written, double atOne, double atTwo, double atFour, double atEight, int redAt = 0)
+        => WallSeconds(atOne, atTwo, atFour, atEight)
+            .SelectMany(count => Enumerable.Range(1, RunsOfABudget)
+                .Select(run => Trx(written, [Ran(Listed, count.Key == redAt.ToString(CultureInfo.InvariantCulture) && run == 5 ? "Failed" : "Passed", 1)], $"parallel-{count.Key}-{run}.trx", count.Value))
+                .Prepend(count.Key)
+                .Prepend("--at"))
+            .ToList();
+
     private static string Budget(
-        WrittenFolder written, double budgetSeconds, double slowestSeconds, int runs = RunsOfABudget, int actionWait = 400, int navigationWait = 800, string name = "budget.json")
+        WrittenFolder written, double budgetSeconds, double slowestSeconds, int runs = RunsOfABudget, int actionWait = 400, int navigationWait = 800,
+        int atOnce = 1, int budgetAtOnce = 1, Dictionary<string, double>? wallSeconds = null, string name = "budget.json")
         => written.Write(name, JsonSerializer.Serialize(new
         {
             budgetSeconds,
@@ -390,6 +559,9 @@ public class WhenAPlaywrightRunEnds
             slowestNavigationMilliseconds = 200,
             slowestNavigation = "Frame.goto in " + Listed,
             runs,
+            budgetAtOnce,
+            testsAtOnce = atOnce,
+            wallSeconds = wallSeconds ?? WallSeconds(200, 190, 185, 195),
         }));
 
     private static void Steps(WrittenFolder written, int run, params (string Test, string Holder, string Method, double Milliseconds)[] calls)
@@ -397,8 +569,10 @@ public class WhenAPlaywrightRunEnds
             $"measure-{run}.steps.tsv",
             string.Concat(calls.Select(call => string.Join('\t', call.Test, call.Holder, call.Method, call.Milliseconds.ToString("0.###", CultureInfo.InvariantCulture)) + "\n")));
 
-    private static string Trx(WrittenFolder written, (string Id, string Outcome, double Seconds)[] ran, string name = "run.trx")
+    private static string Trx(WrittenFolder written, (string Id, string Outcome, double Seconds)[] ran, string name = "run.trx", double wallSeconds = 1)
     {
+        var started = new DateTimeOffset(2026, 11, 11, 10, 0, 0, TimeSpan.FromHours(-5));
+        string Moment(DateTimeOffset at) => at.ToString("yyyy-MM-ddTHH:mm:ss.fffffffzzz", CultureInfo.InvariantCulture);
         var tests = ran.Select(one => one.Id).Distinct().Select((id, place) => (Id: id, Place: place)).ToList();
         var definitions = tests.Select(test =>
         {
@@ -416,6 +590,7 @@ public class WhenAPlaywrightRunEnds
         return written.Write(
             name,
             "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<TestRun xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\">\n"
+            + $"<Times creation=\"{Moment(started)}\" queuing=\"{Moment(started)}\" start=\"{Moment(started)}\" finish=\"{Moment(started.AddSeconds(wallSeconds))}\" />\n"
             + $"<Results>\n{string.Join("\n", results)}\n</Results>\n<TestDefinitions>\n{string.Join("\n", definitions)}\n</TestDefinitions>\n</TestRun>\n");
     }
 

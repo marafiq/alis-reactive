@@ -32,8 +32,12 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   and the two waits, each four times the slowest step of its kind, a navigation's and every other step's. The runner
   writes it (`--measure`) and fails a run that holds a test over the budget. `Harness/Waits.cs` sets the waits on
   every browser context and on every expectation, so a test sets no wait of its own; in a measured run it sets none
-  and records each step from Playwright's trace. A hand never edits the file: the runner refuses a budget or a wait
-  that is not four times what it measured.
+  and records each step from Playwright's trace. The file also holds the count of tests a run takes at once, which
+  `--measure-parallelism` measures: 20 runs at each of 1, 2, 4 and 8, and a count above one is kept only when its
+  runs are green and took no more than the runs at one divided by 1.6. Fixtures run beside each other at that count,
+  a fixture's tests one after another, and the budget is measured at it. A hand never edits the file: the runner
+  refuses a budget or a wait that is not four times what it measured, a count its wall times do not keep, and a
+  budget measured at another count.
 - `Harness/WhenAGateHoldsAnAnswer.cs` is the pattern: the page, the gesture and the outcome are in the test's body,
   and the opposite case stands beside it.
 
@@ -117,6 +121,7 @@ await Expect(Dialog).ToContainTextAsync("Discharge the resident?");
 ```bash
 scripts/playwright.sh --unit U2
 scripts/playwright.sh WhenTwoWorldsRun
+scripts/playwright.sh --measure-parallelism --all
 scripts/playwright.sh --measure --all
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace '<title>{Text(title)}</title>' --with '<title>{Text(title)}</title><script src=\"/js/ej2.min.js\"></script>'

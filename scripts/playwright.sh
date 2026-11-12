@@ -14,6 +14,7 @@ usage() {
 Usage:
   scripts/playwright.sh <selector> [--host <name>]
   scripts/playwright.sh --measure <selector>
+  scripts/playwright.sh --measure-parallelism <selector>
 
 Builds the browser tests and the conformance app, runs the tests one selector names, and reads the run:
   [playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>
@@ -34,6 +35,10 @@ Options:
   --measure       Run the selection 20 times, each green, and write to the harness's measured.json the budget,
                   four times the slowest test, and the action wait and the navigation wait, each four times the
                   slowest step of its kind. A measured run sets no measured wait and records every step.
+  --measure-parallelism
+                  Run the selection 20 times at each of 1, 2, 4 and 8 tests at once, each a measured run, and write
+                  to measured.json the count a run takes: the quickest of 2, 4 and 8 whose green runs took at most
+                  one part in 1.6 of the time at 1, else 1. A budget is measured again at a count that changed.
   -h, --help      Show this help.
 
 A run's files are under tests/Alis.Reactive.Conformance.PlaywrightTests/TestResults/<its stamp>/.
@@ -49,6 +54,7 @@ selector=()
 selectors=0
 host=()
 measure=0
+parallelism=0
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --all) selector=("$1"); selectors=$((selectors + 1)); shift ;;
@@ -59,12 +65,14 @@ while [ "$#" -gt 0 ]; do
       [ "$#" -ge 2 ] || refuse "--host takes a value."
       host=("$1" "$2"); shift 2 ;;
     --measure) measure=1; shift ;;
+    --measure-parallelism) parallelism=1; shift ;;
     -h|--help) usage; exit 0 ;;
     -*) refuse "'$1' is no option; --help lists them." ;;
     *) selector=("$1"); selectors=$((selectors + 1)); shift ;;
   esac
 done
 [ "$selectors" -eq 1 ] || refuse "a run takes one selector, and $selectors were given; --help lists them."
+[ "$((measure + parallelism))" -le 1 ] || refuse "--measure and --measure-parallelism are two measurements; a run takes one."
 
 stop_servers_whose_test_process_ended() {
   local pid args test_process stopped=0
@@ -98,23 +106,46 @@ run_the_tests() {
   local command=(dotnet test "$project" -c Release --no-build --nologo
     --logger "console;verbosity=normal" --logger "trx;LogFileName=$1.trx" --results-directory "$run")
   if [ -n "$filter" ]; then command+=(--filter "$filter"); fi
+  command+=(-- "NUnit.NumberOfTestWorkers=$2")
   "${command[@]}" 2>&1 || true
 }
 
+run_measured() {
+  export ALIS_MEASURED_STEPS="$PWD/$run/$1.steps.tsv"
+  run_the_tests "$1" "$2" > "$run/$1.log"
+  unset ALIS_MEASURED_STEPS
+  local left
+  left="$(stop_servers_whose_test_process_ended "a server left alive after the measured run $1")"
+  [ "$left" -eq 0 ] || refuse "the measured run $1 left $left server alive; nothing is written."
+}
+
+at_once=""
+if [ "$parallelism" -eq 0 ]; then
+  at_once="$(node scripts/playwright-result.mjs --at-once --budget "$budget")" \
+    || refuse "no count of tests at once is measured in $budget; scripts/playwright.sh --measure-parallelism writes it."
+fi
+
 stop_servers_whose_test_process_ended "stopped a server an earlier run left alive" > /dev/null
 
-if [ "$measure" -eq 1 ]; then
+if [ "$parallelism" -eq 1 ]; then
+  measured=()
+  for count in 1 2 4 8; do
+    measured+=(--at "$count")
+    for number in $(seq 1 "$measured_runs"); do
+      run_measured "parallel-$count-$number" "$count"
+      measured+=("$run/parallel-$count-$number.trx")
+    done
+    echo "[playwright:runner] measured $measured_runs runs at $count at once"
+  done
+  node scripts/playwright-result.mjs --measure-parallelism --selection "$run/selection.json" --budget "$budget" "${measured[@]}"
+elif [ "$measure" -eq 1 ]; then
   for number in $(seq 1 "$measured_runs"); do
-    export ALIS_MEASURED_STEPS="$PWD/$run/measure-$number.steps.tsv"
-    run_the_tests "measure-$number" > "$run/measure-$number.log"
-    unset ALIS_MEASURED_STEPS
-    left="$(stop_servers_whose_test_process_ended "a server left alive after measured run $number")"
-    [ "$left" -eq 0 ] || refuse "measured run $number left $left server alive; no budget is written."
+    run_measured "measure-$number" "$at_once"
     echo "[playwright:runner] measured run $number of $measured_runs"
   done
   node scripts/playwright-result.mjs --measure --selection "$run/selection.json" --budget "$budget" "$run"/measure-*.trx
 else
-  run_the_tests run | tee "$run/run.log"
+  run_the_tests run "$at_once" | tee "$run/run.log"
   left="$(stop_servers_whose_test_process_ended "a server left alive after this run")"
   echo "[playwright:runner] log: $run/run.log"
   node scripts/playwright-result.mjs --selection "$run/selection.json" --trx "$run/run.trx" --budget "$budget" --servers-left "$left"

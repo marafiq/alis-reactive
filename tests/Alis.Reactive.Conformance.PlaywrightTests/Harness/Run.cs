@@ -1,6 +1,8 @@
 using Microsoft.Playwright;
 using NUnit.Framework;
 
+[assembly: Parallelizable(ParallelScope.Fixtures)]
+
 namespace Alis.Reactive.Conformance.PlaywrightTests.Harness;
 
 [SetUpFixture]

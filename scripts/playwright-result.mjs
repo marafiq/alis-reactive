@@ -4,6 +4,8 @@ import { cpus, release, type } from "node:os";
 
 const usage = `usage: node scripts/playwright-result.mjs --selection <file> --trx <file> --budget <file> [--shard <i>/<k>] [--servers-left <n>]
        node scripts/playwright-result.mjs --measure --selection <file> --budget <file> <file.trx>...
+       node scripts/playwright-result.mjs --measure-parallelism --selection <file> --budget <file> --at 1 <file.trx>... --at 2 <file.trx>... --at 4 <file.trx>... --at 8 <file.trx>...
+       node scripts/playwright-result.mjs --at-once --budget <file>
 
 Reads what one run of the browser tests wrote and prints its result line:
   [playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>
@@ -13,13 +15,19 @@ the budget, or left a server alive, each said on a line of its own before the re
 --measure reads the TRX of each of 20 green runs of one selection, and beside each TRX the steps the harness wrote
 (<name>.steps.tsv: a test, the holder and the method of one call of Playwright, its milliseconds), and writes the
 budget, four times the slowest test, and the action wait and the navigation wait, each four times the slowest step
-of its kind: a navigation is goto, reload, goBack or goForward, an action every other call on a frame.`;
+of its kind: a navigation is goto, reload, goBack or goForward, an action every other call on a frame.
+
+--measure-parallelism reads 20 runs at each of 1, 2, 4 and 8 tests at once, each run's wall time from its TRX, and
+writes the count a run takes: the quickest of 2, 4 and 8 whose runs are green and took, together, no more than the
+runs at 1 divided by 1.6, else 1. --at-once prints the count the budget file holds.`;
 
 const measuredRuns = 20;
 const timesTheSlowest = 4;
 const navigations = ["goto", "reload", "goBack", "goForward"];
 const holderOfAnAction = "Frame";
 const waits = ["action", "navigation"];
+const countsAtOnce = [1, 2, 4, 8];
+const timesQuicker = 1.6;
 
 function refuse(message) {
   console.error(`[playwright:result] ${message}`);
@@ -27,17 +35,24 @@ function refuse(message) {
 }
 
 function parse(argv) {
-  const options = { shard: "1/1", "servers-left": "0", measure: false, trxFiles: [] };
+  const options = { shard: "1/1", "servers-left": "0", measure: false, parallelism: false, atOnce: false, trxFiles: [], runsAt: new Map() };
+  let files = options.trxFiles;
   for (let index = 0; index < argv.length; index += 1) {
     const word = argv[index];
     if (word === "--measure") options.measure = true;
-    else if (["--selection", "--trx", "--budget", "--shard", "--servers-left"].includes(word)) {
+    else if (word === "--measure-parallelism") options.parallelism = true;
+    else if (word === "--at-once") options.atOnce = true;
+    else if (word === "--at") {
+      if (index + 1 >= argv.length) refuse(`${word} takes a value.\n${usage}`);
+      files = [];
+      options.runsAt.set(argv[(index += 1)], files);
+    } else if (["--selection", "--trx", "--budget", "--shard", "--servers-left"].includes(word)) {
       if (index + 1 >= argv.length) refuse(`${word} takes a value.\n${usage}`);
       options[word.slice(2)] = argv[(index += 1)];
     } else if (word.startsWith("-")) refuse(`${word} is no option.\n${usage}`);
-    else options.trxFiles.push(word);
+    else files.push(word);
   }
-  const needed = options.measure ? ["selection", "budget"] : ["selection", "trx", "budget"];
+  const needed = options.atOnce ? ["budget"] : options.measure || options.parallelism ? ["selection", "budget"] : ["selection", "trx", "budget"];
   for (const name of needed) {
     if (options[name] === undefined) refuse(`--${name} is missing.\n${usage}`);
   }
@@ -91,7 +106,32 @@ function budgetOf(path) {
       return { problem: `the ${kind} wait at ${path} is ${wait}ms and its slowest step ${slowest}ms; a wait is four times the slowest step measured, never chosen` };
     }
   }
+  if (measured.testsAtOnce === undefined || measured.wallSeconds === undefined) {
+    return { problem: `no count of tests at once is measured at ${path}; scripts/playwright.sh --measure-parallelism writes it` };
+  }
+  if (measured.testsAtOnce !== keptOf(measured.wallSeconds)) {
+    return { problem: `the count of tests at once at ${path} is ${measured.testsAtOnce} and its wall times keep ${keptOf(measured.wallSeconds)}; a count is measured, never chosen` };
+  }
+  if (measured.budgetAtOnce !== measured.testsAtOnce) {
+    return { problem: `the budget at ${path} is measured at ${measured.budgetAtOnce} at once and a run takes ${measured.testsAtOnce}; scripts/playwright.sh --measure measures it again` };
+  }
   return { seconds: measured.budgetSeconds };
+}
+
+function keptOf(wallSeconds) {
+  const quickEnough = countsAtOnce.slice(1).filter(count => wallSeconds[count] !== undefined && wallSeconds[count] * timesQuicker <= wallSeconds[1]);
+  return quickEnough.reduce((kept, count) => (wallSeconds[count] < wallSeconds[kept] ? count : kept), quickEnough[0] ?? 1);
+}
+
+function wallSecondsOf(trxPath) {
+  const times = /<Times\s[^>]*>/.exec(readFileSync(trxPath, "utf8"));
+  if (times === null) refuse(`${trxPath} holds no Times, so the run's wall time is not read.`);
+  const moment = name => Date.parse(attribute(times[0], name).replace(/(\.\d{3})\d+/, "$1"));
+  return (moment("finish") - moment("start")) / 1000;
+}
+
+function heldAt(path) {
+  return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : {};
 }
 
 function slowestOf(kind) {
@@ -141,6 +181,40 @@ function resultLine(label, shard, counts) {
     + `${counts.overBudget} over budget, slowest ${counts.slowest.seconds.toFixed(2)}s ${counts.slowest.id}`;
 }
 
+function measureParallelism(options, selection) {
+  for (const count of countsAtOnce) {
+    const given = (options.runsAt.get(String(count)) ?? []).length;
+    if (given < measuredRuns) refuse(`a count of tests at once is measured over ${measuredRuns} runs at each of ${countsAtOnce.join(", ")}, and ${given} were given at ${count}.`);
+  }
+  const wallSeconds = {};
+  const took = [];
+  for (const count of countsAtOnce) {
+    let hundredthsTaken = 0;
+    let red;
+    for (const trxPath of options.runsAt.get(String(count))) {
+      const { said } = read(selection, trxPath, {}, 0);
+      if (said.length > 0 && red === undefined) red = { trxPath, said };
+      hundredthsTaken += hundredths(wallSecondsOf(trxPath));
+    }
+    if (red === undefined) {
+      wallSeconds[count] = hundredthsTaken / 100;
+      took.push(`${wallSeconds[count]}s at ${count}`);
+      continue;
+    }
+    for (const line of red.said) console.log(`[playwright:result] ${red.trxPath}: ${line}`);
+    if (count === 1) {
+      console.log(`[playwright:measured] no count is written: ${red.trxPath} is no green run of '${selection.label}' at 1 at once`);
+      process.exit(1);
+    }
+    console.log(`[playwright:measured] ${count} at once is not kept: ${red.trxPath} is no green run of '${selection.label}'`);
+    took.push(`a red run at ${count}`);
+  }
+  const kept = keptOf(wallSeconds);
+  writeFileSync(options.budget, `${JSON.stringify({ ...heldAt(options.budget), testsAtOnce: kept, wallSeconds }, null, 2)}\n`);
+  const why = kept === 1 ? `none took as little as the runs at 1 divided by ${timesQuicker}` : `${kept} is the quickest that took as little as the runs at 1 divided by ${timesQuicker}`;
+  console.log(`[playwright:measured] ${kept} at once: ${measuredRuns} runs took ${took.slice(0, -1).join(", ")} and ${took.at(-1)}; ${why}`);
+}
+
 function measure(options, selection) {
   if (options.trxFiles.length < measuredRuns) refuse(`a budget is measured over ${measuredRuns} green runs, and ${options.trxFiles.length} TRX files were given.`);
   let slowest = { seconds: 0, id: "no test" };
@@ -166,6 +240,11 @@ function measure(options, selection) {
     console.log(`[playwright:measured] no budget is written: the ${options.trxFiles.length} runs hold no ${kind} step, so no ${kind} wait is measured`);
     process.exit(1);
   }
+  const held = heldAt(options.budget);
+  if (held.testsAtOnce === undefined) {
+    console.log(`[playwright:measured] no budget is written: no count of tests at once is measured at ${options.budget}; scripts/playwright.sh --measure-parallelism writes it first`);
+    process.exit(1);
+  }
   const slowestHundredths = Math.ceil(slowest.seconds * 100 - 1e-6);
   const slowestSeconds = slowestHundredths / 100;
   const now = new Date();
@@ -186,6 +265,9 @@ function measure(options, selection) {
     selection: selection.label,
     measuredOn: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`,
     machine: `${cpus()[0].model}, ${type()} ${release()}`,
+    budgetAtOnce: held.testsAtOnce,
+    testsAtOnce: held.testsAtOnce,
+    wallSeconds: held.wallSeconds,
   };
   writeFileSync(options.budget, `${JSON.stringify(measured, null, 2)}\n`);
   console.log(`[playwright:measured] budget ${measured.budgetSeconds}s, four times the slowest test of ${measured.runs} green runs of ${measured.tests} tests, ${slowestSeconds}s ${slowest.id}`);
@@ -195,9 +277,19 @@ function measure(options, selection) {
 }
 
 const options = parse(process.argv.slice(2));
+if (options.atOnce) {
+  const { testsAtOnce } = heldAt(options.budget);
+  if (testsAtOnce === undefined) process.exit(1);
+  console.log(testsAtOnce);
+  process.exit(0);
+}
 if (!existsSync(options.selection)) refuse(`no selection at ${options.selection}; scripts/playwright-select.mjs writes it.`);
 const selection = JSON.parse(readFileSync(options.selection, "utf8"));
 
+if (options.parallelism) {
+  measureParallelism(options, selection);
+  process.exit(0);
+}
 if (options.measure) {
   measure(options, selection);
   process.exit(0);
