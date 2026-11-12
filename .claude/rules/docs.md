@@ -58,7 +58,9 @@ declares them, or is marked `csharp illustration`. What a rule cites from outsid
 A command a rule quotes with an option goes in a bash block, where the test reads each option against its script,
 and a tool under node_modules is cited by its npx command or its script, never by its path (the lead's slips,
 2026-11-11). The test reads a command as a shell does: what stands inside quotes, single or double, is text it does
-not read, so the text of a planted defect is quoted, and a path or an option is written outside them.
+not read, and outside them a word that holds a slash is read as a path. So the text of a planted defect and a value
+that is no path, a shard's fraction among them, are quoted, and a path or an option is written outside the quotes
+(the lead's slips, 2026-11-11).
 
 ## Workflow
 

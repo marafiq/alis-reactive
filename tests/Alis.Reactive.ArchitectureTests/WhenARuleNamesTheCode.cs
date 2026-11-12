@@ -53,7 +53,7 @@ public class WhenARuleNamesTheCode
 
     [Test]
     public void every_path_a_rule_names_is_in_the_repo()
-        => AssertNone(Findings.Value.Paths, "A rule names a path the repo does not hold. Name the file as it is now, by its path from the rule's folder or the root:");
+        => AssertNone(Findings.Value.Paths, "A rule names a path the repo does not hold. Name the file as it is now, by its path from the rule's folder or the root; in a command, write what is no path, a planted text or a value that holds a slash, in quotes:");
 
     [Test]
     public void every_glob_a_rule_file_loads_on_matches_a_file()
