@@ -974,7 +974,7 @@ source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so 
 by the type (D7.5, X7.4). `NativeTextBox` is declared in `Alis.Reactive.Native`, the first Native slice (M24.N1,
 M24.N9), its render helper a signature until U23, on the core's `IInputComponent`, `ComponentInput` and the
 field's options (M7.N3, M7.N2), which enter the core's table as `InputsAndIds`; the text tests are declared
-(M3.N1, N7.3). `pipeline.Object<T>` is declared (N7.1). An element's text and HTML are an `ElementContent`, whose `Set` takes a source
+(M3.N1, N7.3). The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1). An element's text and HTML are an `ElementContent`, whose `Set` takes a source
 of any type (M5.N1, D7.3), and a world names the version its component is built as. The app's settle, count and item
 endpoints stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its
 action where a test holds one action at two endpoints, and the harness's test of it is green and fails on each of

@@ -957,6 +957,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   only its page names is a constant beside its controller. M1.X8's and M1.X9's messages are the redesign's whole
   text, as their lines say, and name `p.Dispatch`, where the rewrite's locked parameter name is `pipeline`: the
   wording is the owner's, put in the handoff. The owner can overrule each.
+- The lead, 2026-11-12, landing the validator grammar Q16's Doors keep as signatures of `Alis.Reactive/Validation`,
+  a fork's work read at the source, each door throwing until U17, with `AddReactiveFluentValidation` in
+  `RenderingAndDelivery` by P3. The redesign's source at 65fdf118d is the evidence of each signature, and where
+  its docs and a line of Q16 differ the docs follow the line (`Matches`, `IsInEnum`, `PrecisionScale`). Four
+  readings, each the owner's to overrule. The kept list's check `Add` names no door of either line's public
+  surface, so nothing is declared for it. `Matches` over a `Regex` is not declared, since the core bans the type
+  and the pattern's text carries it (D16.11). `RuleLevelCascadeMode`, a door of the redesign the inventory
+  holds and the list does not name, is declared, so no door is lost; `ValidationFailure`'s `ToString` waits for
+  U17, since a text that throws serves no reader. The untyped `ReactiveValidator` keeps a constructor no app
+  reaches, as both older lines have it, so RS0022 is suppressed on the typed validator's constructor with its
+  reason: the first suppression in the rewrite's shipped code, which the owner approves or replaces by an open
+  constructor or by no untyped base.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -135,6 +135,7 @@ Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute.OnAuthorization(System.Web.Mvc.AuthorizationContext! filterContext) -> void
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute.ValidateAntiForgeryHeaderAttribute() -> void
+Alis.Reactive.RenderingAndDelivery.ValidationServices
 Alis.Reactive.RequestsAndResponses.BrowserFile
 Alis.Reactive.RequestsAndResponses.BrowserFile.BrowserFile() -> void
 Alis.Reactive.RequestsAndResponses.BrowserFile.LastModified.get -> Alis.Reactive.Declarations.ReadOnly<long>!
@@ -504,8 +505,64 @@ Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Path<TValue>(System.
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.Validation.CascadeMode
+Alis.Reactive.Validation.CascadeMode.Continue = 0 -> Alis.Reactive.Validation.CascadeMode
+Alis.Reactive.Validation.CascadeMode.Stop = 1 -> Alis.Reactive.Validation.CascadeMode
+Alis.Reactive.Validation.CustomContext<T>
+Alis.Reactive.Validation.CustomContext<T>.AddFailure(string! message) -> void
+Alis.Reactive.Validation.CustomContext<T>.AddFailure<TMember>(System.Linq.Expressions.Expression<System.Func<T, TMember>!>! member, string! message) -> void
+Alis.Reactive.Validation.CustomContext<T>.Model.get -> T
+Alis.Reactive.Validation.IConditionBuilder
+Alis.Reactive.Validation.IConditionBuilder.Otherwise(System.Action! rules) -> void
+Alis.Reactive.Validation.IRuleBuilder<T, TProperty>
+Alis.Reactive.Validation.IRuleBuilder<T, TProperty>.Cascade(Alis.Reactive.Validation.CascadeMode mode) -> Alis.Reactive.Validation.IRuleBuilder<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilder<T, TProperty>.SetValidator(Alis.Reactive.Validation.IValidator<TProperty>! validator) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.DependentRules(System.Action! rules) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.ServerOnly() -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.When(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.WhenOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.WithMessage(System.Func<T, string!>! message) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.WithMessage(string! message) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>.WithName(string! displayName) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+Alis.Reactive.Validation.IValidator<T>
+Alis.Reactive.Validation.IValidator<T>.Validate(T instance) -> Alis.Reactive.Validation.ValidationResult!
+Alis.Reactive.Validation.IValidator<T>.Validate(T instance, string! ruleSet) -> Alis.Reactive.Validation.ValidationResult!
+Alis.Reactive.Validation.IValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+Alis.Reactive.Validation.IValidator<T>.ValidateAsync(T instance, string! ruleSet, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+Alis.Reactive.Validation.InlineValidator<T>
+Alis.Reactive.Validation.InlineValidator<T>.InlineValidator() -> void
+Alis.Reactive.Validation.ReactiveFluentValidationBuilder
+Alis.Reactive.Validation.ReactiveFluentValidationBuilder.Add<TValidator>() -> Alis.Reactive.Validation.ReactiveFluentValidationBuilder!
+Alis.Reactive.Validation.ReactiveValidator
 Alis.Reactive.Validation.ReactiveValidator<T>
+Alis.Reactive.Validation.ReactiveValidator<T>.Include(Alis.Reactive.Validation.IValidator<T>! rules) -> void
 Alis.Reactive.Validation.ReactiveValidator<T>.ReactiveValidator() -> void
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleFor<TProperty>(System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilder<T, TProperty>!
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleForEach<TElement>(System.Linq.Expressions.Expression<System.Func<T, System.Collections.Generic.IEnumerable<TElement>!>!>! collection) -> Alis.Reactive.Validation.IRuleBuilder<T, TElement>!
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleLevelCascadeMode.get -> Alis.Reactive.Validation.CascadeMode
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleLevelCascadeMode.set -> void
+Alis.Reactive.Validation.ReactiveValidator<T>.RuleSet(string! ruleSet, System.Action! rules) -> void
+Alis.Reactive.Validation.ReactiveValidator<T>.Unless(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.UnlessAsync(System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.UnlessOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.Validate(T instance) -> Alis.Reactive.Validation.ValidationResult!
+Alis.Reactive.Validation.ReactiveValidator<T>.Validate(T instance, string! ruleSet) -> Alis.Reactive.Validation.ValidationResult!
+Alis.Reactive.Validation.ReactiveValidator<T>.ValidateAsync(T instance, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+Alis.Reactive.Validation.ReactiveValidator<T>.ValidateAsync(T instance, string! ruleSet, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+Alis.Reactive.Validation.ReactiveValidator<T>.When(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.WhenAsync(System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.ReactiveValidator<T>.WhenOnServer(System.Linq.Expressions.Expression<System.Func<T, bool>!>! predicate, System.Action! rules) -> Alis.Reactive.Validation.IConditionBuilder!
+Alis.Reactive.Validation.RuleBuilderExtensions
+Alis.Reactive.Validation.ValidationFailure
+Alis.Reactive.Validation.ValidationFailure.ErrorMessage.get -> string!
+Alis.Reactive.Validation.ValidationFailure.PropertyName.get -> string!
+Alis.Reactive.Validation.ValidationResult
+Alis.Reactive.Validation.ValidationResult.Errors.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.Validation.ValidationFailure!>!
+Alis.Reactive.Validation.ValidationResult.ErrorsByField.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string![]!>!
+Alis.Reactive.Validation.ValidationResult.IsValid.get -> bool
 Alis.Reactive.ValuesAndSources.Arg
 Alis.Reactive.ValuesAndSources.Arg<T>
 Alis.Reactive.ValuesAndSources.ITypedSource<T>
@@ -617,6 +674,7 @@ static Alis.Reactive.RenderingAndDelivery.PlanHtml.RenderPlan<TModel>(this Syste
 static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestContainer<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>!
 static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestForm<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>!
 static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Alis.Reactive.RenderingAndDelivery.ValidationServices.AddReactiveFluentValidation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Validation.ReactiveFluentValidationBuilder!>! validators) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RequestsAndResponses.Content.File.get -> Alis.Reactive.RequestsAndResponses.SuccessContent<Alis.Reactive.RequestsAndResponses.ResponseFile!>!
 static Alis.Reactive.RequestsAndResponses.Content.Html.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<Alis.Reactive.RequestsAndResponses.Markup!>!
 static Alis.Reactive.RequestsAndResponses.Content.Json<TBody>() -> Alis.Reactive.RequestsAndResponses.ErrorContent<TBody>!
@@ -670,6 +728,61 @@ static Alis.Reactive.TriggersAndPipelines.RequestSteps.Into<TModel>(this Alis.Re
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.Parallel<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, params System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>![]! branches) -> void
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.ShowValidationErrors<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.ValuesAndSources.ITypedSource<Alis.Reactive.RequestsAndResponses.ValidationProblem!>! problem) -> void
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.Validate<TModel, TContainer>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.RequestsAndResponses.RequestContainer<TContainer>! container) -> void
+static Alis.Reactive.Validation.RuleBuilderExtensions.ChildRules<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Action<Alis.Reactive.Validation.InlineValidator<TProperty>!>! rules) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.CreditCard<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Custom<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Action<TProperty, Alis.Reactive.Validation.CustomContext<T>!>! check) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.CustomAsync<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<TProperty, Alis.Reactive.Validation.CustomContext<T>!, System.Threading.CancellationToken, System.Threading.Tasks.Task!>! check) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.EmailAddress<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Empty<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Equal<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Equal<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.ExclusiveBetween<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty from, TProperty to) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.ExclusiveBetween<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty from, TProperty to) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.GreaterThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.InclusiveBetween<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty from, TProperty to) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.InclusiveBetween<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty from, TProperty to) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.IsInEnum<T, TEnum>(this Alis.Reactive.Validation.IRuleBuilder<T, TEnum>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TEnum>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.IsInEnum<T, TEnum>(this Alis.Reactive.Validation.IRuleBuilder<T, TEnum?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TEnum?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Length<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, int length) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Length<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, int minimum, int maximum) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThan<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty?>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.LessThanOrEqualTo<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty?>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Matches<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, string! pattern) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Matches<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, string! pattern, System.Text.RegularExpressions.RegexOptions options) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.MaximumLength<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, int maximum) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.MinimumLength<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule, int minimum) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Must<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<T, TProperty, bool>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Must<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<TProperty, bool>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.MustAsync<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<T, TProperty, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.MustAsync<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Func<TProperty, System.Threading.CancellationToken, System.Threading.Tasks.Task<bool>!>! predicate) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.NotEmpty<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.NotEqual<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Linq.Expressions.Expression<System.Func<T, TProperty>!>! member) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.NotEqual<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, TProperty value) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.NotNull<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.PrecisionScale<T>(this Alis.Reactive.Validation.IRuleBuilder<T, decimal>! rule, int precision, int scale, bool ignoreTrailingZeros) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, decimal>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.PrecisionScale<T>(this Alis.Reactive.Validation.IRuleBuilder<T, decimal?>! rule, int precision, int scale, bool ignoreTrailingZeros) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, decimal?>!
+static Alis.Reactive.Validation.RuleBuilderExtensions.Url<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
 static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(Alis.Reactive.ValuesAndSources.TypedSource<T>! source) -> Alis.Reactive.ValuesAndSources.Arg<T>!
 static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(T value) -> Alis.Reactive.ValuesAndSources.Arg<T>!
 static Alis.Reactive.ValuesAndSources.NullableReferences.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue!>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
