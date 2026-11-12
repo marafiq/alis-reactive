@@ -9,6 +9,11 @@ const beyondItsModulesIndex = "^(\\.\\./|\\./(?!index(\\.ts)?$))";
 
 const besideTheTable = ".";
 
+const findsARootsPlans = "Alis.Reactive.Assets/runtime/Execution/plan-scripts.ts";
+
+const aWideQuery =
+  "CallExpression[callee.type='MemberExpression'][callee.property.name=/^(querySelector|querySelectorAll|getElementsByClassName|getElementsByTagName|getElementsByName|closest|matches)$/]";
+
 const aFile = "[^/]+";
 
 function rowsOf(table) {
@@ -85,6 +90,13 @@ export default defineConfig(
         },
       ],
       eqeqeq: ["error", "always"],
+    },
+  },
+  {
+    files: ["Alis.Reactive.Assets/runtime/**/*.ts", "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.ts"],
+    ignores: [findsARootsPlans],
+    rules: {
+      "no-restricted-syntax": ["error", { selector: aWideQuery, message: "An element is found by its id: what the page needs to know, the plan carries." }],
     },
   },
   ...sliceTables.flatMap(rowsRule),

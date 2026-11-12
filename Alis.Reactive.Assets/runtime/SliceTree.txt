@@ -1,2 +1,8 @@
 Schema
+ValuesAndSources
+OwnershipAndState
+Plugins
+Vendors
+TriggersAndPipelines
+Execution
 .

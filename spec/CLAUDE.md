@@ -811,6 +811,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the redesign's lines). The name of the type M1.F1's sentence hands its `trigger`: the sentence fixes the two
   doors, `Html.On` and `DomReady`, and names no type; it is `Trigger<TModel>`, as both lines' pipeline builder is
   `Pipeline<TModel>` in every door `spec/api` compiles. The owner can overrule each.
+- The lead, 2026-11-12, writing the runtime's dispatch within the owner's order of 2026-11-11 and the decision of
+  the same day on a door that is not built. The plan's words are "the runtime's dispatch, a case for every kind".
+  The lint refuses a switch that lacks a kind, so a switch is whole from its first line: the evaluator's two
+  switches, over the statements and the expressions, are written whole, and a kind whose module's unit has not
+  built it throws there, as a door does. A nested union's switch (the shapes, the absences, the zones, the trace, a
+  listen's release) is written whole by the unit that builds the handler which reaches it: before that it would be
+  a function nothing calls. The object locators', a vendor's listening's and a handler's policy's are written,
+  since the thin path reaches them. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

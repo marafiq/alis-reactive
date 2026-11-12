@@ -257,7 +257,8 @@ Native's table is `NativeComponents` over `NativeAppLevelObjects/* NativeCompone
 `FusionComponents FusionTemplates` over `FusionAppLevelObjects/* FusionComponents/*`; OpenTelemetry's is `Tracing`
 alone. The runtime has its own table,
 `Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top, and its last row is the dot, the bundle's entry beside
-the table. The test app
+the table: `Schema`, `ValuesAndSources`, `OwnershipAndState`, `Plugins`, `Vendors`, `TriggersAndPipelines`,
+`Execution` and the dot today, a row entering with its first file. The test app
 holds `Components/*` over `World HostVariants` over `Care/* Bench/* Refusals/*`, so no screen reaches into another's
 model, and last the files beside the table, its entry point, a class in the app's namespace, since ALIS011 refuses a
 type in no namespace; the Playwright project holds `Harness` and then one row of module folders, so no module's tests
@@ -469,8 +470,8 @@ beside the runtime; a file that holds a comment, the inline disable's, is writte
 the three rules the presets carry for a spec line the same way, and the compiler's refusal of an enum (S8) by a file
 its case writes. U1 lands the presets, the ban on inline configuration and the three rules that read no path (the
 switch, the boolean conditions, the equality); the wide query's refusal and the import rows read a path of the
-runtime, and land in U3: the import rows with the runtime's first row, and the wide query's refusal with the file
-that finds a root's plans, in the thin path. The pure tests' import rule
+runtime, and landed in U3: the import rows with the runtime's first row, and the wide query's refusal with the file
+that finds a root's plans, `runtime/Execution/plan-scripts.ts`, the one file it is lifted in. The pure tests' import rule
 is landed with its refused and accepted files, before U3 writes the first of them.
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
@@ -920,9 +921,12 @@ whose list of the owner's type reads holds the plan's id; the module tests' proj
 `tests/Alis.Reactive.ModuleTests`, with its first tests; and the thin path's C# half: the plan's two doors,
 which a view renders as M19.D3's script with the document's every field, the load trigger (M1.N1), `pipeline.Element(id)`
 (M5.N5) and a set of an element's text to a text literal (M5.N1), written by the block writer of `Execution`. What
-the sentence does not need of those declarations stays unbuilt. Open of it,
-in order: the thin path's runtime, which brings the runtime's dispatch and its `Execution` row, with the file that finds a root's plans and the
-lint's refusal of a wide query; every screen's view; every browser test, failing; the Playwright project's switch.
+the sentence does not need of those declarations stays unbuilt. The thin
+path's runtime is written under the compiler and the lint, and no browser test has run it: seven rows of
+`Alis.Reactive.Assets/runtime` and its entry, the evaluator's two switches with a case for every statement and
+expression kind, an unbuilt kind failing loud, the one switch of the object locators, of a vendor's listening and of
+a handler's policy, the file that finds a root's plans, and the lint's refusal of a wide query in every other.
+Open of it, in order: the thin path's delivery, its page and its one test; ALIS041; every screen's view; every browser test, failing; the Playwright project's switch.
 The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables

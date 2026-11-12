@@ -8,6 +8,7 @@ namespace Alis.Reactive.ArchitectureTests;
 public class WhenTheLintIsConfigured
 {
     private const string Cases = "tests/Alis.Reactive.ArchitectureTests/LintCases/";
+    private const string BesideTheFileThatFindsARootsPlans = "Alis.Reactive.Assets/runtime/Execution/";
     private const string Equality = "eqeqeq";
     private const string BooleanCondition = "@typescript-eslint/strict-boolean-expressions";
     private const string ExhaustiveSwitch = "@typescript-eslint/switch-exhaustiveness-check";
@@ -15,6 +16,7 @@ public class WhenTheLintIsConfigured
     private const string UnnecessaryCondition = "@typescript-eslint/no-unnecessary-condition";
     private const string NonNullAssertion = "@typescript-eslint/no-non-null-assertion";
     private const string RestrictedImport = "no-restricted-imports";
+    private const string RestrictedSyntax = "no-restricted-syntax";
     private const int Error = 2;
     private const int Warning = 1;
 
@@ -130,6 +132,36 @@ public class WhenTheLintIsConfigured
     public void a_file_whose_folder_has_no_row_that_imports_a_row_is_refused() => AssertRefused("rows/unlisted/reads-a-row.refused.ts", RestrictedImport, line: 1);
 
     [RefusedCase]
+    public void each_query_wider_than_an_id_is_refused_at_its_call()
+    {
+        var (_, messages) = Lint(Cases + "wide-queries.refused.ts");
+
+        Assert.That(messages, Is.EqualTo(Enumerable.Range(2, 7).Select(line => new Message(Cases + "wide-queries.refused.ts", RestrictedSyntax, Error, line))));
+    }
+
+    [RefusedCase]
+    public void a_wide_query_beside_the_one_file_that_finds_a_roots_plans_is_refused()
+    {
+        var written = WriteIn(BesideTheFileThatFindsARootsPlans, "export function found(root: ParentNode): number {\n  return root.querySelectorAll(\"script\").length;\n}\n");
+        try
+        {
+            var (_, messages) = Lint(written);
+
+            Assert.That(messages, Is.EqualTo(new[] { new Message(written, RestrictedSyntax, Error, 2) }));
+        }
+        finally
+        {
+            File.Delete(Path.Combine(Repository.Root, written));
+        }
+    }
+
+    [AcceptedCase]
+    public void an_element_found_by_its_id_is_accepted() => AssertAccepted("element-by-its-id.accepted.ts");
+
+    [AcceptedCase]
+    public void a_member_named_like_a_query_that_is_read_and_not_called_is_accepted() => AssertAccepted("member-named-like-a-query.accepted.ts");
+
+    [RefusedCase]
     public void an_inline_disable_changes_no_result()
     {
         var written = Write("export function same(left: number, right: number): boolean {\n  // eslint-disable-next-line eqeqeq\n  return left == right;\n}\n");
@@ -193,9 +225,11 @@ public class WhenTheLintIsConfigured
         Assert.That(messages, Is.Empty);
     }
 
-    private static string Write(string source)
+    private static string Write(string source) => WriteIn(Cases + "written/", source);
+
+    private static string WriteIn(string folder, string source)
     {
-        var written = Cases + "written/" + Guid.NewGuid().ToString("N") + ".ts";
+        var written = folder + "written-" + Guid.NewGuid().ToString("N") + ".ts";
         var path = Path.Combine(Repository.Root, written);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         File.WriteAllText(path, source);
