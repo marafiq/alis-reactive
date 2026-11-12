@@ -12,15 +12,25 @@ public sealed class TEST007ExpectedValueIsAConstant : DiagnosticAnalyzer
 {
     public const string Id = "TEST007";
 
+    private const string Title = "An expected value and what finds an element are constants";
+
     private static readonly DiagnosticDescriptor Computed = new(
         Id,
-        "An expected value and what finds an element are constants",
+        Title,
         "'{0}' is given to '{1}' and is no constant; write the literal the promise states",
         TestCode.Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = ImmutableArray.Create(Computed);
+    private static readonly DiagnosticDescriptor BuiltBefore = new(
+        Id,
+        Title,
+        "'{0}' is given to '{1}' and is built before the call; write the options where they are passed, each value a literal",
+        TestCode.Category,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    private static readonly ImmutableArray<DiagnosticDescriptor> Rules = ImmutableArray.Create(Computed, BuiltBefore);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => Rules;
 
@@ -54,13 +64,24 @@ public sealed class TEST007ExpectedValueIsAConstant : DiagnosticAnalyzer
         foreach (var given in called.Arguments)
         {
             Report(context, given.Value, member.Name);
-            if (TestCode.Written(given.Value) is not IObjectCreationOperation { Initializer: { } options }) continue;
+            var written = TestCode.Written(given.Value);
+            if (IsBuiltBeforeTheCall(written, given.Parameter))
+                context.ReportDiagnostic(Diagnostic.Create(BuiltBefore, written.Syntax.GetLocation(), written.Syntax.ToString(), member.Name));
+            if (written is not IObjectCreationOperation { Initializer: { } options }) continue;
 
             foreach (var set in options.Initializers.OfType<ISimpleAssignmentOperation>())
             {
                 if (set.Target is IPropertyReferenceOperation option) Report(context, set.Value, option.Property.Name);
             }
         }
+    }
+
+    private static bool IsBuiltBeforeTheCall(IOperation written, IParameterSymbol? taking)
+    {
+        var takesOptions = taking?.Type is INamedTypeSymbol { TypeKind: TypeKind.Class } options && TestCode.IsOfPlaywright(options);
+        if (!takesOptions || written.ConstantValue.HasValue) return false;
+
+        return written is not IObjectCreationOperation { Arguments.Length: 0 };
     }
 
     private static void ReadAnAssertion(OperationAnalysisContext context, INamedTypeSymbol assert, INamedTypeSymbol constraint)

@@ -113,8 +113,8 @@ prose alone is a gap to close; a guard for a defect nobody met is not built.
 | A friend assembly: an internal opened to a test or to a consumer | `WhenAnInternalIsExposed` |
 | JavaScript in a view: an inline script, a handler attribute, a script URL | `WhenAViewIsWritten` |
 | In a shipped project, a conditional directive inside a file: one host's code is a file of its own | `WhenCodeCompilesForBothHosts` |
-| A public symbol outside the PublicAPI text, or a line with no symbol | the build (RS0016, RS0017) |
-| An analyzer off its release row, or one that reads a file or the environment | the build (RS2000, RS1035) |
+| A public symbol outside the PublicAPI text, or a line with no symbol; an analyzer off its release row, or one that reads a file or the environment | the build (RS0016, RS0017, RS2000, RS1035) |
+| In a browser test: a reference, a member of Playwright or an attribute of NUnit beyond what a test takes; a wait on time; a branch or a loop; an expected value that is computed, partial, what the test typed or only an absence; an assertion in a helper; no promise or no gesture of its own | `TEST001` to `TEST013` (`spec/REWRITE.md`, section 2.10) |
 | In the runtime: a default for plan data, a floating promise, a switch that misses a kind, a condition that is no boolean, a loose equality, an enum, an inline lint directive | the lint and the TypeScript compiler, held by `WhenTheLintIsConfigured` |
 | A rule with no refused or no accepted case | `WhenAnArchitectureTestIsWritten`; `spec/plants` for a check |
 | A door or a feature lost; a defect below its rung; a meaning with no carrier; a kind outside the grammar; a unit that proves nothing; a path with no verdict; a pin off its version; a generated binding off the spec; a hedge word in the spec | `spec/tools/check.py`, each check with its plants |
@@ -168,8 +168,8 @@ none: its record names the line.
 
 - A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it:
   one test rule to a landed rule's pattern, one module's half against the schema. Three at a time at most. None
-  decides or words a rule. Its brief names the base SHA, says it never reads a secret or a file that holds a
-  credential, and carries the full bar: the task is finished before anything reads it.
+  decides or words a rule. Its brief names the base SHA and carries the full bar, finished before anything reads it;
+  it reads no secret or file that holds a credential, and runs no git command beyond its own worktree and branch.
 - The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
   session, with the reason. A task whose check costs what the work costs is the lead's own.
 - No review is planned behind a writer. A review that runs is bounded before it starts: a fixed list of questions,

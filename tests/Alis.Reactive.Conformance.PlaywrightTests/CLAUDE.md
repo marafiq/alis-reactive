@@ -14,6 +14,11 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   fixture is `When` and its situation, takes its hosts by `TestFixtureSource`, and sits in the folder of the module
   whose test it is, under the screen it runs on. `Harness/` holds what every module's tests use, and `SliceTree.txt`
   orders the folders: `Harness/`, then one row of module folders, so no module's tests use another's helpers.
+- The build holds a test to `.claude/rules/tests.md`: the project imports
+  `tests/Alis.Reactive.TestRules/Alis.Reactive.TestRules.targets`, and each test rule, `TEST001` to `TEST013`, refuses
+  its defect where the test is written, with the cure in its message (`spec/REWRITE.md`, section 2.10). Until U3
+  writes the last test the project says its tests are still being written; after that a promise no test carries
+  fails the build.
 - Each test runs in a world of its own: `ConformanceFixture` opens it, and `TestWorld` seeds it through the world
   contract's typed builders. Teardown ends the world and fails a gate still parked.
 - A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits

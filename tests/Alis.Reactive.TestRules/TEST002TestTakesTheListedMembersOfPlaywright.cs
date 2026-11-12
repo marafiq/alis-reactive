@@ -12,7 +12,6 @@ public sealed class TEST002TestTakesTheListedMembersOfPlaywright : DiagnosticAna
     public const string Id = "TEST002";
 
     private const string Title = "A browser test takes only the listed members of Playwright";
-    private const string PlaywrightsPage = "Microsoft.Playwright.IPage";
     private const char OpensAnId = '#';
 
     private static readonly ImmutableArray<string> ReadBehindThePage = ImmutableArray.Create("ej2_instances", "window.alis");
@@ -66,10 +65,8 @@ public sealed class TEST002TestTakesTheListedMembersOfPlaywright : DiagnosticAna
     private static void Start(CompilationStartAnalysisContext start)
     {
         start.RegisterOperationAction(ReadText, OperationKind.Literal);
-        if (start.Compilation.GetTypeByMetadataName(PlaywrightsPage) is null) return;
-
         start.RegisterOperationAction(ReadCall, OperationKind.Invocation);
-        start.RegisterOperationAction(ReadMember, OperationKind.PropertyReference, OperationKind.EventReference);
+        start.RegisterOperationAction(ReadMember, OperationKind.PropertyReference, OperationKind.EventReference, OperationKind.MethodReference);
     }
 
     private static void ReadCall(OperationAnalysisContext context)

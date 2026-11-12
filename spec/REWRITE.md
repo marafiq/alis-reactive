@@ -563,7 +563,7 @@ rule or a named check:
 | TEST001 | a package, project or file reference of the project beyond the packages Microsoft.Playwright, NUnit, NUnit3TestAdapter and Microsoft.NET.Test.Sdk, the rules project, the framework's analyzers taken as an analyzer, which give a test no type, and the world contract: the framework, the app, a mocking or a snapshot library |
 | TEST002 | a member of Microsoft.Playwright outside the members a test takes, listed below the tables: script run in the page (`EvaluateAsync`, `WaitForFunctionAsync`), a stubbed network (`RouteAsync`), a one-shot read of the page (`InnerTextAsync`, `IsVisibleAsync`), an event no gesture raised (`DispatchEventAsync`) and every member a later version adds; and a literal that names `ej2_instances` or `window.alis` |
 | TEST003 | a wait on time: `WaitForTimeoutAsync`, `Task.Delay`, `Thread.Sleep`, `SpinWait`, and outside `Harness/` a `Timeout` a test sets on a Playwright call, since every wait is the harness's, set from measurement (2.5) |
-| TEST004 | a skipped, repeated, ordered or parameterized test: an NUnit attribute outside `[Test]`, `[TestFixtureSource]` and `[Category]` (`[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `[TestCase]` among them), and a member of `Assert`, `Assume` or `Warn` outside `Assert.That` (`Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` among them) |
+| TEST004 | a skipped, repeated, ordered or parameterized test: an NUnit attribute outside `[Test]`, `[TestFixtureSource]` and `[Category]` (`[Ignore]`, `[Explicit]`, `[Retry]`, `[Repeat]`, `[Order]`, `[TestCase]` among them), and a member of `Assert`, `Assume` or `Warn` outside `Assert.That` (`Assert.Ignore`, `Assert.Inconclusive`, `Assert.Pass`, `Assume.That` among them), and every legacy assertion of NUnit's (`ClassicAssert`, `StringAssert`, `CollectionAssert`) |
 | TEST005 | a branch or a loop in a test method: `if`, `switch` as a statement or an expression, `for`, `foreach`, `while`, `do`, `try`, `goto`, and a conditional operator, listed below the tables |
 | TEST006 | an `Assert.That` over anything but what the browser reports beside the page: a request the page sent, a console message, an uncaught error, a download and a page a gesture opened; the page itself is asserted through `Expect` alone |
 | TEST007 | an expected value, or a locator's selector, role name, label or text, that is neither a compile-time constant nor a generated promise constant |
@@ -632,8 +632,9 @@ TEST005's conditional operators are C#'s: `?:`, `??`, `??=`, `?.`, `?[]`, `&&` a
 
 How the rules read a project and a test. The test rules run where a project takes them: the Playwright project
 imports the rules project's build file, `Alis.Reactive.TestRules.targets`, which adds the rules as an analyzer and hands
-the compiler two properties, and no rule asks whether its compilation is a Playwright project. A rule that reads a
-type it does not find, NUnit's, Playwright's or the world contract's, registers nothing.
+the compiler two properties, and no rule asks whether its compilation is a Playwright project. The part of a rule
+that reads a type the compilation lacks, NUnit's, Playwright's or the world contract's, does not run, and the rest
+of the rule does: with no world contract TEST013 still counts Playwright's gestures.
 - **The project (TEST001).** The build file hands the compiler the project's own reference items as one property,
   each with its kind: a package, a framework, a project that gives the test its types, a project taken as an
   analyzer, a project named for its build alone (`ReferenceOutputAssembly="false"`), a file. An assembly that an
@@ -646,36 +647,47 @@ type it does not find, NUnit's, Playwright's or the world contract's, registers 
 - **A file of the harness** is one under the project's `Harness` folder; the members the harness takes besides, and
   NUnit's set-up attributes, are accepted there alone.
 - **A member of Playwright (TEST002)** is a method, a property or an event of one of its interfaces or static
-  classes, called, read or subscribed anywhere in the project. An options object and an enum value are the data a
-  listed member takes and are not read, but for the two below. `Page.Keyboard`, `Page.Mouse` and, in the harness,
+  classes, called, named, read or subscribed anywhere in the project: a method named and never called, a method
+  group, is read by TEST002 as a call is. An options object and an enum value are the data a listed member takes
+  and are not read, but for the two below. `Page.Keyboard`, `Page.Mouse` and, in the harness,
   `Page.Clock` are read as the way to the members listed under them. `Locator` and `FrameLocator` take one id, `#`
-  and the id, as a constant: any other constant selector is refused by TEST002, and one that is no constant by
-  TEST007.
+  and the id's letters, digits, `_` and `-`, as a constant: any other constant selector is refused by TEST002, and
+  one that is no constant by TEST007.
 - **A wait (TEST003)** is a call of a listed member, wherever it is written, and outside the harness a `Timeout`
   assigned on a Playwright options object.
-- **NUnit (TEST004).** Every attribute of NUnit applied in the project is read, and every member of `Assert`,
-  `Assume` and `Warn` that is called or named.
+- **NUnit (TEST004).** An attribute is NUnit's when NUnit declares it, a class it derives from or an interface it
+  implements, so an attribute a project builds on one of NUnit's is read as NUnit's and refused. Every such attribute
+  applied in the project is read, and every member of `Assert`, `Assume` and `Warn` and of NUnit's legacy
+  assertions, the assembly beside its framework's, that is called or named.
 - **A branch (TEST005)** is read as the compiler reads it, by its operation, where the file writes it: a branch the
-  compiler adds for a `using` or an `await` is none. It is reported at its keyword or operator.
+  compiler adds for a `using` or an `await` is none, and neither is `&`, `|`, a pattern's `or`, `break` or
+  `continue`. It is reported at its keyword or operator.
 - **What `Assert.That` reads (TEST006)** is its first argument: a listed member beside the page, or a member that
   carries `[BesideThePage]`, the world contract's mark for what the harness collected of the page's requests,
   console and uncaught errors; or a call or a member read whose receiver, an extension's first argument included,
-  leads to one (`request.Headers`, a projection of the console's messages). A local, a parameter and a value
-  computed from the page are refused: the fact is asserted where it is read.
+  leads to one (`request.Headers`, a projection of the console's messages), through an `await` and a cast. A local, a
+  parameter, an operator's result and a value computed from the page are refused: the fact is asserted where it is
+  read.
 - **A constant (TEST007)** is what the compiler folds to one, a generated promise constant among them, and an array
   or a collection expression of constants. The values read: each argument of a finding or an expecting member, each
   text, number, boolean and enum an options object passed to one is given, and each argument inside the constraint
-  `Assert.That` takes second.
+  `Assert.That` takes second. An options object is written where it is passed, with no argument of its own: one
+  built before the call is refused, since its values are set where the rule does not read. A list written as
+  neither an array nor a collection expression is refused whole. The rule reads wherever such a member is called, a
+  helper and the harness included.
 - **A partial match (TEST008)** is `ToContainTextAsync`, and a `Regex` passed to a member of Playwright or assigned
-  to one of its options.
+  to one of its options, read by the parameter's or the option's type, in the harness too.
 - **The arrange (TEST009).** A test types with `FillAsync` and `PressSequentiallyAsync`. An expected value is the
-  arrange when it equals a constant the same test typed into the same locator, the same expression or the same
-  local, field or property.
+  arrange when it equals a constant the same test typed into the same locator, the same expression, by its text, or
+  the same local, field or property. A matcher reached through `Not` is read, and no order between the typing and
+  the expecting is asked.
 - **An absence (TEST010)** is `ToBeHiddenAsync`, a matcher reached through `Not`, `ToHaveCountAsync` of zero,
   `ToBeEmptyAsync`, an expected text or value that is empty, and an `Assert.That` whose constraint is `Is.Empty` or
   `Is.Null`. A test whose assertions are all absences is refused at its name, and so is a test that asserts nothing.
-- **Outside a test (TEST011)** is a method that carries no `[Test]`: a call of `Expect` or of a member of `Assert`
-  there is refused, in the harness too.
+  An assertion is an expecting member of the list or an `Assert.That`; an `Assert.That` with no constraint, and one
+  with a compound constraint (`Is.Not.Null`), assert a presence.
+- **Outside a test (TEST011)** is every member that carries no `[Test]`, a method, a constructor, a property and a
+  field's initializer: a call of `Expect` or of a member of `Assert` there is refused, in the harness too.
 - **The binding (TEST012).** The one `[FailsFor]` takes a constant declared in a class of `Promises`. A constant
   whose test holds a gate carries `[Holds]`, the world contract's mark, once for each gate, and the test's body names
   each of those gates. Two tests on one constant are reported at the compilation's end, at the later one's mark, and
@@ -821,9 +833,9 @@ planted defect there. A unit's Doors line names the doors it makes real ahead of
 path does, and a part that lists its doors, each on a Doors line, lands with the latest unit that brings one of them.
 
 **Where the rewrite stands.** U1 is landed. U2 is running. Landed of it: the world contract with the generated gates
-and promises, the harness with its three tests, the app's World area and `scripts/run.sh`. Open of it: the test rules,
-the bindings check and section 2.7's runner, then the CI workflows, the two architecture tests over the app, the
-harness's refusal of the EJ2 script, and the measurements. U3 is next. The commit that lands a piece rewrites this
+and promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
+TEST013 on the Playwright project and the bindings check. Open of it: section 2.7's runner, then the CI workflows,
+the two architecture tests over the app, the harness's refusal of the EJ2 script, and the measurements. U3 is next. The commit that lands a piece rewrites this
 paragraph.
 
 ### U1. Tools, pins and tables

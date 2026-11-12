@@ -30,14 +30,6 @@ internal static class TestCode
     internal static bool IsATest(IMethodSymbol method, INamedTypeSymbol test)
         => method.GetAttributes().Any(applied => SymbolEqualityComparer.Default.Equals(applied.AttributeClass, test));
 
-    internal static IMethodSymbol? MethodAround(ISymbol? inside)
-    {
-        var method = inside as IMethodSymbol;
-        while (method is { MethodKind: MethodKind.LocalFunction or MethodKind.AnonymousFunction })
-            method = method.ContainingSymbol as IMethodSymbol;
-        return method;
-    }
-
     internal static IOperation Written(IOperation value)
     {
         while (value is IConversionOperation { IsImplicit: true } converted) value = converted.Operand;

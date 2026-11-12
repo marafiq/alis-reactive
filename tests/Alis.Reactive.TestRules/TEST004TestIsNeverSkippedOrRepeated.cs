@@ -16,6 +16,7 @@ public sealed class TEST004TestIsNeverSkippedOrRepeated : DiagnosticAnalyzer
     private const string NUnit = "NUnit.Framework.";
     private const string Attribute = "Attribute";
     private const string That = "That";
+    private const string LegacyAssert = "NUnit.Framework.Legacy.ClassicAssert";
 
     private static readonly string[] OfATest = ["Test", "TestFixtureSource", "Category"];
     private static readonly string[] OfTheHarness = ["SetUp", "TearDown", "OneTimeSetUp", "OneTimeTearDown", "SetUpFixture", "Parallelizable"];
@@ -65,10 +66,11 @@ public sealed class TEST004TestIsNeverSkippedOrRepeated : DiagnosticAnalyzer
         var ofTheHarness = TypesOf(start.Compilation, OfTheHarness, Attribute);
         var asserting = TypesOf(start.Compilation, Asserting, "");
         var assert = start.Compilation.GetTypeByMetadataName(NUnit + Asserting[0]);
+        var legacy = start.Compilation.GetTypeByMetadataName(LegacyAssert)?.ContainingAssembly;
 
         start.RegisterOperationAction(applied => ReadAttribute(applied, nunit, ofATest, ofTheHarness), OperationKind.Attribute);
-        start.RegisterOperationAction(called => ReadCall(called, asserting, assert), OperationKind.Invocation);
-        start.RegisterOperationAction(named => ReadName(named, asserting, assert), OperationKind.MethodReference);
+        start.RegisterOperationAction(called => ReadCall(called, asserting, assert, legacy), OperationKind.Invocation);
+        start.RegisterOperationAction(named => ReadName(named, asserting, assert, legacy), OperationKind.MethodReference);
     }
 
     private static ImmutableHashSet<INamedTypeSymbol> TypesOf(Compilation compilation, string[] names, string suffix)
@@ -80,7 +82,7 @@ public sealed class TEST004TestIsNeverSkippedOrRepeated : DiagnosticAnalyzer
     {
         var applied = (IAttributeOperation)context.Operation;
         if (applied.Operation is not IObjectCreationOperation { Constructor.ContainingType: { } attribute }) return;
-        if (!SymbolEqualityComparer.Default.Equals(attribute.ContainingAssembly, nunit) || ofATest.Contains(attribute)) return;
+        if (!IsOfNUnit(attribute, nunit) || ofATest.Contains(attribute)) return;
 
         var ofTheHarnessAlone = ofTheHarness.Contains(attribute);
         if (ofTheHarnessAlone && TestCode.IsInTheHarness(applied.Syntax.SyntaxTree)) return;
@@ -89,23 +91,35 @@ public sealed class TEST004TestIsNeverSkippedOrRepeated : DiagnosticAnalyzer
         context.ReportDiagnostic(Diagnostic.Create(ofTheHarnessAlone ? SetUpOutsideTheHarness : NoAttributeOfATest, written.GetLocation(), written.Identifier.ValueText));
     }
 
-    private static void ReadCall(OperationAnalysisContext context, ImmutableHashSet<INamedTypeSymbol> asserting, INamedTypeSymbol? assert)
+    private static bool IsOfNUnit(INamedTypeSymbol attribute, IAssemblySymbol nunit)
     {
-        var called = (IInvocationOperation)context.Operation;
-        Read(context, called.TargetMethod, TestCode.NameOf(called), asserting, assert);
+        for (var declared = attribute; declared is not null; declared = declared.BaseType)
+        {
+            if (SymbolEqualityComparer.Default.Equals(declared.ContainingAssembly, nunit)) return true;
+        }
+
+        return attribute.AllInterfaces.Any(taken => SymbolEqualityComparer.Default.Equals(taken.ContainingAssembly, nunit));
     }
 
-    private static void ReadName(OperationAnalysisContext context, ImmutableHashSet<INamedTypeSymbol> asserting, INamedTypeSymbol? assert)
+    private static void ReadCall(OperationAnalysisContext context, ImmutableHashSet<INamedTypeSymbol> asserting, INamedTypeSymbol? assert, IAssemblySymbol? legacy)
+    {
+        var called = (IInvocationOperation)context.Operation;
+        Read(context, called.TargetMethod, TestCode.NameOf(called), asserting, assert, legacy);
+    }
+
+    private static void ReadName(OperationAnalysisContext context, ImmutableHashSet<INamedTypeSymbol> asserting, INamedTypeSymbol? assert, IAssemblySymbol? legacy)
     {
         var named = (IMethodReferenceOperation)context.Operation;
         var written = named.Syntax is MemberAccessExpressionSyntax reached ? reached.Name : named.Syntax;
-        Read(context, named.Method, written.GetLocation(), asserting, assert);
+        Read(context, named.Method, written.GetLocation(), asserting, assert, legacy);
     }
 
-    private static void Read(OperationAnalysisContext context, IMethodSymbol method, Location written, ImmutableHashSet<INamedTypeSymbol> asserting, INamedTypeSymbol? assert)
+    private static void Read(
+        OperationAnalysisContext context, IMethodSymbol method, Location written, ImmutableHashSet<INamedTypeSymbol> asserting, INamedTypeSymbol? assert, IAssemblySymbol? legacy)
     {
         var holder = method.ContainingType.OriginalDefinition;
-        if (!asserting.Contains(holder)) return;
+        var isALegacyAssertion = legacy is not null && SymbolEqualityComparer.Default.Equals(holder.ContainingAssembly, legacy);
+        if (!asserting.Contains(holder) && !isALegacyAssertion) return;
         if (method.Name == That && SymbolEqualityComparer.Default.Equals(holder, assert)) return;
 
         context.ReportDiagnostic(Diagnostic.Create(NoAssertionOfATest, written, holder.Name + "." + method.Name));

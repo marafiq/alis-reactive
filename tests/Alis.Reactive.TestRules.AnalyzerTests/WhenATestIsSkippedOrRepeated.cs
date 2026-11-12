@@ -62,7 +62,52 @@ public sealed class WhenATestIsSkippedOrRepeated
                 "WhenARoundStarts.cs",
                 "[Nightly]\npublic sealed class WhenARoundStarts\n{\n"
                 + "    [Test] [FailsFor(\"harness WhenARoundStarts.the_round_is_listed\")] [Obsolete(\"moved\")] public void the_round_is_listed() { }\n}\n"
-                + "public sealed class NightlyAttribute : CategoryAttribute;\n")
+                + "public sealed class NightlyAttribute : Attribute, IComparable\n{\n    public int CompareTo(object? other) => 0;\n}\n")
+            .RunAsync();
+
+    [RefusedCase]
+    public Task an_attribute_a_project_derives_from_nunits_or_builds_on_its_interfaces_is_refused()
+        => new Case<TEST004TestIsNeverSkippedOrRepeated>()
+            .WithFile(
+                "WhenARoundStarts.cs",
+                "[{|#0:Nightly|}]\npublic sealed class WhenARoundStarts\n{\n"
+                + "    [Test] [{|#1:Later|}] public void the_round_is_listed() { }\n"
+                + "    [Test] [{|#2:Deeper|}] public void the_round_is_opened() { }\n"
+                + "    [Test] [{|#3:Again|}] public void the_round_is_closed() { }\n"
+                + "    [{|#4:Before|}] public void Open() { }\n}\n"
+                + "public sealed class NightlyAttribute() : CategoryAttribute(\"nightly\");\n"
+                + "public class LaterAttribute() : IgnoreAttribute(\"later\");\n"
+                + "public sealed class DeeperAttribute : LaterAttribute;\n"
+                + "public sealed class BeforeAttribute : SetUpAttribute;\n"
+                + "public sealed class AgainAttribute : Attribute, NUnit.Framework.Interfaces.IApplyToTest\n{\n"
+                + "    public void ApplyToTest(NUnit.Framework.Internal.Test test) { }\n}\n")
+            .Expecting(NoAttribute(0, "Nightly"), NoAttribute(1, "Later"), NoAttribute(2, "Deeper"), NoAttribute(3, "Again"), NoAttribute(4, "Before"))
+            .RunAsync();
+
+    [RefusedCase]
+    public Task a_legacy_assertion_of_nunits_is_refused_at_its_name()
+        => new Case<TEST004TestIsNeverSkippedOrRepeated>()
+            .WithFile(
+                "WhenARoundStarts.cs",
+                "using NUnit.Framework.Legacy;\n"
+                + Opening
+                + "        ClassicAssert.{|#0:AreEqual|}(4, 4);\n"
+                + "        StringAssert.{|#1:Contains|}(\"North\", \"North wing\");\n"
+                + "        CollectionAssert.{|#2:IsEmpty|}(Array.Empty<string>());\n"
+                + "        Action<bool> check = ClassicAssert.{|#3:IsTrue|};\n"
+                + "        check(true);"
+                + Closing)
+            .Expecting(
+                NoAssertion(0, "ClassicAssert.AreEqual"), NoAssertion(1, "StringAssert.Contains"), NoAssertion(2, "CollectionAssert.IsEmpty"),
+                NoAssertion(3, "ClassicAssert.IsTrue"))
+            .RunAsync();
+
+    [RefusedCase]
+    public Task a_member_of_assert_is_refused_in_a_project_without_nunits_legacy_assertions()
+        => new Case<TEST004TestIsNeverSkippedOrRepeated>()
+            .Without("nunit.framework.legacy.dll")
+            .WithFile("WhenARoundStarts.cs", Opening + "        Assert.{|#0:Pass|}();\n        Rounds.Ignore(\"later\");" + Closing + "internal static class Rounds { internal static void Ignore(string why) { } }\n")
+            .Expecting(NoAssertion(0, "Assert.Pass"))
             .RunAsync();
 
     [RefusedCase]

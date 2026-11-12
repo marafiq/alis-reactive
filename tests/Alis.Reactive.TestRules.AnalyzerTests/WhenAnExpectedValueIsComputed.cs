@@ -100,9 +100,6 @@ public sealed class WhenAnExpectedValueIsComputed
                 + "        _ = _page.GetByText(pattern);\n"
                 + "        _ = _page.Locator(\"#round\").Locator(start);\n"
                 + "        _ = _page.FrameLocator(\"#answer\").GetByText(\"Ada\");\n"
-                + "        var options = new PageGetByRoleOptions();\n"
-                + "        options.Name = Rounds.Next();\n"
-                + "        _ = _page.GetByRole(AriaRole.Heading, options);\n"
                 + "        await Expect(_page.GetByRole(AriaRole.Heading)).ToHaveTextAsync(pattern);\n"
                 + "        await Expect(_page.GetByRole(AriaRole.Listitem)).ToHaveTextAsync(patterns);\n"
                 + "        await Expect(_page.GetByRole(AriaRole.Listitem)).ToHaveTextAsync(either);\n"
@@ -225,6 +222,45 @@ public sealed class WhenAnExpectedValueIsComputed
             .Expecting(Computed(0, "name", "Name"), Computed(1, "id", "FrameLocator"))
             .RunAsync();
 
+    [RefusedCase]
+    public Task an_options_object_built_before_the_call_is_refused_at_the_argument()
+        => new Case<TEST007ExpectedValueIsAConstant>()
+            .WithFile(
+                "WhenARoundStarts.cs",
+                Opening
+                + "        var named = new PageGetByRoleOptions();\n"
+                + "        named.Name = Rounds.Next();\n"
+                + "        _ = _page.GetByRole(AriaRole.Button, {|#0:named|});\n"
+                + "        _ = _page.GetByRole(AriaRole.Button, {|#1:new PageGetByRoleOptions(named)|});\n"
+                + "        _ = _page.GetByRole(AriaRole.Button, {|#2:new(named) { Exact = true }|});\n"
+                + "        await Expect(_page.GetByRole(AriaRole.Heading)).ToHaveTextAsync(\"Rounds\", {|#3:Rounds.Whole()|});"
+                + Closing
+                + "internal static class Rounds\n{\n    internal static string Next() => \"Rounds\";\n    internal static LocatorAssertionsToHaveTextOptions Whole() => new() { IgnoreCase = false };\n}\n")
+            .Expecting(
+                BuiltBefore(0, "named", "GetByRole"),
+                BuiltBefore(1, "new PageGetByRoleOptions(named)", "GetByRole"),
+                BuiltBefore(2, "new(named) { Exact = true }", "GetByRole"),
+                BuiltBefore(3, "Rounds.Whole()", "ToHaveTextAsync"))
+            .RunAsync();
+
+    [AcceptedCase]
+    public Task an_options_object_written_where_it_is_passed_and_no_options_at_all_are_accepted()
+        => new Case<TEST007ExpectedValueIsAConstant>()
+            .WithFile(
+                "WhenARoundStarts.cs",
+                Opening
+                + "        ILocator rows = null!;\n"
+                + "        _ = _page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = \"Start\" });\n"
+                + "        _ = _page.GetByRole(AriaRole.Button, new() { Name = \"Start\" });\n"
+                + "        _ = _page.GetByRole(AriaRole.Button, new());\n"
+                + "        _ = _page.GetByRole(AriaRole.Button, null);\n"
+                + "        _ = _page.GetByRole(AriaRole.Button);\n"
+                + "        _ = _page.GetByRole(AriaRole.Row).Filter(new() { Has = rows });\n"
+                + "        _ = _page.GetByRole(AriaRole.Row).And(rows);\n"
+                + "        await Task.CompletedTask;"
+                + Closing)
+            .RunAsync();
+
     [AcceptedCase]
     public Task a_computed_value_given_to_a_gesture_and_to_a_member_of_another_type_is_accepted()
         => new Case<TEST007ExpectedValueIsAConstant>()
@@ -271,6 +307,10 @@ public sealed class WhenAnExpectedValueIsComputed
         => new Case<TEST007ExpectedValueIsAConstant>()
             .WithFile("WhenARoundStarts.cs", Opening + "        await Expect(_page.GetByRole(AriaRole.Heading)).ToHaveTextAsync({|CS0103:missing|});" + Closing)
             .RunAsync();
+
+    private static DiagnosticResult BuiltBefore(int at, string value, string taker)
+        => new DiagnosticResult(TEST007ExpectedValueIsAConstant.Id, DiagnosticSeverity.Error).WithLocation(at)
+            .WithMessage($"'{value}' is given to '{taker}' and is built before the call; write the options where they are passed, each value a literal");
 
     private static DiagnosticResult Computed(int at, string value, string taker)
         => new DiagnosticResult(TEST007ExpectedValueIsAConstant.Id, DiagnosticSeverity.Error).WithLocation(at)

@@ -12,7 +12,6 @@ public sealed class TEST003TestWaitsForNoTime : DiagnosticAnalyzer
     public const string Id = "TEST003";
 
     private const string Title = "A test waits for the state it names, never for time";
-    private const string PlaywrightsWait = "WaitForTimeoutAsync";
     private const string Delay = "Delay";
     private const string Sleep = "Sleep";
     private const string SpinWait = "SpinWait";
@@ -61,7 +60,7 @@ public sealed class TEST003TestWaitsForNoTime : DiagnosticAnalyzer
         var called = (IInvocationOperation)context.Operation;
         var method = called.TargetMethod;
         var holder = method.ContainingType;
-        var waits = (method.Name == PlaywrightsWait && TestCode.IsOfPlaywright(method))
+        var waits = (method.Name == Taken.WaitOnTime && TestCode.IsOfPlaywright(method))
                     || (method.Name == Delay && Is(holder, task))
                     || (method.Name is Sleep or SpinWait && Is(holder, thread))
                     || Is(holder, spinWait);

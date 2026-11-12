@@ -48,6 +48,22 @@ public sealed class WhenATestTakesAMemberOfPlaywright
             .RunAsync();
 
     [RefusedCase]
+    public Task a_method_outside_the_lists_that_is_named_and_never_called_is_refused_at_its_name()
+        => new Case<TEST002TestTakesTheListedMembersOfPlaywright>()
+            .WithFile(
+                "WhenARoundStarts.cs",
+                Opening
+                + "        Func<string, object?, Task<string>> script = _page.{|#0:EvaluateAsync<string>|};\n"
+                + "        Func<float, Task> wait = _page.{|#1:WaitForTimeoutAsync|};\n"
+                + "        Func<LocatorClickOptions?, Task> click = _page.GetByRole(AriaRole.Button).ClickAsync;\n"
+                + "        await click(null);\n"
+                + "        await wait(1);\n"
+                + "        _ = await script(\"() => document.title\", null);"
+                + Closing)
+            .Expecting(Outside(0, "IPage.EvaluateAsync"), Outside(1, "IPage.WaitForTimeoutAsync"))
+            .RunAsync();
+
+    [RefusedCase]
     public Task a_member_of_a_static_class_of_playwrights_outside_the_lists_is_refused_at_its_name()
         => new Case<TEST002TestTakesTheListedMembersOfPlaywright>()
             .WithFile(
