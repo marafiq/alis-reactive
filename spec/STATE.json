@@ -1434,7 +1434,7 @@
     },
     "hedges": {
       "counts": {
-        "files": 103,
+        "files": 104,
         "hedges": 0
       },
       "detail": "no hedge word in the spec's prose",
@@ -1528,10 +1528,10 @@
         "modules": 26,
         "problems": 0,
         "slice_rows": 16,
-        "spec_entries": 40,
+        "spec_entries": 41,
         "tla": 14
       },
-      "detail": "each of the module table's 20 core modules is a folder of section 2.1's Alis.Reactive/ and in one of 16 SliceTree rows, each of its 26 modules a folder of section 2.1's projects and spec/<Module>/module.md; each of 14 TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; each of spec/'s 40 entries is a module folder or named by section 2.1's spec line",
+      "detail": "each of the module table's 20 core modules is a folder of section 2.1's Alis.Reactive/ and in one of 16 SliceTree rows, each of its 26 modules a folder of section 2.1's projects and spec/<Module>/module.md; each of 14 TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; each of spec/'s 41 entries is a module folder or named by section 2.1's spec line",
       "pass": true
     },
     "native_behaviors": {
@@ -3717,7 +3717,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "d07e7900e6f81e89fdb3f79307986bb367a131ca",
+  "read_at_head": "12b4876e6dbbe34083f214886e4bb792592992cf",
   "step": {
     "failing": [],
     "name": "End of session",
