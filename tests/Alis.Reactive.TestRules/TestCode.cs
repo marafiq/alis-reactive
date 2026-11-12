@@ -42,4 +42,11 @@ internal static class TestCode
         InvocationExpressionSyntax written => written.Expression.GetLocation(),
         _ => called.Syntax.GetLocation(),
     };
+
+    internal static Location NameOf(IMemberReferenceOperation read) => read.Syntax switch
+    {
+        MemberAccessExpressionSyntax reached => reached.Name.GetLocation(),
+        MemberBindingExpressionSyntax bound => bound.Name.GetLocation(),
+        _ => read.Syntax.GetLocation(),
+    };
 }

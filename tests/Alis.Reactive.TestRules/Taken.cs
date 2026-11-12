@@ -6,6 +6,9 @@ namespace Alis.Reactive.TestRules;
 
 internal static class Taken
 {
+    internal const string WaitOnTime = "WaitForTimeoutAsync";
+    internal const string PartialMatch = "ToContainTextAsync";
+
     internal static readonly ImmutableHashSet<string> Gestures = Members(
         "IPage.GotoAsync", "IPage.ReloadAsync", "IPage.GoBackAsync", "IPage.GoForwardAsync",
         "ILocator.ClickAsync", "ILocator.DblClickAsync", "ILocator.FillAsync", "ILocator.ClearAsync", "ILocator.PressAsync",

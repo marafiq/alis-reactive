@@ -19,7 +19,7 @@ public class WhenARuleNamesTheCode
     private static readonly string[] OutsideWhatGitTracks = [".worktrees/<name>"];
     private static readonly string[] Placeholders = ["vX", "file:line"];
     private static readonly string[] WhatTheRulesForbid =
-        ["page.evaluate()", "window.alis", "ToContainTextAsync", "writes_a_let_statement", "set_prop_mutation_writes_value_to_ej2_instance"];
+        ["page.evaluate()", "writes_a_let_statement", "set_prop_mutation_writes_value_to_ej2_instance"];
     private static readonly string[] VendorTypes = ["EmitType", "ChangeEventArgs"];
     private static readonly string[] PlatformMembers = ["Year", "Application_Start", "FlagsAttribute", "Clock"];
     private static readonly string[] OperatorsTheSpecDecides = ["eqDecimal"];
