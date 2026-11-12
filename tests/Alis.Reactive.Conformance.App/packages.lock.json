@@ -4,6 +4,9 @@
     "net10.0": {
       "alis.reactive.conformance.world": {
         "type": "Project"
+      },
+      "AlisReactive": {
+        "type": "Project"
       }
     }
   }

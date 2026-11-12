@@ -17,6 +17,7 @@ public sealed class TEST004TestIsNeverSkippedOrRepeated : DiagnosticAnalyzer
     private const string Attribute = "Attribute";
     private const string That = "That";
     private const string LegacyAssert = "NUnit.Framework.Legacy.ClassicAssert";
+    private const string TestAction = "NUnit.Framework.ITestAction";
 
     private static readonly string[] OfATest = ["Test", "TestFixtureSource", "Category"];
     private static readonly string[] OfTheHarness = ["SetUp", "TearDown", "OneTimeSetUp", "OneTimeTearDown", "SetUpFixture", "Parallelizable"];
@@ -67,8 +68,9 @@ public sealed class TEST004TestIsNeverSkippedOrRepeated : DiagnosticAnalyzer
         var asserting = TypesOf(start.Compilation, Asserting, "");
         var assert = start.Compilation.GetTypeByMetadataName(NUnit + Asserting[0]);
         var legacy = start.Compilation.GetTypeByMetadataName(LegacyAssert)?.ContainingAssembly;
+        var action = start.Compilation.GetTypeByMetadataName(TestAction);
 
-        start.RegisterOperationAction(applied => ReadAttribute(applied, nunit, ofATest, ofTheHarness), OperationKind.Attribute);
+        start.RegisterOperationAction(applied => ReadAttribute(applied, nunit, ofATest, ofTheHarness, action), OperationKind.Attribute);
         start.RegisterOperationAction(called => ReadCall(called, asserting, assert, legacy), OperationKind.Invocation);
         start.RegisterOperationAction(named => ReadName(named, asserting, assert, legacy), OperationKind.MethodReference);
     }
@@ -78,18 +80,25 @@ public sealed class TEST004TestIsNeverSkippedOrRepeated : DiagnosticAnalyzer
             .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
 
     private static void ReadAttribute(
-        OperationAnalysisContext context, IAssemblySymbol nunit, ImmutableHashSet<INamedTypeSymbol> ofATest, ImmutableHashSet<INamedTypeSymbol> ofTheHarness)
+        OperationAnalysisContext context,
+        IAssemblySymbol nunit,
+        ImmutableHashSet<INamedTypeSymbol> ofATest,
+        ImmutableHashSet<INamedTypeSymbol> ofTheHarness,
+        INamedTypeSymbol? action)
     {
         var applied = (IAttributeOperation)context.Operation;
         if (applied.Operation is not IObjectCreationOperation { Constructor.ContainingType: { } attribute }) return;
         if (!IsOfNUnit(attribute, nunit) || ofATest.Contains(attribute)) return;
 
-        var ofTheHarnessAlone = ofTheHarness.Contains(attribute);
+        var ofTheHarnessAlone = ofTheHarness.Contains(attribute) || IsATestAction(attribute, action);
         if (ofTheHarnessAlone && TestCode.IsInTheHarness(applied.Syntax.SyntaxTree)) return;
 
         var written = Last(((AttributeSyntax)applied.Syntax).Name);
         context.ReportDiagnostic(Diagnostic.Create(ofTheHarnessAlone ? SetUpOutsideTheHarness : NoAttributeOfATest, written.GetLocation(), written.Identifier.ValueText));
     }
+
+    private static bool IsATestAction(INamedTypeSymbol attribute, INamedTypeSymbol? action)
+        => action is not null && attribute.AllInterfaces.Contains(action, SymbolEqualityComparer.Default);
 
     private static bool IsOfNUnit(INamedTypeSymbol attribute, IAssemblySymbol nunit)
     {

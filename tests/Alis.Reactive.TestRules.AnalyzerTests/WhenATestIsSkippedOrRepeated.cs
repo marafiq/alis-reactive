@@ -10,6 +10,9 @@ public sealed class WhenATestIsSkippedOrRepeated
 {
     private const string Opening = "public sealed class WhenARoundStarts\n{\n    [Test]\n    public async Task the_round_is_listed()\n    {\n";
     private const string Closing = "\n        await Task.CompletedTask;\n    }\n}\n";
+    private const string ARunsAction =
+        "public sealed class AroundTheRunAttribute : Attribute, ITestAction\n{\n    public ActionTargets Targets => ActionTargets.Suite;\n"
+        + "    public void BeforeTest(NUnit.Framework.Interfaces.ITest test) { }\n    public void AfterTest(NUnit.Framework.Interfaces.ITest test) { }\n}\n";
 
     [RefusedCase]
     public Task a_skipped_a_repeated_an_ordered_and_a_parameterized_test_are_refused_each_at_its_attribute()
@@ -133,6 +136,21 @@ public sealed class WhenATestIsSkippedOrRepeated
                 "Harness/Run.cs",
                 "[SetUpFixture]\npublic sealed class Run\n{\n    [OneTimeSetUp] public void Start() { }\n    [OneTimeTearDown] public void Stop() { }\n}\n"
                 + "[Parallelizable]\npublic abstract class ConformanceFixture\n{\n    [SetUp] public void Open() { }\n    [TearDown] public void Close() { }\n}\n")
+            .RunAsync();
+
+    [RefusedCase]
+    public Task a_test_action_applied_outside_the_harness_is_refused_at_its_name()
+        => new Case<TEST004TestIsNeverSkippedOrRepeated>()
+            .WithFile(
+                "WhenARoundStarts.cs",
+                "[assembly: {|#0:AroundTheRun|}]\npublic sealed class WhenARoundStarts\n{\n    [Test] public void the_round_is_listed() { }\n}\n" + ARunsAction)
+            .Expecting(SetUp(0, "AroundTheRun"))
+            .RunAsync();
+
+    [AcceptedCase]
+    public Task a_test_action_applied_in_the_harness_is_accepted()
+        => new Case<TEST004TestIsNeverSkippedOrRepeated>()
+            .WithFile("Harness/Run.cs", "[assembly: AroundTheRun]\n" + ARunsAction)
             .RunAsync();
 
     [RefusedCase]

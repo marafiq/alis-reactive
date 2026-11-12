@@ -146,7 +146,8 @@
       "alis.reactive.conformance.app": {
         "type": "Project",
         "dependencies": {
-          "Alis.Reactive.Conformance.World": "[1.0.0, )"
+          "Alis.Reactive.Conformance.World": "[1.0.0, )",
+          "AlisReactive": "[1.0.0, )"
         }
       },
       "alis.reactive.conformance.world": {

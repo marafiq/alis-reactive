@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.World
+@using Microsoft.Extensions.Caching.Distributed
+@inject IDistributedCache Cache
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Ward</title>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <main>
+        @RenderBody()
+    </main>
+    <aside aria-label="Today's rounds">
+        @Html.Raw(await Cache.GetStringAsync(CachedRounds.Key))
+    </aside>
+    <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
+</body>
+</html>

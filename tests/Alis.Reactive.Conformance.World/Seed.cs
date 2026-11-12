@@ -8,9 +8,13 @@ public sealed class Seed
 
     public string? Word { get; set; }
 
+    public int? CachedRoundsPlanVersion { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed TheWord(string word) => new() { Word = word };
+
+    public static Seed CachedRoundsOfPlanVersion(int version) => new() { CachedRoundsPlanVersion = version };
 
     public Seed AndResident(string name)
     {

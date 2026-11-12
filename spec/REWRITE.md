@@ -697,7 +697,8 @@ locale and time zone, `NewPageAsync`, `AddCookiesAsync`, `CloseAsync`, `SetDefau
 `StopAsync`, which a measured run records its steps with (2.5), the page's events `Request`, `Console`, `PageError`,
 `Download`, `Popup` and `Close`,
 `RequestGCAsync`, and the clock's `InstallAsync`, `PauseAtAsync`, `FastForwardAsync`, `RunForAsync` and `ResumeAsync`;
-and of NUnit `[SetUp]`, `[TearDown]`, `[OneTimeSetUp]`, `[OneTimeTearDown]`, `[SetUpFixture]` and `[Parallelizable]`.
+and of NUnit `[SetUp]`, `[TearDown]`, `[OneTimeSetUp]`, `[OneTimeTearDown]`, `[SetUpFixture]` and `[Parallelizable]`,
+and an attribute that is a test action of NUnit's, by which the harness opens a run once for every namespace.
 TEST005's conditional operators are C#'s: `?:`, `??`, `??=`, `?.`, `?[]`, `&&` and `||`.
 
 How the rules read a project and a test. The test rules run where a project takes them: the Playwright project
@@ -930,8 +931,11 @@ path's runtime is written under the compiler and the lint, and no browser test h
 `Alis.Reactive.Assets/runtime` and its entry, the evaluator's two switches with a case for every statement and
 expression kind, an unbuilt kind failing loud, the one switch of the object locators, of a vendor's listening and of
 a handler's policy, the file that finds a root's plans, and the lint's refusal of a wide query in every other.
-The core's bundle is built by `build.mjs` at the root, which each script that builds runs first.
-Open of it, in order: the thin path's page and its one test; ALIS041; every screen's view; every browser test, failing; the Playwright project's switch.
+The core's bundle is built by `build.mjs` at the root, which each script that builds runs first. The unit's one
+test, X19.3's, is green on the refusals screen's ward page, whose layout renders a fragment the app's cache holds,
+and fails on each of its two planted defects; it proves the runtime's thin path in a browser through a click
+handler of a seeded plan, and no test of U3 asserts the load trigger there.
+Open of it, in order: the bindings check's view clause; ALIS041; every screen's view; every browser test, failing; the Playwright project's switch.
 The commit that lands a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables

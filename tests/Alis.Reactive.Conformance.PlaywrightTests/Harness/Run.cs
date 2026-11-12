@@ -1,12 +1,24 @@
+using Alis.Reactive.Conformance.PlaywrightTests.Harness;
 using Microsoft.Playwright;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 [assembly: Parallelizable(ParallelScope.Fixtures)]
+[assembly: AroundTheRun]
 
 namespace Alis.Reactive.Conformance.PlaywrightTests.Harness;
 
-[SetUpFixture]
-public sealed class Run
+[AttributeUsage(AttributeTargets.Assembly)]
+public sealed class AroundTheRunAttribute : Attribute, ITestAction
+{
+    public ActionTargets Targets => ActionTargets.Suite;
+
+    public void BeforeTest(ITest test) => Run.OpenTheBrowser().GetAwaiter().GetResult();
+
+    public void AfterTest(ITest test) => Run.CloseTheBrowserAndStopEveryHost().GetAwaiter().GetResult();
+}
+
+internal static class Run
 {
     private static IPlaywright? _playwright;
     private static IBrowser? _browser;
@@ -14,16 +26,14 @@ public sealed class Run
     internal static IBrowser Browser
         => _browser ?? throw new InvalidOperationException("No browser is open: a test of this project runs inside the project's run, which opens one.");
 
-    [OneTimeSetUp]
-    public async Task OpenTheBrowser()
+    internal static async Task OpenTheBrowser()
     {
         _playwright = await Playwright.CreateAsync();
         _browser = await _playwright.Chromium.LaunchAsync();
         Waits.SetOnEveryExpectation();
     }
 
-    [OneTimeTearDown]
-    public async Task CloseTheBrowserAndStopEveryHost()
+    internal static async Task CloseTheBrowserAndStopEveryHost()
     {
         ConformanceHost.StopAll();
         if (_browser is not null) await _browser.CloseAsync();

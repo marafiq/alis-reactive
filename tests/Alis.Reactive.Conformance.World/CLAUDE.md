@@ -10,7 +10,7 @@ references no Alis.Reactive assembly, so a test that compiles against it cannot 
   as a test's gesture. `BesideThePageAttribute` marks what the harness collected of a page's requests, console and
   uncaught errors, the one thing of the harness's that `Assert.That` reads.
 - A seed is written through the typed builders of `Seed.cs`; an endpoint and a page of the World area are named once,
-  in `WorldEndpoints.cs` and `WorldPages.cs`.
+  in `WorldEndpoints.cs` and `WorldPages.cs`; a refusal route's page is named in `RefusalPages.cs`.
 - It compiles for `net48` and `net10.0`, since the twin serves the same world.
 
 ```bash

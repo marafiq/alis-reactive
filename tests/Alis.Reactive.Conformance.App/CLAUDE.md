@@ -11,6 +11,11 @@ its views.
 - The World area (`World/`) scopes data, gates and caches to a test's world by the cookie `"world"`, in Development
   alone. A document's request that carries no world gets a new one, so a person runs the app as a test does; any
   other request with no world gets none.
+- A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
+  and its layout, a view named by its path. A layout links the framework's script from the core's static web
+  assets, last; the static files middleware serves it, which adds no route.
+- `World/WorldCache.cs` is the app's distributed cache in Development, each key under its world, and
+  `World/CachedRounds.cs` is the fragment a seed puts there, as a release of the framework rendered it.
 - The app holds no static a request can change, since every world shares a static: none that can be assigned, and
   no read-only one that holds an array, a collection that is neither a read-only view nor an immutable or frozen
   one, or an object of the app's own that holds a member a request can assign. What a test changes lives in its

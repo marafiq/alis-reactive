@@ -15,6 +15,8 @@ public sealed class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddControllersWithViews();
+        builder.Services.AddDistributedMemoryCache();
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();
 
         var app = builder.Build();
@@ -24,6 +26,8 @@ public sealed class Program
             app.MapWorld();
         }
 
+        app.UseStaticFiles();
+        app.MapControllers();
         if (app.Configuration[TestHost] is { } testHost) StopWith(testHost, app.Lifetime);
         app.Run();
     }

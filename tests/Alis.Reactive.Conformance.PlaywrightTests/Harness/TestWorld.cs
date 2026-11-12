@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net.Http.Json;
 using Alis.Reactive.Conformance.World;
 using Microsoft.Playwright;
@@ -8,15 +9,20 @@ public sealed class TestWorld
 {
     private readonly HttpClient _harness;
     private readonly IBrowserContext _context;
+    private readonly ConcurrentQueue<string> _consoleErrors = new();
 
     private TestWorld(HttpClient harness, IBrowserContext context, IPage page)
     {
         _harness = harness;
         _context = context;
         Page = page;
+        page.Console += (_, message) => Keep(message);
     }
 
     public IPage Page { get; }
+
+    [BesideThePage]
+    public IReadOnlyCollection<string> ConsoleErrors => _consoleErrors;
 
     public async Task Seed(Seed seed) => (await _harness.PostAsJsonAsync(WorldEndpoints.Seed, seed)).EnsureSuccessStatusCode();
 
@@ -26,6 +32,11 @@ public sealed class TestWorld
         var order = new GateOrder { Gate = GateName.Of(gate) };
         (await _harness.PostAsJsonAsync(WorldEndpoints.ArmGate, order)).EnsureSuccessStatusCode();
         return new ArmedGate(_harness, order);
+    }
+
+    private void Keep(IConsoleMessage message)
+    {
+        if (message.Type == "error") _consoleErrors.Enqueue(message.Text);
     }
 
     internal static async Task<TestWorld> Open(ConformanceHost host)

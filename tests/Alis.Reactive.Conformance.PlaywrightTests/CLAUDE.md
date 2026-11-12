@@ -13,14 +13,19 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
 - A test carries one `[FailsFor]` naming its constant in `tests/Alis.Reactive.Conformance.World/Promises.g.cs`. Its
   fixture is `When` and its situation, takes its hosts by `TestFixtureSource`, and sits in the folder of the module
   whose test it is, under the screen it runs on. `Harness/` holds what every module's tests use, and `SliceTree.txt`
-  orders the folders: `Harness/`, then one row of module folders, so no module's tests use another's helpers.
+  orders the folders: `Harness/`, then one row of module folders, each entry a module's screens (`Schema/*`), so no
+  module's tests use another's helpers.
 - The build holds a test to `.claude/rules/tests.md`: the project imports
   `tests/Alis.Reactive.TestRules/Alis.Reactive.TestRules.targets`, and each test rule, `TEST001` to `TEST013`, refuses
   its defect where the test is written, with the cure in its message (`spec/REWRITE.md`, section 2.10). Until U3
   writes the last test the project says its tests are still being written; after that a promise no test carries
   fails the build.
 - Each test runs in a world of its own: `ConformanceFixture` opens it, and `TestWorld` seeds it through the world
-  contract's typed builders. Teardown ends the world and fails a gate still parked.
+  contract's typed builders and keeps the errors its page's console holds, which a test reads with `Assert.That`.
+  Teardown ends the world and fails a gate still parked.
+- A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
+  `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
+  alone and a module's tests sit in the module's.
 - A test whose page asks for Syncfusion's script, an address that ends in `"/ej2.min.js"`, fails at its teardown,
   which names the address: a core test's page holds no component library, and `ConformanceFixture` reads every
   request of a world's page and of a person's. The last command below plants that script's link on the World area's
@@ -123,10 +128,12 @@ await Expect(Dialog).ToContainTextAsync("Discharge the resident?");
 
 ```bash
 scripts/playwright.sh --unit U2
+scripts/playwright.sh --unit U3
 scripts/playwright.sh WhenTwoWorldsRun
 scripts/playwright.sh --measure-parallelism --all
 scripts/playwright.sh --measure --all
 scripts/playwright.sh --pool core --shard "1/1"
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
+scripts/plant-defect.sh --test M14_F1.X19_3_0 --in Alis.Reactive.Assets/runtime/Schema/read-plan.ts --replace "plan.version === pageVersion" --with "plan.version > 0"
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace '<title>{Text(title)}</title>' --with '<title>{Text(title)}</title><script src=\"/js/ej2.min.js\"></script>'
 ```

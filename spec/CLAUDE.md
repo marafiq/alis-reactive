@@ -819,6 +819,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   listen's release) is written whole by the unit that builds the handler which reaches it: before that it would be
   a function nothing calls. The object locators', a vendor's listening's and a handler's policy's are written,
   since the thin path reaches them. The owner can overrule it.
+- The lead, 2026-11-12, within the decision of 2026-11-11 on the test rules' closed lists: TEST004's list for the
+  harness takes one more member, an attribute that is a test action of NUnit's, applied from a file of
+  `tests/Alis.Reactive.Conformance.PlaywrightTests/Harness`. The list named a setup fixture, which NUnit runs for its own namespace alone, and ALIS011 keeps a
+  harness file in the harness's namespace, so the first test of a module's namespace found no browser open: the
+  harness's own tests, U2's, all sit in its namespace. A test action on the assembly opens the run once for every
+  fixture and closes it at the assembly's end. Outside the harness the rule refuses it as it refuses a setup
+  attribute. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

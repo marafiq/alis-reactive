@@ -1,5 +1,8 @@
 using System.Text.Encodings.Web;
 using Alis.Reactive.Conformance.World;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Alis.Reactive.Conformance.App.World;
 
@@ -12,6 +15,10 @@ internal static class WorldArea
     {
         services.AddSingleton<Worlds>();
         services.AddScoped<CurrentWorld>();
+        services.AddHttpContextAccessor();
+        services.AddSingleton<IDistributedCache>(provider => new WorldCache(
+            new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())),
+            provider.GetRequiredService<IHttpContextAccessor>()));
     }
 
     internal static void UseWorld(this WebApplication app)
@@ -24,7 +31,11 @@ internal static class WorldArea
 
     internal static void MapWorld(this WebApplication app)
     {
-        app.MapPost(WorldEndpoints.Seed, (Seed seed, CurrentWorld world) => world.Data.Take(seed));
+        app.MapPost(WorldEndpoints.Seed, async (Seed seed, CurrentWorld world, IDistributedCache cache) =>
+        {
+            world.Data.Take(seed);
+            if (seed.CachedRoundsPlanVersion is { } version) await cache.SetStringAsync(CachedRounds.Key, CachedRounds.AsRenderedAtPlanVersion(version));
+        });
         app.MapPost(WorldEndpoints.End, (CurrentWorld world, Worlds worlds) => new WorldEnd { GatesStillParked = worlds.End(world.Key) });
         app.MapPost(WorldEndpoints.ArmGate, (GateOrder order, CurrentWorld world) => world.Data.Arm(order.Gate));
         app.MapPost(WorldEndpoints.HeldGate, async (GateOrder order, CurrentWorld world, HttpContext context) =>

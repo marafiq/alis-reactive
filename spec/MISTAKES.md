@@ -30,10 +30,10 @@ them, each marked as the lead's slip, and are not copied here.
 | A list a tool keeps was not read before the change that moves it | 2 | The tool, each time before the push: `WhenARuleNamesTheCode` for a listed exception, the hedges check for a hedge word. Since its second entry the tool runs sooner: a commit that edits the spec's prose runs `python3 spec/tools/check.py --check hedges` before its gate, and quotes its line. |
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
 | A claim of absence made from a search that did not cover the tree | 2 | A step a commit or a message shows: an absence is stated with the command that searched, over every tracked file, and its count. It reached the owner, so it starts on this rung. Since its second entry the step names what is searched for: an absence of a meaning in the spec is stated only after the page and the feature file of the module that owns the subject are read for that meaning, and the statement names both; a search for a name another line gave the thing proves nothing of the meaning. No tool reads a claim of absence, so the class stays on this rung. |
-| A rule the handoff states was not applied | 5 | A rule line: the handoff's own, scratch work runs in a subshell. Since its second entry, whose rule a rule file states, a step a command shows: a commit that edits a rule file runs `WhenARuleNamesTheCode` alone before its gate, as one that edits the spec's prose runs the hedges check. |
+| A rule the handoff states was not applied | 8 | A rule line: the handoff's own, scratch work runs in a subshell. Since its second entry, whose rule a rule file states, a step a command shows: a commit that edits a rule file runs `WhenARuleNamesTheCode` alone before its gate, as one that edits the spec's prose runs the hedges check. |
 | An edit by pattern removed text beside its target | 1 | A step a script shows: a replacement names the exact text it replaces and asserts the count of that text. |
 | A command written in another shell's syntax: the session's shell is zsh | 3 | Since its second entry, a step a command shows: an exit code is printed by `echo "exit $?"` written straight after its command, with no pipe between, and a search of the tree is `git grep`; the handoff's rules state both. Every result a commit rests on is printed by a script that runs under bash by its first line. Before that, the shell, which refuses an unmatched pattern. |
-| A rule written before its cases were listed | 1 | A rule line: `Alis.Reactive.Assets/CLAUDE.md`, a rule's refused and accepted cases are listed, one fact each, before the rule is written. |
+| A rule written before its cases were listed | 2 | A rule line: `Alis.Reactive.Assets/CLAUDE.md`, a rule's refused and accepted cases are listed, one fact each, before the rule is written. Since its second entry, whose rule was the harness's, a step a commit shows: a change to the harness runs one test outside `Harness/` before its commit, and the commit quotes that run's line. |
 | A number written from an earlier run, not from the command that proves it | 4 | Since its second entry, a step a script shows: a count or a time is written by the script that runs its command, from that command's own output, and is never typed. Since its third, the step covers a commit message and a handoff too. Since its fourth, it covers a path outside the repository: the session's folders are written once, in an environment file every command reads, which refuses to load when a folder it names is missing. Before that, root CLAUDE.md's Confidence, a rule line, which did not hold. |
 
 ## Waiting for the owner
@@ -180,3 +180,22 @@ them, each marked as the lead's slip, and are not copied here.
   text the code writes goes in quotes. A line added to `Alis.Reactive.Assets/CLAUDE.md` named the bundle, a file
   the build writes and git ignores, as a path in backticks. Caught by the step, `WhenARuleNamesTheCode` run alone
   before the gate. Cost: one edit, and no gate run. Held by that step.
+- 2026-11-12, a rule written before its cases were listed, the class's second entry, its rule the harness's. U2's
+  harness opened the run's browser in a setup fixture of the harness's namespace, and each of its three tests sits
+  in that namespace, so no case of a test in a module's namespace was ever run. Caught by U3's first test, which
+  found no browser open. Cost: one failed run, a rule's list widened by one member with two cases, and a line for
+  the owner. The class moved up a rung with this entry, to the step the table states.
+- 2026-11-12, a rule the handoff states was not applied, the class's sixth entry: a scratch project's tests were
+  run by a bare test command, which the deny rule refused. Caught by the tool. Cost: none; the question was
+  answered from NUnit's own documentation. Held by the tool.
+- 2026-11-12, a rule the handoff states was not applied, the class's seventh entry, its rule root CLAUDE.md's
+  order of a unit: a browser test is written from its promise before its code and read failing. The runtime's
+  thin path was written and committed (18f4c8216) before X19.3's test, which was then written from its promise
+  and passed at its first whole run. Caught on writing the test. Cost: no failing run of the test before the
+  code; its two planted defects, each caught, are the proof that it fails for what it names. Held from this
+  entry on by a step a commit shows: a commit that lands behavior quotes its test's failing line, read before
+  the code was written.
+- 2026-11-12, a rule the handoff states was not applied, the class's eighth entry, its rule `.claude/rules/docs.md`'s:
+  a path is written from the root or from the rule's folder. A decision added to `spec/CLAUDE.md` named the
+  harness's folder from the Playwright project's. Caught by the step, `WhenARuleNamesTheCode` run alone before
+  the gate. Cost: one edit, and no gate run. Held by that step.
