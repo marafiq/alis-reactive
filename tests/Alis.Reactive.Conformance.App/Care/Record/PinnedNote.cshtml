@@ -1,0 +1,37 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Elements
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PinnedNote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "A pinned note";
+    var plan = Html.ReactivePlan<PinnedNote>();
+}
+<h1>The record of @Model.Resident</h1>
+<p id="pinned-note">@Model.Note</p>
+<button type="button" @Html.Raises(plan, PinnedNotes.Hide)>Hide the note</button>
+<button type="button" @Html.Raises(plan, PinnedNotes.Show)>Show the note</button>
+<button type="button" @Html.Raises(plan, PinnedNotes.Stamp)>Stamp the note</button>
+<p>Stamping: <span id="stamping"></span></p>
+<p>Status: <output id="note-status">Pinned</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(PinnedNotes.Hide, pipeline =>
+        {
+            pipeline.Element("pinned-note").Hide();
+            pipeline.Element("note-status").Text.Set("Hidden");
+        })
+        .CustomEvent(PinnedNotes.Show, pipeline =>
+        {
+            pipeline.Element("pinned-note").Show();
+            pipeline.Element("note-status").Text.Set("Shown");
+        })
+        .CustomEvent(PinnedNotes.Stamp, pipeline =>
+        {
+            pipeline.Element("stamping").Text.Set("Stamping");
+            pipeline.Element("note-stamp").Text.Set("Stamped at noon");
+            pipeline.Element("note-status").Text.Set("Stamped");
+        }));
+}
+@Html.RenderPlan(plan)

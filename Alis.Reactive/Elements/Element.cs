@@ -34,6 +34,17 @@ public sealed class Element : Component
 
     /// <summary>Gets the element's classes, <c>classList</c>.</summary>
     public ClassList Classes => throw new NotImplementedException();
+
+    /// <summary>Gets whether the element is hidden, <c>hidden</c>: a source of it that a step also sets.</summary>
+    public Property<bool> Hidden => throw new NotImplementedException();
+
+    /// <summary>Shows the element when the step runs, as setting <see cref="Hidden"/> to false does.</summary>
+    /// <remarks>An element that already shows keeps showing.</remarks>
+    public void Show() => throw new NotImplementedException();
+
+    /// <summary>Hides the element when the step runs, as setting <see cref="Hidden"/> to true does.</summary>
+    /// <remarks>An element that is already hidden stays hidden.</remarks>
+    public void Hide() => throw new NotImplementedException();
 }
 
 /// <summary>
