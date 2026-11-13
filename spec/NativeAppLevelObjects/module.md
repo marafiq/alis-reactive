@@ -10,7 +10,8 @@ DOM is their vendor: each member is named as lib.dom names it, and each object r
 ## Core questions
 
 - Q11: a user's decision is an awaited step (D11.2): `NativeConfirm.Ask` is a `MethodAsync<bool>`, read before the
-  branch that reads it, and an ask whose run ends is closed through the block's signal (D17.11). A drawer's `Cancel`
+  branch that reads it, and an ask whose run ends is closed through the block's signal (D17.11). The confirm's own
+  asks, each one's turn, an abort while it waits or is open and an unmount, are `ConfirmAsks.tla`'s. A drawer's `Cancel`
   is written before the first await, since the drawer reads it when its event returns (D11.4). A toast's time is its
   own, and no step waits for it (D11.9).
 - Q17: the core names no component (D17.9). NativeConfirm and NativeToast are the framework's own (D17.10, N17.4);

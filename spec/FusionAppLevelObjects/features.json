@@ -595,7 +595,13 @@
       "oracle": "Syncfusion EJ2's Dialog, @syncfusion/ej2 33.1.47's ej2.min.js run in Chromium by spec/probes/ej2-payloads-m23.mjs with Playwright 1.63.0 under both lines' confirm options and sequence with real clicks and keys, its source read in @syncfusion/ej2-popups 33.1.44's dialog.js: a header, content or button text given as a string is written as sanitized HTML, an element given as the header or content is appended with its text, a primary button's click and Escape close the Dialog, and Escape raises its close.",
       "checker": [
         "core:Q11",
-        "core:Q17"
+        "core:Q17",
+        "ConfirmAsks.tla:OneQuestionAtATime",
+        "ConfirmAsks.tla:QuestionsInAskedOrder",
+        "ConfirmAsks.tla:NothingWaitsForAnEndedRun",
+        "ConfirmAsks.tla:EachAskAnsweredOnce",
+        "ConfirmAsks.tla:OnlyThePersonsOkAnswersYes",
+        "ConfirmAsks.tla:UnmountAnswersEveryAsk"
       ],
       "defects": [
         {

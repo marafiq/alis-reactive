@@ -41,6 +41,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A writer's range shorter than the data it meets | 1 | A step a script shows: the session's handoff writer turns counts into words up to 199 and asserts the range, so a count past it stops the writer before it writes. |
 | A landing's carrier left out of its commit | 1 | A step a script shows: a commit message writer stops when the commit stages a PublicAPI text and leaves spec/REWRITE.md unstaged, since section 4 names what is declared. |
 | The owner's words answered with a remedy they did not name | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12 on pace, which quotes the correction. |
+| An ordering met without its TLA+ spec named | 1 | A step a commit shows: a commit whose piece meets an ordering names the invariants it rests on in a line of its message, and an ordering no spec holds is written as a spec before its door; root CLAUDE.md's TLA+ line states it. It reached the owner, so it starts on this rung. |
 
 ## Waiting for the owner
 
@@ -390,3 +391,9 @@ them, each marked as the lead's slip, and are not copied here.
   carousel's same clause. Cost: one converter class and an attribute, landed with wave 10. Met twice, so it moves
   up a rung: a step a script shows, a reader of each Fusion slice's line for the forms it names, which reported
   the button and the carousel before the fix and none after it, and a Fusion landing quotes its line.
+- 2026-11-13, an ordering met without its TLA+ spec named, the class's first entry. N17.5's commit declared the
+  argument that hands a method its run's abort signal and named D17.11 alone, not the specs that abort a run, and
+  the lead was about to declare NativeConfirm, whose asks wait in turn and are aborted while waiting or open, an
+  ordering none of the fourteen specs held. Caught by the owner, who asked where the TLA+ work shows. Cost: no
+  door was declared on the missing spec; ConfirmAsks.tla is written first. Held by a step a commit shows: a
+  commit whose piece meets an ordering names its invariants, and an ordering no spec holds is a spec first.

@@ -1141,6 +1141,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   its line names none, as the text area's; a menu item's items as a list that admits null. Raised for U13: the
   pivot view's `DataSourceSettingsModel`, which its line mirrors, is exported by no index of its package. The
   owner can overrule each.
+- The lead, 2026-11-13, after the owner asked where the TLA+ work shows (verbatim in `spec/NOTES.md`): a confirm's
+  own asks are an ordering no spec held, so `ConfirmAsks.tla`, module 25's, checks them before NativeConfirm is
+  declared. Two runs ask, each ask waits its turn, a person answers the open one, a run's end aborts its ask while
+  it waits or is open, and the confirm unmounts: six invariants, each killed by its mutant, and four witnesses
+  (M25.D4, M23.D3). The run's side, a signal that aborts when its run ends and nothing that runs after it, stays
+  `Run.tla`'s and `Lanes.tla`'s, which M25.F4 names; N17.5's `AbortSignal()` hands that signal. Both confirms'
+  features name the six invariants. An abort while an ask waits and an unmount with asks left have no promise
+  yet; their promises are written with module 25's pages. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

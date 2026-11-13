@@ -25,7 +25,8 @@ no consumer, Fusion and Native get nothing an app does not, and any developer on
 - **TLA+ governs every ordering.** Each async lane is a spec under `spec/` that TLC checks, with the mutants that must
   fail (`spec/REWRITE.md`, section 2.6). A lane changes in its spec first, a browser test holds the machine at one
   named action through the harness and never provokes a race by timing, and a question a spec answers is decided
-  from it.
+  from it. A commit whose piece meets an ordering names the invariants it rests on, and an ordering no spec holds
+  is written as one before its door (the owner, 2026-11-13: "I'm not seeing any traces of it").
 - **The schema governs the seam.** C# builders write the plan, a closed grammar of sealed nodes
   (`spec/Core/schema.md`); the view renders it as JSON; the TypeScript contract is generated from the grammar; the
   runtime executes it and invents no behavior the plan does not carry. C# states what a sentence means when the page

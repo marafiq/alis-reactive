@@ -1012,7 +1012,13 @@
         "core:Q17",
         "core:Q8",
         "Run.tla:NothingRunsAfterAnAbort",
-        "Lanes.tla:ReplacedRunRunsNothingAfter"
+        "Lanes.tla:ReplacedRunRunsNothingAfter",
+        "ConfirmAsks.tla:OneQuestionAtATime",
+        "ConfirmAsks.tla:QuestionsInAskedOrder",
+        "ConfirmAsks.tla:NothingWaitsForAnEndedRun",
+        "ConfirmAsks.tla:EachAskAnsweredOnce",
+        "ConfirmAsks.tla:OnlyThePersonsOkAnswersYes",
+        "ConfirmAsks.tla:UnmountAnswersEveryAsk"
       ],
       "defects": [
         {

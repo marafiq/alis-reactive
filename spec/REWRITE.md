@@ -394,6 +394,7 @@ rests on in its `checker` field, and a test names the action it observes.
 | `Composition.tla` | RequestsAndResponses | chained and parallel requests and their counts |
 | `Realtime.tla` | Realtime | connections, drops, give-ups and the reconnect offer |
 | `Partials.tla` | PartialsAndSlots | slot loads and unloads |
+| `ConfirmAsks.tla` | NativeAppLevelObjects | a confirm's asks: each one's turn, an abort while it waits or is open, an unmount |
 
 A feature a month later starts here: its module's `module.md` and `features.json`, the specs its owner holds, the
 actions its tests will observe. A change to an async lane is a spec change first, TLC green with each mutant's
@@ -1018,7 +1019,8 @@ M21.N43, M21.N50 and M21.N51). The validator grammar Q16's Doors keep is declare
 M25.N6 is declared: `IAppLevelComponent` in `Vendors` (P4), `pipeline.Component<TComponent>()` and
 `plan.Component<TComponent>()`, whose handlers are a `ReactiveComponent<TComponent, TModel>`, each a signature
 until U24. N17.5's argument kind, the abort signal a declared method receives, is declared as the lead
-proposes it, `AbortSignal()` beside `Answer`, a signature until U8. An element's text and HTML are an
+proposes it, `AbortSignal()` beside `Answer`, a signature until U8; the confirm's asks are `ConfirmAsks.tla`'s, TLC
+green with each mutant killed. An element's text and HTML are an
 `ElementContent`, whose `Set` takes a source
 of any type (M5.N1, D7.3), and a world names the version its component is built as. The app's settle, count and item
 endpoints stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its
