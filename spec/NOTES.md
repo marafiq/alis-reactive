@@ -1443,3 +1443,5 @@
   Evidence: each of the fifteen tests read red through scripts/playwright.sh where it landed, and each of the screen's 25 addresses answered 500 on a declared door's NotImplementedException in a world of its own.
 - 2026-11-13 U3, the record-contacts screen's seventeen pages (Care/RecordContacts/), a fork's work read at the source and landed: module 21's text box, masked text box, text area, rating, slider, switch, in-place editor, mention, schedule, accordion, bullet chart, list box, split button, tab and tooltip; M21.X205's two rules wait.
   Evidence: each of the seventeen tests read red through scripts/playwright.sh where it landed, and each of the screen's 28 addresses answered 500 on a declared door's NotImplementedException in a world of its own.
+- 2026-11-13 U3, M1.N5's markup raise of an event that declares a payload, with none, declared on both hosts beside the untyped raise, with M1.X5's party bell and M1.X10's escort desk (Care/Record/); it meets no ordering.
+  Evidence: both tests read red through scripts/playwright.sh where they landed, and both addresses answered 500 on a declared door's NotImplementedException in a world of its own.

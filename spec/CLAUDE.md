@@ -1223,8 +1223,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   a declaration holds text: M3.X1 tests a record's Name, a `string`, that holds null. `IsEmpty` and `NotEmpty` take a
   text or a list; `In` and `NotIn` take the values or the source of a list, and `Between` two literals or two sources of
   a struct that orders, its nullable form as well, as N8.2's comparisons take theirs. The record's Name starts at null,
-  as M3.X1 states, and the care panel's raise hands a record, none, or one with no member. M1.X10 is not written: its
-  third button raises a typed event from markup with no payload, a door nobody declares. The owner can overrule each.
+  as M3.X1 states, and the care panel's raise hands a record, none, or one with no member. M1.X10's third button
+  raises a typed event from markup with no payload, the raise M1.N5 states, declared with its page. The owner can
+  overrule each.
 - The lead, 2026-11-13, landing the bed-board screen's fifteen pages from a fork's work read at the source. A template's
   opposite that changes the view's code is a second view
   (`tests/Alis.Reactive.Conformance.App/Care/BedBoard/WardRoomsBedsFirst.cshtml`); a row that lacks a member or holds it
