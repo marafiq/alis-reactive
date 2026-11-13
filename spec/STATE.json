@@ -1516,7 +1516,7 @@
     },
     "module_cites": {
       "counts": {
-        "cites": 1042,
+        "cites": 1043,
         "unresolved": 0
       },
       "detail": "every cite a module.md makes resolves at the SHA it names, or at HEAD, the redesign or main, and a package's in the installed node_modules",
@@ -3717,7 +3717,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "5ee551141a6d407a53bba6b5be7926b997b1d6ce",
+  "read_at_head": "92d47447d5526b67ceb85cc5f2c87da8f5e2db26",
   "step": {
     "failing": [],
     "name": "End of session",
