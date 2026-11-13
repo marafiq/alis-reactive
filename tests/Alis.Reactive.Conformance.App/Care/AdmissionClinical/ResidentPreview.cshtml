@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentPreview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident preview";
+    var plan = Html.ReactivePlan<ResidentPreview>();
+}
+<h1>Resident preview</h1>
+<fieldset>
+    <legend>Given name</legend>
+    @(Html.InputField(plan, m => m.GivenName, options => options.Label("Given name")).FusionTextBox())
+</fieldset>
+<button type="button" @Html.Raises(plan, ResidentPreviews.Preview)>Preview</button>
+<pre id="preview">Not previewed</pre>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentPreviews.Preview, pipeline => pipeline
+        .Get(Model.Address)
+        .OnSuccess(Content.Text, (resident, pipeline) => pipeline.Element("preview").Text.Set(resident.Body))));
+}
+@Html.RenderPlan(plan)

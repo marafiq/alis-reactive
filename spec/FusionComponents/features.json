@@ -4867,7 +4867,7 @@
     {
      "for": "M21.X505",
      "page": "An intake page whose preferred language FusionComboBox is rendered with the languages Tagalog and Punjabi handed over with the view, of a language class whose display label member carries [JsonPropertyName(\"label\")], and Fields(l => l.DisplayLabel, l => l.LanguageCode).",
-     "gesture": "Click the language box's popup button.",
+     "gesture": "Open the language box's popup.",
      "outcome": "The list shows Tagalog and Punjabi.",
      "opposite": "Choosing Punjabi shows Punjabi in the box, and the form sends its code pa.",
      "defect": "EJ2 writes the handed items through Newtonsoft as displayLabel while the field names label, so the list shows two empty options."

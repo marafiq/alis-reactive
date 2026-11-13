@@ -1257,6 +1257,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   where it does not, the test reads the state class EJ2 sets on the box it shows. M21.X3 and M21.X505 are the lead's
   next piece; X803's first promise waits on the antiforgery startup call and the clipboard, its second on the net48
   host, and X804 on the clipboard, for which the harness grants no permission. The owner can overrule each.
+- The lead, 2026-11-13, writing M21.X3's and M21.X505's pages. X505's gesture reads "Open the language box's popup.",
+  as X512's reads, since EJ2 33.1.47 renders the combo box's popup button with no role or name; the box opens by
+  Alt+ArrowDown on its combobox, and the opposite case chooses Punjabi by two presses of the down arrow on the closed
+  box, since an option clicked while the list opens was dropped in three of three rounds of the lead's probe in
+  Chromium, and the two presses chose it in three of three. Fusion takes no startup call (M21.N2), so its render helpers
+  are the Fusion code that runs in an app's process: X3's page renders a Fusion text box before its preview, so a render
+  that set Newtonsoft's process-wide settings shows in the app's own call. Its opposite case is a second address whose
+  endpoint writes under the app's own camel-case settings; the app takes Newtonsoft.Json as Syncfusion's package brings
+  it, with no reference of its own. X803's first promise and X804 wait on the clipboard, and X803's second on the net48
+  host. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

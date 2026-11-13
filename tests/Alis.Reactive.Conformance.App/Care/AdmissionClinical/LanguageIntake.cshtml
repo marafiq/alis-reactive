@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model LanguageIntake
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Language intake";
+    var plan = Html.ReactivePlan<LanguageIntake>();
+}
+<h1>Language intake</h1>
+@using (var intake = Html.BeginRequestForm(plan, "language-intake"))
+{
+    <fieldset>
+        <legend>Preferred language</legend>
+        @(Html.InputField(plan, m => m.LanguageCode, options => options.Label("Preferred language"))
+            .FusionComboBox(Model.Languages, build => build.Fields((CareLanguage l) => l.DisplayLabel, l => l.LanguageCode)))
+    </fieldset>
+    <button type="button" @Html.Raises(plan, LanguageIntakes.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(LanguageIntakes.Save, pipeline => pipeline
+        .Post<LanguageIntake>(LanguageIntakeEndpoints.Languages, request => request.Form(intake.Form))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))));
+}
+<p id="saved">Not saved</p>
+@Html.RenderPlan(plan)

@@ -45,4 +45,10 @@ public static partial class CarePages
     public const string AdmissionStepsAtMedications = AdmissionClinical + "admission-steps/medications";
 
     public const string AdmissionStepsAtRoom = AdmissionClinical + "admission-steps/room";
+
+    public const string LanguageIntake = AdmissionClinical + "language-intake";
+
+    public const string ResidentPreview = AdmissionClinical + "resident-preview";
+
+    public const string ResidentPreviewInCamelCase = AdmissionClinical + "resident-preview/camel-case";
 }
