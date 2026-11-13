@@ -17,7 +17,10 @@ public class RequestContainer<TModel>
     /// <summary>Reads a member of the container's model as the container sends it: the value of the input inside the container that binds the member.</summary>
     /// <remarks>
     /// The value has the member's type, so a number typed into a text box reads as that number. An input left blank, or
-    /// whose text does not convert to the member's type, reads as a new <typeparamref name="TModel"/> would hold the member.
+    /// whose text does not convert to the member's type, reads as a new <typeparamref name="TModel"/> would hold the member,
+    /// and so does a member that no input inside the container binds. The read takes the inputs inside the container when
+    /// its step runs, and two of them that bind the member stop the pipeline, as they stop a request that sends the
+    /// container.
     /// </remarks>
     /// <param name="member">The member to read, as a member path.</param>
     /// <typeparam name="TValue">The type of the member.</typeparam>

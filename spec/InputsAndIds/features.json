@@ -695,7 +695,13 @@
       "checker": [
         "core:Q13",
         "core:Q14",
-        "Validation.tla:UnsentInputsUnread"
+        "Validation.tla:UnsentInputsUnread",
+        "ContainerRead.tla:OneValueOnEveryHost",
+        "ContainerRead.tla:ReadStopsWhenItsSendStops",
+        "ContainerRead.tla:ReadIsWhatTheEndpointBinds",
+        "ContainerRead.tla:AnUnsentMemberReadsWhatTheEndpointBinds",
+        "ContainerRead.tla:ReadSeesTheSlotThatJoinedOrLeftBeforeIt",
+        "ContainerRead.tla:ReadFindsWhatItsContainerSends"
       ],
       "defects": [
         {

@@ -402,6 +402,7 @@ rests on in its `checker` field, and a test names the action it observes.
 | `Realtime.tla` | Realtime | connections, drops, give-ups and the reconnect offer |
 | `Partials.tla` | PartialsAndSlots | slot loads and unloads |
 | `ConfirmAsks.tla` | NativeAppLevelObjects | a confirm's asks: each one's turn, an abort while it waits or is open, an unmount |
+| `ContainerRead.tla` | InputsAndIds | a container's read of a member: the inputs inside it at the read's step, as the endpoint binds what it sends |
 
 A feature a month later starts here: its module's `module.md` and `features.json`, the specs its owner holds, the
 actions its tests will observe. A change to an async lane is a spec change first, TLC green with each mutant's
@@ -966,7 +967,7 @@ The app event family is declared, M1.N2 to M1.N5 with the data a handler reads (
 sentence with, and the bench's first cell, prop.scalar.read, stands on them with its test red. Markup raises an event
 that declares a payload with none as well (M1.N5, M1.D3). A container's typed read of a member as it sends it (N13.1)
 is declared as the lead's proposal for the owner, `container.Read(m => m.Member)` on the container's handle, with
-X8.4's pain assessment, its test red.
+X8.4's pain assessment, its test red; its meanings are `ContainerRead.tla`'s, TLC green with each mutant killed.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
 named by two declarations. Thirty-four more refusal pages stand, each beside the page of its opposite case and each
 test red, six forks' work read at the source and landed, and one the lead's: fifteen of module 4's, five of module

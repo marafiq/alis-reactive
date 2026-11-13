@@ -3137,15 +3137,20 @@ plans name.
 
 - D13.2 A plan's id keys nothing: it names the plan in traces only, and many plans of a page share one id freely.
 - D13.3 A read of a member by its binding name belongs to a container. It reads the input inside the container's
-  element that binds the name, as the container sends it (`container.Read(m => m.Member)`, N13.1). A page-wide read by
-  binding name is refused: two views can bind one name, so on a page a name names no single input. That ends the chain
-  of guesses that read the last contributed input, then the plan's own. A read of a member's input outside a container
-  is `pipeline.Input(m => m.Member)` (N14.4), by the element id Q14 derives the same way in every view that renders
-  the member.
+  element that binds the name, as the container sends it (`container.Read(m => m.Member)`, N13.1): what the endpoint
+  binds from what the container sends. It runs in its step and reads the inputs inside the element then, so an input a
+  slot loads into the container counts from its load, and one whose slot unloads counts no more. One input reads its
+  value (N3.3), so a blank or unconverted one reads the member's start (D3.6); a member no input inside the container
+  binds reads its start (D4.2); two inputs under the name stop it (D13.4), and so does a container whose element the
+  page lacks, as each stops the container's request (D9.15) (`ContainerRead.tla`). A page-wide read by binding name is
+  refused: two views can bind one name, so on a page a name names no single input. That ends the chain of guesses that
+  read the last contributed input, then the plan's own. A read of a member's input outside a container is
+  `pipeline.Input(m => m.Member)` (N14.4), by the element id Q14 derives the same way in every view that renders the
+  member.
 - D13.4 Two inputs a request or a check sends under one scalar binding name (two inside its container, or an
-  `Input` and one inside its container) stop the request or the check, with one logged error that names both
-  element ids. Form data binds the first value and JSON the last
-  on both hosts (`probe:core-form-duplicate-name`, `probe:core-json-duplicate-name`,
+  `Input` and one inside its container) stop the request, the check or the container's read (N13.1), with one logged
+  error that names both element ids. Form data binds the first value and JSON the last on both hosts
+  (`probe:core-form-duplicate-name`, `probe:core-json-duplicate-name`,
   `probe:mvc5-form-duplicate-first`, `probe:mvc5-json-duplicate-last`), so the browser cannot know which one
   the endpoint binds. A list's inputs carry indexed names and are not duplicates.
 - D13.5 A rule for each item is written once, by a path with `each` (D1.5). A check runs it on every item row its
@@ -3166,6 +3171,12 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `probe:core-json-duplicate-name`
 - `probe:mvc5-form-duplicate-first`
 - `probe:mvc5-json-duplicate-last`
+- `ContainerRead.tla:OneValueOnEveryHost`
+- `ContainerRead.tla:ReadStopsWhenItsSendStops`
+- `ContainerRead.tla:ReadIsWhatTheEndpointBinds`
+- `ContainerRead.tla:AnUnsentMemberReadsWhatTheEndpointBinds`
+- `ContainerRead.tla:ReadSeesTheSlotThatJoinedOrLeftBeforeIt`
+- `ContainerRead.tla:ReadFindsWhatItsContainerSends`
 
 **Doors.**
 - kept: `Form(formId)`, its meaning narrowed to a native form's submission set and its argument the form's typed

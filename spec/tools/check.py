@@ -63,6 +63,7 @@ TLC_SPECS = {
     "Realtime": {"question": "Q21 with Q10 and Q12", "step": 5, "expect": "green"},
     "Partials": {"question": "Q14 with Q13 and Q16", "step": 5, "expect": "green"},
     "ConfirmAsks": {"question": "Q11 with Q17", "step": 5, "expect": "green"},
+    "ContainerRead": {"question": "Q13 with Q12", "step": 5, "expect": "green"},
 }
 PLUGIN_DATA_DISPATCH = "pluginNamed(locator.name).contribute"
 HEDGES = [

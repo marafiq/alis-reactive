@@ -1334,6 +1334,19 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   five of the record screen's, X7.11's two and X1.4. X7.7's first promise read none for a cleared int field, where
   D3.6 reads the member's start, so its opposite reads 0. The cost of another form: one line in each view that reads a
   typed member. The owner decides it.
+- The lead, 2026-11-13, on the owner's "make the decision that give quality, and TLA+ covers it and roll with it"
+  (verbatim in `spec/NOTES.md`): N13.1's read is what the endpoint binds from what its container sends, read in its
+  step (D13.3). One input reads its value, a blank or unconverted one the member's start (D3.6); a member no input
+  inside the container binds reads its start (D4.2); two inputs under the name, or a container the page lacks, stop
+  it, as they stop the container's request (D13.4, D9.15). `ContainerRead.tla`, module 7's, checks it over slot loads,
+  unloads and typing between reads: six invariants, each killed by a mutant (main's page-wide read by name, the read
+  Q13's evidence cites that takes the last matching input, a body that leaves with two inputs under one name, a blank
+  read as nothing as X7.7's first opposite had it, a read that keeps the inputs it first found, a missing member read
+  as nothing), and four witnesses. A spec's mutant fails its own invariant wherever it fails any, read by running the
+  mutant under the invariant that every other holds or its own fails, since TLC's workers find states in no fixed
+  order and the tlc check reads the first invariant violated (the lead's slip, 2026-11-13). X8.4's and X7.7's pages
+  test ReadIsWhatTheEndpointBinds and X13.2's OneValueOnEveryHost; the read's two stops, an unsent member and a slot's
+  input joining and leaving have no promise yet, and their pages are U3's next piece. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

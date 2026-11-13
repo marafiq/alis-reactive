@@ -11,8 +11,9 @@ renders and where the page composes its plans. Module 7 of `spec/CLAUDE.md`.
   the member binds as (D3.5, D3.6).
 - Q7: an input a member binds is a source at every value position (D7.2), reached by its member (N14.4).
 - Q12: an input id a live plan holds is taken by no plan that starts later, a slot's content included (R14.6).
-- Q13: a member's value as its container sends it is the container's read (N13.1); a container that holds two inputs
-  of one binding name sends nothing (X13.2).
+- Q13: a member's value as its container sends it is the container's read (N13.1), read in its step from the inputs
+  the container holds then (`ContainerRead.tla`); a container that holds two inputs of one binding name sends nothing
+  and its read stops (X13.2, D13.4).
 - Q14: one binding name and one id per member in every view that renders it (D14.3), a partial for a member by one
   typed door (D14.4), and the closed refusals within one plan and across plans (D14.6).
 - Q16: a failure shows at the message element of the input sent under its binding name, and in the summary place
