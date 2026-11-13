@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FamilyMembers
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Family";
+    var plan = Html.ReactivePlan<FamilyMembers>();
+}
+<h1>Family</h1>
+@using (var family = Html.BeginRequestContainer(plan, "family"))
+{
+    <fieldset>
+        <legend>First member</legend>
+        @(Html.InputField(plan, m => m.Members[0].Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>Second member</legend>
+        @(Html.InputField(plan, m => m.Members[1].Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    <button type="button" @Html.Raises(plan, FamilyMembersButtons.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(FamilyMembersButtons.Save, pipeline => pipeline
+        .Post<FamilyMembers>(Model.Saves, request => request.Inputs(family.Container))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("family-status").Text.Set(saved.Body))
+        .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))));
+}
+<p>Family: <span id="family-status">Not saved</span></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SupplyCodes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Supply codes";
+    var plan = Html.ReactivePlan<SupplyCodes>();
+}
+<h1>Supply codes</h1>
+@using (var codes = Html.BeginRequestForm(plan, "supply-codes"))
+{
+    <fieldset>
+        <legend>Code</legend>
+        @(Html.InputField(plan, m => m.Code, options => options.Label("Code")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("submit-code", "Submit").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<SupplyCodes>(SupplyCodesEndpoints.Codes, request => request.Form(codes.Form))
+        .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("received").Text.Set(received.Body))
+        .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))
+}
+<p id="received"></p>
+@Html.RenderPlan(plan)

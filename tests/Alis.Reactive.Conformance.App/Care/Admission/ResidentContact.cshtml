@@ -1,0 +1,34 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentContact
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident and contact";
+    var plan = Html.ReactivePlan<ResidentContact>();
+}
+<h1>Resident and contact</h1>
+<section aria-label="Resident">
+    <h2>Resident</h2>
+    @using (var resident = Html.BeginRequestContainer(plan, "resident"))
+    {
+        <fieldset>
+            <legend>Resident's name</legend>
+            @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+        </fieldset>
+        <button type="button" @Html.Raises(plan, ResidentContactButtons.SaveResident)>Save resident</button>
+        Html.On(plan, trigger => trigger.CustomEvent(ResidentContactButtons.SaveResident, pipeline => pipeline
+            .Post<ResidentContact>(ResidentContactEndpoints.Residents, request => request.Inputs(resident.Container))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("resident-status").Text.Set(saved.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))));
+    }
+    <p>Resident: <span id="resident-status">Not saved</span></p>
+</section>
+<button type="button" @Html.Raises(plan, ResidentContactButtons.OpenContact)>Open contact</button>
+<section id="contact" aria-label="Contact"></section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentContactButtons.OpenContact, pipeline => pipeline.Get(ResidentContactEndpoints.ContactCard).Into("contact")));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundDosing
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Medication round";
+    var plan = Html.ReactivePlan<RoundDosing>();
+}
+<h1>Medication round</h1>
+@using (var round = Html.BeginRequestContainer(plan, "round-dosing"))
+{
+    <fieldset>
+        <legend>First dose</legend>
+        @(Html.InputField(plan, m => m.Doses[0].Amount, options => options.Label("Amount")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>Second dose</legend>
+        @(Html.InputField(plan, m => m.Doses[1].Amount, options => options.Label("Amount")).NativeTextBox())
+    </fieldset>
+    <div id="added-dose"></div>
+    @(Html.NativeButton("add-dose", "Add a dose").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Get(RoundDosingEndpoints.AddedDose).Into("added-dose")))
+    @(Html.NativeButton("save-round", "Save round").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<RoundDosing>(RoundDosingEndpoints.Rounds, request => request.Inputs(round.Container))
+        .Validate<RoundDosingRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

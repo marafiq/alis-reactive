@@ -39,6 +39,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A limit put to the owner at more weight than the facts in hand give it | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12, a limit that shows itself the first time a developer opens the page and that both older lines share is stated once and is no item for the owner. |
 | A long run chained behind a step that can stop it | 1 | A rule line: the handoff's, a long run (the gate, a full check) is a command of its own, with nothing chained before it but the cd and the environment file. |
 | A writer's range shorter than the data it meets | 1 | A step a script shows: the session's handoff writer turns counts into words up to 199 and asserts the range, so a count past it stops the writer before it writes. |
+| A landing's carrier left out of its commit | 1 | A step a script shows: a commit message writer stops when the commit stages a PublicAPI text and leaves spec/REWRITE.md unstaged, since section 4 names what is declared. |
 | The owner's words answered with a remedy they did not name | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12 on pace, which quotes the correction. |
 
 ## Waiting for the owner
@@ -366,3 +367,8 @@ them, each marked as the lead's slip, and are not copied here.
   the shell's error, read when the next step needed the answer. Cost: one probe run again as `git grep` over the
   project. Held by the class's step, a search of the tree is `git grep`, which the probe broke; the tool rung waits
   for the owner, as the ninth entry says.
+- 2026-11-12, a landing's carrier left out of its commit, the class's first entry. The commit that declared the
+  reference Fusion slice wrote its lead line, its exemplar line and its surface, and left section 4 of
+  spec/REWRITE.md, which names each declared slice of module 24, without it. Caught by the lead writing the next
+  piece's paragraph of that section. Cost: one sentence, landed with the next piece. Held by a step a script
+  shows: the commit message writer stops on a staged PublicAPI text beside an unstaged spec/REWRITE.md.

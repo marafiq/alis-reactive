@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StateMoveIn
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Move in";
+    var plan = Html.ReactivePlan<StateMoveIn>();
+}
+<h1>Move @Model.Resident in</h1>
+<button type="button" @Html.Raises(plan, StateMoveInButtons.Texas)>Texas</button>
+<button type="button" @Html.Raises(plan, StateMoveInButtons.Massachusetts)>Massachusetts</button>
+<section id="state" aria-label="State"></section>
+<p>Moved in with: <span id="moved-in"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(StateMoveInButtons.Texas, pipeline => pipeline.Get(StateMoveInEndpoints.Texas).Into("state"))
+        .CustomEvent(StateMoveInButtons.Massachusetts, pipeline => pipeline.Get(StateMoveInEndpoints.Massachusetts).Into("state")));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model RoundDosingAddedDose
+@{
+    var plan = Html.ReactivePlan<RoundDosingAddedDose>();
+}
+<fieldset>
+    <legend>Third dose</legend>
+    @(Html.InputField(plan, m => m.Doses[2].Amount, options => options.Label("Amount")).NativeTextBox())
+</fieldset>
+@Html.RenderPlan(plan)

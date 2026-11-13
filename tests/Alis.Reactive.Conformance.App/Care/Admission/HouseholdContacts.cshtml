@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HouseholdContacts
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Family contacts";
+    var plan = Html.ReactivePlan<HouseholdContacts>();
+}
+<h1>Family contacts</h1>
+@using (var contacts = Html.BeginRequestForm(plan, "household-contacts"))
+{
+    <fieldset>
+        <legend>Web page</legend>
+        @(Html.InputField(plan, m => m.WebPage, options => options.Label("Web page")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-contacts", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<HouseholdContacts>(HouseholdContactsEndpoints.Contacts, request => request.Form(contacts.Form))
+        .Validate<HouseholdContactsRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SupplyCount
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Supplies";
+    var plan = Html.ReactivePlan<SupplyCount>();
+}
+<h1>Supplies</h1>
+@using (var supply = Html.BeginRequestForm(plan, "supply-count"))
+{
+    <fieldset>
+        <legend>Count</legend>
+        @(Html.InputField(plan, m => m.Count, options => options.Label("Count")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-count", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<SupplyCount>(SupplyCountEndpoints.Counts, request => request.Form(supply.Form))
+        .Validate<SupplyCountRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

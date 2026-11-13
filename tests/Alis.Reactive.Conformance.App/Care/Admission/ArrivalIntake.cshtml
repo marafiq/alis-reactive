@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ArrivalIntake
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Intake";
+    var plan = Html.ReactivePlan<ArrivalIntake>();
+}
+<h1>Intake</h1>
+@using (var intake = Html.BeginRequestContainer(plan, "arrival-intake"))
+{
+    <fieldset>
+        <legend>Name</legend>
+        @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-intake", "Save intake").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<ArrivalIntake>(ArrivalIntakeEndpoints.Intakes, request => request.Inputs(intake.Container))
+        .Validate<ArrivalIntakeRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("status").Text.Set(saved.Body))))
+}
+@(Html.NativeButton("mark-arrived", "Mark arrived").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<ArrivalIntake>(ArrivalIntakeEndpoints.Intakes, request => request.Set(r => r.Status, "Arrived"))
+    .Validate<ArrivalIntakeRules>()
+    .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("status").Text.Set(saved.Body))))
+<p id="status">@Model.Name, @Model.Status</p>
+@Html.RenderPlan(plan)

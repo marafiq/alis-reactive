@@ -1,0 +1,33 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HomeLead
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Home lead";
+    var plan = Html.ReactivePlan<HomeLead>();
+}
+<h1>Home lead</h1>
+<fieldset>
+    <legend>Lead name</legend>
+    @(Html.InputField(plan, m => m.Lead.Name, options => options.Label("Lead name")).NativeTextBox())
+</fieldset>
+@using (var contact = Html.BeginRequestContainer(plan, "lead-contact"))
+{
+    <fieldset>
+        <legend>Phone</legend>
+        @(Html.InputField(plan, m => m.Lead.Phone, options => options.Label("Phone")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-phone", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<HomeLead>(HomeLeadEndpoints.Leads, request => request.Json(contact.Container, body => { }))
+        .Validate<HomeLeadRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+    @(Html.NativeButton("save-lead", "Save all").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<HomeLead>(HomeLeadEndpoints.Leads, request => request.Json(contact.Container, body => body.Input(r => r.Lead.Name, pipeline.Input(m => m.Lead.Name))))
+        .Validate<HomeLeadRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StateMoveInMassachusetts
+@{
+    var plan = Html.ReactivePlan<StateMoveInMassachusetts>();
+}
+<h2>Massachusetts</h2>
+@using (var massachusetts = Html.BeginRequestContainer(plan, "massachusetts"))
+{
+    <fieldset>
+        <legend>Massachusetts permit</legend>
+        @(Html.InputField(plan, m => m.Permit, options => options.Label("Permit")).NativeTextBox())
+    </fieldset>
+    <button type="button" @Html.Raises(plan, StateMoveInButtons.SaveMassachusetts)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(StateMoveInButtons.SaveMassachusetts, pipeline => pipeline
+        .Post<StateMoveInMassachusetts>(StateMoveInEndpoints.MassachusettsMoveIns, request => request.Inputs(massachusetts.Container))
+        .Validate<StateMoveInMassachusettsRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("moved-in").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

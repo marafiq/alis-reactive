@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomNumbering
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Room";
+    var plan = Html.ReactivePlan<RoomNumbering>();
+}
+<h1>Room</h1>
+@using (var room = Html.BeginRequestForm(plan, "room-numbering"))
+{
+    <fieldset>
+        <legend>Room number</legend>
+        @(Html.InputField(plan, m => m.Number, options => options.Label("Room number")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-room", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<RoomNumbering>(RoomNumberingEndpoints.Rooms, request => request.Form(room.Form))
+        .Validate<RoomNumberingRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

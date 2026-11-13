@@ -963,32 +963,34 @@ refusal page reads is a response body of the page's own endpoint. Of the refusal
 six wait: X6.12 and X8.22's first promise need another host (enums as numbers for an opposite case; numbers
 as text), X6.36 a request culture, X7.11, twice, a typed read of a select's value (N13.1), and X1.4 a number
 box. Ten more are placed under hosts the harness does not hold yet. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
-refusal's is, and a hundred and nine care pages stand, each test red: thirty-eight of the record screen's (eight of
-module 9's, seven of module 2's, four of module 17's, three each of modules 1, 3, 5 and 24, two each of modules 7 and
-12 and one each of modules 6, 15 and 19), thirty-six of the residents screen's (twenty-three of module 4's, eight of
-module 6's, two of module 2's and one each of modules 3, 17 and 24), twenty-one of the admission screen's (six of
-module 7's, four each of modules 6 and 24, two each of modules 3 and 15 and one each of modules 9, 17 and 18),
-thirteen of the round screen's (four of module 6's, three of module 3's, two each of modules 1 and 2 and one each of
-modules 4 and 16) and one of the shell screen's (one of module 14's). Thirty-eight feature tests stand on the bench,
-fifteen of module 12's, fourteen of module 11's, four each of modules 13 and 17 and one of module 14's, their pages in
-a folder a module (`Bench/Vendors/`, `Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`, `Bench/Schema/`),
-with a render helper for each of the four other conformance declarations. The net10 host writes enum names in camel
-case, as app.json defines it. Of the care families attempted, sixty-four promises placed under net10 alone wait:
-twenty need a call of the app's startup that throws until its unit (request defaults, antiforgery, flags enums, a
-registered validator, the busy indicator); fourteen need a door the core does not declare (the endpoint's error
-answer, N16.1; a condition on a part a request sends, N10.4; an append to an element's text; an element's Show, Hide
-and Hidden, M5.N1; a handler's policy, N11.1; a typed event raised from markup with no payload; a text joined from a
-source and a literal; an element's children and attributes, M5.N3 and M5.N4; a list operation's result set into a
-property declared a List); six need a number a person types, read as a source (N13.1); five need a request culture;
-four need the value or membership tests (M3.N1); three need a console error's words, which no line states; six need a
-browser zone or the view's time zone; two need the harness's clock verb; one needs the harness's restart verb; one
-needs module 25's NativeDrawer and NativeConfirm, which are not declared; one needs another host for its opposite
-case; and one needs a record whose code holds null, which native.json's type of it does not hold. Two more attempted
-promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test typed where
-the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the harness;
-X11.20 waits on the defaultHooks host. Of the bench's feature tests attempted, ten wait: six need an append to the
-callbacks object's log line, which neither native.json nor a core door gives; three need the harness's restart or gc
-verb; and one needs a list written as an element's rows, which no door writes. Of the bench's ninety-eight placed cells, ninety-four stand, each test red: nine of
+refusal's is, and a hundred and twenty-four care pages stand, each test red: thirty-nine of the record screen's (eight
+of module 9's, seven of module 2's, four of module 17's, three each of modules 1, 3, 5 and 24, two each of modules 7
+and 12 and one each of modules 6, 8, 15 and 19), thirty-six of the residents screen's (twenty-three of module 4's,
+eight of module 6's, two of module 2's and one each of modules 3, 17 and 24), thirty-two of the admission screen's
+(eleven of module 8's, six of module 7's, four each of modules 6 and 24, two each of modules 3 and 15 and one each of
+modules 9, 17 and 18), sixteen of the round screen's (four of module 6's, three each of modules 3 and 8, two each of
+modules 1 and 2 and one each of modules 4 and 16) and one of the shell screen's (one of module 14's). Thirty-eight
+feature tests stand on the bench, fifteen of module 12's, fourteen of module 11's, four each of modules 13 and 17 and
+one of module 14's, their pages in a folder a module (`Bench/Vendors/`, `Bench/Declarations/`, `Bench/Plugins/`,
+`Bench/Execution/`, `Bench/Schema/`), with a render helper for each of the four other conformance declarations. The
+net10 host writes enum names in camel case, as app.json defines it. Of the care families attempted, seventy-one
+promises placed under net10 alone wait: twenty-one need a call of the app's startup that throws until its unit
+(request defaults, antiforgery, flags enums, a registered validator, the busy indicator); seventeen need a door the
+core does not declare (the endpoint's error answer, N16.1; a condition on a part a request sends, N10.4; an append to
+an element's text; an element's Show, Hide and Hidden, M5.N1; a handler's policy, N11.1; a typed event raised from
+markup with no payload; a text joined from a source and a literal; an element's children and attributes, M5.N3 and
+M5.N4; a list operation's result set into a property declared a List; the block's live check, D16.15; a validator's
+Flags<TEnum>(), N16.4, with a rule set a request names, D16.2's form); six need a number a person types, read as a
+source (N13.1); five need a request culture; four need the value or membership tests (M3.N1); three need a console
+error's words, which no line states; six need a browser zone or the view's time zone; two need the harness's clock
+verb; one needs the harness's restart verb; three need module 25's NativeDrawer, NativeConfirm and NativeToast, which
+are not declared; one needs another host for its opposite case; one needs the text box's Type, whose form N18.4 sends
+to gate 2; and one needs a record whose code holds null, which native.json's type of it does not hold. Two more
+attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test
+typed where the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the
+harness; X11.20 waits on the defaultHooks host. Of the bench's feature tests attempted, ten wait: six need an append
+to the callbacks object's log line, which neither native.json nor a core door gives; three need the harness's restart
+or gc verb; and one needs a list written as an element's rows, which no door writes. Of the bench's ninety-eight placed cells, ninety-four stand, each test red: nine of
 its properties, nine of its methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen
 of its sources, its three absences, its sixteen requests and two of its lanes, a slot loaded on start and a
 slot's listener gone at its unload. The sixteenth request cell, http.beside.hidden, sends a form's inputs: a
@@ -1005,7 +1007,8 @@ source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so 
 by the type (D7.5, X7.4). The eight component slices of module 24 are declared in `Alis.Reactive.Native` (M24.N1
 to M24.N9), `NativeTextBox` the first, each render helper a signature until U23, on the core's `IInputComponent`, `ComponentInput` and the
 field's options (M7.N3, M7.N2), which enter the core's table as `InputsAndIds`; the text tests are declared
-(M3.N1, N7.3). The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1). An element's text and HTML are an `ElementContent`, whose `Set` takes a source
+(M3.N1, N7.3). The reference Fusion slice is declared in `Alis.Reactive.Fusion` (M21.N1, M21.N2),
+`FusionMultiSelect<TValue>` on the base `FusionComponent`, each render helper a signature until U25. The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1). An element's text and HTML are an `ElementContent`, whose `Set` takes a source
 of any type (M5.N1, D7.3), and a world names the version its component is built as. The app's settle, count and item
 endpoints stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its
 action where a test holds one action at two endpoints, and the harness's test of it is green and fails on each of

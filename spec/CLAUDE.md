@@ -1072,6 +1072,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   app's item, as the cell event.object reads `Read(d => d.Name)`, in place of EJ2's `FieldSettingsModel`. No member
   carries `name:`. No analyzer reads `[Mirrors]` until N17.2's is built, so the build proves these names compile and
   no more. The owner can overrule each.
+- The lead, 2026-11-12, landing fifteen pages of module 8, two forks' work, and settling what they read into. A page
+  shows a 400 by `ShowValidationErrors` in the request's error scope for status 400, as the admission screen's
+  addressed move-in does, since the condensed default needs a validator registered at startup. An answer a
+  placement has the harness seed is the endpoint's own rule (room 13 is closed), with no seed. X16.7's tabs are two
+  exclusive native disclosure panels inside the container, since a tab its slot loads on a click holds no message
+  element while closed and no door shows or hides an element (M5.N1); the placement's tab slot waits on that door.
+  X16.2's container holds the Phone input alone and the lead's name stands outside it, so both saves send the
+  container whose summary the promise reads (D13.6, D16.13). X16.3's validator names the deputy with the
+  null-forgiving operator: FluentValidation 12.1.1 warns CS8620 on the promise's sentence over a nullable member
+  and runs no child rule on a null one (a scratch probe), so the form is FluentValidation's own. "No message shows"
+  reads as no summary item once the answer line shows. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

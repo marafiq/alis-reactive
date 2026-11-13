@@ -1,0 +1,47 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model IntakeAndKin
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<IntakeAndKin>();
+}
+<h1>Admission</h1>
+<section aria-label="Intake">
+    <h2>Intake</h2>
+    @using (var intake = Html.BeginRequestForm(plan, "intake"))
+    {
+        @(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+        <div id="intake-line"></div>
+        <button type="button" @Html.Raises(plan, IntakeAndKinButtons.OpenTheLine)>Open the line</button>
+        <button type="button" @Html.Raises(plan, IntakeAndKinButtons.CloseTheLine)>Close the line</button>
+        <button type="button" @Html.Raises(plan, IntakeAndKinButtons.SaveIntake)>Save intake</button>
+        Html.On(plan, trigger => trigger.CustomEvent(IntakeAndKinButtons.SaveIntake, pipeline => pipeline
+            .Post<IntakeAndKin>(IntakeAndKinEndpoints.Intakes, request => request.Form(intake.Form))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("intake-status").Text.Set(saved.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))));
+    }
+    <p>Intake: <span id="intake-status">Not saved</span></p>
+</section>
+<section aria-label="Next of kin">
+    <h2>Next of kin</h2>
+    @using (var kin = Html.BeginRequestForm(plan, "next-of-kin"))
+    {
+        @(Html.InputField(plan, m => m.Kin, options => options.Label("Name")).NativeTextBox())
+        <button type="button" @Html.Raises(plan, IntakeAndKinButtons.SaveNextOfKin)>Save next of kin</button>
+        Html.On(plan, trigger => trigger.CustomEvent(IntakeAndKinButtons.SaveNextOfKin, pipeline => pipeline
+            .Post<IntakeAndKin>(IntakeAndKinEndpoints.NextOfKin, request => request.Form(kin.Form))
+            .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("kin-status").Text.Set(saved.Body))
+            .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))));
+    }
+    <p>Next of kin: <span id="kin-status">Not saved</span></p>
+</section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(IntakeAndKinButtons.OpenTheLine, pipeline => pipeline.Get(IntakeAndKinEndpoints.Line).Into("intake-line"))
+        .CustomEvent(IntakeAndKinButtons.CloseTheLine, pipeline => pipeline.Unload("intake-line")));
+}
+@Html.RenderPlan(plan)
