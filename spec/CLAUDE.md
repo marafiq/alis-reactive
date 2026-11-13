@@ -1225,6 +1225,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   a struct that orders, its nullable form as well, as N8.2's comparisons take theirs. The record's Name starts at null,
   as M3.X1 states, and the care panel's raise hands a record, none, or one with no member. M1.X10 is not written: its
   third button raises a typed event from markup with no payload, a door nobody declares. The owner can overrule each.
+- The lead, 2026-11-13, landing the bed-board screen's fifteen pages from a fork's work read at the source. A template's
+  opposite that changes the view's code is a second view
+  (`tests/Alis.Reactive.Conformance.App/Care/BedBoard/WardRoomsBedsFirst.cshtml`); a row that lacks a member or holds it
+  null is written by the page's endpoint as an anonymous object beside the row's record, since rows handed with the view
+  hold every member; a carousel renders with AutoPlay off, so the slide shown waits on no time. The drop-down tree names
+  its fields through EJ2's own fields object with `nameof`, since M21.N21 declares no typed fields as FusionMultiSelect
+  declares its; U26 reads whether EJ2 writes the tree's data under those names, and a typed door for them is a gap the
+  lead raises. M21.X201's three exports read Exporting while the export runs, which a test reads only while the export
+  is held, and their placement names the seed alone: they wait on the harness's remaining verbs, the clock read against
+  EJ2's export first. X15.5 waits on the pascalCase host. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Grids
+@model ResidentWards
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident board";
+    var plan = Html.ReactivePlan<ResidentWards>();
+    var columns = FusionGridColumns.Of<WardedResident>();
+}
+<h1>Resident board</h1>
+@(Html.FusionGrid<ResidentWards, WardedResident>(plan, "resident-wards", build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Name" },
+        new() { HeaderText = "Ward", Template = FusionTemplate.Create<WardedResident>().Span(m => m.Ward).Render(plan) },
+    })))
+<p>Residents: <output id="board-status">Loading</output></p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline
+        .Get(Model.ResidentsEndpoint)
+        .OnSuccess(Content.Json<IReadOnlyList<WardedResident>>(), (residents, pipeline) =>
+        {
+            pipeline.Component<FusionGrid>("resident-wards").DataSource<WardedResident>().Set(residents.Body);
+            pipeline.Element("board-status").Text.Set("Loaded");
+        })));
+}
+@Html.RenderPlan(plan)

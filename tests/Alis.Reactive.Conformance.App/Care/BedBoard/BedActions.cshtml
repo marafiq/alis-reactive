@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Navigations
+@model BedActions
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed board";
+    var plan = Html.ReactivePlan<BedActions>();
+    var wards = new List<MenuItem>
+    {
+        new() { Text = "Ward", Items = new List<MenuItem> { new() { Text = "North" }, new() { Text = "East" } } },
+    };
+}
+<h1>Bed board</h1>
+<section id="bed-area" aria-label="Beds">
+    <p>@Model.Bed</p>
+</section>
+<p>Opening: <output id="opening-status"></output></p>
+<p>Focus: <output id="focus-status"></output></p>
+@(Html.FusionContextMenu(plan, "bed-menu", build => build.Target("#bed-area").Items(wards))
+    .Reactive(menu => menu.BeforeOpen, (opening, pipeline) => pipeline.When(opening.IsFocused)
+        .Then(pipeline => pipeline.Element("opening-status").Text.Set("Focused"))
+        .Else(pipeline => pipeline.Element("opening-status").Text.Set("No focus")))
+    .Reactive(menu => menu.BeforeClose, (closing, pipeline) => pipeline.When(closing.IsFocused)
+        .Then(pipeline => pipeline.Element("focus-status").Text.Set("Focused"))
+        .Else(pipeline => pipeline.Element("focus-status").Text.Set("No focus"))))
+@Html.RenderPlan(plan)

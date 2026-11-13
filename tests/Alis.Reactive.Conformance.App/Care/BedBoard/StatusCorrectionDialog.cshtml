@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model StatusCorrectionDialog
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Status corrections";
+    var plan = Html.ReactivePlan<StatusCorrectionDialog>();
+    var columns = FusionGridColumns.Of<StatusUnderCorrection>();
+    var statusForm = FusionGridEditTemplates.DialogForm<StatusUnderCorrection>(form => form.Select(r => r.Status, "Status", Model.Statuses));
+}
+<h1>Status corrections</h1>
+@(Html.FusionGrid(plan, "status-correction-dialog", Model.Residents, build => build
+    .Toolbar(new List<string> { "Edit" })
+    .EditSettings(new GridEditSettings { AllowEditing = true, Mode = EditMode.Dialog, Template = statusForm })
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.ResidentId), HeaderText = "Resident id", IsPrimaryKey = true, Visible = false },
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Resident" },
+        new() { Field = columns.Field(r => r.Status), HeaderText = "Status" },
+    })))
+@Html.RenderPlan(plan)

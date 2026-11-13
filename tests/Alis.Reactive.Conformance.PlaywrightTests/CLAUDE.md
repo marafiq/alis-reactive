@@ -76,7 +76,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   inside that group, whole and kept to the visible element, since EJ2 keeps a hidden chip beside the text it shows.
   A list the page loads is read after the page's own line that the same success pipeline sets after the items,
   since EJ2 33.1.47 drew no item set while a multi-select's list stood open, in three seconds of the lead's probe
-  (`FusionComponents/FusionMultiSelect/WhenAMultiSelectsItemsAreLoadedFromAnEndpoint.cs`).
+  (`FusionComponents/FusionMultiSelect/WhenAMultiSelectsItemsAreLoadedFromAnEndpoint.cs`). A module 22 test sits in a
+  folder named for its screen under `FusionTemplates/`, in that folder's namespace, and its module folder is its
+  shard unit (`FusionTemplates/BedBoard/WhenARowsWardIsNullOrMissing.cs`).
 - A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
   alone and a module's tests sit in the module's.

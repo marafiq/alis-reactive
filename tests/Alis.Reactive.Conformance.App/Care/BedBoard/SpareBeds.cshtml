@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model SpareBeds
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Bed board";
+    var plan = Html.ReactivePlan<SpareBeds>();
+    var columns = FusionGridColumns.Of<SpareBedResident>();
+    var spare = FusionTemplate.Create<SpareBedResident>()
+        .When(m => !(m.Status == "Active") && m.Beds > 2, then: t => t.Span("away with spare beds"), @else: e => e.Span("other"))
+        .Render(plan);
+}
+<h1>Bed board</h1>
+@(Html.FusionGrid(plan, "spare-beds", Model.Residents, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Name" },
+        new() { HeaderText = "Spare", Template = spare },
+    })))
+@Html.RenderPlan(plan)

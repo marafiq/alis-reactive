@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.PivotView
+@model WardCensus
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward census";
+    var plan = Html.ReactivePlan<WardCensus>();
+}
+<h1>Ward census</h1>
+@(Html.FusionPivotView(plan, "ward-census", build => build
+    .DisplayOption(new PivotViewDisplayOption { View = Model.ShownAs })
+    .DataSourceSettings(new PivotViewDataSourceSettings
+    {
+        DataSource = Model.Residents,
+        Rows = new List<PivotViewRow> { new() { Name = nameof(CensusEntry.Ward), Caption = "Ward" } },
+        Values = new List<PivotViewRow> { new() { Name = nameof(CensusEntry.Residents), Caption = "Residents" } },
+    })))
+<button type="button" @Html.Raises(plan, CensusViews.WhichView)>Which view</button>
+<p>View: <output id="view-name">No view</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusViews.WhichView, pipeline =>
+        pipeline.Element("view-name").Text.Set(pipeline.Component<FusionPivotView>("ward-census").DisplayOption.View)));
+}
+@Html.RenderPlan(plan)

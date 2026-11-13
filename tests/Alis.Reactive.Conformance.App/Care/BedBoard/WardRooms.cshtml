@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model WardRooms
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "North ward";
+    var plan = Html.ReactivePlan<WardRooms>();
+    var residentColumns = FusionGridColumns.Of<AgedResident>();
+    var roomColumns = FusionGridColumns.Of<WardRoom>();
+    var band = FusionTemplate.Create<AgedResident>()
+        .When(m => m.Age < 90, then: t => t.Span("under 90"), @else: e => e.Span("90 and over"))
+        .Render(plan);
+    var spare = FusionTemplate.Create<WardRoom>()
+        .When(m => 2 < m.Beds, then: t => t.Span("spare"), @else: e => e.Span("full"))
+        .Render(plan);
+}
+<h1>North ward</h1>
+<section aria-label="Residents">
+    <h2>Residents</h2>
+    @(Html.FusionGrid(plan, "ward-residents", Model.Residents, build => build
+        .Columns(new List<GridColumn>
+        {
+            new() { Field = residentColumns.Field(r => r.Name), HeaderText = "Name" },
+            new() { HeaderText = "Band", Template = band },
+        })))
+</section>
+<section aria-label="Rooms">
+    <h2>Rooms</h2>
+    @(Html.FusionGrid(plan, "ward-rooms", Model.Rooms, build => build
+        .Columns(new List<GridColumn>
+        {
+            new() { Field = roomColumns.Field(r => r.Room), HeaderText = "Room" },
+            new() { HeaderText = "Spare", Template = spare },
+        })))
+</section>
+@Html.RenderPlan(plan)

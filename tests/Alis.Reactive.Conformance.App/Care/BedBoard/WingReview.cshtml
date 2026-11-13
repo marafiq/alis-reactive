@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Grids
+@model WingReview
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Wing review";
+    var plan = Html.ReactivePlan<WingReview>();
+    var columns = FusionGridColumns.Of<ReviewedResident>();
+    var review = FusionTemplate.Create<ReviewedResident>()
+        .EventButton("Review", WingReviewEvents.StartReview, p => p.ResidentId, m => m.ResidentId)
+        .Render(plan);
+}
+<h1>Wing review</h1>
+@(Html.FusionGrid(plan, "wing-review", Model.Residents, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Resident" },
+        new() { HeaderText = "Review", Template = review },
+    })))
+<p>Reviewing: <output id="reviewing"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WingReviewEvents.StartReview, (started, pipeline) =>
+        pipeline.Element("reviewing").Text.Set(started.Read(start => start.ResidentId))));
+}
+@Html.RenderPlan(plan)

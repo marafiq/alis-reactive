@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model RoomBeds
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Beds";
+    var plan = Html.ReactivePlan<RoomBeds>();
+    var columns = FusionGridColumns.Of<RoomBed>();
+}
+<h1>Beds</h1>
+@(Html.FusionGrid(plan, "beds", Model.Beds, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(b => b.RoomNumber), HeaderText = "Room" },
+        new() { Field = columns.Field(b => b.Ward), HeaderText = "Ward" },
+    })))
+@Html.RenderPlan(plan)
