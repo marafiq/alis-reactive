@@ -67,8 +67,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
 - A care screen's test sits in its module's folder under the screen it runs on, and reads its page by its
   address of `CarePages` in the world contract: `ArrayLambdas/Residents/WhenALambdaComparesWithAValueTheViewHolds.cs`
   is the pattern, the page of the opposite case opened in a second world.
-- A Fusion slice's test sits in a folder named for its slice under `FusionComponents/`, in the namespace of that
-  folder, since ALIS011 holds every file to its first folder's, and opens a care screen's page
+- A Fusion slice's test sits in a folder named for its slice under `FusionComponents/`, in the namespace of
+  `FusionComponents/` alone, its first folder, as ALIS011 holds every file; the runner reads the slice of its shard
+  unit from that folder, and the test opens a care screen's page
   (`FusionComponents/FusionMultiSelect/WhenAMultiSelectsItemsAreHandedOverWithTheView.cs`). EJ2 33.1.47's
   multi-select names its box "multiselect" and links no label to it, so the test finds the box as the combobox
   inside the group its page gives the field, the box's list as the listbox's options, and the chosen item's text

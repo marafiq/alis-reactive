@@ -218,6 +218,6 @@ jobs:
       - name: Every run is green, and the tests that ran are the full list, each once
         run: |
           set -- runs/*/*
-          node scripts/playwright-select.mjs --spec "$1/landings.tsv" --assembly "$1/tests.tsv" --root Alis.Reactive.Conformance.PlaywrightTests \
+          node scripts/playwright-select.mjs --spec "$1/landings.tsv" --assembly "$1/tests.tsv" \
             --weights "$TESTS/shard-weights.json" --out full.json --all --every-host > /dev/null
           node scripts/playwright-result.mjs --proof --full full.json --budget "$TESTS/Harness/measured.json" "$@"

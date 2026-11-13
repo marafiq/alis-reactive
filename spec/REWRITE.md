@@ -347,9 +347,10 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   each said on a line before it. What a run runs is decided before it starts. The runner joins the tests the spec
   lands (`spec/tools/landings.py`, which reads the spec through check.py: each test's promise, its unit, its screen
   and its hosts) with the tests the built assembly holds (`scripts/list-tests.cs`, each test's promise read from its
-  `[FailsFor]`), refuses a selected test of the spec that nobody wrote, and writes the cases the run must run, each a
-  fixture under one host with its test. The result is read against that list by name, so a test that ran twice, a
-  test that was skipped and a fixture that runs under a host its placement does not list each fail the run.
+  `[FailsFor]` and its fixture's folder, which parts a shard unit, from the assembly's portable PDB), refuses a selected
+  test of the spec that nobody wrote, and writes the cases the run must run, each a fixture under one host with its
+  test. The result is read against that list by name, so a test that ran twice, a test that was skipped and a fixture
+  that runs under a host its placement does not list each fail the run.
   WhenAPlaywrightRunStarts holds the selection and WhenAPlaywrightRunEnds the reading, each over files its cases
   write: a refused case for each failure, and an accepted case for a green run. No retries, anywhere.
 - **Waits and budget.** Action waits, navigation waits and the per-test budget are set from measurement, never chosen,

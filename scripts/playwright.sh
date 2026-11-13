@@ -108,7 +108,7 @@ fi
 
 dotnet run scripts/list-tests.cs -p:RestorePackagesWithLockFile=false -- "$assembly" > "$run/tests.tsv"
 python3 spec/tools/landings.py > "$run/landings.tsv"
-filter="$(node scripts/playwright-select.mjs --spec "$run/landings.tsv" --assembly "$run/tests.tsv" --root "$name" --weights "$weights" --out "$run/selection.json" \
+filter="$(node scripts/playwright-select.mjs --spec "$run/landings.tsv" --assembly "$run/tests.tsv" --weights "$weights" --out "$run/selection.json" \
   "${selector[@]}" ${host[@]+"${host[@]}"} ${shard[@]+"${shard[@]}"})"
 echo "[playwright:runner] filter: ${filter:-every test}"
 

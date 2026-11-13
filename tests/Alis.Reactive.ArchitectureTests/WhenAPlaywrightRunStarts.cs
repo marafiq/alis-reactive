@@ -10,9 +10,12 @@ public class WhenAPlaywrightRunStarts
 {
     private const string Landings = "spec/tools/landings.py";
     private const string Selector = "scripts/playwright-select.mjs";
-    private const string Residents = "Tests.Residents.List.WhenAResidentIsListed";
-    private const string Rounds = "Tests.Rounds.Round.WhenARoundStarts";
+    private const string Residents = "Tests.Residents.WhenAResidentIsListed";
+    private const string ResidentsFolder = "Residents/List";
+    private const string Rounds = "Tests.Rounds.WhenARoundStarts";
+    private const string RoundsFolder = "Rounds/Round";
     private const string Worlds = "Tests.Harness.WhenTwoWorldsRun";
+    private const string WorldsFolder = "Harness";
 
     private static readonly string[] TheSpec =
     [
@@ -26,16 +29,19 @@ public class WhenAPlaywrightRunStarts
 
     private static readonly string[] TheAssembly =
     [
-        $"M1.F1 X1.1 0\t{Residents}\tthe_resident_is_listed",
-        $"M1.F1 X1.2 0\t{Residents}\tthe_resident_is_opened",
-        $"M2.F1 X2.1 0\t{Rounds}\tthe_round_is_listed",
-        $"M2.F1 X2.2 0\t{Rounds}\tthe_round_is_signed",
-        $"harness WhenTwoWorldsRun.each_world_lists_its_own\t{Worlds}\teach_world_lists_its_own",
+        $"M1.F1 X1.1 0\t{Residents}\tthe_resident_is_listed\t{ResidentsFolder}",
+        $"M1.F1 X1.2 0\t{Residents}\tthe_resident_is_opened\t{ResidentsFolder}",
+        $"M2.F1 X2.1 0\t{Rounds}\tthe_round_is_listed\t{RoundsFolder}",
+        $"M2.F1 X2.2 0\t{Rounds}\tthe_round_is_signed\t{RoundsFolder}",
+        $"harness WhenTwoWorldsRun.each_world_lists_its_own\t{Worlds}\teach_world_lists_its_own\t{WorldsFolder}",
     ];
 
-    private const string Grid = "Tests.FusionComponents.FusionGrid.Residents.WhenAGridSorts";
-    private const string MultiSelect = "Tests.FusionComponents.FusionMultiSelect.Bench.WhenAnItemIsPicked";
-    private const string Badge = "Tests.FusionTemplates.Residents.WhenABadgeRenders";
+    private const string Grid = "Tests.FusionComponents.WhenAGridSorts";
+    private const string GridFolder = "FusionComponents/FusionGrid";
+    private const string MultiSelect = "Tests.FusionComponents.WhenAnItemIsPicked";
+    private const string MultiSelectFolder = "FusionComponents/FusionMultiSelect";
+    private const string Badge = "Tests.FusionTemplates.WhenABadgeRenders";
+    private const string BadgeFolder = "FusionTemplates/Residents";
 
     private static readonly string[] TheSpecWithFusion =
     [
@@ -52,9 +58,9 @@ public class WhenAPlaywrightRunStarts
     private static readonly string[] TheAssemblyWithFusion =
     [
         .. TheAssembly,
-        $"M21.F3 M21.X1 0\t{Grid}\tthe_grid_sorts",
-        $"M21.F2 M21.X2 0\t{MultiSelect}\tthe_item_is_picked",
-        $"M22.F1 M22.X1 0\t{Badge}\tthe_badge_renders",
+        $"M21.F3 M21.X1 0\t{Grid}\tthe_grid_sorts\t{GridFolder}",
+        $"M21.F2 M21.X2 0\t{MultiSelect}\tthe_item_is_picked\t{MultiSelectFolder}",
+        $"M22.F1 M22.X1 0\t{Badge}\tthe_badge_renders\t{BadgeFolder}",
     ];
 
     [Test]
@@ -121,7 +127,7 @@ public class WhenAPlaywrightRunStarts
         using var written = new WrittenFolder();
 
         string[] withALongerFeature = [.. TheSpec, "M1.F10 X1.1 0\tM1_F10.X1_1_0\tU7\tresidents\tnet10\tpool"];
-        string[] withItsTest = [.. TheAssembly, $"M1.F10 X1.1 0\t{Residents}\tthe_resident_is_moved"];
+        string[] withItsTest = [.. TheAssembly, $"M1.F10 X1.1 0\t{Residents}\tthe_resident_is_moved\t{ResidentsFolder}"];
 
         Assert.That(Select(written, withALongerFeature, withItsTest, "--feature", "M1.F1").Cases,
             Is.EqualTo(new[] { $"{Residents}(\"net10\").the_resident_is_listed", $"{Residents}(\"net10\").the_resident_is_opened" }));
@@ -129,6 +135,8 @@ public class WhenAPlaywrightRunStarts
         Assert.That(Select(written, TheSpec, TheAssembly, "--test", "M1_F1.X1_1_0").Cases, Is.EqualTo(new[] { $"{Residents}(\"net10\").the_resident_is_listed" }));
         Assert.That(Select(written, TheSpec, TheAssembly, "Harness").Cases, Is.EqualTo(new[] { $"{Worlds}(\"net10\").each_world_lists_its_own" }));
         Assert.That(Select(written, TheSpec, TheAssembly, "WhenARoundStarts").Cases, Is.EqualTo(new[] { $"{Rounds}(\"snakeCase\").the_round_is_listed" }));
+        Assert.That(Select(written, TheSpec, TheAssembly, "List").Cases,
+            Is.EqualTo(new[] { $"{Residents}(\"net10\").the_resident_is_listed", $"{Residents}(\"net10\").the_resident_is_opened" }));
     }
 
     [AcceptedCase]
@@ -136,7 +144,7 @@ public class WhenAPlaywrightRunStarts
     {
         using var written = new WrittenFolder();
         string[] spec = [.. TheSpec, "M2.F1 X2.3 0\tM2_F1.X2_3_0\tU6\tround\tsnakeCase\tpool"];
-        string[] assembly = [.. TheAssembly, $"M2.F1 X2.3 0\t{Rounds}Late\tthe_late_round_is_listed"];
+        string[] assembly = [.. TheAssembly, $"M2.F1 X2.3 0\t{Rounds}Late\tthe_late_round_is_listed\t{RoundsFolder}"];
 
         var one = Select(written, spec, assembly, "--test", "M2_F1.X2_1_0");
         var whole = Select(written, spec, assembly, "--test", "M1_F1.X1_1_0");
@@ -206,6 +214,18 @@ public class WhenAPlaywrightRunStarts
         Assert.That(second.Units, Is.EqualTo(new[] { "FusionComponents.FusionGrid", "FusionComponents.FusionGrid", "FusionTemplates" }));
         Assert.That(second.Filter, Is.EqualTo($"(FullyQualifiedName~{Grid}|FullyQualifiedName~{Badge})&TestCategory!=net48&TestCategory!=snakeCase"));
         Assert.That(new[] { first.Shard, second.Shard }, Is.EqualTo(new[] { "1/2", "2/2" }));
+    }
+
+    [AcceptedCase]
+    public void two_fixtures_in_one_slices_folder_are_one_shard_unit()
+    {
+        using var written = new WrittenFolder();
+        string[] spec = [.. TheSpecWithFusion, "M21.F2 M21.X2 1\tM21_F2.M21_X2_1\tU25\tbench\tnet10\tpool"];
+        string[] assembly = [.. TheAssemblyWithFusion, $"M21.F2 M21.X2 1\tTests.FusionComponents.WhenAnItemIsCleared\tthe_item_is_cleared\t{MultiSelectFolder}"];
+
+        var fusion = Select(written, spec, assembly, "--pool", "fusion");
+
+        Assert.That(fusion.Units.Distinct(), Is.EqualTo(new[] { "FusionComponents.FusionGrid", "FusionComponents.FusionMultiSelect", "FusionTemplates" }));
     }
 
     [AcceptedCase]
@@ -307,8 +327,8 @@ public class WhenAPlaywrightRunStarts
     {
         using var written = new WrittenFolder();
 
-        var twice = Select(written, TheSpec, [.. TheAssembly, $"M1.F1 X1.1 0\t{Rounds}\tthe_round_is_closed"], "--all");
-        var unknown = Select(written, TheSpec, [.. TheAssembly, $"M9.F9 X9.9 0\t{Rounds}\tthe_round_is_closed"], "--all");
+        var twice = Select(written, TheSpec, [.. TheAssembly, $"M1.F1 X1.1 0\t{Rounds}\tthe_round_is_closed\t{RoundsFolder}"], "--all");
+        var unknown = Select(written, TheSpec, [.. TheAssembly, $"M9.F9 X9.9 0\t{Rounds}\tthe_round_is_closed\t{RoundsFolder}"], "--all");
 
         Assert.That(twice.Errors.Trim(), Is.EqualTo("[playwright:select] two tests of the assembly carry 'M1.F1 X1.1 0': the_resident_is_listed and the_round_is_closed."));
         Assert.That(unknown.Errors.Trim(), Is.EqualTo(
@@ -334,7 +354,7 @@ public class WhenAPlaywrightRunStarts
         var run = Run("node",
         [
             Path.Combine(Repository.Root, Selector), "--spec", written.Write("landings.tsv", string.Join("\n", spec) + "\n"),
-            "--assembly", written.Write("tests.tsv", string.Join("\n", assembly) + "\n"), "--root", "Tests", "--weights", weights, "--out", selection,
+            "--assembly", written.Write("tests.tsv", string.Join("\n", assembly) + "\n"), "--weights", weights, "--out", selection,
             .. selector.Skip(holdsWeights ? 1 : 0),
         ]);
         if (run.ExitCode != 0) return new Selected([], [], "", "", "", run.Errors, run.ExitCode);

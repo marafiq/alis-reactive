@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
-const usage = `usage: node scripts/playwright-select.mjs --spec <file> --assembly <file> --root <namespace> --weights <file> --out <file> <selector> [--host <name> | --every-host] [--shard <i>/<k>]
+const usage = `usage: node scripts/playwright-select.mjs --spec <file> --assembly <file> --weights <file> --out <file> <selector> [--host <name> | --every-host] [--shard <i>/<k>]
 
-Joins the tests the spec lands (spec/tools/landings.py) with the tests an assembly holds (scripts/list-tests.cs),
-writes the cases one run must run to --out and prints the VSTest filter that selects them.
+Joins the tests the spec lands (spec/tools/landings.py) with the tests an assembly holds (scripts/list-tests.cs, each with
+its fixture's folder), writes the cases one run must run to --out and prints the VSTest filter that selects them.
 
 Selectors, one a run:
   --all                 every test the assembly holds
@@ -20,7 +20,7 @@ Selectors, one a run:
 --host <name> takes that host alone. Without it a run takes the hosts the conformance app serves on this machine.
 --every-host takes every host the spec lands a test under, the twin's and a fresh app's among them: the full list
 CI's proof reads its runs against.
---shard <i>/<k> takes the i-th of a pool's k shards. A shard unit is a module folder, a slice under FusionComponents,
+--shard <i>/<k> takes the i-th of a pool's k shards. A shard unit is a module folder, a slice's folder under FusionComponents,
 and the hosts pool whole; units go longest first, each onto the lightest shard, by the seconds --weights holds.`;
 
 const selectorsWithAValue = ["--unit", "--through", "--feature", "--screen", "--test", "--pool"];
@@ -38,16 +38,16 @@ function parse(argv) {
   const options = { selectors: [] };
   for (let index = 0; index < argv.length; index += 1) {
     const word = argv[index];
-    const valued = ["--spec", "--assembly", "--root", "--weights", "--out", "--host", "--shard", ...selectorsWithAValue].includes(word);
+    const valued = ["--spec", "--assembly", "--weights", "--out", "--host", "--shard", ...selectorsWithAValue].includes(word);
     if (valued && index + 1 >= argv.length) refuse(`${word} takes a value.\n${usage}`);
-    if (["--spec", "--assembly", "--root", "--weights", "--out", "--host", "--shard"].includes(word)) options[word.slice(2)] = argv[(index += 1)];
+    if (["--spec", "--assembly", "--weights", "--out", "--host", "--shard"].includes(word)) options[word.slice(2)] = argv[(index += 1)];
     else if (selectorsWithAValue.includes(word)) options.selectors.push({ kind: word.slice(2), value: argv[(index += 1)] });
     else if (word === "--all") options.selectors.push({ kind: "all", value: "all" });
     else if (word === "--every-host") options.everyHost = true;
     else if (word.startsWith("-")) refuse(`${word} is no option.\n${usage}`);
     else options.selectors.push({ kind: "name", value: word });
   }
-  for (const needed of ["spec", "assembly", "root", "weights", "out"]) {
+  for (const needed of ["spec", "assembly", "weights", "out"]) {
     if (options[needed] === undefined) refuse(`--${needed} is missing.\n${usage}`);
   }
   if (options.selectors.length !== 1) refuse(`a run takes one selector, and ${options.selectors.length} were given.\n${usage}`);
@@ -74,6 +74,10 @@ function unitsOnShard(units, weights, shard) {
   return new Set(shards[shard.index - 1].units);
 }
 
+function partsOf(test) {
+  return test.folder.split("/");
+}
+
 function rows(path, columns) {
   return readFileSync(path, "utf8").split("\n").filter(line => line !== "").map(line => {
     const cells = line.split("\t");
@@ -88,7 +92,7 @@ function unitNumber(unit) {
   return Number(read[1]);
 }
 
-function wanted(selector, landed, written, root) {
+function wanted(selector, landed, written) {
   switch (selector.kind) {
     case "all":
       return new Set(written.keys());
@@ -109,7 +113,7 @@ function wanted(selector, landed, written, root) {
       if (!pools.includes(selector.value)) refuse(`'${selector.value}' is no pool; the pools are ${pools.join(", ")}.`);
       return new Set(written.keys());
     default:
-      return new Set([...written].filter(([, test]) => test.fixture.slice(root.length + 1).split(".").includes(selector.value)).map(([promise]) => promise));
+      return new Set([...written].filter(([, test]) => [...partsOf(test), test.fixture.slice(test.fixture.lastIndexOf(".") + 1)].includes(selector.value)).map(([promise]) => promise));
   }
 }
 
@@ -117,7 +121,7 @@ const options = parse(process.argv.slice(2));
 const selector = options.selectors[0];
 const landed = rows(options.spec, ["promise", "constant", "unit", "screen", "host", "served"]);
 const written = new Map();
-for (const test of rows(options.assembly, ["promise", "fixture", "method"])) {
+for (const test of rows(options.assembly, ["promise", "fixture", "method", "folder"])) {
   if (written.has(test.promise)) refuse(`two tests of the assembly carry '${test.promise}': ${written.get(test.promise).method} and ${test.method}.`);
   written.set(test.promise, test);
 }
@@ -126,14 +130,13 @@ const ofTheSpec = new Set(landed.map(row => row.promise));
 const unknown = [...written.keys()].filter(promise => !ofTheSpec.has(promise));
 if (unknown.length > 0) refuse(`the assembly holds a test on '${unknown[0]}', no promise of the spec, ${unknown.length} such in all; build the test project again.`);
 
-const selected = wanted(selector, landed, written, options.root);
+const selected = wanted(selector, landed, written);
 if (selected.size === 0) refuse(`'${selector.value}' selects no test.`);
 const unwritten = [...selected].filter(promise => !written.has(promise));
 if (unwritten.length > 0) {
   refuse(`'${selector.value}' selects ${selected.size} tests of the spec; the assembly holds no test for ${unwritten.length} of them, the first '${unwritten[0]}'.`);
 }
 
-const partsOf = test => test.fixture.slice(options.root.length + 1).split(".");
 const poolOf = (row, test) => (fusionFolders.includes(partsOf(test)[0]) ? "fusion" : row.host === theAppsOwnHost ? "core" : "hosts");
 const unitOf = (row, test) => {
   if (row.served !== "pool") return row.served;

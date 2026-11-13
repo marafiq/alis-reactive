@@ -42,6 +42,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A landing's carrier left out of its commit | 1 | A step a script shows: a commit message writer stops when the commit stages a PublicAPI text and leaves spec/REWRITE.md unstaged, since section 4 names what is declared. |
 | The owner's words answered with a remedy they did not name | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12 on pace, which quotes the correction. |
 | An ordering met without its TLA+ spec named | 1 | A step a commit shows: a commit whose piece meets an ordering names the invariants it rests on in a line of its message, and an ordering no spec holds is written as a spec before its door; root CLAUDE.md's TLA+ line states it. It reached the owner, so it starts on this rung. |
+| A case written in a shape its real input cannot take | 1 | A rule line: `tests/Alis.Reactive.ArchitectureTests/CLAUDE.md`, a runner case's tables hold what the real tools write, each fixture in its first folder's namespace beside its folder. |
 | A name landed that departs from its siblings' name for one concept | 1 | A step a script shows: at each landing, a script of the session reads every render helper's builder callback and every options callback and stops on a name other than `build` and `options`; a landing quotes its line. |
 
 ## Waiting for the owner
@@ -462,3 +463,12 @@ them, each marked as the lead's slip, and are not copied here.
   entry in `spec/Reference/app.json`, word for word, and two plants anchor on those words, so three anchors were
   found twice. Caught before the gate by the plant anchors' count, the step the class's third entry built. Cost: two
   phrases reworded to the new page's own link. Held by that step.
+- 2026-11-13, a case written in a shape its real input cannot take, a new class. The runner's selection cases listed
+  Fusion fixtures in namespaces that name a slice and a screen, `Tests.FusionComponents.FusionMultiSelect.Bench` among
+  them, which ALIS011 refuses in the test project, where a file's namespace is its first folder's; the selector read a
+  shard unit's slice from the namespace, so each Fusion fixture would have been a unit of its own while the cases
+  stayed green. Caught after the push, before any shard ran a Fusion test, when the lead planned the exemplar's test
+  namespace from the selector and read ALIS011 before writing it. Cost: the lister reads each fixture's folder from
+  the assembly's portable PDB, the selector parts its units by that folder and takes no root, and the cases list real
+  namespaces beside their folders, with a case of two fixtures in one slice's folder. Held by a rule line,
+  `tests/Alis.Reactive.ArchitectureTests/CLAUDE.md`, the runner's cases.

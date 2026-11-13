@@ -42,7 +42,9 @@ expects none.
   small grammars its cases declare, and expects each refusal's own words and the TypeScript and the schema of an
   accepted one as literals. The core's own contract is held by the first step of `scripts/check.sh`.
 - `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
-  result, over the tables and TRX files their cases write, and expect each refusal's own line.
+  result, over the tables and TRX files their cases write, and expect each refusal's own line. A case's tables
+  hold what the real tools write: a fixture in the namespace of its first folder, as ALIS011 holds every test,
+  beside the folder `scripts/list-tests.cs` reads from the assembly's portable PDB (the lead's slip, 2026-11-13).
 
 ```bash
 dotnet test tests/Alis.Reactive.ArchitectureTests
