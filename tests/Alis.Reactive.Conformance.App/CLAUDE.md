@@ -28,9 +28,9 @@ its views.
   (`Components/ConformanceComponent/ConformanceStart.cs`), written as the plan writes a literal; the class gains a
   member when a page first needs the component to start with it, and what its payload's held object holds is
   `Components/ConformanceComponent/HeldStart.cs`, what its record holds `Components/ConformanceComponent/RecordStart.cs`. Its `Version` is the build of the component a
-  world names, `ComponentVersion` of the world contract, one of the versions `spec/Reference/native.json` lists, and its three endpoint members name the settle, count
-  and item endpoints of `World/WorldArea.cs`, which the component's methods await: each reaches the settle gate
-  and answers a 500 where a seed says so. A page's layout is `Shared/_Layout.cshtml`, which
+  world names, `ComponentVersion` of the world contract, one of the versions `spec/Reference/native.json` lists, and its endpoint members name the endpoints of
+  `World/WorldArea.cs` its methods await, each at the settle gate and answering as a seed says: a 500, a count or the
+  check's answer. A page's layout is `Shared/_Layout.cshtml`, which
   links the framework's script, unless the page renders something of its own beside its body, as the ward's does.
 - `Bench/` holds the component bench, a folder for each family of cells of `spec/Reference/native.json`
   (`Bench/Properties/` the first; `Bench/Poc15/` holds a controller for each member the event.poc15 cells reach; a

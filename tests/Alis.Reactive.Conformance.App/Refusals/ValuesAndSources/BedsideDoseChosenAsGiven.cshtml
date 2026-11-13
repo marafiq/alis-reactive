@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedsideDoseCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bedside dose";
+    var plan = Html.ReactivePlan<BedsideDoseCheck>();
+}
+<h1>Bedside dose of @Model.Resident</h1>
+@using (var dose = Html.BeginRequestContainer(plan, "bedside-dose"))
+{
+    @(Html.InputField(plan, m => m.SeenAtTheBedside, options => options.Label("Seen at the bedside")).NativeCheckBox())
+    @(Html.InputField(plan, m => m.Status, options => options.Label("Status")).NativeDropDown(build => build.Items(Model.Statuses)))
+    <button type="button" @Html.Raises(plan, BedsideDoses.CheckTheDose)>Check the dose</button>
+    Html.On(plan, trigger => trigger.CustomEvent(BedsideDoses.CheckTheDose, pipeline => pipeline.Get(Model.Chart)
+        .OnSuccess<BedsideChartSearch>((found, pipeline) => pipeline.Element("dose-badge").Text.Set(
+            dose.Container.Read(m => m.SeenAtTheBedside).Choose(BedsideDoseStatus.Given, found.Body.Read(search => search.Chart!.Status))))));
+}
+<p>Dose: <span id="dose-badge">-</span></p>
+@Html.RenderPlan(plan)

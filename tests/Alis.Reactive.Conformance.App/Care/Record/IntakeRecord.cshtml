@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model IntakeRecord
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Intake record";
+    var plan = Html.ReactivePlan<IntakeRecord>();
+}
+<h1>Intake of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Fluid intake" }))
+@using (var intake = Html.BeginRequestContainer(plan, "intake"))
+{
+    @(Html.InputField(plan, m => m.Intake, options => options.Label("Intake")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, IntakeRecords.RecordTheIntake)>Record</button>
+    Html.On(plan, trigger => trigger.CustomEvent(IntakeRecords.RecordTheIntake, pipeline =>
+        pipeline.Component<ConformanceComponent>("care-panel").NullableCount.Set(intake.Container.Read(m => m.Intake).OrNull())));
+}
+@Html.RenderPlan(plan)

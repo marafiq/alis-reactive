@@ -58,4 +58,6 @@ public sealed class ConformanceStart
     public string HeldCountEndpoint { get; init; } = WorldEndpoints.HeldCount;
 
     public string RecordEndpoint { get; init; } = WorldEndpoints.Record;
+
+    public string CheckEndpoint { get; init; } = WorldEndpoints.Check;
 }

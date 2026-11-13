@@ -64,6 +64,8 @@ public sealed class Seed
 
     public int? RecordCount { get; set; }
 
+    public bool? CheckAnswer { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed TheWord(string word) => new() { Word = word };
@@ -123,6 +125,8 @@ public sealed class Seed
     public static Seed TheComponentsBetaConstructor(string constructor) => new() { ComponentBetaConstructor = constructor };
 
     public static Seed TheRecordEndpointsCount(int count) => new() { RecordCount = count };
+
+    public static Seed TheCheckEndpointsAnswer(bool answer) => new() { CheckAnswer = answer };
 
     public Seed AndResident(string name)
     {

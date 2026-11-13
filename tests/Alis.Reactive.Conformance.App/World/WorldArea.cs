@@ -67,6 +67,8 @@ internal static class WorldArea
             .AddEndpointFilter(AtTheSettleGate);
         app.MapPost(WorldEndpoints.Record, (CurrentWorld world) => Results.Json(new Record { Count = world.Data.RecordCount, Code = "C-750" }))
             .AddEndpointFilter(AtTheSettleGate);
+        app.MapPost(WorldEndpoints.Check, (CurrentWorld world) => Results.Json(world.Data.CheckAnswer))
+            .AddEndpointFilter(AtTheSettleGate);
     }
 
     private static IResult TheWorldsWord(CurrentWorld world) => Results.Content(Page("The word", $"<p>{Text(world.Data.Word)}</p>"), Html);

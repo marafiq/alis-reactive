@@ -1,0 +1,42 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PainEscalation
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Pain escalation";
+    var plan = Html.ReactivePlan<PainEscalation>();
+}
+<h1>Pain escalation for @Model.Resident</h1>
+<section aria-label="Nurse">
+    <h2>Nurse</h2>
+    @(plan.ConformanceComponent("nurse", new ConformanceStart { Text = "Nurse on the floor" }))
+    <button type="button" @Html.Raises(plan, PainEscalations.NurseFree)>Free</button>
+    <button type="button" @Html.Raises(plan, PainEscalations.NurseBusy)>Busy</button>
+</section>
+<section aria-label="Doctor">
+    <h2>Doctor</h2>
+    @(plan.ConformanceComponent("doctor", new ConformanceStart { Text = "Doctor on call" }))
+</section>
+@using (var meter = Html.BeginRequestContainer(plan, "pain-meter"))
+{
+    @(Html.InputField(plan, m => m.Pain, options => options.Label("Pain")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, PainEscalations.Assess)>Assess</button>
+    Html.On(plan, trigger => trigger.CustomEvent(PainEscalations.Assess, pipeline =>
+        pipeline.When(meter.Container.Read(m => m.Pain).Gte(8))
+            .Then(pipeline => pipeline.Element("escalation").Text.Set("Ambulance"))
+            .ElseIf(pipeline.Component<ConformanceComponent>("nurse").Total().Gt(0))
+            .Then(pipeline => pipeline.Element("escalation").Text.Set("Nurse"))
+            .ElseIf(pipeline.Component<ConformanceComponent>("doctor").SettleCheck())
+            .Then(pipeline => pipeline.Element("escalation").Text.Set("Doctor"))
+            .Else(pipeline => pipeline.Element("escalation").Text.Set("Wait"))));
+}
+<p>Plan: <span id="escalation"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(PainEscalations.NurseFree, pipeline => pipeline.Component<ConformanceComponent>("nurse").Count.Set(1)));
+    Html.On(plan, trigger => trigger.CustomEvent(PainEscalations.NurseBusy, pipeline => pipeline.Component<ConformanceComponent>("nurse").Count.Set(0)));
+}
+@Html.RenderPlan(plan)

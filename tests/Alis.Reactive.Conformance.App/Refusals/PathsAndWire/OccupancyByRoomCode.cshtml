@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomOccupancy
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Occupancy";
+    var plan = Html.ReactivePlan<RoomOccupancy>();
+}
+<h1>Occupancy of @Model.Key.Ward @Model.Key.Room</h1>
+@using (var room = Html.BeginRequestContainer(plan, "occupancy"))
+{
+    @(Html.InputField(plan, m => m.Occupied, options => options.Label("Occupied")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, Occupancies.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(Occupancies.Save, pipeline => pipeline
+        .Post<OccupiedBeds>(Occupancies.SavedBeds, request => request.Set(r => r.Beds["E4"], room.Container.Read(m => m.Occupied)))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("beds-saved").Text.Set(saved.Body))));
+}
+<p>Saved: <span id="beds-saved"></span></p>
+@Html.RenderPlan(plan)

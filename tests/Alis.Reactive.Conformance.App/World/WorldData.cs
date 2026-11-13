@@ -35,6 +35,7 @@ internal sealed class WorldData
     private volatile string? _componentStartsPlace;
     private volatile string? _componentBetaConstructor;
     private volatile int _recordCount = 125;
+    private volatile bool _checkAnswer = true;
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -90,6 +91,8 @@ internal sealed class WorldData
 
     internal int RecordCount => _recordCount;
 
+    internal bool CheckAnswer => _checkAnswer;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
@@ -119,6 +122,7 @@ internal sealed class WorldData
         if (seed.ComponentStartsPlace is { } startsPlace) _componentStartsPlace = startsPlace;
         if (seed.ComponentBetaConstructor is { } betaConstructor) _componentBetaConstructor = betaConstructor;
         if (seed.RecordCount is { } recordCount) _recordCount = recordCount;
+        if (seed.CheckAnswer is { } checkAnswer) _checkAnswer = checkAnswer;
     }
 
     internal void Arm(GateOrder order) => _gates[(order.Gate, order.At)] = new WorldGate();

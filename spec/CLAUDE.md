@@ -1347,6 +1347,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   order and the tlc check reads the first invariant violated (the lead's slip, 2026-11-13). X8.4's and X7.7's pages
   test ReadIsWhatTheEndpointBinds and X13.2's OneValueOnEveryHost; the read's two stops, an unsent member and a slot's
   input joining and leaving have no promise yet, and their pages are U3's next piece. The owner can overrule it.
+- The lead, 2026-11-13, landing the eight pages that read a typed value through its container (N13.1), a fork's work
+  read at the source, and settling what it read into. X8.14's promise names the check endpoint the doctor's
+  SettleCheck() awaits and the answer the harness seeds it, so the world holds it at the settle gate, answering yes
+  where no seed does, and native.json's Settle behavior names it beside the record endpoint SettleRecord() awaits.
+  X7.7's second promise read a cleared target after a check that had shown Within target, an outcome a handler that
+  stopped would also leave, so its cleared case opens a fresh record, whose badge starts empty, and its opposite, a
+  target of 400, reads Over target there. X7.11's second promise names no test for its `Choose`, so the page's is a
+  check box, Seen at the bedside, read by the container's `Read`. X8.13's page writes which button's branch ran, so
+  the calls are read after the handler returned. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

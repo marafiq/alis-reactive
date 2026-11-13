@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PainRelief
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Pain relief";
+    var plan = Html.ReactivePlan<PainRelief>();
+}
+<h1>Pain relief for @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Doctor on call" }))
+@using (var relief = Html.BeginRequestContainer(plan, "pain-relief"))
+{
+    @(Html.InputField(plan, m => m.Pain, options => options.Label("Pain")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, PainReliefs.GiveParacetamol)>Give paracetamol</button>
+    <button type="button" @Html.Raises(plan, PainReliefs.CallTheDoctor)>Call the doctor</button>
+    Html.On(plan, trigger => trigger.CustomEvent(PainReliefs.GiveParacetamol, pipeline =>
+        pipeline.When(relief.Container.Read(m => m.Pain).Lt(4).And(pipeline.Component<ConformanceComponent>("care-panel").Check()))
+            .Then(pipeline => pipeline.Element("relief-given").Text.Set("Paracetamol given"))));
+    Html.On(plan, trigger => trigger.CustomEvent(PainReliefs.CallTheDoctor, pipeline =>
+        pipeline.When(relief.Container.Read(m => m.Pain).Gte(4).Or(pipeline.Component<ConformanceComponent>("care-panel").Check()))
+            .Then(pipeline => pipeline.Element("relief-given").Text.Set("Doctor called"))));
+}
+<p>Relief: <span id="relief-given"></span></p>
+@Html.RenderPlan(plan)

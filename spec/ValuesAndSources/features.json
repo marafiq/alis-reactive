@@ -230,9 +230,9 @@
         {
           "for": "X7.7",
           "page": "A fluid balance page whose Check button runs When(intake.OrNull() > target) to show Over target, else Within target, with a target of 1000 ml that can be cleared.",
-          "gesture": "Type 1200 and click Check, then type 500 and click Check, then clear the target and click Check.",
-          "outcome": "The badge shows Over target, then Within target, then Within target.",
-          "opposite": "With the target set back to 400 and an intake of 500, Check shows Over target.",
+          "gesture": "Type 1200 and click Check, then type 500 and click Check.",
+          "outcome": "The badge shows Over target, then Within target.",
+          "opposite": "On a fresh record, with an intake of 500 and the target cleared, Check shows Within target, since the cleared target reads its start, null, and no order holds against it; with the target then set to 400, Check shows Over target.",
           "defect": "JavaScript's 500 > null holds, so the cleared target shows Over target."
         },
         {

@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model FluidTargetCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Fluid target";
+    var plan = Html.ReactivePlan<FluidTargetCheck>();
+}
+<h1>Fluid target of @Model.Resident</h1>
+@using (var fluids = Html.BeginRequestContainer(plan, "fluid-target"))
+{
+    @(Html.InputField(plan, m => m.Intake, options => options.Label("Intake")).NativeTextBox())
+    @(Html.InputField(plan, m => m.Target, options => options.Label("Target")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, FluidTargetChecks.Check)>Check</button>
+    Html.On(plan, trigger => trigger.CustomEvent(FluidTargetChecks.Check, pipeline =>
+        pipeline.When(fluids.Container.Read(m => m.Intake).OrNull().Gt(fluids.Container.Read(m => m.Target)))
+            .Then(pipeline => pipeline.Element("target-badge").Text.Set("Over target"))
+            .Else(pipeline => pipeline.Element("target-badge").Text.Set("Within target"))));
+}
+<p>Intake: <span id="target-badge"></span></p>
+@Html.RenderPlan(plan)
