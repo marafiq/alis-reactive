@@ -2,7 +2,9 @@
 Alis.Reactive.ArrayLambdas.DataLists
 Alis.Reactive.Conditions.Choices
 Alis.Reactive.Conditions.Comparisons
+Alis.Reactive.Conditions.MembershipTests
 Alis.Reactive.Conditions.TextTests
+Alis.Reactive.Conditions.ValueTests
 Alis.Reactive.Declarations.Callback<TArgs, TResult>
 Alis.Reactive.Declarations.Callback<TArgs, TResult>.Set(System.Func<TArgs!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! answer) -> void
 Alis.Reactive.Declarations.Data<T>
@@ -650,6 +652,14 @@ static Alis.Reactive.Conditions.Comparisons.Not(this Alis.Reactive.ValuesAndSour
 static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.Comparisons.NotEq<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! left, TValue right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.Comparisons.Or(this Alis.Reactive.ValuesAndSources.TypedSource<bool>! left, Alis.Reactive.ValuesAndSources.TypedSource<bool>! right) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.Between<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! low, Alis.Reactive.ValuesAndSources.TypedSource<TValue>! high) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.Between<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, TValue low, TValue high) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.Between<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! low, Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! high) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.Between<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source, TValue low, TValue high) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.In<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IReadOnlyList<TValue>!>! values) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.In<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, params TValue[]! values) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.NotIn<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IReadOnlyList<TValue>!>! values) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.MembershipTests.NotIn<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source, params TValue[]! values) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.TextTests.Contains(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.TextTests.Contains(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.TextTests.EndsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
@@ -659,6 +669,14 @@ static Alis.Reactive.Conditions.TextTests.MinLength(this Alis.Reactive.ValuesAnd
 static Alis.Reactive.Conditions.TextTests.MinLength(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, int length) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.TextTests.StartsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, Alis.Reactive.ValuesAndSources.ITypedSource<string?>! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Conditions.TextTests.StartsWith(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text, string! value) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.IsEmpty(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.IsEmpty<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IReadOnlyList<TItem>?>! list) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.IsNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.IsNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.NotEmpty(this Alis.Reactive.ValuesAndSources.ITypedSource<string?>! text) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.NotEmpty<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IReadOnlyList<TItem>?>! list) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.NotNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
+static Alis.Reactive.Conditions.ValueTests.NotNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue?>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.Declarations.EventListening.CallbackProperties.get -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.Declarations.EventListening.EventTarget.get -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.Declarations.EventListening.Methods(string! subscribe, string! unsubscribe) -> Alis.Reactive.Declarations.EventListening!

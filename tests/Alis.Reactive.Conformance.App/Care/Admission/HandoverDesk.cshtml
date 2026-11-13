@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HandoverDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The handover desk";
+    var plan = Html.ReactivePlan<HandoverDesk>();
+    var nightRoundStarts = new DateTimeOffset(2026, 11, 9, 18, 0, 0, TimeSpan.Zero);
+}
+<h1>The handover of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, HandoverDesks.LoadTheFirst)>Load the first handover</button>
+<button type="button" @Html.Raises(plan, HandoverDesks.LoadTheSecond)>Load the second handover</button>
+<p>Seen at the night round's start: <span id="moment"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(HandoverDesks.LoadTheFirst, pipeline => pipeline
+            .Get(HandoverDeskEndpoints.First)
+            .OnSuccess(Content.Json<HandoverSeen>(), (handover, pipeline) => pipeline.When(handover.Body.Read(seen => seen.Seen).Eq(nightRoundStarts))
+                .Then(pipeline => pipeline.Element("moment").Text.Set("the same moment"))
+                .Else(pipeline => pipeline.Element("moment").Text.Set("another moment"))))
+        .CustomEvent(HandoverDesks.LoadTheSecond, pipeline => pipeline
+            .Get(HandoverDeskEndpoints.Second)
+            .OnSuccess(Content.Json<HandoverSeen>(), (handover, pipeline) => pipeline.When(handover.Body.Read(seen => seen.Seen).Eq(nightRoundStarts))
+                .Then(pipeline => pipeline.Element("moment").Text.Set("the same moment"))
+                .Else(pipeline => pipeline.Element("moment").Text.Set("another moment")))));
+}
+@Html.RenderPlan(plan)

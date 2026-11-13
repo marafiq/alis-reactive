@@ -17,4 +17,6 @@ public sealed class RaiseStart
     public int Count { get; init; }
 
     public bool EmptyRecord { get; init; }
+
+    public RecordStart? Record { get; init; }
 }

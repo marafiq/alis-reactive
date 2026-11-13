@@ -1,0 +1,70 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model OpenDayBooking
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Book the open day";
+    var plan = Html.ReactivePlan<OpenDayBooking>();
+    var openDay = new DateTime(2026, 10, 27);
+    var lastOpenDay = new DateTime(2026, 10, 29);
+}
+<h1>The open day for @Model.Resident</h1>
+@(plan.ConformanceComponent("care-picker", new ConformanceStart { Text = "Care level" }))
+<button type="button" @Html.Raises(plan, OpenDayBookings.Check)>Check</button>
+<dl>
+    <dt>A day</dt>
+    <dd id="picked"></dd>
+    <dt>To book</dt>
+    <dd id="to-book"></dd>
+    <dt>The open day</dt>
+    <dd id="same"></dd>
+    <dt>Another day</dt>
+    <dd id="other"></dd>
+    <dt>Before the open day</dt>
+    <dd id="before"></dd>
+    <dt>By the open day</dt>
+    <dd id="by"></dd>
+    <dt>After the open day</dt>
+    <dd id="after"></dd>
+    <dt>From the open day on</dt>
+    <dd id="from"></dd>
+    <dt>The open week</dt>
+    <dd id="week"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(OpenDayBookings.Check, pipeline =>
+    {
+        var day = pipeline.Component<ConformanceComponent>("care-picker").NullableDay;
+        pipeline.When(day.IsNull())
+            .Then(pipeline => pipeline.Element("picked").Text.Set("pick a day"))
+            .Else(pipeline => pipeline.Element("picked").Text.Set("a day picked"));
+        pipeline.When(day.NotNull())
+            .Then(pipeline => pipeline.Element("to-book").Text.Set("a day to book"))
+            .Else(pipeline => pipeline.Element("to-book").Text.Set("nothing to book"));
+        pipeline.When(day.Eq(openDay))
+            .Then(pipeline => pipeline.Element("same").Text.Set("the open day"))
+            .Else(pipeline => pipeline.Element("same").Text.Set("not the open day"));
+        pipeline.When(day.NotEq(openDay))
+            .Then(pipeline => pipeline.Element("other").Text.Set("another day"))
+            .Else(pipeline => pipeline.Element("other").Text.Set("the open day itself"));
+        pipeline.When(day.Lt(openDay))
+            .Then(pipeline => pipeline.Element("before").Text.Set("before the open day"))
+            .Else(pipeline => pipeline.Element("before").Text.Set("not before the open day"));
+        pipeline.When(day.Lte(openDay))
+            .Then(pipeline => pipeline.Element("by").Text.Set("by the open day"))
+            .Else(pipeline => pipeline.Element("by").Text.Set("not by the open day"));
+        pipeline.When(day.Gt(openDay))
+            .Then(pipeline => pipeline.Element("after").Text.Set("after the open day"))
+            .Else(pipeline => pipeline.Element("after").Text.Set("not after the open day"));
+        pipeline.When(day.Gte(openDay))
+            .Then(pipeline => pipeline.Element("from").Text.Set("from the open day on"))
+            .Else(pipeline => pipeline.Element("from").Text.Set("not from the open day on"));
+        pipeline.When(day.Between(openDay, lastOpenDay))
+            .Then(pipeline => pipeline.Element("week").Text.Set("in the open week"))
+            .Else(pipeline => pipeline.Element("week").Text.Set("outside the open week"));
+    }));
+}
+@Html.RenderPlan(plan)

@@ -966,34 +966,34 @@ refusal page reads is a response body of the page's own endpoint. Of the refusal
 six wait: X6.12 and X8.22's first promise need another host (enums as numbers for an opposite case; numbers
 as text), X6.36 a request culture, X7.11, twice, a typed read of a select's value (N13.1), and X1.4 a number
 box. Ten more are placed under hosts the harness does not hold yet. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
-refusal's is, and a hundred and thirty-seven care pages stand, each test red: thirty-nine of the record screen's
-(eight of module 9's, seven of module 2's, four of module 17's, three each of modules 1, 3, 5 and 24, two each of
-modules 7 and 12 and one each of modules 6, 8, 15 and 19), thirty-six of the residents screen's (twenty-three of
-module 4's, eight of module 6's, two of module 2's and one each of modules 3, 17 and 24), thirty-four of the admission
-screen's (thirteen of module 8's, six of module 7's, four each of modules 6 and 24, two each of modules 3 and 15 and
-one each of modules 9, 17 and 18), sixteen of the round screen's (four of module 6's, three each of modules 3 and 8,
-two each of modules 1 and 2 and one each of modules 4 and 16), ten of the shell screen's (eight of module 25's and one
-each of modules 14 and 17) and two of the admission-clinical screen's (two of module 21's). Thirty-eight feature tests
-stand on the bench, fifteen of module 12's, fourteen of module 11's, four each of modules 13 and 17 and one of module
-14's, their pages in a folder a module (`Bench/Vendors/`, `Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`,
-`Bench/Schema/`), with a render helper for each of the four other conformance declarations. The net10 host writes enum
-names in camel case, as app.json defines it. Of the care families attempted, seventy-three promises placed under net10
-alone wait: twenty-five need a call of the app's startup that throws until its unit (request defaults, antiforgery,
-flags enums, a registered validator, the busy indicator); eighteen need a door the core does not declare (the
-endpoint's error answer, N16.1; a condition on a part a request sends, N10.4; an append to an element's text; an
-element's Show, Hide and Hidden, M5.N1; a handler's policy, N11.1; a typed event raised from markup with no payload; a
-text joined from a source and a literal; an element's children and attributes, M5.N3 and M5.N4; a list operation's
-result set into a property declared a List; the block's live check, D16.15; a validator's Flags<TEnum>(), N16.4, with
-a rule set a request names, D16.2's form); six need a number a person types, read as a source (N13.1); five need a
-request culture; four need the value or membership tests (M3.N1); three need a console error's words, which no line
-states; six need a browser zone or the view's time zone; two need the harness's clock verb; one needs the harness's
-restart verb; one needs another host for its opposite case; one needs the text box's Type, whose form N18.4 sends to
-gate 2; and one needs a record whose code holds null, which native.json's type of it does not hold. Two more attempted
-promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test typed where
-the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the harness;
-X11.20 waits on the defaultHooks host. Of the bench's feature tests attempted, ten wait: six need an append to the
-callbacks object's log line, which neither native.json nor a core door gives; three need the harness's restart or gc
-verb; and one needs a list written as an element's rows, which no door writes.
+refusal's is, and a hundred and forty care pages stand, each test red: forty of the record screen's (eight of module
+9's, seven of module 2's, four each of modules 3 and 17, three each of modules 1, 5 and 24, two each of modules 7 and
+12 and one each of modules 6, 8, 15 and 19), thirty-six of the residents screen's (twenty-three of module 4's, eight
+of module 6's, two of module 2's and one each of modules 3, 17 and 24), thirty-six of the admission screen's (thirteen
+of module 8's, six of module 7's, four each of modules 3, 6 and 24, two of module 15's and one each of modules 9, 17
+and 18), sixteen of the round screen's (four of module 6's, three each of modules 3 and 8, two each of modules 1 and 2
+and one each of modules 4 and 16), ten of the shell screen's (eight of module 25's and one each of modules 14 and 17)
+and two of the admission-clinical screen's (two of module 21's). Thirty-eight feature tests stand on the bench,
+fifteen of module 12's, fourteen of module 11's, four each of modules 13 and 17 and one of module 14's, their pages in
+a folder a module (`Bench/Vendors/`, `Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`, `Bench/Schema/`),
+with a render helper for each of the four other conformance declarations. The net10 host writes enum names in camel
+case, as app.json defines it. Of the care families attempted, seventy promises placed under net10 alone wait:
+twenty-five need a call of the app's startup that throws until its unit (request defaults, antiforgery, flags enums, a
+registered validator, the busy indicator); nineteen need a door the core does not declare (the endpoint's error
+answer, N16.1; a condition on a part a request sends, N10.4; an append to an element's text; an element's Show, Hide
+and Hidden, M5.N1; a handler's policy, N11.1; a typed event raised from markup with no payload; a text joined from a
+source and a literal; an element's children and attributes, M5.N3 and M5.N4; a list operation's result set into a
+property declared a List; the block's live check, D16.15; a validator's Flags<TEnum>(), N16.4, with a rule set a
+request names, D16.2's form); six need a number a person types, read as a source (N13.1); five need a request culture;
+three need a console error's words, which no line states; six need a browser zone or the view's time zone; two need
+the harness's clock verb; one needs the harness's restart verb; one needs another host for its opposite case; one
+needs the text box's Type, whose form N18.4 sends to gate 2; and one needs a record whose code holds null, which
+native.json's type of it does not hold. Two more attempted promises are placed beyond net10 alone: M24.X10 waits on
+TEST009, which refuses an expected value the test typed where the promise's outcome is the value the server renders
+back, a rule the owner decides, and on net48 in the harness; X11.20 waits on the defaultHooks host. Of the bench's
+feature tests attempted, ten wait: six need an append to the callbacks object's log line, which neither native.json
+nor a core door gives; three need the harness's restart or gc verb; and one needs a list written as an element's rows,
+which no door writes.
 Of the bench's ninety-eight placed cells, ninety-five stand, each test red: nine of its properties, nine of its
 methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen of its sources, its three
 absences, its sixteen requests and three of its lanes, a slot loaded on start, a slot's listener gone at its unload
@@ -1009,8 +1009,8 @@ harness's push verb) and a slot whose host destroys its component (the harness's
 source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so a source at its pattern is refused
 by the type (D7.5, X7.4). The eight component slices of module 24 are declared in `Alis.Reactive.Native` (M24.N1
 to M24.N9), `NativeTextBox` the first, each render helper a signature until U23, on the core's `IInputComponent`, `ComponentInput` and the
-field's options (M7.N3, M7.N2), which enter the core's table as `InputsAndIds`; the text tests are declared
-(M3.N1, N7.3). The reference Fusion slice is declared in `Alis.Reactive.Fusion` (M21.N1, M21.N2),
+field's options (M7.N3, M7.N2), which enter the core's table as `InputsAndIds`; the text, value and
+membership tests are declared (M3.N1, N7.3). The reference Fusion slice is declared in `Alis.Reactive.Fusion` (M21.N1, M21.N2),
 `FusionMultiSelect<TValue>` on the base `FusionComponent`, each render helper a signature until U25, and so are the
 twelve other slices the admission-clinical screen holds (M21.N5, M21.N10, M21.N13, M21.N15 to M21.N17, M21.N20,
 M21.N22, M21.N31, M21.N36, M21.N42 and M21.N45), each until U26, and so are the twenty the record-contacts and

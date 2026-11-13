@@ -4,7 +4,7 @@ namespace Alis.Reactive.Conformance.App.Components;
 
 public sealed class Record
 {
-    public string Name { get; set; } = "";
+    public string Name { get; set; } = null!;
 
     public string Code { get; set; } = "C0";
 

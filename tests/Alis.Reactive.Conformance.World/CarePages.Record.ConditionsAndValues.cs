@@ -10,6 +10,7 @@ public static partial class CarePages
     public const string VitalSigns = Record + "vital-signs";
     public const string FallNote = Record + "fall-note";
     public const string AlarmNote = Record + "alarm-note";
+    public const string RecordNameGate = Record + "record-name-gate";
     public const string PumpLogWithNoAlarm = Record + "pump-log/no-alarm";
     public const string PumpLogWithAnAlarm = Record + "pump-log/an-alarm";
     public const string WeightCheckOfAnUnweighedResident = Record + "weight-check/unweighed";

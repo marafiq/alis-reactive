@@ -1343,7 +1343,7 @@
           "csharp": "Ratio"
         }
       ],
-      "what": "the app's C# class Record, whose Code starts at C0, the value a record whose data lacks code reads (D4.2)"
+      "what": "the app's C# class Record, whose Name starts at null and whose Code at C0, the values a record whose data lacks name or code reads (D4.2)"
     },
     {
       "name": "Detail",

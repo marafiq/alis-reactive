@@ -16,7 +16,10 @@ its views.
 - `Components/` holds the conformance library (`spec/Reference/native.json`), a folder for each component with its
   declaration, its payloads, its live objects and the data classes its members name; what several components
   reach sits in `Components/` itself. A declaration mirrors its component member for member, each by its C# name and
-  its door as that file states them; none is edited by hand to differ from it.
+  its door as that file states them; none is edited by hand to differ from it. A data class's member starts at what
+  that file's type and every promise that reads the member lacking state, and a reference member the file holds
+  non-null that starts at null is written null-forgiving, as `Components/ConformanceComponent/Binding.cs` writes its
+  sealed spot; the nullable compiler chooses no start (the lead's slip, 2026-11-13).
 - A component's render helper sits beside its declaration and starts it from a class of its own
   (`Components/ConformanceComponent/ConformanceStart.cs`), written as the plan writes a literal; the class gains a
   member when a page first needs the component to start with it, and what its payload's held object holds is

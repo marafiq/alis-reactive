@@ -1217,6 +1217,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   built, and the multi-select's render helper is the next. EJ2 33.1.47's box, read in Chromium by the lead's probe,
   names itself "multiselect" and links no label, so the test finds it as the combobox inside the group the page gives
   the field. The owner can overrule each.
+- The lead, 2026-11-13, declaring M3.N1's value and membership tests as signatures, with the pages that first call them.
+  `IsNull` and `NotNull` take a source of a nullable struct, so a test of an `int`, never null, is refused by the type
+  (CS0452), and a source of any reference type, its non-nullable form as well, since the browser's data holds null where
+  a declaration holds text: M3.X1 tests a record's Name, a `string`, that holds null. `IsEmpty` and `NotEmpty` take a
+  text or a list; `In` and `NotIn` take the values or the source of a list, and `Between` two literals or two sources of
+  a struct that orders, its nullable form as well, as N8.2's comparisons take theirs. The record's Name starts at null,
+  as M3.X1 states, and the care panel's raise hands a record, none, or one with no member. M1.X10 is not written: its
+  third button raises a typed event from markup with no payload, a door nobody declares. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
