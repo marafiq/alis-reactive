@@ -74,7 +74,9 @@ its views.
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.
 - `World/WorldData.cs` keeps a world's gates by action and endpoint: an endpoint's filter reaches its gate with
-  its own address, and takes the hold that names it before one that names none.
+  its own address, and takes the hold that names it before one that names none. An MVC action a test holds at the
+  answer gate carries the filter `World/AtTheAnswerGateAttribute.cs`, which reaches the gate with the action's own
+  address (`World/WordDeskController.cs`); another gate gets its filter with the first page whose test holds it.
 - `World/WorldCache.cs` is the app's distributed cache in Development, each key under its world, and
   `World/CachedRounds.cs` is the fragment a seed puts there, as a release of the framework rendered it.
 - The app holds no static a request can change, since every world shares a static: none that can be assigned, and

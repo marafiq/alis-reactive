@@ -10648,6 +10648,30 @@
           "on": "the words page's second answer"
         }
       ]
+    },
+    {
+      "fixture": "WhenAnActionWaitsAtTheGate",
+      "test": "the_actions_held_answer_reads_the_word_seeded_while_it_was_held",
+      "unit": "U3",
+      "page": "The world's word desk, a page of the app's World area with no framework part on it: a link that opens, in the page's frame, an action of an MVC controller of the app, whose filter reaches the answer gate with the action's own address and which answers with the word the world's seed holds as text the server writes.",
+      "gesture": "Seed the word North, arm the gate on the action's answer, naming its endpoint, click Ask the desk, wait until the harness reports the gate held, seed the word South, then release the gate the wait returned held.",
+      "outcome": "The frame shows South: the action's filter parked the request before the action ran, so the answer was computed at the release, from the word the world held then.",
+      "opposite": "With no gate armed, seeding North and clicking Ask the desk shows North in the frame.",
+      "defect": "The action's filter does not reach the answer gate, or reaches it with another address than the action's, so the action reads North before the test seeds South and the frame shows North, or the harness never reports the gate held and the wait fails.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the word desk's answer"
+        }
+      ]
     }
   ]
 }

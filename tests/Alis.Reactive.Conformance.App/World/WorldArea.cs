@@ -9,7 +9,7 @@ namespace Alis.Reactive.Conformance.App.World;
 
 internal static class WorldArea
 {
-    private const string Html = "text/html; charset=utf-8";
+    internal const string Html = "text/html; charset=utf-8";
     private const string DocumentHeader = "Sec-Fetch-Dest";
 
     internal static void AddWorld(this IServiceCollection services)
@@ -108,8 +108,8 @@ internal static class WorldArea
             $"<a href=\"{WorldEndpoints.WordAnswer}\" target=\"answer\">Read the word</a><iframe id=\"answer\" name=\"answer\" title=\"The word's answer\"></iframe>"
             + $"<a href=\"{WorldEndpoints.WordAnswerAgain}\" target=\"again\">Read it again</a><iframe id=\"again\" name=\"again\" title=\"The word's answer again\"></iframe>");
 
-    private static string Page(string title, string body)
+    internal static string Page(string title, string body)
         => $"<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>{Text(title)}</title></head><body>{body}</body></html>";
 
-    private static string Text(string written) => HtmlEncoder.Default.Encode(written);
+    internal static string Text(string written) => HtmlEncoder.Default.Encode(written);
 }

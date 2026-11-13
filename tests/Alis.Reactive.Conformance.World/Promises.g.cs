@@ -1071,5 +1071,7 @@ public static class Promises
         public const string WhenAPersonOpensTheApp_the_first_page_opens_in_a_world_of_its_own = "harness WhenAPersonOpensTheApp.the_first_page_opens_in_a_world_of_its_own";
         [Holds(CompositionGate.Answer)]
         public const string WhenAGateIsHeldAtTwoEndpoints_each_endpoints_answer_waits_for_its_own_release = "harness WhenAGateIsHeldAtTwoEndpoints.each_endpoints_answer_waits_for_its_own_release";
+        [Holds(CompositionGate.Answer)]
+        public const string WhenAnActionWaitsAtTheGate_the_actions_held_answer_reads_the_word_seeded_while_it_was_held = "harness WhenAnActionWaitsAtTheGate.the_actions_held_answer_reads_the_word_seeded_while_it_was_held";
     }
 }
