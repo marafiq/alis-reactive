@@ -53,7 +53,7 @@ internal sealed class ConformanceHost
                 Environment = { ["ASPNETCORE_ENVIRONMENT"] = "Development", ["TZ"] = "America/New_York" },
             },
         };
-        foreach (var argument in new[] { AppAssembly(folder), "--urls", "http://127.0.0.1:0", "--test-host", Environment.ProcessId.ToString(CultureInfo.InvariantCulture) })
+        foreach (var argument in new[] { AppAssembly(folder), "--urls", "http://127.0.0.1:0", "--host", host, "--test-host", Environment.ProcessId.ToString(CultureInfo.InvariantCulture) })
             server.StartInfo.ArgumentList.Add(argument);
 
         server.OutputDataReceived += (_, line) => Heard(line.Data, said, listening, host);

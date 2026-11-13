@@ -31,4 +31,4 @@ case "${1:-}" in
 esac
 
 node build.mjs
-ASPNETCORE_ENVIRONMENT=Development exec dotnet run --project tests/Alis.Reactive.Conformance.App -- --urls http://localhost:5220
+ASPNETCORE_ENVIRONMENT=Development exec dotnet run --project tests/Alis.Reactive.Conformance.App -- --urls http://localhost:5220 --host net10

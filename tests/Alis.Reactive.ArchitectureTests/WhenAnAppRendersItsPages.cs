@@ -58,7 +58,7 @@ public class WhenAnAppRendersItsPages
     {
         await using var app = new WebApplicationFactory<Program>();
 
-        var swept = await Sweep(app.WithWebHostBuilder(host => host.ConfigureTestServices(Watch)).Server);
+        var swept = await Sweep(app.WithWebHostBuilder(host => host.UseSetting("host", HostNames.Net10).ConfigureTestServices(Watch)).Server);
 
         Assert.That(swept.Opened, Is.Not.Empty, "The conformance app maps no address a GET opens, so the sweep read nothing");
         Assert.That(

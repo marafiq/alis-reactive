@@ -1274,6 +1274,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   with no full stop; the page of its rendering twin gives the button the text Smart Paste. A template's rendering twin
   is a second view, as the bed-board screen's are. M21.X203's three wait on the grid's validation door, as M21.X205's
   do. The owner can overrule each.
+- The lead, 2026-11-13, writing the harness's net10 hosts whose definition in `spec/Reference/app.json` is the app's
+  JSON options alone: numbersAsText, dateConverter, snakeCase, pascalCase and enumsAsNumbers. The conformance app
+  takes the host it runs under as its argument `--host`, with no default, and sets that host's options in one place,
+  `tests/Alis.Reactive.Conformance.App/AppHost.cs`, so the options the 2026-11-12 line has the app's Program set for
+  net10 are set there now; each variant keeps net10's other options and changes the one its definition names. An app
+  started under no host or one it does not serve stops at start with the hosts it serves, since a test run under a
+  host the app ignores would prove net10's wire. The jsonContract host waits on its Admission class and fusionShell on
+  its layout. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

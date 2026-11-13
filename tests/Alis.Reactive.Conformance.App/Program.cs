@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Alis.Reactive.Conformance.App.World;
 
 namespace Alis.Reactive.Conformance.App;
@@ -9,6 +7,7 @@ namespace Alis.Reactive.Conformance.App;
 public sealed class Program
 {
     private const string TestHost = "test-host";
+    private const string Host = "host";
 
     private Program()
     {
@@ -17,7 +16,8 @@ public sealed class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddControllersWithViews().AddJsonOptions(json => json.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
+        var host = builder.Configuration[Host] ?? throw new InvalidOperationException("The conformance app starts under a host spec/Reference/app.json defines: --host <name>.");
+        builder.Services.AddControllersWithViews().AddJsonOptions(json => AppHost.SetJsonOptions(host, json.JsonSerializerOptions));
         builder.Services.AddDistributedMemoryCache();
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();
 
