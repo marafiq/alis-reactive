@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardAllergies
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward allergies";
+    var plan = Html.ReactivePlan<WardAllergies>();
+}
+<h1>Ward allergies</h1>
+<fieldset>
+    <legend>Allergies</legend>
+    @(Html.InputField(plan, m => m.AllergyCodes, options => options.Label("Allergies"))
+        .FusionMultiSelect(build => build.Fields((Allergy a) => a.DisplayLabel, a => a.AllergyCode)))
+</fieldset>
+<button type="button" @Html.Raises(plan, WardAllergyLists.Load)>Load allergies</button>
+<p>The ward's list: <output id="ward-list">Not loaded</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardAllergyLists.Load, pipeline => pipeline
+        .Get(WardAllergiesEndpoints.Allergies)
+        .OnSuccess(Content.Json<IReadOnlyList<Allergy>>(), (allergies, pipeline) =>
+        {
+            pipeline.Input(m => m.AllergyCodes).Component<FusionMultiSelect<int[]?>>().DataSource<Allergy>().Set(allergies.Body);
+            pipeline.Element("ward-list").Text.Set("Loaded");
+        })));
+}
+@Html.RenderPlan(plan)

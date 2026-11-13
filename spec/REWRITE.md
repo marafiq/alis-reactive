@@ -966,16 +966,16 @@ refusal page reads is a response body of the page's own endpoint. Of the refusal
 six wait: X6.12 and X8.22's first promise need another host (enums as numbers for an opposite case; numbers
 as text), X6.36 a request culture, X7.11, twice, a typed read of a select's value (N13.1), and X1.4 a number
 box. Ten more are placed under hosts the harness does not hold yet. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
-refusal's is, and a hundred and thirty-six care pages stand, each test red: thirty-nine of the record screen's (eight
-of module 9's, seven of module 2's, four of module 17's, three each of modules 1, 3, 5 and 24, two each of modules 7
-and 12 and one each of modules 6, 8, 15 and 19), thirty-six of the residents screen's (twenty-three of module 4's,
-eight of module 6's, two of module 2's and one each of modules 3, 17 and 24), thirty-four of the admission screen's
-(thirteen of module 8's, six of module 7's, four each of modules 6 and 24, two each of modules 3 and 15 and one each
-of modules 9, 17 and 18), sixteen of the round screen's (four of module 6's, three each of modules 3 and 8, two each
-of modules 1 and 2 and one each of modules 4 and 16), ten of the shell screen's (eight of module 25's and one each of
-modules 14 and 17) and one of the admission-clinical screen's (one of module 21's). Thirty-eight feature tests stand
-on the bench, fifteen of module 12's, fourteen of module 11's, four each of modules 13 and 17 and one of module 14's,
-their pages in a folder a module (`Bench/Vendors/`, `Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`,
+refusal's is, and a hundred and thirty-seven care pages stand, each test red: thirty-nine of the record screen's
+(eight of module 9's, seven of module 2's, four of module 17's, three each of modules 1, 3, 5 and 24, two each of
+modules 7 and 12 and one each of modules 6, 8, 15 and 19), thirty-six of the residents screen's (twenty-three of
+module 4's, eight of module 6's, two of module 2's and one each of modules 3, 17 and 24), thirty-four of the admission
+screen's (thirteen of module 8's, six of module 7's, four each of modules 6 and 24, two each of modules 3 and 15 and
+one each of modules 9, 17 and 18), sixteen of the round screen's (four of module 6's, three each of modules 3 and 8,
+two each of modules 1 and 2 and one each of modules 4 and 16), ten of the shell screen's (eight of module 25's and one
+each of modules 14 and 17) and two of the admission-clinical screen's (two of module 21's). Thirty-eight feature tests
+stand on the bench, fifteen of module 12's, fourteen of module 11's, four each of modules 13 and 17 and one of module
+14's, their pages in a folder a module (`Bench/Vendors/`, `Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`,
 `Bench/Schema/`), with a render helper for each of the four other conformance declarations. The net10 host writes enum
 names in camel case, as app.json defines it. Of the care families attempted, seventy-three promises placed under net10
 alone wait: twenty-five need a call of the app's startup that throws until its unit (request defaults, antiforgery,

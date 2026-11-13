@@ -74,6 +74,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   multi-select names its box "multiselect" and links no label to it, so the test finds the box as the combobox
   inside the group its page gives the field, the box's list as the listbox's options, and the chosen item's text
   inside that group, whole and kept to the visible element, since EJ2 keeps a hidden chip beside the text it shows.
+  A list the page loads is read after the page's own line that the same success pipeline sets after the items,
+  since EJ2 33.1.47 drew no item set while a multi-select's list stood open, in three seconds of the lead's probe
+  (`FusionComponents/FusionMultiSelect/WhenAMultiSelectsItemsAreLoadedFromAnEndpoint.cs`).
 - A run opens one browser for every fixture of the assembly and closes it, with every host, at its end:
   `Harness/Run.cs` applies a test action of NUnit's to the assembly, since a setup fixture covers its own namespace
   alone and a module's tests sit in the module's.
