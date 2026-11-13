@@ -1083,6 +1083,22 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   null-forgiving operator: FluentValidation 12.1.1 warns CS8620 on the promise's sentence over a nullable member
   and runs no child rule on a null one (a scratch probe), so the form is FluentValidation's own. "No message shows"
   reads as no summary item once the answer line shows. The owner can overrule each.
+- The lead, 2026-11-12, landing twelve Fusion slices of the admission-clinical screen as signatures, two forks'
+  work, and settling what they read into. The multi-column combo box's helper is written with every type argument,
+  `FusionMultiColumnComboBox<TModel, TMember, TValue>`, since C# takes all of a method's type arguments or none and
+  its line writes TValue alone. An event whose payload EJ2 types as an object of no shape (a drop-down's focus and
+  blur) is the core's `Event`, with no payload declared. A payload member EJ2 marks optional whose line gives no
+  nullable type is optional and not nullable (the check box's checked, the radio button's value). A slice keeps
+  its line's members and no more: the combo box declares no items property, and the multi-column combo box's value
+  and text are text that admits null, as M21.X511 states. A render helper that takes the view's HTML helper is
+  split by host (the radio button's, the stepper's, the smart paste button's); the uploader's take the file members
+  `MultipartBody.File` takes on each host (M21.X710), and the date range picker's take a list of dates that admits
+  null alone, since two overloads cannot differ by an annotation. The uploader's files-changed event and its
+  payload are the framework's (M21.D701) and mirror no EJ2 type. A gap, raised for the core: the uploader's input
+  is its files, the browser files EJ2's public list of files holds (M21.D701), and `ComponentInput.Of` takes a
+  declared `ReadOnly`, while no door reads one from the members of a returned list, so the uploader's `Files`
+  throws until module 7's unit designs that door. A promise's "FusionRadioButtons" is the plural of the radio
+  button, no door. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
