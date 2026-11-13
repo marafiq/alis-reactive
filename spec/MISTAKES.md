@@ -42,6 +42,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A landing's carrier left out of its commit | 1 | A step a script shows: a commit message writer stops when the commit stages a PublicAPI text and leaves spec/REWRITE.md unstaged, since section 4 names what is declared. |
 | The owner's words answered with a remedy they did not name | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12 on pace, which quotes the correction. |
 | An ordering met without its TLA+ spec named | 1 | A step a commit shows: a commit whose piece meets an ordering names the invariants it rests on in a line of its message, and an ordering no spec holds is written as a spec before its door; root CLAUDE.md's TLA+ line states it. It reached the owner, so it starts on this rung. |
+| A name landed that departs from its siblings' name for one concept | 1 | A step a script shows: at each landing, a script of the session reads every render helper's builder callback and every options callback and stops on a name other than `build` and `options`; a landing quotes its line. |
 
 ## Waiting for the owner
 
@@ -397,3 +398,9 @@ them, each marked as the lead's slip, and are not copied here.
   ordering none of the fourteen specs held. Caught by the owner, who asked where the TLA+ work shows. Cost: no
   door was declared on the missing spec; ConfirmAsks.tla is written first. Held by a step a commit shows: a
   commit whose piece meets an ordering names its invariants, and an ordering no spec holds is a spec first.
+- 2026-11-13, a name landed that departs from its siblings' name for one concept, the class's first entry. Wave
+  10 landed the smart text area's helper with its options callback named `configure`, where every other options
+  callback is `options`, and module 22's fork named `Div`'s content builder `configure`, where every render
+  helper's builder is `build`. Caught when the lead read the fork's report of the names it took. Cost: two names
+  renamed before either was built on, in the template landing. Held by a step a script shows: a reader of the
+  callbacks' names, run at each landing, its line in the commit.

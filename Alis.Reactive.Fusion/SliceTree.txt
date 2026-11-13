@@ -1,2 +1,2 @@
-FusionComponents
+FusionComponents FusionTemplates
 FusionComponents/*

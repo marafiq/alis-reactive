@@ -1149,6 +1149,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `Run.tla`'s and `Lanes.tla`'s, which M25.F4 names; N17.5's `AbortSignal()` hands that signal. Both confirms'
   features name the six invariants. An abort while an ask waits and an unmount with asks left have no promise
   yet; their promises are written with module 25's pages. The owner can overrule it.
+- The lead, 2026-11-13, landing module 22's three template types as signatures from a fork's work read at the
+  source. The forms the fork took from the redesign stand: `Render` takes the view's plan as its own type
+  parameter and returns the text a slice's template option takes (M22.D3); `EventButton` takes the core's
+  `AppEvent<TPayload>` with no constraint, as the core declares none; `Badge` keeps the optional class
+  "e-badge"; the three-argument `Img` is the template builder's alone; `Create<TModel>()` names the item as the
+  builder does. Two names are the lead's: `Div` takes its content builder as `build`, the name every render
+  helper gives its builder, and the smart text area's helper takes its options as `options`, the name of every
+  other options callback, where wave 10 had landed `configure` for both. `When`'s branches stay `then` and
+  `else`, M22.N2's. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
