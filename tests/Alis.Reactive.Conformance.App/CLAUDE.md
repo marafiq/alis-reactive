@@ -43,8 +43,13 @@ its views.
   `Bench/Declarations/`, `Bench/Plugins/` and `Bench/Execution/` hold the pages of the bench's other feature
   tests, a folder a module; a page whose plugins are scripts takes `Bench/Plugins/_ScriptedLayout.cshtml`, which
   links the scripts the page names before the framework's. `Bench/Schema/` holds the bench's page of module 14,
-  two plans that handle one element's events. `Care/Shell/` holds the shell screen's pages. A care page whose plugins are scripts takes its screen's own layout,
-  `Care/Record/_ScriptedLayout.cshtml`, which links the scripts the page names before the framework's: the bench's
+  two plans that handle one element's events. `Care/Shell/` holds the shell screen's pages, which take
+  `Care/Shell/_ShellLayout.cshtml`: it renders the drawer and the confirm beside the body, as an app's layout
+  renders its app-level objects. A page whose request sends no container renders the notice region,
+  `Html.NativeToast`, itself, since the core shows that request's failed check there (D16.13), and it needs no
+  pipeline door for it (the lead's reversal, 2026-11-13). A care page whose plugins are scripts takes its
+  screen's own layout, `Care/Record/_ScriptedLayout.cshtml`, which links the scripts the page names before the
+  framework's: the bench's
   sits on the same row of the table, so each keeps its own. `Bench/Validation/` holds the validation cells: their
   forms, their validators (`Bench/Validation/ValidationRules.cs`, not registered until U17 builds the startup call;
   a request names its validator by `Validate<TValidator>()`) and the form endpoints, which answer what they bound;

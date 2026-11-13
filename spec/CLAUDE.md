@@ -1180,6 +1180,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   names with that registration; M20.N1's exemption already covers the dictionary EJ2's column takes. A filter
   predicate's value, `FusionGrid.Predicate`'s, is EJ2's union of text, number, date, boolean and lists, which no type of
   the line names; it waits on its form, U26's. The owner can overrule each.
+- The lead, 2026-11-13, writing the pages module 25's slices unblock: the bench's lane.confirm cell and the care
+  pages X11.2, X16.15 and X16.16. The shell's pages take a layout of their own that renders the drawer and the
+  confirm, as an app's layout renders its app-level objects; a page whose request sends no container renders the
+  notice region itself, the summary place D16.13 gives that request, with no pipeline door. The lead had said
+  X16.15 and X16.16 wait on a notice door the core does not declare; D16.13 says otherwise, and the rule line is
+  the conformance app's CLAUDE.md. A test reads the page behind an open modal dialog by role, since Playwright
+  1.64.1's role match hides an element by its computed style and aria-hidden alone. X16.16's page routes the
+  server's 400 by `ShowValidationErrors`, as the admission screen's other pages do. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

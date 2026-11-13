@@ -9,4 +9,7 @@ public static partial class CarePages
     public const string StateMoveIn = Admission + "state-move-in";
     public const string ResidentContact = Admission + "resident-contact";
     public const string RoomSave = Admission + "room-save";
+    public const string BedAssignment = Admission + "bed-assignment";
+    public const string BedAssignmentInAWard = Admission + "bed-assignment/in-a-ward";
+    public const string WardAssignment = Admission + "ward-assignment";
 }

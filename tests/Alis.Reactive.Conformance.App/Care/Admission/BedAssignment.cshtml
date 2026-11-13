@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedAssignmentPage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<BedAssignmentPage>();
+}
+<h1>Bed assignment</h1>
+@if (Model.SendsTheWard)
+{
+    @(Html.NativeButton("assign", "Assign").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<BedPlacement>(BedAssignmentEndpoints.Assignments, request => request.Set(assignment => assignment.Bed, 4).Set(assignment => assignment.Ward, "North"))
+        .Validate<BedAssignmentRules>()
+        .OnSuccess(Content.Text, (assigned, pipeline) => pipeline.Element("assigned").Text.Set(assigned.Body))))
+}
+else
+{
+    @(Html.NativeButton("assign", "Assign").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<BedPlacement>(BedAssignmentEndpoints.Assignments, request => request.Set(assignment => assignment.Bed, 4))
+        .Validate<BedAssignmentRules>()
+        .OnSuccess(Content.Text, (assigned, pipeline) => pipeline.Element("assigned").Text.Set(assigned.Body))))
+}
+<p>Assigned: <span id="assigned"></span></p>
+@Html.NativeToast(TimeSpan.FromSeconds(5), "Dismiss")
+@Html.RenderPlan(plan)

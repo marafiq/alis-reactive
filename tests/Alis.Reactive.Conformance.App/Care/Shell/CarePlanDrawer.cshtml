@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarePlanEditor
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Care plan";
+    var plan = Html.ReactivePlan<CarePlanEditor>();
+}
+<h1>@Model.Resident's care plan</h1>
+<button type="button" @Html.Raises(plan, CarePlanDrawerButtons.EditCarePlan)>Edit care plan</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CarePlanDrawerButtons.EditCarePlan, pipeline =>
+    {
+        pipeline.Element(NativeDrawer.TitleId).Text.Set("Care plan");
+        pipeline.Component<NativeDrawer>().Open();
+        pipeline.Get(CarePlanDrawerEndpoints.Form).Into(NativeDrawer.ContentId);
+    }));
+    plan.Component<NativeDrawer>().Reactive(drawer => drawer.BeforeClose, (closing, pipeline) =>
+        pipeline.When(closing.ClosedBy.Eq(DrawerClosedBy.CloseButton)).Then(pipeline =>
+        {
+            closing.Cancel.Set(true);
+            pipeline.When(pipeline.Component<NativeConfirm>().Ask("Discard the unsaved care plan?"))
+                .Then(pipeline => pipeline.Component<NativeDrawer>().Close());
+        }));
+}
+@Html.RenderPlan(plan)

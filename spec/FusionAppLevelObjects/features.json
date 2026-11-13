@@ -596,6 +596,8 @@
       "checker": [
         "core:Q11",
         "core:Q17",
+        "Run.tla:NothingRunsAfterAnAbort",
+        "Lanes.tla:ReplacedRunRunsNothingAfter",
         "ConfirmAsks.tla:OneQuestionAtATime",
         "ConfirmAsks.tla:QuestionsInAskedOrder",
         "ConfirmAsks.tla:NothingWaitsForAnEndedRun",

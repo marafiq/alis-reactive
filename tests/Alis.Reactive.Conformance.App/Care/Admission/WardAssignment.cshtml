@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardAssignmentPage
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<WardAssignmentPage>();
+}
+<h1>Ward assignment</h1>
+<fieldset>
+    <legend>Ward</legend>
+    @(Html.InputField(plan, m => m.Ward, options => options.Label("Ward")).NativeTextBox())
+</fieldset>
+@(Html.NativeButton("assign", "Assign").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Post<WardAssignment>(WardAssignmentEndpoints.Assignments, request => request.Input(assignment => assignment.Ward, pipeline.Input(m => m.Ward)))
+    .Validate<WardAssignmentRules>()
+    .OnSuccess(Content.Text, (assigned, pipeline) => pipeline.Element("assigned").Text.Set(assigned.Body))
+    .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))
+<p>Assigned: <span id="assigned"></span></p>
+@Html.NativeToast(TimeSpan.FromSeconds(5), "Dismiss")
+@Html.RenderPlan(plan)

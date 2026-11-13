@@ -13,6 +13,9 @@ public sealed class LaneCellsController : Controller
     [HttpGet(BenchPages.LaneSlotUnloadListener)]
     public IActionResult LaneSlotUnloadListener() => View("/Bench/Lanes/LaneSlotUnloadListener.cshtml", TheWorldsBoard());
 
+    [HttpGet(BenchPages.LaneConfirm)]
+    public IActionResult LaneConfirm() => View("/Bench/Lanes/LaneConfirm.cshtml", TheWorldsBoard());
+
     [HttpGet(BenchEndpoints.ListeningCard)]
     public IActionResult ListeningCard() => PartialView("/Bench/Lanes/LaneListeningCard.cshtml", new LaneCard("The card listens to the page's component."));
 
@@ -26,4 +29,6 @@ public sealed record LaneCard(string Note);
 public static class LaneCells
 {
     public static readonly AppEvent CloseCard = AppEvent.Declare();
+
+    public static readonly AppEvent Move = AppEvent.Declare();
 }
