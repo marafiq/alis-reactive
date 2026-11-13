@@ -1385,16 +1385,16 @@
         "F1_synonym_groups": 25,
         "F2": "pass",
         "F2_cells": 240,
-        "F2_compiling": 117,
+        "F2_compiling": 128,
         "F2_failing": 0,
         "F2_forms": 33,
         "F2_forms_as_named": 33,
-        "F2_gap_doors": 9,
-        "F2_gaps": 119,
+        "F2_gap_doors": 8,
+        "F2_gaps": 108,
         "F2_position_gaps": 4,
         "F2_positions": 15,
         "F2_refused": 4,
-        "F2_source_gaps": 5,
+        "F2_source_gaps": 4,
         "F2_sources": 16,
         "F3": "pass",
         "F3_differ": 22,
@@ -1417,7 +1417,7 @@
         "F5_stale_rows": 0,
         "F5_untyped": 0,
         "lambda_parameters": 463,
-        "members": 542
+        "members": 543
       },
       "detail": "one concept per name, every Q7 cell compiles, is refused as named or waits on a door the spec marks new, one shape per name, callbacks named as the locked table names them, every string parameter of a closed kind",
       "pass": true
@@ -3816,7 +3816,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "af8ab5a1f32a9b81cced527277f5d405cd058109",
+  "read_at_head": "c90774c97136b42b63191a8534f9adefe68ecab4",
   "step": {
     "failing": [],
     "name": "End of session",
