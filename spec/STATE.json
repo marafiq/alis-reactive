@@ -24,12 +24,12 @@
     },
     "bindings": {
       "counts": {
-        "constants": 575,
+        "constants": 576,
         "gates": 73,
         "marks": 60,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 575 constants, 60 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 576 constants, 60 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -3794,11 +3794,11 @@
     },
     "unit_proofs": {
       "counts": {
-        "harness_tests": 5,
+        "harness_tests": 6,
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 51m 2h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 14m 1a, U10 5b 16m 10a, U11 16b 22m 23a, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 27b 12m 1a, U16 13m 4a, U17 21m 9a, U18 76b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 45b 14m 1a, U22 7b 4m, U23 124b, U24 29b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 51m 3h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 14m 1a, U10 5b 16m 10a, U11 16b 22m 23a, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 27b 12m 1a, U16 13m 4a, U17 21m 9a, U18 76b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 45b 14m 1a, U22 7b 4m, U23 124b, U24 29b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -3816,7 +3816,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "a5dd06b448601d487e9d364ac80dbaa94c56c027",
+  "read_at_head": "553d078f3ff0c5f1b005905b34f18a8aa4a3781c",
   "step": {
     "failing": [],
     "name": "End of session",
