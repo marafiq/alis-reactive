@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PanelHandoverCard
+@{
+    var plan = Html.ReactivePlan<PanelHandoverCard>();
+}
+<p>@Model.Note</p>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Listen(
+        pipeline.Component<ConformanceComponent>("care-panel"),
+        panel => panel.Handed,
+        (peer, pipeline) => pipeline.Listen(
+            peer,
+            handed => handed.Change,
+            (change, pipeline) => pipeline.Element("changed-count").Text.Set(pipeline.Plugin<CareTally>().AddOne())))));
+}
+@Html.RenderPlan(plan)

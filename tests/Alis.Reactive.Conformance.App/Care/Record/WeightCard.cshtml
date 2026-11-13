@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WeightCard
+@{
+    var plan = Html.ReactivePlan<WeightCard>();
+}
+@using (var card = Html.BeginRequestForm(plan, "weight-card"))
+{
+    @(Html.InputField(plan, m => m.Value, options => options.Label("Kilograms")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, WeightCards.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(WeightCards.Save, pipeline => pipeline
+        .Post<WeightCard>(ChartCardEndpoints.Weights, request => request.Form(card.Form))
+        .OnSuccess(Content.Text, (charted, pipeline) => pipeline.Element("weight-charted").Text.Set(charted.Body))));
+}
+<p>Charted: <span id="weight-charted"></span></p>
+@Html.RenderPlan(plan)

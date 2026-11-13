@@ -1,0 +1,14 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@model ElementPartialsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<ElementPartialsBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceElement("element", new ElementStart { Room = Model.Room }))
+@await Html.PartialAsync("/Bench/Schema/ElementKeypad.cshtml", new KeypadPart("Key pressed"))
+@await Html.PartialAsync("/Bench/Schema/ElementOpenedSignal.cshtml", new SignalPart("Room opened"))
+@Html.RenderPlan(plan)

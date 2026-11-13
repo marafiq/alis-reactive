@@ -1,0 +1,14 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NoticeboardNotice
+@{
+    var plan = Html.ReactivePlan<NoticeboardNotice>();
+}
+<h2>Notice</h2>
+<p>@Model.Text</p>
+<button type="button" @Html.Raises(plan, NoticeboardButtons.MarkTheNoticeRead)>Mark the notice read</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NoticeboardButtons.MarkTheNoticeRead, pipeline => pipeline.Element("notice-read").Text.Set("read")));
+}
+@Html.RenderPlan(plan)

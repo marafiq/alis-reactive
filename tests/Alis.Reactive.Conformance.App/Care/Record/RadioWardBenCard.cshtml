@@ -1,0 +1,14 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RadioWardBenCard
+@{
+    var plan = Html.ReactivePlan<RadioWardBenCard>();
+}
+<h2>@Model.Name</h2>
+<button type="button" @Html.Raises(plan, RadioWardButtons.CountForBen)>Count</button>
+<p>Tally: <span id="ben-tally">0</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RadioWardButtons.CountForBen, pipeline => pipeline.Element("ben-tally").Text.Set(pipeline.Plugin<CardTally>().AddOne())));
+}
+@Html.RenderPlan(plan)

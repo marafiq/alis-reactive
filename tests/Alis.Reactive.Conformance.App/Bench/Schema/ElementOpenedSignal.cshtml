@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SignalPart
+@{
+    var plan = Html.ReactivePlan<SignalPart>();
+}
+<dl>
+    <dt>@Model.Caption</dt>
+    <dd id="opened-room"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Listen(
+        pipeline.Component<ConformanceElement>("element"),
+        element => element.Opened,
+        (signal, pipeline) => pipeline.Element("opened-room").Text.Set(signal.Detail.Read(detail => detail!.Room)))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftCardSheet
+@{
+    var plan = Html.ReactivePlan<ShiftCardSheet>();
+    plan.Plugin<CardRadio>().Reactive(radio => radio.Call, pipeline => pipeline.Element("card-call").Text.Set("Called"));
+}
+<h2>@Model.Title</h2>
+<p id="card-note">Not saved</p>
+<p>Radio: <span id="card-call">Quiet</span></p>
+<button type="button" @Html.Raises(plan, ShiftCardButtons.SaveTheCard)>Save</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ShiftCardButtons.SaveTheCard, pipeline => pipeline
+        .Post(ShiftCardEndpoints.Save)
+        .OnSuccess(pipeline => pipeline.Unload("shift-card-slot"))
+        .Finally(pipeline =>
+        {
+            pipeline.Element("card-note").Text.Set("Saved");
+            pipeline.Element("status").Text.Set(pipeline.Plugin<CardTally>().AddOne());
+        })));
+}
+@Html.RenderPlan(plan)

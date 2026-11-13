@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HallNotices
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Hall notices";
+    var plan = Html.ReactivePlan<HallNotices>();
+}
+<h1>@Model.Hall</h1>
+<button type="button" @Html.Raises(plan, HallBells.RingTheBell)>Ring the bell</button>
+<button type="button" @Html.Raises(plan, HallNoticesButtons.OpenTheBoard)>Open the board</button>
+<button type="button" @Html.Raises(plan, HallNoticesButtons.CloseTheBoard)>Close the board</button>
+<dl>
+    <dt>Rings the hall heard</dt>
+    <dd id="page-heard"></dd>
+    <dt>Rings the board heard</dt>
+    <dd id="board-heard"></dd>
+    <dt>Rings the note heard</dt>
+    <dd id="note-heard"></dd>
+</dl>
+<section id="board-slot" aria-label="Board"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(HallBells.RingTheBell, pipeline => pipeline.Dispatch(HallBells.Rang, pipeline.Object<HallRing>(ring => ring.Set(rung => rung.Count, pipeline.Plugin<HallBell>().Ring()))))
+        .CustomEvent(HallBells.Rang, (ring, pipeline) => pipeline.Element("page-heard").Text.Set(ring.Read(rung => rung.Count)))
+        .CustomEvent(HallNoticesButtons.OpenTheBoard, pipeline => pipeline.Get(HallNoticesEndpoints.Board).Into("board-slot"))
+        .CustomEvent(HallNoticesButtons.CloseTheBoard, pipeline => pipeline.Unload("board-slot")));
+}
+@Html.RenderPlan(plan)

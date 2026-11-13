@@ -36,6 +36,8 @@ internal static class WorldArea
         {
             world.Data.Take(seed);
             if (seed.CachedRoundsPlanVersion is { } version) await cache.SetStringAsync(CachedRounds.Key, CachedRounds.AsRenderedAtPlanVersion(version));
+            if (seed.CachedVitalsPlanVersion is { } vitalsVersion) await cache.SetStringAsync(CachedVitals.Key, CachedVitals.AsRenderedAtPlanVersion(vitalsVersion));
+            if (seed.CachedVitalsCutOff is true) await cache.SetStringAsync(CachedVitals.Key, CachedVitals.CutOffInsideAnObject());
         });
         app.MapPost(WorldEndpoints.End, (CurrentWorld world, Worlds worlds) => new WorldEnd { GatesStillParked = worlds.End(world.Key) });
         app.MapPost(WorldEndpoints.ArmGate, (GateOrder order, CurrentWorld world) => world.Data.Arm(order));

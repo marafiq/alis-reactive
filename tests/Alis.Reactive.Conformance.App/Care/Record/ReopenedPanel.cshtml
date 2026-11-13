@@ -1,0 +1,13 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ReopenedPanel
+@{
+    var plan = Html.ReactivePlan<ReopenedPanel>();
+}
+<h2>@Model.Heading</h2>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = Model.Alarm })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.Element("raised-heard").Text.Set("raised")))
+<p>Raise heard: <span id="raised-heard"></span></p>
+@Html.RenderPlan(plan)

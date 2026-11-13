@@ -42,10 +42,14 @@ its views.
   each of those declarations has its render helper beside it (`Components/ConformanceStore/ConformanceStoreHtml.cs`).
   `Bench/Declarations/`, `Bench/Plugins/` and `Bench/Execution/` hold the pages of the bench's other feature
   tests, a folder a module; a page whose plugins are scripts takes `Bench/Plugins/_ScriptedLayout.cshtml`, which
-  links the scripts the page names before the framework's. `Bench/Validation/` holds the validation cells: their
+  links the scripts the page names before the framework's. `Bench/Schema/` holds the bench's page of module 14,
+  two plans that handle one element's events. `Care/Shell/` holds the shell screen's pages. A care page whose plugins are scripts takes its screen's own layout,
+  `Care/Record/_ScriptedLayout.cshtml`, which links the scripts the page names before the framework's: the bench's
+  sits on the same row of the table, so each keeps its own. `Bench/Validation/` holds the validation cells: their
   forms, their validators (`Bench/Validation/ValidationRules.cs`, not registered until U17 builds the startup call;
   a request names its validator by `Validate<TValidator>()`) and the form endpoints, which answer what they bound;
-  a page groups each field it checks in a fieldset whose legend names it, the scope a test reads its message in.
+  a page groups each field it checks in a fieldset or a region that names it, the scope a test reads its message
+  in.
 - `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has
   its link there, and so does the page that renders beside it. A module's refusal pages sit in a folder named for
   it (`Refusals/ArrayLambdas/` holds ten): a controller for each screen with its models, the refused page and the

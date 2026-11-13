@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PinBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Pin board";
+    var plan = Html.ReactivePlan<PinBoard>();
+}
+<h1>@Model.Hall</h1>
+<button type="button" @Html.Raises(plan, PinBoardButtons.OpenTheBoard)>Open the board</button>
+<button type="button" @Html.Raises(plan, PinBoardButtons.PinANote)>Pin a note to the board</button>
+<button type="button" @Html.Raises(plan, PinBoardButtons.CloseTheBoard)>Close the board</button>
+<button type="button" @Html.Raises(plan, HallBells.RingTheBell)>Ring the bell</button>
+<dl>
+    <dt>Pins tried</dt>
+    <dd id="pin-tried"></dd>
+    <dt>Pins made</dt>
+    <dd id="pin-after"></dd>
+    <dt>Pins ended</dt>
+    <dd id="pin-ended"></dd>
+    <dt>Rings the hall heard</dt>
+    <dd id="page-heard"></dd>
+</dl>
+<section id="board-slot" aria-label="Board"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(HallBells.RingTheBell, pipeline => pipeline.Dispatch(HallBells.Rang, pipeline.Object<HallRing>(ring => ring.Set(rung => rung.Count, pipeline.Plugin<HallBell>().Ring()))))
+        .CustomEvent(HallBells.Rang, (ring, pipeline) => pipeline.Element("page-heard").Text.Set(ring.Read(rung => rung.Count)))
+        .CustomEvent(PinBoardButtons.OpenTheBoard, pipeline => pipeline.Get(PinBoardEndpoints.Board).Into("board-slot"))
+        .CustomEvent(PinBoardButtons.CloseTheBoard, pipeline => pipeline.Unload("board-slot"))
+        .CustomEvent(PinBoardButtons.PinANote, pipeline =>
+        {
+            pipeline.Element("pin-tried").Text.Set(pipeline.Plugin<CardTally>().AddOne());
+            pipeline.Get(PinBoardEndpoints.Note).Into("note-slot").Finally(pipeline => pipeline.Element("pin-ended").Text.Set(pipeline.Plugin<CardTally>().Count));
+            pipeline.Element("pin-after").Text.Set(pipeline.Plugin<CardTally>().Count);
+        }));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PanelReopening
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care panel";
+    var plan = Html.ReactivePlan<PanelReopening>();
+}
+<h1>Care panel of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, PanelReopeningEvents.OpenThePanel)>Open the panel</button>
+<button type="button" @Html.Raises(plan, PanelReopeningEvents.CloseThePanel)>Close the panel</button>
+<section id="panel-slot" aria-label="Panel"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(PanelReopeningEvents.OpenThePanel, pipeline => pipeline.Get(PanelReopeningEndpoints.Panel).Into("panel-slot"))
+        .CustomEvent(PanelReopeningEvents.CloseThePanel, pipeline => pipeline.Unload("panel-slot")));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentNameCard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident card";
+    var plan = Html.ReactivePlan<ResidentNameCard>();
+}
+<h1>Resident card</h1>
+<dl>
+    <dt>Name</dt>
+    <dd id="resident-name"></dd>
+    <dt>Room</dt>
+    <dd id="resident-room"></dd>
+</dl>
+<button type="button" @Html.Raises(plan, ResidentNameCards.ShowName)>Show name</button>
+<button type="button" @Html.Raises(plan, ResidentNameCards.ShowRoom)>Show room</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentNameCards.ShowName, pipeline => pipeline.Element("resident-name").Text.Set(Model.Name)));
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentNameCards.ShowRoom, pipeline => pipeline.Element("resident-room").Text.Set(Model.Room)));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model VisitWeek
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit week";
+    var plan = Html.ReactivePlan<VisitWeek>();
+}
+<h1>Visit week</h1>
+<form method="post" action="@CarePages.VisitWeek">
+    @(Html.InputField(plan, m => m.VisitDays, options => options.Label("Visit days")).NativeCheckList(list => list.Option("Mon").Option("Tue").Option("Wed")))
+    <button type="submit">Save</button>
+</form>
+@Html.RenderPlan(plan)

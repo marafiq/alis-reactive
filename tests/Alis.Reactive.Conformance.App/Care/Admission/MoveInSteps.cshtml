@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MoveInSteps
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Move in";
+    var plan = Html.ReactivePlan<MoveInSteps>();
+}
+<h1>Move in to @Model.Home</h1>
+<button type="button" @Html.Raises(plan, MoveInStepsButtons.RingTheBell)>Ring the bell</button>
+<dl>
+    <dt>Rings the home heard</dt>
+    <dd id="page-heard"></dd>
+    <dt>Rings the resident step heard</dt>
+    <dd id="resident-step-heard"></dd>
+</dl>
+<section id="move-in-step" aria-label="Step">
+    @await Html.PartialAsync("/Care/Admission/MoveInResidentStep.cshtml", Model.ResidentStep)
+</section>
+<button type="button" @Html.Raises(plan, MoveInStepsButtons.Next)>Next</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(MoveInStepsButtons.RingTheBell, pipeline => pipeline.Dispatch(MoveInStepsButtons.BellRang, pipeline.Object<MoveInRing>(ring => ring.Set(rung => rung.Count, pipeline.Plugin<MoveInBell>().Ring()))))
+        .CustomEvent(MoveInStepsButtons.BellRang, (ring, pipeline) => pipeline.Element("page-heard").Text.Set(ring.Read(rung => rung.Count)))
+        .CustomEvent(MoveInStepsButtons.Next, pipeline => pipeline.Get(MoveInStepsEndpoints.RoomStep).Into("move-in-step")));
+}
+@Html.RenderPlan(plan)

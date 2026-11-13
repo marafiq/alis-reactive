@@ -50,7 +50,7 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   typed builder of the world contract where the promise changes what the component holds.
 - A check's failure shows twice, beside its input and in its form's summary (D16.13, MVC's own pattern), so a test
   reads each in its own scope. The message beside an input is read inside the group its page gives the field, a
-  fieldset found by its role and its legend's name, matched whole, by `GetByText` with the whole message; one
+  fieldset or a region found by its role and its name, matched whole, by `GetByText` with the whole message; one
   absent beside another input is that group's `ToBeHiddenAsync`, beside the group that shows it. The summary is
   read as the page's list items where it is the page's one list, else inside the region the page gives its form,
   their texts whole (`ToHaveTextAsync` with the array of messages), and an

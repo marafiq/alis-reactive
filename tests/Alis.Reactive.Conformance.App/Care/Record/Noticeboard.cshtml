@@ -1,0 +1,38 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Noticeboard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Noticeboard";
+    var plan = Html.ReactivePlan<Noticeboard>();
+}
+<h1>Noticeboard of the @Model.Hall</h1>
+<button type="button" @Html.Raises(plan, NoticeboardButtons.PinTheNotice)>Pin the notice</button>
+<button type="button" @Html.Raises(plan, NoticeboardButtons.PinTheTornNotice)>Pin the torn notice</button>
+<dl>
+    <dt>Pinning</dt>
+    <dd id="pinning"></dd>
+    <dt>Pinned</dt>
+    <dd id="pinned"></dd>
+    <dt>Last pin ended</dt>
+    <dd id="pin-ended"></dd>
+    <dt>Notice</dt>
+    <dd id="notice-read"></dd>
+</dl>
+<section id="notice-slot" aria-label="Notice"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(NoticeboardButtons.PinTheNotice, pipeline =>
+        {
+            pipeline.Get(NoticeboardEndpoints.Notice).Into("notice-slot");
+            pipeline.Element("pinned").Text.Set("the notice");
+        })
+        .CustomEvent(NoticeboardButtons.PinTheTornNotice, pipeline =>
+        {
+            pipeline.Element("pinning").Text.Set("the torn notice");
+            pipeline.Post(NoticeboardEndpoints.TornNotice).Into("notice-slot").Finally(pipeline => pipeline.Element("pin-ended").Text.Set("the torn notice"));
+            pipeline.Element("pinned").Text.Set("the torn notice");
+        }));
+}
+@Html.RenderPlan(plan)

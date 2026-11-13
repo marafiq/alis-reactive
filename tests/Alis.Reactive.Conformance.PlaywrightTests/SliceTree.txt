@@ -1,2 +1,2 @@
 Harness
-Schema/* ValuesAndSources/* Vendors/* PathsAndWire/* PartialsAndSlots/* TriggersAndPipelines/* ArrayLambdas/* RequestsAndResponses/* InputsAndIds/* Conditions/* Execution/* TypeKnowledge/* Elements/* NativeComponents/* Declarations/* Plugins/*
+Schema/* ValuesAndSources/* Vendors/* PathsAndWire/* PartialsAndSlots/* TriggersAndPipelines/* ArrayLambdas/* RequestsAndResponses/* InputsAndIds/* Conditions/* Execution/* TypeKnowledge/* Elements/* NativeComponents/* Declarations/* Plugins/* OwnershipAndState/* RenderingAndDelivery/*

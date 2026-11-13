@@ -1,0 +1,35 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RadioWard
+@{
+    Layout = "/Care/Record/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Ward radio";
+    var plan = Html.ReactivePlan<RadioWard>();
+}
+<h1>Radio of @Model.Ward</h1>
+<button type="button" @Html.Raises(plan, RadioWardButtons.OpenAdasCard)>Open Ada's card</button>
+<button type="button" @Html.Raises(plan, RadioWardButtons.OpenBensCard)>Open Ben's card</button>
+<button type="button" @Html.Raises(plan, RadioWardButtons.CallTheWard)>Call the ward</button>
+<dl>
+    <dt>Card heard</dt>
+    <dd id="card-heard"></dd>
+    <dt>Notes heard</dt>
+    <dd id="inner-heard"></dd>
+    <dt>Opened</dt>
+    <dd id="after"></dd>
+    <dt>Settled</dt>
+    <dd id="finally"></dd>
+</dl>
+<section id="card-slot" aria-label="Card"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RadioWardButtons.OpenAdasCard, pipeline => pipeline.Get(RadioWardEndpoints.AdasCard).Into("card-slot"))
+        .CustomEvent(RadioWardButtons.OpenBensCard, pipeline =>
+        {
+            pipeline.Get(RadioWardEndpoints.BensCard).Into("card-slot").Finally(pipeline => pipeline.Element("finally").Text.Set("Ben settled"));
+            pipeline.Element("after").Text.Set("Ben opened");
+        })
+        .CustomEvent(RadioWardButtons.CallTheWard, pipeline => pipeline.Plugin<CardRadio>().Transmit()));
+}
+@Html.RenderPlan(plan)

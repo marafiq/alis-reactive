@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FreeBedDesk
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Find a free bed";
+    var plan = Html.ReactivePlan<FreeBedDesk>();
+}
+<h1>Free beds on the @Model.Ward</h1>
+<button type="button" @Html.Raises(plan, FreeBedEvents.Find)>Find a free bed</button>
+<p id="bed-busy" hidden>Opening the bed</p>
+<p>Bed: <span id="bed-name"></span></p>
+<p>Status: <span id="bed-status">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(FreeBedEvents.Find, pipeline => pipeline
+        .Get(Model.FreeBeds)
+        .OnSuccess<FreeBedAnswer>((free, pipeline) => pipeline
+            .Get<BedOpening>(FreeBedEndpoints.Bed, request => request.Path(bed => bed.BedId, free.Body.Read(answer => answer.Bed!.Id)))
+            .WhileLoading(pipeline => pipeline.Element("bed-status").Text.Set("Opening"))
+            .Busy("bed-busy")
+            .OnSuccess<OpenedBed>((opened, pipeline) => pipeline.Element("bed-name").Text.Set(opened.Body.Read(bed => bed.Name)))
+            .Finally(pipeline => pipeline.Element("bed-status").Text.Set("Closed")))));
+}
+@Html.RenderPlan(plan)

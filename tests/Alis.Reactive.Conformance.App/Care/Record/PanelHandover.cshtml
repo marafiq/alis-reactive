@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PanelHandover
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care panel";
+    var plan = Html.ReactivePlan<PanelHandover>();
+}
+<h1>Care panel of @Model.Resident</h1>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Care panel" }))
+<button type="button" @Html.Raises(plan, PanelHandoverEvents.OpenTheCard)>Open the panel card</button>
+<button type="button" @Html.Raises(plan, PanelHandoverEvents.CloseTheCard)>Close the panel card</button>
+<section id="panel-card" aria-label="Panel card"></section>
+<p>Peer changes: <span id="changed-count"></span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(PanelHandoverEvents.OpenTheCard, pipeline => pipeline.Get(PanelHandoverEndpoints.Card).Into("panel-card"))
+        .CustomEvent(PanelHandoverEvents.CloseTheCard, pipeline => pipeline.Unload("panel-card")));
+}
+@Html.RenderPlan(plan)

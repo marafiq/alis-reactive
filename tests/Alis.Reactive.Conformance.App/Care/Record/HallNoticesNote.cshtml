@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HallNoticesNote
+@{
+    var plan = Html.ReactivePlan<HallNoticesNote>();
+}
+<p>@Model.Text</p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(HallBells.Rang, (ring, pipeline) => pipeline.Element("note-heard").Text.Set(ring.Read(rung => rung.Count))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftCard
+@{
+    Layout = "/Care/Record/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Shift card";
+    var plan = Html.ReactivePlan<ShiftCard>();
+}
+<h1>@Model.Shift</h1>
+<button type="button" @Html.Raises(plan, ShiftCardButtons.OpenTheCard)>Open the card</button>
+<p>Cards saved: <span id="status"></span></p>
+<section id="shift-card-slot" aria-label="Card"></section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ShiftCardButtons.OpenTheCard, pipeline => pipeline.Get(ShiftCardEndpoints.Card).Into("shift-card-slot")));
+}
+@Html.RenderPlan(plan)

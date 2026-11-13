@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarePanelCard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Care panel";
+    var plan = Html.ReactivePlan<CarePanelCard>();
+}
+<h1>Record of @Model.Resident</h1>
+<h2>Care panel</h2>
+@(plan.ConformanceComponent("care-panel", new ConformanceStart { Text = "Pulse" })
+    .Reactive(panel => panel.Raised, (raised, pipeline) => pipeline.Element("page-count").Text.Set(raised.Count)))
+<button type="button" @Html.Raises(plan, CarePanelCardButtons.OpenTheCard)>Open the card</button>
+<button type="button" @Html.Raises(plan, CarePanelCardButtons.CloseTheCard)>Close the card</button>
+<dl>
+    <dt>Pulse on the record</dt>
+    <dd id="page-count"></dd>
+    <dt>Pulse on the card</dt>
+    <dd id="card-count"></dd>
+</dl>
+<section id="pulse-card" aria-label="Card"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(CarePanelCardButtons.OpenTheCard, pipeline => pipeline.Get(CarePanelCardEndpoints.Card).Into("pulse-card"))
+        .CustomEvent(CarePanelCardButtons.CloseTheCard, pipeline => pipeline.Unload("pulse-card")));
+}
+@Html.RenderPlan(plan)

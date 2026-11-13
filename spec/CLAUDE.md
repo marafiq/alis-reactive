@@ -1040,13 +1040,26 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The lead, 2026-11-12, writing the six validation cells of the bench, read against D16.2, D16.13, D13.6 and G13.
   The forms of a field's message and of a form's summary are MVC's own pattern, as D16.13 writes them (a summary
   that lists the property errors, a message for each field), approved at that by G13; a test reads each in its own
-  scope, as the Playwright project's file says, and a page groups each field it checks in a fieldset of its own.
+  scope, as the Playwright project's file says, and a page groups each field it checks in a fieldset or a region of
+  its own.
   No door names a rule set (D16.2 sends the sentence to gate 2; neither spec/api nor the POC compiles one), so the
   plain rule and the rule under `When` are two validators of one form, each named by the request's
   `Validate<TValidator>()`; whether U17 lets two registered validators of one model stand beside the condensed
   default is U17's question, raised here. The validators are written and not registered, since the startup call
   throws until U17; the form endpoints answer what they bound, since N16.1's door is not declared. The owner can
   overrule each.
+- The lead, 2026-11-12, landing twenty-five more pages, three forks' work, and settling what they read into. A care
+  page's plugins are the test app's, declared on the core's doors beside the page (a bell, a tally, a radio whose
+  unsubscribe throws, each script written by U13), and a care screen whose pages name scripts keeps its own layout,
+  since the bench's sits on its row of the app's table. M9.X2's vendor helper writes an element and a script, as its
+  promise states: the content a slot loads holds a vendor's script when a vendor helper renders it, which the
+  views rule does not reach in a helper. A plan that is not JSON is served only by the page's own endpoint, written by hand with the marker
+  `Alis.Reactive/RenderingAndDelivery/ViewPlans.cs` writes, since the framework never writes one. An element a page
+  writes in a request's `Finally` shows a test that a stopped step has finished, since a stop runs each `Finally` of
+  the requests it happens inside (D10.23). A listen from a partial's or a card's plan on another plan's component is
+  written on that plan's load. X13.4 reads its summary as the page's list items, as the validation cells do. Raised
+  for the owner: TEST009 refuses an expected value the test typed, and M24.X10's outcome is the value the server
+  renders back into the box after a refused bind; the promise waits, and so does its net48 leg on the harness.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

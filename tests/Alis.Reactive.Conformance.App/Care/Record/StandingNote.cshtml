@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StandingNote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Standing note";
+    var plan = Html.ReactivePlan<StandingNote>();
+}
+<h1>@Model.Hall</h1>
+<button type="button" @Html.Raises(plan, HallBells.RingTheBell)>Ring the bell</button>
+<button type="button" @Html.Raises(plan, StandingNoteButtons.OpenTheBoard)>Open the board</button>
+<dl>
+    <dt>Rings the hall heard</dt>
+    <dd id="page-heard"></dd>
+    <dt>Rings the note heard</dt>
+    <dd id="note-heard"></dd>
+</dl>
+<section id="board-slot" aria-label="Board"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(HallBells.RingTheBell, pipeline => pipeline.Dispatch(HallBells.Rang, pipeline.Object<HallRing>(ring => ring.Set(rung => rung.Count, pipeline.Plugin<HallBell>().Ring()))))
+        .CustomEvent(HallBells.Rang, (ring, pipeline) => pipeline.Element("page-heard").Text.Set(ring.Read(rung => rung.Count)))
+        .CustomEvent(StandingNoteButtons.OpenTheBoard, pipeline => pipeline.Get(StandingNoteEndpoints.Board).Into("board-slot")));
+}
+@Html.RenderPlan(plan)

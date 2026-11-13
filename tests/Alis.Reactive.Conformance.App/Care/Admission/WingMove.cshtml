@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WingMove
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Move in";
+    var plan = Html.ReactivePlan<WingMove>();
+}
+<h1>Move in</h1>
+@(Html.InputField(plan, m => m.Wing, options => options.Label("Wing")).NativeRadioGroup(group => group.Option("Rose").Option("Lily").Option("Oak"))
+    .Reactive(group => group.Change, (changed, pipeline) => pipeline
+        .Element("wing-echo").Text.Set(pipeline.Input(m => m.Wing).Component<NativeRadioGroup>().Value)))
+<button type="button" @Html.Raises(plan, WingMoves.MoveToOak)>Move to Oak</button>
+<p>Chosen wing: <span id="wing-echo"></span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WingMoves.MoveToOak, pipeline => pipeline
+        .Input(m => m.Wing).Component<NativeRadioGroup>().Value.Set("Oak")));
+}
+@Html.RenderPlan(plan)

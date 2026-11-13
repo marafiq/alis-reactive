@@ -1,0 +1,14 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MoveInResidentStep
+@{
+    var plan = Html.ReactivePlan<MoveInResidentStep>();
+}
+<h2>Resident</h2>
+@(Html.InputField(plan, m => m.Resident, options => options.Label("Resident")).NativeTextBox())
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoveInStepsButtons.BellRang, (ring, pipeline) => pipeline.Element("resident-step-heard").Text.Set(ring.Read(rung => rung.Count))));
+}
+@Html.RenderPlan(plan)

@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarePanelCardPulse
+@{
+    var plan = Html.ReactivePlan<CarePanelCardPulse>();
+}
+<h3>@Model.Title</h3>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Listen(
+        pipeline.Component<ConformanceComponent>("care-panel"),
+        panel => panel.Raised,
+        (raised, pipeline) => pipeline.Element("card-count").Text.Set(raised.Count))));
+}
+@Html.RenderPlan(plan)

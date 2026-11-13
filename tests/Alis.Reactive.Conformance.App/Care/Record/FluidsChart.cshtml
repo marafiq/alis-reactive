@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ChartEntry<FluidsReading>
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Fluids chart";
+    var plan = Html.ReactivePlan<ChartEntry<FluidsReading>>();
+}
+<h1>Fluids chart</h1>
+@using (var chart = Html.BeginRequestForm(plan, "fluids-chart"))
+{
+    <label for="Alis_Reactive_Conformance_App_Care_ChartEntry_FluidsReading___Initials">Nurse's initials</label>
+    @(Html.InputField(plan, m => m.Initials).NativeTextBox())
+    <button type="button" @Html.Raises(plan, FluidsCharts.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(FluidsCharts.Save, pipeline => pipeline
+        .Post<ChartEntry<FluidsReading>>(FluidsChartEndpoints.Entries, request => request.Form(chart.Form))
+        .OnSuccess(Content.Text, (charted, pipeline) => pipeline.Element("charted").Text.Set(charted.Body))));
+}
+<p>Charted: <span id="charted"></span></p>
+@Html.RenderPlan(plan)

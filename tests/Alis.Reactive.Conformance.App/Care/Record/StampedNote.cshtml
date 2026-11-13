@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model StampedNote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Stamped note";
+    var plan = Html.ReactivePlan<StampedNote>();
+}
+<h1>@Model.Hall</h1>
+<button type="button" @Html.Raises(plan, StampedNoteButtons.OpenTheBoard)>Open the board</button>
+<button type="button" @Html.Raises(plan, StampedNoteButtons.PinANote)>Pin a note to the board</button>
+<p>Notes pinned: <span id="notes-pinned">0</span></p>
+<section id="board-slot" aria-label="Board"></section>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(StampedNoteButtons.OpenTheBoard, pipeline => pipeline.Get(StampedNoteEndpoints.Board).Into("board-slot"))
+        .CustomEvent(StampedNoteButtons.PinANote, pipeline =>
+        {
+            pipeline.Get(StampedNoteEndpoints.Note).Into("note-slot");
+            pipeline.Element("notes-pinned").Text.Set(pipeline.Plugin<CardTally>().AddOne());
+        }));
+}
+@Html.RenderPlan(plan)

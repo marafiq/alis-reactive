@@ -10,6 +10,10 @@ public sealed class Seed
 
     public int? CachedRoundsPlanVersion { get; set; }
 
+    public int? CachedVitalsPlanVersion { get; set; }
+
+    public bool? CachedVitalsCutOff { get; set; }
+
     public string? ComponentText { get; set; }
 
     public string? ComponentOuterText { get; set; }
@@ -65,6 +69,10 @@ public sealed class Seed
     public static Seed TheWord(string word) => new() { Word = word };
 
     public static Seed CachedRoundsOfPlanVersion(int version) => new() { CachedRoundsPlanVersion = version };
+
+    public static Seed CachedVitalsOfPlanVersion(int version) => new() { CachedVitalsPlanVersion = version };
+
+    public static Seed CachedVitalsCutOffInsideAnObject() => new() { CachedVitalsCutOff = true };
 
     public static Seed TheComponentsText(string text) => new() { ComponentText = text };
 

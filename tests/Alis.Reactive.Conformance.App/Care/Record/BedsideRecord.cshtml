@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedsideRecord
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident record";
+    var plan = Html.ReactivePlan<BedsideRecord>();
+}
+<h1>@Model.Resident</h1>
+@(Html.NativeButton("call-nurse", "Call the nurse").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+    .Element("call-status").Text.Set("Called")))
+<p>Nurse: <span id="call-status">Waiting</span></p>
+@Html.RenderPlan(plan)

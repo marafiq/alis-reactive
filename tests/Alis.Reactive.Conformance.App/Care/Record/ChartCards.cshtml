@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@model ChartCards
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Charts";
+}
+<h1>Charts for @Model.Resident</h1>
+<section aria-label="Fluids">
+    <h2>Fluids</h2>
+    @await Html.PartialAsync("/Care/Record/FluidsCard.cshtml", new FluidsCard())
+</section>
+<section aria-label="Weight">
+    <h2>Weight</h2>
+    @await Html.PartialAsync("/Care/Record/WeightCard.cshtml", new WeightCard())
+</section>

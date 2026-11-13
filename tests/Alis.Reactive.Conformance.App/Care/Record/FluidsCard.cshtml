@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FluidsCard
+@{
+    var plan = Html.ReactivePlan<FluidsCard>();
+}
+@using (var card = Html.BeginRequestForm(plan, "fluids-card"))
+{
+    @(Html.InputField(plan, m => m.Value, options => options.Label("Millilitres")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, FluidsCards.Save)>Save</button>
+    Html.On(plan, trigger => trigger.CustomEvent(FluidsCards.Save, pipeline => pipeline
+        .Post<FluidsCard>(ChartCardEndpoints.Fluids, request => request.Form(card.Form))
+        .OnSuccess(Content.Text, (charted, pipeline) => pipeline.Element("fluids-charted").Text.Set(charted.Body))));
+}
+<p>Charted: <span id="fluids-charted"></span></p>
+@Html.RenderPlan(plan)
