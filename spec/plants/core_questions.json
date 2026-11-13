@@ -108,8 +108,8 @@
   "edits": [
    {
     "file": "spec/Core/DESIGN.md",
-    "old": "**Checker.**\n- `Ownership.tla:RulesLeaveWithTheirOwner`\n- `Ownership.tla:RegistrationsDoNotAccumulate`\n- `probe:core-form-duplicate-name`\n- `probe:core-json-duplicate-name`\n- `probe:mvc5-form-duplicate-first`\n- `probe:mvc5-json-duplicate-last`\n",
-    "new": "**Checker.**\n- Ownership.tla:RulesLeaveWithTheirOwner\n- Ownership.tla:RegistrationsDoNotAccumulate\n- probe:core-form-duplicate-name\n- probe:core-json-duplicate-name\n- probe:mvc5-form-duplicate-first\n- probe:mvc5-json-duplicate-last\n"
+    "old": "**Checker.**\n- `Ownership.tla:RulesLeaveWithTheirOwner`\n- `Ownership.tla:RegistrationsDoNotAccumulate`\n- `probe:core-form-duplicate-name`\n- `probe:core-json-duplicate-name`\n- `probe:mvc5-form-duplicate-first`\n- `probe:mvc5-json-duplicate-last`\n- `ContainerRead.tla:OneValueOnEveryHost`\n- `ContainerRead.tla:ReadStopsWhenItsSendStops`\n- `ContainerRead.tla:ReadIsWhatTheEndpointBinds`\n- `ContainerRead.tla:AnUnsentMemberReadsWhatTheEndpointBinds`\n- `ContainerRead.tla:ReadSeesTheSlotThatJoinedOrLeftBeforeIt`\n- `ContainerRead.tla:ReadFindsWhatItsContainerSends`\n",
+    "new": "**Checker.**\n- Ownership.tla:RulesLeaveWithTheirOwner\n- Ownership.tla:RegistrationsDoNotAccumulate\n- probe:core-form-duplicate-name\n- probe:core-json-duplicate-name\n- probe:mvc5-form-duplicate-first\n- probe:mvc5-json-duplicate-last\n- ContainerRead.tla:OneValueOnEveryHost\n- ContainerRead.tla:ReadStopsWhenItsSendStops\n- ContainerRead.tla:ReadIsWhatTheEndpointBinds\n- ContainerRead.tla:AnUnsentMemberReadsWhatTheEndpointBinds\n- ContainerRead.tla:ReadSeesTheSlotThatJoinedOrLeftBeforeIt\n- ContainerRead.tla:ReadFindsWhatItsContainerSends\n"
    }
   ],
   "expect": "Q13: Checker names no invariant or probe"
