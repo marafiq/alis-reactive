@@ -1075,5 +1075,6 @@ public static class Promises
         public const string WhenAGateIsHeldAtTwoEndpoints_each_endpoints_answer_waits_for_its_own_release = "harness WhenAGateIsHeldAtTwoEndpoints.each_endpoints_answer_waits_for_its_own_release";
         [Holds(CompositionGate.Answer)]
         public const string WhenAnActionWaitsAtTheGate_the_actions_held_answer_reads_the_word_seeded_while_it_was_held = "harness WhenAnActionWaitsAtTheGate.the_actions_held_answer_reads_the_word_seeded_while_it_was_held";
+        public const string WhenAWorldOpensUnderAnotherHost_the_world_is_seeded_and_served_by_the_host_the_test_names = "harness WhenAWorldOpensUnderAnotherHost.the_world_is_seeded_and_served_by_the_host_the_test_names";
     }
 }

@@ -86,6 +86,8 @@ its views.
   its own address, and takes the hold that names it before one that names none. An MVC action a test holds at the
   answer gate carries the filter `World/AtTheAnswerGateAttribute.cs`, which reaches the gate with the action's own
   address (`World/WordDeskController.cs`); another gate gets its filter with the first page whose test holds it.
+  The word slip, an action of the same controller, writes the world's word with MVC's JSON options, which the host
+  sets, since the World area's minimal endpoints write with the HTTP options, which no host sets.
 - `World/WorldCache.cs` is the app's distributed cache in Development, each key under its world, and
   `World/CachedRounds.cs` is the fragment a seed puts there, as a release of the framework rendered it.
 - The app holds no static a request can change, since every world shares a static: none that can be assigned, and

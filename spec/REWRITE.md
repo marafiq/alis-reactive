@@ -297,12 +297,13 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
 - **The world.** Each test makes a key and sets it as the cookie `world` on its own browser context before it opens a
   page; every request, stream and hub negotiation carries it. The app's world middleware, in Development only, scopes
   data, gates, hub groups, stream filters and caches to the key; a document request with none gets a new world, so a
-  person can run the app. Teardown ends the world and fails any gate still parked. The World area serves four pages of
-  its own for the harness's tests, app.json's `harnessTests`, which use no framework door: a records page listing the
+  person can run the app. Teardown ends the world and fails any gate still parked. The World area serves five pages of its own for the harness's tests, app.json's `harnessTests`, which use no framework door: a records page listing the
   world's residents as text the server writes, a word page whose link opens, in the page's frame, an endpoint that
   answers with the word the world's seed holds, a words page whose two links open, each in a frame of its own,
   two endpoints that answer with that word at one gate, which a test holds at each by naming the endpoint, and a
-  word desk whose link opens an MVC action that answers with that word, its filter at the answer gate.
+  word desk whose link opens an MVC action that answers with that word, its filter at the answer gate, and a
+  word slip, a page an MVC action writes, which shows the world's word and the count of its letters as the app's
+  JSON options write them.
 - **The verbs** are app.json's: seed, gate, push, drop, refuse, reopen, restart, clock, gc. A placement lists its
   verbs and its held steps, each held step with the TLA+ action it holds, and check_app refuses a verb with no step.
   Gates are generated from the `Next` of each spec a held step names into the world contract (`Gates.g.cs`, one enum
@@ -336,7 +337,11 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
   host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
   "Now listening on:" line; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
-  server alive fails. The net10 clock is America/New_York, the twin's UTC; the browser context is en-US in
+  server alive fails. A promise whose opposite case holds under another net10 host's options opens that case's
+  world under it: `NewWorldUnder` takes the other host by its name of `Hosts`, starts its server on first use as a
+  fixture's own is started, and the test's teardown ends that world with the rest; the fixture still runs under the
+  hosts its placement lists, so no placement, case of a run or category names the opposite case's host. The net10
+  clock is America/New_York, the twin's UTC; the browser context is en-US in
   America/Los_Angeles, so a date read in the wrong zone shows. The hosts consumerNet10 and consumerNet48 are the fresh
   apps' own servers, which hold no World area: a test under one runs on app.json's `fresh` screen, sets no world and
   uses no harness verb.
@@ -518,7 +523,8 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
 ### 2.8 Shards and CI
 
 - **The shard unit** is a module folder; the net10 host-variant fixtures form one unit, so each variant's server starts
-  once per run; FusionComponents splits by slice. Pools: core, hosts and fusion; a test under a fresh app's host runs in its delivery job, never in a pool. The fusion
+  once per run; FusionComponents splits by slice. A world a test opens under another host starts that host's server in the shard
+  that runs the test. Pools: core, hosts and fusion; a test under a fresh app's host runs in its delivery job, never in a pool. The fusion
   pool holds the tests of the three Fusion module folders under every host a pool serves, the hosts pool every other
   test under a host variant, and the core pool every other test under net10. Shards are balanced longest-first
   from the TRX-measured weights in `shard-weights.json`, so a stale weight unbalances and never drops a test:
@@ -964,9 +970,10 @@ named by two declarations. Twenty-nine more refusal pages stand, each beside the
 each test red, five forks' work read at the source and landed: eleven of module 4's, four each of modules 3
 and 7, three of module 6's, two each of modules 1 and 17, and one each of modules 2, 9 and 16. A list a
 refusal page reads is a response body of the page's own endpoint. Of the refusal promises placed under net10,
-six wait: X6.12 and X8.22's first promise need another host (enums as numbers for an opposite case; numbers
-as text), X6.36 a request culture, X7.11, twice, a typed read of a select's value (N13.1), and X1.4 a number
-box. Ten more are placed under other hosts: four under hosts the app serves now, X6.43's first under numbersAsText and X6.57's three under dateConverter, whose opposite cases run under net10, and six under hosts the harness does not hold yet (defaultHooks, realtimeNoOffer, noAntiforgeryChoice, noRequests and net48 twice). Three of the fusion-refusals screen's six stand
+five wait: X6.12's first opens its opposite case under enumsAsNumbers through `NewWorldUnder`, the next piece's, X6.36 a request culture, X7.11, twice, a typed read of a select's value (N13.1), and X1.4 a number
+box. Eleven more are placed under other hosts: five under hosts the app serves now, X6.43's and X8.22's first under
+numbersAsText and X6.57's three under dateConverter, whose opposite cases open under net10 through `NewWorldUnder`,
+the next piece's, and six under hosts the harness does not hold yet (defaultHooks, realtimeNoOffer, noAntiforgeryChoice, noRequests and net48 twice). Three of the fusion-refusals screen's six stand
 on the Fusion layout, in `Refusals/FusionComponents/` and `Refusals/FusionTemplates/`, each beside its rendering twin
 and each test red (M21.X805, M22.X1, M22.X4); M21.X203's three wait on the grid's validation door, as M21.X205's
 do. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
@@ -993,17 +1000,18 @@ from a source and a literal; an element's children and attributes, M5.N3 and M5.
 a property declared a List; the block's live check, D16.15; a validator's Flags<TEnum>(), N16.4, with a rule set a
 request names, D16.2's form); six need a number a person types, read as a source (N13.1); five need a request culture;
 three need a console error's words, which no line states; six need a browser zone or the view's time zone; two need
-the harness's clock verb; one needs the harness's restart verb; one needs another host for its opposite case; one
-needs the text box's Type, whose form N18.4 sends to gate 2; one needs a record whose code holds null, which
-native.json's type of it does not hold; three need an export held while it runs, which their placement does not name
-and no harness verb holds; two need a grid column's rules from the app's validator, whose door waits on the core door
-U17 names (M21.N23, N16.2); and two need the clipboard, which the harness grants no page, and the first of them the
-antiforgery startup call besides. Four more attempted promises are placed beyond net10 alone: M24.X10 waits on
-TEST009, which refuses an expected value the test typed where the promise's outcome is the value the server renders
-back, a rule the owner decides, and on net48 in the harness; X11.20 waits on the defaultHooks host, X15.5 on the
-pascalCase host, and M21.X803's second on the net48 host. Of the bench's feature tests attempted, ten wait: six need
-an append to the callbacks object's log line, which neither native.json nor a core door gives; three need the
-harness's restart or gc verb; and one needs a list written as an element's rows, which no door writes.
+the harness's clock verb; one needs the harness's restart verb; one needs its opposite case opened under
+enumsAsNumbers through NewWorldUnder, which the next piece writes; one needs the text box's Type, whose form N18.4
+sends to gate 2; one needs a record whose code holds null, which native.json's type of it does not hold; three need an
+export held while it runs, which their placement does not name and no harness verb holds; two need a grid column's
+rules from the app's validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need the
+clipboard, which the harness grants no page, and the first of them the antiforgery startup call besides. Four more
+attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test
+typed where the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the
+harness; X11.20 waits on the defaultHooks host, X15.5 on the pascalCase host, and M21.X803's second on the net48 host.
+Of the bench's feature tests attempted, ten wait: six need an append to the callbacks object's log line, which neither
+native.json nor a core door gives; three need the harness's restart or gc verb; and one needs a list written as an
+element's rows, which no door writes.
 Of the bench's ninety-eight placed cells, ninety-five stand, each test red: nine of its properties, nine of its
 methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen of its sources, its three
 absences, its sixteen requests and three of its lanes, a slot loaded on start, a slot's listener gone at its unload

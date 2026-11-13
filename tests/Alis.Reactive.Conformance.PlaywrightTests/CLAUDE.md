@@ -22,7 +22,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   fails the build.
 - Each test runs in a world of its own: `ConformanceFixture` opens it, and `TestWorld` seeds it through the world
   contract's typed builders and keeps the errors its page's console holds, which a test reads with `Assert.That`.
-  Teardown ends the world and fails a gate still parked.
+  Teardown ends the world and fails a gate still parked. An opposite case that holds under another host's options
+  opens its world by `NewWorldUnder` with that host's name of `Hosts`, its variable named in the promise's words, and
+  the fixture keeps the hosts its placement lists (`Harness/WhenAWorldOpensUnderAnotherHost.cs`).
 - A refusal where the view renders is read as its developer reads it: the heading of the page ASP.NET shows for
   an exception, the exception's name, a colon and the whole message, found by its role and its exact name.
   `ValuesAndSources/Refusals/WhenALiteralIsPastTheNumbersJavaScriptHolds.cs` is the pattern, the page that renders

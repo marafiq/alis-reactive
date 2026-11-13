@@ -1303,6 +1303,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   text is "Took 25", and the component's records' names are a list named Records, read item by item inside the
   component's element, beside the status Records, the records line; native.json's two behaviors and the tests'
   CLAUDE.md state both. The owner can overrule each.
+- The lead, 2026-11-13, adding the harness door a promise's opposite case under another host needs, designed by a
+  Fable agent at xhigh and decided from its answer read at the source. A test opens that case's world by
+  `NewWorldUnder` with the other host's name of `Hosts`; the fixture keeps the hosts its placement lists, so the
+  runner's cases, the shards and the categories are unchanged, and a world under another host starts that host's
+  server inside the test's own run and budget (slowest 1.38s in the harness test's first green run). The harness test
+  reads a word slip an MVC action writes with MVC's JSON options, since the World area's minimal endpoints write with
+  the HTTP options, which no host sets. X8.22's first promise moves to numbersAsText, since its page's numbers are the
+  ones the app's number handling writes as text, and its opposite case opens under net10. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -6,4 +6,5 @@ public static class WorldPages
     public const string Word = "/world/word";
     public const string Words = "/world/words";
     public const string WordDesk = "/world/word-desk";
+    public const string WordSlip = "/world/word-slip";
 }

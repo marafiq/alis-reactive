@@ -1880,7 +1880,7 @@
       "index": 0,
       "screen": "refusals",
       "hosts": [
-        "net10"
+        "numbersAsText"
       ],
       "parts": [],
       "harness": [
@@ -10696,6 +10696,22 @@
           "action": "Composition.tla:Answer",
           "on": "the word desk's answer"
         }
+      ]
+    },
+    {
+      "fixture": "WhenAWorldOpensUnderAnotherHost",
+      "test": "the_world_is_seeded_and_served_by_the_host_the_test_names",
+      "unit": "U3",
+      "page": "The world's word slip, a page of the app's World area with no framework part on it: an action of an MVC controller of the app writes the word the world's seed holds and the count of its letters as the app's JSON options write them, as text the server writes.",
+      "gesture": "Open a world under numbersAsText, a host the fixture does not run under, seed the word East and open the word slip.",
+      "outcome": "The slip reads {\"word\":\"East\",\"letters\":\"4\"}: the world's seed and its page reached the server of the host the test named, whose options write a number as text.",
+      "opposite": "A world of the fixture's own host, net10, seeded North, reads {\"word\":\"North\",\"letters\":5}.",
+      "defect": "The world opens under the fixture's own host, or the app sets net10's options whatever host it starts under, so the slip reads {\"word\":\"East\",\"letters\":4}; or the seed goes to the fixture's host while the page opens under the named one, so the slip reads {\"word\":\"\",\"letters\":\"0\"}.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": [
+        "seed"
       ]
     }
   ]
