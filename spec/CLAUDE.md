@@ -1293,6 +1293,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   as the multi-column combo box's columns are. The OTP input renders its boxes on a div, which U26's helper renders,
   since EJ2 33.1.47 renders none on an input (X612), and the time picker's value reads EJ2's default en-US format
   (X1031). The owner can overrule each.
+- The lead, 2026-11-13, writing the first pages under the System.Text.Json hosts. X7.14's Add gets the supply again
+  and passes its vial count to the scanner's Add, as X7.12's Check gets the chart again, and a line set after the call
+  shows the handler returned before the opposite case reads the amount it leaves. M11.X1's record endpoint writes a
+  class of its own that holds MultiWord alone, so the snake-case host writes {"multi_word": 40}, and the camel record
+  endpoint answers its JSON as text, since no option of the app writes camel case under that host. M11.X2's records
+  start from `RecordStart`, which gains MultiWord. A Fable agent at xhigh designed how a test reads two lines no
+  landed test read, decided from its answer read at the source: TakeNullable's line is a status named Took whose whole
+  text is "Took 25", and the component's records' names are a list named Records, read item by item inside the
+  component's element, beside the status Records, the records line; native.json's two behaviors and the tests'
+  CLAUDE.md state both. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

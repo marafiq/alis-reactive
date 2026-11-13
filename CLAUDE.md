@@ -172,6 +172,10 @@ the class. A class met twice is held too low: it moves up a rung in that unit. A
   one test rule to a landed rule's pattern, one module's half against the schema. Three at a time at most. None
   decides or words a rule. Its brief names the base SHA and carries the full bar, finished before anything reads it;
   it reads no secret or file that holds a credential, and runs no git command beyond its own worktree and branch.
+- A complex decision, one whose error would spread across tests, a harness door or a spec line, goes first to an
+  agent on the latest Fable model at xhigh effort, briefed with its spec lines, the files and the constraints; the
+  lead decides from its answer, read at the source (the owner, 2026-11-13: "when you need complex decision use fable
+  latest at xhigh").
 - The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
   session, with the reason. A task whose check costs what the work costs is the lead's own.
 - No review is planned behind a writer. A review that runs is bounded before it starts: a fixed list of questions,

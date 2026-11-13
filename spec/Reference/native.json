@@ -547,7 +547,7 @@
           ]
         },
         {
-          "behavior": "TakeNullable shows Took and the count it receives, Took none before a call; TakeText shows the text it receives as its taken text, (null) for null and (undefined) for undefined.",
+          "behavior": "TakeNullable shows Took and the count it receives, Took none before a call, in a status named Took; TakeText shows the text it receives as its taken text, (null) for null and (undefined) for undefined.",
           "tests": [
             "M11.X1",
             "X5.12",
@@ -572,7 +572,7 @@
           ]
         },
         {
-          "behavior": "SortItems orders and redraws its items by the key its answer gives for each; SortBy orders its records by the member the field names; the component lists its records' names.",
+          "behavior": "SortItems orders and redraws its items by the key its answer gives for each; SortBy orders its records by the member the field names; the component lists its records' names, a list named Records with an item for each record.",
           "tests": [
             "X17.20",
             "M11.X2",

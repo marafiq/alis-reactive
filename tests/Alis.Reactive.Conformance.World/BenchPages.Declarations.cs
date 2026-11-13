@@ -18,4 +18,6 @@ public static partial class BenchPages
     public const string DeclarationsOptionalPayloadText = Declarations + "optional-payload-text";
     public const string DeclarationsNullablePayloadText = Declarations + "nullable-payload-text";
     public const string DeclarationsPayloadOuter = Declarations + "payload-outer";
+    public const string DeclarationsNamesUnderTheAppsNaming = Declarations + "names-under-the-apps-naming";
+    public const string DeclarationsRecordsSortedByAField = Declarations + "records-sorted-by-a-field";
 }

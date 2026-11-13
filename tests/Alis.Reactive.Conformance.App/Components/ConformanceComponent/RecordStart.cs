@@ -9,4 +9,6 @@ public sealed class RecordStart
     public int Count { get; init; }
 
     public string? Day { get; init; }
+
+    public int MultiWord { get; init; }
 }

@@ -27,4 +27,6 @@ public static partial class CarePages
     public const string MedicationCheckOfAResidentWithNoChart = Round + "medication-check/no-chart";
     public const string MedicationCheckOfAResidentWhoseChartSaysMissed = Round + "medication-check/missed";
     public const string MedicationTestCheck = Round + "medication-check/test";
+    public const string SupplyScanOfFiveVials = Round + "supply-scan/five-vials";
+    public const string SupplyScanOfAnEmptyBox = Round + "supply-scan/empty-box";
 }

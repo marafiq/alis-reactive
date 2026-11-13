@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Declarations
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SortedRecordsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<SortedRecordsBoard>();
+}
+<h1>The bench</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Records = Model.Records }))
+<button type="button" @Html.Raises(plan, NameButtons.SortByMultiWord)>Sort by multi-word</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NameButtons.SortByMultiWord, pipeline => pipeline
+        .Component<ConformanceComponent>("conformance").SortBy(Field.Of((Record r) => r.MultiWord))));
+}
+@Html.RenderPlan(plan)
