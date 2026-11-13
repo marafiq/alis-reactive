@@ -25,7 +25,7 @@ them, each marked as the lead's slip, and are not copied here.
 | Class | Entries | Held by |
 |---|---:|---|
 | Placed before its line was read: a type, a folder or a unit named in the spec or in code before the design line that names it was read | 2 | Since 2026-11-12, a step a commit shows: a commit that places a type names the line that places it, "placed by" and the line's id. A type `spec/api` declares is placed by the namespace `spec/api` gives it under `spec/REWRITE.md` 2.2's map, and an exception names P1 to P4 by its number. Before that, root CLAUDE.md's loop, step 2, a rule line, which did not hold. |
-| A doc sentence written from memory of the design, not from its line | 4 | A step a `spec/NOTES.md` entry shows: the entry of a piece that writes XML docs lists the D, N and X lines the docs rest on, each read before the build. `.claude/rules/docs.md`, XML docs, rule 4 states it. Since its third entry the step covers every cite, a message's among them: the command that prints the line runs before the cite is written, and the cite is copied from its output. |
+| A doc sentence written from memory of the design, not from its line | 5 | A step a `spec/NOTES.md` entry shows: the entry of a piece that writes XML docs lists the D, N and X lines the docs rest on, each read before the build. `.claude/rules/docs.md`, XML docs, rule 4 states it. Since its third entry the step covers every cite, a message's among them: the command that prints the line runs before the cite is written, and the cite is copied from its output. |
 | A signature typed from memory, not from the source | 2 | A step a commit shows: the doc ids of the built core compared with the ids the fluent probe prints for `spec/api`, the count of missing ids quoted in the commit. Since its second entry, for a Fusion slice, a step a script shows: a script of the session reads each declared slice's line and its feature's proposed sentences and meanings for the forms they name beyond a member and its type (a converter that refuses integer values, each `JsonPropertyName`, `nullable: true`), finds each in the slice's code, and a Fusion landing quotes its line before its gate. |
 | A list a tool keeps was not read before the change that moves it | 9 | The tool, each time before the push: `WhenARuleNamesTheCode` for a listed exception, the hedges check for a hedge word. Since its second entry the tool runs sooner: a commit that edits the spec's prose runs `python3 spec/tools/check.py --check hedges` before its gate, and quotes its line. Since its third entry a commit that edits a file a plant names counts, by a script, every plant anchor not found once in its file before its gate, and quotes that line too. Since its sixth, the session's gate script reads the hedges check's pass field, since the check exits 0 when it fails. |
 | A report left out what its writer knew was open | 1 | A rule line: root CLAUDE.md's loop, step 7, a commit says what did not run. |
@@ -42,11 +42,16 @@ them, each marked as the lead's slip, and are not copied here.
 | A landing's carrier left out of its commit | 1 | A step a script shows: a commit message writer stops when the commit stages a PublicAPI text and leaves spec/REWRITE.md unstaged, since section 4 names what is declared. |
 | The owner's words answered with a remedy they did not name | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12 on pace, which quotes the correction. |
 | An ordering met without its TLA+ spec named | 1 | A step a commit shows: a commit whose piece meets an ordering names the invariants it rests on in a line of its message, and an ordering no spec holds is written as a spec before its door; root CLAUDE.md's TLA+ line states it. It reached the owner, so it starts on this rung. |
-| A case written in a shape its real input cannot take | 1 | A rule line: `tests/Alis.Reactive.ArchitectureTests/CLAUDE.md`, a runner case's tables hold what the real tools write, each fixture in its first folder's namespace beside its folder. |
+| A case written in a shape its real input cannot take | 2 | A rule line: `tests/Alis.Reactive.ArchitectureTests/CLAUDE.md`, a runner case's tables hold what the real tools write, each fixture in its first folder's namespace beside its folder. Since its second entry, a step a script shows: a carriers script finds a generated paragraph's ends as the wrap can write them, across any whitespace. |
 | A start chosen to quiet the compiler where a spec line states it | 1 | A rule line: `tests/Alis.Reactive.Conformance.App/CLAUDE.md`, a data class's member starts at what native.json's type and every promise that reads the member lacking state, and the nullable compiler chooses no start. |
 | A name landed that departs from its siblings' name for one concept | 1 | A step a script shows: at each landing, a script of the session reads every render helper's builder callback and every options callback and stops on a name other than `build` and `options`; a landing quotes its line. |
 
 ## Waiting for the owner
+
+- A check of `spec/tools/check.py` that reads each door a line of `spec/CLAUDE.md` names against `spec/api` and the
+  N lines of the door's module, so a lead line names no door the spec removed. The class "a doc sentence written from
+  memory of the design" met its fifth entry on the step's rung. Cost: one check with a refused and an accepted plant,
+  and every door a lead line names written in backticks.
 
 - A kept check for the signature pieces: the built core's doc ids against the ids the fluent probe prints for
   `spec/api`, under `spec/REWRITE.md` 2.2's map, each exception a line of the check's own table with its P number.
@@ -498,3 +503,14 @@ them, each marked as the lead's slip, and are not copied here.
   from the root, and named EJ2's fields class in backticks, which no C# file of the repo names. Caught before the
   commit by `WhenARuleNamesTheCode`, which the gate runs first when a rule file is staged. Cost: one gate stopped
   before its checks, the path written from the root and the class named in words. Held by that test.
+- 2026-11-13, a doc sentence written from memory of the design, not from its line, the class's fifth entry. The lead
+  line on the Fusion exemplar in `spec/CLAUDE.md` said U25 lands the startup call spec/api names, AddReactiveFusion,
+  where M21.N2 states that AddReactiveFusion leaves and spec/api names no Fusion startup call. Caught after the push,
+  by the admission-clinical fork, which skipped M21.X3 on the contradiction. Cost: one promise the fork did not write,
+  and the line corrected in the landing's commit. Held by the class's step, the line read before the sentence; the
+  tool's rung waits for the owner's yes, under "Waiting for the owner".
+- 2026-11-13, a case written in a shape its real input cannot take, the class's second entry. The carriers script of
+  the admission-clinical landing found the end of section 4's care paragraph by its last words on one line, where the
+  paragraph the last commit regenerated wraps them across two. Caught before anything was written, by the script's own
+  lookup. Cost: one run of the script stopped, and the lookup written across whitespace. Held, a rung up, by a step a
+  script shows: a carriers script finds a generated paragraph's ends across any whitespace.

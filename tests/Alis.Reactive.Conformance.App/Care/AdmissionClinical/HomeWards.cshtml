@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HomeWards
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Home wards";
+    var plan = Html.ReactivePlan<HomeWards>();
+}
+<h1>Home wards</h1>
+<fieldset>
+    <legend>Ward</legend>
+    @(Html.InputField(plan, m => m.WardCode, options => options.Label("Ward"))
+        .FusionDropDownList(build => build.Fields((HomeWard w) => w.DisplayLabel, w => w.WardCode)))
+</fieldset>
+<button type="button" @Html.Raises(plan, HomeWardLists.Load)>Load wards</button>
+<p>The home's wards: <output id="ward-list">Not loaded</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(HomeWardLists.Load, pipeline => pipeline
+        .Get(HomeWardsEndpoints.Wards)
+        .OnSuccess(Content.Json<IReadOnlyList<HomeWard>>(), (wards, pipeline) =>
+        {
+            pipeline.Input(m => m.WardCode).Component<FusionDropDownList<string?>>().DataSource<HomeWard>().Set(wards.Body);
+            pipeline.Element("ward-list").Text.Set("Loaded");
+        })));
+}
+@Html.RenderPlan(plan)

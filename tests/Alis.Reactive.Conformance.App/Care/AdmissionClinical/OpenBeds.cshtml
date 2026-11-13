@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.MultiColumnComboBox
+@model OpenBeds
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Open beds";
+    var plan = Html.ReactivePlan<OpenBeds>();
+}
+<h1>Open beds</h1>
+<fieldset>
+    <legend>Bed</legend>
+    @(Html.InputField(plan, m => m.BedCode, options => options.Label("Bed"))
+        .FusionMultiColumnComboBox<OpenBeds, string?, string>(build => build
+            .Fields((CareBed b) => b.DisplayLabel, b => b.BedCode)
+            .Columns([new Column { Field = "label", Header = "Bed" }, new Column { Field = "bedCode", Header = "Code" }])))
+</fieldset>
+<button type="button" @Html.Raises(plan, OpenBedLists.Load)>Load beds</button>
+<p>The open beds: <output id="bed-list">Not loaded</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(OpenBedLists.Load, pipeline => pipeline
+        .Get(OpenBedsEndpoints.Beds)
+        .OnSuccess(Content.Json<IReadOnlyList<CareBed>>(), (beds, pipeline) =>
+        {
+            pipeline.Input(m => m.BedCode).Component<FusionMultiColumnComboBox<string>>().DataSource<CareBed>().Set(beds.Body);
+            pipeline.Element("bed-list").Text.Set("Loaded");
+        })));
+}
+@Html.RenderPlan(plan)

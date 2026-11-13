@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ArrivalDay
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Arrival";
+    var plan = Html.ReactivePlan<ArrivalDay>();
+}
+<h1>Arrival</h1>
+<fieldset>
+    <legend>Arrival</legend>
+    @(Html.InputField(plan, m => m.ArrivesOn, options => options.Label("Arrives on")).FusionDatePicker(build => build.Format("yyyy-MM-dd")))
+</fieldset>
+@Html.RenderPlan(plan)

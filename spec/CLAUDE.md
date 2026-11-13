@@ -1212,11 +1212,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   FusionMultiSelect over the items its view hands it, in a form whose Save sends the chosen codes. The app references
   Alis.Reactive.Fusion, and a Fusion page takes `tests/Alis.Reactive.Conformance.App/Shared/_FusionLayout.cshtml`, which
   holds what the app's other layout holds: U25 links EJ2's script and theme there, before the framework's, with the
-  startup call spec/api names, AddReactiveFusion, the licence and the fixture's one way to take EJ2's script
-  (`spec/REWRITE.md`, section 2.5). The page answers 500 at the request form block, the first door it meets that is not
-  built, and the multi-select's render helper is the next. EJ2 33.1.47's box, read in Chromium by the lead's probe,
-  names itself "multiselect" and links no label, so the test finds it as the combobox inside the group the page gives
-  the field. The owner can overrule each.
+  licence and the fixture's one way to take EJ2's script (`spec/REWRITE.md`, section 2.5); Fusion takes no startup call,
+  since AddReactiveFusion leaves (M21.N2). The page answers 500 at the request form block, the first door it meets that
+  is not built, and the multi-select's render helper is the next. EJ2 33.1.47's box, read in Chromium by the lead's
+  probe, names itself "multiselect" and links no label, so the test finds it as the combobox inside the group the page
+  gives the field. The owner can overrule each.
 - The lead, 2026-11-13, declaring M3.N1's value and membership tests as signatures, with the pages that first call them.
   `IsNull` and `NotNull` take a source of a nullable struct, so a test of an `int`, never null, is refused by the type
   (CS0452), and a source of any reference type, its non-nullable form as well, since the browser's data holds null where
@@ -1244,6 +1244,19 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   found no slider role on EJ2's slider rendered over an input, so U26 renders FusionSlider's host as the element EJ2
   gives that role. M21.X205's two rules wait on the grid's validation door, as the FusionGrid line says. The owner can
   overrule each.
+- The lead, 2026-11-13, landing fourteen of the admission-clinical screen's pages from a fork's work read at the
+  source. A drop-down list's choice in the opposite case is a key pressed on the closed list (X507), since EJ2 33.1.47
+  drops an option clicked while the list opens; a multi-column combo box opens by Alt+ArrowDown on its combobox (X512),
+  since its popup icon has no role or name, and its row is clicked by its grid cell; a radio button is clicked by its
+  label, which takes the click meant for its input (X1022). The multi-column combo box names its columns through EJ2's
+  own column objects by the members' JSON names, since M21.N31 declares no typed columns as FusionGrid declares its; a
+  typed door for them is a gap the lead raises, as the drop-down tree's fields are. The uploader's test reads the first
+  POST around the choice and Save (X1014), since a font or an image the page loads in that window is a GET and the
+  uploader's send is a POST. The check box's test reads its role's checked state, which the input the view renders holds
+  before EJ2 starts; U25's planted defect decides whether that state catches a box rendered with no starting value, and
+  where it does not, the test reads the state class EJ2 sets on the box it shows. M21.X3 and M21.X505 are the lead's
+  next piece; X803's first promise waits on the antiforgery startup call and the clipboard, its second on the net48
+  host, and X804 on the clipboard, for which the harness grants no permission. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

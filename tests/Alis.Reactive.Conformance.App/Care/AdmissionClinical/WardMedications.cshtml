@@ -1,0 +1,29 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardMedications
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Ward medications";
+    var plan = Html.ReactivePlan<WardMedications>();
+}
+<h1>Ward medications</h1>
+<fieldset>
+    <legend>Current medication</legend>
+    @(Html.InputField(plan, m => m.CurrentMedication, options => options.Label("Current medication"))
+        .FusionAutoComplete(build => build.Fields((Medication m) => m.DisplayLabel, m => m.DisplayLabel)))
+</fieldset>
+<button type="button" @Html.Raises(plan, WardMedicationLists.Load)>Load medications</button>
+<p>The ward's list: <output id="ward-list">Not loaded</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardMedicationLists.Load, pipeline => pipeline
+        .Get(WardMedicationsEndpoints.Medications)
+        .OnSuccess(Content.Json<IReadOnlyList<Medication>>(), (medications, pipeline) =>
+        {
+            pipeline.Input(m => m.CurrentMedication).Component<FusionAutoComplete<string?>>().DataSource<Medication>().Set(medications.Body);
+            pipeline.Element("ward-list").Text.Set("Loaded");
+        })));
+}
+@Html.RenderPlan(plan)
