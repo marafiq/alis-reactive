@@ -1449,3 +1449,5 @@
   Evidence: each of the fourteen tests read red through scripts/playwright.sh where it landed, and each of the screen's 19 addresses answered 500 on a declared door's NotImplementedException in a world of its own.
 - 2026-11-13 U3, M21.X3's resident preview and M21.X505's language intake (Care/AdmissionClinical/), the lead's own pages, with X505's gesture read as X512's; the admission-clinical screen's family joins the care families the session's scripts count.
   Evidence: both tests read red through scripts/playwright.sh where they landed, and the three addresses answered 500 on a declared door's NotImplementedException in a world of its own.
+- 2026-11-13 U3, three of the fusion-refusals screen's pages (Refusals/FusionComponents/, Refusals/FusionTemplates/), the lead's own: M21.X805's smart paste button with no endpoint, M22.X1's template condition over a decimal and M22.X4's over a sum of two members, each beside its rendering twin; M21.X203's three wait.
+  Evidence: the three tests read red through scripts/playwright.sh where they landed, and the six addresses answered 500 on a declared door's NotImplementedException in a world of its own.

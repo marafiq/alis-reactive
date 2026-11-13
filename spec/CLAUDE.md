@@ -1267,6 +1267,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   endpoint writes under the app's own camel-case settings; the app takes Newtonsoft.Json as Syncfusion's package brings
   it, with no reference of its own. X803's first promise and X804 wait on the clipboard, and X803's second on the net48
   host. The owner can overrule each.
+- The lead, 2026-11-13, writing three of the fusion-refusals screen's pages. A Fusion refusal page sits in
+  `tests/Alis.Reactive.Conformance.App/Refusals/` under its module's folder, on the Fusion layout, at an address of
+  RefusalPages under the refusal area, so the sweep of the app's pages reads it as refused by design, and its test sits
+  as a Fusion slice's or a template screen's does. M21.X805's heading is its X line's quoted message, whole, which ends
+  with no full stop; the page of its rendering twin gives the button the text Smart Paste. A template's rendering twin
+  is a second view, as the bed-board screen's are. M21.X203's three wait on the grid's validation door, as M21.X205's
+  do. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

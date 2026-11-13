@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.Fusion.FusionTemplates
+@using Alis.Reactive.RenderingAndDelivery
+@using Syncfusion.EJ2.Grids
+@model RiskBoard
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident board";
+    var plan = Html.ReactivePlan<RiskBoard>();
+    var columns = FusionGridColumns.Of<ScoredResident>();
+    var risk = FusionTemplate.Create<ScoredResident>()
+        .When(m => m.FallScore > 2.5, then: t => t.Badge("High"), @else: e => e.Span("Low"))
+        .Render(plan);
+}
+<h1>Resident board</h1>
+@(Html.FusionGrid(plan, "resident-risks", Model.Residents, build => build
+    .Columns(new List<GridColumn>
+    {
+        new() { Field = columns.Field(r => r.Name), HeaderText = "Name" },
+        new() { HeaderText = "Risk", Template = risk },
+    })))
+@Html.RenderPlan(plan)

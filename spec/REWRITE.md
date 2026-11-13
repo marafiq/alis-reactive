@@ -966,7 +966,10 @@ and 7, three of module 6's, two each of modules 1 and 17, and one each of module
 refusal page reads is a response body of the page's own endpoint. Of the refusal promises placed under net10,
 six wait: X6.12 and X8.22's first promise need another host (enums as numbers for an opposite case; numbers
 as text), X6.36 a request culture, X7.11, twice, a typed read of a select's value (N13.1), and X1.4 a number
-box. Ten more are placed under hosts the harness does not hold yet. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
+box. Ten more are placed under hosts the harness does not hold yet. Three of the fusion-refusals screen's six stand
+on the Fusion layout, in `Refusals/FusionComponents/` and `Refusals/FusionTemplates/`, each beside its rendering twin
+and each test red (M21.X805, M22.X1, M22.X4); M21.X203's three wait on the grid's validation door, as M21.X205's
+do. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
 refusal's is, and a hundred and ninety-one care pages stand, each test red: forty-three of the record screen's (eight
 of module 9's, seven of module 2's, five of module 1's, four each of modules 3, 5 and 17, three of module 24's, two
 each of modules 7 and 12 and one each of modules 6, 8, 15 and 19), thirty-six of the residents screen's (twenty-three
