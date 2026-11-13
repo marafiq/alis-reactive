@@ -64,12 +64,14 @@ its views.
   a request names its validator by `Validate<TValidator>()`) and the form endpoints, which answer what they bound;
   a page groups each field it checks in a fieldset or a region that names it, the scope a test reads its message
   in.
-- `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has
-  its link there, and so does the page that renders beside it. A module's refusal pages sit in a folder named for
-  it (`Refusals/ArrayLambdas/` holds ten): a controller for each screen with its models, the refused page and the
-  page of its opposite case, one view where only the data differs. An endpoint a page alone names is a constant
-  beside its controller (`Refusals/ArrayLambdas/ArrayLambdaEndpoints.cs`); one a test names is a constant of
-  `RefusalEndpoints` in the world contract.
+- `Refusals/Index/` is the refusals index, a page of links: a refusal page a promise reaches from the index has its
+  link there, and so does the page that renders beside it. A module's refusal pages sit in a folder named for it
+  (`Refusals/ArrayLambdas/` the first): a controller for each screen with its models, the refused page and the page of
+  its opposite case, one view where only the data differs. A refusal whose opposite case holds under another host's
+  JSON options is one page at one address, opened in both worlds, since the host changes the app's options and nothing
+  else (`Refusals/ArrayLambdas/FridgeReadingsAtZero.cshtml`). An endpoint a page alone names is a constant beside its
+  controller (`Refusals/ArrayLambdas/ArrayLambdaEndpoints.cs`); one a test names is a constant of `RefusalEndpoints`
+  in the world contract.
 - `Care/` holds the care screens, a folder for each screen of `spec/Reference/app.json` (`Care/Residents/` the
   first): a promise placed on a screen is a page of its own there, as a refusal's is, with its controller, its
   models and its view, named for what a person does on it (`Care/Residents/CensusController.cs`,

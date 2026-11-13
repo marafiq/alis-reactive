@@ -24,7 +24,7 @@ them, each marked as the lead's slip, and are not copied here.
 
 | Class | Entries | Held by |
 |---|---:|---|
-| Placed before its line was read: a type, a folder or a unit named in the spec or in code before the design line that names it was read | 2 | Since 2026-11-12, a step a commit shows: a commit that places a type names the line that places it, "placed by" and the line's id. A type `spec/api` declares is placed by the namespace `spec/api` gives it under `spec/REWRITE.md` 2.2's map, and an exception names P1 to P4 by its number. Before that, root CLAUDE.md's loop, step 2, a rule line, which did not hold. |
+| Placed before its line was read: a type, a folder or a unit named in the spec or in code before the design line that names it was read | 3 | Since 2026-11-12, a step a commit shows: a commit that places a type names the line that places it, "placed by" and the line's id. A type `spec/api` declares is placed by the namespace `spec/api` gives it under `spec/REWRITE.md` 2.2's map, and an exception names P1 to P4 by its number. Before that, root CLAUDE.md's loop, step 2, a rule line, which did not hold. Since its third, a promise placed under a host names in its commit the D line that decides the form of the value its page reads (D7.7's base forms), "read in" and the line's id; the tool's rung waits for the owner's yes. |
 | A doc sentence written from memory of the design, not from its line | 6 | A step a `spec/NOTES.md` entry shows: the entry of a piece that writes XML docs lists the D, N and X lines the docs rest on, each read before the build. `.claude/rules/docs.md`, XML docs, rule 4 states it. Since its third entry the step covers every cite, a message's among them: the command that prints the line runs before the cite is written, and the cite is copied from its output. Since its sixth, a unit a commit message names is copied from the heading of `spec/REWRITE.md` section 4 that lists the feature. |
 | A signature typed from memory, not from the source | 2 | A step a commit shows: the doc ids of the built core compared with the ids the fluent probe prints for `spec/api`, the count of missing ids quoted in the commit. Since its second entry, for a Fusion slice, a step a script shows: a script of the session reads each declared slice's line and its feature's proposed sentences and meanings for the forms they name beyond a member and its type (a converter that refuses integer values, each `JsonPropertyName`, `nullable: true`), finds each in the slice's code, and a Fusion landing quotes its line before its gate. |
 | A list a tool keeps was not read before the change that moves it | 9 | The tool, each time before the push: `WhenARuleNamesTheCode` for a listed exception, the hedges check for a hedge word. Since its second entry the tool runs sooner: a commit that edits the spec's prose runs `python3 spec/tools/check.py --check hedges` before its gate, and quotes its line. Since its third entry a commit that edits a file a plant names counts, by a script, every plant anchor not found once in its file before its gate, and quotes that line too. Since its sixth, the session's gate script reads the hedges check's pass field, since the check exits 0 when it fails. |
@@ -39,7 +39,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A limit put to the owner at more weight than the facts in hand give it | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12, a limit that shows itself the first time a developer opens the page and that both older lines share is stated once and is no item for the owner. |
 | A long run chained behind a step that can stop it | 2 | A rule line: the handoff's, a long run (the gate, a full check) is a command of its own, with nothing chained before it but the cd and the environment file. Since its second entry, a step a script shows: the gate starts only from the session's gate script, alone in its command, and each step the script runs before it prints why the gate did not run. |
 | A writer's range shorter than the data it meets | 2 | A step a script shows: the session's handoff writer turns counts into words up to 199 and asserts the range, so a count past it stops the writer before it writes. Since its second, every word function of the session's writers asserts its range, the paragraph's and the handoff's reaching 999; the tool's rung waits for the owner's yes. |
-| A landing's carrier left out of its commit | 1 | A step a script shows: a commit message writer stops when the commit stages a PublicAPI text and leaves spec/REWRITE.md unstaged, since section 4 names what is declared. |
+| A landing's carrier left out of its commit | 2 | A step a script shows: a commit message writer stops when the commit stages a PublicAPI text and leaves spec/REWRITE.md unstaged, since section 4 names what is declared. Since its second, a rule line names a folder by its first file or as the first of its kind, never by a count of what it holds, which a landing would have to carry. |
 | The owner's words answered with a remedy they did not name | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12 on pace, which quotes the correction. |
 | An ordering met without its TLA+ spec named | 1 | A step a commit shows: a commit whose piece meets an ordering names the invariants it rests on in a line of its message, and an ordering no spec holds is written as a spec before its door; root CLAUDE.md's TLA+ line states it. It reached the owner, so it starts on this rung. |
 | A case written in a shape its real input cannot take | 2 | A rule line: `tests/Alis.Reactive.ArchitectureTests/CLAUDE.md`, a runner case's tables hold what the real tools write, each fixture in its first folder's namespace beside its folder. Since its second entry, a step a script shows: a carriers script finds a generated paragraph's ends as the wrap can write them, across any whitespace. |
@@ -72,6 +72,12 @@ them, each marked as the lead's slip, and are not copied here.
   placements of `spec/Reference/app.json` and the tests' `FailsFor` give. The class "a number written from an
   earlier run" met its tenth entry, its third of this session. Cost: one check with a refused and an accepted
   plant; the counting exists today as four scratch scripts of the session.
+
+- A check of `spec/tools/check.py` that reads each placement under a host whose definition changes only the app's
+  JSON options against its promise's page, which must name a value the app's form holds (a response body or a
+  pushed message, D7.7), so no promise is placed under such a host over a live value its options never reach.
+  The class "placed before its line was read" met its third entry on the step's rung. Cost: one check with a
+  refused and an accepted plant, reading the promise's words, which it can misread; X8.22's first is today's one case.
 
 ## Entries
 
@@ -538,3 +544,15 @@ them, each marked as the lead's slip, and are not copied here.
   its reference and the templates. Caught by the advisor, holding the handover fork's "U26" against the earlier
   message. Cost: two pushed messages that name a unit too early. Held by the class's step, extended: a unit a commit
   message names is copied from the section 4 heading that lists its feature.
+- 2026-11-13, placed before its line was read, the class's third entry. Commit 553d078f3 moved X8.22's first promise
+  to numbersAsText for its page's numbers, without reading the page against D7.7: the page read the conformance
+  component's records, which the live form holds as JSON numbers under every host, so the refusal could not hold under
+  any. Caught by the fork writing the eight host-opposite pages, which reported it as a skip. Cost: one pushed
+  placement that rested on a page no host could refuse, and a lead line that said the page's numbers were the app's.
+  Held by the class's step, extended to a placement: its commit names the D line that decides the form of the value
+  its page reads.
+- 2026-11-13, a landing's carrier left out of its commit, the class's second entry. The conformance app's rule file
+  said `Refusals/ArrayLambdas/` holds ten, where eleven controllers stood before this landing and fifteen after it,
+  since earlier landings added pages and left the count. Caught by the lead reading the rule against `git ls-files`.
+  Cost: a rule line that misstated its folder. Held by the cause removed: the line names the folder as the first, as
+  `Care/Residents/` is named, with no count a landing must carry.

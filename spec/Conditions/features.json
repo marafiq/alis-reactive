@@ -489,10 +489,10 @@
         },
         {
           "for": "X8.22",
-          "page": "A view of the ConformanceComponent whose Records hold data whose Ratio, a double, the app's number handling writes as text; a button's When compares the found record's Ratio with 0.",
+          "page": "A fluid ratio page whose Check the ratio button gets the residents' fluid ratios, a response body of the page's own endpoint whose Ratio, a double, the app's number handling writes as text; its success route's When compares the found resident's Ratio with 0.",
           "gesture": "Open the page.",
           "outcome": "The page is refused where the view renders with one error naming the double written as text and ending compare it on the server.",
-          "opposite": "The same comparison over a ratio written as a JSON number renders, and its branch runs for a ratio of -0.",
+          "opposite": "Under options that write numbers as JSON numbers, the same page renders, and Check the ratio runs the branch for a ratio of -0.",
           "defect": "The page renders and the browser compares the text -0 with 0, so the branch does not run where .NET's -0.0 == 0.0 holds."
         },
         {

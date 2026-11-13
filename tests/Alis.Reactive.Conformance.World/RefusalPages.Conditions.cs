@@ -10,4 +10,5 @@ public static partial class RefusalPages
     public const string StatusesWrittenByTheApp = Area + "conditions/dose-statuses/the-apps-form";
     public const string DoseGivenAtAConvertedTime = Area + "conditions/dose-given/its-converter-writes";
     public const string DoseGivenAtATime = Area + "conditions/dose-given/the-apps-form";
+    public const string FluidRatioAtZero = Area + "conditions/fluid-ratio/at-zero";
 }

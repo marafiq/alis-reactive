@@ -21,4 +21,6 @@ public static class ConditionEndpoints
     public const string DosesGivenAtConvertedTimes = Root + "dose-given/doses-its-converter-writes";
 
     public const string DosesGivenAtTimes = Root + "dose-given/doses";
+
+    public const string FluidRatios = Root + "fluid-ratio/ratios";
 }

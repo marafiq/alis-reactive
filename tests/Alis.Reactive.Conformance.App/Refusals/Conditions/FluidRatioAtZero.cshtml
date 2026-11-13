@@ -1,0 +1,21 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FluidRatioCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The fluid ratio";
+    var plan = Html.ReactivePlan<FluidRatioCheck>();
+    var resident = Model.Resident;
+}
+<h1>The fluid ratio</h1>
+<p>@Model.Resident: <span id="ratio"></span></p>
+<button type="button" @Html.Raises(plan, FluidRatioChecks.Check)>Check the ratio</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(FluidRatioChecks.Check, pipeline => pipeline.Get(ConditionEndpoints.FluidRatios)
+        .OnSuccess<List<FluidRatio>>((ratios, pipeline) => pipeline.When(ratios.Body.Find(r => r.Resident == resident, r => r.Ratio).Eq(0.0))
+            .Then(pipeline => pipeline.Element("ratio").Text.Set("balanced")))));
+}
+@Html.RenderPlan(plan)

@@ -966,33 +966,37 @@ The app event family is declared, M1.N2 to M1.N5 with the data a handler reads (
 no sentence with, and the bench's first cell, prop.scalar.read, stands on them with its test red. Markup raises an
 event that declares a payload with none as well (M1.N5, M1.D3).
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
-named by two declarations. Twenty-nine more refusal pages stand, each beside the page of its opposite case and
-each test red, five forks' work read at the source and landed: eleven of module 4's, four each of modules 3
-and 7, three of module 6's, two each of modules 1 and 17, and one each of modules 2, 9 and 16. A list a
-refusal page reads is a response body of the page's own endpoint. Of the refusal promises placed under net10,
-five wait: X6.12's first opens its opposite case under enumsAsNumbers through `NewWorldUnder`, the next piece's, X6.36 a request culture, X7.11, twice, a typed read of a select's value (N13.1), and X1.4 a number
-box. Eleven more are placed under other hosts: five under hosts the app serves now, X6.43's and X8.22's first under
-numbersAsText and X6.57's three under dateConverter, whose opposite cases open under net10 through `NewWorldUnder`,
-the next piece's, and six under hosts the harness does not hold yet (defaultHooks, realtimeNoOffer, noAntiforgeryChoice, noRequests and net48 twice). Three of the fusion-refusals screen's six stand
-on the Fusion layout, in `Refusals/FusionComponents/` and `Refusals/FusionTemplates/`, each beside its rendering twin
-and each test red (M21.X805, M22.X1, M22.X4); M21.X203's three wait on the grid's validation door, as M21.X205's
-do. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
-refusal's is, and two hundred and five care pages stand, each test red: forty-three of the record screen's (eight of
+named by two declarations. Thirty-four more refusal pages stand, each beside the page of its opposite case and each
+test red, six forks' work read at the source and landed, and one the lead's: fifteen of module 4's, five of module
+3's, four of module 7's, three of module 6's, two each of modules 1 and 17, and one each of modules 2, 9 and 16. A
+list a refusal page reads is a response body of the page's own endpoint. Six of them open their opposite case's world
+under another host through `NewWorldUnder`, on one page at one address: X6.12's first, placed under net10, under
+enumsAsNumbers, and X6.43's and X8.22's first, placed under numbersAsText, and X6.57's first two, placed under
+dateConverter, under net10. Of the refusal promises placed under net10, four wait: X6.36 a request culture, X7.11,
+twice, a typed read of a select's value (N13.1), and X1.4 a number box. Seven more are placed under other hosts:
+X6.57's third under dateConverter, whose visit form needs a date picker bound to a DateTime, which no door renders,
+since the text box's Type is N18.4's form and the owner's, and six under hosts the harness does not hold yet
+(defaultHooks, realtimeNoOffer, noAntiforgeryChoice, noRequests and net48 twice). Three of the fusion-refusals
+screen's six stand on the Fusion layout, in `Refusals/FusionComponents/` and `Refusals/FusionTemplates/`, each beside
+its rendering twin and each test red (M21.X805, M22.X1, M22.X4); M21.X203's three wait on the grid's validation door,
+as M21.X205's do. A promise placed on a care screen is a page of its own in `Care/<Screen>/`, as a
+refusal's is, and two hundred and seven care pages stand, each test red: forty-three of the record screen's (eight of
 module 9's, seven of module 2's, five of module 1's, four each of modules 3, 5 and 17, three of module 24's, two each
-of modules 7 and 12 and one each of modules 6, 8, 15 and 19), thirty-six of the residents screen's (twenty-three of
+of modules 7 and 12 and one each of modules 6, 8, 15 and 19), thirty-seven of the residents screen's (twenty-four of
 module 4's, eight of module 6's, two of module 2's and one each of modules 3, 17 and 24), thirty-six of the admission
 screen's (thirteen of module 8's, six of module 7's, four each of modules 3, 6 and 24, two of module 15's and one each
 of modules 9, 17 and 18), eighteen of the admission-clinical screen's (eighteen of module 21's), seventeen of the
 round screen's (four of module 6's, three each of modules 2, 3 and 8, two of module 1's and one each of modules 4 and
-16), seventeen of the record-contacts screen's (seventeen of module 21's), fifteen of the bed-board screen's (eight of
-module 21's and seven of module 22's), thirteen of the handover screen's (thirteen of module 21's) and ten of the
-shell screen's (eight of module 25's and one each of modules 14 and 17). Forty feature tests stand on the bench,
-sixteen of module 11's, fifteen of module 12's, four each of modules 13 and 17 and one of module 14's, their pages in
-a folder a module (`Bench/Vendors/`, `Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`, `Bench/Schema/`),
-with a render helper for each of the four other conformance declarations. The app starts under the host its argument
-`--host` names, with the JSON options app.json gives that host: net10's camel-case members and enum names, or those
-options with the one change each of five other hosts names; X7.14 stands under numbersAsText, and M11.X1 and M11.X2
-under snakeCase. Of the care families attempted, seventy-four promises placed under net10 alone wait: twenty-five need
+16), seventeen of the record-contacts screen's (seventeen of module 21's), sixteen of the bed-board screen's (eight
+each of modules 21 and 22), thirteen of the handover screen's (thirteen of module 21's) and ten of the shell screen's
+(eight of module 25's and one each of modules 14 and 17). Forty feature tests stand on the bench, sixteen of module
+11's, fifteen of module 12's, four each of modules 13 and 17 and one of module 14's, their pages in a folder a module
+(`Bench/Vendors/`, `Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`, `Bench/Schema/`), with a render helper
+for each of the four other conformance declarations. The app starts under the host its argument `--host` names, with
+the JSON options app.json gives that host: net10's camel-case members and enum names, or those options with the one
+change each of five other hosts names; X7.14 stands under numbersAsText, M11.X1 and M11.X2 under snakeCase, and X15.5
+under pascalCase, its opposite case opened under net10 through `NewWorldUnder`, as X6.16's is opened under
+enumsAsNumbers. Of the care families attempted, seventy-three promises placed under net10 alone wait: twenty-five need
 a call of the app's startup that throws until its unit (request defaults, antiforgery, flags enums, a registered
 validator, the busy indicator); sixteen need a door the core does not declare (the endpoint's error answer, N16.1; a
 condition on a part a request sends, N10.4; an append to an element's text; a handler's policy, N11.1; a text joined
@@ -1000,18 +1004,17 @@ from a source and a literal; an element's children and attributes, M5.N3 and M5.
 a property declared a List; the block's live check, D16.15; a validator's Flags<TEnum>(), N16.4, with a rule set a
 request names, D16.2's form); six need a number a person types, read as a source (N13.1); five need a request culture;
 three need a console error's words, which no line states; six need a browser zone or the view's time zone; two need
-the harness's clock verb; one needs the harness's restart verb; one needs its opposite case opened under
-enumsAsNumbers through NewWorldUnder, which the next piece writes; one needs the text box's Type, whose form N18.4
-sends to gate 2; one needs a record whose code holds null, which native.json's type of it does not hold; three need an
+the harness's clock verb; one needs the harness's restart verb; one needs the text box's Type, whose form N18.4 sends
+to gate 2; one needs a record whose code holds null, which native.json's type of it does not hold; three need an
 export held while it runs, which their placement does not name and no harness verb holds; two need a grid column's
 rules from the app's validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need the
-clipboard, which the harness grants no page, and the first of them the antiforgery startup call besides. Four more
+clipboard, which the harness grants no page, and the first of them the antiforgery startup call besides. Three more
 attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test
 typed where the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the
-harness; X11.20 waits on the defaultHooks host, X15.5 on the pascalCase host, and M21.X803's second on the net48 host.
-Of the bench's feature tests attempted, ten wait: six need an append to the callbacks object's log line, which neither
-native.json nor a core door gives; three need the harness's restart or gc verb; and one needs a list written as an
-element's rows, which no door writes.
+harness; X11.20 waits on the defaultHooks host and M21.X803's second on the net48 host. Of the bench's feature tests
+attempted, ten wait: six need an append to the callbacks object's log line, which neither native.json nor a core door
+gives; three need the harness's restart or gc verb; and one needs a list written as an element's rows, which no door
+writes.
 Of the bench's ninety-eight placed cells, ninety-five stand, each test red: nine of its properties, nine of its
 methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen of its sources, its three
 absences, its sixteen requests and three of its lanes, a slot loaded on start, a slot's listener gone at its unload

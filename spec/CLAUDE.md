@@ -1311,6 +1311,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   reads a word slip an MVC action writes with MVC's JSON options, since the World area's minimal endpoints write with
   the HTTP options, which no host sets. X8.22's first promise moves to numbersAsText, since its page's numbers are the
   ones the app's number handling writes as text, and its opposite case opens under net10. The owner can overrule each.
+- The lead, 2026-11-13, landing six pages whose opposite case opens under another host, a fork's work read at the
+  source, and writing X8.22's first. A refusal whose opposite case holds under another host's options is one page at
+  one address, opened in a second world by `NewWorldUnder`. X6.12's message takes the cure its braces give a whole
+  number, a decimal or an enum, its selector dropped; X6.57's `{type}` for a `DateTime` is "DateTime", and its
+  `{term}` in a pipeline condition is the read's path ("handover.At"). X6.16's page counts doses of an enum of its
+  own, `CountedDoseStatus`, since the round screen's `DoseStatus` holds no Held and sits on another row. X8.22's first
+  promise read the conformance component's records, which the live form holds as JSON numbers under every host (D7.7),
+  so its refusal could not hold: its page now reads the residents' fluid ratios, a response body of its own endpoint,
+  as the refusal pages' lists are (2026-11-12), and the move of 553d078f3 to numbersAsText stands on that page.
+  X6.57's third waits on a date picker bound to a DateTime, which no door renders (N18.4). The owner can overrule
+  each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -1,0 +1,35 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundDoseCounts
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The round's doses";
+    var plan = Html.ReactivePlan<RoundDoseCounts>();
+}
+<h1>@Model.Round round: dose counts</h1>
+<dl>
+    <dt>Doses due</dt>
+    <dd id="due-count"></dd>
+    <dt>Doses injected</dt>
+    <dd id="injected-count"></dd>
+    <dt>Doses as planned</dt>
+    <dd id="as-planned-count"></dd>
+    <dt>Doses stronger than their priority</dt>
+    <dd id="above-priority-count"></dd>
+    <dt>Doses by a route before L</dt>
+    <dd id="early-route-count"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(RoundDoseCountEndpoints.Doses)
+        .OnSuccess<List<CountedDose>>((doses, pipeline) =>
+        {
+            pipeline.Element("due-count").Text.Set(doses.Body.Count(d => d.Status == CountedDoseStatus.Due));
+            pipeline.Element("injected-count").Text.Set(doses.Body.Count(d => d.Route == 'I'));
+            pipeline.Element("as-planned-count").Text.Set(doses.Body.Count(d => d.Status == d.Planned));
+            pipeline.Element("above-priority-count").Text.Set(doses.Body.Count(d => d.Milligrams > d.Priority));
+            pipeline.Element("early-route-count").Text.Set(doses.Body.Count(d => d.Route < 'L'));
+        })));
+}
+@Html.RenderPlan(plan)
