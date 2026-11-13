@@ -27,8 +27,8 @@ its parts and how each part is sent, is module 6's (Q9): this module states what
 6 which form a part takes. An input's binding, `coalesce(as(read, shape), blank)` (N3.3), is module 7's, and an
 element id's derivation module 7's (D14.3). The plan's culture and time zone fields are module 14's door (N19.3);
 their meaning is this module's (D3.11, D3.12). A server error key shown at its input is module 8's (X1.5). A plugin
-handed no member path as text is module 13's (X2.2). Fusion's `AddReactiveFusion`, which sets the naming Syncfusion's
-server helpers write with, is module 21's row, under D2.9.
+handed no member path as text is module 13's (X2.2). Fusion's `AddReactiveFusion`, which set the naming Syncfusion's
+server helpers write with on both older lines, is module 21's row, which removes it (M21.N2), under D2.9.
 
 This module owns `BrowserFile`, the C# type of the `file` shape (D3.1, N3.2), since its whole meaning is a value's
 form: what the page reads of a file the person chose, and the file itself in form data alone (X3.2). It holds the

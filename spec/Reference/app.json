@@ -46,7 +46,7 @@
   "hosts": [
     {
       "id": "net10",
-      "what": "ASP.NET Core MVC on net10 with the app's default options: camel-case members and enum names, Fusion registered, ShowBusy() with NativeLoader, ShowReconnect() with the Native offer, request defaults sending X-Requested-With with a 401 route, a catch-all, ShowValidationErrors() and the standard retry, antiforgery in a header, Flags<CareDays>() and Flags<RotaDays>() named, its process clock in America/New_York",
+      "what": "ASP.NET Core MVC on net10 with the app's default options: camel-case members and enum names, Syncfusion's licence registered, ShowBusy() with NativeLoader, ShowReconnect() with the Native offer, request defaults sending X-Requested-With with a 401 route, a catch-all, ShowValidationErrors() and the standard retry, antiforgery in a header, Flags<CareDays>() and Flags<RotaDays>() named, its process clock in America/New_York",
       "framework": "net10"
     },
     {

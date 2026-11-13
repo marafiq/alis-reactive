@@ -627,11 +627,11 @@
    "promises": [
     {
      "for": "M21.X3",
-     "page": "An app that registers Fusion at startup, whose own preview endpoint returns a resident written by JsonConvert.SerializeObject with no settings of the app's, and a Preview button that loads the endpoint's text into a preview element.",
+     "page": "An app that renders Fusion components, its Syncfusion licence registered at startup, whose own preview endpoint returns a resident written by JsonConvert.SerializeObject with no settings of the app's, and a Preview button that loads the endpoint's text into a preview element.",
      "gesture": "Click Preview.",
      "outcome": "The preview shows {\"ResidentId\":7,\"GivenName\":\"Rose\"}.",
      "opposite": "The same endpoint written under the app's own camel-case JsonSerializerSettings shows {\"residentId\":7,\"givenName\":\"Rose\"}: the app's settings decide.",
-     "defect": "Registering Fusion sets Newtonsoft's process-wide default to camel case, so the app's own call writes residentId and givenName although the app chose nothing."
+     "defect": "A Fusion door sets Newtonsoft's process-wide default to camel case, so the app's own call writes residentId and givenName although the app chose nothing."
     }
    ],
    "verdicts": [
