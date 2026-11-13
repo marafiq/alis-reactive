@@ -1,0 +1,39 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model PainAssessment
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Pain assessment";
+    var plan = Html.ReactivePlan<PainAssessment>();
+}
+<h1>Pain assessment for @Model.Resident</h1>
+@using (var meter = Html.BeginRequestContainer(plan, "pain-meter"))
+{
+    @(Html.InputField(plan, m => m.Pain, options => options.Label("Pain")).NativeTextBox())
+    <button type="button" @Html.Raises(plan, PainAssessments.Assess)>Assess</button>
+    Html.On(plan, trigger => trigger.CustomEvent(PainAssessments.Assess, pipeline =>
+    {
+        var pain = meter.Container.Read(m => m.Pain);
+        pipeline.When(pain.Gte(4)).Then(pipeline =>
+        {
+            pipeline.Element("pain-plan").Text.Set("Call the doctor");
+            pipeline.Element("pain-log").Text.Set("doctor");
+        })
+        .ElseIf(pain.Gte(2)).Then(pipeline =>
+        {
+            pipeline.Element("pain-plan").Text.Set("Give pain relief");
+            pipeline.Element("pain-log").Text.Set("relief");
+        })
+        .Else(pipeline =>
+        {
+            pipeline.Element("pain-plan").Text.Set("No action");
+            pipeline.Element("pain-log").Text.Set("none");
+        });
+    }));
+}
+<p>Plan: <span id="pain-plan"></span></p>
+<p>Log: <span id="pain-log"></span></p>
+@Html.RenderPlan(plan)

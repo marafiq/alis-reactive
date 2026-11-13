@@ -80,7 +80,9 @@ its views.
   page reads is a response body of the page's own endpoint, named beside its controller
   (`Care/Residents/ResidentsEndpoints.cs`) unless a test names it. A Fusion screen's page takes
   `Shared/_FusionLayout.cshtml`, which holds what `Shared/_Layout.cshtml` holds until U25 links EJ2's script and
-  theme in it, before the framework's (`Care/AdmissionClinical/AllergyIntake.cshtml`).
+  theme in it, before the framework's (`Care/AdmissionClinical/AllergyIntake.cshtml`). A page that reads a value a
+  person types or chooses, typed as its member, renders the field inside a container block and reads it by the
+  container's `Read` (`Care/Record/PainAssessment.cshtml`).
 - A screen's files sit together in its folder, `Refusals/Schema/` the first: its controller, its model, its view
   and its layout, a view named by its path. A layout links the framework's script from the core's static web
   assets, last; the static files middleware serves it, which adds no route.

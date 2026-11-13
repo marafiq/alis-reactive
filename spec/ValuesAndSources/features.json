@@ -224,7 +224,7 @@
           "page": "The resident record whose Record button sets the care panel's NullableCount, shown in its nullable count line, from the intake field, a number input, widened with OrNull(), and that field can be cleared.",
           "gesture": "Type 500 in the intake field and click Record.",
           "outcome": "The care panel's nullable count line reads 500.",
-          "opposite": "With the field cleared, Record sets the panel's nullable count line to none.",
+          "opposite": "With the field cleared, Record sets the panel's nullable count line to 0, the intake's start, since a blank input reads what the member binds as (D3.6).",
           "defect": "The widened value is dropped or written as text, so the panel keeps its earlier nullable count or shows the text 500."
         },
         {

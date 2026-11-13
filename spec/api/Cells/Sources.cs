@@ -26,7 +26,7 @@ public static class Sources
 
     public static TypedSource<string?> ResponseBodyField(Response<CellRequest, CellReply> reply) => reply.Body.Read(body => body.Wing);
 
-    public static TypedSource<string?> ContainerMember() => NoDoor.Source("N13.1: no container read");
+    public static TypedSource<string?> ContainerMember(RequestContainer<CellView> container) => container.Read(view => view.Wing);
 
     public static TypedSource<string?> ArrayOperationResult(Response<CellRequest, CellReply> reply) => reply.Body.Read(body => body.Residents).Find(resident => resident.Ward == "North", resident => resident.Wing);
 

@@ -177,6 +177,7 @@ Alis.Reactive.RequestsAndResponses.Notice.Warning(string! text) -> void
 Alis.Reactive.RequestsAndResponses.PageUrl<TPage>
 Alis.Reactive.RequestsAndResponses.PageUrl<TPage>.Read<TValue>(System.Linq.Expressions.Expression<System.Func<TPage, TValue>!>! member) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
 Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>
+Alis.Reactive.RequestsAndResponses.RequestContainer<TModel>.Read<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue>!
 Alis.Reactive.RequestsAndResponses.RequestForm<TModel>
 Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>
 Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>.Body.get -> Alis.Reactive.Declarations.ReadOnly<TBody>!

@@ -106,7 +106,7 @@
         },
         {
           "line": "proposed",
-          "text": "A container reads a member as the container sends it, so a read by binding name belongs to a container and names one input.",
+          "text": "meter.Container.Read(m => m.Pain)",
           "doors": [
             "N13.1"
           ]

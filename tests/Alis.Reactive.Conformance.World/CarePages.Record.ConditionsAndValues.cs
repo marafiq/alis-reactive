@@ -5,6 +5,7 @@ public static partial class CarePages
     private const string Record = Area + "record/";
 
     public const string RoomBooking = Record + "room-booking";
+    public const string PainAssessment = Record + "pain-assessment";
     public const string FluidBalanceMeasuredBeforeItsWrite = Record + "fluid-balance/measured-before-its-write";
     public const string FluidBalanceMeasuredAfterItsWrite = Record + "fluid-balance/measured-after-its-write";
     public const string VitalSigns = Record + "vital-signs";

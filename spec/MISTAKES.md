@@ -42,7 +42,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A landing's carrier left out of its commit | 2 | A step a script shows: a commit message writer stops when the commit stages a PublicAPI text and leaves spec/REWRITE.md unstaged, since section 4 names what is declared. Since its second, a rule line names a folder by its first file or as the first of its kind, never by a count of what it holds, which a landing would have to carry. |
 | The owner's words answered with a remedy they did not name | 1 | A rule line: `spec/CLAUDE.md`, the owner's decision of 2026-11-12 on pace, which quotes the correction. |
 | An ordering met without its TLA+ spec named | 1 | A step a commit shows: a commit whose piece meets an ordering names the invariants it rests on in a line of its message, and an ordering no spec holds is written as a spec before its door; root CLAUDE.md's TLA+ line states it. It reached the owner, so it starts on this rung. |
-| A case written in a shape its real input cannot take | 2 | A rule line: `tests/Alis.Reactive.ArchitectureTests/CLAUDE.md`, a runner case's tables hold what the real tools write, each fixture in its first folder's namespace beside its folder. Since its second entry, a step a script shows: a carriers script finds a generated paragraph's ends as the wrap can write them, across any whitespace. |
+| A case written in a shape its real input cannot take | 3 | A rule line: `tests/Alis.Reactive.ArchitectureTests/CLAUDE.md`, a runner case's tables hold what the real tools write, each fixture in its first folder's namespace beside its folder. Since its second entry, a step a script shows: a carriers script finds a generated paragraph's ends as the wrap can write them, across any whitespace. Since its third, every anchor a carriers script reads, a lead line's end among them, is found across any whitespace, and every one is found before the script's first write; the tool's rung waits for the owner's yes. |
 | A start chosen to quiet the compiler where a spec line states it | 1 | A rule line: `tests/Alis.Reactive.Conformance.App/CLAUDE.md`, a data class's member starts at what native.json's type and every promise that reads the member lacking state, and the nullable compiler chooses no start. |
 | A name landed that departs from its siblings' name for one concept | 1 | A step a script shows: at each landing, a script of the session reads every render helper's builder callback and every options callback and stops on a name other than `build` and `options`; a landing quotes its line. |
 
@@ -78,6 +78,11 @@ them, each marked as the lead's slip, and are not copied here.
   pushed message, D7.7), so no promise is placed under such a host over a live value its options never reach.
   The class "placed before its line was read" met its third entry on the step's rung. Cost: one check with a
   refused and an accepted plant, reading the promise's words, which it can misread; X8.22's first is today's one case.
+
+- A writer of `spec/tools` that applies a list of prose edits by anchors found across any whitespace, each found
+  once before any is written, so a landing's carriers stop whole or land whole. The class "a case written in a
+  shape its real input cannot take" met its third entry on the step's rung. Cost: one tool with its refused and
+  accepted cases; the session's carriers scripts do it by hand today.
 
 ## Entries
 
@@ -556,3 +561,9 @@ them, each marked as the lead's slip, and are not copied here.
   since earlier landings added pages and left the count. Caught by the lead reading the rule against `git ls-files`.
   Cost: a rule line that misstated its folder. Held by the cause removed: the line names the folder as the first, as
   `Care/Residents/` is named, with no count a landing must carry.
+- 2026-11-13, a case written in a shape its real input cannot take, the class's third entry. The carriers script of
+  N13.1's declaration found the end of the last lead line of spec/CLAUDE.md as "The owner can overrule each." on one
+  line, where the line wraps it across two, and it stopped there after its earlier edits had been written. Caught by
+  the script's own lookup. Cost: a half-written set of carriers, finished by a second script that found the end across
+  whitespace and asserted each write was not already made. Held by the class's step, extended: every anchor across any
+  whitespace, every anchor found before the first write; the tool's rung waits for the owner's yes.

@@ -57,6 +57,8 @@ public class RequestContainer<TModel>
     private protected RequestContainer()
     {
     }
+
+    public TypedSource<TValue> Read<TValue>(Expression<Func<TModel, TValue>> member) => throw new NotSupportedException();
 }
 
 public sealed class RequestForm<TModel> : RequestContainer<TModel>

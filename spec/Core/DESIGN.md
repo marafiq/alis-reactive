@@ -1241,7 +1241,9 @@ Terms used throughout:
   - the live form, what a live object holds or hands: a member of a component, plugin or element, a method's result,
     an event's payload, argument or callback argument, one declared as data included (D5.6), since the vendor's
     JavaScript wrote it, and data read past any of these; a computed value (a count, a sum, a comparison), which the
-    browser computes as a JavaScript number or boolean (D6.11); and an object or list built from sources (N7.2).
+    browser computes as a JavaScript number or boolean (D6.11); an object or list built from sources (N7.2); and a
+    member as its container sends it (N13.1), read from the input that holds it and converted by the member's key, as
+    an input's value is (N3.3).
   The live form is System.Text.Json's writing of the type with the app's naming policies and its contract (its
   resolver, a source-generated context's included) and nothing else the options set: every number a JSON number,
   every null member written, and no converter but the plan's own `DateTime` converter (D3.9)
@@ -3135,10 +3137,11 @@ plans name.
 
 - D13.2 A plan's id keys nothing: it names the plan in traces only, and many plans of a page share one id freely.
 - D13.3 A read of a member by its binding name belongs to a container. It reads the input inside the container's
-  element that binds the name, as the container sends it. A page-wide read by binding name is refused: two views can
-  bind one name, so on a page a name names no single input. That ends the chain of guesses that read the last
-  contributed input, then the plan's own. A read of a member's input outside a container is `pipeline.Input(m =>
-  m.Member)` (N14.4), by the element id Q14 derives the same way in every view that renders the member.
+  element that binds the name, as the container sends it (`container.Read(m => m.Member)`, N13.1). A page-wide read by
+  binding name is refused: two views can bind one name, so on a page a name names no single input. That ends the chain
+  of guesses that read the last contributed input, then the plan's own. A read of a member's input outside a container
+  is `pipeline.Input(m => m.Member)` (N14.4), by the element id Q14 derives the same way in every view that renders
+  the member.
 - D13.4 Two inputs a request or a check sends under one scalar binding name (two inside its container, or an
   `Input` and one inside its container) stop the request or the check, with one logged error that names both
   element ids. Form data binds the first value and JSON the last
@@ -3174,7 +3177,12 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   place (D16.13); `Html.FormSummary(formId)` (`Alis.Reactive/Razor/PlanExtensions.cs:98`), carried by the container's
   block (N14.3).
 - `N13.1` new: a container's typed read of a member as the container sends it, the one read by binding name (D13.3); its
-  form goes to gate 2. It carries `p.Bound(m => ..)`, whose page-wide read by name is refused.
+  form went to gate 2. It carries `p.Bound(m => ..)`, whose page-wide read by name is refused. No line and no compiled
+  sentence wrote its form, so it is the owner's to decide (G13); U3 declares the lead's proposal as a signature, for
+  the views to be written on: `container.Read(m => m.Member)`, a member of the container's handle
+  `RequestContainer<TModel>`, which a view reaches as its block's `Form` or `Container`, or by
+  `pipeline.Container<TModel>(containerId)` from another view, as `PageUrl<TPage>.Read` reads a page URL member (the
+  lead, 2026-11-13, `spec/CLAUDE.md`).
 
 **Evidence.**
 - P2, each row with the meaning that answers it:

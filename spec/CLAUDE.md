@@ -1322,6 +1322,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   as the refusal pages' lists are (2026-11-12), and the move of 553d078f3 to numbersAsText stands on that page.
   X6.57's third waits on a date picker bound to a DateTime, which no door renders (N18.4). The owner can overrule
   each.
+- The lead, 2026-11-13, declaring N13.1, a container's typed read of a member as it sends it, designed by a Fable
+  agent at xhigh and decided from its answer read at the source. No line and no compiled sentence wrote its form, so
+  by G13 it is the owner's, and U3 declares the lead's proposal as a signature: `container.Read(m => m.Member)`, a
+  member of `RequestContainer<TModel>`, the handle a block's `Form` or `Container` holds and
+  `pipeline.Container<TModel>(containerId)` returns, named `Read` as `PageUrl<TPage>.Read`, a payload's `Read` and a
+  method result's are. It is no second door beside `pipeline.Input(m => m.Member)`, which reaches the input by its id
+  and reads its component's members in their own types (D13.3, D7.2). D7.7 now puts the read in the live form, since
+  the input that holds the value wrote it, as conversions.md's key for it already says. A page that reads a number a
+  person types renders the field in a container block, X8.4's pain assessment the first; eight more pages wait on it,
+  five of the record screen's, X7.11's two and X1.4. X7.7's first promise read none for a cleared int field, where
+  D3.6 reads the member's start, so its opposite reads 0. The cost of another form: one line in each view that reads a
+  typed member. The owner decides it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

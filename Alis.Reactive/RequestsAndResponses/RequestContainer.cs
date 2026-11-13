@@ -1,3 +1,7 @@
+using System;
+using System.Linq.Expressions;
+using Alis.Reactive.ValuesAndSources;
+
 namespace Alis.Reactive.RequestsAndResponses;
 
 /// <summary>
@@ -9,6 +13,16 @@ public class RequestContainer<TModel>
     private protected RequestContainer()
     {
     }
+
+    /// <summary>Reads a member of the container's model as the container sends it: the value of the input inside the container that binds the member.</summary>
+    /// <remarks>
+    /// The value has the member's type, so a number typed into a text box reads as that number. An input left blank, or
+    /// whose text does not convert to the member's type, reads as a new <typeparamref name="TModel"/> would hold the member.
+    /// </remarks>
+    /// <param name="member">The member to read, as a member path.</param>
+    /// <typeparam name="TValue">The type of the member.</typeparam>
+    /// <returns>A source of the member's value.</returns>
+    public TypedSource<TValue> Read<TValue>(Expression<Func<TModel, TValue>> member) => throw new NotImplementedException();
 }
 
 /// <summary>
