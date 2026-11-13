@@ -14,22 +14,22 @@
       "counts": {
         "cells": 117,
         "hosts": 20,
-        "placed": 452,
+        "placed": 453,
         "problems": 0,
         "rewrite": 0,
         "screens": 14
       },
-      "detail": "452 feature tests and 117 cell tests on 14 screens under 20 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "453 feature tests and 117 cell tests on 14 screens under 20 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "bindings": {
       "counts": {
-        "constants": 574,
+        "constants": 575,
         "gates": 73,
-        "marks": 59,
+        "marks": 60,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 574 constants, 59 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 575 constants, 60 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -1327,7 +1327,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 609,
+        "defects": 610,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1598,7 +1598,7 @@
         "mapped": 8909,
         "matrix_promised": 117,
         "matrix_runs": 117,
-        "promises": 452,
+        "promises": 453,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1626,10 +1626,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 569,
+        "tests": 570,
         "units": 27
       },
-      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 2, U10 5, U11 16, U12 0, U13 98, U14 6, U15 27, U16 0, U17 0, U18 76, U19 18, U20 8, U21 45, U22 7, U23 124, U24 28, U25 32, U26 69, U27 3",
+      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 2, U10 5, U11 16, U12 0, U13 98, U14 6, U15 27, U16 0, U17 0, U18 76, U19 18, U20 8, U21 45, U22 7, U23 124, U24 29, U25 32, U26 69, U27 3",
       "pass": true
     },
     "slice_tests": {
@@ -3798,7 +3798,7 @@
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 51m 2h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 14m 1a, U10 5b 16m 10a, U11 16b 22m 23a, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 27b 12m 1a, U16 13m 4a, U17 21m 9a, U18 76b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 45b 14m 1a, U22 7b 4m, U23 124b, U24 28b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 51m 2h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 14m 1a, U10 5b 16m 10a, U11 16b 22m 23a, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 27b 12m 1a, U16 13m 4a, U17 21m 9a, U18 76b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 45b 14m 1a, U22 7b 4m, U23 124b, U24 29b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -3816,7 +3816,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "1b7c076e60a5e9e6beb0248e6807f2ec75558444",
+  "read_at_head": "858e7ebb72a8326ff153cc56ef1db85851b262b1",
   "step": {
     "failing": [],
     "name": "End of session",
