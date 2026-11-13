@@ -5,7 +5,7 @@ namespace Alis.Reactive.Fusion.FusionComponents;
 /// <summary>
 /// Where a <see cref="FusionButton"/> places its icon beside its text, written by its name.
 /// </summary>
-[JsonConverter(typeof(JsonStringEnumConverter<FusionButtonIconPosition>))]
+[JsonConverter(typeof(FusionButtonIconPositionConverter))]
 public enum FusionButtonIconPosition
 {
     /// <summary>Before the text.</summary>

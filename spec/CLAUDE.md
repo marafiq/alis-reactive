@@ -1127,6 +1127,20 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   named for lib.dom's type the method receives. A declaration lists it among its method's arguments where the
   method takes the signal, and a view passes nothing for it. The cost of another form: one line in each
   declaration that lists it. The owner decides it.
+- The lead, 2026-11-13, landing seventeen Fusion slices of the handover, bed-board and fusion-layout screens as
+  signatures, three forks' work read at the source, and settling what they read into. Four forms are the lead's,
+  each read at EJ2 33.1.47's source: the scheduler's `DataBound` is the core's `Event`, since EJ2 raises it with
+  null (crud.js:59) and a payload read at the first argument would stop its handler; the context menu's open
+  payload writes `Top` and `Left` as the menu's does, since EJ2 reads both back for either (menu-base.js:1107,
+  :1145); and an enum whose line refuses integer values carries a converter of its own that refuses them, the
+  carousel's slide direction and the button's icon position, which wave 9 had landed with the converter that
+  takes them. The forms the forks took stand as written: a data class a method returns where its line names a JSON
+  name (the chip list's `Indexes`); text where a line names no enum (the scheduler's view, the pivot view's
+  display); a payload its line names and reads nothing of as an empty class; the smart text area's options with
+  no `Value`, since its helpers start at the member's value (M21.X605); a helper over a member of any type where
+  its line names none, as the text area's; a menu item's items as a list that admits null. Raised for U13: the
+  pivot view's `DataSourceSettingsModel`, which its line mirrors, is exported by no index of its package. The
+  owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

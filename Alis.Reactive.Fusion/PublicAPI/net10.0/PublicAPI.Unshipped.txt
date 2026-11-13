@@ -62,6 +62,27 @@ Alis.Reactive.Fusion.FusionComponents.FusionAutoComplete<TValue>.HidePopup() -> 
 Alis.Reactive.Fusion.FusionComponents.FusionAutoComplete<TValue>.ShowPopup() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionAutoComplete<TValue>.Value.get -> Alis.Reactive.Declarations.Property<TValue>!
 Alis.Reactive.Fusion.FusionComponents.FusionAutoCompleteHtml
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.ActiveItem.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbClickEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbClickEventArgs.BreadcrumbClickEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbClickEventArgs.Item.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.BreadcrumbItemModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.Disabled.get -> bool?
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.Disabled.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.IconCss.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.IconCss.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.Id.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.Id.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.Text.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.Text.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.Url.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbItemModel.Url.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.FusionBreadcrumb() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.ItemClick.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb.BreadcrumbClickEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumbHtml
 Alis.Reactive.Fusion.FusionComponents.FusionBulletChart
 Alis.Reactive.Fusion.FusionComponents.FusionBulletChart.BulletChartMouseClick.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionBulletChart.IBulletMouseEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionBulletChart.DataSource<TItem>() -> Alis.Reactive.Declarations.Property<System.Collections.Generic.IReadOnlyList<TItem>!>!
@@ -98,6 +119,30 @@ Alis.Reactive.Fusion.FusionComponents.FusionButtonIconPosition.Bottom = 3 -> Ali
 Alis.Reactive.Fusion.FusionComponents.FusionButtonIconPosition.Left = 0 -> Alis.Reactive.Fusion.FusionComponents.FusionButtonIconPosition
 Alis.Reactive.Fusion.FusionComponents.FusionButtonIconPosition.Right = 1 -> Alis.Reactive.Fusion.FusionComponents.FusionButtonIconPosition
 Alis.Reactive.Fusion.FusionComponents.FusionButtonIconPosition.Top = 2 -> Alis.Reactive.Fusion.FusionComponents.FusionButtonIconPosition
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.CarouselSlideDirection
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.CarouselSlideDirection.Next = 1 -> Alis.Reactive.Fusion.FusionComponents.FusionCarousel.CarouselSlideDirection
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.CarouselSlideDirection.Previous = 0 -> Alis.Reactive.Fusion.FusionComponents.FusionCarousel.CarouselSlideDirection
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.FusionCarousel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.Next() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.Prev() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SelectedIndex.get -> Alis.Reactive.Declarations.Property<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChanged.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangedEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangedEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangedEventArgs.CurrentIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangedEventArgs.IsSwiped.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangedEventArgs.PreviousIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangedEventArgs.SlideChangedEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangedEventArgs.SlideDirection.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionCarousel.CarouselSlideDirection>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChanging.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangingEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangingEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangingEventArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangingEventArgs.CurrentIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangingEventArgs.IsSwiped.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangingEventArgs.NextIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangingEventArgs.SlideChangingEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionCarousel.SlideChangingEventArgs.SlideDirection.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionCarousel.CarouselSlideDirection>!
+Alis.Reactive.Fusion.FusionComponents.FusionCarouselHtml
 Alis.Reactive.Fusion.FusionComponents.FusionCheckBox
 Alis.Reactive.Fusion.FusionComponents.FusionCheckBox.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionCheckBox.ChangeEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionCheckBox.ChangeEventArgs
@@ -111,6 +156,66 @@ Alis.Reactive.Fusion.FusionComponents.FusionCheckBox.FocusIn() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionCheckBox.FusionCheckBox() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionCheckBox.Indeterminate.get -> Alis.Reactive.Declarations.Property<bool>!
 Alis.Reactive.Fusion.FusionComponents.FusionCheckBoxHtml
+Alis.Reactive.Fusion.FusionComponents.FusionChipList
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Add(Alis.Reactive.ValuesAndSources.Arg<string!>! text) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDataArgs
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDataArgs.ChipDataArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDataArgs.Index.get -> int
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDataArgs.Index.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDataArgs.Text.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDataArgs.Text.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDeletedEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDeletedEventArgs.ChipDeletedEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDeletedEventArgs.Index.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDeletedEventArgs.Text.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Click.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionChipList.ClickEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ClickEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ClickEventArgs.ClickEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ClickEventArgs.Index.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ClickEventArgs.Selected.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.ClickEventArgs.Text.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Deleted.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDeletedEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Find(Alis.Reactive.ValuesAndSources.Arg<int>! index) -> Alis.Reactive.Declarations.MethodResult<Alis.Reactive.Fusion.FusionComponents.FusionChipList.ChipDataArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.FusionChipList() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.GetSelectedChip<TData>() -> Alis.Reactive.Declarations.MethodResult<Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.GetSelectedChips<TData>() -> Alis.Reactive.Declarations.MethodResult<Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Remove(Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<int>!>! indexes) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Remove(Alis.Reactive.ValuesAndSources.Arg<int>! index) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Select(Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<int>!>! indexes) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Select(Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<string!>!>! values, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectionType>! selectionType) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.Select(Alis.Reactive.ValuesAndSources.Arg<int>! index) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedChips<TValue>() -> Alis.Reactive.Declarations.Property<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>.Data.get -> TData
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>.Data.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>.Index.get -> int
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>.Index.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>.SelectedItem() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>.Text.get -> string!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItem<TData>.Text.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>.Data.get -> System.Collections.Generic.IReadOnlyList<TData>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>.Data.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>.Indexes.get -> System.Collections.Generic.IReadOnlyList<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>.Indexes.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>.SelectedItems() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>.Texts.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectedItems<TData>.Texts.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectionType
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectionType.Text = 1 -> Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectionType
+Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectionType.Value = 0 -> Alis.Reactive.Fusion.FusionComponents.FusionChipList.SelectionType
+Alis.Reactive.Fusion.FusionComponents.FusionChipListHtml
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.ColorPickerEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.ColorPickerEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.ColorPickerEventArgs.ColorPickerEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.ColorPickerEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.Disabled.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.FusionColorPicker() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.Toggle() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionColorPicker.Value.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionColorPickerHtml
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Blur.get -> Alis.Reactive.Declarations.Event!
 Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.ChangeEventArgs!>!
@@ -132,6 +237,46 @@ Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>.Value.get -> Alis.R
 Alis.Reactive.Fusion.FusionComponents.FusionComboBoxHtml
 Alis.Reactive.Fusion.FusionComponents.FusionComponent
 Alis.Reactive.Fusion.FusionComponents.FusionComponent.FusionComponent() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeClose.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeItemRender.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpen.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs.BeforeOpenCloseMenuEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs.IsFocused.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs.Items.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs.Left.get -> Alis.Reactive.Declarations.Property<double>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs.ParentItem.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.BeforeOpenCloseMenuEventArgs.Top.get -> Alis.Reactive.Declarations.Property<double>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.Close() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.FusionContextMenu() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuEventArgs.Item.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuEventArgs.MenuEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.IconCss.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.IconCss.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Id.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Id.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Items.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel!>?
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Items.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.MenuItemModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Separator.get -> bool?
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Separator.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Text.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Text.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Url.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel.Url.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.OnClose.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.OpenCloseMenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.OnOpen.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.OpenCloseMenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.Open(Alis.Reactive.ValuesAndSources.Arg<double>! top, Alis.Reactive.ValuesAndSources.Arg<double>! left) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.OpenCloseMenuEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.OpenCloseMenuEventArgs.Items.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.OpenCloseMenuEventArgs.OpenCloseMenuEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.OpenCloseMenuEventArgs.ParentItem.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.Select.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu.MenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionContextMenuHtml
 Alis.Reactive.Fusion.FusionComponents.FusionDatePicker<TValue>
 Alis.Reactive.Fusion.FusionComponents.FusionDatePicker<TValue>.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionDatePicker<TValue>.ChangedEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionDatePicker<TValue>.ChangedEventArgs
@@ -234,6 +379,21 @@ Alis.Reactive.Fusion.FusionComponents.FusionDropDownList<TValue>.ShowPopup() -> 
 Alis.Reactive.Fusion.FusionComponents.FusionDropDownList<TValue>.Text.get -> Alis.Reactive.Declarations.Property<string?>!
 Alis.Reactive.Fusion.FusionComponents.FusionDropDownList<TValue>.Value.get -> Alis.Reactive.Declarations.Property<TValue>!
 Alis.Reactive.Fusion.FusionComponents.FusionDropDownListHtml
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.DdtChangeEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.Clear() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.DdtChangeEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.DdtChangeEventArgs.DdtChangeEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.DdtChangeEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.DdtChangeEventArgs.OldValue.get -> Alis.Reactive.Declarations.ReadOnly<string![]!>!
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.DdtChangeEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string![]!>!
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.FusionDropDownTree() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.HidePopup() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.ShowPopup() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.Text.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.Value.get -> Alis.Reactive.Declarations.Property<string![]?>!
+Alis.Reactive.Fusion.FusionComponents.FusionDropDownTreeHtml
 Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>
 Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>.ActionBegin.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>.ActionBeginEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>.ActionBeginData
@@ -442,6 +602,46 @@ Alis.Reactive.Fusion.FusionComponents.FusionMention<TValue>.PopupEventArgs.Popup
 Alis.Reactive.Fusion.FusionComponents.FusionMention<TValue>.Search(Alis.Reactive.ValuesAndSources.Arg<string!>! text, Alis.Reactive.ValuesAndSources.Arg<double>! positionX, Alis.Reactive.ValuesAndSources.Arg<double>! positionY) -> void
 Alis.Reactive.Fusion.FusionComponents.FusionMention<TValue>.ShowPopup() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionMentionHtml
+Alis.Reactive.Fusion.FusionComponents.FusionMenu
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeClose.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeItemRender.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpen.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs.BeforeOpenCloseMenuEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs.IsFocused.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs.Items.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs.Left.get -> Alis.Reactive.Declarations.Property<double>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs.ParentItem.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.BeforeOpenCloseMenuEventArgs.Top.get -> Alis.Reactive.Declarations.Property<double>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.Close() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.FusionMenu() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuEventArgs.Item.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuEventArgs.MenuEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.IconCss.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.IconCss.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Id.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Id.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Items.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel!>?
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Items.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.MenuItemModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Separator.get -> bool?
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Separator.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Text.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Text.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Url.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel.Url.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.OnClose.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMenu.OpenCloseMenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.OnOpen.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMenu.OpenCloseMenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.Open() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.OpenCloseMenuEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.OpenCloseMenuEventArgs.Items.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.OpenCloseMenuEventArgs.OpenCloseMenuEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.OpenCloseMenuEventArgs.ParentItem.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenu.Select.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMenu.MenuEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMenuHtml
 Alis.Reactive.Fusion.FusionComponents.FusionMultiColumnComboBox<TValue>
 Alis.Reactive.Fusion.FusionComponents.FusionMultiColumnComboBox<TValue>.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMultiColumnComboBox<TValue>.ChangeEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionMultiColumnComboBox<TValue>.ChangeEventArgs
@@ -496,6 +696,114 @@ Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.TaggingEventArgs
 Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.TaggingEventArgs.TaggingEventArgs() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Value.get -> Alis.Reactive.Declarations.Property<TValue>!
 Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Blur.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.NumericBlurEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.ChangeEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.ChangeEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.ChangeEventArgs.ChangeEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.ChangeEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.ChangeEventArgs.PreviousValue.get -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.ChangeEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Decrement() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Focus.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.NumericFocusEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.FocusIn() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.FocusOut() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.FusionNumericTextBox() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Increment() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Min.get -> Alis.Reactive.Declarations.Property<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.NumericBlurEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.NumericBlurEventArgs.NumericBlurEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.NumericFocusEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.NumericFocusEventArgs.NumericFocusEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>.Value.get -> Alis.Reactive.Declarations.Property<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBoxHtml
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.Blur.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpFocusEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.Focus.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpFocusEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.FocusIn() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.FocusOut() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.FusionOtpInput() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.Input.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpInputEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpChangedEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpChangedEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpChangedEventArgs.OtpChangedEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpChangedEventArgs.PreviousValue.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpChangedEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpFocusEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpFocusEventArgs.Index.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpFocusEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpFocusEventArgs.OtpFocusEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpFocusEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpInputEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpInputEventArgs.Index.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpInputEventArgs.OtpInputEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpInputEventArgs.PreviousValue.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpInputEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.Value.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.ValueChanged.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionOtpInput.OtpChangedEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionOtpInputHtml
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.CellSelecting.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionPivotView.PivotCellSelectedEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.CreateCalculatedFieldDialog() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DataBound.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DataSourceSettings.get -> Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DataSourceSettingsModel!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DataSourceSettingsModel
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DataSourceSettingsModel.DataSource<TRow>() -> Alis.Reactive.Declarations.Property<System.Collections.Generic.IReadOnlyList<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DataSourceSettingsModel.DataSourceSettingsModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DisplayOption.get -> Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DisplayOptionModel!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DisplayOptionModel
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DisplayOptionModel.DisplayOptionModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DisplayOptionModel.Primary.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.DisplayOptionModel.View.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.FusionPivotView() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.GetPersistData(Alis.Reactive.ValuesAndSources.Arg<bool>! isRemoveDatasource) -> Alis.Reactive.Declarations.MethodResult<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.ActualValue.get -> double?
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.ActualValue.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.Axis.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.Axis.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.ColIndex.get -> int?
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.ColIndex.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.FormattedText.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.FormattedText.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.IAxisSet() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.IsGrandSum.get -> bool?
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.IsGrandSum.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.IsSum.get -> bool?
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.IsSum.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.RowIndex.get -> int?
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.RowIndex.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.Value.get -> double?
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet.Value.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.LoadPersistData(Alis.Reactive.ValuesAndSources.Arg<string!>! persistData) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.PivotCellSelectedEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.PivotCellSelectedEventArgs.Data.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionPivotView.IAxisSet!>!
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.PivotCellSelectedEventArgs.PivotCellSelectedEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.Refresh() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotView.ShowConditionalFormattingDialog() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionPivotViewHtml
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Begin.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Content.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.CssClass.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Disabled.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.EnableProgress.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.End.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.FocusIn() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.FusionProgressButton() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Progress.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressComplete() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressEventArgs.CurrentDuration.get -> Alis.Reactive.Declarations.ReadOnly<double>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressEventArgs.Percent.get -> Alis.Reactive.Declarations.Property<double>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressEventArgs.ProgressEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.ProgressEventArgs.Step.get -> Alis.Reactive.Declarations.Property<double>!
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Start() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Start(Alis.Reactive.ValuesAndSources.Arg<double>! percent) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButton.Stop() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionProgressButtonHtml
 Alis.Reactive.Fusion.FusionComponents.FusionRadioButton
 Alis.Reactive.Fusion.FusionComponents.FusionRadioButton.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionRadioButton.ChangeArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionRadioButton.ChangeArgs
@@ -521,6 +829,111 @@ Alis.Reactive.Fusion.FusionComponents.FusionRating.Reset() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionRating.Value.get -> Alis.Reactive.Declarations.Property<double>!
 Alis.Reactive.Fusion.FusionComponents.FusionRating.ValueChanged.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionRating.RatingChangedEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionRatingHtml
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.ChangeEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.ChangeEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.ChangeEventArgs.ChangeEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.ChangeEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.ChangeEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.FocusIn() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.FusionRichTextEditor() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor.Value.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditorHtml
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionBegin<TEvent>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs<TEvent>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionComplete.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs.ActionEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs.RequestType.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs<TEvent>
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs<TEvent>.ActionEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs<TEvent>.AddedRecords.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<TEvent>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs<TEvent>.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs<TEvent>.ChangedRecords.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<TEvent>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs<TEvent>.DeletedRecords.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<TEvent>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ActionEventArgs<TEvent>.RequestType.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.AddEvent<TEvent>(Alis.Reactive.ValuesAndSources.Arg<TEvent!>! data) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CellClick.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CellClickEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CellClickEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CellClickEventArgs.CellClickEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CellClickEventArgs.EndTime.get -> Alis.Reactive.Declarations.ReadOnly<System.DateTime>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CellClickEventArgs.GroupIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CellClickEventArgs.IsAllDay.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CellClickEventArgs.StartTime.get -> Alis.Reactive.Declarations.ReadOnly<System.DateTime>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CloseEditor() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CloseQuickInfoPopup() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CloseTooltip() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.Add = 0 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.Delete = 2 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.DeleteFollowingEvents = 8 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.DeleteOccurrence = 3 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.DeleteSeries = 4 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.EditFollowingEvents = 7 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.EditOccurrence = 5 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.EditSeries = 6 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction.Save = 1 -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentView.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.DataBound.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.DeleteEvent<TKey>(Alis.Reactive.ValuesAndSources.Arg<TKey>! id, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction>! currentAction) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventClick.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventClickArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventClickArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventClickArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventClickArgs.EventClickArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventRendered<TEvent>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventRenderedArgs<TEvent>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventRenderedArgs<TEvent>
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventRenderedArgs<TEvent>.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventRenderedArgs<TEvent>.Data.get -> Alis.Reactive.Declarations.ReadOnly<TEvent>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventRenderedArgs<TEvent>.EventRenderedArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventRenderedArgs<TEvent>.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventSettings.get -> Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventSettingsModel!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventSettingsModel
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventSettingsModel.DataSource<TEvent>() -> Alis.Reactive.Declarations.Property<System.Collections.Generic.IReadOnlyList<TEvent>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.EventSettingsModel.EventSettingsModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.FusionSchedule() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.GetCurrentViewDates() -> Alis.Reactive.Declarations.MethodResult<System.Collections.Generic.IReadOnlyList<System.DateTime>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.GetEvents<TEvent>() -> Alis.Reactive.Declarations.MethodResult<System.Collections.Generic.IReadOnlyList<TEvent>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.Navigating.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs.Action.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs.CurrentDate.get -> Alis.Reactive.Declarations.ReadOnly<System.DateTime>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs.CurrentView.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs.NavigatingEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs.PreviousDate.get -> Alis.Reactive.Declarations.ReadOnly<System.DateTime>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs.PreviousView.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.NavigatingEventArgs.ViewIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.OpenEditor<TEvent>(Alis.Reactive.ValuesAndSources.Arg<TEvent!>! data, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction>! action) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupClose.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupCloseEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupCloseEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupCloseEventArgs.PopupCloseEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupCloseEventArgs.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupOpen<TEvent>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupOpenEventArgs<TEvent>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupOpenEventArgs<TEvent>
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupOpenEventArgs<TEvent>.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupOpenEventArgs<TEvent>.Data.get -> Alis.Reactive.Declarations.ReadOnly<TEvent>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupOpenEventArgs<TEvent>.PopupOpenEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.PopupOpenEventArgs<TEvent>.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.Print() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.RefreshEvents() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.SaveEvent<TEvent>(Alis.Reactive.ValuesAndSources.Arg<TEvent!>! data, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Fusion.FusionComponents.FusionSchedule.CurrentAction>! currentAction) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.ScrollTo(Alis.Reactive.ValuesAndSources.Arg<string!>! hour) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSchedule.SelectedDate.get -> Alis.Reactive.Declarations.Property<System.DateTime>!
+Alis.Reactive.Fusion.FusionComponents.FusionScheduleHtml
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.Close.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSidebar.EventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.EventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.EventArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.EventArgs.EventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.EventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.FusionSidebar() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.Hide() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.IsOpen.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.Open.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSidebar.EventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.Show() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSidebar.Toggle() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSidebarHtml
 Alis.Reactive.Fusion.FusionComponents.FusionSlider<TValue>
 Alis.Reactive.Fusion.FusionComponents.FusionSlider<TValue>.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSlider<TValue>.SliderChangeEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionSlider<TValue>.Changed.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSlider<TValue>.SliderChangeEventArgs!>!
@@ -551,6 +964,44 @@ Alis.Reactive.Fusion.FusionComponents.FusionSmartPasteButtonOptions.CssClass.set
 Alis.Reactive.Fusion.FusionComponents.FusionSmartPasteButtonOptions.FusionSmartPasteButtonOptions() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionSmartPasteButtonOptions.IsPrimary.get -> bool
 Alis.Reactive.Fusion.FusionComponents.FusionSmartPasteButtonOptions.IsPrimary.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartSuggestionMode
+Alis.Reactive.Fusion.FusionComponents.FusionSmartSuggestionMode.Inline = 1 -> Alis.Reactive.Fusion.FusionComponents.FusionSmartSuggestionMode
+Alis.Reactive.Fusion.FusionComponents.FusionSmartSuggestionMode.None = 0 -> Alis.Reactive.Fusion.FusionComponents.FusionSmartSuggestionMode
+Alis.Reactive.Fusion.FusionComponents.FusionSmartSuggestionMode.Popup = 2 -> Alis.Reactive.Fusion.FusionComponents.FusionSmartSuggestionMode
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.AfterSuggestionInsert.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.AfterSuggestionInsertArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.AfterSuggestionInsertArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.AfterSuggestionInsertArgs.AfterSuggestionInsertArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.AfterSuggestionInsertArgs.InsertedText.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.BeforeSuggestionInsert.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.BeforeSuggestionInsertArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.BeforeSuggestionInsertArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.BeforeSuggestionInsertArgs.BeforeSuggestionInsertArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.BeforeSuggestionInsertArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.BeforeSuggestionInsertArgs.Text.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.ChangedEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.ChangedEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.ChangedEventArgs.ChangedEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.ChangedEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.ChangedEventArgs.PreviousValue.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.ChangedEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.FocusIn() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.FusionSmartTextArea() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea.Value.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaHtml
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.CssClass.get -> string!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.CssClass.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.FusionSmartTextAreaOptions() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.Rows.get -> int
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.Rows.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.SuggestionEndpoint.get -> string!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.SuggestionEndpoint.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.SuggestionMode.get -> Alis.Reactive.Fusion.FusionComponents.FusionSmartSuggestionMode
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.SuggestionMode.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.UserPhrases.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.UserPhrases.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.UserRole.get -> string!
+Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions.UserRole.set -> void
 Alis.Reactive.Fusion.FusionComponents.FusionSplitButton
 Alis.Reactive.Fusion.FusionComponents.FusionSplitButton.Click.get -> Alis.Reactive.Declarations.Event!
 Alis.Reactive.Fusion.FusionComponents.FusionSplitButton.Content.get -> Alis.Reactive.Declarations.Property<string!>!
@@ -682,6 +1133,33 @@ Alis.Reactive.Fusion.FusionComponents.FusionTextBox.InputEventArgs.PreviousValue
 Alis.Reactive.Fusion.FusionComponents.FusionTextBox.InputEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
 Alis.Reactive.Fusion.FusionComponents.FusionTextBox.Value.get -> Alis.Reactive.Declarations.Property<string?>!
 Alis.Reactive.Fusion.FusionComponents.FusionTextBoxHtml
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.ChangeEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.ChangeEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.ChangeEventArgs.ChangeEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.ChangeEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.ChangeEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.FocusIn() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.FocusOut() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.FusionTimePicker() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>.Value.get -> Alis.Reactive.Declarations.Property<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionTimePickerHtml
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ClickEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ClickEventArgs.ClickEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ClickEventArgs.Item.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.Clicked.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ClickEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.Disable(Alis.Reactive.ValuesAndSources.Arg<bool>! value) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.FusionToolbar() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel.Disabled.get -> bool?
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel.Disabled.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel.Id.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel.Id.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel.ItemModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel.Text.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionToolbar.ItemModel.Text.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionToolbarHtml
 Alis.Reactive.Fusion.FusionComponents.FusionTooltip
 Alis.Reactive.Fusion.FusionComponents.FusionTooltip.AfterClose.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionTooltip.TooltipEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionTooltip.AfterOpen.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionTooltip.TooltipEventArgs!>!
@@ -726,18 +1204,24 @@ static Alis.Reactive.Fusion.FusionComponents.FusionAutoCompleteHtml.Fields<TItem
 static Alis.Reactive.Fusion.FusionComponents.FusionAutoCompleteHtml.Fields<TItem, TText, TItemValue>(this Syncfusion.EJ2.DropDowns.AutoCompleteBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TText>!>! text, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value) -> Syncfusion.EJ2.DropDowns.AutoCompleteBuilder!
 static Alis.Reactive.Fusion.FusionComponents.FusionAutoCompleteHtml.FusionAutoComplete<TModel, TValue, TItem>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Collections.Generic.IReadOnlyList<TItem>! items, System.Action<Syncfusion.EJ2.DropDowns.AutoCompleteBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionAutoComplete<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionAutoCompleteHtml.FusionAutoComplete<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.DropDowns.AutoCompleteBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionAutoComplete<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumbHtml.FusionBreadcrumb<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.BreadcrumbBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionBreadcrumb!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionBulletChartHtml.Fields<TItem, TItemValue, TTarget, TCategory>(this Syncfusion.EJ2.Charts.BulletChartBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value, System.Linq.Expressions.Expression<System.Func<TItem, TTarget>!>! target, System.Linq.Expressions.Expression<System.Func<TItem, TCategory>!>! category) -> Syncfusion.EJ2.Charts.BulletChartBuilder!
 static Alis.Reactive.Fusion.FusionComponents.FusionBulletChartHtml.Fields<TItem, TItemValue, TTarget>(this Syncfusion.EJ2.Charts.BulletChartBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value, System.Linq.Expressions.Expression<System.Func<TItem, TTarget>!>! target) -> Syncfusion.EJ2.Charts.BulletChartBuilder!
 static Alis.Reactive.Fusion.FusionComponents.FusionBulletChartHtml.FusionBulletChart<TModel, TItem>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Collections.Generic.IReadOnlyList<TItem>! items, System.Action<Syncfusion.EJ2.Charts.BulletChartBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionBulletChart!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionBulletChartHtml.FusionBulletChart<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Charts.BulletChartBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionBulletChart!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionButtonHtml.FusionButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.ButtonBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionButton!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionCarouselHtml.FusionCarousel<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.CarouselBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionCarousel!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionCheckBoxHtml.FusionCheckBox<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, bool>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionCheckBox!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionCheckBoxHtml.FusionCheckBox<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, bool>! field, System.Action<Syncfusion.EJ2.Buttons.CheckBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionCheckBox!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionChipListHtml.FusionChipList<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.ChipListBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionChipList!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionColorPickerHtml.FusionColorPicker<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionColorPicker!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionColorPickerHtml.FusionColorPicker<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.Inputs.ColorPickerBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionColorPicker!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionComboBoxHtml.Fields<TItem, TText, TItemValue>(this Syncfusion.EJ2.DropDowns.ComboBoxBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TText>!>! text, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value) -> Syncfusion.EJ2.DropDowns.ComboBoxBuilder!
 static Alis.Reactive.Fusion.FusionComponents.FusionComboBoxHtml.FusionComboBox<TModel, TValue, TItem>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Collections.Generic.IReadOnlyList<TItem>! items, System.Action<Syncfusion.EJ2.DropDowns.ComboBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionComboBoxHtml.FusionComboBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionComboBoxHtml.FusionComboBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.DropDowns.ComboBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionComboBox<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionComponent.FusionVendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Fusion.FusionComponents.FusionContextMenuHtml.FusionContextMenu<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.ContextMenuBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionContextMenu!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionDatePickerHtml.FusionDatePicker<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDatePicker<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionDatePickerHtml.FusionDatePicker<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.Calendars.DatePickerBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDatePicker<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionDateRangePickerHtml.FusionDateRangePicker<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, System.DateTime[]?>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDateRangePicker!, TModel>!
@@ -751,6 +1235,8 @@ static Alis.Reactive.Fusion.FusionComponents.FusionDropDownListHtml.Fields<TItem
 static Alis.Reactive.Fusion.FusionComponents.FusionDropDownListHtml.FusionDropDownList<TModel, TValue, TItem>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Collections.Generic.IReadOnlyList<TItem>! items, System.Action<Syncfusion.EJ2.DropDowns.DropDownListBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDropDownList<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionDropDownListHtml.FusionDropDownList<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDropDownList<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionDropDownListHtml.FusionDropDownList<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.DropDowns.DropDownListBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDropDownList<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionDropDownTreeHtml.FusionDropDownTree<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionDropDownTreeHtml.FusionDropDownTree<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.DropDowns.DropDownTreeBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditorHtml.FusionInPlaceEditor<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditorHtml.FusionInPlaceEditor<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.InPlaceEditor.InPlaceEditorBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionKanbanHtml.FusionKanban<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Kanban.KanbanBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionKanban!, TModel>!
@@ -762,6 +1248,7 @@ static Alis.Reactive.Fusion.FusionComponents.FusionMaskedTextBoxHtml.FusionMaske
 static Alis.Reactive.Fusion.FusionComponents.FusionMentionHtml.Fields<TItem, TText, TItemValue>(this Syncfusion.EJ2.DropDowns.MentionBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TText>!>! text, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value) -> Syncfusion.EJ2.DropDowns.MentionBuilder!
 static Alis.Reactive.Fusion.FusionComponents.FusionMentionHtml.FusionMention<TModel, TValue, TItem>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Collections.Generic.IReadOnlyList<TItem>! items, System.Action<Syncfusion.EJ2.DropDowns.MentionBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMention<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionMentionHtml.FusionMention<TModel, TValue>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.DropDowns.MentionBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMention<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionMenuHtml.FusionMenu<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.MenuBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMenu!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionMultiColumnComboBoxHtml.Fields<TItem, TText, TItemValue, TGroup>(this Syncfusion.EJ2.MultiColumnComboBox.MultiColumnComboBoxBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TText>!>! text, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value, System.Linq.Expressions.Expression<System.Func<TItem, TGroup>!>! groupBy) -> Syncfusion.EJ2.MultiColumnComboBox.MultiColumnComboBoxBuilder!
 static Alis.Reactive.Fusion.FusionComponents.FusionMultiColumnComboBoxHtml.Fields<TItem, TText, TItemValue>(this Syncfusion.EJ2.MultiColumnComboBox.MultiColumnComboBoxBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TText>!>! text, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value) -> Syncfusion.EJ2.MultiColumnComboBox.MultiColumnComboBoxBuilder!
 static Alis.Reactive.Fusion.FusionComponents.FusionMultiColumnComboBoxHtml.FusionMultiColumnComboBox<TModel, TMember, TRow, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TMember>! field, System.Collections.Generic.IReadOnlyList<TRow>! rows, System.Action<Syncfusion.EJ2.MultiColumnComboBox.MultiColumnComboBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMultiColumnComboBox<TValue>!, TModel>!
@@ -772,12 +1259,23 @@ static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.Fields<TItem,
 static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.FusionMultiSelect<TModel, TValue, TItem>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Collections.Generic.IReadOnlyList<TItem>! items, System.Action<Syncfusion.EJ2.DropDowns.MultiSelectBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.FusionMultiSelect<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.FusionMultiSelect<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.DropDowns.MultiSelectBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBoxHtml.FusionNumericTextBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.Inputs.NumericTextBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionNumericTextBox<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionOtpInputHtml.FusionOtpInput<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, string?>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionOtpInput!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionOtpInputHtml.FusionOtpInput<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, string?>! field, System.Action<Syncfusion.EJ2.Inputs.OtpInputBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionOtpInput!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionPivotViewHtml.FusionPivotView<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.PivotView.PivotViewBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionPivotView!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionProgressButtonHtml.FusionProgressButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.ProgressButtonBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionProgressButton!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionRadioButtonHtml.FusionRadioButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Buttons.RadioButtonBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionRadioButton!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionRatingHtml.FusionRating<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, double>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionRating!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionRatingHtml.FusionRating<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, double>! field, System.Action<Syncfusion.EJ2.Inputs.RatingBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionRating!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditorHtml.FusionRichTextEditor<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditorHtml.FusionRichTextEditor<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.RichTextEditor.RichTextEditorBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionRichTextEditor!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionScheduleHtml.FusionSchedule<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Schedule.ScheduleBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionSchedule!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionSidebarHtml.FusionSidebar<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.SidebarBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionSidebar!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionSliderHtml.FusionSlider<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionSlider<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionSliderHtml.FusionSlider<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.Inputs.SliderBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionSlider<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionSmartPasteButtonHtml.FusionSmartPasteButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, string! elementId, System.Action<Alis.Reactive.Fusion.FusionComponents.FusionSmartPasteButtonOptions!>! options) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaHtml.FusionSmartTextArea<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaHtml.FusionSmartTextArea<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Alis.Reactive.Fusion.FusionComponents.FusionSmartTextAreaOptions!>! configure) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionSmartTextArea!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionSplitButtonHtml.FusionSplitButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.SplitButtons.SplitButtonBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionSplitButton!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionStepperHtml.FusionStepper<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.StepperBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionStepper!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionSwitchHtml.FusionSwitch<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, bool>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionSwitch!, TModel>!
@@ -787,6 +1285,9 @@ static Alis.Reactive.Fusion.FusionComponents.FusionTextAreaHtml.FusionTextArea<T
 static Alis.Reactive.Fusion.FusionComponents.FusionTextAreaHtml.FusionTextArea<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.Inputs.TextAreaBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionTextArea!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionTextBoxHtml.FusionTextBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionTextBox!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionTextBoxHtml.FusionTextBox<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.Inputs.TextBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionTextBox!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionTimePickerHtml.FusionTimePicker<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionTimePickerHtml.FusionTimePicker<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.Calendars.TimePickerBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionTimePicker<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionToolbarHtml.FusionToolbar<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.ToolbarBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionToolbar!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionTooltipHtml.FusionTooltip<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Popups.TooltipBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionTooltip!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionUploaderHtml.FusionUploader<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, Microsoft.AspNetCore.Http.IFormFile?>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionUploader!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionUploaderHtml.FusionUploader<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, Microsoft.AspNetCore.Http.IFormFile?>! field, System.Action<Syncfusion.EJ2.Inputs.UploaderBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionUploader!, TModel>!

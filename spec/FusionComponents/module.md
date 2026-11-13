@@ -438,7 +438,9 @@ Each name is gate 2's; each door is the capability it carries.
   `LiveObject<FusionSchedule.EventSettingsModel>(nullable: true)` (M21.X307) with `DataSource<TEvent>()`, `DataBind`,
   `GetEvents<TEvent>`, `AddEvent`, `SaveEvent`, `DeleteEvent<TKey>`, `OpenEditor`, `CloseEditor`, `RefreshEvents`,
   `Print`, `ScrollTo`, `GetCurrentViewDates`, `CloseQuickInfoPopup` and `CloseTooltip`; `FusionSchedule.CurrentAction`, with System.Text.Json's string enum converter (M21.X305); nine
-  events and their payloads, nested in it under EJ2's names, an event's data the app's own class `TEvent` and
+  events, each payload nested in it under EJ2's name and `DataBound` an `Event` with none, since EJ2 raises it
+  with null (`@syncfusion/ej2-schedule/src/schedule/actions/crud.js:59`, D17.4); an event's data the app's own class
+  `TEvent` and
   `Navigating`'s dates read as `DateTime` (M21.X306); and the render helper `Html.FusionSchedule(plan, id, build =>
   ..)`. It replaces main's fifteen files (`Alis.Reactive.Fusion/Components/FusionSchedule/` at 623dd4a27), whose doors
   carry their verdicts in `spec/FusionComponents/features.json`. Each JavaScript name is EJ2 33.1.47's public member

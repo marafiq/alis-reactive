@@ -17611,7 +17611,7 @@
     },
     {
      "line": "proposed",
-     "text": "CellClick, EventClick, ActionBegin<TEvent>(), ActionComplete, Navigating, PopupOpen<TEvent>(), PopupClose, DataBound and EventRendered<TEvent>() hand payloads nested in FusionSchedule under EJ2's names, read with Read, each payload's cancel its Property<bool>.",
+     "text": "CellClick, EventClick, ActionBegin<TEvent>(), ActionComplete, Navigating, PopupOpen<TEvent>(), PopupClose and EventRendered<TEvent>() hand payloads nested in FusionSchedule under EJ2's names, read with Read, each payload's cancel its Property<bool>; DataBound is an Event with no payload, since EJ2 raises it with null.",
      "doors": [
       "M21.N39",
       "N5.6",

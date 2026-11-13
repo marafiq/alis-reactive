@@ -1012,7 +1012,9 @@ field's options (M7.N3, M7.N2), which enter the core's table as `InputsAndIds`; 
 twelve other slices the admission-clinical screen holds (M21.N5, M21.N10, M21.N13, M21.N15 to M21.N17, M21.N20,
 M21.N22, M21.N31, M21.N36, M21.N42 and M21.N45), each until U26, and so are the twenty the record-contacts and
 handover screens hold (M21.N3, M21.N4, M21.N7, M21.N8, M21.N18, M21.N19, M21.N24 to M21.N29, M21.N37, M21.N41,
-M21.N44, M21.N46 to M21.N49 and M21.N52). The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1).
+M21.N44, M21.N46 to M21.N49 and M21.N52), and so are the seventeen the handover, bed-board and fusion-layout
+screens hold (M21.N6, M21.N9, M21.N11, M21.N12, M21.N14, M21.N21, M21.N30, M21.N32 to M21.N35, M21.N38 to M21.N40,
+M21.N43, M21.N50 and M21.N51). The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1).
 M25.N6 is declared: `IAppLevelComponent` in `Vendors` (P4), `pipeline.Component<TComponent>()` and
 `plan.Component<TComponent>()`, whose handlers are a `ReactiveComponent<TComponent, TModel>`, each a signature
 until U24. N17.5's argument kind, the abort signal a declared method receives, is declared as the lead
