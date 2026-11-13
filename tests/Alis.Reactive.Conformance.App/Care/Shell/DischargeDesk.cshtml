@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DischargeDesk
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Discharge desk";
+    var plan = Html.ReactivePlan<DischargeDesk>();
+}
+<h1>Discharge desk</h1>
+<button type="button" @Html.Raises(plan, DischargeDeskButtons.Discharge)>Discharge</button>
+<button type="button" @Html.Raises(plan, DischargeDeskButtons.AddNote)>Add note</button>
+<p>Decision: <output id="decision"></output></p>
+<p>Notes: <output id="notes"></output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(DischargeDeskButtons.Discharge, pipeline =>
+            pipeline.When(pipeline.Component<NativeConfirm>().Ask("Discharge Ada?"))
+                .Then(pipeline => pipeline.Element("decision").Text.Set("Discharged"))
+                .Else(pipeline => pipeline.Element("decision").Text.Set("Kept")))
+        .CustomEvent(DischargeDeskButtons.AddNote, pipeline => pipeline.Element("notes").Text.Set("added")));
+}
+@Html.RenderPlan(plan)

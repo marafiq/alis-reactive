@@ -1,0 +1,8 @@
+@using Alis.Reactive.Conformance.App.Care
+@model ResidentShiftNotes
+<ul aria-label="@Model.Resident's notes">
+    @foreach (var note in Model.Notes)
+    {
+        <li>@note</li>
+    }
+</ul>

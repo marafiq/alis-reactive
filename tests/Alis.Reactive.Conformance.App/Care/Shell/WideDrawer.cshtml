@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WideDrawerPage
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Ward board";
+    var plan = Html.ReactivePlan<WideDrawerPage>();
+}
+<h1>@Model.Ward ward board</h1>
+<button type="button" @Html.Raises(plan, WideDrawerButtons.OpenWide)>Open wide</button>
+<button type="button" @Html.Raises(plan, WideDrawerButtons.ReadSize)>Read size</button>
+<p>Drawer size: <output id="size-read"></output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(WideDrawerButtons.OpenWide, pipeline =>
+        {
+            pipeline.Component<NativeDrawer>().Size.Set(DrawerSize.Lg);
+            pipeline.Component<NativeDrawer>().Open();
+        })
+        .CustomEvent(WideDrawerButtons.ReadSize, pipeline => pipeline.Element("size-read").Text.Set(pipeline.Component<NativeDrawer>().Size)));
+}
+@Html.RenderPlan(plan)

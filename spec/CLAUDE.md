@@ -1180,14 +1180,26 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   names with that registration; M20.N1's exemption already covers the dictionary EJ2's column takes. A filter
   predicate's value, `FusionGrid.Predicate`'s, is EJ2's union of text, number, date, boolean and lists, which no type of
   the line names; it waits on its form, U26's. The owner can overrule each.
-- The lead, 2026-11-13, writing the pages module 25's slices unblock: the bench's lane.confirm cell and the care
-  pages X11.2, X16.15 and X16.16. The shell's pages take a layout of their own that renders the drawer and the
-  confirm, as an app's layout renders its app-level objects; a page whose request sends no container renders the
-  notice region itself, the summary place D16.13 gives that request, with no pipeline door. The lead had said
-  X16.15 and X16.16 wait on a notice door the core does not declare; D16.13 says otherwise, and the rule line is
-  the conformance app's CLAUDE.md. A test reads the page behind an open modal dialog by role, since Playwright
-  1.64.1's role match hides an element by its computed style and aria-hidden alone. X16.16's page routes the
-  server's 400 by `ShowValidationErrors`, as the admission screen's other pages do. The owner can overrule each.
+- The lead, 2026-11-13, writing the pages module 25's slices unblock: the bench's lane.confirm cell and the care pages
+  X11.2, X16.15 and X16.16. The shell's pages take a layout of their own that renders the drawer and the confirm, as
+  an app's layout renders its app-level objects; a page whose request sends no container renders the notice region
+  itself, the summary place D16.13 gives that request, with no pipeline door. The lead had said X16.15 and X16.16 wait
+  on a notice door; D16.13 says otherwise, and the rule line is the conformance app's CLAUDE.md. The lead had said too
+  that the core declares no notice door, which was false: a pipeline's Notice is declared, and the shell's toast
+  promises call it. A test reads the page behind an open modal dialog by role, since Playwright 1.64.1's role match
+  hides an element by its computed style and aria-hidden alone. X16.16's page routes the server's 400 by
+  `ShowValidationErrors`, as the admission screen's other pages do. The owner can overrule each.
+- The lead, 2026-11-13, writing the shell screen's seven pages module 25's slices unblock (M25.X1, M25.X2, X17.6,
+  X17.7, M25.X5, M25.X6 and M25.X7). The shell's layout renders the confirm as M25.F4's promises write it, titled
+  Please confirm with Yes and No, and X11.2's test reads that title. A page's stylesheet is a style element in the
+  layout's Styles section; M25.X1's two pages give the drawer a transform its visible class undoes, one with no
+  transition and one with a 50 ms transform transition, since a transition runs only where the transform changes.
+  A click behind the open confirm takes Playwright's force option, since the actionability check waits on a button
+  the backdrop covers, where a person's click lands on the backdrop. M25.X6's question is the text box's value read
+  through OrNull, since the confirm's Ask takes a nullable text. An element a promise does not name is the page's
+  own: the decision line M25.X6's and M25.X7's pages show, and the note the drawer's partial shows.
+  Five shell promises wait: X17.8 on a handler's policy (N11.1), M25.X3 on the busy indicator's startup call, and
+  X17.9, M25.X8 and M25.X9 on the startup call of the request defaults. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

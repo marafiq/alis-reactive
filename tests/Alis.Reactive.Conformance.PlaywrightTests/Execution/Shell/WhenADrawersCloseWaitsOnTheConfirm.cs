@@ -20,7 +20,7 @@ public sealed class WhenADrawersCloseWaitsOnTheConfirm(string host) : Conformanc
         var drawer = discarding.Page.GetByRole(AriaRole.Complementary, new PageGetByRoleOptions { Name = "Care plan", Exact = true });
         await Expect(drawer.GetByRole(AriaRole.Textbox, new LocatorGetByRoleOptions { Name = "Goals", Exact = true })).ToBeVisibleAsync();
         await drawer.GetByRole(AriaRole.Button, new LocatorGetByRoleOptions { Name = "Close", Exact = true }).ClickAsync();
-        var asking = discarding.Page.GetByRole(AriaRole.Dialog, new PageGetByRoleOptions { Name = "Confirm", Exact = true });
+        var asking = discarding.Page.GetByRole(AriaRole.Dialog, new PageGetByRoleOptions { Name = "Please confirm", Exact = true });
         await Expect(asking.GetByText("Discard the unsaved care plan?", new LocatorGetByTextOptions { Exact = true })).ToBeVisibleAsync();
         await Expect(drawer).ToBeVisibleAsync();
         await asking.GetByRole(AriaRole.Button, new LocatorGetByRoleOptions { Name = "Yes", Exact = true }).ClickAsync();
@@ -31,7 +31,7 @@ public sealed class WhenADrawersCloseWaitsOnTheConfirm(string host) : Conformanc
         await keeping.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Edit care plan", Exact = true }).ClickAsync();
         var kept = keeping.Page.GetByRole(AriaRole.Complementary, new PageGetByRoleOptions { Name = "Care plan", Exact = true });
         await kept.GetByRole(AriaRole.Button, new LocatorGetByRoleOptions { Name = "Close", Exact = true }).ClickAsync();
-        var refusing = keeping.Page.GetByRole(AriaRole.Dialog, new PageGetByRoleOptions { Name = "Confirm", Exact = true });
+        var refusing = keeping.Page.GetByRole(AriaRole.Dialog, new PageGetByRoleOptions { Name = "Please confirm", Exact = true });
         await refusing.GetByRole(AriaRole.Button, new LocatorGetByRoleOptions { Name = "No", Exact = true }).ClickAsync();
         await Expect(refusing).ToBeHiddenAsync();
         await Expect(kept).ToBeVisibleAsync();

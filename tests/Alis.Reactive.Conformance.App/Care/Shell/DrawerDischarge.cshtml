@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DrawerDischargePage
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<DrawerDischargePage>();
+}
+<h1>Discharge @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, DrawerDischargeButtons.OpenNotes)>Open notes</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(DrawerDischargeButtons.OpenNotes, pipeline =>
+    {
+        pipeline.Component<NativeDrawer>().Open();
+        pipeline.Get(DrawerDischargeEndpoints.Notes).Into(NativeDrawer.ContentId);
+    }));
+}
+@Html.RenderPlan(plan)

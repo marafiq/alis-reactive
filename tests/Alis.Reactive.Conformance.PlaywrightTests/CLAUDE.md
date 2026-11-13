@@ -57,6 +57,13 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   empty summary as a count of none, read after the answer line that shows the save was taken. That a failed check
   sends nothing is read as the answer line staying empty after the message shows. Two components on one page are
   each reached inside their own group (`Vendors/Bench/WhenEachEntryOfAListHasItsRule.cs`).
+- A click a promise lands behind an open modal dialog, where a person's pointer meets the dialog's backdrop, takes
+  Playwright's force option, so the actionability check, which waits for a button the backdrop covers, does not
+  stand in for the browser, and the browser delivers the click at the button's place; the outcome is read straight
+  after it, beside the opposite case that clicks the button once the dialog has closed
+  (`NativeAppLevelObjects/Shell/WhenAClickLandsBehindTheConfirm.cs`). The drawer, whose heading a close empties, is
+  the page's one complementary region, found by its role with no name, and its heading and content are read by the
+  ids M25.D1 names.
 - A care screen's test sits in its module's folder under the screen it runs on, and reads its page by its
   address of `CarePages` in the world contract: `ArrayLambdas/Residents/WhenALambdaComparesWithAValueTheViewHolds.cs`
   is the pattern, the page of the opposite case opened in a second world.

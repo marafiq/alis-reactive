@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FamilyNotice
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<FamilyNotice>();
+}
+<h1>Discharge @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, FamilyNoticeButtons.Discharge)>Discharge</button>
+<p>Discharge: <output id="discharge"></output></p>
+<p>Notify the family: <output id="notify"></output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(FamilyNoticeButtons.Discharge, pipeline =>
+            pipeline.Element("discharge").Text.Set(pipeline.Component<NativeConfirm>().Ask("Discharge Ada?")))
+        .CustomEvent(FamilyNoticeButtons.Discharge, pipeline =>
+            pipeline.Element("notify").Text.Set(pipeline.Component<NativeConfirm>().Ask("Notify the family?"))));
+}
+@Html.RenderPlan(plan)

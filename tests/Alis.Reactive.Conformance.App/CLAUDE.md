@@ -47,7 +47,9 @@ its views.
   `Care/Shell/_ShellLayout.cshtml`: it renders the drawer and the confirm beside the body, as an app's layout
   renders its app-level objects. A page whose request sends no container renders the notice region,
   `Html.NativeToast`, itself, since the core shows that request's failed check there (D16.13), and it needs no
-  pipeline door for it (the lead's reversal, 2026-11-13). A care page whose plugins are scripts takes its
+  pipeline door for it (the lead's reversal, 2026-11-13). A shell page that styles the drawer writes a style
+  element in the layout's Styles section, which the layout renders in its head (`Care/Shell/ShiftNotes.cshtml`).
+  A care page whose plugins are scripts takes its
   screen's own layout, `Care/Record/_ScriptedLayout.cshtml`, which links the scripts the page names before the
   framework's: the bench's
   sits on the same row of the table, so each keeps its own. `Bench/Validation/` holds the validation cells: their
