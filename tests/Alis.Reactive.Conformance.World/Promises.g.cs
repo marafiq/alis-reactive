@@ -878,6 +878,8 @@ public static class Promises
         public const string M25_X5_0 = "M25.F4 M25.X5 0";
         public const string M25_X6_0 = "M25.F4 M25.X6 0";
         public const string M25_X7_0 = "M25.F4 M25.X7 0";
+        [Holds(CompositionGate.Answer)]
+        public const string M25_X12_0 = "M25.F4 M25.X12 0";
     }
 
     public static class M25_F5

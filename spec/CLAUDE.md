@@ -1200,6 +1200,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   own: the decision line M25.X6's and M25.X7's pages show, and the note the drawer's partial shows.
   Five shell promises wait: X17.8 on a handler's policy (N11.1), M25.X3 on the busy indicator's startup call, and
   X17.9, M25.X8 and M25.X9 on the startup call of the request defaults. The owner can overrule each.
+- The lead, 2026-11-13, writing M25.X12, the browser promise of `ConfirmAsks.tla`'s NothingWaitsForAnEndedRun: a
+  family partial whose two handlers of one click ask, the second waiting behind the first, and a refresh of its slot
+  held at the answer gate, whose release ends both runs (D12.4), so no dialog shows. Both asks are one plan's, since
+  D11.5 orders two handlers of one event within the plan that subscribed them and states no order across plans.
+  D11.8's await bullet is amended: it listed the older lines' Confirm as an await no abort reaches, where
+  NativeConfirm's ask takes the block's signal (N17.5) and answers false on an abort (M25.D4). UnmountAnswersEveryAsk
+  has no browser promise, since the page's confirm never unmounts while the page lives (D12.1, D13.1); that is the
+  owner's to decide, with the lead's recommendation that TLC hold it. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

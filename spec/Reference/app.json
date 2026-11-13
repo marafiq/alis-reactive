@@ -4211,6 +4211,31 @@
       ]
     },
     {
+      "feature": "M25.F4",
+      "for": "M25.X12",
+      "index": 0,
+      "screen": "shell",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "confirm",
+        "shellSlot",
+        "shellEndpoint"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Composition.tla:Answer",
+          "on": "the family panel's refresh"
+        }
+      ]
+    },
+    {
       "feature": "M25.F5",
       "for": "X17.9",
       "index": 0,

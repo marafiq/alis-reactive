@@ -23,4 +23,6 @@ public static partial class CarePages
     public const string DischargeNote = Shell + "discharge-note";
 
     public const string DischargeDesk = Shell + "discharge-desk";
+
+    public const string FamilyDischarge = Shell + "family-discharge";
 }

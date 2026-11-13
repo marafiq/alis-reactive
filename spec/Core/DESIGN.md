@@ -2629,8 +2629,10 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   - A request in flight is aborted through its fetch's abort signal and runs no route. Each of its `Finally`
     layers whose `WhileLoading` completed runs once, and its busy targets are released after the defaults'
     (`Run.tla:ReleasedWhenEnded`). A retry's wait ends (D10.15).
-  - An await the browser cannot abort (a `MethodAsync` promise, `Confirm`, a hub's `invoke`) settles
-    later, and its settling runs nothing.
+  - An await the browser cannot abort (a `MethodAsync` promise whose declaration takes no abort signal, a hub's
+    `invoke`) settles later, and its settling runs nothing. A method whose declaration takes the block's signal
+    (D17.11) hears the abort and settles as its code decides, NativeConfirm's ask by closing, or by leaving its
+    queue unshown, and answering false (M25.D4); its settling runs nothing either.
   - No route and no step after runs for a disposed owner.
   - Every `Finally` runs before the owner releases its listeners, components and content, while its
     elements are still on the page. So a `Finally` that clears what its `WhileLoading` showed, or re-enables a

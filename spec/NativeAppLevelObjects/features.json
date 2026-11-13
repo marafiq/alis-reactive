@@ -1047,6 +1047,11 @@
           "id": "M25.X7",
           "rung": "behavior",
           "defect": "A dialog shown by show() and not showModal() leaves the page live behind it, so a click behind the open question runs its handler before the user answered (probe:dom-dialog-modal-click-behind, D17.10, M25.N4)."
+        },
+        {
+          "id": "M25.X12",
+          "rung": "behavior",
+          "defect": "A confirm code that leaves the waiting ask of a run that ended in its queue, as one that ignores the ask's signal does (ConfirmAsks.tla's mutant IgnoresTheSignal), shows that question once the open ask closes, to a person whose answer no run reads; an abort while an ask waits takes it out of the queue unshown and answers false (M25.D4, D12.4, D11.8)."
         }
       ],
       "promises": [
@@ -1097,6 +1102,14 @@
           "outcome": "notes stays empty and the dialog still asks Discharge Ada?.",
           "opposite": "Click No, then Add note: notes reads added.",
           "defect": "A dialog shown by show() leaves the page live behind it, so the click sets notes to added while the question is open (probe:dom-dialog-modal-click-behind)."
+        },
+        {
+          "for": "M25.X12",
+          "page": "A discharge page whose layout renders Html.NativeConfirm(\"Please confirm\", ok: \"Yes\", cancel: \"No\"), with a family panel whose on-load GET loads a family partial: the partial's Discharge click has two handlers, the first asking Discharge Ada? and setting discharge's text to its answer, the second asking Notify the family? and setting notify's text to its answer. Refresh family loads the panel again by a GET whose partial reads Family details refreshed.; the harness gates that GET (Composition.tla's Answer).",
+          "gesture": "Once the family partial shows, click Refresh family; once the harness reports its GET held, click Discharge; while the dialog asks Discharge Ada?, release the GET.",
+          "outcome": "The panel reads Family details refreshed. and no dialog shows: the refresh ended both runs, so the open question closed and Notify the family?, which waited, never shows.",
+          "opposite": "Click Discharge, then Yes, with no refresh: the dialog asks Notify the family?, and after No notify reads false.",
+          "defect": "A confirm code that keeps the waiting ask of an ended run shows Notify the family? once Discharge Ada? closes, for a run the refresh ended (ConfirmAsks.tla:NothingWaitsForAnEndedRun)."
         }
       ],
       "verdicts": []
