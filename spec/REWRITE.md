@@ -1010,7 +1010,9 @@ field's options (M7.N3, M7.N2), which enter the core's table as `InputsAndIds`; 
 (M3.N1, N7.3). The reference Fusion slice is declared in `Alis.Reactive.Fusion` (M21.N1, M21.N2),
 `FusionMultiSelect<TValue>` on the base `FusionComponent`, each render helper a signature until U25, and so are the
 twelve other slices the admission-clinical screen holds (M21.N5, M21.N10, M21.N13, M21.N15 to M21.N17, M21.N20,
-M21.N22, M21.N31, M21.N36, M21.N42 and M21.N45), each until U26. The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1). An element's text and HTML are an `ElementContent`, whose `Set` takes a source
+M21.N22, M21.N31, M21.N36, M21.N42 and M21.N45), each until U26, and so are the twenty the record-contacts and
+handover screens hold (M21.N3, M21.N4, M21.N7, M21.N8, M21.N18, M21.N19, M21.N24 to M21.N29, M21.N37, M21.N41,
+M21.N44, M21.N46 to M21.N49 and M21.N52). The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1). An element's text and HTML are an `ElementContent`, whose `Set` takes a source
 of any type (M5.N1, D7.3), and a world names the version its component is built as. The app's settle, count and item
 endpoints stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its
 action where a test holds one action at two endpoints, and the harness's test of it is green and fails on each of

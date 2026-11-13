@@ -1099,6 +1099,19 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   declared `ReadOnly`, while no door reads one from the members of a returned list, so the uploader's `Files`
   throws until module 7's unit designs that door. A promise's "FusionRadioButtons" is the plural of the radio
   button, no door. The owner can overrule each.
+- The lead, 2026-11-12, landing twenty Fusion slices of the record-contacts and handover screens as signatures,
+  three forks' work, and settling what they read into. A data class a slice hands EJ2 or reads from a payload (a
+  split button's or a drop-down button's item, a Kanban column, an in-place editor's action data) names each member
+  by `JsonPropertyName` with EJ2's name (X17.48), and a member EJ2 marks optional admits null; a Kanban column's key
+  is required, typed by the cards' key (M21.X303). An enum a slice hands EJ2 (the text box's icon place, the
+  button's icon position, the Kanban's dialog action) carries a string enum converter and each member's EJ2 name
+  by `JsonStringEnumMemberName`, which an app's own enum converter honors too (M21.X602, M21.X301). A method keeps
+  the arguments its line or the older lines' door gives: the Kanban's card and dialog methods as the redesign's,
+  the accordion's expand with both its arguments; an overload for an argument EJ2 marks optional waits for a
+  promise that needs it. A member EJ2's TypeScript does not type and a probe pins (the in-place editor's payload
+  names and action data) is declared from the probe. A render helper's element id is `elementId` in every slice,
+  where a line writes id; a position in pixels is a double. A slice's component code under the runtime's
+  components folder (the mention's) is its unit's. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
