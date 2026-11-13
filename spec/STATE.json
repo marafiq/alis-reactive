@@ -1529,9 +1529,9 @@
         "problems": 0,
         "slice_rows": 16,
         "spec_entries": 41,
-        "tla": 15
+        "tla": 16
       },
-      "detail": "each of the module table's 20 core modules is a folder of section 2.1's Alis.Reactive/ and in one of 16 SliceTree rows, each of its 26 modules a folder of section 2.1's projects and spec/<Module>/module.md; each of 15 TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; each of spec/'s 41 entries is a module folder or named by section 2.1's spec line",
+      "detail": "each of the module table's 20 core modules is a folder of section 2.1's Alis.Reactive/ and in one of 16 SliceTree rows, each of its 26 modules a folder of section 2.1's projects and spec/<Module>/module.md; each of 16 TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; each of spec/'s 41 entries is a module folder or named by section 2.1's spec line",
       "pass": true
     },
     "native_behaviors": {
@@ -1660,8 +1660,8 @@
     },
     "tlc": {
       "counts": {
-        "met": 15,
-        "specs": 15
+        "met": 16,
+        "specs": 16
       },
       "detail": "every spec green, every invariant killed by its mutant, every witness reached",
       "pass": true,
@@ -2167,6 +2167,105 @@
             "states": "72 states generated, 57 distinct states found, 23 states left on queue.",
             "violated": [
               "UnmountAnswersEveryAsk"
+            ]
+          }
+        },
+        "ContainerRead": {
+          "ContainerRead.cfg": {
+            "green": true,
+            "hash": "49880afa3bcb36e514fb58357f39ef628fe3d172434a74b7ce140dc328826964",
+            "line": "Model checking completed. No error has been found.",
+            "states": "1944 states generated, 306 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "ContainerRead.violates.AnUnsentMemberReadsWhatTheEndpointBinds.cfg": {
+            "green": false,
+            "hash": "bd07221115b22452c4855242a9d3a1f8e1910fe39e6dd4fd630f896aebffe612",
+            "line": "violated: AnUnsentMemberReadsWhatTheEndpointBinds",
+            "states": "111 states generated, 69 distinct states found, 36 states left on queue.",
+            "violated": [
+              "AnUnsentMemberReadsWhatTheEndpointBinds"
+            ]
+          },
+          "ContainerRead.violates.OneValueOnEveryHost.cfg": {
+            "green": false,
+            "hash": "bb1d4435c7f8f104986d658316e89c5476d77d8d82958108334b1e2e51e92b50",
+            "line": "violated: OneValueOnEveryHost",
+            "states": "188 states generated, 95 distinct states found, 42 states left on queue.",
+            "violated": [
+              "OneValueOnEveryHost"
+            ]
+          },
+          "ContainerRead.violates.ReachBlankReadsItsStart.cfg": {
+            "green": false,
+            "hash": "575fafaa4b2950a4c7c41742d723c03fbc75a4fafe873b7d3227fb7e058c1d3c",
+            "line": "violated: ReachBlankReadsItsStart",
+            "states": "258 states generated, 112 distinct states found, 59 states left on queue.",
+            "violated": [
+              "ReachBlankReadsItsStart"
+            ]
+          },
+          "ContainerRead.violates.ReachMissingContainerStops.cfg": {
+            "green": false,
+            "hash": "9b88e72294bb140f144ab7230487ff18c1611ee9949f25020883c5925a44163f",
+            "line": "violated: ReachMissingContainerStops",
+            "states": "54 states generated, 48 distinct states found, 27 states left on queue.",
+            "violated": [
+              "ReachMissingContainerStops"
+            ]
+          },
+          "ContainerRead.violates.ReachStartOnceTheSlotLeft.cfg": {
+            "green": false,
+            "hash": "717d9b6b5bddbeca12ce617c78c76db8b2ecc1a1eccebc32571414b5c1a7e3b5",
+            "line": "violated: ReachStartOnceTheSlotLeft",
+            "states": "962 states generated, 212 distinct states found, 44 states left on queue.",
+            "violated": [
+              "ReachStartOnceTheSlotLeft"
+            ]
+          },
+          "ContainerRead.violates.ReachStopOnceASlotsInputJoins.cfg": {
+            "green": false,
+            "hash": "0fb2ec09cafe8c77b34ac8b215b50c702585b616057be4972e9a5fcaa79fb0fb",
+            "line": "violated: ReachStopOnceASlotsInputJoins",
+            "states": "381 states generated, 144 distinct states found, 60 states left on queue.",
+            "violated": [
+              "ReachStopOnceASlotsInputJoins"
+            ]
+          },
+          "ContainerRead.violates.ReadFindsWhatItsContainerSends.cfg": {
+            "green": false,
+            "hash": "97d04df6e1391a64d3eab206e700c9ccdec1a25b8bbfeba6ed6693c5454b2a6f",
+            "line": "violated: ReadFindsWhatItsContainerSends",
+            "states": "66 states generated, 48 distinct states found, 15 states left on queue.",
+            "violated": [
+              "ReadFindsWhatItsContainerSends"
+            ]
+          },
+          "ContainerRead.violates.ReadIsWhatTheEndpointBinds.cfg": {
+            "green": false,
+            "hash": "48e326e76e3aad7c3de655613a2be223f7a8efa053434636f21bf1de487da675",
+            "line": "violated: ReadIsWhatTheEndpointBinds",
+            "states": "318 states generated, 127 distinct states found, 57 states left on queue.",
+            "violated": [
+              "ReadIsWhatTheEndpointBinds"
+            ]
+          },
+          "ContainerRead.violates.ReadSeesTheSlotThatJoinedOrLeftBeforeIt.cfg": {
+            "green": false,
+            "hash": "daf1adfed3237406fd557dc4aec7a489fc2b620af86f6bfc2d9dbec86f080dd8",
+            "line": "violated: ReadSeesTheSlotThatJoinedOrLeftBeforeIt",
+            "states": "729 states generated, 273 distinct states found, 131 states left on queue.",
+            "violated": [
+              "ReadSeesTheSlotThatJoinedOrLeftBeforeIt"
+            ]
+          },
+          "ContainerRead.violates.ReadStopsWhenItsSendStops.cfg": {
+            "green": false,
+            "hash": "f59906830f114a485f02b111221251b4a0126b7e26c8391f7a82ff35678f7e78",
+            "line": "violated: ReadStopsWhenItsSendStops",
+            "states": "393 states generated, 146 distinct states found, 60 states left on queue.",
+            "violated": [
+              "ReadStopsWhenItsSendStops"
             ]
           }
         },
@@ -3816,7 +3915,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "c90774c97136b42b63191a8534f9adefe68ecab4",
+  "read_at_head": "419f8c9e246ac5ab923af0fc7c7852d7c284fcbb",
   "step": {
     "failing": [],
     "name": "End of session",
