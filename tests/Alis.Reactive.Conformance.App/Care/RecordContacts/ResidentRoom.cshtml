@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ResidentRoom
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident's room";
+    var plan = Html.ReactivePlan<ResidentRoom>();
+}
+<h1>Resident's room</h1>
+<fieldset>
+    <legend>Room</legend>
+    @(Html.InputField(plan, m => m.Room, options => options.Label("Room")).FusionInPlaceEditor())
+</fieldset>
+@Html.RenderPlan(plan)

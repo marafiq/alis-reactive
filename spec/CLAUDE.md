@@ -1235,6 +1235,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   lead raises. M21.X201's three exports read Exporting while the export runs, which a test reads only while the export
   is held, and their placement names the seed alone: they wait on the harness's remaining verbs, the clock read against
   EJ2's export first. X15.5 waits on the pascalCase host. The owner can overrule each.
+- The lead, 2026-11-13, landing the record-contacts screen's seventeen pages from a fork's work read at the source.
+  The mention attaches to the note box a view gives it, a text area with its label, by EJ2's target, since a mention
+  binds no member; a promise's opposite that the view's options change is a model member the builder reads, served at a
+  second address; a test reads EJ2 33.1.47's rating as the slider it names itself, by its value, a list box's chosen
+  item by EJ2's state class on the visible option, and a closed accordion panel by its hidden text. The fork's probe
+  found no slider role on EJ2's slider rendered over an input, so U26 renders FusionSlider's host as the element EJ2
+  gives that role. M21.X205's two rules wait on the grid's validation door, as the FusionGrid line says. The owner can
+  overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model BedRails
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Resident profile";
+    var plan = Html.ReactivePlan<BedRails>();
+}
+<h1>Resident profile</h1>
+<fieldset>
+    <legend>Bed rails</legend>
+    @(Html.InputField(plan, m => m.BedRailsUp, options => options.Label("Bed rails")).FusionSwitch())
+</fieldset>
+@Html.RenderPlan(plan)

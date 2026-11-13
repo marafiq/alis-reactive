@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model NoteMention
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Care note";
+    var plan = Html.ReactivePlan<NoteMention>();
+}
+<h1>Care note</h1>
+<fieldset>
+    <legend>Note</legend>
+    <label for="care-note">Note</label>
+    <textarea id="care-note"></textarea>
+</fieldset>
+@(Html.FusionMention<NoteMention, string, OnDutyStaff>(plan, "staff-mention", Model.Staff, build => build.Target("#care-note").Fields((OnDutyStaff s) => s.DisplayLabel, s => s.StaffCode)))
+@Html.RenderPlan(plan)

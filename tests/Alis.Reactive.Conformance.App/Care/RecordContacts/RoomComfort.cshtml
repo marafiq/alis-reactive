@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoomComfort
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Comfort";
+    var plan = Html.ReactivePlan<RoomComfort>();
+}
+<h1>Comfort</h1>
+<fieldset>
+    <legend>Room temperature</legend>
+    @(Html.InputField(plan, m => m.RoomTemperature, options => options.Label("Room temperature")).FusionSlider(build => build.Min(60).Max(80)))
+</fieldset>
+<button type="button" @Html.Raises(plan, ComfortChecks.Check)>Check</button>
+<p>Reading: <output id="temperature-reading">Not checked</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ComfortChecks.Check, pipeline => pipeline
+        .Element("temperature-reading").Text.Set(pipeline.Input(m => m.RoomTemperature).Component<FusionSlider<double?>>().Value)));
+}
+@Html.RenderPlan(plan)

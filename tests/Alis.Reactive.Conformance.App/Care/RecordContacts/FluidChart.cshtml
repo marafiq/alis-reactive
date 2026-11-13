@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FluidChart
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Fluid chart";
+    var plan = Html.ReactivePlan<FluidChart>();
+}
+<h1>Fluid chart</h1>
+@(Html.FusionBulletChart(plan, "fluid-chart", Model.Intake, build => build.Title(Model.Title).Fields((FluidIntake i) => i.Taken, i => i.Target))
+    .Reactive(chart => chart.BulletChartMouseClick, (_, pipeline) => pipeline.Element("chart-note").Text.Set("Chart read")))
+<p id="chart-note">-</p>
+@Html.RenderPlan(plan)

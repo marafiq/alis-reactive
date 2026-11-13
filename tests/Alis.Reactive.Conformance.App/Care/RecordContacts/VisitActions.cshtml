@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitActions
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Visits";
+    var plan = Html.ReactivePlan<VisitActions>();
+}
+<h1>Visits</h1>
+@(Html.FusionSplitButton(plan, "visit-actions", build => build.Content(Model.Action)))
+<button type="button" @Html.Raises(plan, VisitActionReads.Show)>Show action</button>
+<p id="visit-action">No action</p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(VisitActionReads.Show, pipeline => pipeline
+        .Element("visit-action").Text.Set(pipeline.Component<FusionSplitButton>("visit-actions").Content)));
+}
+@Html.RenderPlan(plan)
