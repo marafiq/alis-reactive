@@ -1168,6 +1168,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   U27 write, so they mirror no vendor's types until then; FusionToast mirrors EJ2's Toast. A row control's
   attribute doors are N18.4's, whose forms go to gate 2, so only its `CssClass` is declared. The two confirms'
   `Ask` rest on `ConfirmAsks.tla`'s six invariants with `Run.tla`'s and `Lanes.tla`'s. The owner can overrule each.
+- The lead, 2026-11-13, landing FusionGrid (M21.N23) as signatures from a fork's work read at the source. The forms the
+  fork took stand: a member beyond the line where a renamed door needs one (`GetCurrentViewRecords<TRow>()`,
+  `GetRowIndexByPrimaryKey<TKey>`); `Page<TRow>()` holding `FusionGrid.DataResult<TRow>`, EJ2's `DataResult` nested; a
+  row's key as the view's `TKey`, since EJ2 takes text or a number; the filter operators of text alone; a payload's
+  `Name` optional only where EJ2 marks it, and `Cancel` only where EJ2's type declares it; the edit templates returning
+  the text EJ2's builder takes; `where TRow : class`, as EJ2's builder requires. Two doors of the line wait on gaps,
+  each named with its use case. The line's grid validation door, From over a validator's rules and Field over a column,
+  gives a grid column EJ2's rules from the app's validator (M21.X203 to M21.X205); the core's surface holds no value
+  that carries a validator's browser rules, since N16.2's registration is internal, so the door waits on a core door U17
+  names with that registration; M20.N1's exemption already covers the dictionary EJ2's column takes. A filter
+  predicate's value, `FusionGrid.Predicate`'s, is EJ2's union of text, number, date, boolean and lists, which no type of
+  the line names; it waits on its form, U26's. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

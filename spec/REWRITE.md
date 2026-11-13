@@ -1015,11 +1015,12 @@ M21.N22, M21.N31, M21.N36, M21.N42 and M21.N45), each until U26, and so are the 
 handover screens hold (M21.N3, M21.N4, M21.N7, M21.N8, M21.N18, M21.N19, M21.N24 to M21.N29, M21.N37, M21.N41,
 M21.N44, M21.N46 to M21.N49 and M21.N52), and so are the seventeen the handover, bed-board and fusion-layout
 screens hold (M21.N6, M21.N9, M21.N11, M21.N12, M21.N14, M21.N21, M21.N30, M21.N32 to M21.N35, M21.N38 to M21.N40,
-M21.N43, M21.N50 and M21.N51). Module 22's three template types are declared in `FusionTemplates` (M22.N1 to
-M22.N4). Module 25's slices are declared in `NativeAppLevelObjects` (M25.N1 to M25.N5, M25.N7): NativeDrawer,
+M21.N43, M21.N50 and M21.N51), and so is FusionGrid (M21.N23), save a column's rules from a validator and a filter
+predicate's value, each a gap `spec/CLAUDE.md` names. Module 22's three template types are declared in `FusionTemplates`
+(M22.N1 to M22.N4). Module 25's slices are declared in `NativeAppLevelObjects` (M25.N1 to M25.N5, M25.N7): NativeDrawer,
 NativeConfirm, the row actions and the render helpers of the loader, the toast and the reconnect offer, the reconnect
-offer's net10's alone; the busy, notice and reconnect contracts those three fulfil give a view no door (D10.21) and
-are U24's. Module 23's FusionToast and FusionConfirm are declared in `FusionAppLevelObjects` (M23.N1, M23.N2), each
+offer's net10's alone; the busy, notice and reconnect contracts those three fulfil give a view no door (D10.21) and are
+U24's. Module 23's FusionToast and FusionConfirm are declared in `FusionAppLevelObjects` (M23.N1, M23.N2), each
 confirm's `Ask` on N17.5's argument and `ConfirmAsks.tla`. The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1).
 M25.N6 is declared: `IAppLevelComponent` in `Vendors` (P4), `pipeline.Component<TComponent>()` and
 `plan.Component<TComponent>()`, whose handlers are a `ReactiveComponent<TComponent, TModel>`, each a signature

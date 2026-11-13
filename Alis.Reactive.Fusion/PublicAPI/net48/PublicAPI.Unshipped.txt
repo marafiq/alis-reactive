@@ -416,6 +416,193 @@ Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.ShowPopup() -> void
 Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.Text.get -> Alis.Reactive.Declarations.Property<string?>!
 Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree.Value.get -> Alis.Reactive.Declarations.Property<string![]?>!
 Alis.Reactive.Fusion.FusionComponents.FusionDropDownTreeHtml
+Alis.Reactive.Fusion.FusionComponents.FusionGrid
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionBegin<TRow>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionComplete<TRow>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.Action.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.ActionEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.Data.get -> Alis.Reactive.Declarations.ReadOnly<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.PreviousData.get -> Alis.Reactive.Declarations.ReadOnly<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.RequestType.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.RowIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.SelectedRow.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ActionEventArgs<TRow>.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.AddRecord<TRow>(Alis.Reactive.ValuesAndSources.Arg<TRow!>! data) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.AddRecord<TRow>(Alis.Reactive.ValuesAndSources.Arg<TRow!>! data, Alis.Reactive.ValuesAndSources.Arg<int>! index) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.AutoFitColumns() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.AutoFitColumns(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! fieldNames) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BatchChanges<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BatchChanges<TRow>.AddedRecords.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BatchChanges<TRow>.BatchChanges() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BatchChanges<TRow>.ChangedRecords.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BatchChanges<TRow>.DeletedRecords.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeforeBatchSave<TRow>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeforeBatchSaveArgs<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeforeBatchSaveArgs<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeforeBatchSaveArgs<TRow>.BatchChanges.get -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.BatchChanges<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeforeBatchSaveArgs<TRow>.BeforeBatchSaveArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeforeBatchSaveArgs<TRow>.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeforeBatchSaveArgs<TRow>.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEdit<TRow>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEditArgs<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEditArgs<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEditArgs<TRow>.BeginEditArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEditArgs<TRow>.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEditArgs<TRow>.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEditArgs<TRow>.RowData.get -> Alis.Reactive.Declarations.ReadOnly<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEditArgs<TRow>.RowIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.BeginEditArgs<TRow>.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSave<TRow, TValue>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>.CellSaveArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>.ColumnName.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>.PreviousValue.get -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>.RowData.get -> Alis.Reactive.Declarations.ReadOnly<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>.Value.get -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaved<TRow, TValue>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.CellSaveArgs<TRow, TValue>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClearFiltering() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClearGrouping() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClearSelection() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClearSorting() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClickEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClickEventArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClickEventArgs.ClickEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClickEventArgs.Item.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionGrid.ItemModel!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClickEventArgs.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CloseEdit() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Column
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Column.Column() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Column.HeaderText.get -> Alis.Reactive.Declarations.Property<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Column.Visible.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.CsvExport() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataResult<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataResult<TRow>.Count.get -> int
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataResult<TRow>.Count.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataResult<TRow>.DataResult() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataResult<TRow>.Result.get -> System.Collections.Generic.IReadOnlyList<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataResult<TRow>.Result.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataSource<TRow>() -> Alis.Reactive.Declarations.Property<System.Collections.Generic.IReadOnlyList<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChange.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.Action.get -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.GridActionEventArgs!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.DataStateChangeEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.Group.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<string!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.RequiresCounts.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.Search.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.Skip.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.Sorted.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionGrid.Sorts!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.Take.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataStateChangeEventArgs.Where.get -> Alis.Reactive.Declarations.ReadOnly<System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate!>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.DeleteRecord() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.EditCell(Alis.Reactive.ValuesAndSources.Arg<int>! index, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! field) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.EndEdit() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ExcelExport() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterByColumn(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field<string!>!>! fieldName, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator>! filterOperator, Alis.Reactive.ValuesAndSources.Arg<string!>! filterValue) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator.Contains = 0 -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator.EndsWith = 4 -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator.Equal = 1 -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator.NotEqual = 2 -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator.StartsWith = 3 -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.FilterOperator
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.FusionGrid() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GetBatchChanges<TRow>() -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.BatchChanges<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GetColumnByField(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! field) -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.Column!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GetCurrentViewRecords<TRow>() -> Alis.Reactive.Declarations.MethodResult<System.Collections.Generic.IReadOnlyList<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GetRowIndexByPrimaryKey<TKey>(Alis.Reactive.ValuesAndSources.Arg<TKey>! value) -> Alis.Reactive.Declarations.MethodResult<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GetSelectedRecords<TRow>() -> Alis.Reactive.Declarations.MethodResult<System.Collections.Generic.IReadOnlyList<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GetSelectedRowIndexes() -> Alis.Reactive.Declarations.MethodResult<System.Collections.Generic.IReadOnlyList<int>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GoToPage(Alis.Reactive.ValuesAndSources.Arg<int>! pageNo) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GridActionEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GridActionEventArgs.ColumnName.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GridActionEventArgs.Direction.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Fusion.FusionComponents.FusionGrid.SortDirection>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GridActionEventArgs.GridActionEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GridActionEventArgs.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GridActionEventArgs.RequestType.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GridActionEventArgs.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.GroupColumn(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! columnName) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.HideColumns(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! keys) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ItemModel
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ItemModel.Id.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ItemModel.Id.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ItemModel.ItemModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ItemModel.Text.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ItemModel.Text.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.OpenColumnChooser() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Page<TRow>() -> Alis.Reactive.Declarations.Property<Alis.Reactive.Fusion.FusionComponents.FusionGrid.DataResult<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.PdfExport() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Condition.get -> string!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Condition.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Field.get -> string!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Field.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Operator.get -> string!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Operator.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Predicate() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Predicates.get -> System.Collections.Generic.IReadOnlyList<Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Predicate.Predicates.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Print() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RecordClick<TRow>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.RecordClickEventArgs<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RecordClickEventArgs<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RecordClickEventArgs<TRow>.CellIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RecordClickEventArgs<TRow>.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RecordClickEventArgs<TRow>.RecordClickEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RecordClickEventArgs<TRow>.RowData.get -> Alis.Reactive.Declarations.ReadOnly<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RecordClickEventArgs<TRow>.RowIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Refresh() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RefreshHeader() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ReorderColumns(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! fromFName, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! toFName) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelectEventArgs<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelectEventArgs<TRow>.Data.get -> Alis.Reactive.Declarations.ReadOnly<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelectEventArgs<TRow>.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelectEventArgs<TRow>.Name.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelectEventArgs<TRow>.PreviousRowIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelectEventArgs<TRow>.RowIndex.get -> Alis.Reactive.Declarations.ReadOnly<int>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelectEventArgs<TRow>.RowSelectEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelected<TRow>() -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.RowSelectEventArgs<TRow>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SaveCell() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Search(Alis.Reactive.ValuesAndSources.Arg<string!>! searchString) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel.Fields.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel.Fields.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel.Key.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel.Key.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel.Operator.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel.Operator.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SearchSettingsModel.SearchSettingsModel() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SelectRow(Alis.Reactive.ValuesAndSources.Arg<int>! index) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SelectRowsByRange(Alis.Reactive.ValuesAndSources.Arg<int>! startIndex, Alis.Reactive.ValuesAndSources.Arg<int>! endIndex) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SetCellValue<TKey, TValue>(Alis.Reactive.ValuesAndSources.Arg<TKey>! key, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field<TValue>!>! field, Alis.Reactive.ValuesAndSources.Arg<TValue>! value) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SetRowData<TKey, TRow>(Alis.Reactive.ValuesAndSources.Arg<TKey>! key, Alis.Reactive.ValuesAndSources.Arg<TRow!>! rowData) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ShowColumns(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! keys) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SortColumn(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! columnName, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Fusion.FusionComponents.FusionGrid.SortDirection>! direction, Alis.Reactive.ValuesAndSources.Arg<bool>! isMultiSort) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SortDirection
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SortDirection.Ascending = 0 -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.SortDirection
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.SortDirection.Descending = 1 -> Alis.Reactive.Fusion.FusionComponents.FusionGrid.SortDirection
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Sorts
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Sorts.Direction.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Sorts.Direction.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Sorts.Name.get -> string?
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Sorts.Name.set -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.Sorts.Sorts() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.StartEdit() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.ToolbarClick.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionGrid.ClickEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.UngroupColumn(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field!>! columnName) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.UpdateCell<TValue>(Alis.Reactive.ValuesAndSources.Arg<int>! rowIndex, Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Declarations.Field<TValue>!>! field, Alis.Reactive.ValuesAndSources.Arg<TValue>! value) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGrid.UpdateRow<TRow>(Alis.Reactive.ValuesAndSources.Arg<int>! index, Alis.Reactive.ValuesAndSources.Arg<TRow!>! data) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionGridColumns
+Alis.Reactive.Fusion.FusionComponents.FusionGridColumns<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGridColumns<TRow>.Field<TValue>(System.Linq.Expressions.Expression<System.Func<TRow, TValue>!>! member) -> string!
+Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>
+Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>.Date<TField>(System.Linq.Expressions.Expression<System.Func<TRow, TField>!>! field, string! label) -> Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>.Number<TField>(System.Linq.Expressions.Expression<System.Func<TRow, TField>!>! field, string! label) -> Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>.Select<TField>(System.Linq.Expressions.Expression<System.Func<TRow, TField>!>! field, string! label, System.Collections.Generic.IReadOnlyList<string!>! options) -> Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>.Text<TField>(System.Linq.Expressions.Expression<System.Func<TRow, TField>!>! field, string! label) -> Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>!
+Alis.Reactive.Fusion.FusionComponents.FusionGridEditTemplates
+Alis.Reactive.Fusion.FusionComponents.FusionGridHtml
 Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>
 Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>.ActionBegin.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>.ActionBeginEventArgs!>!
 Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>.ActionBeginData
@@ -1307,6 +1494,13 @@ static Alis.Reactive.Fusion.FusionComponents.FusionDropDownListHtml.FusionDropDo
 static Alis.Reactive.Fusion.FusionComponents.FusionDropDownListHtml.FusionDropDownList<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.DropDowns.DropDownListBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDropDownList<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionDropDownTreeHtml.FusionDropDownTree<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionDropDownTreeHtml.FusionDropDownTree<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.DropDowns.DropDownTreeBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionDropDownTree!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionGridColumns.Of<TRow>() -> Alis.Reactive.Fusion.FusionComponents.FusionGridColumns<TRow>!
+static Alis.Reactive.Fusion.FusionComponents.FusionGridEditTemplates.DateInput<TRow, TField>(System.Linq.Expressions.Expression<System.Func<TRow, TField>!>! field) -> string!
+static Alis.Reactive.Fusion.FusionComponents.FusionGridEditTemplates.DialogForm<TRow>(System.Action<Alis.Reactive.Fusion.FusionComponents.FusionGridDialogFormBuilder<TRow>!>! build) -> string!
+static Alis.Reactive.Fusion.FusionComponents.FusionGridEditTemplates.Select<TRow, TField, TItem>(System.Linq.Expressions.Expression<System.Func<TRow, TField>!>! field, System.Collections.Generic.IReadOnlyList<TItem>! items, System.Func<TItem, string!>! text, System.Func<TItem, string!>! value) -> string!
+static Alis.Reactive.Fusion.FusionComponents.FusionGridEditTemplates.Select<TRow, TField>(System.Linq.Expressions.Expression<System.Func<TRow, TField>!>! field, System.Collections.Generic.IReadOnlyList<string!>! options) -> string!
+static Alis.Reactive.Fusion.FusionComponents.FusionGridHtml.FusionGrid<TModel, TRow>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Grids.GridBuilder<TRow!>!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionGrid!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionGridHtml.FusionGrid<TModel, TRow>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Collections.Generic.IReadOnlyList<TRow!>! rows, System.Action<Syncfusion.EJ2.Grids.GridBuilder<TRow!>!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionGrid!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditorHtml.FusionInPlaceEditor<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditorHtml.FusionInPlaceEditor<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.InPlaceEditor.InPlaceEditorBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionInPlaceEditor<TValue>!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionKanbanHtml.FusionKanban<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Kanban.KanbanBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionKanban!, TModel>!
