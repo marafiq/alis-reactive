@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model OvernightStay
+@{
+    var plan = Html.ReactivePlan<OvernightStay>();
+}
+@(Html.InputField(plan, m => m.Nights, options => options.Label("Nights")).NativeTextBox())
+@Html.RenderPlan(plan)

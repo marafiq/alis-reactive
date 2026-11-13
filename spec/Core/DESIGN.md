@@ -3216,6 +3216,16 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - `X13.4` behavior: a server message for a member an editor template rendered shows beside that input.
 - `X13.5` behavior (D13.6): two containers on one page keep their own summaries, and a container's summary stays after a
   slot that joined it unloads.
+- `X13.6` behavior (D13.3, D13.4): a container's read of a member that its own input and an input a slot loads into
+  it both bind stops its pipeline, as the container's request stops, and the console names both element ids.
+- `X13.7` behavior (D13.3, D4.2): a container's read of a member no input inside it binds reads the member's start,
+  the value the endpoint binds when the container sends none.
+- `X13.8` behavior (D13.3): a container's read takes the inputs inside it when its step runs: an input a slot loads
+  into the container is read from its load, and is read no more once its slot unloads.
+- `X13.9` behavior (D13.3): a container's read finds only the inputs inside its element, so an input outside it that
+  binds the same name is never read.
+- `X13.10` behavior (D13.3, D9.15): a read of a container whose element the page lacks stops its pipeline, as the
+  container's request stops.
 
 ## Q14. MVC partials and ids
 

@@ -1345,8 +1345,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   as nothing), and four witnesses. A spec's mutant fails its own invariant wherever it fails any, read by running the
   mutant under the invariant that every other holds or its own fails, since TLC's workers find states in no fixed
   order and the tlc check reads the first invariant violated (the lead's slip, 2026-11-13). X8.4's and X7.7's pages
-  test ReadIsWhatTheEndpointBinds and X13.2's OneValueOnEveryHost; the read's two stops, an unsent member and a slot's
-  input joining and leaving have no promise yet, and their pages are U3's next piece. The owner can overrule it.
+  test ReadIsWhatTheEndpointBinds and X13.2's OneValueOnEveryHost; X13.6 and X13.10 test ReadStopsWhenItsSendStops, a
+  slot's second input under the name and a container the page lacks, X13.7 AnUnsentMemberReadsWhatTheEndpointBinds,
+  X13.8 ReadSeesTheSlotThatJoinedOrLeftBeforeIt and X13.9 ReadFindsWhatItsContainerSends, each test red. The owner can
+  overrule it.
 - The lead, 2026-11-13, landing the eight pages that read a typed value through its container (N13.1), a fork's work
   read at the source, and settling what it read into. X8.14's promise names the check endpoint the doctor's
   SettleCheck() awaits and the answer the harness seeds it, so the world holds it at the settle gate, answering yes

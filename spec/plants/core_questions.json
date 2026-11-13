@@ -141,6 +141,31 @@
     "file": "spec/Core/DESIGN.md",
     "old": "- `X13.5` behavior",
     "new": "- `X13.5` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.6` behavior",
+    "new": "- `X13.6` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.7` behavior",
+    "new": "- `X13.7` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.8` behavior",
+    "new": "- `X13.8` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.9` behavior",
+    "new": "- `X13.9` browser"
+   },
+   {
+    "file": "spec/Core/DESIGN.md",
+    "old": "- `X13.10` behavior",
+    "new": "- `X13.10` browser"
    }
   ],
   "expect": "Q13: Defects lists no defect with a rung"

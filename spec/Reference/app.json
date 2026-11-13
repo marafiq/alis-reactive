@@ -3902,6 +3902,93 @@
     },
     {
       "feature": "M7.F3",
+      "for": "X13.6",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "sectionSlot",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
+      "for": "X13.7",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
+      "for": "X13.8",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "sectionSlot",
+        "inputs",
+        "intakeEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
+      "for": "X13.9",
+      "index": 0,
+      "screen": "admission",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "intakeForm",
+        "inputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
+      "for": "X13.10",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "tabForm",
+        "noteInputs",
+        "notes",
+        "recordEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M7.F3",
       "for": "M7.X6",
       "index": 0,
       "screen": "admission",

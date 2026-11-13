@@ -713,6 +713,26 @@
           "rung": "behavior"
         },
         {
+          "id": "X13.6",
+          "rung": "behavior"
+        },
+        {
+          "id": "X13.7",
+          "rung": "behavior"
+        },
+        {
+          "id": "X13.8",
+          "rung": "behavior"
+        },
+        {
+          "id": "X13.9",
+          "rung": "behavior"
+        },
+        {
+          "id": "X13.10",
+          "rung": "behavior"
+        },
+        {
           "id": "M7.X5",
           "rung": "type",
           "defect": "A reach of an input through an object-typed member lambda compiles over a member of any type and erases its type, so a request member of another type takes it: N14.4's pipeline.Input(m => m.Member) returns a BoundInput typed by the member's value, and a request's Input of a member of another type does not compile (CS0029)."
@@ -740,6 +760,46 @@
           "outcome": "No request leaves the browser, the bound text keeps its dash, and the console's one error names both element ids.",
           "opposite": "With the partial's input bound to Nickname, Save posts and the page shows name Ada.",
           "defect": "The form sends one of the two by page order, so a request leaves and the page shows name Ada or Bo, a value the endpoint cannot tell from the other."
+        },
+        {
+          "for": "X13.6",
+          "page": "A stay extension form holding the Nights field and a section the extension loads into; Add the extension loads into the form a partial of the model StayExtensionSection whose input, labelled Extended nights, binds its own Nights, and Quote sets the quote to the form's Read of Nights. At a second address of the same view the section's input binds ExtraNights.",
+          "gesture": "Type 14 in Nights, click Add the extension, type 7 in Extended nights and click Quote.",
+          "outcome": "The quote keeps its dash, and the console's one error names both element ids.",
+          "opposite": "At the address whose section binds ExtraNights, the same gestures show the quote 14.",
+          "defect": "The read takes the last input that binds Nights, so the quote shows 7, or the first, so it shows 14 with no error, a value the endpoint cannot tell from the other."
+        },
+        {
+          "for": "X13.7",
+          "page": "A short stay form whose model starts Nights at 14; the standard stay's form holds the Resident field and no Nights field, and the custom stay's, the same view at a second address, holds both; Quote sets the quote to the form's Read of Nights.",
+          "gesture": "On the standard stay, click Quote.",
+          "outcome": "The quote shows 14, the nights the endpoint binds when the form sends none.",
+          "opposite": "On the custom stay, type 21 in Nights and click Quote: the quote shows 21.",
+          "defect": "A member the form does not send reads nothing, so the quote shows nothing, or its type's default, so it shows 0."
+        },
+        {
+          "for": "X13.8",
+          "page": "An overnight stay form holding the Resident field and a section the overnight loads into, its model starting Nights at 14; Add the overnight loads into the form a partial of the same model that renders the Nights field, Remove the overnight unloads it, and Quote sets the quote to the form's Read of Nights.",
+          "gesture": "Click Quote; click Add the overnight, type 21 in Nights and click Quote; click Remove the overnight and click Quote.",
+          "outcome": "The quote shows 14, then 21, then 14.",
+          "opposite": "Before the overnight loads and after it unloads, no input inside the form binds Nights, so the first and the last Quote show the start, 14, and not 21.",
+          "defect": "The container keeps the inputs it found at its first read, so the second Quote shows 14, or keeps the input its slot took away, so the last Quote shows 21."
+        },
+        {
+          "for": "X13.9",
+          "page": "A respite quote form holding the Nights field, its model starting Nights at 14, and beside the form a previous stay card, a partial of the model PreviousStayCard whose input, labelled Previous nights, binds its own Nights; Quote sets the quote to the form's Read of Nights.",
+          "gesture": "Type 7 in Nights and 21 in Previous nights, then click Quote.",
+          "outcome": "The quote shows 7.",
+          "opposite": "With Nights cleared and Quote clicked again, the quote shows 14, the form's start, and not the card's 21.",
+          "defect": "The read finds every input on the page that binds Nights, so it stops at two and the quote keeps its dash, or it reads the card's 21."
+        },
+        {
+          "for": "X13.10",
+          "page": "A resident's record whose Open the note loads into the record's tab a partial of the model NoteDraft holding the note-draft form with the Note field; the record's own Preview sets the preview to the Read of Note through pipeline.Container<NoteDraft>(\"note-draft\").",
+          "gesture": "Click Preview; then click Open the note, type Ate well in Note and click Preview.",
+          "outcome": "The first Preview leaves the preview at its dash, and the second shows Ate well.",
+          "opposite": "Once the note tab has loaded, the page holds the form and the read reaches its Note: the second Preview shows Ate well.",
+          "defect": "A read of a container the page lacks reads the member's start, so the first Preview empties the preview."
         },
         {
           "for": "M7.X6",

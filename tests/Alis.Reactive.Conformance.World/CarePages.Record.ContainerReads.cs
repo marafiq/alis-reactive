@@ -8,4 +8,5 @@ public static partial class CarePages
     public const string PainEscalation = Record + "pain-escalation";
     public const string IntakeRecord = Record + "intake-record";
     public const string FluidTargetCheck = Record + "fluid-target-check";
+    public const string NotePreview = Record + "note-preview";
 }

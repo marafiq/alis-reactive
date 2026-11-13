@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RespiteQuote
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Respite quote";
+    var plan = Html.ReactivePlan<RespiteQuote>();
+}
+<h1>Respite quote</h1>
+<section aria-label="Quote">
+    @using (var quote = Html.BeginRequestForm(plan, "respite-quote"))
+    {
+        @(Html.InputField(plan, m => m.Nights, options => options.Label("Nights")).NativeTextBox())
+        <button type="button" @Html.Raises(plan, RespiteQuotes.Quote)>Quote</button>
+        Html.On(plan, trigger => trigger.CustomEvent(RespiteQuotes.Quote, pipeline => pipeline.Element("quote").Text.Set(quote.Form.Read(m => m.Nights))));
+    }
+    <p>Nights quoted: <span id="quote">-</span></p>
+</section>
+<section aria-label="Previous stay">
+    @await Html.PartialAsync("/Care/Admission/RespitePreviousStay.cshtml", new PreviousStayCard())
+</section>
+@Html.RenderPlan(plan)

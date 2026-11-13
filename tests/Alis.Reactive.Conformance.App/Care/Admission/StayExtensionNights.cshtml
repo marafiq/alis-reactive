@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model StayExtensionSection
+@{
+    var plan = Html.ReactivePlan<StayExtensionSection>();
+}
+@(Html.InputField(plan, m => m.Nights, options => options.Label("Extended nights")).NativeTextBox())
+@Html.RenderPlan(plan)

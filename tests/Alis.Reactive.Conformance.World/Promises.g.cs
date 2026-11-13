@@ -233,6 +233,11 @@ public static class Promises
     {
         public const string X13_1_0 = "M7.F3 X13.1 0";
         public const string X13_2_0 = "M7.F3 X13.2 0";
+        public const string X13_6_0 = "M7.F3 X13.6 0";
+        public const string X13_7_0 = "M7.F3 X13.7 0";
+        public const string X13_8_0 = "M7.F3 X13.8 0";
+        public const string X13_9_0 = "M7.F3 X13.9 0";
+        public const string X13_10_0 = "M7.F3 X13.10 0";
         public const string M7_X6_0 = "M7.F3 M7.X6 0";
     }
 
