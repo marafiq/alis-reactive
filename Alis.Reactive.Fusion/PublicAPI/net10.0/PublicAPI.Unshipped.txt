@@ -1,1 +1,48 @@
 #nullable enable
+Alis.Reactive.Fusion.FusionComponents.FusionComponent
+Alis.Reactive.Fusion.FusionComponents.FusionComponent.FusionComponent() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Change.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectChangeEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.DataBind() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.DataSource<TItem>() -> Alis.Reactive.Declarations.Property<System.Collections.Generic.IReadOnlyList<TItem>!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Destroy() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FieldSettings
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FieldSettings.FieldSettings() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FieldSettings.GroupBy.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FieldSettings.Text.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Fields.get -> Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FieldSettings!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Filtering.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FilteringEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FilteringEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FilteringEventArgs.FilteringEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FilteringEventArgs.PreventDefaultAction.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FilteringEventArgs.Text.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FilteringEventArgs.UpdateData<TItem>(Alis.Reactive.ValuesAndSources.Arg<System.Collections.Generic.IReadOnlyList<TItem>!>! dataSource) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.FusionMultiSelect() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.HidePopup() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectChangeEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectChangeEventArgs.IsInteracted.get -> Alis.Reactive.Declarations.ReadOnly<bool>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectChangeEventArgs.MultiSelectChangeEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectChangeEventArgs.Value.get -> Alis.Reactive.Declarations.ReadOnly<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectPopup
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectPopup.MultiSelectPopup() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectPopup.OffsetY.get -> Alis.Reactive.Declarations.Property<double>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Open.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.PopupEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Placeholder.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.PopupEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.PopupEventArgs.Popup.get -> Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.MultiSelectPopup!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.PopupEventArgs.PopupEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.SelectAll(Alis.Reactive.ValuesAndSources.Arg<bool>! state) -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.ShowPopup() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Tagging.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.TaggingEventArgs!>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.TaggingEventArgs
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.TaggingEventArgs.ItemData<TItem>() -> Alis.Reactive.Declarations.ReadOnly<TItem>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.TaggingEventArgs.TaggingEventArgs() -> void
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>.Value.get -> Alis.Reactive.Declarations.Property<TValue>!
+Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml
+override sealed Alis.Reactive.Fusion.FusionComponents.FusionComponent.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Fusion.FusionComponents.FusionComponent.FusionVendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.Fields<TItem, TText, TItemValue, TGroup>(this Syncfusion.EJ2.DropDowns.MultiSelectBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TText>!>! text, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value, System.Linq.Expressions.Expression<System.Func<TItem, TGroup>!>! groupBy) -> Syncfusion.EJ2.DropDowns.MultiSelectBuilder!
+static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.Fields<TItem, TText, TItemValue>(this Syncfusion.EJ2.DropDowns.MultiSelectBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TText>!>! text, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value) -> Syncfusion.EJ2.DropDowns.MultiSelectBuilder!
+static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.FusionMultiSelect<TModel, TValue, TItem>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Collections.Generic.IReadOnlyList<TItem>! items, System.Action<Syncfusion.EJ2.DropDowns.MultiSelectBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.FusionMultiSelect<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>!, TModel>!
+static Alis.Reactive.Fusion.FusionComponents.FusionMultiSelectHtml.FusionMultiSelect<TModel, TValue>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>! field, System.Action<Syncfusion.EJ2.DropDowns.MultiSelectBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionMultiSelect<TValue>!, TModel>!

@@ -1060,6 +1060,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   written on that plan's load. X13.4 reads its summary as the page's list items, as the validation cells do. Raised
   for the owner: TEST009 refuses an expected value the test typed, and M24.X10's outcome is the value the server
   renders back into the box after a refused bind; the promise waits, and so does its net48 leg on the harness.
+- The lead, 2026-11-12, declaring the reference Fusion slice as signatures (M21.N1, M21.N2), the exemplar of the
+  other Fusion slices, each name read from EJ2 33.1.47's TypeScript. `FusionComponent` carries `FusionVendor` as a
+  property, since `ComponentVendor.Define` throws until module 12's unit builds it and a static field would fail
+  every Fusion type that loads. Both lines' `Fields<TItem>(text, value)` takes `Expression<Func<TItem, object?>>`,
+  which ALIS009 refuses, so each member it selects is a type parameter of its own, `Fields<TItem, TText, TItemValue>`
+  and `Fields<TItem, TText, TItemValue, TGroup>`, still an extension of EJ2's `MultiSelectBuilder`, which `build`
+  hands (M21.D1); EJ2's builder carries no item type, so a view names the item's class in the first lambda's
+  parameter. The items the view hands and the items `UpdateData` shows are an `IReadOnlyList<TItem>`,
+  and `DataSource<TItem>()` a `Property<IReadOnlyList<TItem>>`. The tagging payload's `ItemData<TItem>()` reads the
+  app's item, as the cell event.object reads `Read(d => d.Name)`, in place of EJ2's `FieldSettingsModel`. No member
+  carries `name:`. No analyzer reads `[Mirrors]` until N17.2's is built, so the build proves these names compile and
+  no more. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
