@@ -1158,6 +1158,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   helper gives its builder, and the smart text area's helper takes its options as `options`, the name of every
   other options callback, where wave 10 had landed `configure` for both. `When`'s branches stay `then` and
   `else`, M22.N2's. The owner can overrule each.
+- The lead, 2026-11-13, declaring module 25's and module 23's app-level slices as signatures. The drawer's
+  `BeforeCloseArgs` stays flat, `ClosedBy` and `Cancel` as M25.N1 names them, so M25.D1 now has the drawer code
+  raise "beforeClose" as an event whose own members are the payload: a listener reads its payload at its first
+  argument (D17.4), where a `CustomEvent` puts both under `detail`, one more member each handler names. The
+  loader's, toast's and reconnect offer's contracts are declared by U24, which builds what calls them, since no
+  view reaches them (D10.21); U3 declares their render helpers, the reconnect offer's on net10 alone. The drawer
+  and both confirms carry no `Mirrors` yet: their members are written by the framework's own code, which U24 and
+  U27 write, so they mirror no vendor's types until then; FusionToast mirrors EJ2's Toast. A row control's
+  attribute doors are N18.4's, whose forms go to gate 2, so only its `CssClass` is declared. The two confirms'
+  `Ask` rest on `ConfirmAsks.tla`'s six invariants with `Run.tla`'s and `Lanes.tla`'s. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -16,15 +16,19 @@ no other consumer.
 - A slice's tests prove only what its declaration adds: its members' names and shapes, its browser facts and its
   own defects.
 - A file compiles for both hosts or for one, by the core's rule (`Alis.Reactive/CLAUDE.md`).
-- U3 declares a slice with the first view that holds its component, and U23 builds it: the declaration is written
-  member for member from its line of `spec/NativeComponents/module.md`, and its render helper throws
-  `NotImplementedException` until then (`spec/CLAUDE.md`, the lead's lines of 2026-11-12). The eight component
-  slices of module 24 are declared. The text box is the exemplar: its declaration is
-  `NativeComponents/NativeTextBox/NativeTextBox.cs`, and its render helpers with their builder are
-  `NativeComponents/NativeTextBox/NativeTextBoxHtml.cs`. A member that differs by host is in the slice's host
-  file (`NativeComponents/NativeDropDown/NativeDropDownHtml.Net10.cs` holds the drop-down's `Items`, MVC's own
-  options). A file's namespace is its first folder's, so every slice is in the namespace of `NativeComponents/`,
-  whose own file is the base the slices share, `NativeComponents/NativeComponent.cs`.
+- U3 declares a slice with the first view that holds its component, and U23 builds it: the declaration is written member
+  for member from its line of `spec/NativeComponents/module.md`, and its render helper throws `NotImplementedException`
+  until then (`spec/CLAUDE.md`, the lead's lines of 2026-11-12). The eight component slices of module 24 are declared.
+  The text box is the exemplar: its declaration is `NativeComponents/NativeTextBox/NativeTextBox.cs`, and its render
+  helpers with their builder are `NativeComponents/NativeTextBox/NativeTextBoxHtml.cs`. A member that differs by host is
+  in the slice's host file (`NativeComponents/NativeDropDown/NativeDropDownHtml.Net10.cs` holds the drop-down's `Items`,
+  MVC's own options). A file's namespace is its first folder's: a component slice is in the namespace of
+  `NativeComponents/`, whose own file is the base the slices share, `NativeComponents/NativeComponent.cs`, and module
+  25's app-level slices, written from their lines of `spec/NativeAppLevelObjects/module.md` and built by U24, are in
+  that of `NativeAppLevelObjects/`: the drawer, the confirm, the row actions and the render helpers of the loader, the
+  toast and the reconnect offer, whose contracts the core calls and no view reaches (D10.21). The reconnect offer's
+  helper is net10's alone, as realtime is
+  (`NativeAppLevelObjects/NativeReconnectOffer/NativeReconnectOfferHtml.Net10.cs`).
 
 ## Commands
 

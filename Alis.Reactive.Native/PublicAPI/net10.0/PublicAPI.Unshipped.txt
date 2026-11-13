@@ -1,4 +1,43 @@
 #nullable enable
+Alis.Reactive.Native.NativeAppLevelObjects.DrawerClosedBy
+Alis.Reactive.Native.NativeAppLevelObjects.DrawerClosedBy.Close = 2 -> Alis.Reactive.Native.NativeAppLevelObjects.DrawerClosedBy
+Alis.Reactive.Native.NativeAppLevelObjects.DrawerClosedBy.CloseButton = 1 -> Alis.Reactive.Native.NativeAppLevelObjects.DrawerClosedBy
+Alis.Reactive.Native.NativeAppLevelObjects.DrawerClosedBy.Escape = 0 -> Alis.Reactive.Native.NativeAppLevelObjects.DrawerClosedBy
+Alis.Reactive.Native.NativeAppLevelObjects.DrawerSize
+Alis.Reactive.Native.NativeAppLevelObjects.DrawerSize.Lg = 2 -> Alis.Reactive.Native.NativeAppLevelObjects.DrawerSize
+Alis.Reactive.Native.NativeAppLevelObjects.DrawerSize.Md = 1 -> Alis.Reactive.Native.NativeAppLevelObjects.DrawerSize
+Alis.Reactive.Native.NativeAppLevelObjects.DrawerSize.Sm = 0 -> Alis.Reactive.Native.NativeAppLevelObjects.DrawerSize
+Alis.Reactive.Native.NativeAppLevelObjects.NativeConfirm
+Alis.Reactive.Native.NativeAppLevelObjects.NativeConfirm.Ask(Alis.Reactive.ValuesAndSources.Arg<string?>! message) -> Alis.Reactive.Declarations.MethodResult<bool>!
+Alis.Reactive.Native.NativeAppLevelObjects.NativeConfirm.DefaultId.get -> string!
+Alis.Reactive.Native.NativeAppLevelObjects.NativeConfirm.NativeConfirm() -> void
+Alis.Reactive.Native.NativeAppLevelObjects.NativeConfirmHtml
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.BeforeClose.get -> Alis.Reactive.Declarations.Event<Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.BeforeCloseArgs!>!
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.BeforeCloseArgs
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.BeforeCloseArgs.BeforeCloseArgs() -> void
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.BeforeCloseArgs.Cancel.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.BeforeCloseArgs.ClosedBy.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.Native.NativeAppLevelObjects.DrawerClosedBy>!
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.Close() -> void
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.Closed.get -> Alis.Reactive.Declarations.Event!
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.DefaultId.get -> string!
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.NativeDrawer() -> void
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.Open() -> void
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.Size.get -> Alis.Reactive.Declarations.Property<Alis.Reactive.Native.NativeAppLevelObjects.DrawerSize>!
+Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawerHtml
+Alis.Reactive.Native.NativeAppLevelObjects.NativeLoaderHtml
+Alis.Reactive.Native.NativeAppLevelObjects.NativeReconnectOfferHtml
+Alis.Reactive.Native.NativeAppLevelObjects.NativeRowActions
+Alis.Reactive.Native.NativeAppLevelObjects.NativeToastHtml
+Alis.Reactive.Native.NativeAppLevelObjects.RowAction<TModel, TRow>
+Alis.Reactive.Native.NativeAppLevelObjects.RowAction<TModel, TRow>.Render(TRow row, string! text) -> Alis.Reactive.Native.NativeAppLevelObjects.RowControl!
+Alis.Reactive.Native.NativeAppLevelObjects.RowActivated<TRow>
+Alis.Reactive.Native.NativeAppLevelObjects.RowActivated<TRow>.Element.get -> Alis.Reactive.Elements.Element!
+Alis.Reactive.Native.NativeAppLevelObjects.RowActivated<TRow>.Row.get -> Alis.Reactive.Declarations.ReadOnly<TRow>!
+Alis.Reactive.Native.NativeAppLevelObjects.RowActivated<TRow>.RowActivated() -> void
+Alis.Reactive.Native.NativeAppLevelObjects.RowControl
+Alis.Reactive.Native.NativeAppLevelObjects.RowControl.CssClass(string! css) -> Alis.Reactive.Native.NativeAppLevelObjects.RowControl!
+Alis.Reactive.Native.NativeAppLevelObjects.RowControl.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void
 Alis.Reactive.Native.NativeComponents.CheckListItem
 Alis.Reactive.Native.NativeComponents.CheckListItem.CheckListItem(string! value, string! text) -> void
 Alis.Reactive.Native.NativeComponents.CheckListItem.CheckListItem(string! value, string! text, string! description) -> void
@@ -166,7 +205,18 @@ Alis.Reactive.Native.NativeComponents.RadioButtonItem.RadioButtonItem(string! va
 Alis.Reactive.Native.NativeComponents.RadioButtonItem.RadioButtonItem(string! value, string! text, string! description) -> void
 Alis.Reactive.Native.NativeComponents.RadioButtonItem.Text.get -> string!
 Alis.Reactive.Native.NativeComponents.RadioButtonItem.Value.get -> string!
+const Alis.Reactive.Native.NativeAppLevelObjects.NativeConfirm.ElementId = "alis-confirm" -> string!
+const Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.ContentId = "alis-drawer-content" -> string!
+const Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.ElementId = "alis-drawer" -> string!
+const Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawer.TitleId = "alis-drawer-title" -> string!
 override sealed Alis.Reactive.Native.NativeComponents.NativeComponent.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Native.NativeAppLevelObjects.NativeConfirmHtml.NativeConfirm(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, string! title, string! ok, string! cancel) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.Native.NativeAppLevelObjects.NativeDrawerHtml.NativeDrawer(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, string! closeText) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.Native.NativeAppLevelObjects.NativeLoaderHtml.NativeLoader(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, string! text) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.Native.NativeAppLevelObjects.NativeReconnectOfferHtml.NativeReconnectOffer(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, string! text, string! retry) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.Native.NativeAppLevelObjects.NativeRowActions.NativeActionButton<TModel, TRow>(this Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>! rows, System.Action<Alis.Reactive.Native.NativeAppLevelObjects.RowActivated<TRow>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! action) -> Alis.Reactive.Native.NativeAppLevelObjects.RowAction<TModel, TRow>!
+static Alis.Reactive.Native.NativeAppLevelObjects.NativeRowActions.NativeActionLink<TModel, TRow>(this Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>! rows, System.Action<Alis.Reactive.Native.NativeAppLevelObjects.RowActivated<TRow>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! action) -> Alis.Reactive.Native.NativeAppLevelObjects.RowAction<TModel, TRow>!
+static Alis.Reactive.Native.NativeAppLevelObjects.NativeToastHtml.NativeToast(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, System.TimeSpan shownFor, string! dismiss) -> Microsoft.AspNetCore.Html.IHtmlContent!
 static Alis.Reactive.Native.NativeComponents.NativeButtonHtml.NativeButton<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, string! id, string! text) -> Alis.Reactive.Native.NativeComponents.NativeButtonBuilder<TModel>!
 static Alis.Reactive.Native.NativeComponents.NativeCheckBoxHtml.NativeCheckBox<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, bool>! field) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeCheckBox!, TModel>!
 static Alis.Reactive.Native.NativeComponents.NativeCheckBoxHtml.NativeCheckBox<TModel>(this Alis.Reactive.RenderingAndDelivery.InputField<TModel, bool>! field, System.Action<Alis.Reactive.Native.NativeComponents.NativeCheckBoxBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Native.NativeComponents.NativeCheckBox!, TModel>!

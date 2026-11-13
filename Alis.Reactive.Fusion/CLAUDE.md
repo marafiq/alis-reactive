@@ -14,13 +14,16 @@ pinned at one version for NuGet and npm together (`scripts/pin-syncfusion.mjs`);
   marks private is a gap to name, never a door.
 - A slice's tests prove only what its declaration adds, and no test of a core module runs through a Fusion slice.
 - A file compiles for both hosts or for one, by the core's rule (`Alis.Reactive/CLAUDE.md`).
-- U3 declares a slice with the first view that holds its component; U25 builds the package and the reference, and
-  U26 the other slices. The declaration is written member for member from its line of
-  `spec/FusionComponents/module.md`, and its render helpers throw `NotImplementedException` until its unit builds
-  them. The multi-select box is the exemplar: its declaration, with its payloads nested, is
-  `FusionComponents/FusionMultiSelect/FusionMultiSelect.cs`, and its render helpers with `Fields` on EJ2's builder
-  are `FusionComponents/FusionMultiSelect/FusionMultiSelectHtml.cs`. Every slice is in the namespace of
-  `FusionComponents/`, whose own file is the base the slices share, `FusionComponents/FusionComponent.cs`.
+- U3 declares a slice with the first view that holds its component; U25 builds the package and the reference, and U26
+  the other slices. The declaration is written member for member from its line of `spec/FusionComponents/module.md`, and
+  its render helpers throw `NotImplementedException` until its unit builds them. The multi-select box is the exemplar:
+  its declaration, with its payloads nested, is `FusionComponents/FusionMultiSelect/FusionMultiSelect.cs`, and its
+  render helpers with `Fields` on EJ2's builder are `FusionComponents/FusionMultiSelect/FusionMultiSelectHtml.cs`. A
+  file's namespace is its first folder's: a component slice is in the namespace of `FusionComponents/`, whose own file
+  is the base the slices share, `FusionComponents/FusionComponent.cs`; module 22's template types are in
+  `FusionTemplates/`; and module 23's app-level slices, built by U27, `FusionAppLevelObjects/FusionToast/` and
+  `FusionAppLevelObjects/FusionConfirm/`, are in the namespace of `FusionAppLevelObjects/`, on the same base or, for the
+  confirm, the core's `Component` with a vendor of its own.
 
 ## Commands
 

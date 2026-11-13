@@ -1,2 +1,2 @@
 FusionComponents FusionTemplates
-FusionComponents/*
+FusionAppLevelObjects/* FusionComponents/*

@@ -984,8 +984,8 @@ M5.N4; a list operation's result set into a property declared a List; the block'
 Flags<TEnum>(), N16.4, with a rule set a request names, D16.2's form); six need a number a person types, read as a
 source (N13.1); five need a request culture; four need the value or membership tests (M3.N1); three need a console
 error's words, which no line states; six need a browser zone or the view's time zone; two need the harness's clock
-verb; one needs the harness's restart verb; three need module 25's NativeDrawer, NativeConfirm and NativeToast, which
-are not declared; one needs another host for its opposite case; one needs the text box's Type, whose form N18.4 sends
+verb; one needs the harness's restart verb; three need their pages on module 25's NativeDrawer, NativeConfirm and
+NativeToast, which are declared; one needs another host for its opposite case; one needs the text box's Type, whose form N18.4 sends
 to gate 2; and one needs a record whose code holds null, which native.json's type of it does not hold. Two more
 attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test
 typed where the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the
@@ -1002,8 +1002,8 @@ block: each request names the validator that checks it (`Validate<TValidator>()`
 under `When` two validators of one form, since no door names a rule set (D16.2 sends that form to gate 2); the
 validators are written and not registered until U17 builds the startup call, and the form endpoint answers what it
 bound until N16.1's door. Four cells wait: a source that calls a hub (N21.1), a push (the realtime doors and the
-harness's push verb), a confirm (NativeConfirm, on N17.5's argument the owner decides) and a slot whose host
-destroys its component (the harness's restart verb).
+harness's push verb), a confirm (its view, on NativeConfirm, declared on N17.5's argument the owner decides) and a
+slot whose host destroys its component (the harness's restart verb).
 source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so a source at its pattern is refused
 by the type (D7.5, X7.4). The eight component slices of module 24 are declared in `Alis.Reactive.Native` (M24.N1
 to M24.N9), `NativeTextBox` the first, each render helper a signature until U23, on the core's `IInputComponent`, `ComponentInput` and the
@@ -1016,7 +1016,11 @@ handover screens hold (M21.N3, M21.N4, M21.N7, M21.N8, M21.N18, M21.N19, M21.N24
 M21.N44, M21.N46 to M21.N49 and M21.N52), and so are the seventeen the handover, bed-board and fusion-layout
 screens hold (M21.N6, M21.N9, M21.N11, M21.N12, M21.N14, M21.N21, M21.N30, M21.N32 to M21.N35, M21.N38 to M21.N40,
 M21.N43, M21.N50 and M21.N51). Module 22's three template types are declared in `FusionTemplates` (M22.N1 to
-M22.N4). The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1).
+M22.N4). Module 25's slices are declared in `NativeAppLevelObjects` (M25.N1 to M25.N5, M25.N7): NativeDrawer,
+NativeConfirm, the row actions and the render helpers of the loader, the toast and the reconnect offer, the reconnect
+offer's net10's alone; the busy, notice and reconnect contracts those three fulfil give a view no door (D10.21) and
+are U24's. Module 23's FusionToast and FusionConfirm are declared in `FusionAppLevelObjects` (M23.N1, M23.N2), each
+confirm's `Ask` on N17.5's argument and `ConfirmAsks.tla`. The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1).
 M25.N6 is declared: `IAppLevelComponent` in `Vendors` (P4), `pipeline.Component<TComponent>()` and
 `plan.Component<TComponent>()`, whose handlers are a `ReactiveComponent<TComponent, TModel>`, each a signature
 until U24. N17.5's argument kind, the abort signal a declared method receives, is declared as the lead

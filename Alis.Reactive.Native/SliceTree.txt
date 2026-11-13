@@ -1,2 +1,2 @@
 NativeComponents
-NativeComponents/*
+NativeAppLevelObjects/* NativeComponents/*

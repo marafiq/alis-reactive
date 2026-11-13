@@ -1,4 +1,26 @@
 #nullable enable
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirm
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirm.Ask(Alis.Reactive.ValuesAndSources.Arg<string?>! message) -> Alis.Reactive.Declarations.MethodResult<bool>!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirm.DefaultId.get -> string!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirm.FusionConfirm() -> void
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirmHtml
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.Content.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.CssClass.get -> Alis.Reactive.Declarations.Property<Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone>!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.DefaultId.get -> string!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.FusionToast() -> void
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.Hide() -> void
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.Show() -> void
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.ShowCloseButton.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.ShowProgressBar.get -> Alis.Reactive.Declarations.Property<bool>!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.TimeOut.get -> Alis.Reactive.Declarations.Property<int>!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.Title.get -> Alis.Reactive.Declarations.Property<string?>!
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastHtml
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone.Danger = 2 -> Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone.Info = 3 -> Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone.Success = 0 -> Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone
+Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone.Warning = 1 -> Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastTone
 Alis.Reactive.Fusion.FusionComponents.FusionAIAssistView
 Alis.Reactive.Fusion.FusionComponents.FusionAIAssistView.ActiveView.get -> Alis.Reactive.Declarations.Property<int>!
 Alis.Reactive.Fusion.FusionComponents.FusionAIAssistView.AddPromptResponse(Alis.Reactive.ValuesAndSources.Arg<Alis.Reactive.Fusion.FusionComponents.FusionAIAssistView.PromptModel!>! outputResponse) -> void
@@ -1239,7 +1261,13 @@ Alis.Reactive.Fusion.FusionTemplates.FusionTemplateBuilder<TModel>.Text(string! 
 Alis.Reactive.Fusion.FusionTemplates.FusionTemplateBuilder<TModel>.Text<TProperty>(System.Linq.Expressions.Expression<System.Func<TModel, TProperty>!>! property) -> Alis.Reactive.Fusion.FusionTemplates.FusionTemplateBuilder<TModel>!
 Alis.Reactive.Fusion.FusionTemplates.FusionTemplateBuilder<TModel>.When(System.Linq.Expressions.Expression<System.Func<TModel, bool>!>! condition, System.Action<Alis.Reactive.Fusion.FusionTemplates.FusionConditionalBuilder<TModel>!>! then) -> Alis.Reactive.Fusion.FusionTemplates.FusionTemplateBuilder<TModel>!
 Alis.Reactive.Fusion.FusionTemplates.FusionTemplateBuilder<TModel>.When(System.Linq.Expressions.Expression<System.Func<TModel, bool>!>! condition, System.Action<Alis.Reactive.Fusion.FusionTemplates.FusionConditionalBuilder<TModel>!>! then, System.Action<Alis.Reactive.Fusion.FusionTemplates.FusionConditionalBuilder<TModel>!>! else) -> Alis.Reactive.Fusion.FusionTemplates.FusionTemplateBuilder<TModel>!
+const Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirm.ElementId = "alisConfirmDialog" -> string!
+const Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToast.ElementId = "alisFusionToast" -> string!
+override Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirm.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
 override sealed Alis.Reactive.Fusion.FusionComponents.FusionComponent.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
+static Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirmHtml.FusionConfirmDialog(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.Fusion.FusionAppLevelObjects.FusionConfirmHtml.FusionConfirmDialog(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html, string! title, string! ok, string! cancel) -> Microsoft.AspNetCore.Html.IHtmlContent!
+static Alis.Reactive.Fusion.FusionAppLevelObjects.FusionToastHtml.FusionToast(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper! html) -> Microsoft.AspNetCore.Html.IHtmlContent!
 static Alis.Reactive.Fusion.FusionComponents.FusionAIAssistViewHtml.FusionAIAssistView<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.InteractiveChat.AIAssistViewBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionAIAssistView!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionAccordionHtml.FusionAccordion<TModel>(this Microsoft.AspNetCore.Mvc.Rendering.IHtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! elementId, System.Action<Syncfusion.EJ2.Navigations.AccordionBuilder!>! build) -> Alis.Reactive.RenderingAndDelivery.Rendered<Alis.Reactive.Fusion.FusionComponents.FusionAccordion!, TModel>!
 static Alis.Reactive.Fusion.FusionComponents.FusionAutoCompleteHtml.Fields<TItem, TText, TItemValue, TGroup>(this Syncfusion.EJ2.DropDowns.AutoCompleteBuilder! build, System.Linq.Expressions.Expression<System.Func<TItem, TText>!>! text, System.Linq.Expressions.Expression<System.Func<TItem, TItemValue>!>! value, System.Linq.Expressions.Expression<System.Func<TItem, TGroup>!>! groupBy) -> Syncfusion.EJ2.DropDowns.AutoCompleteBuilder!
