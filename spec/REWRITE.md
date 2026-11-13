@@ -1001,7 +1001,7 @@ block: each request names the validator that checks it (`Validate<TValidator>()`
 under `When` two validators of one form, since no door names a rule set (D16.2 sends that form to gate 2); the
 validators are written and not registered until U17 builds the startup call, and the form endpoint answers what it
 bound until N16.1's door. Four cells wait: a source that calls a hub (N21.1), a push (the realtime doors and the
-harness's push verb), a confirm (NativeConfirm and N17.5's argument, the owner's form) and a slot whose host
+harness's push verb), a confirm (NativeConfirm, on N17.5's argument the owner decides) and a slot whose host
 destroys its component (the harness's restart verb).
 source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so a source at its pattern is refused
 by the type (D7.5, X7.4). The eight component slices of module 24 are declared in `Alis.Reactive.Native` (M24.N1
@@ -1015,7 +1015,9 @@ handover screens hold (M21.N3, M21.N4, M21.N7, M21.N8, M21.N18, M21.N19, M21.N24
 M21.N44, M21.N46 to M21.N49 and M21.N52). The validator grammar Q16's Doors keep is declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1).
 M25.N6 is declared: `IAppLevelComponent` in `Vendors` (P4), `pipeline.Component<TComponent>()` and
 `plan.Component<TComponent>()`, whose handlers are a `ReactiveComponent<TComponent, TModel>`, each a signature
-until U24. An element's text and HTML are an `ElementContent`, whose `Set` takes a source
+until U24. N17.5's argument kind, the abort signal a declared method receives, is declared as the lead
+proposes it, `AbortSignal()` beside `Answer`, a signature until U8. An element's text and HTML are an
+`ElementContent`, whose `Set` takes a source
 of any type (M5.N1, D7.3), and a world names the version its component is built as. The app's settle, count and item
 endpoints stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its
 action where a test holds one action at two endpoints, and the harness's test of it is green and fails on each of

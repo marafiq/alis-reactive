@@ -258,6 +258,15 @@ public abstract class JsObject
         where TSource : TDeclared
         => throw new NotImplementedException();
 
+    /// <summary>Makes the argument that hands the method the abort signal of the steps that call it.</summary>
+    /// <remarks>
+    /// The signal aborts when the run that called the method ends, so an object that waits on a person, such as a
+    /// confirm, closes what it opened. A method receives a signal only where its declaration lists this argument, and a
+    /// view passes nothing for it.
+    /// </remarks>
+    /// <returns>The argument to list among a method's arguments.</returns>
+    protected static Arg AbortSignal() => throw new NotImplementedException();
+
     /// <summary>Declares an event the object raises with no payload.</summary>
     /// <param name="name">The event's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>

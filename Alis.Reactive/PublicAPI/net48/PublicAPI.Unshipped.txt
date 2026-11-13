@@ -664,6 +664,7 @@ static Alis.Reactive.Declarations.EventListening.EventTarget.get -> Alis.Reactiv
 static Alis.Reactive.Declarations.EventListening.Methods(string! subscribe, string! unsubscribe) -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.Declarations.EventListening.ReturnedUnsubscriber(string! subscribe) -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.Declarations.Field.Of<TRow, TValue>(System.Linq.Expressions.Expression<System.Func<TRow, TValue>!>! member) -> Alis.Reactive.Declarations.Field<TValue>!
+static Alis.Reactive.Declarations.JsObject.AbortSignal() -> Alis.Reactive.ValuesAndSources.Arg!
 static Alis.Reactive.Declarations.JsObject.Answer<TArgs, TResult>(System.Func<TArgs!, Alis.Reactive.ValuesAndSources.TypedSource<TResult>!>! answer) -> Alis.Reactive.ValuesAndSources.Arg!
 static Alis.Reactive.Declarations.JsObject.Fixed<TValue>(TValue value) -> Alis.Reactive.ValuesAndSources.Arg!
 static Alis.Reactive.Declarations.JsObject.Pass<TDeclared, TSource>(Alis.Reactive.ValuesAndSources.TypedSource<TSource>! value) -> Alis.Reactive.ValuesAndSources.Arg!

@@ -1119,6 +1119,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   app-level object's element is the layout's, so the view writes no markup for it. Each constrains its declaration
   to a component that is an app-level object. Both doors throw until U24 builds them, as the plan's plugin door does,
   though the reach by id is built, since no test yet proves the reach with no id. The owner can overrule it.
+- The lead, 2026-11-12, declaring N17.5, the argument kind that hands a declared method the abort signal of its
+  block (D17.11), which NativeConfirm's ask and FusionConfirm's need (M25.N4, M23.F2). No line gives its form, and
+  neither `spec/api`, the POC, main nor the redesign compiles one: a search of each one's C# for a signal argument
+  found none. By G13 the form is the owner's before U8 builds it, so U3 declares the lead's proposal as a
+  signature: `AbortSignal()`, an `Arg` among a declaration's argument kinds beside `Answer`, `Fixed` and `Pass`,
+  named for lib.dom's type the method receives. A declaration lists it among its method's arguments where the
+  method takes the signal, and a view passes nothing for it. The cost of another form: one line in each
+  declaration that lists it. The owner decides it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

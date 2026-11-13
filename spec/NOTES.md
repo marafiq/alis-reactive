@@ -1409,3 +1409,5 @@
   Evidence: both hosts build the package with 793 lines of PublicAPI text, differing only in twenty-three helpers split by host; every cite read at its line of EJ2 33.1.47's TypeScript by the forks; the architecture tests pass 226 of 226.
 - 2026-11-12 U3, M25.N6 declared as signatures, the lead's: IAppLevelComponent in Vendors (P4), pipeline.Component<TComponent>() and plan.Component<TComponent>() with its handler type ReactiveComponent<TComponent, TModel>, the name the lead's in one line of spec/CLAUDE.md; module 25's slices are declared next, by a fork.
   Evidence: both hosts build the core with seven more lines of PublicAPI text each; M25.N6 and M25.D6 of spec/NativeAppLevelObjects read whole.
+- 2026-11-12 U3, N17.5 declared as a signature, the lead's proposal: JsObject.AbortSignal(), an argument kind beside Answer, Fixed and Pass that hands a declared method its block's abort signal (D17.11); the form is the owner's by G13, one line of spec/CLAUDE.md.
+  Evidence: git grep of spec/api, poc, main at 623dd4a27 and the redesign at 65fdf118d finds no signal argument in their C#; both hosts build the core with one more line of PublicAPI text each.
