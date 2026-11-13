@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@model ConformanceEntry
+@{
+    var plan = Html.ReactivePlan<ConformanceEntry>();
+}
+@(Html.InputField(plan, m => m.Code).ConformanceComponent(new ConformanceStart { Text = "Codes", Value = Model.Code, Options = ["a-1", "a-2"] }))
+@Html.RenderPlan(plan)

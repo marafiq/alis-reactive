@@ -13,4 +13,7 @@ public static class BenchEndpoints
     public const string ListeningCard = "/card/listening";
     public const string Echo = "/echo";
     public const string EchoHeader = "/echo/header";
+    public const string Form = "/form";
+    public const string FormEntries = "/form/entries";
+    public const string FormFirst = "/form/first";
 }

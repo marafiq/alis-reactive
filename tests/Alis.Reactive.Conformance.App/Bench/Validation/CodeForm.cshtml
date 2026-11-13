@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ConformanceForm
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "The bench";
+    var plan = Html.ReactivePlan<ConformanceForm>();
+}
+<h1>The bench</h1>
+@using (var codes = Html.BeginRequestForm(plan, "codes"))
+{
+    <fieldset>
+        <legend>Code</legend>
+        @(Html.InputField(plan, m => m.Code).ConformanceComponent(new ConformanceStart { Text = "Codes", Value = Model.Code, Options = ["a-1", "a-2"] }))
+    </fieldset>
+    @(Html.NativeButton("save", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<ConformanceForm>(BenchEndpoints.Form, request => request.Form(codes.Form))
+        .Validate<CodeRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("shown").Text.Set(saved.Body))))
+}
+<p id="shown"></p>
+@Html.RenderPlan(plan)

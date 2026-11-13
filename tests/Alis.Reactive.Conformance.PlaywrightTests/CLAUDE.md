@@ -48,6 +48,15 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   query the promise states, since its origin is the host's, and its body
   (`Vendors/Bench/WhenAGetSendsAComponentsMemberInItsQuery.cs`). The opposite case runs in a second world, seeded through a
   typed builder of the world contract where the promise changes what the component holds.
+- A check's failure shows twice, beside its input and in its form's summary (D16.13, MVC's own pattern), so a test
+  reads each in its own scope. The message beside an input is read inside the group its page gives the field, a
+  fieldset found by its role and its legend's name, matched whole, by `GetByText` with the whole message; one
+  absent beside another input is that group's `ToBeHiddenAsync`, beside the group that shows it. The summary is
+  read as the page's list items where it is the page's one list, else inside the region the page gives its form,
+  their texts whole (`ToHaveTextAsync` with the array of messages), and an
+  empty summary as a count of none, read after the answer line that shows the save was taken. That a failed check
+  sends nothing is read as the answer line staying empty after the message shows. Two components on one page are
+  each reached inside their own group (`Vendors/Bench/WhenEachEntryOfAListHasItsRule.cs`).
 - A care screen's test sits in its module's folder under the screen it runs on, and reads its page by its
   address of `CarePages` in the world contract: `ArrayLambdas/Residents/WhenALambdaComparesWithAValueTheViewHolds.cs`
   is the pattern, the page of the opposite case opened in a second world.

@@ -1037,6 +1037,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `IReadOnlyList<T>`, does not fit a property declared `List<T>` (M4.X3's sentence); M4.X2's promise needs a
   record whose code holds null, which `spec/Reference/native.json` types a text; and no door writes a list as an
   element's rows (X4.9). The owner can overrule each.
+- The lead, 2026-11-12, writing the six validation cells of the bench, read against D16.2, D16.13, D13.6 and G13.
+  The forms of a field's message and of a form's summary are MVC's own pattern, as D16.13 writes them (a summary
+  that lists the property errors, a message for each field), approved at that by G13; a test reads each in its own
+  scope, as the Playwright project's file says, and a page groups each field it checks in a fieldset of its own.
+  No door names a rule set (D16.2 sends the sentence to gate 2; neither spec/api nor the POC compiles one), so the
+  plain rule and the rule under `When` are two validators of one form, each named by the request's
+  `Validate<TValidator>()`; whether U17 lets two registered validators of one model stand beside the condensed
+  default is U17's question, raised here. The validators are written and not registered, since the startup call
+  throws until U17; the form endpoints answer what they bound, since N16.1's door is not declared. The owner can
+  overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
