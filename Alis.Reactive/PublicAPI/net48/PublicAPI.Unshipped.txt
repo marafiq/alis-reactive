@@ -111,7 +111,11 @@ Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.ValueJson.get -> s
 Alis.Reactive.RenderingAndDelivery.InputFields
 Alis.Reactive.RenderingAndDelivery.MemberPartials
 Alis.Reactive.RenderingAndDelivery.PlanHtml
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>
+Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Component<TComponent>() -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Json<TValue>(TValue value) -> string!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Plugin<TPlugin>() -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Render<TComponent>(string! id, System.Web.IHtmlString! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
@@ -367,6 +371,7 @@ Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess<TB
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Component<TComponent>() -> TComponent!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Component<TComponent>(string! id) -> TComponent!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Container<TContainer>(string! containerId) -> Alis.Reactive.RequestsAndResponses.RequestContainer<TContainer>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Delete(string! url) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
@@ -577,6 +582,8 @@ Alis.Reactive.Vendors.Component
 Alis.Reactive.Vendors.Component.Component() -> void
 Alis.Reactive.Vendors.ComponentVendor
 Alis.Reactive.Vendors.ComponentVendor.Name.get -> string!
+Alis.Reactive.Vendors.IAppLevelComponent
+Alis.Reactive.Vendors.IAppLevelComponent.DefaultId.get -> string!
 Alis.Reactive.Vendors.VendorLookup
 abstract Alis.Reactive.Declarations.EventedObject.Listening.get -> Alis.Reactive.Declarations.EventListening!
 abstract Alis.Reactive.Vendors.Component.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!

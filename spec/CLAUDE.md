@@ -1112,6 +1112,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   names and action data) is declared from the probe. A render helper's element id is `elementId` in every slice,
   where a line writes id; a position in pixels is a double. A slice's component code under the runtime's
   components folder (the mention's) is its unit's. The owner can overrule each.
+- The lead, 2026-11-12, declaring M25.N6, the core door module 25's pages and the bench's confirm cell wait on:
+  `IAppLevelComponent` with `DefaultId`, an instance member (M25.D6), in `Vendors`, placed by P4;
+  `pipeline.Component<TComponent>()` beside the reach by id; and `plan.Component<TComponent>()`, which returns a
+  `ReactiveComponent<TComponent, TModel>`, a handler type beside the plugin's, since the line names none and an
+  app-level object's element is the layout's, so the view writes no markup for it. Each constrains its declaration
+  to a component that is an app-level object. Both doors throw until U24 builds them, as the plan's plugin door does,
+  though the reach by id is built, since no test yet proves the reach with no id. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

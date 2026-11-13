@@ -42,6 +42,14 @@ public sealed class Pipeline<TModel>
         return component;
     }
 
+    /// <summary>Reaches an app-level object on the element its declaration fixes, to read, set, call and listen to its declared members.</summary>
+    /// <remarks>An element the page lacks, or a member its object lacks, stops the pipeline that reaches it.</remarks>
+    /// <typeparam name="TComponent">The object's declaration.</typeparam>
+    /// <returns>The object.</returns>
+    public TComponent Component<TComponent>()
+        where TComponent : Component, IAppLevelComponent, new()
+        => throw new NotImplementedException();
+
     /// <summary>Reaches a plugin the page registers, to read, set, call and listen to its declared members.</summary>
     /// <typeparam name="TPlugin">The plugin's declaration.</typeparam>
     /// <returns>The plugin.</returns>

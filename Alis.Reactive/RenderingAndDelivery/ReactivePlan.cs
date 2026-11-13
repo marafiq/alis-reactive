@@ -27,6 +27,14 @@ public sealed partial class ReactivePlan<TModel>
         where TPlugin : Plugin, new()
         => throw new NotImplementedException();
 
+    /// <summary>Reaches an app-level object on the element its declaration fixes, to handle its events.</summary>
+    /// <remarks>A handler leaves with the view that wrote it: a partial's handler of the drawer leaves when the partial leaves, and the drawer stays the page's.</remarks>
+    /// <typeparam name="TComponent">The object's declaration.</typeparam>
+    /// <returns>The object, whose events a view handles with <c>Reactive</c>.</returns>
+    public ReactiveComponent<TComponent, TModel> Component<TComponent>()
+        where TComponent : Component, IAppLevelComponent, new()
+        => throw new NotImplementedException();
+
     /// <summary>Writes a value as the plan writes a literal, for the options a render helper starts its component with.</summary>
     /// <remarks>A date, an enum and a number reach the component's code in the forms the plan's own values take.</remarks>
     /// <param name="value">The value to write.</param>
@@ -90,6 +98,33 @@ public sealed class ReactivePlugin<TPlugin, TModel>
     /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
     /// <returns>The plugin.</returns>
     public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TArgs : JsObject, new()
+        => throw new NotImplementedException();
+}
+
+/// <summary>
+/// An app-level object, reached from a view's plan to handle its events.
+/// </summary>
+/// <typeparam name="TComponent">The object's declaration.</typeparam>
+/// <typeparam name="TModel">The model of the view that reaches it.</typeparam>
+public sealed class ReactiveComponent<TComponent, TModel>
+    where TComponent : Component, IAppLevelComponent, new()
+{
+    internal ReactiveComponent()
+    {
+    }
+
+    /// <summary>Runs a pipeline each time the object raises an event that has no payload.</summary>
+    /// <param name="raised">The event, as a member of the object's declaration.</param>
+    /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <returns>The object.</returns>
+    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time the object raises an event, with the event's payload.</summary>
+    /// <param name="raised">The event, as a member of the object's declaration.</param>
+    /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <returns>The object.</returns>
+    public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
 }
