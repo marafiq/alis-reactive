@@ -1208,6 +1208,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   NativeConfirm's ask takes the block's signal (N17.5) and answers false on an abort (M25.D4). UnmountAnswersEveryAsk
   has no browser promise, since the page's confirm never unmounts while the page lives (D12.1, D13.1); that is the
   owner's to decide, with the lead's recommendation that TLC hold it. The owner can overrule each.
+- The lead, 2026-11-13, writing the Fusion exemplar, the admission-clinical screen's first page: M21.X2's allergy
+  FusionMultiSelect over the items its view hands it, in a form whose Save sends the chosen codes. The app references
+  Alis.Reactive.Fusion, and a Fusion page takes `tests/Alis.Reactive.Conformance.App/Shared/_FusionLayout.cshtml`, which
+  holds what the app's other layout holds: U25 links EJ2's script and theme there, before the framework's, with the
+  startup call spec/api names, AddReactiveFusion, the licence and the fixture's one way to take EJ2's script
+  (`spec/REWRITE.md`, section 2.5). The page answers 500 at the request form block, the first door it meets that is not
+  built, and the multi-select's render helper is the next. EJ2 33.1.47's box, read in Chromium by the lead's probe,
+  names itself "multiselect" and links no label, so the test finds it as the combobox inside the group the page gives
+  the field. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -11,6 +11,7 @@
         <ProjectReference Include="..\..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <ProjectReference Include="..\..\Alis.Reactive\Alis.Reactive.csproj" />
         <ProjectReference Include="..\..\Alis.Reactive.Native\Alis.Reactive.Native.csproj" />
+        <ProjectReference Include="..\..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Conformance.World\Alis.Reactive.Conformance.World.csproj" />
     </ItemGroup>
 

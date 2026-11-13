@@ -107,6 +107,11 @@
         "resolved": "18.11.1",
         "contentHash": "E3VdeksrrkN0fp/Fjsfr3yraNGHbgxRx3k2pjVIohYiZcCcrXQ/Dz6YX7KcZpx8NCf4G8yqnGA5OnMalds/qjg=="
       },
+      "Microsoft.Extensions.AI.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.0.0",
+        "contentHash": "PHeuDm2tC6wJPEQvleUr2kNQaIMNqSf3aEbzkIPlZyQ0+0SYI9SwXVLdGD1NPBI+xB+Vb2lxZKhrFlIf9kP9WA=="
+      },
       "Microsoft.Extensions.DependencyModel": {
         "type": "Transitive",
         "resolved": "10.0.15",
@@ -171,11 +176,22 @@
           "Microsoft.TestPlatform.ObjectModel": "18.11.1"
         }
       },
+      "Newtonsoft.Json": {
+        "type": "Transitive",
+        "resolved": "13.0.3",
+        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
+      },
+      "Syncfusion.Licensing": {
+        "type": "Transitive",
+        "resolved": "33.1.47",
+        "contentHash": "nI9j0NiVgZW92MI+jSas56UCzKWAN/CL21hcplThzE8o60wnY32ML70zlAF29BEPD5k5pgFE2GTQgeCg8MOlyA=="
+      },
       "alis.reactive.conformance.app": {
         "type": "Project",
         "dependencies": {
           "Alis.Reactive.Conformance.World": "[1.0.0, )",
           "AlisReactive": "[1.0.0, )",
+          "AlisReactive.Fusion": "[1.0.0, )",
           "AlisReactive.Native": "[1.0.0, )"
         }
       },
@@ -191,6 +207,13 @@
       "AlisReactive": {
         "type": "Project"
       },
+      "AlisReactive.Fusion": {
+        "type": "Project",
+        "dependencies": {
+          "AlisReactive": "[1.0.0, )",
+          "Syncfusion.EJ2.AspNet.Core": "[33.1.47, 33.1.47]"
+        }
+      },
       "AlisReactive.Native": {
         "type": "Project",
         "dependencies": {
@@ -202,6 +225,17 @@
         "requested": "[5.9.0, )",
         "resolved": "5.9.0-1.26328.17",
         "contentHash": "HP9NNk8ZjOSI2hgOyXnQg+kv7/X837Vr2nAlXiGAtqtYnYKjRRa1UmQFr8KFs5ynGYKqfbb8zB9APoWjiAGdMg=="
+      },
+      "Syncfusion.EJ2.AspNet.Core": {
+        "type": "CentralTransitive",
+        "requested": "[33.1.47, 33.1.47]",
+        "resolved": "33.1.47",
+        "contentHash": "EMxos6e5iWP2XHt5zeQop/pHQcwZ3fAe4+otxlXM2/Ng9ZIErfnsS0j4Wdji6ZUaCisclWqc0BfODpUfXTERoQ==",
+        "dependencies": {
+          "Microsoft.Extensions.AI.Abstractions": "10.0.0",
+          "Newtonsoft.Json": "13.0.3",
+          "Syncfusion.Licensing": "33.1.47"
+        }
       }
     }
   }
