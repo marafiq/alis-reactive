@@ -1282,6 +1282,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   started under no host or one it does not serve stops at start with the hosts it serves, since a test run under a
   host the app ignores would prove net10's wire. The jsonContract host waits on its Admission class and fusionShell on
   its layout. The owner can overrule each.
+- The lead, 2026-11-13, landing the handover screen's thirteen pages from a fork's work read at the source. The
+  numeric text box takes its format through the build callback M21.N32 declares (X1019). A list view's starting
+  selection is a step the page runs when its document is ready, since EJ2 33.1.47's list view takes no selected item
+  at start, and the opposite case of an unselection reads its outcome after the status that shows the handler returned
+  (X509). The AI assist view's send button is the one button of its footer toolbar, which EJ2 names
+  "assist-footer-toolbar" and renders with no name (X901). The drop-down button's items are the slice's own
+  `FusionDropDownButton.ItemModel` (X1012). The Kanban names its key field, its columns' keys and its cards' header
+  field through EJ2's own builder by the members' JSON names (X1017); a typed door for them is a gap the lead raises,
+  as the multi-column combo box's columns are. The OTP input renders its boxes on a div, which U26's helper renders,
+  since EJ2 33.1.47 renders none on an input (X612), and the time picker's value reads EJ2's default en-US format
+  (X1031). The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

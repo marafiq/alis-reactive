@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ShiftHandover
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Shift handover";
+    var plan = Html.ReactivePlan<ShiftHandover>();
+}
+<h1>Shift handover</h1>
+<fieldset>
+    <legend>Shift note</legend>
+    @(Html.InputField(plan, m => m.ShiftNote, options => options.Label("Shift note")).FusionSmartTextArea())
+</fieldset>
+@Html.RenderPlan(plan)

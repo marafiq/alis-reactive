@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model DoseRow
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Dose row";
+    var plan = Html.ReactivePlan<DoseRow>();
+}
+<h1>@Model.Resident: @Model.Medicine</h1>
+@(Html.FusionDropDownButton(plan, "dose-actions", build => build
+    .Content("Dose actions")
+    .Items(new List<FusionDropDownButton.ItemModel> { new() { Text = "Give dose" }, new() { Text = "Skip dose" } }))
+    .Reactive(button => button.Select, (chosen, pipeline) => pipeline
+        .Element("dose-choice").Text.Set(chosen.Item.Read(item => item.Text))))
+<p>Chosen: <output id="dose-choice">-</output></p>
+@Html.RenderPlan(plan)

@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model DoseRecord
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Dose record";
+    var plan = Html.ReactivePlan<DoseRecord>();
+}
+<h1>Dose record</h1>
+<fieldset>
+    <legend>Dose given</legend>
+    @(Html.InputField(plan, m => m.DoseMg, options => options.Label("Dose given (mg)")).FusionNumericTextBox(build => build.Format("n2")))
+</fieldset>
+@Html.RenderPlan(plan)

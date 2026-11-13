@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Syncfusion.EJ2.Kanban
+@model DoseBoard
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Dose board";
+    var plan = Html.ReactivePlan<DoseBoard>();
+}
+<h1>Dose board</h1>
+@(Html.FusionKanban(plan, "dose-board", build => build
+    .KeyField("status")
+    .Columns([new KanbanColumn { HeaderText = "To give", KeyField = "Due" }, new KanbanColumn { HeaderText = "Given", KeyField = "Given" }])
+    .CardSettings(new KanbanCardSettings { HeaderField = "medicine" })
+    .DataSource(Model.Doses))
+    .Reactive(board => board.CardClick<DoseCard>(), (clicked, pipeline) => pipeline
+        .Element("dose-picked").Text.Set(clicked.Data.Read(card => card.Medicine))))
+<p>Picked: <output id="dose-picked">-</output></p>
+@Html.RenderPlan(plan)

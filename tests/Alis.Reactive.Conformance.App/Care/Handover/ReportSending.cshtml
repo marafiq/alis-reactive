@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Fusion.FusionComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ReportSending
+@{
+    Layout = "/Shared/_FusionLayout.cshtml";
+    ViewData["Title"] = "Shift handover";
+    var plan = Html.ReactivePlan<ReportSending>();
+}
+<h1>Shift handover</h1>
+@(Html.FusionProgressButton(plan, "send-report", build => build.Content(Model.Content)))
+<button type="button" @Html.Raises(plan, ReportSendingReads.ShowLabel)>Show label</button>
+<p>Label: <output id="report-label">No label</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ReportSendingReads.ShowLabel, pipeline => pipeline
+        .Element("report-label").Text.Set(pipeline.Component<FusionProgressButton>("send-report").Content)));
+}
+@Html.RenderPlan(plan)
