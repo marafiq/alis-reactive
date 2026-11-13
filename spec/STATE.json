@@ -1529,9 +1529,9 @@
         "problems": 0,
         "slice_rows": 16,
         "spec_entries": 41,
-        "tla": 14
+        "tla": 15
       },
-      "detail": "each of the module table's 20 core modules is a folder of section 2.1's Alis.Reactive/ and in one of 16 SliceTree rows, each of its 26 modules a folder of section 2.1's projects and spec/<Module>/module.md; each of 14 TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; each of spec/'s 41 entries is a module folder or named by section 2.1's spec line",
+      "detail": "each of the module table's 20 core modules is a folder of section 2.1's Alis.Reactive/ and in one of 16 SliceTree rows, each of its 26 modules a folder of section 2.1's projects and spec/<Module>/module.md; each of 15 TLA+ specs in section 2.6 sits at spec/<Owner>/ and TLC runs it; each of spec/'s 41 entries is a module folder or named by section 2.1's spec line",
       "pass": true
     },
     "native_behaviors": {
@@ -1660,8 +1660,8 @@
     },
     "tlc": {
       "counts": {
-        "met": 14,
-        "specs": 14
+        "met": 15,
+        "specs": 15
       },
       "detail": "every spec green, every invariant killed by its mutant, every witness reached",
       "pass": true,
@@ -2068,6 +2068,105 @@
             "states": "14800 states generated, 11484 distinct states found, 8398 states left on queue.",
             "violated": [
               "ReachUnloadedInFlightThenHidden"
+            ]
+          }
+        },
+        "ConfirmAsks": {
+          "ConfirmAsks.cfg": {
+            "green": true,
+            "hash": "10307d2d31dcb1885b0370d4baefcb4e820e5b2a886df05e351c4e3ec78a3bdb",
+            "line": "Model checking completed. No error has been found.",
+            "states": "497 states generated, 328 distinct states found, 0 states left on queue.",
+            "violated": []
+          },
+          "ConfirmAsks.violates.EachAskAnsweredOnce.cfg": {
+            "green": false,
+            "hash": "3a9aa1e101657b5e6186b03a2dfd1c56aaec91a588a62eb60df7e784f88d4354",
+            "line": "violated: EachAskAnsweredOnce",
+            "states": "122 states generated, 94 distinct states found, 36 states left on queue.",
+            "violated": [
+              "EachAskAnsweredOnce"
+            ]
+          },
+          "ConfirmAsks.violates.NothingWaitsForAnEndedRun.cfg": {
+            "green": false,
+            "hash": "18cd89a843a3a678e3852a3a948ffd844b3cd0a52f57d74a9f00157bd9f7f1e6",
+            "line": "violated: NothingWaitsForAnEndedRun",
+            "states": "24 states generated, 18 distinct states found, 0 states left on queue.",
+            "violated": [
+              "NothingWaitsForAnEndedRun"
+            ]
+          },
+          "ConfirmAsks.violates.OneQuestionAtATime.cfg": {
+            "green": false,
+            "hash": "af11af942d1a3e2e154f5717979bc500caabe098caa4bc3fca6d3c00a876241d",
+            "line": "violated: OneQuestionAtATime",
+            "states": "98 states generated, 78 distinct states found, 34 states left on queue.",
+            "violated": [
+              "OneQuestionAtATime"
+            ]
+          },
+          "ConfirmAsks.violates.OnlyThePersonsOkAnswersYes.cfg": {
+            "green": false,
+            "hash": "28a5474d7053d33f581953f8770c4b693102597de1326ac7cce1063359dc247f",
+            "line": "violated: OnlyThePersonsOkAnswersYes",
+            "states": "24 states generated, 18 distinct states found, 0 states left on queue.",
+            "violated": [
+              "OnlyThePersonsOkAnswersYes"
+            ]
+          },
+          "ConfirmAsks.violates.QuestionsInAskedOrder.cfg": {
+            "green": false,
+            "hash": "ca93cfab45b61ca75f08dedfeade8dad18dd5ed091c8301f756cf452497f7ce8",
+            "line": "violated: QuestionsInAskedOrder",
+            "states": "258 states generated, 192 distinct states found, 61 states left on queue.",
+            "violated": [
+              "QuestionsInAskedOrder"
+            ]
+          },
+          "ConfirmAsks.violates.ReachAbortWhileOpen.cfg": {
+            "green": false,
+            "hash": "92bd48af33c80fc4a6a6efc90875d89507ad1f39355e28bd06b2dff75d4fa720",
+            "line": "violated: ReachAbortWhileOpen",
+            "states": "156 states generated, 117 distinct states found, 40 states left on queue.",
+            "violated": [
+              "ReachAbortWhileOpen"
+            ]
+          },
+          "ConfirmAsks.violates.ReachAbortWhileWaiting.cfg": {
+            "green": false,
+            "hash": "27e9a8c2169cd9e740a735ac771dc86530b0a0564ccc422e230f14a236b93307",
+            "line": "violated: ReachAbortWhileWaiting",
+            "states": "156 states generated, 110 distinct states found, 43 states left on queue.",
+            "violated": [
+              "ReachAbortWhileWaiting"
+            ]
+          },
+          "ConfirmAsks.violates.ReachSecondQuestionAfterTheFirst.cfg": {
+            "green": false,
+            "hash": "5de72f31b2007f54c9bd4cac74eb8e851406cabe92ee7da4ef292e2c801471e9",
+            "line": "violated: ReachSecondQuestionAfterTheFirst",
+            "states": "420 states generated, 284 distinct states found, 0 states left on queue.",
+            "violated": [
+              "ReachSecondQuestionAfterTheFirst"
+            ]
+          },
+          "ConfirmAsks.violates.ReachUnmountWithAWaitingAsk.cfg": {
+            "green": false,
+            "hash": "b3ace59785679fa32e92138175ffeabb4cca06fc057e8750b9a4a810871d3d02",
+            "line": "violated: ReachUnmountWithAWaitingAsk",
+            "states": "431 states generated, 299 distinct states found, 50 states left on queue.",
+            "violated": [
+              "ReachUnmountWithAWaitingAsk"
+            ]
+          },
+          "ConfirmAsks.violates.UnmountAnswersEveryAsk.cfg": {
+            "green": false,
+            "hash": "e4bff34eab666ddf62a61fb5454ee642197e87fd402ac61f7156f8ebd775ad6f",
+            "line": "violated: UnmountAnswersEveryAsk",
+            "states": "72 states generated, 57 distinct states found, 23 states left on queue.",
+            "violated": [
+              "UnmountAnswersEveryAsk"
             ]
           }
         },
@@ -3717,7 +3816,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "92d47447d5526b67ceb85cc5f2c87da8f5e2db26",
+  "read_at_head": "aa893e572431b928fc804ede86cd367ea17ba06d",
   "step": {
     "failing": [],
     "name": "End of session",
