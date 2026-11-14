@@ -1395,6 +1395,12 @@ Terms used throughout:
   new:N18.14.
 - `X7.16` type (D7.3): a literal at a condition operator's left operand does not compile: the comparisons are extension
   methods on a typed source, so `"North".Eq(wing)` finds no `Eq` on a string (CS1929): new:N8.2.
+- `X7.17` behavior (N7.7, D7.6): a joined text's part that holds null adds nothing, and the parts beside it are
+  joined: a duty nurse whose name holds null shows "Nurse [] on duty", where a part written as JavaScript's `+` writes
+  it shows "Nurse [null] on duty", and a joined text that read nothing for it would show nothing.
+- `X7.18` behavior (N7.7, D3.11): a joined text's number part shows as the server writes it under the view's culture:
+  a trace dose of 0.00005 grams, a `double`, joined between "Dose " and " g" shows "Dose 5E-05 g", where JavaScript's
+  own conversion of the number writes "Dose 0.00005 g" (`Schema.tla:JoinedPartsAreTexts`).
 
 ## Q8. Conditions: three kinds
 

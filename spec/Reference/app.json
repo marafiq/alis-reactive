@@ -7680,6 +7680,38 @@
       ]
     },
     {
+      "feature": "M2.F1",
+      "for": "X7.17",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M2.F1",
+      "for": "X7.18",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
       "feature": "M2.F2",
       "for": "M2.X1",
       "index": 0,

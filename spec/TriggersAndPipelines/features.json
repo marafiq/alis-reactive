@@ -168,7 +168,7 @@
         },
         {
           "for": "X11.19",
-          "page": "The care panel, the resident record's ConformanceComponent, whose Raise button raises Raised from its own code and, as soon as its listeners return, shows its payload line, Payload text: and the payload's WriteOnlyText, and its answer line, the payload's Answer for its first item, One; two handlers of Raised, neither with an awaited step: the first writes Kappa into the payload's WriteOnlyText, the second sets the payload's Answer to item => item.Name + \" by Lambda\".",
+          "page": "The care panel, the resident record's ConformanceComponent, whose Raise button raises Raised from its own code and, as soon as its listeners return, shows its payload line, Payload text: and the payload's WriteOnlyText, and its answer line, the payload's Answer for its first item, One; two handlers of Raised, neither with an awaited step: the first writes Kappa into the payload's WriteOnlyText, the second sets the payload's Answer to item => pipeline.Concat(item.Name, \" by Lambda\").",
           "gesture": "Click the care panel's Raise.",
           "outcome": "The panel shows Payload text: Kappa and One by Lambda.",
           "opposite": "With an awaited step before the second handler's write, the panel shows Payload text: Kappa and an empty answer line.",

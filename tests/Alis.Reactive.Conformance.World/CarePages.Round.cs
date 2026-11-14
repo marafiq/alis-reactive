@@ -29,4 +29,8 @@ public static partial class CarePages
     public const string MedicationTestCheck = Round + "medication-check/test";
     public const string SupplyScanOfFiveVials = Round + "supply-scan/five-vials";
     public const string SupplyScanOfAnEmptyBox = Round + "supply-scan/empty-box";
+    public const string DutyBoardWithANurseWithNoName = Round + "duty-board/nurse-with-no-name";
+    public const string DutyBoardWithBeaOnDuty = Round + "duty-board/bea-on-duty";
+    public const string DoseLookupOfATraceDose = Round + "dose-lookup/trace-dose";
+    public const string DoseLookupOfAHalfGramDose = Round + "dose-lookup/half-gram-dose";
 }

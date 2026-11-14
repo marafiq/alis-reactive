@@ -155,6 +155,14 @@
         {
           "id": "X7.16",
           "rung": "type"
+        },
+        {
+          "id": "X7.17",
+          "rung": "behavior"
+        },
+        {
+          "id": "X7.18",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -277,6 +285,22 @@
           "outcome": "The badge shows Given.",
           "opposite": "With the box cleared, the badge shows Not given, the found chart's Missed.",
           "defect": "The literal arm is written as the enum's number while the found status is the converter's text, so the comparison fails and the badge shows Not given."
+        },
+        {
+          "for": "X7.17",
+          "page": "The round's duty board, whose Find the nurse button GETs the nurse on duty, whose body's Name holds null, and sets the duty line to the text joined from Nurse [, the nurse's name and ] on duty.",
+          "gesture": "Click Find the nurse.",
+          "outcome": "The duty line reads Nurse [] on duty.",
+          "opposite": "A nurse on duty named Bea: the duty line reads Nurse [Bea] on duty.",
+          "defect": "A part that holds null is written as JavaScript's + writes it, so the line reads Nurse [null] on duty, or the joined text reads nothing and the line shows nothing."
+        },
+        {
+          "for": "X7.18",
+          "page": "The round's dose board, whose Find the dose button GETs the trace dose, whose body's Grams is 0.00005, a double, and sets the dose line to the text joined from Dose, a space, the grams and a space with g.",
+          "gesture": "Click Find the dose.",
+          "outcome": "The dose line reads Dose 5E-05 g.",
+          "opposite": "A dose of 0.5 grams: the dose line reads Dose 0.5 g.",
+          "defect": "The join converts the number by JavaScript's own rules, so the line reads Dose 0.00005 g (Schema.tla:JoinedPartsAreTexts)."
         }
       ],
       "verdicts": [

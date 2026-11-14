@@ -1,0 +1,19 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model DoseLookup
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Dose lookup";
+    var plan = Html.ReactivePlan<DoseLookup>();
+}
+<h1>Dose lookup</h1>
+<button type="button" @Html.Raises(plan, DoseLookups.FindTheDose)>Find the dose</button>
+<p id="dose-line">-</p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(DoseLookups.FindTheDose, pipeline => pipeline.Get(Model.Dose)
+            .OnSuccess<DoseFound>((found, pipeline) => pipeline.Element("dose-line").Text.Set(pipeline.Concat("Dose ", found.Body.Read(dose => dose.Grams), " g")))));
+}
+@Html.RenderPlan(plan)
