@@ -17,8 +17,6 @@ namespace Alis.Reactive.ArrayLambdas;
 /// </remarks>
 public static class DataLists
 {
-    private const string TextIsNoList = "A text is not a list in the browser. A list's operations take a list, such as a List<T> or an array.";
-
     /// <summary>Counts the list's items.</summary>
     /// <returns>A source of the number of items.</returns>
     public static TypedSource<int> Count<TItem>(this ITypedSource<IEnumerable<TItem>> list) => throw new NotImplementedException();
@@ -150,52 +148,4 @@ public static class DataLists
     /// <param name="term">The decimal read from each item.</param>
     /// <returns>A source of the total.</returns>
     public static TypedSource<decimal> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, decimal>> term) => throw new NotImplementedException();
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<int> Count(this ITypedSource<string> text) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<int> Count(this ITypedSource<string> text, Expression<Func<char, bool>> predicate) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<IReadOnlyList<char>> Where(this ITypedSource<string> text, Expression<Func<char, bool>> keep) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<IReadOnlyList<TResult>> Select<TResult>(this ITypedSource<string> text, Expression<Func<char, TResult>> field) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<bool> Any(this ITypedSource<string> text) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<bool> Any(this ITypedSource<string> text, Expression<Func<char, bool>> predicate) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<bool> All(this ITypedSource<string> text, Expression<Func<char, bool>> predicate) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<char> Find(this ITypedSource<string> text, Expression<Func<char, bool>> predicate) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<TResult> Find<TResult>(this ITypedSource<string> text, Expression<Func<char, bool>> predicate, Expression<Func<char, TResult>> field) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<int> Sum(this ITypedSource<string> text, Expression<Func<char, int>> term) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<double> Sum(this ITypedSource<string> text, Expression<Func<char, double>> term) => throw new NotSupportedException(TextIsNoList);
-
-    /// <summary>Refuses a text read as a list of its characters: a text is not a list in the browser.</summary>
-    [Obsolete(TextIsNoList, error: true)]
-    public static TypedSource<decimal> Sum(this ITypedSource<string> text, Expression<Func<char, decimal>> term) => throw new NotSupportedException(TextIsNoList);
 }

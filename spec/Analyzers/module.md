@@ -52,6 +52,7 @@ Kept from the core, each the analyzer that holds its rule:
   is an error in every app (D7.3).
 - `N18.15` ALIS041, the plan analyzer: a plan a view opens and never renders, renders twice, or hands to a door after
   it rendered (D14.7).
+- `N18.16` ALIS042, the text list analyzer: an operation of `DataLists` run over a source of text (D6.10).
 - `N6.3` `ReadsNothingSuppressor`, ALIS026 and ALIS027, and `N9.5` `RequestKeysSuppressor`, ALIS036, the two
   suppressors whose meanings are modules 4's and 6's; `N9.4` ALIS029, a file-shaped member in a GET or a JSON body;
   ALIS028, `ITypedSource<T>`'s analyzer (N6.4).
@@ -96,6 +97,7 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS038, ALIS039 | the flags door; two app events of one name | new (N16.5, M1.N6) |
 | ALIS040 | a source whose nullability differs from its argument's or operand's | new (N18.14) |
 | ALIS041 | a plan a view opens and does not render once, last | new (N18.15) |
+| ALIS042 | a list's operation over a source of text | new (N18.16) |
 
 ## Improvements
 

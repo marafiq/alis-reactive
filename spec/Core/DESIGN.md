@@ -761,8 +761,11 @@ Terms used throughout:
 - D6.10 The operations over a list of data take every list a model declares: `List<T>`, `T[]`, `IList<T>`,
   `IReadOnlyList<T>`, `IEnumerable<T>` and every other `IEnumerable<T>`. They are extension methods on
   `ITypedSource<IEnumerable<TItem>>`, the covariant view `TypedSource<T>` implements, and each returns a
-  `TypedSource<T>`, so the sources stay the closed class D7.2 names. A text is no list in the browser: each
-  operation over a `string` is refused at compile time by an `[Obsolete(error: true)]` overload (CS0619).
+  `TypedSource<T>`, so the sources stay the closed class D7.2 names. A text is no list in the browser. C# reads a
+  `string` as an `IEnumerable<char>`, so the covariant source hands each operation a source of text with `TItem` as
+  `char`, and no type refuses it: a receiver that leaves `string` out leaves out `IList<T>` and `IEnumerable<T>` with
+  it. ALIS042 refuses the operation at build (N18.16), and each operation refuses a source of text where the view
+  renders, for code the analyzer does not follow (D18.6).
 - D6.12 A comparison in a list's lambda over data compares the item's members with each other or with the values the
   view holds (D6.7), by closed rules C# checks where the view renders:
   - A value the view holds is written in the list's base form (D7.7), through the app's JSON options for data the
@@ -4832,6 +4835,10 @@ shapes, starts and the payload's path of each event.
 - `N18.15` new: ALIS041, the plan analyzer: a plan a view opens with `Html.ReactivePlan` and never renders, renders
   twice, or hands to a door after `Html.RenderPlan` (D14.7, M9.X1). The redesign refuses the last two where the view
   renders, and neither line refuses the first; the owner chose the rule on 2026-11-12, over a block that nests the view.
+- `N18.16` new: ALIS042, the text list analyzer: an operation of `DataLists` run over a source of text, a value whose
+  type is or implements `ITypedSource<string>`, reported at that source (D6.10, M4.X1). No type refuses it, and the
+  twelve overloads marked obsolete as errors that an earlier session landed for it held twelve of the operations and
+  left the six orders open; they leave, since no member exists only to refuse a call.
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4), two constant definitions of one vendor name whose data differ in one compilation

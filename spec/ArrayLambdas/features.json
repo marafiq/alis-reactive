@@ -478,8 +478,8 @@
         },
         {
           "id": "M4.X1",
-          "rung": "type",
-          "defect": "An operation over a text does not compile: each operation of new:N6.1 over a source of string binds an overload marked Obsolete with error true, CS0619, since the covariant source of N6.4 would otherwise take a string as a list of char, which the browser does not iterate as .NET does (D6.10)."
+          "rung": "analyzer",
+          "defect": "A care note's text counted, filtered, summed or ordered as a list of its characters, since the covariant source of N6.4 takes a string as a list of char (D6.10): \"'{source}' is a source of text, and a text is no list in the browser; run {operation} over a list, such as a List<T> or an array, or test the text with Contains, StartsWith, EndsWith, MinLength or Matches.\" At build by ALIS042, and where the view renders on code it does not follow (D18.6): new:N18.16."
         },
         {
           "id": "M4.X2",

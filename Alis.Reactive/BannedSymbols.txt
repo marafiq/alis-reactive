@@ -8,3 +8,4 @@ M:System.Linq.Expressions.Expression`1.Compile;An expression is read, never comp
 M:System.Linq.Expressions.Expression`1.Compile(System.Boolean);An expression is read, never compiled (D18.4)
 M:System.Linq.Expressions.Expression`1.Compile(System.Runtime.CompilerServices.DebugInfoGenerator);An expression is read, never compiled (D18.4)
 T:System.Text.RegularExpressions.Regex;The core writes no regular expression (D16.10)
+M:System.ObsoleteAttribute.#ctor(System.String,System.Boolean);No member exists only to refuse a call: a defect no type stages is an analyzer's (D18.6)

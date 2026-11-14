@@ -134,6 +134,7 @@ public class WhenTheCoreIsCompiled
                 "    internal static object Traced(System.Linq.Expressions.LambdaExpression read, System.Runtime.CompilerServices.DebugInfoGenerator lines) => read.Compile(lines);\n" +
                 "    internal static System.Func<int, bool> TypedTraced(System.Linq.Expressions.Expression<System.Func<int, bool>> isOfAge, System.Runtime.CompilerServices.DebugInfoGenerator lines) => isOfAge.Compile(lines);\n" +
                 "    internal static bool Matches(string name) => System.Text.RegularExpressions.Regex.IsMatch(name, \"^A\");\n" +
+                "    [System.Obsolete(\"A text is no list\", true)] internal static int Refused() => 0;\n" +
                 "}\n")),
             Is.EqualTo(new[]
             {
@@ -147,6 +148,7 @@ public class WhenTheCoreIsCompiled
                 "Ward/Nurse.cs:11: " + Banned,
                 "Ward/Nurse.cs:12: " + Banned,
                 "Ward/Nurse.cs:13: " + Banned,
+                "Ward/Nurse.cs:14: " + Banned,
             }));
 
     [AcceptedCase]
@@ -159,6 +161,7 @@ public class WhenTheCoreIsCompiled
                 "{\n" +
                 "    internal static string? Id() => typeof(Nurse).FullName;\n" +
                 "    internal static System.Linq.Expressions.ExpressionType Kind(System.Linq.Expressions.Expression<System.Func<int, bool>> isOfAge) => isOfAge.Body.NodeType;\n" +
+                "    [System.Obsolete(\"Read Id\")] internal static string Older() => \"\";\n" +
                 "}\n")),
             Is.Empty);
 
