@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HourLog
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Hour log";
+    var plan = Html.ReactivePlan<HourLog>();
+}
+<h1>Hour log of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, HourLogs.OpenTheDesk)>Open the desk</button>
+<button type="button" @Html.Raises(plan, HourLogs.CloseTheDesk)>Close the desk</button>
+<button type="button" @Html.Raises(plan, HourLogs.NoteTheHour)>Note the hour</button>
+<section id="hour-desk" aria-label="Desk"></section>
+<section id="hour-entry" aria-label="Hour"></section>
+<p>Status: <output id="hour-status">Open</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(HourLogs.OpenTheDesk, pipeline => pipeline.Get(HourLogEndpoints.Tools).Into("hour-desk"))
+        .CustomEvent(HourLogs.CloseTheDesk, pipeline => pipeline.Unload("hour-desk"))
+        .CustomEvent(HourLogs.NoteTheHour, pipeline =>
+        {
+            pipeline.Element("hour-status").Text.Set("Noting");
+            pipeline.Element("hour-entry").Text.Append("Noted at 02:00");
+            pipeline.Element("hour-status").Text.Set("Noted");
+        }));
+}
+@Html.RenderPlan(plan)

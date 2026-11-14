@@ -214,6 +214,11 @@
           "id": "M5.X3",
           "rung": "behavior",
           "defect": "A text set from a value that reads nothing, an optional member its holder lacks (D5.3), shows nothing, and the step after it runs (D4.5)."
+        },
+        {
+          "id": "M5.X4",
+          "rung": "behavior",
+          "defect": "An append of a value that reads nothing, a payload's member when no payload was raised (D4.2), adds nothing to the content, and the step after it runs (D7.6, D4.5)."
         }
       ],
       "promises": [
@@ -274,6 +279,14 @@
           "defect": "Content a load put in a slot is held only while the plan that loaded it lives, so closing the desk lets the click replace the entry."
         },
         {
+          "for": "X12.12",
+          "page": "The hour log: the log's tools, loaded into the desk, whose plan loads an entry into the hour slot outside the desk, and Note the hour, whose step sets the log's status to Noting, then appends Noted at 02:00 to the hour slot's text, then sets the status to Noted.",
+          "gesture": "Open the desk, load the entry, then click Note the hour.",
+          "outcome": "The step stops with one console error: the status reads Noting, the entry stays, and its Acknowledge still shows Acknowledged.",
+          "opposite": "With the desk opened and closed and nothing loaded, the same click shows Noted at 02:00 in the hour slot and Noted in the status, with no console error.",
+          "defect": "An append written as a set with no content mark is not held, so it replaces the entry with its text and the status reads Noted."
+        },
+        {
           "for": "M5.X1",
           "page": "A note with Show and Hide buttons, and a button whose step sets text on an element the page lacks before it sets the status.",
           "gesture": "Click Hide, then Show, then the button with the missing element.",
@@ -296,6 +309,14 @@
           "outcome": "The first status is empty and the second shows Saved.",
           "opposite": "Clicking Ward round, the first status shows Ward round.",
           "defect": "The missing text shown as the text undefined or null, or the missing value stopping the pipeline so the second status keeps its text."
+        },
+        {
+          "for": "M5.X4",
+          "page": "The arrivals board: Bea arrived raises Arrived with the nurse Bea, Someone arrived raises it with no payload, and the handler appends the payload's nurse to the arrivals line, which starts Arrivals:, then sets the board's status to Noted.",
+          "gesture": "Click Someone arrived.",
+          "outcome": "The arrivals line still reads Arrivals: and the status reads Noted.",
+          "opposite": "Clicking Bea arrived, the line reads Arrivals: Bea and the status Noted.",
+          "defect": "The missing nurse appended as the text undefined or null, or the missing value stopping the pipeline so the status keeps Waiting."
         }
       ],
       "verdicts": [

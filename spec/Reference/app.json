@@ -2365,6 +2365,22 @@
     },
     {
       "feature": "M5.F1",
+      "for": "X12.12",
+      "index": 5,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
       "for": "M5.X1",
       "index": 0,
       "screen": "record",
@@ -2405,6 +2421,21 @@
         "tabForm",
         "notes",
         "carePanel"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "M5.X4",
+      "index": 0,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes"
       ],
       "harness": [
         "seed"

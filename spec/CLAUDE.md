@@ -1514,6 +1514,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   plan left, is the opposite case of the first, the visit desk's and the night log's, each a different way the hold
   leaves, so it has no page of its own; the team board's opposite is an element that holds no slot, since the page's
   own slot is held while the page lives. The append's case lands with its door. The owner can overrule each.
+- The lead, 2026-11-14, declaring the append to an element's text or HTML on `SlotHolds.tla`, from the form
+  TEXT-VERIFY-FABLE.md of the handoff folder gives, read at the source: `ElementContent.Append` takes a text or a
+  source of any type, as `Set` does, and writes the content again with the value after it, the `set` a `Set` of
+  `pipeline.Concat(content, value)` writes, so it is a content write and stops over a held slot as `Set` does (M5.N1,
+  D12.9). It throws until module 5's unit builds it. Both `Text` and `Html` take it, as M5.N1's one `ElementContent`
+  gives both, and `Html`'s append makes the element's children again, which the owner decides: keeping it costs
+  nothing, and refusing it on `Html` splits `ElementContent` into two classes. The append's own case is M5.X4, a value
+  that reads nothing adds nothing and the step after it runs; an append to an element the page lacks stops as every
+  element step does, M5.X1's meaning (D4.1), so it has no page of its own; the append over a held slot is X12.12's
+  sixth page. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

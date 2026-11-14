@@ -106,6 +106,8 @@ Alis.Reactive.Elements.Element.Text.get -> Alis.Reactive.Elements.ElementContent
 Alis.Reactive.Elements.ElementChildren
 Alis.Reactive.Elements.ElementChildren.ElementChildren() -> void
 Alis.Reactive.Elements.ElementContent
+Alis.Reactive.Elements.ElementContent.Append(string? text) -> void
+Alis.Reactive.Elements.ElementContent.Append<TValue>(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 Alis.Reactive.Elements.ElementContent.Set(string? text) -> void
 Alis.Reactive.Elements.ElementContent.Set<TValue>(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 Alis.Reactive.InputsAndIds.ComponentInput

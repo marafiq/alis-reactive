@@ -7,6 +7,7 @@ public static partial class CarePages
     public const string RecordCard = Record + "record-card";
     public const string RecordCardWithNoSummary = Record + "record-card/no-summary";
     public const string PinnedNote = Record + "pinned-note";
+    public const string ArrivalsBoard = Record + "arrivals-board";
     public const string PartyBell = Record + "party-bell";
     public const string EscortDesk = Record + "escort-desk";
     public const string NotesDesk = Record + "notes-desk";

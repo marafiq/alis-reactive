@@ -3033,7 +3033,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   split refuses it: within one plan where the view renders (R14.4), and across plans the step stops in the browser
   with one error naming the slot (R14.7), on the slot's element or on an element that holds it, which only the
   browser sees. No server object sees every plan of a response (D14.1). `Unload(element)` empties a slot.
-  - An element's `Text` and `Html` mark their `set` as a content write (`content`, schema.md).
+  - An element's `Text` and `Html` mark their `set` as a content write (`content`, schema.md), `Set`'s and `Append`'s
+    (M5.N1).
   - The browser holds each slot a live plan names, as its plan starts, and each slot whose content has a live owner
     (what a load or the server put there); each hold leaves with its owner. So content a closed card loaded into a
     slot outside it stays held until that slot unloads.

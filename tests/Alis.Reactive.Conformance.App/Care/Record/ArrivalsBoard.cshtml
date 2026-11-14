@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ArrivalsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Arrivals board";
+    var plan = Html.ReactivePlan<ArrivalsBoard>();
+}
+<h1>Arrivals for @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, ArrivalsBoards.Arrived, new Arrival { Nurse = "Bea" })>Bea arrived</button>
+<button type="button" @Html.Raises(plan, ArrivalsBoards.Arrived)>Someone arrived</button>
+<p id="arrivals">Arrivals: </p>
+<p>Status: <output id="arrival-status">Waiting</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ArrivalsBoards.Arrived, (arrived, pipeline) =>
+        {
+            pipeline.Element("arrivals").Text.Append(arrived.Read(arrival => arrival.Nurse));
+            pipeline.Element("arrival-status").Text.Set("Noted");
+        }));
+}
+@Html.RenderPlan(plan)

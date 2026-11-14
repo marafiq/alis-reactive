@@ -1,0 +1,15 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model HourLogEntry
+@{
+    var plan = Html.ReactivePlan<HourLogEntry>();
+}
+<h2>Hourly entry</h2>
+<p>@Model.Entry</p>
+<button type="button" @Html.Raises(plan, HourLogs.Acknowledge)>Acknowledge</button>
+<p>Entry: <output id="hour-acknowledged">Not acknowledged</output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(HourLogs.Acknowledge, pipeline => pipeline.Element("hour-acknowledged").Text.Set("Acknowledged")));
+}
+@Html.RenderPlan(plan)

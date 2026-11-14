@@ -21,15 +21,17 @@ public sealed class Element : Component
 
     /// <summary>Gets the element's text, <c>textContent</c>: a source of it that a step also sets.</summary>
     /// <remarks>
-    /// A value that cannot be read shows nothing when it is set. A set is refused on an element a slot loads
-    /// into, since it would remove what the slot loaded while that content's plan still runs.
+    /// A value that cannot be read shows nothing when it is set. A set or an append over an element that is or
+    /// holds a slot a plan still holds is refused where the view renders when the same plan loads that slot, and
+    /// stops its pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
     /// </remarks>
     public ElementContent Text => new(this, "textContent");
 
     /// <summary>Gets the element's HTML, <c>innerHTML</c>: a source of it that a step also sets.</summary>
     /// <remarks>
-    /// A value that cannot be read shows nothing when it is set. A set is refused on an element a slot loads
-    /// into, since it would remove what the slot loaded while that content's plan still runs.
+    /// A value that cannot be read shows nothing when it is set. A set or an append over an element that is or
+    /// holds a slot a plan still holds is refused where the view renders when the same plan loads that slot, and
+    /// stops its pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
     /// </remarks>
     public ElementContent Html => throw new NotImplementedException();
 
@@ -78,6 +80,23 @@ public sealed class ElementContent : ReadOnly<string?>
     /// <param name="source">The source of the value to show.</param>
     /// <typeparam name="TValue">The type of the value the source reads.</typeparam>
     public void Set<TValue>(ITypedSource<TValue> source) => throw new NotImplementedException();
+
+    /// <summary>Adds a text after the content when the step runs.</summary>
+    /// <remarks>
+    /// The content is written again with the text after it, as a set of the joined text writes it, so an element's
+    /// text keeps its text alone and its HTML makes its child elements again.
+    /// </remarks>
+    /// <param name="text">The text, written into the plan where the view renders; null adds nothing.</param>
+    public void Append(string? text) => throw new NotImplementedException();
+
+    /// <summary>Adds what a source reads after the content when the step runs, shown as text.</summary>
+    /// <remarks>
+    /// A number shows as the server writes it under the view's culture, and a date as its day, with its time when
+    /// that is not midnight. A source that cannot be read adds nothing, and the content is written again as it was.
+    /// </remarks>
+    /// <param name="source">The source of the value to add.</param>
+    /// <typeparam name="TValue">The type of the value the source reads.</typeparam>
+    public void Append<TValue>(ITypedSource<TValue> source) => throw new NotImplementedException();
 }
 
 /// <summary>
