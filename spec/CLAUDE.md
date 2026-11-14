@@ -1491,6 +1491,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   ALIS042 (N18.16), a list's operation over a text, lands with its door in U11, where every operation throws until
   then. The analyzer agent's line it numbered X7.17 is X7.19, since X7.17 and X7.18 hold the joined text's browser
   promises.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), leaving for eight to ten hours: "if a decision is needed,
+  Quality and fable xhigh will decide with tla+ - step back and do the right - never do the hack". A decision the work
+  needs while the owner is away goes to a Fable agent at xhigh and is decided by quality from the TLA+ specs, the lead
+  landing it from the answer read at the source, as root CLAUDE.md's forks section states, and none is taken by a
+  shortcut around the spec. The lead's reading, the owner's to overrule: a decision on a principle, a closed rule or
+  the scope still goes to the owner as one line, as root CLAUDE.md's loop states.
 - The lead, 2026-11-14, landing `SlotHolds.tla`, module 18's, the ordering of D12.9's content write over a held slot,
   from a Fable agent's design at xhigh (SLOTHOLDS-FABLE.md of the handoff folder) read at the source and run by the
   lead. No spec held that ordering, which `Set` writes and every door that writes a content `set` shares, so it is

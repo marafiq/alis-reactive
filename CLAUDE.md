@@ -191,7 +191,10 @@ word (the owner, 2026-11-13: "know that slip is about you invented so you can av
 - A complex task or a critical decision, one whose error would drift the schema, spread across tests, a harness door
   or a spec line, or lower the bar, goes first to an agent on the latest Fable model at xhigh effort, briefed with its
   spec lines, the files and the constraints; the lead lands it from its answer, read at the source (the owner,
-  2026-11-13: "for complex tasks, use fabe xhigh, also for critical decisions use fable xhigh").
+  2026-11-13: "for complex tasks, use fabe xhigh, also for critical decisions use fable xhigh"). While the owner is
+  away, a decision the work needs is made so: by quality, from the TLA+ specs, the agent's answer read at the source,
+  and never by a shortcut around the spec (the owner, 2026-11-14: "if a decision is needed, Quality and fable xhigh
+  will decide with tla+ - step back and do the right - never do the hack").
 - The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
   session, with the reason. A task whose check costs what the work costs is the lead's own.
 - No review is planned behind a writer. A review that runs is bounded before it starts: a fixed list of questions,
