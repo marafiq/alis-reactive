@@ -9,7 +9,7 @@ import {
   type SetStatement,
   type Statement,
 } from "../Schema/index";
-import { heldOrNull, Stop, type Read } from "../ValuesAndSources/index";
+import { got, heldOrNull, Stop, type Read } from "../ValuesAndSources/index";
 import { bind, isAnObject, type Context } from "./context";
 import { evaluate } from "./expressions";
 
@@ -70,22 +70,21 @@ function holds(when: Read): boolean {
 }
 
 function write(statement: SetStatement, context: Context): void {
-  const [member, ...below] = statement.path;
-  if (member === undefined || below.length > 0) throw notBuilt("a set at a path of " + String(statement.path.length) + " steps");
-  const holder = holderOf(evaluate(statement.target, context), member, statement.members);
-  const written = Reflect.set(holder, member, heldOrNull(evaluate(statement.value, context)));
-  if (!written) throw new Stop("The member '" + String(member) + "' refused the write.");
+  const holder = got(evaluate(statement.target, context), statement.path.slice(0, -1), statement.members);
+  for (const member of statement.path.slice(-1)) {
+    const written = Reflect.set(holderOf(holder, member, statement.members), member, heldOrNull(evaluate(statement.value, context)));
+    if (!written) throw new Stop("The member '" + String(member) + "' refused the write.");
+  }
 }
 
-function holderOf(target: Read, member: PathStep, members: SetMembers): object {
+function holderOf(holder: Read, member: PathStep, members: SetMembers): object {
+  if (holder.kind === "nothing" || !isAnObject(holder.value)) throw new Stop("Nothing holds the member '" + String(member) + "'.");
   switch (members) {
-    case "required": {
-      if (target.kind === "nothing" || !isAnObject(target.value)) throw new Stop("Nothing holds the member '" + String(member) + "'.");
-      if (!(member in target.value)) throw new Stop("The member '" + String(member) + "' is not on the object that should hold it.");
-      return target.value;
-    }
+    case "required":
+      if (!(member in holder.value)) throw new Stop("The member '" + String(member) + "' is not on the object that should hold it.");
+      return holder.value;
     case "optional":
-      throw notBuilt("a set of an optional member");
+      return holder.value;
     default:
       return assertNever(members);
   }
