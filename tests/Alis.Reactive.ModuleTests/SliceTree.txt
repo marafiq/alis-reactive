@@ -1,2 +1,2 @@
 .
-Schema PathsAndWire OwnershipAndState PartialsAndSlots
+Schema PathsAndWire OwnershipAndState ValuesAndSources PartialsAndSlots

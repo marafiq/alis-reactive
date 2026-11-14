@@ -43,7 +43,7 @@ public sealed class Property<TValue> : ReadOnly<TValue>
     /// <summary>Sets the property to a literal when the step runs.</summary>
     /// <param name="value">The value to set, written into the plan where the view renders.</param>
     public void Set(TValue value)
-        => _owner.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, false, _owner.Bound.Target, Literals.Of(value)));
+        => _owner.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, false, _owner.Bound.Target, Literals.Of(value, _owner.Bound.Writer.Content.Json)));
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>

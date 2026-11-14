@@ -71,7 +71,7 @@ public sealed class ElementContent : ReadOnly<string?>
     /// <summary>Sets the content to a text when the step runs.</summary>
     /// <param name="text">The text, written into the plan where the view renders; null shows nothing.</param>
     public void Set(string? text)
-        => _element.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, true, _element.Bound.Target, Literals.Of(text)));
+        => _element.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, true, _element.Bound.Target, Literals.Text(text)));
 
     /// <summary>Sets the content to what a source reads when the step runs, shown as text.</summary>
     /// <remarks>

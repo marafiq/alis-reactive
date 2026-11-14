@@ -1,8 +1,12 @@
 #if NET10_0_OR_GREATER
 using System;
+using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Alis.Reactive.RenderingAndDelivery;
 
@@ -18,7 +22,7 @@ public static class PlanHtml
     /// </remarks>
     /// <returns>The plan.</returns>
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
-        => ViewPlans.Open<TModel>();
+        => ViewPlans.Open<TModel>(new AppJson(() => html.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions));
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>

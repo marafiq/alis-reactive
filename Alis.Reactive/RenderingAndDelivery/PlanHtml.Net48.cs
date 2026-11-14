@@ -1,7 +1,9 @@
 #if NET48
 using System;
+using System.Text.Json;
 using System.Web;
 using System.Web.Mvc;
+using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.TriggersAndPipelines;
 
 namespace Alis.Reactive.RenderingAndDelivery;
@@ -18,7 +20,7 @@ public static class PlanHtml
     /// </remarks>
     /// <returns>The plan.</returns>
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
-        => ViewPlans.Open<TModel>();
+        => ViewPlans.Open<TModel>(new AppJson(TheOptionsTheAppRegisters));
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>
@@ -68,5 +70,7 @@ public static class PlanHtml
     /// <returns>The plan's script.</returns>
     public static IHtmlString RenderPlan<TModel>(this HtmlHelper html, ReactivePlan<TModel> plan)
         => new HtmlString(ViewPlans.ScriptOf(plan));
+
+    private static JsonSerializerOptions TheOptionsTheAppRegisters() => throw new NotImplementedException();
 }
 #endif
