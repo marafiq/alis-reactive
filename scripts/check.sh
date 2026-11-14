@@ -13,7 +13,8 @@ Runs every check that needs no browser, in order, and stops at the first that fa
   2. npm ci when node_modules is missing, then npm audit
   3. the Syncfusion pin's agreement in NuGet, npm and the lock
   4. tsc -b over the runtime, eslint with --max-warnings 0, vitest over the runtime's pure tests, then the browser bundle
-  5. dotnet restore in locked mode, then dotnet build -c Release
+  5. dotnet restore in locked mode, then dotnet build -c Release, then the doors each browser test's pages call,
+     written by scripts/page-doors.cs and compared with the tracked spec/Reference/page-doors.json
   6. dotnet format --verify-no-changes over the solution
   7. the architecture tests, the analyzer cases, the test rules' cases and the module tests
   8. python3 spec/tools/check.py --ci, which reads JAVA_HOME and TLA2TOOLS_JAR
@@ -69,6 +70,15 @@ dotnet restore Alis.Reactive.slnx --locked-mode
 
 step "dotnet build -c Release"
 dotnet build Alis.Reactive.slnx -c Release --no-restore
+
+doors=spec/Reference/page-doors.json
+step "the doors each browser test's pages call"
+dotnet run scripts/page-doors.cs -p:RestorePackagesWithLockFile=false
+git ls-files --error-unmatch "$doors" > /dev/null
+if ! git diff --exit-code -- "$doors"; then
+  echo "[check] The built pages call other doors than the tracked table lands: stage the page-doors.json it wrote." >&2
+  exit 1
+fi
 
 step "dotnet format --verify-no-changes"
 dotnet format Alis.Reactive.slnx --verify-no-changes --severity warn --no-restore

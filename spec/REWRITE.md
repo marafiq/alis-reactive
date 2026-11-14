@@ -491,6 +491,8 @@ is landed with its refused and accepted files, before U3 writes the first of the
 
 Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
 agreement in NuGet, npm and the lock; `tsc -b`; eslint; vitest over the runtime's pure tests; the browser bundle, `node build.mjs`; a locked `dotnet restore`; `dotnet build -c Release`;
+the doors each browser test's pages call, written from that build by `scripts/page-doors.cs` and diffed with the
+tracked table;
 `dotnet format --verify-no-changes` over the solution; the architecture tests, the analyzer cases, the test
 rules' cases and the module tests; `check.py --ci`, which
 its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (the bundle and the build, then run, with the selectors
@@ -914,12 +916,22 @@ Each unit after it owns one module, in the table's order (2.3) and a row's modul
 the C# half that writes its nodes, the runtime half that executes them, its analyzers and its pure tests. Then Native,
 then Fusion. ALIS010 holds at every commit.
 
-A browser test passes in the unit check.py lands it in: its feature's unit, or a later unit that holds the module of
-one of its screen parts (check.py prints each unit's tests). So a module's unit proves its two halves by its pure
+A browser test passes in the unit check.py lands it in: the latest of its feature's unit, the unit that holds the
+module of each of its screen parts and the unit that holds the module of each door its pages call that is not built
+(check.py prints each unit's tests). `scripts/page-doors.cs` reads the doors from the Release build: from a test's
+`[FailsFor]` through the pages it opens, the links it clicks by their text, each view's layout, partials and slot
+loads, and the app's code those views run, to each member of the framework they call whose body throws
+`NotImplementedException`, and it writes each test's views and the modules of those members to
+`spec/Reference/page-doors.json`, refusing a test whose pages it cannot read. `scripts/check.sh` alone writes that
+table, after its build, and fails when it differs from the tracked one, so a test lands by the doors the committed
+table records as not built and keeps its unit through the commit that builds its last door; a test not yet written
+lands by its feature and its parts. So a module's unit proves its two halves by its pure
 tests and its analyzer cases and turns green the browser tests whose pages need nothing later; a test whose page
 needs a later module, a Native input or a request among them, turns green in that module's unit and fails on its
 planted defect there. A unit's Doors line names the doors it makes real ahead of their features' units, as U3's thin
 path does, and a part that lists its doors, each on a Doors line, lands with the latest unit that brings one of them.
+A Doors line names a door by its N id and the table by its module, so a test whose page calls a door a later unit's
+Doors line brings lands in that door's module's unit until the commit that builds it.
 
 **Where the rewrite stands.** U1 and U2 are landed. U2 left the world contract with the generated gates and
 promises, the harness with its three tests, the app's World area, `scripts/run.sh`, the test rules TEST001 to
@@ -1098,8 +1110,9 @@ defects. An MVC action reaches the answer gate by its filter, with its own addre
 held, and the harness's test of it is green and fails on each of its two planted defects. U3 is closed: the
 tests that wait, the views and doors they meet, the harness verbs they use and the Playwright project's switch,
 which waits for the last test, land with their units (the owner, 2026-11-14).
-The bindings check takes no view clause (section 2.5). The commit that lands a piece
-rewrites this paragraph.
+The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
+pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). The commit that lands
+a piece rewrites this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1

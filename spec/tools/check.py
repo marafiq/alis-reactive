@@ -2299,15 +2299,49 @@ def module_units(home, modules):
     return module_unit
 
 
-def test_landings(app, home, module_unit, brought):
-    landed = Counter()
+def spec_tests(app):
+    constants, taken = promise_constants(), Counter()
+
+    def promise(group):
+        taken[group] += 1
+        name, value, _ = constants[group][taken[group] - 1]
+        return f"{group}.{name}", value
+
     for entry in app["placements"]:
-        if entry["feature"] in home:
-            landed[rewrite_landing(app, module_unit, home[entry["feature"]], entry, brought)] += 1
+        yield promise(csharp_name(entry["feature"])), entry
     for entry in app["cells"]:
-        owner = module_unit.get("Vendors" if "cell" in entry else "FusionComponents")
-        if owner is not None:
-            landed[rewrite_landing(app, module_unit, owner, entry, brought)] += 1
+        yield promise("Cells" if "cell" in entry else "OwnCells"), entry
+    for entry in app["harnessTests"]:
+        yield promise("Harness"), entry
+
+
+def promise_value(entry):
+    if "feature" in entry:
+        return f"{entry['feature']} {entry['for']} {entry['index']}"
+    return f"cell {entry['cell']}" if "cell" in entry else f"own {entry['own']}"
+
+
+def page_doors():
+    return json.loads((SPEC / "Reference" / "page-doors.json").read_text())
+
+
+def page_modules(doors, promise):
+    return doors[promise]["modules"] if promise in doors else []
+
+
+def test_place(app, entry, modules, home, module_unit, brought):
+    start = home.get(entry["feature"]) if "feature" in entry else module_unit.get("Vendors" if "cell" in entry else "FusionComponents")
+    if start is None:
+        return None
+    return max([rewrite_landing(app, module_unit, start, entry, brought)] + [module_unit[module] for module in modules if module in module_unit])
+
+
+def test_landings(app, home, module_unit, brought, doors):
+    landed = Counter()
+    for entry in app["placements"] + app["cells"]:
+        place = test_place(app, entry, page_modules(doors, promise_value(entry)), home, module_unit, brought)
+        if place is not None:
+            landed[place] += 1
     return landed
 
 
@@ -2345,7 +2379,7 @@ def check_unit_proofs():
                 for feature in json.loads(feature_path.read_text()).get("features", [])}
     home = unit_homes(units)
     app = json.loads((SPEC / "Reference" / "app.json").read_text())
-    landed = test_landings(app, home, module_units(home, {name: module for name, (module, _) in features.items()}), door_units(units))
+    landed = test_landings(app, home, module_units(home, {name: module for name, (module, _) in features.items()}), door_units(units), page_doors())
     analyzer = Counter({place: 0 for place in range(len(units))})
     module, core = Counter({place: 0 for place in range(len(units))}), core_modules()
     for name, place in home.items():
@@ -2395,7 +2429,12 @@ def check_rewrite():
                  for screen in app["screens"] for part in screen["parts"] for door in part.get("doors", []) if door not in known]
     problems += [f"{screen['id']}'s {part['id']} lists {door}, which no unit's Doors line brings"
                  for screen in app["screens"] for part in screen["parts"] for door in part.get("doors", []) if door in known and door not in brought]
-    landed = test_landings(app, home, module_unit, door_units(units))
+    doors = page_doors()
+    promised = {promise_value(entry) for entry in app["placements"] + app["cells"]}
+    problems += [f"spec/Reference/page-doors.json lands {promise}, which no placement or cell of app.json promises" for promise in sorted(doors) if promise not in promised]
+    problems += [f"{promise}'s pages call a door of {module!r}, the module of no unit"
+                 for promise in sorted(doors) for module in doors[promise]["modules"] if module not in module_unit]
+    landed = test_landings(app, home, module_unit, door_units(units), doors)
     detail = (f"{len(units)} units hold {len(home)} features once; the browser tests land "
               + ", ".join(f"{unit['id']} {landed[place]}" for place, unit in enumerate(units)))
     return result(not problems, "; ".join(problems[:6]) or detail, units=len(units), features=len(home),
@@ -3259,12 +3298,12 @@ def promise_constants():
     app = json.loads((SPEC / "Reference" / "app.json").read_text())
     groups = {}
     for placement in app["placements"]:
-        named = (csharp_name(f"{placement['for']}_{placement['index']}"), f"{placement['feature']} {placement['for']} {placement['index']}", held_gates(placement))
+        named = (csharp_name(f"{placement['for']}_{placement['index']}"), promise_value(placement), held_gates(placement))
         groups.setdefault(placement["feature"], []).append(named)
     features = sorted(groups, key=lambda feature: [int(number) for number in re.findall(r"\d+", feature)])
     ordered = {csharp_name(feature): groups[feature] for feature in features}
-    ordered["Cells"] = [(csharp_name(cell["cell"]), f"cell {cell['cell']}", held_gates(cell)) for cell in app["cells"] if "cell" in cell]
-    ordered["OwnCells"] = [(csharp_name(cell["own"]), f"own {cell['own']}", held_gates(cell)) for cell in app["cells"] if "own" in cell]
+    ordered["Cells"] = [(csharp_name(cell["cell"]), promise_value(cell), held_gates(cell)) for cell in app["cells"] if "cell" in cell]
+    ordered["OwnCells"] = [(csharp_name(cell["own"]), promise_value(cell), held_gates(cell)) for cell in app["cells"] if "own" in cell]
     ordered["Harness"] = [(f"{test['fixture']}_{test['test']}", f"harness {test['fixture']}.{test['test']}", held_gates(test)) for test in app["harnessTests"]]
     return ordered
 

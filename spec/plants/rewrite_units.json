@@ -168,5 +168,38 @@
    }
   ],
   "expect": "fresh's consumerStatus lists M5.N1, which no unit's Doors line brings"
+ },
+ {
+  "name": "a page calls a door of a module no unit holds",
+  "edits": [
+   {
+    "file": "spec/Reference/page-doors.json",
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"ArrayLambdas\",\n",
+    "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Ledgers\",\n"
+   }
+  ],
+  "expect": "M16.F1 X18.8 0's pages call a door of 'Ledgers', the module of no unit"
+ },
+ {
+  "name": "the doors table lands a promise app.json does not hold",
+  "edits": [
+   {
+    "file": "spec/Reference/page-doors.json",
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"ArrayLambdas\",\n",
+    "new": "  \"M16.F1 X18.8 9\": {\n    \"modules\": [\n      \"ArrayLambdas\",\n"
+   }
+  ],
+  "expect": "spec/Reference/page-doors.json lands M16.F1 X18.8 9, which no placement or cell of app.json promises"
+ },
+ {
+  "name": "a page calls a door of another module a unit holds",
+  "edits": [
+   {
+    "file": "spec/Reference/page-doors.json",
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"ArrayLambdas\",\n",
+    "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Conditions\",\n"
+   }
+  ],
+  "expect": null
  }
 ]
