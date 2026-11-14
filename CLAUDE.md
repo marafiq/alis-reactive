@@ -170,11 +170,12 @@ word (the owner, 2026-11-13: "know that slip is about you invented so you can av
 
 ## Forks, agents and reviews
 
-- A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it:
-  one test rule to a landed rule's pattern, one module's half against the schema. Three at a time at most. None
-  decides or words a rule. Its brief names the base SHA and carries the full bar, finished before anything reads it;
-  it reads no secret or file that holds a credential, runs no git command beyond its own worktree and branch, and
-  runs no command its brief does not name (the lead's correction of a fork, 2026-11-13).
+- A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it: one
+  test rule to a landed rule's pattern, one module's half against the schema. Three at a time at most. None decides or
+  words a rule. Its brief names the base SHA and carries the full bar, finished before anything reads it, and every
+  spec file, D line and TLA+ action it cites is found at that SHA by a command before it goes out (the lead's mistake,
+  2026-11-14); it reads no secret or file that holds a credential, runs no git command beyond its own worktree and
+  branch, and runs no command its brief does not name (the lead's correction of a fork, 2026-11-13).
 - An agent starts from a definition of `.claude/agents/`, which carries the harness its kind of task meets and the
   reply it returns: `.claude/agents/designer.md` for a complex task or a critical decision, on the latest Fable model
   at xhigh, and `.claude/agents/page-writer.md` for pages and their tests. It reads this file, `spec/CLAUDE.md`'s
