@@ -196,6 +196,20 @@ public sealed class Pipeline<TModel>
         where TObject : EventedObject
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
+
+    /// <summary>Listens to an event of an object the pipeline reaches, from this step on, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <remarks>
+    /// The listener is added once for each object, when the step runs, and is removed when the plan that wrote it
+    /// leaves the page.
+    /// </remarks>
+    /// <param name="source">The object whose event is listened to.</param>
+    /// <param name="raised">The event, as a member of the object's declaration.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise, with the event's payload.</param>
+    public void Listen<TObject, TArgs>(TObject source, Func<TObject, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TObject : EventedObject
+        where TArgs : JsObject, new()
+        => throw new NotImplementedException();
 }
 
 /// <summary>

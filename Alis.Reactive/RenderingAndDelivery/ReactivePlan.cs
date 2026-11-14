@@ -73,6 +73,22 @@ public sealed partial class Rendered<TComponent, TModel>
     public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time the component raises an event that has no payload, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <param name="raised">The event, as a member of the component's declaration.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <returns>The rendered component.</returns>
+    public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time the component raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <param name="raised">The event, as a member of the component's declaration.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <returns>The rendered component.</returns>
+    public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TArgs : JsObject, new()
+        => throw new NotImplementedException();
 }
 
 /// <summary>
@@ -100,6 +116,22 @@ public sealed class ReactivePlugin<TPlugin, TModel>
     public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time the plugin raises an event that has no payload, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <param name="raised">The event, as a member of the plugin's declaration.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <returns>The plugin.</returns>
+    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time the plugin raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <param name="raised">The event, as a member of the plugin's declaration.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <returns>The plugin.</returns>
+    public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TArgs : JsObject, new()
+        => throw new NotImplementedException();
 }
 
 /// <summary>
@@ -125,6 +157,22 @@ public sealed class ReactiveComponent<TComponent, TModel>
     /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
     /// <returns>The object.</returns>
     public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TArgs : JsObject, new()
+        => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time the object raises an event that has no payload, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <param name="raised">The event, as a member of the object's declaration.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <returns>The object.</returns>
+    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time the object raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <param name="raised">The event, as a member of the object's declaration.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <returns>The object.</returns>
+    public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
 }

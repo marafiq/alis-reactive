@@ -38,10 +38,25 @@ public sealed class Trigger<TModel>
     /// <returns>The trigger, to handle another.</returns>
     public Trigger<TModel> CustomEvent(AppEvent appEvent, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
 
+    /// <summary>Runs a pipeline each time an app event that carries no payload is raised, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <returns>The trigger, to handle another.</returns>
+    public Trigger<TModel> CustomEvent(AppEvent appEvent, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+
     /// <summary>Runs a pipeline each time an app event is raised, with the event's payload.</summary>
     /// <typeparam name="TPayload">The class of the payload.</typeparam>
     /// <param name="appEvent">The event, as the app declares it.</param>
     /// <param name="pipeline">The steps to run on each raise, with the payload the raise carries.</param>
     /// <returns>The trigger, to handle another.</returns>
     public Trigger<TModel> CustomEvent<TPayload>(AppEvent<TPayload> appEvent, Action<Data<TPayload>, Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time an app event is raised, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <typeparam name="TPayload">The class of the payload.</typeparam>
+    /// <param name="appEvent">The event, as the app declares it.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise, with the payload the raise carries.</param>
+    /// <returns>The trigger, to handle another.</returns>
+    public Trigger<TModel> CustomEvent<TPayload>(AppEvent<TPayload> appEvent, HandlerPolicy policy, Action<Data<TPayload>, Pipeline<TModel>> pipeline) => throw new NotImplementedException();
 }

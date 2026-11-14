@@ -29,4 +29,14 @@ public sealed partial class NativeButtonBuilder<TModel>
     public NativeButtonBuilder<TModel> Reactive<TArgs>(ReactivePlan<TModel> plan, Func<NativeButton, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
+
+    /// <summary>Runs a pipeline each time the button raises an event, with the event's payload, from the plan's start, under a policy for a raise that comes while its last run is in flight.</summary>
+    /// <param name="plan">The view's plan.</param>
+    /// <param name="raised">The event, as a member of the button's declaration.</param>
+    /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
+    /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <returns>The builder.</returns>
+    public NativeButtonBuilder<TModel> Reactive<TArgs>(ReactivePlan<TModel> plan, Func<NativeButton, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TArgs : JsObject, new()
+        => throw new NotImplementedException();
 }

@@ -1358,6 +1358,20 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   target of 400, reads Over target there. X7.11's second promise names no test for its `Choose`, so the page's is a
   check box, Seen at the bedside, read by the container's `Read`. X8.13's page writes which button's branch ran, so
   the calls are read after the handler returned. The owner can overrule each.
+- The lead, 2026-11-13, declaring N11.1, a handler's policy, designed by a Fable agent at xhigh and decided from its
+  answer read at the source. No line and no compiled sentence wrote its form (the POC writes overlap alone), so by G13
+  it is the owner's, and U3 declares the lead's proposal as a signature: `HandlerPolicy`, a sealed class of
+  `TriggersAndPipelines` with a private constructor and three static values, `Overlap`, `Replace` and `Skip`, as
+  `EventListening` is shaped, passed before the pipeline callback in an overload beside each door that starts a
+  handler: `trigger.CustomEvent`, `Reactive` on a rendered component, on a plugin and on an app-level object,
+  `pipeline.Listen`, Native's button `Reactive` and both row actions. It reads in the promises' order, trigger,
+  policy, block; `Lanes.tla` fixes a handler's policy at its start, so no pipeline sentence sets it, where a step
+  could write it twice or in a branch not taken; it adds no callback to the locked table. On load takes none: it runs
+  once per start of its owner and a slot's reload is a new owner (M1.D1, D12.4), so it writes overlap. `Overlap` stays
+  public as the grammar's third value, so a consumer that forwards a policy names the default; its cost is a second
+  spelling of a door that names none. A consumer door that starts a handler off the core's doors adds its own overload
+  and forwards the policy. X17.8 waits on a text joined from a source and a literal, which no door writes, and X11.15,
+  X11.21 and X11.22 on the defaultHooks host. The owner decides the form.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

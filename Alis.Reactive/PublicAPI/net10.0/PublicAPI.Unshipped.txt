@@ -117,7 +117,9 @@ Alis.Reactive.RenderingAndDelivery.InputFields
 Alis.Reactive.RenderingAndDelivery.MemberPartials
 Alis.Reactive.RenderingAndDelivery.PlanHtml
 Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Component<TComponent>() -> Alis.Reactive.RenderingAndDelivery.ReactiveComponent<TComponent!, TModel>!
@@ -126,10 +128,14 @@ Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Plugin<TPlugin>() -> Ali
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Render<TComponent>(string! id, Microsoft.AspNetCore.Html.IHtmlContent! html) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>.Rows<TRow>(string! rowsId) -> Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive(System.Func<TPlugin!, Alis.Reactive.Declarations.Event!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive(System.Func<TPlugin!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
+Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive<TArgs>(System.Func<TPlugin!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
 Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin, TModel>.Reactive<TArgs>(System.Func<TPlugin!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.ReactivePlugin<TPlugin!, TModel>!
 Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive(System.Func<TComponent!, Alis.Reactive.Declarations.Event!>! raised, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
+Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.Reactive<TArgs>(System.Func<TComponent!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.RenderingAndDelivery.Rendered<TComponent!, TModel>!
 Alis.Reactive.RenderingAndDelivery.Rendered<TComponent, TModel>.WriteTo(System.IO.TextWriter! writer, System.Text.Encodings.Web.HtmlEncoder! encoder) -> void
 Alis.Reactive.RenderingAndDelivery.RequestBlocks
@@ -302,6 +308,7 @@ Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.Validate<TValida
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.Guard<TModel>
 Alis.Reactive.TriggersAndPipelines.Guard<TModel>.Then(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! branch) -> Alis.Reactive.TriggersAndPipelines.Branches<TModel>!
+Alis.Reactive.TriggersAndPipelines.HandlerPolicy
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Chained(System.Action<TReply, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! chained) -> void
@@ -387,6 +394,7 @@ Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Get<TRequest>(string! url, S
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Head(string! url) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Head<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Input<TValue>(System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Listen<TObject, TArgs>(TObject! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> void
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Listen<TObject, TArgs>(TObject! source, System.Func<TObject!, Alis.Reactive.Declarations.Event<TArgs!>!>! raised, System.Action<TArgs!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> void
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Object<T>(System.Action<Alis.Reactive.ValuesAndSources.ObjectMembers<T>!>! members) -> Alis.Reactive.ValuesAndSources.TypedSource<T>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Options(string! url) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
@@ -495,7 +503,9 @@ Alis.Reactive.TriggersAndPipelines.RequestDefaults.ShowValidationErrors() -> Ali
 Alis.Reactive.TriggersAndPipelines.RequestDefaults.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
 Alis.Reactive.TriggersAndPipelines.RequestSteps
 Alis.Reactive.TriggersAndPipelines.Trigger<TModel>
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.CustomEvent(Alis.Reactive.TriggersAndPipelines.AppEvent! appEvent, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.CustomEvent(Alis.Reactive.TriggersAndPipelines.AppEvent! appEvent, System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
+Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.CustomEvent<TPayload>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, Alis.Reactive.TriggersAndPipelines.HandlerPolicy! policy, System.Action<Alis.Reactive.Declarations.Data<TPayload>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.CustomEvent<TPayload>(Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>! appEvent, System.Action<Alis.Reactive.Declarations.Data<TPayload>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 Alis.Reactive.TriggersAndPipelines.Trigger<TModel>.DomReady(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.Trigger<TModel>!
 Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>
@@ -752,6 +762,9 @@ static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Set<TRequest, TValue>(this Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>! request, System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
 static Alis.Reactive.TriggersAndPipelines.ElementSteps.Element<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, string! id) -> Alis.Reactive.Elements.Element!
+static Alis.Reactive.TriggersAndPipelines.HandlerPolicy.Overlap.get -> Alis.Reactive.TriggersAndPipelines.HandlerPolicy!
+static Alis.Reactive.TriggersAndPipelines.HandlerPolicy.Replace.get -> Alis.Reactive.TriggersAndPipelines.HandlerPolicy!
+static Alis.Reactive.TriggersAndPipelines.HandlerPolicy.Skip.get -> Alis.Reactive.TriggersAndPipelines.HandlerPolicy!
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.Into<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, string! elementId, Alis.Reactive.ValuesAndSources.ITypedSource<Alis.Reactive.RequestsAndResponses.Markup!>! html) -> void
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.Parallel<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, params System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>![]! branches) -> void
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.ShowValidationErrors<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.ValuesAndSources.ITypedSource<Alis.Reactive.RequestsAndResponses.ValidationProblem!>! problem) -> void

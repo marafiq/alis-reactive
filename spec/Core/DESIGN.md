@@ -2759,7 +2759,14 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 **Doors.**
 - kept: `Method`, `Method<T>`, `MethodAsync`, `MethodAsync<T>`, `Parallel`, the hub's `invoke` and `send`; `Confirm`
   is carried by N17.3 over a component's `MethodAsync<bool>` (D17.9).
-- `N11.1` new: a handler's policy, `overlap`, `replace` or `skip` (D11.7); its door's form goes to gate 2.
+- `N11.1` new: a handler's policy, `overlap`, `replace` or `skip` (D11.7); its door's form went to gate 2. No line and
+  no compiled sentence wrote its form, so it is the owner's to decide (G13); U3 declares the lead's proposal as a
+  signature, for the views to be written on: `HandlerPolicy`, a sealed type whose three values are
+  `HandlerPolicy.Overlap`, `HandlerPolicy.Replace` and `HandlerPolicy.Skip`, passed before the pipeline callback in an
+  overload of each door that starts a handler (`trigger.CustomEvent`, `Reactive` on a rendered component, on a plugin
+  and on an app-level object, `pipeline.Listen`, and a consumer's own, Native's button and row actions); a door that
+  names none runs under `overlap`. On load takes none, since it runs once per start of its owner (M1.D1) (the lead,
+  2026-11-13, `spec/CLAUDE.md`).
 - `N11.2` new: the refusal at render of a write to a property of the trigger's payload itself after an awaited
   step (D11.4).
 
