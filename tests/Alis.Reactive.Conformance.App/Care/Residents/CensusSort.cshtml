@@ -1,0 +1,27 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CensusSort
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Residents";
+    var plan = Html.ReactivePlan<CensusSort>();
+}
+<h1>Residents</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Records = Model.Admissions }))
+@(plan.ConformanceComponent("census-sorted", new ConformanceStart { Text = "Sorted" }))
+<p>First admitted: <span id="first-name"></span></p>
+<button type="button" @Html.Raises(plan, CensusSorts.Sort)>Sort</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CensusSorts.Sort, pipeline =>
+    {
+        var census = pipeline.Component<ConformanceComponent>("census");
+        pipeline.Component<ConformanceComponent>("census-sorted").Records.Set(Model.Descending
+            ? census.Records.OrderByDescending(r => r.Name)
+            : census.Records.OrderBy(r => r.Name));
+        pipeline.Element("first-name").Text.Set(census.Records.Find(r => true, r => r.Name));
+    }));
+}
+@Html.RenderPlan(plan)

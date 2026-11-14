@@ -152,7 +152,7 @@
           "js": "records",
           "kind": "property",
           "ts": "records: Record[]",
-          "door": "Property<List<Record>>",
+          "door": "Property<IReadOnlyList<Record>>",
           "csharp": "Records",
           "type": "Record"
         },
@@ -160,7 +160,7 @@
           "js": "nullableRecords",
           "kind": "property",
           "ts": "nullableRecords: Record[] | null",
-          "door": "Property<List<Record>?>",
+          "door": "Property<IReadOnlyList<Record>?>",
           "csharp": "NullableRecords",
           "type": "Record"
         },
@@ -168,7 +168,7 @@
           "js": "bindings",
           "kind": "property",
           "ts": "bindings: Binding[]",
-          "door": "Property<List<Binding>>",
+          "door": "Property<IReadOnlyList<Binding>>",
           "csharp": "Bindings",
           "type": "Binding"
         },

@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ResidentAdmission
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission";
+    var plan = Html.ReactivePlan<ResidentAdmission>();
+}
+<h1>Admission</h1>
+@using (var admission = Html.BeginRequestForm(plan, "admission"))
+{
+    using (var resident = Html.BeginRequestContainer(plan, "resident"))
+    {
+        <fieldset>
+            <legend>Resident</legend>
+            @(Html.InputField(plan, m => m.Name, options => options.Label("Name")).NativeTextBox())
+        </fieldset>
+    }
+}
+@Html.RenderPlan(plan)

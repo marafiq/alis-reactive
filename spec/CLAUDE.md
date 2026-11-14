@@ -1447,6 +1447,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   members' table takes. Two things wait for the owner: the form, against the smaller one the agent names,
   `Children.Items.Count()`, two doors and no forwarder with D5.13's clause reworded; and an operation D6.2 gains
   later, which needs its forwarder where no compiler asks for one. X6.56's and M5.X2's pages are the next piece's.
+- The lead, 2026-11-13, on X16.20's live check and M4.X3's sorted list, designed by a Fable agent at xhigh
+  (LIVE-LIST-FABLE.md of the handoff folder) and decided from its answer read at the source. X16.20's page names no
+  state of D16.15's live check: its form and the fieldset container inside it are bare blocks, live through the
+  validator registered at startup, so the page stands now, red, and the registration waits for U17 as X16.22's does.
+  The live check a block names is declared with the first view that names one, as the lead's line of 2026-11-12 says;
+  the agent's form for it, a closed value of two states, none and a rule set by its name, passed to both block doors,
+  is in that file for then. The gap the lead raised on 2026-11-12, a list operation's result that does not fit a
+  property declared `List<T>`, is the declaration's: `spec/Reference/native.json` and the reference component declare
+  its three array-valued properties `Property<IReadOnlyList<T>>`, as the Fusion slices declare theirs, and every
+  sentence over them still builds, so M4.X3's census sort stands, red. Two things wait for the owner: D5.3 gaining
+  that a member the API types as an array is declared `IReadOnlyList<T>`, and whether `NativeCheckList.Value`, a
+  `Property<string[]>` by its own line, follows.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

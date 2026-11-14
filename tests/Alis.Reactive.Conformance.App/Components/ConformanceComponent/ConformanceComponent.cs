@@ -41,11 +41,11 @@ public sealed class ConformanceComponent : Component, IInputComponent
 
     public Property<Record> Record => Property<Record>();
 
-    public Property<List<Record>> Records => Property<List<Record>>();
+    public Property<IReadOnlyList<Record>> Records => Property<IReadOnlyList<Record>>();
 
-    public Property<List<Record>?> NullableRecords => Property<List<Record>?>();
+    public Property<IReadOnlyList<Record>?> NullableRecords => Property<IReadOnlyList<Record>?>();
 
-    public Property<List<Binding>> Bindings => Property<List<Binding>>();
+    public Property<IReadOnlyList<Binding>> Bindings => Property<IReadOnlyList<Binding>>();
 
     public Property<Binding> Binding => Property<Binding>();
 
