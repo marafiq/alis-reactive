@@ -1,5 +1,6 @@
 import { assertNever, notBuilt, type Operator } from "../Schema/index";
 import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
+import { decimalsEqual } from "./decimals";
 import { keyOf } from "./keys";
 import { empty, included } from "./lists";
 import { matched, nullOrEmpty, textTested } from "./texts";
@@ -56,8 +57,9 @@ export function operated(op: Operator, terms: readonly Term[]): Read {
     case "sumInt":
     case "sumDouble":
     case "sumDecimal":
-    case "eqDecimal":
       throw notBuilt("the operator '" + op + "'");
+    case "eqDecimal":
+      return decimalsEqual(termOf(op, terms, 0)(), termOf(op, terms, 1)());
     case "contains":
       return textTested(termOf(op, terms, 0)(), termOf(op, terms, 1)(), (held, sought) => held.includes(sought));
     case "startsWith":

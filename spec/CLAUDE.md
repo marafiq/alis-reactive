@@ -1622,6 +1622,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the first row its three doors share: no X line writes a pipeline condition's refusal of a pattern, so it is X6.38's
   reason after "The pattern '{pattern}'", the subject X16.12 gives a rule's pattern, an `InvalidOperationException`
   as every refusal where the view renders. The owner can overrule it.
+- The lead, 2026-11-14, building `Choose` (N7.4): C# binds `test.Choose(first, second)` over two sources of a class that
+  derives from `TypedSource<T>` (an element's `Text`, a declared `Property<T>`) to the form for two values, its `TValue` the
+  source's class, an identity conversion that beats the form for two sources, so the plan would write each source as a
+  JSON value. No type stages it apart, so that form refuses a value that is a source where the view renders, naming the
+  type argument that binds the form for sources (`test.Choose<string?>(first, second)`). An analyzer refusing it at build
+  and its X line wait for the owner.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
