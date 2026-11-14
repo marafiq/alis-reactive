@@ -54,6 +54,7 @@ them, each marked as the lead's mistake, and are not copied here.
 | A path or a name cited in a brief from memory, not from the tree | 1 | A step a command shows: before a brief goes out, each spec file, D line and TLA+ action it cites is found at its base by a command, and the brief is corrected where one is not; root CLAUDE.md's forks section states it. |
 | A wait on the harness with no page state read before it | 1 | A rule line: `tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md`, a test whose held request leaves as its page loads reads the page's own heading before it waits for the hold. |
 | A slice's name written in another form than its declaration's | 1 | The tool: `spec/tools/check.py`'s app check, which reads a page's slice by the name its declaration gives it, held it before the push. |
+| A restore run on a file the next step reads | 1 | A step a script shows: the session's push script stops, with nothing pushed, when `spec/STATE.json` holds no change from the full check or anything else tracked is changed, its refused case met once with the remote unchanged. |
 
 ## Waiting for the owner
 
@@ -801,3 +802,10 @@ them, each marked as the lead's mistake, and are not copied here.
   plural, and the app check, which reads a page's slice by its declared name, found NativeButton held by no part of
   M5.X5's fourth promise and of M24.X6's first. Caught by the same full check, before any push. Cost: shared with the
   entry above. The part's role names NativeButton as declared; the tool holds the class.
+- 2026-11-14, a restore run on a file the next step reads, the class's first entry, the lead's. After the full check
+  at 1188d2abd read 40 of 40, the lead ran `git checkout -- spec/STATE.json`, the restore that is right before a gate,
+  and threw away the STATE that check had written, which the push script commits; the script would have pushed the
+  content and stopped at the STATE commit. Caught by the lead's reading of the command's output before the push.
+  Cost: one more full check and this commit. Held by a step a script shows: the push script stops before any push
+  when the STATE holds no change or anything else tracked is changed, its refused case run once with the remote
+  unchanged at f19e32c56.
