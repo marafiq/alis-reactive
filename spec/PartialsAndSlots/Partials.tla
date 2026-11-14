@@ -74,7 +74,8 @@ Attached(p) ==
 
 HoldsInput(p) == p # Page \/ ownAt # "none"
 
-IdOf(model, prefix, path) == IF Mutant = "IdWithoutPrefix" THEN <<model, path>> ELSE <<model, prefix \o path>>
+IdOf(model, prefix, path) ==
+    IF Mutant = "IdWithoutPrefix" /\ \A k \in Members : Attached(KinPlan(k)) THEN <<model, path>> ELSE <<model, prefix \o path>>
 
 InputId(p) == IdOf(Model(p), RenderedUnder(p), Field(p))
 

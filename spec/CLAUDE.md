@@ -1560,6 +1560,19 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   a set over a slot that holds only what a step added writes, what a step added leaves at its slot's unload, and an
   append beside a typed box and a button keeps both. This reverses the lead's line of 2026-11-14 that declared the
   append as a content set. The owner can overrule each.
+- The lead, 2026-11-14, on the isolation of a spec's mutants, which the line of 2026-11-13 on `ContainerRead.tla`
+  stated as a state predicate and the lead ran on three specs alone, a mistake of the lead's in `spec/MISTAKES.md`.
+  TLC 2.19 as pinned checks a state's invariants when it generates the state and enqueues the state after, so no
+  successor of a failing state is generated, and it names two invariants that fail in one state in its config's order:
+  a Fable agent at xhigh read both in the jar's bytecode and by runs, and the lead read the bytecode at the source. So
+  a mutant is isolated when, on every behavior, its own invariant fails no later than any other. It is read by running
+  the mutant with a history variable that holds whether its own invariant has failed, under the invariant that every
+  other holds, its own fails or it has failed before; and a spec's violates configs each list the invariant its
+  name carries first, so a state where two fail names its own. A mutant that modeled two defects is narrowed within
+  its own text, the base's states unchanged: Lanes' AllSettledEarly and ReplaceKeepsOld, Partials' IdWithoutPrefix and
+  CallbackProperty's Replace. Twelve specs read every mutant isolated and list their own first; Run.tla,
+  Ownership.tla, Composition.tla and Request.tla are read, and their configs ordered, with the orders landing. A new
+  TLC jar is read for both facts before its pin moves. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

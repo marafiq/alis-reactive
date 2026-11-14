@@ -78,7 +78,7 @@ Cleared(h) == /\ since' = [since EXCEPT ![h] = 0]
 
 DoStart(h) ==
     LET v == prop[gen] IN
-    IF Mutant # "Replace" /\ v \in FwNames THEN
+    IF v \in FwNames THEN
         /\ chain' = [chain EXCEPT ![FwIndex(v)].list = Append(@, h)]
         /\ Records(h, gen, FwIndex(v))
         /\ UNCHANGED <<prop, installs, refused>>
@@ -191,7 +191,9 @@ Hearers(v, throws) ==
     IF v \in FwNames THEN
         LET k == FwIndex(v)
             held == IF Mutant = "Replace" THEN <<>> ELSE Called(chain[k].held)
-        IN IF throws /\ Mutant = "SkipOnThrow" THEN held ELSE held \o chain[k].list
+        IN IF throws /\ Mutant = "SkipOnThrow" THEN held
+           ELSE IF Mutant = "Replace" /\ chain[k].list # <<>> THEN <<chain[k].list[Len(chain[k].list)]>>
+           ELSE held \o chain[k].list
     ELSE Called(v)
 
 Raise ==

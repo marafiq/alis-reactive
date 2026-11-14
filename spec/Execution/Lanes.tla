@@ -70,7 +70,7 @@ FireSecond ==
               /\ UNCHANGED <<pc, completion>>
          [] policy = "replace" /\ InFlight("first") ->
               /\ decided' = "replace"
-              /\ IF Mutant = "ReplaceKeepsOld"
+              /\ IF Mutant = "ReplaceKeepsOld" /\ pc["first"] \in {"attempt", "route"}
                    THEN pc' = [pc EXCEPT !["second"] = "attempt"] /\ UNCHANGED completion
                    ELSE /\ pc' = [pc EXCEPT !["second"] = "attempt", !["first"] = EndOnCut(pc["first"])]
                         /\ completion' = [completion EXCEPT !["first"] = "aborted"]
@@ -158,7 +158,7 @@ Release ==
 
 AllSettled ==
     /\ ~parallelDone
-    /\ CASE Mutant = "AllSettledEarly" -> \E b \in Branches : branch[b] # "attempt"
+    /\ CASE Mutant = "AllSettledEarly" -> \A b \in Branches : branch[b] # "route"
          [] Mutant = "JoinAtTheBranchAwait" -> \A b \in Branches : branch[b] # "attempt"
          [] OTHER -> \A b \in Branches : branch[b] = "done"
     /\ allSettled' = allSettled + 1
