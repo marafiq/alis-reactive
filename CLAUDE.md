@@ -71,6 +71,8 @@ keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s
      an edit, name its row: the spec line, the door, the node it writes, the runtime that executes it, the test.
   3. Decide from the proof in hand: the TLA+ specs, the principles and the owner's decisions. A decision on a
      principle, a closed rule or the scope goes to the owner as one line with its cost and its risk; no other does.
+     The line opens with what already holds and the one thing a yes changes, then the lead's recommendation; code
+     follows it (the owner, 2026-11-14: "you made it confusing for me").
   4. Change one meaning in one commit, with every place that carries it.
   5. Prove it on the rung that holds it, once. Behavior: a `scripts/playwright.sh` result line, the test first failing
      on its planted defect (`scripts/plant-defect.sh`). A rule (an analyzer, a test rule, a lint rule, an architecture
@@ -144,7 +146,10 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
 - A session starts and ends at a stable state: every unit pushed, `git ls-remote` equal to HEAD, nothing uncommitted.
   The owner starts a new session; the lead ends none, and a reply to continue, given to a go or no-go ask, is the go:
   work that needs no answer never waits. A status to the owner says what is completed and what is open, in the plan's
-  own words, never where a head is (the owner, 2026-11-11). A long run is wrapped in `caffeinate`.
+  own words, never where a head is (the owner, 2026-11-11). What is open is a piece of a unit. The lead's own
+  checking, a mutant's isolation or a check of the spec's tools, runs in the background, holds no finished piece and
+  is no item of a status or of a handoff's next (the owner, 2026-11-14: "you keep saying that it's open when your
+  behavior should be finishing the rewrite"). A long run is wrapped in `caffeinate`.
 - A handoff is written after every push, since the harness compacts without warning. It holds the head, what landed
   with its proof line, what is next, and no time but one `date` printed then (the lead's mistake, 2026-11-11);
   the lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.

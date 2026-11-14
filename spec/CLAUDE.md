@@ -1587,6 +1587,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   first defect. UnwindRestartsFinally restarts a running `Finally` of either layer only where no abort unwound it,
   and EnclosingRunsOn keeps the waiting request's frame, its `Finally` owed, beneath the steps that run on; each is
   narrowed within its own text, the base's states unchanged. The owner can overrule it.
+- The lead, 2026-11-14, landing X11.24's page, the bedside bell, from the record page-writer's work and the orders
+  designer's answer. Its replace log rests on `Run.tla`'s TheOldFinallyRunsBeforeTheNewRun. Its opposite states the
+  overlap's log whole, rang 1 rang 2 finally 1 after 1 finally 2 after 2: the dispatch runs the new run to its
+  request inside the old route's step (M1.D2, whose oracle is the DOM's dispatch), and no answer settles while a run
+  runs (`Run.tla`'s Settle), so `Run.tla` gains no action for the order. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

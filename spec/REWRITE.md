@@ -1026,13 +1026,13 @@ of the fusion-refusals screen's six stand on the Fusion layout, in `Refusals/Fus
 `Refusals/FusionTemplates/`, each beside its rendering twin and each test red (M21.X805, M22.X1, M22.X4); M21.X203's
 three wait on the grid's validation door, as M21.X205's do. A promise placed on a care screen is a page of its own in
 `Care/<Screen>/`, as a
-refusal's is, and two hundred and forty-five care pages stand, each test red: sixty-three of the record screen's
-(thirteen of module 5's, nine each of modules 2 and 9, eight of module 3's, six of module 1's, four of module 17's,
-three each of modules 7 and 24, two each of modules 6, 8 and 12 and one each of modules 15 and 19), forty-six of the
-admission screen's (fifteen of module 8's, ten of module 7's, five of module 6's, four each of modules 3 and 24, two
-each of modules 1, 15 and 17 and one each of modules 9 and 18), forty-two of the residents screen's (twenty-five of
-module 4's, nine of module 6's, two each of modules 2 and 5 and one each of modules 3, 17, 24 and 25), nineteen of the
-round screen's (five of module 2's, four of module 6's, three each of modules 3 and 8, two of module 1's and one each of
+refusal's is, and two hundred and forty-six care pages stand, each test red: sixty-four of the record screen's (thirteen
+of module 5's, nine each of modules 2 and 9, eight of module 3's, seven of module 1's, four of module 17's, three each
+of modules 7 and 24, two each of modules 6, 8 and 12 and one each of modules 15 and 19), forty-six of the admission
+screen's (fifteen of module 8's, ten of module 7's, five of module 6's, four each of modules 3 and 24, two each of
+modules 1, 15 and 17 and one each of modules 9 and 18), forty-two of the residents screen's (twenty-five of module 4's,
+nine of module 6's, two each of modules 2 and 5 and one each of modules 3, 17, 24 and 25), nineteen of the round
+screen's (five of module 2's, four of module 6's, three each of modules 3 and 8, two of module 1's and one each of
 modules 4 and 16), eighteen of the admission-clinical screen's (eighteen of module 21's), seventeen of the
 record-contacts screen's (seventeen of module 21's), sixteen of the bed-board screen's (eight each of modules 21 and
 22), thirteen of the handover screen's (thirteen of module 21's) and eleven of the shell screen's (nine of module 25's
@@ -1043,63 +1043,62 @@ other conformance declarations. The app starts under the host its argument `--ho
 app.json gives that host: net10's camel-case members and enum names, or those options with the one change each of five
 other hosts names; X7.14 stands under numbersAsText, M11.X1 and M11.X2 under snakeCase, and X15.5 under pascalCase, its
 opposite case opened under net10 through `NewWorldUnder`, as X6.16's is opened under enumsAsNumbers. Of the care
-families attempted, fifty-two promises placed under net10 alone wait: twenty-five need a call of the app's startup that
-throws until its unit (request defaults, antiforgery, flags enums, a registered validator, the busy indicator); one
-needs its page on the append to an element's text, which the core declares now (M5.N1); five need a request culture;
-three need a console error's words, which no line states; six need a browser zone or the view's time zone; two need the
-harness's clock verb; one needs the harness's restart verb; one needs the text box's Type, whose form N18.4 sends to
-gate 2; one needs a record whose code holds null, which native.json's type of it does not hold; three need an export
-held while it runs, which their placement does not name and no harness verb holds; two need a grid column's rules from
-the app's validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need the clipboard, which the
-harness grants no page, and the first of them the antiforgery startup call besides. Three more attempted promises are
-placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test typed where the promise's
-outcome is the value the server renders back, a rule the owner decides, and on net48 in the harness; X11.20 waits on the
-defaultHooks host and M21.X803's second on the net48 host. Of the bench's feature tests attempted, ten wait: six need an
-append to the callbacks object's log line, which neither native.json nor a core door gives; three need the harness's
-restart or gc verb; and one needs a list written as an element's rows, which no door writes. Of the bench's ninety-eight
-placed cells, ninety-five stand, each test red: nine of its properties, nine of its methods, thirty-six of its events,
-thirty of them the cells of event.poc15, thirteen of its sources, its three absences, its sixteen requests and three of
-its lanes, a slot loaded on start, a slot's listener gone at its unload and a step that waits on the confirm's answer.
-The sixteenth request cell, http.beside.hidden, sends a form's inputs: a view's request container is declared as the
-lead proposes it, `Html.BeginRequestForm` and `Html.BeginRequestContainer`, each a block a view ends by `using` (N14.3),
-a form the owner decides before the unit that builds it, and the conformance component is declared an input. Its six
-validation cells stand on that block: each request names the validator that checks it (`Validate<TValidator>()`), the
-plain rule and the rule under `When` two validators of one form, since no door names a rule set (D16.2 sends that form
-to gate 2); the validators are written and not registered until U17 builds the startup call, and the form endpoint
-answers what it bound until N16.1's door. Three cells wait: a source that calls a hub (N21.1), a push (the realtime
-doors and the harness's push verb) and a slot whose host destroys its component (the harness's restart verb).
-source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so a source at its pattern is refused by
-the type (D7.5, X7.4). The eight component slices of module 24 are declared in `Alis.Reactive.Native` (M24.N1 to
-M24.N9), `NativeTextBox` the first, each render helper a signature until U23, on the core's `IInputComponent`,
-`ComponentInput` and the field's options (M7.N3, M7.N2), which enter the core's table as `InputsAndIds`; the text, value
-and membership tests are declared (M3.N1, N7.3). The reference Fusion slice is declared in `Alis.Reactive.Fusion`
-(M21.N1, M21.N2), `FusionMultiSelect<TValue>` on the base `FusionComponent`, each render helper a signature until U25,
-and so are the twelve other slices the admission-clinical screen holds (M21.N5, M21.N10, M21.N13, M21.N15 to M21.N17,
-M21.N20, M21.N22, M21.N31, M21.N36, M21.N42 and M21.N45), each until U26, and so are the twenty the record-contacts and
-handover screens hold (M21.N3, M21.N4, M21.N7, M21.N8, M21.N18, M21.N19, M21.N24 to M21.N29, M21.N37, M21.N41, M21.N44,
-M21.N46 to M21.N49 and M21.N52), and so are the seventeen the handover, bed-board and fusion-layout screens hold
-(M21.N6, M21.N9, M21.N11, M21.N12, M21.N14, M21.N21, M21.N30, M21.N32 to M21.N35, M21.N38 to M21.N40, M21.N43, M21.N50
-and M21.N51), and so is FusionGrid (M21.N23), save a column's rules from a validator and a filter predicate's value,
-each a gap `spec/CLAUDE.md` names. Module 22's three template types are declared in `FusionTemplates` (M22.N1 to
-M22.N4). Module 25's slices are declared in `NativeAppLevelObjects` (M25.N1 to M25.N5, M25.N7): NativeDrawer,
-NativeConfirm, the row actions and the render helpers of the loader, the toast and the reconnect offer, the reconnect
-offer's net10's alone; the busy, notice and reconnect contracts those three fulfil give a view no door (D10.21) and are
-U24's. Module 23's FusionToast and FusionConfirm are declared in `FusionAppLevelObjects` (M23.N1, M23.N2), each
-confirm's `Ask` on N17.5's argument and `ConfirmAsks.tla`. The validator grammar Q16's Doors keep is declared in
-`Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1). M25.N6 is declared: `IAppLevelComponent`
-in `Vendors` (P4), `pipeline.Component<TComponent>()` and `plan.Component<TComponent>()`, whose handlers are a
-`ReactiveComponent<TComponent, TModel>`, each a signature until U24. N17.5's argument kind, the abort signal a declared
-method receives, is declared as the lead proposes it, `AbortSignal()` beside `Answer`, a signature until U8; the
-confirm's asks are `ConfirmAsks.tla`'s, TLC green with each mutant killed. An element's text and HTML are an
-`ElementContent`, whose `Set` takes a source of any type (M5.N1, D7.3), its `Hidden`, `Show()` and `Hide()` are declared
-(M5.N1), and a world names the version its component is built as. The app's settle, count and item endpoints stand, each
-at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its action where a test holds
-one action at two endpoints, and the harness's test of it is green and fails on each of its two planted defects. An MVC
-action reaches the answer gate by its filter, with its own address, so a care page's endpoint can be held, and the
-harness's test of it is green and fails on each of its two planted defects. Open of it, in order: the doors a view meets
-that are not yet declared, each with that view; every screen's view; every browser test, failing; the Playwright
-project's switch. The bindings check takes no view clause (section 2.5). The commit that lands a piece rewrites this
-paragraph.
+families attempted, fifty-one promises placed under net10 alone wait: twenty-five need a call of the app's startup that
+throws until its unit (request defaults, antiforgery, flags enums, a registered validator, the busy indicator); five
+need a request culture; three need a console error's words, which no line states; six need a browser zone or the view's
+time zone; two need the harness's clock verb; one needs the harness's restart verb; one needs the text box's Type, whose
+form N18.4 sends to gate 2; one needs a record whose code holds null, which native.json's type of it does not hold;
+three need an export held while it runs, which their placement does not name and no harness verb holds; two need a grid
+column's rules from the app's validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need the
+clipboard, which the harness grants no page, and the first of them the antiforgery startup call besides. Three more
+attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test
+typed where the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the
+harness; X11.20 waits on the defaultHooks host and M21.X803's second on the net48 host. Of the bench's feature tests
+attempted, ten wait: six need an append to the callbacks object's log line, which neither native.json nor a core door
+gives; three need the harness's restart or gc verb; and one needs a list written as an element's rows, which no door
+writes. Of the bench's ninety-eight placed cells, ninety-five stand, each test red: nine of its properties, nine of its
+methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen of its sources, its three absences,
+its sixteen requests and three of its lanes, a slot loaded on start, a slot's listener gone at its unload and a step
+that waits on the confirm's answer. The sixteenth request cell, http.beside.hidden, sends a form's inputs: a view's
+request container is declared as the lead proposes it, `Html.BeginRequestForm` and `Html.BeginRequestContainer`, each a
+block a view ends by `using` (N14.3), a form the owner decides before the unit that builds it, and the conformance
+component is declared an input. Its six validation cells stand on that block: each request names the validator that
+checks it (`Validate<TValidator>()`), the plain rule and the rule under `When` two validators of one form, since no door
+names a rule set (D16.2 sends that form to gate 2); the validators are written and not registered until U17 builds the
+startup call, and the form endpoint answers what it bound until N16.1's door. Three cells wait: a source that calls a
+hub (N21.1), a push (the realtime doors and the harness's push verb) and a slot whose host destroys its component (the
+harness's restart verb). source.MatchesPattern holds no test: `Matches` takes a literal pattern only, so a source at its
+pattern is refused by the type (D7.5, X7.4). The eight component slices of module 24 are declared in
+`Alis.Reactive.Native` (M24.N1 to M24.N9), `NativeTextBox` the first, each render helper a signature until U23, on the
+core's `IInputComponent`, `ComponentInput` and the field's options (M7.N3, M7.N2), which enter the core's table as
+`InputsAndIds`; the text, value and membership tests are declared (M3.N1, N7.3). The reference Fusion slice is declared
+in `Alis.Reactive.Fusion` (M21.N1, M21.N2), `FusionMultiSelect<TValue>` on the base `FusionComponent`, each render
+helper a signature until U25, and so are the twelve other slices the admission-clinical screen holds (M21.N5, M21.N10,
+M21.N13, M21.N15 to M21.N17, M21.N20, M21.N22, M21.N31, M21.N36, M21.N42 and M21.N45), each until U26, and so are the
+twenty the record-contacts and handover screens hold (M21.N3, M21.N4, M21.N7, M21.N8, M21.N18, M21.N19, M21.N24 to
+M21.N29, M21.N37, M21.N41, M21.N44, M21.N46 to M21.N49 and M21.N52), and so are the seventeen the handover, bed-board
+and fusion-layout screens hold (M21.N6, M21.N9, M21.N11, M21.N12, M21.N14, M21.N21, M21.N30, M21.N32 to M21.N35, M21.N38
+to M21.N40, M21.N43, M21.N50 and M21.N51), and so is FusionGrid (M21.N23), save a column's rules from a validator and a
+filter predicate's value, each a gap `spec/CLAUDE.md` names. Module 22's three template types are declared in
+`FusionTemplates` (M22.N1 to M22.N4). Module 25's slices are declared in `NativeAppLevelObjects` (M25.N1 to M25.N5,
+M25.N7): NativeDrawer, NativeConfirm, the row actions and the render helpers of the loader, the toast and the reconnect
+offer, the reconnect offer's net10's alone; the busy, notice and reconnect contracts those three fulfil give a view no
+door (D10.21) and are U24's. Module 23's FusionToast and FusionConfirm are declared in `FusionAppLevelObjects` (M23.N1,
+M23.N2), each confirm's `Ask` on N17.5's argument and `ConfirmAsks.tla`. The validator grammar Q16's Doors keep is
+declared in `Validation`, with its startup call. `pipeline.Object<T>` is declared (N7.1). M25.N6 is declared:
+`IAppLevelComponent` in `Vendors` (P4), `pipeline.Component<TComponent>()` and `plan.Component<TComponent>()`, whose
+handlers are a `ReactiveComponent<TComponent, TModel>`, each a signature until U24. N17.5's argument kind, the abort
+signal a declared method receives, is declared as the lead proposes it, `AbortSignal()` beside `Answer`, a signature
+until U8; the confirm's asks are `ConfirmAsks.tla`'s, TLC green with each mutant killed. An element's text and HTML are
+an `ElementContent`, whose `Set` takes a source of any type (M5.N1, D7.3), its `Hidden`, `Show()` and `Hide()` are
+declared (M5.N1), and a world names the version its component is built as. The app's settle, count and item endpoints
+stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its action where a
+test holds one action at two endpoints, and the harness's test of it is green and fails on each of its two planted
+defects. An MVC action reaches the answer gate by its filter, with its own address, so a care page's endpoint can be
+held, and the harness's test of it is green and fails on each of its two planted defects. Open of it, in order: the
+doors a view meets that are not yet declared, each with that view; every screen's view; every browser test, failing; the
+Playwright project's switch. The bindings check takes no view clause (section 2.5). The commit that lands a piece
+rewrites this paragraph.
 
 ### U1. Tools, pins and tables
 Features: M20.F1

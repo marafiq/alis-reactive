@@ -57,6 +57,10 @@ them, each marked as the lead's mistake, and are not copied here.
 | A restore run on a file the next step reads | 1 | A step a script shows: the session's push script stops, with nothing pushed, when `spec/STATE.json` holds no change from the full check or anything else tracked is changed, its refused case met once with the remote unchanged. |
 | A standard stated for every spec and run on the new ones alone | 1 | A step a commit shows: the isolation is run over each TLA+ spec with none on record, each spec's last line quoted in its commit. |
 | A test's expected value its promise does not state | 1 | A rule line: `tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md`, a text that holds lines of more than one plan's handlers is read whole only where the spec orders those handlers, else each plan writes to an element of its own. |
+| A file restored with an old modified time, which an incremental build read as up to date | 1 | A step a script shows: the session's restore scripts write each file they bring back with the time of the copy, never the time it was set aside, and a red run's own build line is read before its result. |
+| A decision put to the owner that did not open with what already holds | 1 | A rule line: root CLAUDE.md's loop, step 3, a decision's line opens with what already holds and the one thing a yes changes, then the lead's recommendation, and code follows it. |
+| The lead's own checking put before the plan's pieces | 1 | A rule line: root CLAUDE.md's Sessions, the lead's own checking runs in the background and is no item of a status; and a step a script shows: the session's handoff writer stops when its next names a mutant's isolation or the checker. |
+| An edit script that checked a line after it wrote it | 1 | A step a script shows: the session's edit scripts build every file's new text and assert its widths and counts before they write any file. |
 
 ## Waiting for the owner
 
@@ -869,3 +873,31 @@ them, each marked as the lead's mistake, and are not copied here.
   and handoff folders; it stopped at its first read, writing nothing. Caught by its own error. Cost: one rerun.
   Held by a step a script shows: the writer asserts its usage and that each folder holds the file it reads, and
   the same call now stops with that message, read by the lead.
+- 2026-11-14, a file restored with an old modified time, which an incremental build read as up to date, a new
+  class, its first entry, the lead's. Setting X11.24's files aside and back with a copy that keeps each file's
+  time gave the world contract's part file the time it was set aside, older than the World assembly the X12.2
+  run had built, so MSBuild skipped the project and the App's build failed on the bell's two page constants;
+  the new files built, since they changed the project's file list. The lead's memory held the same lesson for a
+  restored mutant. Caught by the build's error, before any commit. Cost: one red run. Held by a step a script
+  shows, the class's row.
+- 2026-11-14, a decision put to the owner that did not open with what already holds, a new class, its first
+  entry, the lead's. The order of an app event's handlers across plans went to the owner as a status line and
+  then as code and two options, and neither said first that D11.5 already orders the handlers of one plan.
+  Caught by the owner: "you made it confusing for me. The order is granted in the same plan, yes or no?"
+  Cost: one more exchange with the owner. Held by a rule line, the class's row; the lead's memory held plain
+  one-line questions since 2026-11-10, and this line names what the question opens with.
+- 2026-11-14, the lead's own checking put before the plan's pieces, a new class, its first entry, the lead's. Its
+  cause is the one the owner named on 2026-11-11, "the checker is not the product", before this log began, so it is
+  held a rung above a rule line from its first entry. After the handoff of 08:20 the session landed nothing for four
+  hours: Run.tla's orders, X11.24's bedside bell and the owner's order of an app event's handlers, each finished,
+  waited behind the history form's isolation of Run.tla's fourteen mutants, and each status listed that run and the
+  isolation of Composition and Request as open beside the plan's pieces. Caught by the owner: "From last few sessions,
+  you keep saying that it's open". Cost: the session's morning, and a status the owner could not read as the plan.
+  Held by a rule line, root CLAUDE.md's Sessions, and a step a script shows: the session's handoff writer stops when
+  its next names a mutant's isolation or the checker.
+- 2026-11-14, an edit script that checked a line after it wrote it, a new class, its first entry, the lead's. The
+  script that wrote the owner's correction into root CLAUDE.md and spec/MISTAKES.md wrote each file, then asserted its
+  widths, and stopped twice with a line of 157 and one of 138 columns already written. Its next edit, of the session's
+  handoff writer, broke a string and parsed it only after the write. Caught by the asserts and the parse, before the
+  stage. Cost: three repairs by hand. Held by a step a script shows: the session's edit scripts build every file's new
+  text and assert it before they write any file.

@@ -199,7 +199,7 @@
           "page": "A bell whose click handler, under replace, logs rang and its round, sends a request whose route rings the bell again on round 1 and whose Finally logs finally and the round, then logs after and the round.",
           "gesture": "Click the bell once.",
           "outcome": "The log reads rang 1 finally 1 rang 2 finally 2 after 2.",
-          "opposite": "Under overlap the log holds after 1 as well.",
+          "opposite": "Under overlap the log reads rang 1 rang 2 finally 1 after 1 finally 2 after 2.",
           "defect": "The new run starts before the old Finally, so the log reads rang 1 rang 2 finally 1, or the old run's after-step runs.",
           "observes": "Run.tla:CutInItsStep"
         },

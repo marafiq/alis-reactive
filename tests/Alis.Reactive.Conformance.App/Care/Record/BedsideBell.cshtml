@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedsideBell
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Bedside bell";
+    var plan = Html.ReactivePlan<BedsideBell>();
+}
+<h1>Bedside bell of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, BedsideBells.Rang, new BedsideRing { Round = 1 })>Ring the bell</button>
+<p>Log: <output id="bell-log"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BedsideBells.Rang, Model.Policy, (ring, pipeline) =>
+    {
+        pipeline.Element("bell-log").Text.Append(pipeline.Concat("rang ", ring.Read(rung => rung.Round), " "));
+        pipeline.Get(BedsideBellEndpoints.Desk)
+            .OnSuccess(Content.None, (answered, pipeline) => pipeline.When(ring.Read(rung => rung.Round).Eq(1))
+                .Then(pipeline => pipeline.Dispatch(BedsideBells.Rang, new BedsideRing { Round = 2 })))
+            .Finally(pipeline => pipeline.Element("bell-log").Text.Append(pipeline.Concat("finally ", ring.Read(rung => rung.Round), " ")));
+        pipeline.Element("bell-log").Text.Append(pipeline.Concat("after ", ring.Read(rung => rung.Round), " "));
+    }));
+}
+@Html.RenderPlan(plan)
