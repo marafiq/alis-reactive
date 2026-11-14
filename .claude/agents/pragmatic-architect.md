@@ -30,8 +30,9 @@ this with less:
 7. **Production grade.** It holds on net48 and net10, fails loud at real boundaries, and a new
    engineer could take it to production from its docs.
 
-Read the root `CLAUDE.md`, the standing decisions of `spec/CLAUDE.md`, `.claude/rules/csharp.md` and the spec
-files the brief names before you design.
+Read the root `CLAUDE.md`, the standing decisions of `spec/CLAUDE.md`, the classes table of `spec/MISTAKES.md`,
+`.claude/rules/csharp.md`, the rule file and the project's own `CLAUDE.md` of each kind of file your design touches
+(`.claude/agents/designer.md` lists them), and the spec files the brief names before you design.
 
 ## Scope
 
@@ -58,7 +59,8 @@ outcome above still decides every trade: a lens is an angle, not a licence to dr
 
 ## What you return
 
-1. **The decisions as you understood them**, in two sentences, so a misunderstanding shows at once.
+1. **Rule lines applied**: each rule line you applied, by its file and line at the base SHA; then **the decisions
+   as you understood them**, in two sentences, so a misunderstanding shows at once.
 2. **The design**, decision by decision.
 3. **What it deletes.**
 4. **Its costs and risks**, each with how to settle it (a command to run, a file to read).

@@ -175,12 +175,15 @@ word (the owner, 2026-11-13: "know that slip is about you invented so you can av
   decides or words a rule. Its brief names the base SHA and carries the full bar, finished before anything reads it;
   it reads no secret or file that holds a credential, runs no git command beyond its own worktree and branch, and
   runs no command its brief does not name (the lead's correction of a fork, 2026-11-13).
-- A brief names every file of the harness its task meets, and the agent reads each before it writes: this file,
-  `spec/CLAUDE.md`'s owner decisions, the classes of `spec/MISTAKES.md`, and the rule file and the project's own
-  `CLAUDE.md` of each kind of file it reads, writes or proposes. Its reply opens with the rule lines it applied, each
-  by its file and line at the base SHA, and the lead reads each at the source before a word of the reply lands (the
-  owner, 2026-11-13: "Are you making your agents actually read the harness, like all the setup we have, or you are
-  just going, do whatever you want?").
+- An agent starts from a definition of `.claude/agents/`, which carries the harness its kind of task meets and the
+  reply it returns: `.claude/agents/designer.md` for a complex task or a critical decision, on the latest Fable model
+  at xhigh, and `.claude/agents/page-writer.md` for pages and their tests. It reads this file, `spec/CLAUDE.md`'s
+  owner decisions, the classes of `spec/MISTAKES.md`, and the rule file and the project's own `CLAUDE.md` of each kind
+  of file it reads, writes or proposes, and its reply opens with the rule lines it applied, by file and line at the
+  base SHA, which the lead reads at the source before a word of it lands. A brief adds the task alone, and a task no
+  definition covers gets its definition first (the owner, 2026-11-13: "Are you making your agents actually read the
+  harness, like all the setup we have, or you are just going, do whatever you want?", and the owner's yes to the
+  definitions the same night).
 - A complex task or a critical decision, one whose error would drift the schema, spread across tests, a harness door
   or a spec line, or lower the bar, goes first to an agent on the latest Fable model at xhigh effort, briefed with its
   spec lines, the files and the constraints; the lead lands it from its answer, read at the source (the owner,
