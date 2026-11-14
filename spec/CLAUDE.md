@@ -1446,7 +1446,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   under a member it names. M5.F1's class count is reworded to the ordinal `StartsWith`, the overload the translated
   members' table takes. Two things wait for the owner: the form, against the smaller one the agent names,
   `Children.Items.Count()`, two doors and no forwarder with D5.13's clause reworded; and an operation D6.2 gains
-  later, which needs its forwarder where no compiler asks for one. X6.56's and M5.X2's pages are the next piece's.
+  later, which needs its forwarder where no compiler asks for one. X6.56's lunch seating and M5.X2's table support
+  stand on the residents screen, each test red, a Fable agent's work at xhigh landed from the source with one model
+  member no seat set removed. No seed member carries a seat, so each page renders what its own model holds. The lunch
+  seating's opposite case is a plugin of the page's own whose list member declares a data iterator over a paged
+  result, its script U13's, and the page sets the result's count before the step that counts its items, so a test
+  reads the stop at the count and not at the plugin's lookup. The residents screen gains a scripted layout of its own,
+  as the record screen's.
 - The lead, 2026-11-13, on X16.20's live check and M4.X3's sorted list, designed by a Fable agent at xhigh
   (LIVE-LIST-FABLE.md of the handoff folder) and decided from its answer read at the source. X16.20's page names no
   state of D16.15's live check: its form and the fieldset container inside it are bare blocks, live through the

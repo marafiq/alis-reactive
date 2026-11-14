@@ -1,0 +1,46 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Declarations
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model TableSupport
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Table support";
+    var plan = Html.ReactivePlan<TableSupport>();
+}
+<h1>Support at table @Model.Table</h1>
+<ul id="table-seats" aria-label="Seats">
+    @foreach (var seat in Model.Seats)
+    {
+        var wheelchair = seat.UsesAWheelchair ? "data-wheelchair" : null;
+        if (seat.Supervision is null)
+        {
+            <li @wheelchair>@seat.Resident</li>
+        }
+        else
+        {
+            <li data-supervision="@seat.Supervision" @wheelchair>@seat.Resident</li>
+        }
+    }
+</ul>
+<dl>
+    <dt>Close supervision</dt>
+    <dd id="close-supervision"></dd>
+    <dt>Not close</dt>
+    <dd id="not-close"></dd>
+    <dt>Wheelchair seats</dt>
+    <dd id="wheelchair-seats"></dd>
+    <dt>Hoist seats</dt>
+    <dd id="hoist-seats"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline =>
+    {
+        pipeline.Element("close-supervision").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.GetAttribute("data-supervision").Eq("close")));
+        pipeline.Element("not-close").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.GetAttribute("data-supervision").NotEq("close")));
+        pipeline.Element("wheelchair-seats").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.HasAttribute("data-wheelchair")));
+        pipeline.Element("hoist-seats").Text.Set(pipeline.Element("table-seats").Children.Count(seat => seat.HasAttribute("data-hoist")));
+    }));
+}
+@Html.RenderPlan(plan)

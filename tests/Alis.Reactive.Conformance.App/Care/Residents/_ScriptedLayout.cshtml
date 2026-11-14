@@ -1,0 +1,20 @@
+@using Alis.Reactive.Conformance.App.Care
+@model IScriptedResidentsPage
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>@ViewData["Title"]</title>
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <main>
+        @RenderBody()
+    </main>
+    @foreach (var script in Model.Scripts)
+    {
+        <script src="@script"></script>
+    }
+    <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
+</body>
+</html>
