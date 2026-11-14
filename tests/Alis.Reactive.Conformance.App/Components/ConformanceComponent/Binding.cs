@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace Alis.Reactive.Conformance.App.Components;
@@ -25,5 +26,6 @@ public sealed record Binding(string Name, string Code) : BindingBase
     public override string Renamed { get; init; } = "";
 
     [JsonIgnore]
+    [SuppressMessage("Alis.Reactive.Analyzers", "ALIS025", Justification = "The drift WhenAReadNamesAnOverrideTheJsonOptionsIgnore arranges: X18.8 refuses the read of it where the view renders")]
     public override string Ignored { get; init; } = "";
 }

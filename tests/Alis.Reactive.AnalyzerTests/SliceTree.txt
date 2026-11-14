@@ -1,2 +1,2 @@
 .
-Analyzers PartialsAndSlots ValuesAndSources
+Analyzers TypeKnowledge PartialsAndSlots ValuesAndSources
