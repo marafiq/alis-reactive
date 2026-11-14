@@ -23,6 +23,7 @@ public sealed class WhenAStepWritesOverASlotThatHoldsALoadedCard(string host) : 
         await Expect(loaded.Page.GetByRole(AriaRole.Heading, new PageGetByRoleOptions { Name = "Night note", Exact = true })).ToBeVisibleAsync();
         await loaded.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Acknowledge", Exact = true }).ClickAsync();
         await Expect(loaded.Page.Locator("#note-acknowledged")).ToHaveTextAsync("Acknowledged");
+        Assert.That(loaded.ConsoleErrors, Has.Count.EqualTo(1));
 
         var emptied = await NewWorld();
         await emptied.Page.GotoAsync(CarePages.NotesDesk);
@@ -33,5 +34,6 @@ public sealed class WhenAStepWritesOverASlotThatHoldsALoadedCard(string host) : 
         await emptied.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Close the desk", Exact = true }).ClickAsync();
         await emptied.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Mark no card open", Exact = true }).ClickAsync();
         await Expect(emptied.Page.Locator("#note-card")).ToHaveTextAsync("No card open");
+        Assert.That(emptied.ConsoleErrors, Is.Empty);
     }
 }

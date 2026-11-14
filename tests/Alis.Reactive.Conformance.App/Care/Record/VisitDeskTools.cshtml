@@ -1,0 +1,16 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitDeskTools
+@{
+    var plan = Html.ReactivePlan<VisitDeskTools>();
+}
+<h2>@Model.Day</h2>
+<button type="button" @Html.Raises(plan, VisitDesks.LoadTheVisit)>Load the visit</button>
+<button type="button" @Html.Raises(plan, VisitDesks.CloseTheVisit)>Close the visit</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(VisitDesks.LoadTheVisit, pipeline => pipeline.Get(VisitDeskEndpoints.Visit).Into("visit-note"))
+        .CustomEvent(VisitDesks.CloseTheVisit, pipeline => pipeline.Unload("visit-note")));
+}
+@Html.RenderPlan(plan)

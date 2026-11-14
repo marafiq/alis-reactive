@@ -1503,6 +1503,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   alone, where D12.9 holds a slot by its content too: schema.md's `set` row, R14.7 and X12.12's last sentence say both
   now. R14.7's one error names the first held slot at or inside the element in document order, so an element that
   holds several names one. The owner can overrule each.
+- The lead, 2026-11-14, writing the four pages that test `SlotHolds.tla`'s invariants beside X12.12's first, read
+  against the agent's six cases in SLOTHOLDS-FABLE.md. Each promise is a page of its own on the record screen, as a
+  care promise is: the shift tray, a card's step over the slot it was loaded into; the team board, a page's step over
+  an element that holds a held slot; the visit desk, a page's step over an empty slot an open card's plan names; the
+  night log, content a closed card loaded into a slot outside it, which stays held until that slot unloads. A step
+  that stops is read by the status the step before it sets, which the step after it would overwrite, and the console's
+  one error is read after that status, as a promise whose error words no line states is read; X12.12's first test
+  reads its error now, which its promise named and its test had left out. The agent's fifth case, a slot whose only
+  plan left, is the opposite case of the first, the visit desk's and the night log's, each a different way the hold
+  leaves, so it has no page of its own; the team board's opposite is an element that holds no slot, since the page's
+  own slot is held while the page lives. The append's case lands with its door. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

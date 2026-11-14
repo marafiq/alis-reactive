@@ -242,6 +242,38 @@
           "defect": "A text write over a slot leaves the loaded card's behavior running under content it no longer shows."
         },
         {
+          "for": "X12.12",
+          "page": "The shift tray: the tray's tools, loaded into the tray, with Clear the tray, whose step sets the tray's status to Clearing, then the tray's text, then the status to Tray cleared, and Mark the shift, whose step sets the text of the tools' shift note, which holds no slot.",
+          "gesture": "Open the tray, then click Clear the tray.",
+          "outcome": "The step stops with one console error: the status reads Clearing and the tools stay as they were loaded.",
+          "opposite": "Mark the shift shows Shift marked in the shift note, with no console error.",
+          "defect": "A card's step over the slot it was loaded into is not held, so the tray shows Cleared, its tools are gone and the status reads Tray cleared."
+        },
+        {
+          "for": "X12.12",
+          "page": "The team board: the board's tools, loaded into a slot inside the board, with Clear the board, whose step sets the board's status to Clearing, then the board's text, then the status to Board cleared, and Clear the noticeboard, whose step sets the text of the noticeboard, which holds no slot.",
+          "gesture": "Open the board's tools, then click Clear the board.",
+          "outcome": "The step stops with one console error: the status reads Clearing and the tools stay inside the board.",
+          "opposite": "Clear the noticeboard shows Noticeboard cleared, with no console error.",
+          "defect": "A step over an element is checked against the element alone, so the board's text replaces the slot inside it and its tools, and the status reads Board cleared."
+        },
+        {
+          "for": "X12.12",
+          "page": "The visit desk: the desk's tools, loaded into the desk, whose plan loads a visit into the visit note, a slot outside the desk, and Mark no visit, whose step sets the desk's status to Marking, then the visit note's text, then the status to Marked.",
+          "gesture": "Open the desk, then click Mark no visit.",
+          "outcome": "The step stops with one console error: the status reads Marking and the visit note stays empty.",
+          "opposite": "Once the desk is closed, the same click shows No visit today in the visit note and Marked in the status, with no console error.",
+          "defect": "A slot a live plan names that holds nothing is not held, so the visit note shows No visit today while the tools that load it are open."
+        },
+        {
+          "for": "X12.12",
+          "page": "The night log: the log's tools, loaded into the log desk, whose plan loads an entry into the entry slot outside the desk and unloads it, and Mark no entry, whose step sets the log's status to Marking, then the entry slot's text, then the status to Marked.",
+          "gesture": "Open the desk, load the entry, close the desk, then click Mark no entry.",
+          "outcome": "The step stops with one console error: the status reads Marking, the entry stays, and its Acknowledge still shows Acknowledged.",
+          "opposite": "Opening the desk again and closing the entry before the desk closes, the same click shows No entry tonight and Marked, with no console error.",
+          "defect": "Content a load put in a slot is held only while the plan that loaded it lives, so closing the desk lets the click replace the entry."
+        },
+        {
           "for": "M5.X1",
           "page": "A note with Show and Hide buttons, and a button whose step sets text on an element the page lacks before it sets the status.",
           "gesture": "Click Hide, then Show, then the button with the missing element.",

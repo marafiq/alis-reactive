@@ -1003,8 +1003,9 @@ validator registered at startup, which U17 builds.
 A text joined from texts and sources (N7.7) is declared as the owner said yes to it: `pipeline.Concat` over parts C#
 converts a text and a source of any type to, its plan a `call` of the array's `join` over a `list` of the parts, which
 adds no kind and no operator; `Schema.tla:JoinedPartsAreTexts` holds that every part reaches `join` as a text. A
-content write over a held slot, which `Set` writes, is `SlotHolds.tla`'s, TLC green with each mutant killed; an
-append to an element's text, which writes the same `set`, is not declared yet.
+content write over a held slot, which `Set` writes, is `SlotHolds.tla`'s, TLC green with each mutant killed, and
+five pages of the record screen test its invariants, X12.12's, each test red; an append to an element's text, which
+writes the same `set`, is not declared yet.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
 named by two declarations. Thirty-four more refusal pages stand, each beside the page of its opposite case and each
 test red, six forks' work read at the source and landed, and one the lead's: fifteen of module 4's, five of module
@@ -1021,16 +1022,16 @@ of the fusion-refusals screen's six stand on the Fusion layout, in `Refusals/Fus
 `Refusals/FusionTemplates/`, each beside its rendering twin and each test red (M21.X805, M22.X1, M22.X4); M21.X203's
 three wait on the grid's validation door, as M21.X205's do. A promise placed on a care screen is a page of its own in
 `Care/<Screen>/`, as a
-refusal's is, and two hundred and thirty-one care pages stand, each test red: fifty-two of the record screen's (nine
-of module 2's, eight each of modules 3 and 9, five of module 1's, four each of modules 5 and 17, three each of modules
-7 and 24, two each of modules 6, 8 and 12 and one each of modules 15 and 19), forty-five of the admission screen's
-(fifteen of module 8's, ten of module 7's, five of module 6's, four each of modules 3 and 24, two each of modules 1
-and 15 and one each of modules 9, 17 and 18), forty-one of the residents screen's (twenty-five of module 4's, eight of
-module 6's, two each of modules 2 and 5 and one each of modules 3, 17, 24 and 25), nineteen of the round screen's
-(five of module 2's, four of module 6's, three each of modules 3 and 8, two of module 1's and one each of modules 4
-and 16), eighteen of the admission-clinical screen's (eighteen of module 21's), seventeen of the record-contacts
-screen's (seventeen of module 21's), sixteen of the bed-board screen's (eight each of modules 21 and 22), thirteen of
-the handover screen's (thirteen of module 21's) and ten of the shell screen's (eight of module 25's and one each of
+refusal's is, and two hundred and thirty-five care pages stand, each test red: fifty-six of the record screen's (nine
+of module 2's, eight each of modules 3, 5 and 9, five of module 1's, four of module 17's, three each of modules 7 and
+24, two each of modules 6, 8 and 12 and one each of modules 15 and 19), forty-five of the admission screen's (fifteen
+of module 8's, ten of module 7's, five of module 6's, four each of modules 3 and 24, two each of modules 1 and 15 and
+one each of modules 9, 17 and 18), forty-one of the residents screen's (twenty-five of module 4's, eight of module
+6's, two each of modules 2 and 5 and one each of modules 3, 17, 24 and 25), nineteen of the round screen's (five of
+module 2's, four of module 6's, three each of modules 3 and 8, two of module 1's and one each of modules 4 and 16),
+eighteen of the admission-clinical screen's (eighteen of module 21's), seventeen of the record-contacts screen's
+(seventeen of module 21's), sixteen of the bed-board screen's (eight each of modules 21 and 22), thirteen of the
+handover screen's (thirteen of module 21's) and ten of the shell screen's (eight of module 25's and one each of
 modules 14 and 17). Forty feature tests stand on the bench, sixteen of module 11's, fifteen of module 12's, four each
 of modules 13 and 17 and one of module 14's, their pages in a folder a module (`Bench/Vendors/`,
 `Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`, `Bench/Schema/`), with a render helper for each of the

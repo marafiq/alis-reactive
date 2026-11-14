@@ -1,0 +1,22 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftTrayTools
+@{
+    var plan = Html.ReactivePlan<ShiftTrayTools>();
+}
+<h2>@Model.Shift</h2>
+<button type="button" @Html.Raises(plan, ShiftTrays.ClearTheTray)>Clear the tray</button>
+<button type="button" @Html.Raises(plan, ShiftTrays.MarkTheShift)>Mark the shift</button>
+<p id="shift-note">Shift open</p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ShiftTrays.ClearTheTray, pipeline =>
+        {
+            pipeline.Element("tray-status").Text.Set("Clearing");
+            pipeline.Element("tray").Text.Set("Cleared");
+            pipeline.Element("tray-status").Text.Set("Tray cleared");
+        })
+        .CustomEvent(ShiftTrays.MarkTheShift, pipeline => pipeline.Element("shift-note").Text.Set("Shift marked")));
+}
+@Html.RenderPlan(plan)

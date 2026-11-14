@@ -1,0 +1,18 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ShiftTray
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Shift tray";
+    var plan = Html.ReactivePlan<ShiftTray>();
+}
+<h1>Shift tray of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, ShiftTrays.OpenTheTray)>Open the tray</button>
+<section id="tray" aria-label="Tray"></section>
+<p>Status: <output id="tray-status">Closed</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(ShiftTrays.OpenTheTray, pipeline => pipeline.Get(ShiftTrayEndpoints.Tools).Into("tray")));
+}
+@Html.RenderPlan(plan)
