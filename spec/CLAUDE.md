@@ -1477,6 +1477,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `Set` writes, whose stop over a held slot (D12.9, X12.12) no spec holds, so the append is declared after that
   ordering is written as a spec, as root CLAUDE.md requires, and the same spec covers `Set`. The lead's line of
   2026-11-12 on event.poc15's three cells stands: their promises read the source alone.
+- The owner, 2026-11-13 (verbatim in `spec/NOTES.md`), on the lead's proposal of an operator that would refuse a
+  source joined into a text by `+`, and on D6.10's twelve overloads that refuse a list's operation over a text: "why
+  obsolete code is in re-write - get it right sir - it seems like u did not think through design - or have analyzer
+  right". No member exists only to refuse a call: a door no author needs is no door, and a defect no type stages is
+  the analyzer's to refuse at build, by the owner's decision of 2026-11-08. The twelve overloads leave with the
+  analyzer line that takes their refusal, and the text a source is joined into by .NET gets a line of its own; a Fable
+  agent at xhigh designs both rules (TEXT-ANALYZERS-FABLE.md of the handoff folder), and the lead decides them from
+  its answer read at the source.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

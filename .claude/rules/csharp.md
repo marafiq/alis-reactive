@@ -22,6 +22,10 @@ and a newly raised rule is built over `spec/api` too before its commit (the lead
   other surface change (root CLAUDE.md, Rules).
 - A Fusion class is Fusion and the EJ2 class it renders; a Native class is Native and what it renders
   (`spec/REWRITE.md`, section 2.4).
+- No member exists only to refuse a call: an overload or an operator marked obsolete as an error, or any member whose
+  one purpose is to fail when a view calls it, is a door no author needs. A defect no type stages is refused by an
+  analyzer, one line of the spec (`.claude/rules/analyzers.md`). The owner, 2026-11-13, verbatim: "why obsolete code
+  is in re-write - get it right sir - it seems like u did not think through design - or have analyzer right".
 
 Callback parameter naming convention (locked):
 
