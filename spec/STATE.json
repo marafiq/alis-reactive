@@ -1579,10 +1579,10 @@
     },
     "paths": {
       "counts": {
-        "paths": 181,
+        "paths": 182,
         "problems": 0
       },
-      "detail": "each of 181 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
+      "detail": "each of 182 paths at HEAD and main's tip, down to tests, tools, build, examples, scripts, .github and .claude's folders, is kept by section 2 or retired by section 3, never both",
       "pass": true
     },
     "plants": {
@@ -1596,7 +1596,7 @@
         "unrefused": 0
       },
       "detail": "247 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "201d5489f5e7e92372ab7cb93f404678b854965a36ad31538e4868e27fb15930",
+      "digest": "e4c27b9bfef7ccc4e5292296241b46fd0db276cf3c3abad3f86a5768b837934f",
       "pass": true
     },
     "probes": {
@@ -4159,7 +4159,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "912c66776fe742d6f3d475829fd2c07f7be7527a",
+  "read_at_head": "2beefa87971df388d939a4ed1d0e0969353320aa",
   "step": {
     "failing": [],
     "name": "End of session",
