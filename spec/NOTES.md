@@ -1533,3 +1533,5 @@
   Evidence: the owner's message of 2026-11-14 in session 6c1184a9, answered with the lead's faults measured from git since the cut.
 - 2026-11-14 the owner, verbatim, "Yeah, I consolidate the mistakes so it's clear. Mistakes are supposed to be caught very quickly, not that they become their own maintenance. And that was my clear instructions to you when the rewrite started. And you fell into the same trap and misleading me. I mean, if all the days have been just went into this thinking and overthinking, I'm not following. Bring me the fruits of this labor now." spec/MISTAKES.md counts each mistake in its kind.
   Evidence: the owner's message of 2026-11-14 in session 6c1184a9; the log's 135 entries are in git at 2a4a56b59.
+- 2026-11-14 the owner, verbatim, "Yes", to the lead's question whether `landings.py` lands each browser test in the unit of the last door its page calls.
+  Evidence: the owner's message of 2026-11-14 in session 6c1184a9, answering the lead's status after the push of 7371c2c2c.

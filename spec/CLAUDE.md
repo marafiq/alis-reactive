@@ -848,7 +848,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   before a door its page calls fails its unit's run, since a door that is not built throws, and the cure is a part
   in its placement. It was put to the owner as one line and not taken up, and it is no principle, closed rule or
   scope: a guard no view needs yet. The exact form, a page named by each placement and a reader of the doors each
-  view calls, is a new check and waits for the owner's yes. The owner can overrule it.
+  view calls, is a new check, which the owner's yes of 2026-11-14 below lets in.
 - The owner, 2026-11-12 (verbatim in `spec/NOTES.md`), after the lead had called the conformance app many sessions
   of work: "My expectation is that TLA plus proves the schema, POCs, main, everything is in place, and you sort of
   taking hell of a time." Then: "Quality has to stay. Quality comes from action, not too much thinking. Too much
@@ -1612,6 +1612,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   thin path. Decided: a push lands a unit or ends a session, behind the full check; the isolation is run no more;
   `spec/MISTAKES.md` counts each mistake in its kind; a decision that follows from a yes of the owner's is the lead's,
   stated as done.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), to the lead's question whether a browser test lands in the unit
+  of the last door its view calls: "Yes". Most pages call doors of later units (a trigger's `CustomEvent`, a list's
+  `Find`, the conformance component, a request), so a unit's run selected tests it cannot turn green. `landings.py` and
+  the check that places each test read the views each test opens and the core's doors each view calls, and land the
+  test in the unit that builds the last of them, the reader the line of 2026-11-12 left waiting.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
