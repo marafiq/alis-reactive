@@ -13,6 +13,8 @@ export function evaluate(expression: Expression, context: Context): Read {
       return bound(expression.name, context);
     case "fn":
       return value(callable(expression.params, expression.body, context));
+    case "signal":
+      return value(context.signal);
     case "get":
     case "data":
     case "as":
@@ -21,7 +23,6 @@ export function evaluate(expression: Expression, context: Context): Read {
     case "record":
     case "list":
     case "op":
-    case "signal":
       throw notBuilt("the expression '" + expression.kind + "'");
     default:
       return assertNever(expression);

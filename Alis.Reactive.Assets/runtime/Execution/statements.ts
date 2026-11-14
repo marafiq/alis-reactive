@@ -1,24 +1,72 @@
-import { assertNever, notBuilt, type PathStep, type SetMembers, type SetStatement, type Statement } from "../Schema/index";
+import {
+  assertNever,
+  notBuilt,
+  type DoStatement,
+  type LetStatement,
+  type PathStep,
+  type RequestStatement,
+  type SetMembers,
+  type SetStatement,
+  type Statement,
+} from "../Schema/index";
 import { heldOrNull, Stop, type Read } from "../ValuesAndSources/index";
-import { isAnObject, type Context } from "./context";
+import { bind, isAnObject, type Context } from "./context";
 import { evaluate } from "./expressions";
 
-export function execute(statement: Statement, context: Context): void {
+export type Step =
+  | { readonly kind: "completed"; readonly context: Context }
+  | { readonly kind: "block"; readonly statements: readonly Statement[] }
+  | { readonly kind: "blocks"; readonly blocks: readonly (readonly Statement[])[] }
+  | { readonly kind: "request"; readonly statement: RequestStatement }
+  | { readonly kind: "wait"; readonly on: Promise<unknown>; readonly settled: (read: Read) => Context }
+  | { readonly kind: "stop"; readonly reason: string };
+
+export function execute(statement: Statement, context: Context): Step {
   switch (statement.kind) {
     case "set":
       write(statement, context);
-      return;
+      return { kind: "completed", context };
     case "do":
+      return done(statement, context);
     case "let":
+      return bound(statement, context);
     case "if":
+      return { kind: "block", statements: holds(evaluate(statement.when, context)) ? statement.then : statement.else };
     case "all":
+      return { kind: "blocks", blocks: statement.blocks };
     case "request":
-    case "listen":
+      return { kind: "request", statement };
     case "stop":
+      return { kind: "stop", reason: statement.reason };
+    case "listen":
       throw notBuilt("the statement '" + statement.kind + "'");
     default:
-      assertNever(statement);
+      return assertNever(statement);
   }
+}
+
+function done(statement: DoStatement, context: Context): Step {
+  const read = evaluate(statement.expr, context);
+  if (!statement.await) return { kind: "completed", context };
+  return { kind: "wait", on: Promise.resolve(heldOrNull(read)), settled: () => context };
+}
+
+function bound(statement: LetStatement, context: Context): Step {
+  switch (statement.binds) {
+    case "line": {
+      const read = evaluate(statement.expr, context);
+      if (!statement.await) return { kind: "completed", context: bind(context, statement.name, read) };
+      return { kind: "wait", on: Promise.resolve(heldOrNull(read)), settled: (settled) => bind(context, statement.name, settled) };
+    }
+    case "read":
+      throw notBuilt("a let bound where its name is read");
+    default:
+      return assertNever(statement.binds);
+  }
+}
+
+function holds(when: Read): boolean {
+  return when.kind === "value" && when.value === true;
 }
 
 function write(statement: SetStatement, context: Context): void {

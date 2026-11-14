@@ -10,7 +10,7 @@ classes and the checks that waited for the owner are in git at 2a4a56b59.
 | Kind | Count | What catches it |
 |---|---:|---|
 | Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering | 28 | Reading the line, the signature or the page at HEAD before writing; the compiler, the analyzers, `spec/tools/check.py` and the gate |
-| A rule or a tool's list not applied before the change | 44 | The gate before the commit: the rule names, the hedges and the paths; `should` is written `must` (the owner, 2026-11-14) |
+| A rule or a tool's list not applied before the change | 45 | The gate before the commit: the rule names, the hedges and the paths; `should` is written `must` (the owner, 2026-11-14) |
 | A number, a proof line or an absence not read from the run that proves it | 22 | The run's own result line, read when it prints; a search over every tracked file, with its count |
 | A shell command or a script wrong in its own terms | 37 | The script's asserts, before it writes any file; `echo "exit $?"` straight after the command |
 | Said to the owner in a way that hid or blurred what holds | 6 | A status says what works, how many units are left and each count; a question goes to the owner only for a principle or a scope the owner has not decided |
