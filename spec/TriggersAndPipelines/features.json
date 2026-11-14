@@ -420,7 +420,7 @@
       "meanings": [
         {
           "id": "M1.D2",
-          "meaning": "A dispatch raises its event on the document as a CustomEvent whose detail is the payload in the live form (gate 1's P8), or null when it carries none. The DOM runs the event's listeners inside the dispatch, in the order they subscribed, so each of its handlers runs up to its first awaited step before the step after Dispatch runs (D11.5); a stop in a handler ends that handler only, and the dispatching pipeline goes on (D4.8). A handler reads its payload as data (D4.2): a member the payload lacks reads its start, and a payload of null reads nothing, so a dispatch with no payload of an event that declares one runs its handlers with every member reading nothing."
+          "meaning": "A dispatch raises its event on the document as a CustomEvent whose detail is the payload in the live form (gate 1's P8), or null when it carries none. The DOM runs the event's listeners inside the dispatch, in the order they subscribed, one listener a handler, so its handlers run across plans in D17.3's order and each runs up to its first awaited step before the step after Dispatch runs (D11.5, Ownership.tla:HandlersHearInTheOrderTheySubscribed); a stop in a handler ends that handler only, and the dispatching pipeline goes on (D4.8). A handler reads its payload as data (D4.2): a member the payload lacks reads its start, and a payload of null reads nothing, so a dispatch with no payload of an event that declares one runs its handlers with every member reading nothing."
         },
         {
           "id": "M1.D3",
@@ -430,6 +430,7 @@
       "oracle": "The DOM Standard: dispatchEvent runs an event's listeners synchronously in the order they were added and reports a listener's exception without stopping the dispatch, a CustomEvent carries its detail, and a click's target's ancestors are its path; the HTML Standard, which lowercases an attribute's name in an HTML document; and the spec itself for the payload's live form (gate 1's P8), its reads (D4.2) and the as conversion (D3.13).",
       "checker": [
         "Run.tla:SecondHandlerStartsInTheTurn",
+        "Ownership.tla:HandlersHearInTheOrderTheySubscribed",
         "Absence.tla:StopEndsOnlyItsHandler",
         "Absence.tla:DataAbsentReadsItsStart",
         "Absence.tla:NullHolderReadsNothing",

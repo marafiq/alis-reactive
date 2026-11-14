@@ -6,7 +6,8 @@ CONSTANT Mutant
 Mutants == {"none", "ReleaseOnlyLoadedSlot", "LoadKeepsOldListeners", "BootContentUnderPage", "RegistrationPerLoadOnPage",
             "ReloadSkipsRegistration", "ReleaseLeavesRules", "FirstReleaseStopsHub", "ReleaseKeepsOffer", "UnsubscribeDestroyed",
             "ListenTwice", "ListenSurvivesRelease", "RemoveOnCollected", "RemoveOnDestroyed", "InlineByName",
-            "SummaryOnlyWithoutInline", "ReleaseEndsAtFirstThrow", "ThrownListenerStillRuns", "ThrowLeavesTheContent"}
+            "SummaryOnlyWithoutInline", "ReleaseEndsAtFirstThrow", "ThrownListenerStillRuns", "ThrowLeavesTheContent",
+            "LoadRestartsThePage"}
 
 ASSUME Mutant \in Mutants
 
@@ -18,22 +19,30 @@ MaxLoads == 2
 VARIABLES live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
           destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone,
           req, sentGen, inline, inlineGen, summarized,
-          throws, attached, heard, met, covered, lastStep, loadedGen, selfRun
+          throws, attached, heard, met, covered, lastStep, loadedGen, selfRun, joined, ran
 
 vars == <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
           destroyed, threw, releasedDestroyed, listenOn, listenGen, alive, listenThrew, gone, listenOffGone,
           req, sentGen, inline, inlineGen, summarized,
-          throws, attached, heard, met, covered, lastStep, loadedGen, selfRun>>
+          throws, attached, heard, met, covered, lastStep, loadedGen, selfRun, joined, ran>>
 
 listens == <<listenOn, listenGen, alive, listenThrew, gone, listenOffGone>>
 
 checks == <<req, sentGen, inline, inlineGen, summarized>>
 
-releases == <<throws, attached, heard, met, covered, lastStep, loadedGen, selfRun>>
+releases == <<throws, attached, heard, met, covered, lastStep, loadedGen, selfRun, joined, ran>>
 
 stepOutcome == <<selfRun>>
 
 HasField(content) == content \in {"boot", "card"}
+
+Page == <<"page", 0>>
+
+Without(s, left) == SelectSeq(s, LAMBDA e : e \notin left)
+
+Joined(s, left, added) ==
+    LET next == Without(s, left) \o (IF added = {} THEN <<>> ELSE <<CHOOSE e \in added : TRUE>>)
+    IN IF Mutant = "LoadRestartsThePage" /\ added # {} THEN Without(next, {Page}) \o <<Page>> ELSE next
 
 Holders(l, content) == {o \in {"a"} : l[o] /\ content = "card"} \cup {o \in {"b"} : l[o]}
 
@@ -68,6 +77,8 @@ Init ==
     /\ summarized = FALSE
     /\ throws = {}
     /\ attached = IF Mutant = "BootContentUnderPage" THEN {} ELSE {<<"a", 0>>}
+    /\ joined = IF Mutant = "BootContentUnderPage" THEN <<Page>> ELSE <<<<"a", 0>>, Page>>
+    /\ ran = <<>>
     /\ heard = [o \in Slots |-> 0]
     /\ met = {}
     /\ covered = {}
@@ -121,7 +132,9 @@ ReleasedWhole(order, added, by, x) ==
     /\ met' = Range(order) \cap throws
     /\ throws' = throws \ Range(order)
     /\ attached' = (attached \ Current(Range(order) \ throws)) \cup added
+    /\ joined' = Joined(joined, Current(Range(order) \ throws), added)
     /\ heard' = NoneHeard
+    /\ ran' = <<>>
     /\ covered' = Current(Range(order))
     /\ StepOutcome(by, x, Range(order))
 
@@ -141,7 +154,9 @@ EndedAtTheThrow(order, step, by, x) ==
     /\ met' = {order[first]}
     /\ throws' = throws \ before
     /\ attached' = attached \ Current(before)
+    /\ joined' = Joined(joined, Current(before), {})
     /\ heard' = NoneHeard
+    /\ ran' = <<>>
     /\ covered' = Current(Range(order))
     /\ lastStep' = step
     /\ loadedGen' = CASE step = "load" -> aGen + 1 [] step = "loadB" -> bLoads + 1 [] OTHER -> loadedGen
@@ -235,7 +250,9 @@ LoadsB(by) ==
          ELSE /\ met' = {}
               /\ covered' = {}
               /\ attached' = attached \cup {<<"b", bLoads + 1>>}
+              /\ joined' = Joined(joined, {}, {<<"b", bLoads + 1>>})
               /\ heard' = NoneHeard
+              /\ ran' = <<>>
               /\ UNCHANGED throws
               /\ StepOutcome(by, "b", {})
     /\ lastStep' = "loadB"
@@ -274,18 +291,19 @@ UnsubscribeThrows(o) ==
                    destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
     /\ UNCHANGED checks
-    /\ UNCHANGED <<attached, heard, met, covered, lastStep, loadedGen>>
+    /\ UNCHANGED <<attached, heard, met, covered, lastStep, loadedGen, joined, ran>>
     /\ UNCHANGED stepOutcome
 
 Running == IF Mutant = "ThrownListenerStillRuns" THEN attached ELSE {e \in attached : live[e[1]] /\ OwnerGen(e[1]) = e[2]}
 
 Raise ==
     /\ heard' = [o \in Slots |-> Cardinality({e \in Running : e[1] = o})]
+    /\ ran' = SelectSeq(joined, LAMBDA e : e = Page \/ e \in Running)
     /\ UNCHANGED <<live, aContent, aGen, bGen, aLoads, bLoads, listenersOf, registeredOn, fieldRegistered, rules, managed, offer,
                    destroyed, threw, releasedDestroyed>>
     /\ UNCHANGED listens
     /\ UNCHANGED checks
-    /\ UNCHANGED <<throws, attached, met, covered, lastStep, loadedGen>>
+    /\ UNCHANGED <<throws, attached, met, covered, lastStep, loadedGen, joined>>
     /\ UNCHANGED stepOutcome
 
 HostDestroys ==
@@ -418,6 +436,12 @@ InlineOnlyAtTheSentInput == inline => inlineGen = sentGen
 EveryOwnerReleasedPastAThrow == met # {} => \A c \in covered : ~(live[c[1]] /\ OwnerGen(c[1]) = c[2])
 
 ThrownListenerRunsNothing == \A o \in Slots : heard[o] <= IF live[o] THEN 1 ELSE 0
+
+Earlier(s, x, y) == \E i, j \in 1..Len(s) : i < j /\ s[i] = x /\ s[j] = y
+
+HandlersHearInTheOrderTheySubscribed ==
+    \A e \in Range(ran) : /\ (e[1] \in Slots /\ e[2] > 0) => Earlier(ran, Page, e)
+                          /\ (e[1] = "b" /\ <<"a", aGen>> \in Range(ran)) => Earlier(ran, <<"a", aGen>>, e)
 
 StepReplacesTheContent ==
     /\ lastStep = "load" => (live["a"] /\ aContent = "card" /\ aGen = loadedGen)

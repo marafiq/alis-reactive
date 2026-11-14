@@ -8,6 +8,6 @@
 <h2>@Model.Name</h2>
 <p>@Model.Room</p>
 @{
-    Html.On(plan, trigger => trigger.CustomEvent(FallWatches.FallNoted, pipeline => pipeline.Element("resident-calls").Text.Append($"{Model.Name} heard the note\n")));
+    Html.On(plan, trigger => trigger.CustomEvent(FallWatches.FallNoted, pipeline => pipeline.Element("call-list").Text.Append($"{Model.Name} heard the note\n")));
 }
 @Html.RenderPlan(plan)

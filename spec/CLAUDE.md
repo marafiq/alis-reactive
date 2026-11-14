@@ -1203,7 +1203,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
 - The lead, 2026-11-13, writing M25.X12, the browser promise of `ConfirmAsks.tla`'s NothingWaitsForAnEndedRun: a
   family partial whose two handlers of one click ask, the second waiting behind the first, and a refresh of its slot
   held at the answer gate, whose release ends both runs (D12.4), so no dialog shows. Both asks are one plan's, since
-  D11.5 orders two handlers of one event within the plan that subscribed them and states no order across plans.
+  D11.5 orders the two handlers of one event in the plan's order.
   D11.8's await bullet is amended: it listed the older lines' Confirm as an await no abort reaches, where
   NativeConfirm's ask takes the block's signal (N17.5) and answers false on an abort (M25.D4). UnmountAnswersEveryAsk
   has no browser promise, since the page's confirm never unmounts while the page lives (D12.1, D13.1); that is the
@@ -1575,11 +1575,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   fourteen mutants isolated; AfterIfReadsBefore's read, Composition.tla's and Request.tla's run in the background,
   and each lands in a commit of its own. A new TLC jar is read for both facts before its pin moves. The owner can
   overrule it.
-- The lead, 2026-11-14, landing X12.2's page from the orders designer's answer, a Fable agent at xhigh, read at the
-  source. X12.2's promise states the ward's line and the card's once each and no order between them, and D11.5, a
-  closed rule, orders the handlers of one plan alone, so the card's plan writes to a list of its own outside the
-  slot and each list is read whole. An order of an app event's handlers across plans, as D17.3 orders a callback
-  property's listeners, held at `Ownership.tla`'s Raise, waits for the owner's yes. The owner can overrule it.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on the order of an app event's handlers across plans: "I'll
+  go with your recommendation". An app event's handlers run in the order they subscribed, as D17.3 orders a
+  callback property's listeners: a page's plans in the order the page holds their scripts, a slot's when its load
+  starts them, a reloaded slot's after every handler still live, so a slot the server rendered hears before its
+  page (D11.5, M1.D2, `Ownership.tla`'s HandlersHearInTheOrderTheySubscribed, killed by LoadRestartsThePage, from
+  the orders designer's answer). X12.2's call list is one list again, read in order.
 - The lead, 2026-11-14, landing `Run.tla`'s order of a new run under replace from the orders designer's answer, a
   Fable agent at xhigh, read at the source. A run that the old run's own step raises under replace begins at the
   old run's first return after its cut, waiting or ended, and by then a `Finally` layer the old run's requests had

@@ -2648,9 +2648,11 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   `Run.tla:WritesAfterTheTurnAreRefused`).
 - D11.5 The order is closed:
   - The steps after an awaited step run after it settles.
-  - Two handlers of one event run in the order the plan subscribed them, each up to its first awaited
-    step before the next starts. After that, their runs go on as their awaits settle, and a stop ends
-    only its own handler (Q4).
+  - Two handlers of one event run in the order they subscribed (D17.3), each up to its first awaited step before
+    the next starts: two of one plan in the plan's order, and across plans a page's plans in the order the page
+    holds their scripts, a slot's plans when its load starts them and a reloaded slot's after every handler still
+    live, so a slot the server rendered hears before its page (`Ownership.tla:HandlersHearInTheOrderTheySubscribed`).
+    After that, their runs go on as their awaits settle, and a stop ends only its own handler (Q4).
   - `Parallel` starts its branches in authored order in one turn, each up to its first awaited step. The
     steps after `Parallel` run once, after every branch settled, and a stop in a branch ends only that
     branch (D10.10).
@@ -2799,6 +2801,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `Run.tla:DisposedRunNeverWaits`
 - `Run.tla:ReplacedFinallyGoesOn`
 - `Run.tla:TheOldFinallyRunsBeforeTheNewRun`
+- `Ownership.tla:HandlersHearInTheOrderTheySubscribed`
 - `probe:abort-signal-keeps-first-reason`
 - `probe:fetch-aborted-signal-sends-nothing`
 - `Absence.tla:UnawaitedPromiseStops`
@@ -3074,6 +3077,7 @@ plans name.
 - `Ownership.tla:EveryOwnerReleasedPastAThrow`
 - `Ownership.tla:ThrownListenerRunsNothing`
 - `Ownership.tla:StepReplacesTheContent`
+- `Ownership.tla:HandlersHearInTheOrderTheySubscribed`
 - `SlotHolds.tla:AStepOverANamedSlotThatHoldsContentStops`
 - `SlotHolds.tla:AStepOverANamedSlotThatHoldsNoneStops`
 - `SlotHolds.tla:AStepOverContentInASlotNoPlanNamesStops`

@@ -74,10 +74,10 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
 - A care screen's test sits in its module's folder under the screen it runs on, and reads its page by its
   address of `CarePages` in the world contract: `ArrayLambdas/Residents/WhenALambdaComparesWithAValueTheViewHolds.cs`
   is the pattern, the page of the opposite case opened in a second world.
-- A text that holds lines the handlers of more than one plan write is read whole only where the spec orders those
-  handlers. D11.5 orders the handlers of one plan, so where a promise states lines of two plans and no order
-  between them, each plan writes to an element of its own and each element is read whole (the lead's mistake,
-  2026-11-14: X12.2's test read the page's line before the card's in one call list).
+- A text that holds lines the handlers of more than one plan write is read whole only where the promise states
+  their order, as D11.5 orders an app event's handlers; where it states none, each plan writes to an element of its
+  own and each element is read whole (the lead's mistake, 2026-11-14: X12.2's test read the page's line before the
+  card's before its promise stated that order).
 - A Fusion slice's test sits in a folder named for its slice under `FusionComponents/`, in the namespace of
   `FusionComponents/` alone, its first folder, as ALIS011 holds every file; the runner reads the slice of its shard
   unit from that folder, and the test opens a care screen's page

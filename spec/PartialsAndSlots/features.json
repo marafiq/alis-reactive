@@ -422,6 +422,7 @@
         "Ownership.tla:EveryOwnerReleasedPastAThrow",
         "Ownership.tla:ThrownListenerRunsNothing",
         "Ownership.tla:StepReplacesTheContent",
+        "Ownership.tla:HandlersHearInTheOrderTheySubscribed",
         "Lanes.tla:FinallyRunsBeforeRelease",
         "Run.tla:NothingRunsAfterAnAbort",
         "SlotHolds.tla:AStepOverANamedSlotThatHoldsContentStops",
@@ -497,10 +498,10 @@
         },
         {
           "for": "X12.2",
-          "page": "A ward page whose Note a fall button raises the app event FallNoted and whose own handler adds \"The ward heard the note\" to the ward calls; Open Ada's card and Open Ben's card each load that resident's card into the card slot, and a card's plan handles FallNoted by adding \"{name} heard the note\" to the resident calls, a list the page holds outside the slot.",
+          "page": "A ward page whose Note a fall button raises the app event FallNoted and whose own handler adds \"The ward heard the note\" to the page's call list; Open Ada's card and Open Ben's card each load that resident's card into the card slot, and a card's plan handles FallNoted by adding \"{name} heard the note\" to the same list.",
           "gesture": "Click Open Ada's card, Open Ben's card and Open Ada's card, then Note a fall.",
-          "outcome": "The ward calls read \"The ward heard the note\" and the resident calls \"Ada Byron heard the note\", once each.",
-          "opposite": "Clicking Close the card and Note a fall again adds \"The ward heard the note\" alone: the ward calls read it twice, and the resident calls \"Ada Byron heard the note\" still.",
+          "outcome": "The call list's lines read, in order: \"The ward heard the note\", \"Ada Byron heard the note\", once each.",
+          "opposite": "Clicking Close the card and Note a fall again adds \"The ward heard the note\" alone, so the call list's lines read, in order: \"The ward heard the note\", \"Ada Byron heard the note\", \"The ward heard the note\".",
           "defect": "Each load subscribes the new card's handler beside those the loads before it left, so one note adds \"Ada Byron heard the note\" twice and \"Ben Okafor heard the note\" once.",
           "observes": "Ownership.tla:Raise"
         },

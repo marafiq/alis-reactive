@@ -23,13 +23,11 @@ public sealed class WhenACardIsLoadedIntoASlotThreeTimes(string host) : Conforma
         await ward.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Open Ada's card", Exact = true }).ClickAsync();
         await Expect(ward.Page.GetByRole(AriaRole.Heading, new PageGetByRoleOptions { Name = "Ada Byron", Exact = true })).ToBeVisibleAsync();
         await ward.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Note a fall", Exact = true }).ClickAsync();
-        await Expect(ward.Page.Locator("#ward-calls")).ToHaveTextAsync("The ward heard the note");
-        await Expect(ward.Page.Locator("#resident-calls")).ToHaveTextAsync("Ada Byron heard the note");
+        await Expect(ward.Page.Locator("#call-list")).ToHaveTextAsync("The ward heard the note Ada Byron heard the note");
 
         await ward.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Close the card", Exact = true }).ClickAsync();
         await Expect(ward.Page.GetByRole(AriaRole.Heading, new PageGetByRoleOptions { Name = "Ada Byron", Exact = true })).ToBeHiddenAsync();
         await ward.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Note a fall", Exact = true }).ClickAsync();
-        await Expect(ward.Page.Locator("#ward-calls")).ToHaveTextAsync("The ward heard the note The ward heard the note");
-        await Expect(ward.Page.Locator("#resident-calls")).ToHaveTextAsync("Ada Byron heard the note");
+        await Expect(ward.Page.Locator("#call-list")).ToHaveTextAsync("The ward heard the note Ada Byron heard the note The ward heard the note");
     }
 }
