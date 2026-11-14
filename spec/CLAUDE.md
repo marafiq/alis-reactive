@@ -1378,6 +1378,20 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   where it returns `ValidationProblem` today. On net10 it answers D10.8's body as MVC's validation problem, on net48
   as a JSON result IIS keeps as written (D10.8). X10.5's admission form stands on it on net10, its test red;
   X10.7, the same form under IIS, is placed on net48 and waits on that host.
+- The lead, 2026-11-13, declaring N10.4, a condition on a part a request sends, designed by a Fable agent at xhigh
+  (N10.4-FABLE.md of the handoff folder) and decided from its answer read at the source. A chained request and a
+  parallel branch are pipelines and take the pipeline's `When` (D10.16, D10.23), as X10.11's badge desk writes it. No
+  line wrote a part's form, so by G13 it is the owner's, and U3 declares the lead's proposal as a signature:
+  `PartsGuard` of `TriggersAndPipelines`, with `Then`, and `When` on each of the eight parts classes, each handing its
+  branch the stage that takes no body and no container, so the body and the container are named before the first
+  condition. A part a failed condition leaves out is never sent, and the endpoint binds the member's start (D10.16;
+  Request.tla's FailedConditionSendsNothing is X10.10's planted defect). A branch's parameter is the app's word for
+  what it sends, as X10.10's page names it note, since no parameter but the pipeline's hides an enclosing name
+  (`.claude/rules/csharp.md`); the callback table gains no row. Three things wait for the owner: the form; the
+  schema's contract, whose HttpSend gives a sent part its wire form alone, so the form needs a required field on each
+  sent part for its condition, which the owner adds; and D10.16's container's inputs, which the proposal leaves
+  without a door, since a container fixes the body's format, which takes no condition. X10.10 stands on it, its test
+  red.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

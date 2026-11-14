@@ -1,0 +1,24 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WellbeingCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Wellbeing check";
+    var plan = Html.ReactivePlan<WellbeingCheck>();
+}
+<h1>Wellbeing check for @Model.Resident</h1>
+@(Html.InputField(plan, m => m.IncludeNote, options => options.Label("Include note")).NativeCheckBox())
+@(Html.InputField(plan, m => m.Note, options => options.Label("Note")).NativeTextBox())
+<button type="button" @Html.Raises(plan, WellbeingChecks.Save)>Save</button>
+<p>Note saved: <span id="note-echo">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WellbeingChecks.Save, pipeline => pipeline
+        .Post<WellbeingNote>(WellbeingCheckEndpoints.Checks, request => request
+            .When(pipeline.Input(m => m.IncludeNote).Component<NativeCheckBox>().Checked)
+            .Then(note => note.Set(check => check.Note, pipeline.Input(m => m.Note).Component<NativeTextBox>().Value)))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("note-echo").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

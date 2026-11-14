@@ -2311,8 +2311,13 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `N10.2` new: `HttpResponse`, the contract of what `send` returns (`status`, `outcome`, `body`).
 - `N10.3` new: the standard retry policy of D10.14 in the defaults, its attempts and first wait, and a request's
   opting out; the door's form goes to gate 2.
-- `N10.4` new: a condition on a part a request sends, on a chained request and on a parallel branch (D10.16),
-  through the one condition core; its door's form goes to gate 2.
+- `N10.4` new: a condition on a part a request sends, on a chained request and on a parallel branch (D10.16), through
+  the one condition core; its door's form went to gate 2. A chained request and a parallel branch are pipelines and
+  take the pipeline's `When` (D10.16, D10.23's `chained` row). No line and no compiled sentence wrote a part's form,
+  so it is the owner's to decide (G13); U3 declares the lead's proposal as a signature: `PartsGuard<TParts>` with
+  `Then(branch)`, and `When(condition)` on each stage and body of a request's parts, whose branch is handed the stage
+  that takes no body and no container, so a member, a named input, a header and a file take a condition and a
+  container's inputs take none yet (the lead, 2026-11-13, `spec/CLAUDE.md`).
 - `N10.5` new: the condensed request of D10.17, whose default parts read the request's own parts; its form goes
   to gate 2.
 - `N10.7` new, the HTTP surface chosen 2026-11-08 from two independent designs (verdicts per axis in `spec/NOTES.md`),

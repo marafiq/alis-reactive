@@ -219,6 +219,7 @@ Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Path<TValue>(System.Lin
 Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.File(Alis.Reactive.RequestsAndResponses.BrowserFile! file) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!
@@ -239,6 +240,7 @@ Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.Text(string! text) -> Ali
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.UrlEncoded(Alis.Reactive.RequestsAndResponses.RequestContainer<TRequest>! container, System.Action<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.UrlEncoded(Alis.Reactive.RequestsAndResponses.RequestForm<TRequest>! form, System.Action<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.UrlEncoded(System.Action<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>! body) -> Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.BodiedParts<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>
 Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>.Component<TComponent>() -> TComponent!
 Alis.Reactive.TriggersAndPipelines.Branches<TModel>
@@ -343,6 +345,7 @@ Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Input<TValue>(System.Linq.
 Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
 Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
 Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>
 Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.File(System.Linq.Expressions.Expression<System.Func<TRequest, System.Collections.Generic.List<System.Web.HttpPostedFileBase!>!>!>! member, Alis.Reactive.Declarations.LiveObjects<Alis.Reactive.RequestsAndResponses.BrowserFile!>! files) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
 Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.File(System.Linq.Expressions.Expression<System.Func<TRequest, System.Web.HttpPostedFileBase?>!>! member, Alis.Reactive.RequestsAndResponses.BrowserFile! file) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
@@ -351,6 +354,7 @@ Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Input<TValue>(System.
 Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
 Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
 Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.MultipartBody<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.NoModel
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
@@ -384,6 +388,8 @@ Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess<TB
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PartsGuard<TParts>
+Alis.Reactive.TriggersAndPipelines.PartsGuard<TParts>.Then(System.Action<TParts!>! branch) -> TParts!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Component<TComponent>() -> TComponent!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Component<TComponent>(string! id) -> TComponent!
@@ -483,6 +489,7 @@ Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Path<TValue>(System.Li
 Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>
 Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Header<TValue>(string! name, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
@@ -492,6 +499,7 @@ Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Path<TValue>(System.Linq
 Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.QueryParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.RequestDefaults
 Alis.Reactive.TriggersAndPipelines.RequestDefaults.Antiforgery(Alis.Reactive.TriggersAndPipelines.AntiforgeryIn! place) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
 Alis.Reactive.TriggersAndPipelines.RequestDefaults.Finally(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<Alis.Reactive.TriggersAndPipelines.NoModel!>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.RequestDefaults!
@@ -518,6 +526,7 @@ Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Input<TValue>(System
 Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
 Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
 Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!
+Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.UrlEncodedBody<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Header<TValue>(string! name, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
@@ -527,6 +536,7 @@ Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Path<TValue>(System.
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue>!>! member, TValue value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
 Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.Query<TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!
+Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>.When(Alis.Reactive.ValuesAndSources.TypedSource<bool>! condition) -> Alis.Reactive.TriggersAndPipelines.PartsGuard<Alis.Reactive.TriggersAndPipelines.WholeBodyParts<TRequest>!>!
 Alis.Reactive.Validation.CascadeMode
 Alis.Reactive.Validation.CascadeMode.Continue = 0 -> Alis.Reactive.Validation.CascadeMode
 Alis.Reactive.Validation.CascadeMode.Stop = 1 -> Alis.Reactive.Validation.CascadeMode

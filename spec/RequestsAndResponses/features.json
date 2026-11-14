@@ -188,6 +188,14 @@
             "N10.7",
             "N9.6"
           ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<NoteRequest>(notesUrl, request => request.When(includeNote).Then(note => note.Set(r => r.Note, noteBox.Value)))",
+          "doors": [
+            "N10.7",
+            "N10.4"
+          ]
         }
       ],
       "nodes": [
