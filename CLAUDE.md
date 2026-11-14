@@ -80,8 +80,8 @@ keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s
      `"[check] every check passed."`; run the full check once at that head; push behind its first line, then the
      unit's STATE. `git ls-remote` equals HEAD after each push.
   7. The commit says what changed, its proof lines and what did not run, and a unit's last commit rewrites where
-     the rewrite stands (`spec/REWRITE.md`, section 4). A slip is said in one line and fixed in every place that
-     shares its cause, with no new mechanism built for it.
+     the rewrite stands (`spec/REWRITE.md`, section 4). A mistake is said in one line and fixed in every place
+     that shares its cause, with no new mechanism built for it.
 - `spec/tools/check.py` and `spec/plants` change in two cases: a check reports wrongly on correct content, or it passes
   a defect met in content. A new check waits for the owner's yes.
 
@@ -146,8 +146,8 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
   work that needs no answer never waits. A status to the owner says what is completed and what is open, in the plan's
   own words, never where a head is (the owner, 2026-11-11). A long run is wrapped in `caffeinate`.
 - A handoff is written after every push, since the harness compacts without warning. It holds the head, what landed
-  with its proof line, what is next, and no time but one `date` printed then (the lead's slip, 2026-11-11); the
-  lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.
+  with its proof line, what is next, and no time but one `date` printed then (the lead's mistake, 2026-11-11);
+  the lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.
 - To begin: `scripts/doctor.sh`, then the orient command above, which prints the branch against its remote, what is
   uncommitted, the last committed STATE, the owner's latest decisions and the handoff. Then read this file,
   `spec/REWRITE.md` sections 1 and 4, `spec/CLAUDE.md`'s standing decisions, the latest first, and the rule file of
@@ -157,14 +157,16 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
 
 ## Corrections
 
-A correction has one home, where the work happens. An owner's correction, a reversal of the lead's with no new fact,
-a fork's or an agent's mistake the lead corrected, and a slip of a session each become, the turn they happen, a line
+A correction has one home, where the work happens. An owner's correction, a reversal of the lead's with no new fact, a
+fork's or an agent's mistake the lead corrected, and a mistake of a session each become, the turn they happen, a line
 of the rule file that owns the subject: a test's in `.claude/rules/tests.md` or its project's own file, an analyzer's
 in `.claude/rules/analyzers.md`, C#'s in `.claude/rules/csharp.md` or its project's own file, the runtime's in
 `Alis.Reactive.Assets/CLAUDE.md`, the spec's and the owner's decisions in `spec/CLAUDE.md`, the plan's, the loop's, a
 session's and a fork's here. The line states the rule as a plain fact, with its date and whose words it is. Every
 mistake is also an entry of `spec/MISTAKES.md`, written the turn it is found, with its class, its cost and what holds
 the class. A class met twice is held too low: it moves up a rung in that unit. A piece begins by reading the classes.
+A mistake is called a mistake, in a rule line, a log entry, a commit and a message to the owner, never by a softer
+word (the owner, 2026-11-13: "know that slip is about you invented so you can avoid accountability about mistakes").
 
 ## Forks, agents and reviews
 
@@ -173,6 +175,12 @@ the class. A class met twice is held too low: it moves up a rung in that unit. A
   decides or words a rule. Its brief names the base SHA and carries the full bar, finished before anything reads it;
   it reads no secret or file that holds a credential, runs no git command beyond its own worktree and branch, and
   runs no command its brief does not name (the lead's correction of a fork, 2026-11-13).
+- A brief names every file of the harness its task meets, and the agent reads each before it writes: this file,
+  `spec/CLAUDE.md`'s owner decisions, the classes of `spec/MISTAKES.md`, and the rule file and the project's own
+  `CLAUDE.md` of each kind of file it reads, writes or proposes. Its reply opens with the rule lines it applied, each
+  by its file and line at the base SHA, and the lead reads each at the source before a word of the reply lands (the
+  owner, 2026-11-13: "Are you making your agents actually read the harness, like all the setup we have, or you are
+  just going, do whatever you want?").
 - A complex task or a critical decision, one whose error would drift the schema, spread across tests, a harness door
   or a spec line, or lower the bar, goes first to an agent on the latest Fable model at xhigh effort, briefed with its
   spec lines, the files and the constraints; the lead lands it from its answer, read at the source (the owner,

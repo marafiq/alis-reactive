@@ -55,12 +55,12 @@ A CLAUDE.md, a file under `.claude/rules` or `.claude/agents`, or a skill's `.cl
 `tests/Alis.Reactive.ArchitectureTests/WhenARuleNamesTheCode.cs` fails once what it names moves or is renamed. A path
 is written from the root or from the rule's folder, never with a line. Text the code writes goes in quotes (`"yyyy-MM-dd"`). A C# block quotes declarations as the code
 declares them, or is marked `csharp illustration`. What a rule cites from outside the repo goes on that test's list.
-A command a rule quotes with an option goes in a bash block, where the test reads each option against its script,
-and a tool under node_modules is cited by its npx command or its script, never by its path (the lead's slips,
+A command a rule quotes with an option goes in a bash block, where the test reads each option against its script, and
+a tool under node_modules is cited by its npx command or its script, never by its path (the lead's mistakes,
 2026-11-11). The test reads a command as a shell does: what stands inside quotes, single or double, is text it does
 not read, and outside them a word that holds a slash is read as a path. So the text of a planted defect and a value
-that is no path, a shard's fraction among them, are quoted, and a path or an option is written outside the quotes
-(the lead's slips, 2026-11-11).
+that is no path, a shard's fraction among them, are quoted, and a path or an option is written outside the quotes (the
+lead's mistakes, 2026-11-11).
 
 ## Workflow
 

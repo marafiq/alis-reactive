@@ -663,7 +663,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   re-reads after a compaction: the pins rule, and one loop of seven steps in its Spec-first section, each exit a
   line a tool printed. The loop replaces Workflow's five states and holds what a prompt had to repeat: read before
   writing, decide from the proof in hand, one meaning with every carrier, a rule proven by a refused and an accepted
-  case, the full check at the committed head before the push, a slip said in one line. The cut rewrites that file
+  case, the full check at the committed head before the push, a mistake said in one line. The cut rewrites that file
   within Claude Code's 200-line guide; until then it holds the redesign's sections too.
 - The lead, 2026-11-11, within the owner's decisions of 2026-11-06 (an analyzer is written as .NET's own are and
   enforces one line of the spec) and of 2026-11-08 (a rule the source states is the compiler's): ALIS009's conditions
@@ -729,7 +729,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   as in flip notes, u corrected forks mistakes", each "linked to claude. so that we are not going in circles". So
   every correction has one home where the work happens: a reversal of the lead's ("flips must be linked to
   claude.mds...as in if flip apply to tests then there..."), a fork's or an agent's mistake the lead corrected, a
-  slip of a session and an owner's correction each become a rule line in the rule file that owns the subject, and
+  mistake of a session and an owner's correction each become a rule line in the rule file that owns the subject, and
   the record of it names that file. The framework's projects hold one simple rule for code that compiles for net48
   and net10.0 in their own rule file ("a simple rule will solve that for ever in local project"). When and where a
   fork is used is stated once, since "all of that is known at this point after extensive sessions, pocs, tla+ work".
@@ -1344,7 +1344,7 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   read as nothing as X7.7's first opposite had it, a read that keeps the inputs it first found, a missing member read
   as nothing), and four witnesses. A spec's mutant fails its own invariant wherever it fails any, read by running the
   mutant under the invariant that every other holds or its own fails, since TLC's workers find states in no fixed
-  order and the tlc check reads the first invariant violated (the lead's slip, 2026-11-13). X8.4's and X7.7's pages
+  order and the tlc check reads the first invariant violated (the lead's mistake, 2026-11-13). X8.4's and X7.7's pages
   test ReadIsWhatTheEndpointBinds and X13.2's OneValueOnEveryHost; X13.6 and X13.10 test ReadStopsWhenItsSendStops, a
   slot's second input under the name and a container the page lacks, X13.7 AnUnsentMemberReadsWhatTheEndpointBinds,
   X13.8 ReadSeesTheSlotThatJoinedOrLeftBeforeIt and X13.9 ReadFindsWhatItsContainerSends, each test red. The owner can
@@ -1547,4 +1547,4 @@ change it, append what was decided to `spec/NOTES.md`, commit by path, run `pyth
 and push the spec branch the one way section 16 of the brief allows, then `spec/STATE.json` as that run wrote it.
 A plant names the text it replaces, so a commit that rewrites a line of the spec moves the anchor of each plant that
 names it in the same commit, and the plants of the checks that read the line run before the full check (the lead's
-slips, 2026-11-11).
+mistakes, 2026-11-11).

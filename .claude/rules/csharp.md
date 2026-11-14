@@ -13,7 +13,7 @@ differ. A guard clause stays on one line, and CA1822 looks only at private membe
 `.editorconfig` raises to a warning, and `scripts/check.sh` fails on any file the formatter would change. Never
 format by hand or by script. A rule raised there reaches code the solution does not hold, `poc/` and what `spec/api`
 compiles against it: the older line's folders keep the rules they were written under, by that file's last section,
-and a newly raised rule is built over `spec/api` too before its commit (the lead's slip, 2026-11-11).
+and a newly raised rule is built over `spec/api` too before its commit (the lead's mistake, 2026-11-11).
 
 ## The public surface
 

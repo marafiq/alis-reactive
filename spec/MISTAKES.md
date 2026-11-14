@@ -3,7 +3,7 @@
 The log of the rewrite's mistakes, and the way the work improves by it (the owner, 2026-11-12, verbatim in
 `spec/NOTES.md`). It is append-only. An entry is written the turn a mistake is found, before the work goes on, by
 whoever found it. The mistakes of the sessions before this log began are the dated lines of the rule files that own
-them, each marked as the lead's slip, and are not copied here.
+them, each marked as the lead's mistake, and are not copied here.
 
 ## How the log is kept and read
 
@@ -49,6 +49,8 @@ them, each marked as the lead's slip, and are not copied here.
 | A proof line picked by a pattern that matched another run's line | 1 | A step a script shows: a commit message's writer reads a test project's result line after that project's own `[check] dotnet test` marker in the gate's log and asserts the line names the project's assembly, as the handoff's writer reads it. |
 | A command run on a guess of what it does | 3 | A rule line: root CLAUDE.md's forks line, a fork runs no command its brief does not name. Since its second entry, a step a script shows: the session's browser runner reads each option it passes against the usage block of `scripts/playwright.sh` and stops, with nothing run, on one the block does not name. Since its third entry, a step a command shows: the session's commands enter a scratch folder only in a subshell, `( cd … )`. |
 | A refusal written as a member that exists only to fail, where no type can stage it | 1 | A rule line: `.claude/rules/csharp.md`, the public surface, no member exists only to refuse a call, and a defect no type stages is an analyzer's. The tool, the core's `Alis.Reactive/BannedSymbols.txt` refusing an obsolete mark, lands with the removal of D6.10's twelve overloads, which an earlier session landed before this log and the owner named with this entry. |
+| A softer word for the lead's mistake, which hides whose it is | 1 | A rule line: root CLAUDE.md's Corrections, a mistake is called a mistake in a rule line, a log entry, a commit and a message to the owner. |
+| A brief that left out the harness its task meets | 1 | A rule line: root CLAUDE.md's forks section, a brief names every file of the harness its task meets, and the agent's reply opens with the rule lines it applied. It reached the owner, so it starts a rung above, on a step a commit shows: a commit that lands an agent's work quotes the rule lines its reply opened with, each read at the source. |
 
 ## Waiting for the owner
 
@@ -718,3 +720,20 @@ them, each marked as the lead's slip, and are not copied here.
   their classes' counts in the table. Caught by the session's handoff writer after the push of 703cff621, whose
   assert read 105 counted against 107 entries before it wrote the handoff. Cost: one handoff rerun. The tool held
   it; the counts are moved here.
+- 2026-11-13, a softer word for the lead's mistake, the class's first entry, the lead's. Root CLAUDE.md's loop and
+  Corrections, and the dated lines of the rule files that record the lead's mistakes, called them slips: sixteen
+  words in eight files.
+  Caught by the owner, verbatim: "Why there has been so many slips? What's going on? And know that slip is about you invented so you can avoid accountability about mistakes. So you start calling your slips."
+  Cost: the sixteen words reworded. Held by a rule line of root CLAUDE.md's Corrections. The entries of this log and
+  of `spec/NOTES.md` keep the words they were written with, since both logs are append-only.
+- 2026-11-13, a brief that left out the harness its task meets, the class's first entry, the lead's. Of the
+  session's twelve brief files, six named this log's classes, and the five of them that wrote pages named the rule
+  files of tests, views and C# and the test projects' own CLAUDE.md files too. The six that asked for a design named
+  none of this log; the slot-hold brief named root CLAUDE.md and spec/CLAUDE.md alone while its agent proposed six
+  Playwright promises, and the analyzer brief left out the cases project's CLAUDE.md and the C# and docs rule files.
+  One brief of twelve named the docs rule file, and none asked its agent to show the rules it applied.
+  Caught by the owner, verbatim: "Are you making your agents actually read the harness, like all the setup we have, or you are just going, do whatever you want?"
+  Cost: the analyzer agent was sent the five files its brief lacked while it ran, and the slot-hold answer's six
+  promises are read against the test rules before any lands. Held by a rule line of root CLAUDE.md's forks section
+  and, since it reached the owner, a step a commit shows: a commit that lands an agent's work quotes the rule lines
+  its reply opened with, each read at the source.

@@ -19,9 +19,9 @@ expects none.
 - A defect planted in a rule's reader fails a case named for it; one that no case fails on names a missing case.
   The build refuses an unread member or parameter, so a planted defect that leaves one does not compile and proves
   nothing: it is redone as a mutation that compiles. A copy the sweep restores is touched, since the build reads a
-  file's time, and a stale build passes for the restored code (the lead's slips, 2026-11-11). The copy is built and
-  read green before the first plant, with what the fixture runs beside the code, `node_modules` among it: a plant
-  on a copy that already fails proves nothing (the lead's slip, 2026-11-11).
+  file's time, and a stale build passes for the restored code (the lead's mistakes, 2026-11-11). The copy is built
+  and read green before the first plant, with what the fixture runs beside the code, `node_modules` among it: a plant
+  on a copy that already fails proves nothing (the lead's mistake, 2026-11-11).
 - `LintCases` holds the lint's refused and accepted files, which `WhenTheLintIsConfigured` lints; `LintCases/rows` is
   a slice table of its own, for the import rows.
 - `WhenAnAppRendersItsPages` and `WhenTheAppHoldsNoStaticState` read the conformance app as built, which this project
@@ -44,7 +44,7 @@ expects none.
 - `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
   result, over the tables and TRX files their cases write, and expect each refusal's own line. A case's tables
   hold what the real tools write: a fixture in the namespace of its first folder, as ALIS011 holds every test,
-  beside the folder `scripts/list-tests.cs` reads from the assembly's portable PDB (the lead's slip, 2026-11-13).
+  beside the folder `scripts/list-tests.cs` reads from the assembly's portable PDB (the lead's mistake, 2026-11-13).
 
 ```bash
 dotnet test tests/Alis.Reactive.ArchitectureTests

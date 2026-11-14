@@ -26,7 +26,7 @@ as the C# module whose nodes it executes, and `runtime/SliceTree.txt` is its sli
   code that a rule refuses is rewritten.
 - A rule of the lint is proven by a refused and an accepted file in `tests/Alis.Reactive.ArchitectureTests/LintCases`,
   which `WhenTheLintIsConfigured` lints with this configuration. A rule's refused and accepted cases are listed, one
-  fact each, before the rule is written (the lead's slip, 2026-11-12).
+  fact each, before the rule is written (the lead's mistake, 2026-11-12).
 - `runtime/SliceTree.txt` orders the module folders. A slice's file imports the files of its own folder and of the
   rows before its own, each by its file's name, and the table's last row is the dot, the bundle's entry
   `runtime/index.ts` beside it. A folder enters the table with its first file: the lint refuses every relative
