@@ -176,7 +176,12 @@
         "core:Q5",
         "core:Q6",
         "core:Q7",
-        "core:Q12"
+        "core:Q12",
+        "SlotHolds.tla:AStepOverANamedSlotThatHoldsContentStops",
+        "SlotHolds.tla:AStepOverANamedSlotThatHoldsNoneStops",
+        "SlotHolds.tla:AStepOverContentInASlotNoPlanNamesStops",
+        "SlotHolds.tla:AStepOverAnElementHoldingAHeldSlotStops",
+        "SlotHolds.tla:OnlyAHeldSlotStopsAStep"
       ],
       "defects": [
         {
@@ -233,7 +238,7 @@
           "page": "A card loaded into a slot, with a button that sets the slot's text.",
           "gesture": "Load the card, then click the button.",
           "outcome": "The step stops with one error that names the slot, and the card stays as it was loaded.",
-          "opposite": "Once the card's plan leaves and the slot holds no loaded content, the same button sets the text.",
+          "opposite": "Once the card's plan leaves and the slot holds no content a load or the server put there, the same button sets the text.",
           "defect": "A text write over a slot leaves the loaded card's behavior running under content it no longer shows."
         },
         {

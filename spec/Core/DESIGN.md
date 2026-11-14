@@ -3037,6 +3037,12 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   - The browser holds each slot a live plan names, as its plan starts, and each slot whose content has a live owner
     (what a load or the server put there); each hold leaves with its owner. So content a closed card loaded into a
     slot outside it stays held until that slot unloads.
+  - `spec/OwnershipAndState/SlotHolds.tla` checks the holds over every order of loads, unloads and content writes by a
+    page and a card, over the slot the card is loaded into, the card's own slot and a notes slot outside the card, the
+    server's content included: a step stops over a slot a live plan names that holds content, the card's own step over
+    the slot it was loaded into among them, over one a live plan names that holds none, over content in a slot no live
+    plan names and over an element that holds a held slot, and nothing else stops it. Every door that writes a content
+    `set` rests on the five.
 
 **Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
 the statement `listen`, and `Handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
@@ -3058,6 +3064,11 @@ plans name.
 - `Ownership.tla:EveryOwnerReleasedPastAThrow`
 - `Ownership.tla:ThrownListenerRunsNothing`
 - `Ownership.tla:StepReplacesTheContent`
+- `SlotHolds.tla:AStepOverANamedSlotThatHoldsContentStops`
+- `SlotHolds.tla:AStepOverANamedSlotThatHoldsNoneStops`
+- `SlotHolds.tla:AStepOverContentInASlotNoPlanNamesStops`
+- `SlotHolds.tla:AStepOverAnElementHoldingAHeldSlotStops`
+- `SlotHolds.tla:OnlyAHeldSlotStopsAStep`
 - `Lanes.tla:FinallyRunsBeforeRelease`
 - `Run.tla:NothingRunsAfterAnAbort`
 - `probe:ej2-destroy-removes-instance`
@@ -3143,8 +3154,8 @@ plans name.
 - `X12.12` behavior (D12.9, R14.7): a card's step that writes over the slot the card was loaded into stops, and so
   does a page's step that writes over an element holding that slot, or over a slot an open card's plan unloads; the
   steps before it ran and the steps after it run nothing; so does one that writes over notes a closed card loaded
-  into a slot outside it. Once the only plan that named a slot leaves and the slot holds no loaded content, a step
-  writes over it.
+  into a slot outside it. Once the only plan that named a slot leaves and the slot holds no content a load or the
+  server put there, a step writes over it.
 - `X12.14` behavior (D12.8, D14.2): a card a slot loads listens to the page's monitor, reached by its element's id, and
   shows each reading the monitor raises; after the slot unloads, the monitor's next reading changes no card text,
   and the page's own `.Reactive` handler of the same event still shows it.
@@ -3371,8 +3382,9 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - At composition, in the browser:
     - R14.6 a plan holding an input id a live plan already holds is not started. One error names the id and
       both plans' views. A slot's content that renders an id the page holds is the same case.
-    - R14.7 a step that sets the text or HTML of an element a live plan holds as a slot, or of an element that holds
-      one, stops, with one error naming the slot (X12.12).
+    - R14.7 a step that sets the text or HTML of an element that is or holds a held slot, one a live plan names or
+      whose content has a live owner (D12.9), stops, with one error naming the first held slot at or inside the
+      element in document order (X12.12).
 - D14.7 A plan is a variable of its view: `Html.ReactivePlan<TModel>()` opens it, each door of the view that writes
   into it takes it, and `Html.RenderPlan(plan)`, the view's last line, writes it (N14.2). Every view of the POC is
   written so, and the view's markup stays flat, since no door wraps it. A block that nests the whole view and writes

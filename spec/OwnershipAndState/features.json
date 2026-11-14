@@ -200,7 +200,12 @@
         "Ownership.tla:RulesLeaveWithTheirOwner",
         "Ownership.tla:HubKeptWhileHeld",
         "Ownership.tla:OfferOnlyWhileHeld",
-        "Ownership.tla:EveryOwnerReleasedPastAThrow"
+        "Ownership.tla:EveryOwnerReleasedPastAThrow",
+        "SlotHolds.tla:AStepOverANamedSlotThatHoldsContentStops",
+        "SlotHolds.tla:AStepOverANamedSlotThatHoldsNoneStops",
+        "SlotHolds.tla:AStepOverContentInASlotNoPlanNamesStops",
+        "SlotHolds.tla:AStepOverAnElementHoldingAHeldSlotStops",
+        "SlotHolds.tla:OnlyAHeldSlotStopsAStep"
       ],
       "defects": [
         {

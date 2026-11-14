@@ -1491,6 +1491,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   ALIS042 (N18.16), a list's operation over a text, lands with its door in U11, where every operation throws until
   then. The analyzer agent's line it numbered X7.17 is X7.19, since X7.17 and X7.18 hold the joined text's browser
   promises.
+- The lead, 2026-11-14, landing `SlotHolds.tla`, module 18's, the ordering of D12.9's content write over a held slot,
+  from a Fable agent's design at xhigh (SLOTHOLDS-FABLE.md of the handoff folder) read at the source and run by the
+  lead. No spec held that ordering, which `Set` writes and every door that writes a content `set` shares, so it is
+  written before such a door is declared, as root CLAUDE.md requires. It is a spec of its own, since Ownership.tla
+  holds no slot outside its card, no element around a slot and no write, and module 18's Boundaries now give it the
+  holds a slot keeps. A page and a card, the slot the card is loaded into, the card's own slot and a notes slot
+  outside it, from three boots of what the server put there: five invariants, each killed by its mutant
+  (OwnSlotUnchecked, ContentPlanHoldsNothing, SlotOwnerHoldsNoKey, OwnElementOnly, HoldSurvivesRelease), each mutant
+  failing its own invariant wherever it fails any, and twelve witnesses. Three carriers stated the hold of a live plan
+  alone, where D12.9 holds a slot by its content too: schema.md's `set` row, R14.7 and X12.12's last sentence say both
+  now. R14.7's one error names the first held slot at or inside the element in document order, so an element that
+  holds several names one. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
