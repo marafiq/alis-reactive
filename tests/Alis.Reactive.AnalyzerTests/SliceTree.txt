@@ -1,2 +1,2 @@
 .
-Analyzers PartialsAndSlots
+Analyzers PartialsAndSlots ValuesAndSources

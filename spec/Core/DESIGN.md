@@ -1239,6 +1239,11 @@ Terms used throughout:
   `Property<T?>` or `WriteOnly<T?>` takes a `T` source (N7.6). At an argument and in a comparison, where C# offers no
   such overload, it goes through `OrNull()` (N7.5), which writes nothing of its own, and a narrower reference type
   reaches an argument through the declaration's `Pass`, a door Q5 keeps for the component author.
+  A text a position takes is written into the plan where the view renders, so a source .NET makes a text of is the
+  name of its type. C# joins a `string` with any object by `+` and `+=`, fills an interpolation hole with any value
+  and gives every object `ToString()`, and the static methods of `string`, `Concat`, `Format` and `Join` among them,
+  take any object; no type refuses them. ALIS043 refuses each at build (N18.17), and `pipeline.Concat` joins a text
+  from sources (N7.7). The render receives a text like any other and refuses nothing.
 - D7.4 One builder makes an object from sources, member by typed member, and the dispatch payload, a method
   or plugin argument and a property write all use it. One door makes a list from sources.
 - D7.5 Every condition operator takes a source for each operand: the text tests, `MinLength`, `Between`,
@@ -1404,6 +1409,11 @@ Terms used throughout:
 - `X7.18` behavior (N7.7, D3.11): a joined text's number part shows as the server writes it under the view's culture:
   a trace dose of 0.00005 grams, a `double`, joined between "Dose " and " g" shows "Dose 5E-05 g", where JavaScript's
   own conversion of the number writes "Dose 0.00005 g" (`Schema.tla:JoinedPartsAreTexts`).
+- `X7.19` analyzer (D7.3): a call bell's status set to "rang " joined with the bed's name, a `string` source, by `+`,
+  `+=`, an interpolation hole, `ToString()`, `string.Concat`, `string.Format` or `string.Join`: "'{source}' is a
+  source, read in the browser when its step runs, and .NET makes a text of it here, the name of its type; pass
+  '{source}' itself where a source is taken, and join it into a text with pipeline.Concat." At build by ALIS043:
+  new:N18.17.
 
 ## Q8. Conditions: three kinds
 
@@ -4839,6 +4849,12 @@ shapes, starts and the payload's path of each event.
   type is or implements `ITypedSource<string>`, reported at that source (D6.10, M4.X1). No type refuses it, and the
   twelve overloads marked obsolete as errors that an earlier session landed for it held twelve of the operations and
   left the six orders open; they leave, since no member exists only to refuse a call.
+- `N18.17` new: ALIS043, the joined text analyzer: a source .NET makes a text of, by `+` or `+=` with a `string`, an
+  interpolation hole, `ToString()` or a static method of `string`, reported at the source (D7.3, X7.19). The set is
+  closed by two facts: the conversions C# itself defines, and the static methods of the one type `string`. An `object`
+  parameter of any other method and Razor's `@` get no report, since the rule cannot prove what that method does with
+  the source, and neither does a source a second variable holds, which the rule does not follow. It lands in U3 by the
+  owner's yes of 2026-11-13, since the thin path's text door takes any .NET text.
 - `N18.12` new: ALIS034, the declaration analyzer: a constant vendor or plugin name outside its characters or with a
   dot (D17.3, D17.14), an argument at a position on a declaration that is neither an event's payload nor a
   callback's arguments (D17.4), two constant definitions of one vendor name whose data differ in one compilation

@@ -53,6 +53,8 @@ Kept from the core, each the analyzer that holds its rule:
 - `N18.15` ALIS041, the plan analyzer: a plan a view opens and never renders, renders twice, or hands to a door after
   it rendered (D14.7).
 - `N18.16` ALIS042, the text list analyzer: an operation of `DataLists` run over a source of text (D6.10).
+- `N18.17` ALIS043, the joined text analyzer: a source .NET makes a text of, by `+`, `+=`, an interpolation hole,
+  `ToString()` or a static method of `string` (D7.3).
 - `N6.3` `ReadsNothingSuppressor`, ALIS026 and ALIS027, and `N9.5` `RequestKeysSuppressor`, ALIS036, the two
   suppressors whose meanings are modules 4's and 6's; `N9.4` ALIS029, a file-shaped member in a GET or a JSON body;
   ALIS028, `ITypedSource<T>`'s analyzer (N6.4).
@@ -98,6 +100,7 @@ One id, one rule. Each analyzer id of both lines and the rewrite:
 | ALIS040 | a source whose nullability differs from its argument's or operand's | new (N18.14) |
 | ALIS041 | a plan a view opens and does not render once, last | new (N18.15) |
 | ALIS042 | a list's operation over a source of text | new (N18.16) |
+| ALIS043 | a source .NET makes a text of | new (N18.17) |
 
 ## Improvements
 

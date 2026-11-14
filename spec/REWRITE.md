@@ -953,6 +953,9 @@ ALIS041 holds the plan's two doors at build, in a view through the code Razor's 
 view's own line: a plan no line hands to `Html.RenderPlan`, a plan rendered twice and a door that takes the plan
 after it rendered. Where the build does not follow a view's code, a section among it, the render refuses the last
 two with the same sentence (D18.6).
+ALIS043 refuses at build a source .NET makes a text of, by `+`, `+=`, an interpolation hole, `ToString()` or a static
+method of `string`, in a view through the code Razor's generator writes and in a hand-written file, at the source
+(N18.17, X7.19); `pipeline.Concat` is the door its message names (N7.7).
 WhenAnAppRendersItsPages states its next cases: each plan a page renders is read against `plan.schema.json`, an
 MVC action is opened at its route, a route's parameter takes the value a link gives it, a page of the refusals
 area that refuses is accepted as refused by design, and a page whose door is not built is listed apart from a
@@ -1127,7 +1130,9 @@ its promise, failing. The module tests land here with their first tests, the sch
 `tests/Alis.Reactive.ModuleTests` with its rule file and its slice table, and vitest with the runtime's first
 `*.test.ts`. The thin path: one plan, opened and rendered by its view's two doors (N14.2), which ALIS041 holds and lands here
 (N18.15), with a load trigger (M1.N1) whose pipeline, one
-run of one block, sets an element's text (M5.N5, M5.N1), compiled for both hosts. The lint's two rules that read a
+run of one block, sets an element's text (M5.N5, M5.N1), compiled for both hosts. ALIS043 lands here too (N18.17), by
+the owner's yes of 2026-11-13, since that text door takes any .NET text and a source .NET makes a text of shows its
+type's name. The lint's two rules that read a
 path of the runtime land here, each with its refused and accepted file (section 2.7), and so do the core's banned
 symbols with WhenTheCoreIsCompiled, before the core's first code that reads a type. WhenAnAppRendersItsPages, which U2 lands over the World
 area's three addresses, meets its next cases here and states each with a refused and an accepted case: every plan a

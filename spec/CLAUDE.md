@@ -1485,6 +1485,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   analyzer line that takes their refusal, and the text a source is joined into by .NET gets a line of its own; a Fable
   agent at xhigh designs both rules (TEXT-ANALYZERS-FABLE.md of the handoff folder), and the lead decides them from
   its answer read at the source.
+- The owner, 2026-11-13 (verbatim in `spec/NOTES.md`), to the lead's recommendation from that answer: "Okay, go ahead,
+  add it to recommendation. So it is right. I already said yes." ALIS043 (N18.17), a source .NET makes a text of,
+  lands in U3, since the thin path's text door takes any .NET text and such a page shows the source's type name today;
+  ALIS042 (N18.16), a list's operation over a text, lands with its door in U11, where every operation throws until
+  then. The analyzer agent's line it numbered X7.17 is X7.19, since X7.17 and X7.18 hold the joined text's browser
+  promises.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

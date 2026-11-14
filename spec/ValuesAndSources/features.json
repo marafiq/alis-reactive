@@ -163,6 +163,10 @@
         {
           "id": "X7.18",
           "rung": "behavior"
+        },
+        {
+          "id": "X7.19",
+          "rung": "analyzer"
         }
       ],
       "promises": [
