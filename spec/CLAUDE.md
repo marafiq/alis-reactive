@@ -1570,9 +1570,9 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   other holds, its own fails or it has failed before; and a spec's violates configs each list the invariant its
   name carries first, so a state where two fail names its own. A mutant that modeled two defects is narrowed within
   its own text, the base's states unchanged: Lanes' AllSettledEarly and ReplaceKeepsOld, Partials' IdWithoutPrefix and
-  CallbackProperty's Replace. Twelve specs read every mutant isolated and list their own first; Run.tla,
-  Ownership.tla, Composition.tla and Request.tla are read, and their configs ordered, with the orders landing. A new
-  TLC jar is read for both facts before its pin moves. The owner can overrule it.
+  CallbackProperty's Replace. Thirteen specs read every mutant isolated and list their own first, Ownership.tla
+  among them; Run.tla is read, and its configs ordered, with the orders landing, then Composition.tla and
+  Request.tla. A new TLC jar is read for both facts before its pin moves. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
