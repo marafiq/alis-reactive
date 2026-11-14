@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model FallWatch
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Fall watch";
+    var plan = Html.ReactivePlan<FallWatch>();
+}
+<h1>Fall watch of @Model.Ward</h1>
+<button type="button" @Html.Raises(plan, FallWatches.OpenAdasCard)>Open Ada's card</button>
+<button type="button" @Html.Raises(plan, FallWatches.OpenBensCard)>Open Ben's card</button>
+<button type="button" @Html.Raises(plan, FallWatches.CloseTheCard)>Close the card</button>
+<button type="button" @Html.Raises(plan, FallWatches.FallNoted)>Note a fall</button>
+<section id="card-slot" aria-label="Card"></section>
+<h2>Ward calls</h2>
+<pre id="ward-calls"></pre>
+<h2>Resident calls</h2>
+<pre id="resident-calls"></pre>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(FallWatches.OpenAdasCard, pipeline => pipeline.Get(FallWatchEndpoints.AdasCard).Into("card-slot"))
+        .CustomEvent(FallWatches.OpenBensCard, pipeline => pipeline.Get(FallWatchEndpoints.BensCard).Into("card-slot"))
+        .CustomEvent(FallWatches.CloseTheCard, pipeline => pipeline.Unload("card-slot"))
+        .CustomEvent(FallWatches.FallNoted, pipeline => pipeline.Element("ward-calls").Text.Append("The ward heard the note\n")));
+}
+@Html.RenderPlan(plan)

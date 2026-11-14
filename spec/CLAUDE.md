@@ -1573,6 +1573,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   CallbackProperty's Replace. Thirteen specs read every mutant isolated and list their own first, Ownership.tla
   among them; Run.tla is read, and its configs ordered, with the orders landing, then Composition.tla and
   Request.tla. A new TLC jar is read for both facts before its pin moves. The owner can overrule it.
+- The lead, 2026-11-14, landing X12.2's page from the orders designer's answer, a Fable agent at xhigh, read at the
+  source. X12.2's promise states the ward's line and the card's once each and no order between them, and D11.5, a
+  closed rule, orders the handlers of one plan alone, so the card's plan writes to a list of its own outside the
+  slot and each list is read whole. An order of an app event's handlers across plans, as D17.3 orders a callback
+  property's listeners, held at `Ownership.tla`'s Raise, waits for the owner's yes. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

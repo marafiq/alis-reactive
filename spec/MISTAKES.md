@@ -56,6 +56,7 @@ them, each marked as the lead's mistake, and are not copied here.
 | A slice's name written in another form than its declaration's | 1 | The tool: `spec/tools/check.py`'s app check, which reads a page's slice by the name its declaration gives it, held it before the push. |
 | A restore run on a file the next step reads | 1 | A step a script shows: the session's push script stops, with nothing pushed, when `spec/STATE.json` holds no change from the full check or anything else tracked is changed, its refused case met once with the remote unchanged. |
 | A standard stated for every spec and run on the new ones alone | 1 | A step a commit shows: the isolation is run over each TLA+ spec with none on record, each spec's last line quoted in its commit. |
+| A test's expected value its promise does not state | 1 | A rule line: `tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md`, a text that holds lines of more than one plan's handlers is read whole only where the spec orders those handlers, else each plan writes to an element of its own. |
 
 ## Waiting for the owner
 
@@ -849,3 +850,11 @@ them, each marked as the lead's mistake, and are not copied here.
   read 40 of 40. The step the class rests on did not hold twice in one session: the session's full-check script now
   keeps an earlier log of its head itself, so no command needs a step before it, and the hook, the tool rung, waits
   for the owner's yes.
+- 2026-11-14, a test's expected value its promise does not state, the class's first entry, the lead's, through
+  the record page-writer's commit 52befc2dc. X12.2's test read the call list as one text, the ward's line before
+  Ada's, where the promise states the two lines once each and no order, and D11.5 orders the handlers of one plan
+  alone; the fork's message rested the order on D17.3, which orders a callback property's listeners. Caught by
+  the orders designer's reading, before the landing. Cost: the commit waited a night unlanded, and the page and
+  its test were rewritten: the card's plan writes to a list of its own outside the slot. The order across plans
+  goes to the owner as one line, since D11.5 is a closed rule. Held by a rule line in the Playwright tests'
+  CLAUDE.md, the class's row.
