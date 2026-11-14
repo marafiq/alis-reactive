@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.BannedApiAnalyzers;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
 using NUnit.Framework;
 
@@ -14,11 +15,13 @@ public class WhenTheCoreIsCompiled
 {
     private const string Core = "Alis.Reactive/";
     private const string Banned = "RS0030";
+    private const string MadeByItsParameterlessConstructor = "System.Activator.CreateInstance";
     private const string OnlyWhereListed = "the core reads type information only where the owner's list names the file and the member (spec/Core/DESIGN.md, D18.1)";
 
     private static readonly string[] TypeReadsTheOwnerLists =
     [
         "RenderingAndDelivery/ViewPlans.cs System.Type.FullName",
+        "TriggersAndPipelines/Pipeline.cs System.Activator.CreateInstance",
     ];
 
     private static readonly string[] HoldersOfTypeInformation =
@@ -80,6 +83,24 @@ public class WhenTheCoreIsCompiled
                 "Ward/Nurse.cs:5: reads System.Delegate.Target; " + OnlyWhereListed,
                 "Ward/Nurse.cs:6: reads System.ComponentModel.TypeDescriptor.GetProperties; " + OnlyWhereListed,
             }));
+
+    [RefusedCase]
+    public void a_new_object_of_a_type_parameter_is_refused_as_the_activator_read_it_compiles_to()
+        => Assert.That(
+            Problems([new("Ward/Nurse.cs", "namespace Ward;\ninternal static class Nurse\n{\n    internal static T Made<T>() where T : new() => new T();\n}\n")], []),
+            Is.EqualTo(new[] { "Ward/Nurse.cs:4: reads System.Activator.CreateInstance; " + OnlyWhereListed }));
+
+    [AcceptedCase]
+    public void a_new_object_of_a_named_class_is_accepted()
+        => Assert.That(
+            Problems([new("Ward/Nurse.cs", "namespace Ward;\ninternal sealed class Nurse\n{\n    internal static Nurse Made() => new Nurse();\n}\n")], []),
+            Is.Empty);
+
+    [AcceptedCase]
+    public void a_new_object_of_a_type_parameter_where_the_list_names_it_is_accepted()
+        => Assert.That(
+            Problems([new("Ward/Nurse.cs", "namespace Ward;\ninternal static class Nurse\n{\n    internal static T Made<T>() where T : new() => new T();\n}\n")], ["Ward/Nurse.cs System.Activator.CreateInstance"]),
+            Is.Empty);
 
     [RefusedCase]
     public void a_read_the_list_names_for_another_file_is_refused()
@@ -182,10 +203,18 @@ public class WhenTheCoreIsCompiled
     }
 
     private static IEnumerable<Read> ReadsOf(SyntaxTree tree, SemanticModel model)
+        => NamedReadsOf(tree, model).Concat(MadeReadsOf(tree, model));
+
+    private static IEnumerable<Read> NamedReadsOf(SyntaxTree tree, SemanticModel model)
         => tree.GetRoot().DescendantNodes().OfType<SimpleNameSyntax>()
             .Select(name => (Name: name, Member: TypeInformationOf(model.GetSymbolInfo(name).Symbol)))
             .Where(read => read.Member != null)
             .Select(read => new Read(tree.FilePath, LineOf(read.Name.GetLocation()), read.Member!));
+
+    private static IEnumerable<Read> MadeReadsOf(SyntaxTree tree, SemanticModel model)
+        => tree.GetRoot().DescendantNodes().OfType<BaseObjectCreationExpressionSyntax>()
+            .Where(made => model.GetOperation(made) is ITypeParameterObjectCreationOperation)
+            .Select(made => new Read(tree.FilePath, LineOf(made.GetLocation()), MadeByItsParameterlessConstructor));
 
     private static string? TypeInformationOf(ISymbol? symbol) => symbol switch
     {

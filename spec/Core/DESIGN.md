@@ -4764,8 +4764,9 @@ plans (Q19).
   listed at gate 1 (D18.1, N18.1): the members of `System.Reflection` that list, read, write or invoke members or read
   attributes, `Activator`, `Type.GetType` by name and `Expression.Compile`, except the owner's exceptions D18.1
   lists. It reads operations, not names: `new T()` over a type parameter, an `ITypeParameterObjectCreationOperation`
-  whose source never names `Activator`, is an `Activator` read, which `WhenTheCoreIsCompiled`, reading the names the
-  source writes, misses. A type's identity stays open to the framework (D18.1). The POC bans the whole `System.Reflection`
+  whose source never names `Activator`, is an `Activator` read, which `WhenTheCoreIsCompiled` reads from that operation
+  beside the names the source writes, and the core's one, in `Pipeline.Component<TComponent>(id)`, is on the owner's
+  list (C12). A type's identity stays open to the framework (D18.1). The POC bans the whole `System.Reflection`
   namespace; each owner-listed read of it sits in a method that carries `SuppressMessage` for RS0030, and the list
   of D18.1 holds every read.
 - D18.5 Every door on the public surface is typed (ALIS009). The three strings of B13 become typed doors:
