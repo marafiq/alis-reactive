@@ -1,6 +1,7 @@
 import { assertNever, notBuilt, type Expression } from "../Schema/index";
-import { converted, heldOrNull, value, type Read } from "../ValuesAndSources/index";
+import { converted, got, heldOrNull, value, type Read } from "../ValuesAndSources/index";
 import type { Context } from "./context";
+import { read } from "./data";
 import { located } from "./objects";
 
 export function evaluate(expression: Expression, context: Context): Read {
@@ -18,7 +19,9 @@ export function evaluate(expression: Expression, context: Context): Read {
     case "as":
       return converted(evaluate(expression.expr, context), expression.shape, context.plan.culture, context.plan.timeZone);
     case "get":
+      return got(evaluate(expression.target, context), expression.path, expression.members);
     case "data":
+      return read(evaluate(expression.target, context), expression.path);
     case "call":
     case "answer":
     case "record":
