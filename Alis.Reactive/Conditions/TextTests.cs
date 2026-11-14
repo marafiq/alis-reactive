@@ -59,7 +59,8 @@ public static class TextTests
     /// <param name="text">The text the test reads.</param>
     /// <param name="pattern">The regular expression.</param>
     /// <returns>A source that is true when the text matches the pattern.</returns>
-    public static TypedSource<bool> Matches(this ITypedSource<string?> text, string pattern) => throw new NotImplementedException();
+    public static TypedSource<bool> Matches(this ITypedSource<string?> text, string pattern)
+        => Tested(Operator.Matches, text, Literals.Text(BrowserPattern.CopyOf(pattern, reason => new InvalidOperationException("The pattern '" + pattern + "' " + reason))));
 
     /// <summary>Tests that the text is at least a number of characters long, counted as <c>string.Length</c> counts.</summary>
     /// <param name="text">The text the test reads.</param>

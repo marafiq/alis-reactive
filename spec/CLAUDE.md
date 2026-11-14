@@ -1618,6 +1618,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `Find`, the conformance component, a request), so a unit's run selected tests it cannot turn green. `landings.py` and
   the check that places each test read the views each test opens and the core's doors each view calls, and land the
   test in the unit that builds the last of them, the reader the line of 2026-11-12 left waiting.
+- The lead, 2026-11-14, building `Matches` (M3.N1) on D16.11's one reader, `Alis.Reactive/Conditions/BrowserPattern.cs`,
+  the first row its three doors share: no X line writes a pipeline condition's refusal of a pattern, so it is X6.38's
+  reason after "The pattern '{pattern}'", the subject X16.12 gives a rule's pattern, an `InvalidOperationException`
+  as every refusal where the view renders. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
