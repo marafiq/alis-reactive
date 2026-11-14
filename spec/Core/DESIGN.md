@@ -4732,9 +4732,11 @@ plans (Q19).
   - the assembly scan of validator registration: refused (Q16), `Add<TValidator>()` per validator;
   - the member scan that confirms a declaration's caller (`JsObject`): an analyzer checks at build time that a
     `Method`, `MethodAsync` or property declaration is called from the member it declares (N18.2). Built in POC 13e:
-    a door is the body of the property or method it declares, never in a constructor, finalizer, setter, indexer,
-    event accessor or static member, nor inside a condition, a lambda, another door's arguments or a body with other
-    statements, and its `declaredBy:` is the compiler's (ALIS023); its `name:`, `optional:`, `nullable:` and
+    a door is the body of the property or method it declares, called on the declaration's own object, never in a
+    constructor, finalizer, setter, indexer or event accessor, nor inside a condition, a lambda, another door's
+    arguments or a body that holds more than the call (another statement, a read past its result), and its
+    `declaredBy:` is the compiler's (ALIS023); a static member reaches a door only on another object, since the
+    compiler refuses the call on its own (CS0120); its `name:`, `optional:`, `nullable:` and
     `position:` are constants the build reads (ALIS024). An explicit interface member declares the JavaScript member
     of its simple name, as `[CallerMemberName]` names it;
   - the method scan for `PureMethodAttribute`: refused at gate 1 (C14); a model method carried into the plan is

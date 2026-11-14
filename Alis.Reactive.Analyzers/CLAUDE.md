@@ -2,8 +2,9 @@
 
 The compiler's rules, packed inside AlisReactive: each analyzer is one line of the spec that the build runs. A folder
 is named for the module whose lines its rules enforce; `Analyzers/` holds module 20's own, `ALIS009` to `ALIS013`,
-`TypeKnowledge/` holds `ALIS025`, an override's JSON name and ignore, `PartialsAndSlots/` holds `ALIS041`, the plan a
-view opens and renders, and `ValuesAndSources/` holds `ALIS043`, a source .NET makes a text of.
+`TypeKnowledge/` holds `ALIS023` to `ALIS025`, a declaration door's body and constants and an override's JSON name
+and ignore, `PartialsAndSlots/` holds `ALIS041`, the plan a view opens and renders, and `ValuesAndSources/` holds
+`ALIS043`, a source .NET makes a text of.
 
 ## The standard
 
