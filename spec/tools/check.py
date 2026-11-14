@@ -495,7 +495,7 @@ def spec_hash(tla, cfg):
 def run_tlc(tla, cfg):
     with tempfile.TemporaryDirectory() as meta:
         completed = subprocess.run(
-            [JAVA, f"-Djava.io.tmpdir={meta}", "-cp", str(TLA_JAR), "tlc2.TLC", "-deadlock", "-workers", "auto", "-metadir", meta, "-config", cfg.name, tla.name],
+            [JAVA, f"-Djava.io.tmpdir={meta}", "-cp", str(TLA_JAR), "tlc2.TLC", "-deadlock", "-workers", os.environ.get(TLC_WORKERS, "auto"), "-metadir", meta, "-config", cfg.name, tla.name],
             cwd=tla.parent, capture_output=True, text=True,
         )
     lines = (completed.stdout + completed.stderr).splitlines()
@@ -3061,6 +3061,7 @@ def check_no_comments():
 
 PLANTS = SPEC / "plants"
 PLANT_WORKERS = 4
+TLC_WORKERS = "ALIS_TLC_WORKERS"
 PLANT_EXEMPT = {"plants": "it runs every other check's plants"}
 PLANT_PASSED = {"CAUGHT", "KEPT"}
 PLANT_TIMEOUT = 1800
@@ -3068,6 +3069,17 @@ PLANT_TIMEOUT = 1800
 
 def plant_sets():
     return {path.stem: json.loads(path.read_text()) for path in sorted(PLANTS.glob("*.json"))}
+
+
+def plants_digest(sets):
+    planted = sorted({edit["file"] for plants in sets.values() for plant in plants for edit in plant.get("edits", [])})
+    sources = [Path(__file__).resolve(), *sorted(PLANTS.glob("*.json")), *(REPO / name for name in planted)]
+    digest = hashlib.sha256()
+    for path in sources:
+        digest.update(str(path.relative_to(REPO) if path.is_relative_to(REPO) else path.name).encode() + b"\0")
+        digest.update(path.read_bytes() if path.is_file() else b"absent")
+        digest.update(b"\0")
+    return digest.hexdigest()
 
 
 def plant_shape_problems(check_id, plants):
@@ -3142,8 +3154,10 @@ def planted_outcome(tree, check_id, plant):
                 return {"pass": None, "detail": f"{edit['file']} holds {edit['old'][:50]!r} {text.count(edit['old'])} times"}
             path.write_text(text.replace(edit["old"], edit["new"]))
         try:
+            workers = str(max(1, (os.cpu_count() or 1) // PLANT_WORKERS))
             completed = subprocess.run([sys.executable, str(tree / "spec" / "tools" / "check.py"), "--check", check_id],
-                                       capture_output=True, text=True, cwd=tree, timeout=PLANT_TIMEOUT)
+                                       capture_output=True, text=True, cwd=tree, timeout=PLANT_TIMEOUT,
+                                       env={**os.environ, TLC_WORKERS: workers})
         except subprocess.TimeoutExpired:
             return {"pass": None, "detail": f"{check_id} ran past {PLANT_TIMEOUT} s"}
         if completed.returncode != 0:
@@ -3163,7 +3177,7 @@ def plant_verdict(plant, outcome):
     return "CAUGHT" if outcome["pass"] is False and plant["expect"] in outcome["detail"] else "MISSED"
 
 
-def run_plants(sets):
+def run_plants(sets, tlc_runs=None):
     jobs = [(check_id, plant) for check_id, plants in sets.items() for plant in plants]
     if not jobs:
         return []
@@ -3181,6 +3195,8 @@ def run_plants(sets):
     try:
         for tree in trees:
             snapshot_worktree(tree)
+            if tlc_runs:
+                (tree / "spec" / "STATE.json").write_text(json.dumps({"checks": {"tlc": {"runs": tlc_runs}}}, indent=2, sort_keys=True) + "\n")
         with ThreadPoolExecutor(len(trees)) as pool:
             return [verdict for found in pool.map(work, range(len(trees))) for verdict in found]
     finally:
@@ -3190,15 +3206,19 @@ def run_plants(sets):
         subprocess.run(["git", "-C", str(REPO), "worktree", "prune"], capture_output=True)
 
 
-def check_plants():
+def check_plants(previous=None, tlc_runs=None):
     sets = plant_sets()
+    digest = plants_digest(sets)
+    prior = (previous or {}).get("checks", {}).get("plants", {})
+    if prior.get("pass") and prior.get("digest") == digest:
+        return {**prior, "detail": prior["detail"].split("; check.py and its plants unchanged")[0] + "; check.py and its plants unchanged since that run"}
     known = [check_id for check_id, _, _ in CHECKS if check_id not in PLANT_EXEMPT and check_id not in SKIPPED]
     problems = [f"spec/plants/{name}.json names no check of check.py" for name in sets if name not in known and name not in SKIPPED]
     for check_id, plants in sets.items():
         problems += plant_shape_problems(check_id, plants)
     if problems:
         return result(False, "; ".join(problems[:6]), problems=len(problems))
-    verdicts = run_plants({name: plants for name, plants in sets.items() if name in known})
+    verdicts = run_plants({name: plants for name, plants in sets.items() if name in known}, tlc_runs)
     problems += [f"{check_id} {verdict} {name}: {detail[:140]}" for check_id, name, verdict, detail in verdicts if verdict not in PLANT_PASSED]
     unrefused = [check_id for check_id in known if not any(plant.get("expect") for plant in sets.get(check_id, []))]
     unaccepted = [check_id for check_id in known if not any(plant.get("expect") is None for plant in sets.get(check_id, []))]
@@ -3208,8 +3228,10 @@ def check_plants():
     kept = sum(1 for verdict in verdicts if verdict[2] == "KEPT")
     proven = len(known) - len(set(unrefused) | set(unaccepted))
     detail = f"{caught} refused plants caught and {kept} accepted plants kept green; {proven} of {len(known)} checks proven both ways"
-    return result(not problems, "; ".join(problems[:6]) or detail, caught=caught, kept=kept, proven=proven, checks=len(known),
-                  failed=len(verdicts) - caught - kept, unrefused=len(unrefused), unaccepted=len(unaccepted))
+    outcome = result(not problems, "; ".join(problems[:6]) or detail, caught=caught, kept=kept, proven=proven, checks=len(known),
+                     failed=len(verdicts) - caught - kept, unrefused=len(unrefused), unaccepted=len(unaccepted))
+    outcome["digest"] = digest
+    return outcome
 
 
 WORLD_CONTRACT = REPO / "tests" / "Alis.Reactive.Conformance.World"
@@ -3357,6 +3379,8 @@ def run_checks(brief, previous):
             outcomes[check_id] = check_tlc(brief, previous, 4)
         elif check_id == "tlc":
             outcomes[check_id] = check_tlc(brief, {"checks": {"tlc": {"runs": {**previous.get("checks", {}).get("tlc", {}).get("runs", {}), **outcomes["core_tlc"]["runs"]}}}}, 5)
+        elif check_id == "plants":
+            outcomes[check_id] = check_plants(previous, outcomes.get("tlc", {}).get("runs"))
         else:
             outcomes[check_id] = function()
     return outcomes
