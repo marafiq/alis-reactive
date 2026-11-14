@@ -14,22 +14,22 @@
       "counts": {
         "cells": 117,
         "hosts": 20,
-        "placed": 466,
+        "placed": 469,
         "problems": 0,
         "rewrite": 0,
         "screens": 14
       },
-      "detail": "466 feature tests and 117 cell tests on 14 screens under 20 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
+      "detail": "469 feature tests and 117 cell tests on 14 screens under 20 hosts; no core test loads Syncfusion, a placed test reaches every D17.3 vendor kind on a conformance declaration, each Native or Fusion component a test's page names is held by a part it lists, and a test that fills a field or reads what the server sends lists the part that does it",
       "pass": true
     },
     "bindings": {
       "counts": {
-        "constants": 589,
+        "constants": 592,
         "gates": 73,
         "marks": 60,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 589 constants, 60 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 592 constants, 60 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -1327,7 +1327,7 @@
     "defects": {
       "counts": {
         "core_defects_unplaced": 0,
-        "defects": 619,
+        "defects": 620,
         "doubled": 0,
         "features": 112,
         "mapped": 8909,
@@ -1598,7 +1598,7 @@
         "mapped": 8909,
         "matrix_promised": 117,
         "matrix_runs": 117,
-        "promises": 466,
+        "promises": 469,
         "rows": 8909,
         "unmapped": 0
       },
@@ -1626,10 +1626,10 @@
       "counts": {
         "features": 112,
         "problems": 0,
-        "tests": 583,
+        "tests": 586,
         "units": 27
       },
-      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 2, U10 5, U11 16, U12 0, U13 98, U14 6, U15 28, U16 0, U17 0, U18 78, U19 18, U20 8, U21 50, U22 7, U23 129, U24 29, U25 32, U26 69, U27 3",
+      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 1, U5 1, U6 0, U7 0, U8 2, U9 2, U10 5, U11 16, U12 0, U13 98, U14 6, U15 28, U16 0, U17 0, U18 78, U19 18, U20 8, U21 52, U22 7, U23 130, U24 29, U25 32, U26 69, U27 3",
       "pass": true
     },
     "slice_tests": {
@@ -3638,160 +3638,187 @@
         "SlotHolds": {
           "SlotHolds.cfg": {
             "green": true,
-            "hash": "f3c7787a76adbb7c454fe6b0ebc3b6963ceb4402d93b5a5a86dfcea8c708e1d9",
+            "hash": "0743201b235532804fe4e842c1d4a0f802bcaf24be6fb0299c25625d9183b174",
             "line": "Model checking completed. No error has been found.",
-            "states": "13651 states generated, 492 distinct states found, 0 states left on queue.",
+            "states": "205955 states generated, 3760 distinct states found, 0 states left on queue.",
             "violated": []
           },
           "SlotHolds.violates.AStepOverANamedSlotThatHoldsContentStops.cfg": {
             "green": false,
-            "hash": "62efbcf35568440ef7f66493a0eaf2d6bfec91c8cf66ee120b8d650498369454",
+            "hash": "46bff4616ef9308657b592be2128cc50146f676696f5285a1539806bb33bba88",
             "line": "violated: AStepOverANamedSlotThatHoldsContentStops",
-            "states": "160 states generated, 57 distinct states found, 26 states left on queue.",
+            "states": "103 states generated, 48 distinct states found, 32 states left on queue.",
             "violated": [
               "AStepOverANamedSlotThatHoldsContentStops"
             ]
           },
           "SlotHolds.violates.AStepOverANamedSlotThatHoldsNoneStops.cfg": {
             "green": false,
-            "hash": "2fcfa0dde96158587b2e7c946b6b31dcb2a9c6ff207bb830d1cec16d47179883",
+            "hash": "eaa45407a7c3d3c4ac2b1710ee33b044604822d37c992fb4289ad944cbbe969b",
             "line": "violated: AStepOverANamedSlotThatHoldsNoneStops",
-            "states": "221 states generated, 82 distinct states found, 53 states left on queue.",
+            "states": "155 states generated, 58 distinct states found, 44 states left on queue.",
             "violated": [
               "AStepOverANamedSlotThatHoldsNoneStops"
             ]
           },
           "SlotHolds.violates.AStepOverAnElementHoldingAHeldSlotStops.cfg": {
             "green": false,
-            "hash": "dcc1534635fe1796c929fa0781ae62d6840b8f699e4a99758afef721d04510a3",
+            "hash": "036083d0acc316aece4f3d7564807a110b22387049f5170a57172b11b14b84b3",
             "line": "violated: AStepOverAnElementHoldingAHeldSlotStops",
-            "states": "165 states generated, 64 distinct states found, 41 states left on queue.",
+            "states": "41 states generated, 19 distinct states found, 15 states left on queue.",
             "violated": [
               "AStepOverAnElementHoldingAHeldSlotStops"
             ]
           },
           "SlotHolds.violates.AStepOverContentInASlotNoPlanNamesStops.cfg": {
             "green": false,
-            "hash": "77915cfcf80e8243113ec1230327eba4a3623f73e30af38843590cb85f368a3e",
+            "hash": "b16e32e47b727216026d83ae42b619cdfe9928122400f8356fe62f64356a8902",
             "line": "violated: AStepOverContentInASlotNoPlanNamesStops",
-            "states": "593 states generated, 171 distinct states found, 143 states left on queue.",
+            "states": "855 states generated, 171 distinct states found, 148 states left on queue.",
             "violated": [
               "AStepOverContentInASlotNoPlanNamesStops"
             ]
           },
+          "SlotHolds.violates.AStepOverWhatAStepAddedWrites.cfg": {
+            "green": false,
+            "hash": "0e5ef4d6bca32362af0c4e63f79315e2631479765275a2f98ac6bf38c7cacf3e",
+            "line": "violated: AStepOverWhatAStepAddedWrites",
+            "states": "799 states generated, 176 distinct states found, 154 states left on queue.",
+            "violated": [
+              "AStepOverWhatAStepAddedWrites"
+            ]
+          },
           "SlotHolds.violates.OnlyAHeldSlotStopsAStep.cfg": {
             "green": false,
-            "hash": "17477fd7f4428e2bf008e8617761b3dd74697047887a0a02f03d32180678b327",
+            "hash": "548ccbe09966ccaf714c45456a6b5ba3dddccb8a087ba84c2addaa51c8622754",
             "line": "violated: OnlyAHeldSlotStopsAStep",
-            "states": "989 states generated, 206 distinct states found, 164 states left on queue.",
+            "states": "1289 states generated, 230 distinct states found, 200 states left on queue.",
             "violated": [
               "OnlyAHeldSlotStopsAStep"
             ]
           },
           "SlotHolds.violates.ReachACardsOwnSlotStops.cfg": {
             "green": false,
-            "hash": "aa075dead1d23574d071a0a1956d00342f7a13512caab281a74d0b2ca9629611",
+            "hash": "3ada3148dca1baa420ee26ffdaf9fe385a12519bc694232f12f3943fff645b2c",
             "line": "violated: ReachACardsOwnSlotStops",
-            "states": "258 states generated, 89 distinct states found, 60 states left on queue.",
+            "states": "294 states generated, 89 distinct states found, 69 states left on queue.",
             "violated": [
               "ReachACardsOwnSlotStops"
             ]
           },
           "SlotHolds.violates.ReachACardsStepOverItsOwnSlotStops.cfg": {
             "green": false,
-            "hash": "116323a422e727ca0cda6a2bf72ae864bcf3a285b42696a94f8dc1ec52e76ccf",
+            "hash": "2d102218b7714261e70901213991ebb86c5223f591df8b3ce44768dbdc8dfd55",
             "line": "violated: ReachACardsStepOverItsOwnSlotStops",
-            "states": "155 states generated, 56 distinct states found, 26 states left on queue.",
+            "states": "42 states generated, 23 distinct states found, 16 states left on queue.",
             "violated": [
               "ReachACardsStepOverItsOwnSlotStops"
             ]
           },
           "SlotHolds.violates.ReachAPagesStepOverALoadedSlotAnOpenCardNamesStops.cfg": {
             "green": false,
-            "hash": "46bc9fdb0a169744ab36101d3e21c1731fe1bf9d53c7e1bac1981ed3cc6fc898",
+            "hash": "d02eb0cf263d5ae92f2bb6c61e5b461eeae41ccd0e1b8050c262463f568b4ff1",
             "line": "violated: ReachAPagesStepOverALoadedSlotAnOpenCardNamesStops",
-            "states": "497 states generated, 139 distinct states found, 105 states left on queue.",
+            "states": "1023 states generated, 210 distinct states found, 176 states left on queue.",
             "violated": [
               "ReachAPagesStepOverALoadedSlotAnOpenCardNamesStops"
             ]
           },
           "SlotHolds.violates.ReachAPagesStepOverTheElementHoldingTheCardStops.cfg": {
             "green": false,
-            "hash": "d17a7b5dd4ea7d88a4124ac8eb194d599d257cb181fd0985225fec53bdb73c79",
+            "hash": "e674e58d03b2e1b7f35093c27295a755d7fcc8813d36fba14cae359e64d73e0b",
             "line": "violated: ReachAPagesStepOverTheElementHoldingTheCardStops",
-            "states": "409 states generated, 134 distinct states found, 106 states left on queue.",
+            "states": "649 states generated, 161 distinct states found, 133 states left on queue.",
             "violated": [
               "ReachAPagesStepOverTheElementHoldingTheCardStops"
             ]
           },
           "SlotHolds.violates.ReachASlotItsOnlyPlanLeftTakesTheWrite.cfg": {
             "green": false,
-            "hash": "bc6b561c7f5d983c295520b606df8620bfae9cb11e511f4e7cbb5ce736e2b5f7",
+            "hash": "fe10a3f85bcaf79bc171db0644be4144bf487a4291357bc34af6731259c17cb5",
             "line": "violated: ReachASlotItsOnlyPlanLeftTakesTheWrite",
-            "states": "385 states generated, 127 distinct states found, 107 states left on queue.",
+            "states": "3784 states generated, 399 distinct states found, 317 states left on queue.",
             "violated": [
               "ReachASlotItsOnlyPlanLeftTakesTheWrite"
             ]
           },
+          "SlotHolds.violates.ReachAStepAddsOverAHeldSlot.cfg": {
+            "green": false,
+            "hash": "ff337e8550dfcbe4849060ec40b5a726991191a7e2a5cd4bbe3d80ac45c8afc5",
+            "line": "violated: ReachAStepAddsOverAHeldSlot",
+            "states": "840 states generated, 168 distinct states found, 143 states left on queue.",
+            "violated": [
+              "ReachAStepAddsOverAHeldSlot"
+            ]
+          },
           "SlotHolds.violates.ReachAStepOverASlotAnOpenCardNamesStops.cfg": {
             "green": false,
-            "hash": "100556d57336c1a54e4bfc26f0a35dfa2bc782507c07b308dc80b4a2bab8052c",
+            "hash": "2fd29ab583300df84b3d97520a93fd50b9e5abcaa688a7b25eadcce5d64d7b4c",
             "line": "violated: ReachAStepOverASlotAnOpenCardNamesStops",
-            "states": "336 states generated, 114 distinct states found, 88 states left on queue.",
+            "states": "590 states generated, 153 distinct states found, 125 states left on queue.",
             "violated": [
               "ReachAStepOverASlotAnOpenCardNamesStops"
             ]
           },
+          "SlotHolds.violates.ReachAStepWritesOverWhatAStepAdded.cfg": {
+            "green": false,
+            "hash": "5c9254d79d35c048a5c05abf80d07c9b577e5dd26c0eed246a16051c24cc3210",
+            "line": "violated: ReachAStepWritesOverWhatAStepAdded",
+            "states": "685 states generated, 154 distinct states found, 134 states left on queue.",
+            "violated": [
+              "ReachAStepWritesOverWhatAStepAdded"
+            ]
+          },
           "SlotHolds.violates.ReachAnElementHoldingNoSlotTakesTheWrite.cfg": {
             "green": false,
-            "hash": "452d62cc062b452382f2e422169c917f4ba17eb2498765d081b6fe486b8e890d",
+            "hash": "ec5145a0b5024321299e5a6b3b21af7e1df56a5b94642a567a7f1f9f170bc5df",
             "line": "violated: ReachAnElementHoldingNoSlotTakesTheWrite",
-            "states": "323 states generated, 116 distinct states found, 86 states left on queue.",
+            "states": "637 states generated, 148 distinct states found, 118 states left on queue.",
             "violated": [
               "ReachAnElementHoldingNoSlotTakesTheWrite"
             ]
           },
           "SlotHolds.violates.ReachAnEmptiedSlotStillStops.cfg": {
             "green": false,
-            "hash": "11c8f9f55bf4dfb48d19c41468f2c0af64c15487d564b38f30a23f48ee5787e8",
+            "hash": "55172ebb18ed57bb29c2e5434aabd337f7a0d36af2e501e12918577dcebab28b",
             "line": "violated: ReachAnEmptiedSlotStillStops",
-            "states": "863 states generated, 184 distinct states found, 139 states left on queue.",
+            "states": "5143 states generated, 539 distinct states found, 427 states left on queue.",
             "violated": [
               "ReachAnEmptiedSlotStillStops"
             ]
           },
           "SlotHolds.violates.ReachNotesAClosedCardLoadedStop.cfg": {
             "green": false,
-            "hash": "d7dad93588f04a5ae7b5121dab298b566958b81c0cde2a8e20b29ffa679dd42b",
+            "hash": "f144a1df5368b1bac95fc61a7bdda84dd6aaf8865331732e345c1b097770e33c",
             "line": "violated: ReachNotesAClosedCardLoadedStop",
-            "states": "979 states generated, 195 distinct states found, 149 states left on queue.",
+            "states": "3707 states generated, 393 distinct states found, 304 states left on queue.",
             "violated": [
               "ReachNotesAClosedCardLoadedStop"
             ]
           },
           "SlotHolds.violates.ReachNotesClearedBeforeTheirCardClosedTakeTheWrite.cfg": {
             "green": false,
-            "hash": "f2db39989f87eae187f386e5a201a9213e41d0a4b34bde4e69931c161d1865eb",
+            "hash": "126b9abb26582bf075e926040800e1a46df225d2c0c787322caa67a6ba025f18",
             "line": "violated: ReachNotesClearedBeforeTheirCardClosedTakeTheWrite",
-            "states": "5714 states generated, 386 distinct states found, 173 states left on queue.",
+            "states": "12885 states generated, 911 distinct states found, 657 states left on queue.",
             "violated": [
               "ReachNotesClearedBeforeTheirCardClosedTakeTheWrite"
             ]
           },
           "SlotHolds.violates.ReachNotesTheServerPutThereStop.cfg": {
             "green": false,
-            "hash": "0d95750a86a340992c2e88aa1a8296b7d8435d4ec19b87ac3a711135eaea6cb6",
+            "hash": "0881296984feb24683851bc175267ae5a1faf108594184c21215dd7416d4cc06",
             "line": "violated: ReachNotesTheServerPutThereStop",
-            "states": "389 states generated, 127 distinct states found, 106 states left on queue.",
+            "states": "458 states generated, 113 distinct states found, 97 states left on queue.",
             "violated": [
               "ReachNotesTheServerPutThereStop"
             ]
           },
           "SlotHolds.violates.ReachTheElementAroundAnEmptiedSlotStillStops.cfg": {
             "green": false,
-            "hash": "9d5b23664b9a7f2b3597b78f665faed2e392ca662098569b4e252b539c31f92c",
+            "hash": "f5d7a62b1fb1b8c7eb83a215e0a9c29d93ec0861264cd084d8a1f14165ce0506",
             "line": "violated: ReachTheElementAroundAnEmptiedSlotStillStops",
-            "states": "745 states generated, 159 distinct states found, 122 states left on queue.",
+            "states": "540 states generated, 125 distinct states found, 105 states left on queue.",
             "violated": [
               "ReachTheElementAroundAnEmptiedSlotStillStops"
             ]
@@ -4077,7 +4104,7 @@
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 51m 3h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 16m 2a, U10 5b 16m 10a, U11 16b 22m 24a, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 28b 12m 1a, U16 13m 4a, U17 21m 9a, U18 78b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 50b 14m 1a, U22 7b 4m, U23 129b, U24 29b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 51m 3h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 16m 2a, U10 5b 16m 10a, U11 16b 22m 24a, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 28b 12m 1a, U16 13m 4a, U17 21m 9a, U18 78b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 52b 14m 1a, U22 7b 4m, U23 130b, U24 29b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -4095,7 +4122,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "0a8a3bc276286434727b3b7e86ec04d2d99d43bd",
+  "read_at_head": "8e966b106a42598825b6fadb76d649cbb481468c",
   "step": {
     "failing": [],
     "name": "End of session",
