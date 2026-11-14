@@ -1,0 +1,28 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeAppLevelObjects
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@using Alis.Reactive.ValuesAndSources
+@model DischargeIntake
+@{
+    Layout = "/Care/Shell/_ShellLayout.cshtml";
+    ViewData["Title"] = "Discharge";
+    var plan = Html.ReactivePlan<DischargeIntake>();
+}
+<h1>Discharge intake of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, DischargeIntakeButtons.Save)>Save</button>
+<p>Saved: <output id="saved"></output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Get(CareEndpoints.DischargeIntakeAmendedName)
+            .OnSuccess<IntakeSave>((amended, pipeline) => pipeline.Dispatch(IntakeEvents.IntakeSaveRequested, amended.Body)))
+        .CustomEvent(DischargeIntakeButtons.Save, pipeline => pipeline.Dispatch(IntakeEvents.IntakeSaveRequested, new IntakeSave { Name = Model.Resident }))
+        .CustomEvent(IntakeEvents.IntakeSaveRequested, HandlerPolicy.Replace, (requested, pipeline) =>
+            pipeline.When(pipeline.Component<NativeConfirm>().Ask(pipeline.Concat("Save the intake for ", requested.Read(intake => intake.Name), "?").OrNull()))
+                .Then(pipeline => pipeline
+                    .Post<IntakeSave>(DischargeIntakeEndpoints.Saves, request => request.Set(save => save.Name, requested.Read(intake => intake.Name)))
+                    .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body)))));
+}
+@Html.RenderPlan(plan)

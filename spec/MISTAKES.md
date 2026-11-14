@@ -52,6 +52,7 @@ them, each marked as the lead's mistake, and are not copied here.
 | A softer word for the lead's mistake, which hides whose it is | 1 | A rule line: root CLAUDE.md's Corrections, a mistake is called a mistake in a rule line, a log entry, a commit and a message to the owner. |
 | A harness piece stated in force before it was seen to run | 1 | A step a commit shows: a change to the session's harness, an agent definition, a hook or a setting, is run live in the session before a rule line states it in force, and its commit quotes the line that ran it. It reached the owner in a pushed rule line, so it starts on this rung. |
 | A path or a name cited in a brief from memory, not from the tree | 1 | A step a command shows: before a brief goes out, each spec file, D line and TLA+ action it cites is found at its base by a command, and the brief is corrected where one is not; root CLAUDE.md's forks section states it. |
+| A wait on the harness with no page state read before it | 1 | A rule line: `tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md`, a test whose held request leaves as its page loads reads the page's own heading before it waits for the hold. |
 
 ## Waiting for the owner
 
@@ -770,3 +771,11 @@ them, each marked as the lead's mistake, and are not copied here.
   file; `$W` was empty, so the write aimed at `/../cites-append-form.sh` and the read-only root refused it. Caught by
   the shell's error. Cost: none; nothing was written, and the probe ran from its script. Held by the rule line; the
   tool rung, the twentieth entry's hook widened to the environment file, waits for the owner.
+- 2026-11-14, a wait on the harness with no page state read before it, the class's first entry, a fork's, which the
+  lead corrected. X17.8's test armed the answer gate, opened the page and waited for the hold at once; while the
+  page answers 500 at an unbuilt door, a navigation that returns in time leaves the hold's wait on HttpClient's
+  default of 100 seconds, so the lead's red run read "1 over budget" at 100.82s where the fork's had read the
+  navigation's timeout. Caught by the lead's red run before the landing. Cost: one more red run and one more gate.
+  Held by a rule line of the Playwright tests' CLAUDE.md: the test reads the page's heading before the hold's wait,
+  and it failed at that line in 0.98s; no other test waits for a hold straight after a navigation, by the session's
+  held-after-goto.py. A bound on the hold's wait is a harness door, the owner's.

@@ -93,11 +93,14 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   which names the address: a core test's page holds no component library, and `ConformanceFixture` reads every
   request of a world's page and of a person's. The last command below plants that script's link on the World area's
   pages and reads the refusal; the same plant with another script's name passes.
-- A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits
-  until the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
+- A test of an async lane holds the machine at one named TLA+ action: it arms the gate before its gesture, waits until
+  the harness reports it held, asserts the held state, and releases the held gate that wait returned. It never
   provokes an ordering by timing, by a stubbed network or by a control on the page. A test that holds one action at
-  two endpoints arms a hold for each, naming the endpoint by its constant of the world contract, and releases each
-  on its own (`Harness/WhenAGateIsHeldAtTwoEndpoints.cs`).
+  two endpoints arms a hold for each, naming the endpoint by its constant of the world contract, and releases each on
+  its own (`Harness/WhenAGateIsHeldAtTwoEndpoints.cs`). A test whose held request leaves as its page loads arms the
+  gate before it opens the page and reads the page's own heading before it waits for the hold, so a page that does not
+  render fails at that line and not at the hold's wait, which no measured wait bounds (the lead's correction of a
+  fork, 2026-11-14).
 - `Harness/measured.json` holds what 20 green runs measured: the budget of one test, four times the slowest test,
   and the two waits, each four times the slowest step of its kind, a navigation's and every other step's. The runner
   writes it (`--measure`) and fails a run that holds a test over the budget. `Harness/Waits.cs` sets the waits on

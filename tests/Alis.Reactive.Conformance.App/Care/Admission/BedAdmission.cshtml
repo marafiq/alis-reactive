@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BedAdmission
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admit to a bed";
+    var plan = Html.ReactivePlan<BedAdmission>();
+}
+<h1>Admit @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, BedAdmissions.Admit)>Admit</button>
+<p>Log: <output id="admission-log"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(BedAdmissions.Admit, pipeline =>
+    {
+        pipeline.Post(BedAdmissionEndpoints.Admissions)
+            .NoDefaults()
+            .OnSuccess(pipeline =>
+            {
+                pipeline.Element("admission-log").Text.Append("Admitted ");
+                pipeline.Post(CareEndpoints.BedAdmissionBeds);
+                pipeline.Element("admission-log").Text.Append("Bed assigned ");
+            })
+            .Finally(pipeline => pipeline.Element("admission-log").Text.Append("Finally "))
+            .Chained((admitted, pipeline) => pipeline.Element("admission-log").Text.Append("Chained "));
+        pipeline.Element("admission-log").Text.Append("After ");
+    }));
+}
+@Html.RenderPlan(plan)

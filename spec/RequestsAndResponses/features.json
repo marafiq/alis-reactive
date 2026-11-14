@@ -1386,7 +1386,7 @@
           "page": "The residents screen's Refresh counts runs Parallel: a GET of the wing's residents whose route appends residents to the activity log, and a GET of its discharges whose route appends discharges; the step after Parallel appends settled. The harness gates each GET (Lanes.tla's Settle).",
           "gesture": "Click Refresh counts; once the harness reports both GETs held, release the residents GET and wait until the log reads residents; then release the discharges GET.",
           "outcome": "Before the discharges' release the log reads residents; after it the log reads residents, discharges, settled, with settled once.",
-          "opposite": "With both GETs released together, the log ends with settled once.",
+          "opposite": "With the discharges GET released first, the log reads discharges, then discharges, residents, settled, with settled once.",
           "defect": "The steps after Parallel run after the first answer, so the log reads residents, settled, discharges; or once per branch, so settled shows twice.",
           "observes": "Lanes.tla:Settle"
         },

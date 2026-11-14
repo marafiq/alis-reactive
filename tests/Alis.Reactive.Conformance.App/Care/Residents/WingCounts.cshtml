@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WingCounts
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Wing counts";
+    var plan = Html.ReactivePlan<WingCounts>();
+}
+<h1>Counts of the @Model.Wing</h1>
+<button type="button" @Html.Raises(plan, WingCountsButtons.Refresh)>Refresh counts</button>
+<p>Activity log: <output id="activity-log"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WingCountsButtons.Refresh, pipeline =>
+    {
+        pipeline.Parallel(
+            pipeline => pipeline.Get(CareEndpoints.WingCountsResidents).OnSuccess(pipeline => pipeline.Element("activity-log").Text.Append("residents ")),
+            pipeline => pipeline.Get(CareEndpoints.WingCountsDischarges).OnSuccess(pipeline => pipeline.Element("activity-log").Text.Append("discharges ")));
+        pipeline.Element("activity-log").Text.Append("settled ");
+    }));
+}
+@Html.RenderPlan(plan)

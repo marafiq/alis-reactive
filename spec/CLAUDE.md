@@ -1524,6 +1524,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   that reads nothing adds nothing and the step after it runs; an append to an element the page lacks stops as every
   element step does, M5.X1's meaning (D4.1), so it has no page of its own; the append over a held slot is X12.12's
   sixth page. The owner can overrule each.
+- The lead, 2026-11-14, landing three gated pages on the append and the joined text from a page-writer's work on the
+  latest Fable model at xhigh, read at the source: X10.6's wing counts, X11.14's bed admission and X17.8's discharge
+  intake. A log is one element's text that each step appends a word and a space to, read whole. X10.6's opposite, both
+  GETs released together, names no order its two answers reach the page in, so it is the other order of release, the
+  discharges GET first, read whole. X11.14's route that sends no second request is a second view at its own address,
+  since no model member changes a route's code. X17.8's Save is a click the page raises, whose handler dispatches the
+  intake event with the resident's name, and its test arms the answer gate before it opens the page, since the GET it
+  holds is sent as the page loads. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
