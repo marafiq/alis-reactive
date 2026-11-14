@@ -181,7 +181,8 @@
         "SlotHolds.tla:AStepOverANamedSlotThatHoldsNoneStops",
         "SlotHolds.tla:AStepOverContentInASlotNoPlanNamesStops",
         "SlotHolds.tla:AStepOverAnElementHoldingAHeldSlotStops",
-        "SlotHolds.tla:OnlyAHeldSlotStopsAStep"
+        "SlotHolds.tla:OnlyAHeldSlotStopsAStep",
+        "SlotHolds.tla:AStepOverWhatAStepAddedWrites"
       ],
       "defects": [
         {
@@ -219,6 +220,11 @@
           "id": "M5.X4",
           "rung": "behavior",
           "defect": "An append of a value that reads nothing, a payload's member when no payload was raised (D4.2), adds nothing to the content, and the step after it runs (D7.6, D4.5)."
+        },
+        {
+          "id": "M5.X5",
+          "rung": "behavior",
+          "defect": "An append adds its value after what the element holds and removes nothing (M5.N1): over a held slot it adds where a set stops, and the slot's content and its plan stay (D12.9); a slot that holds only what a step added is held by no one, so a set writes over it; what a step added to a slot leaves at that slot's unload (D12.4); and a value a person typed and a handler inside the element stay."
         }
       ],
       "promises": [
@@ -279,14 +285,6 @@
           "defect": "Content a load put in a slot is held only while the plan that loaded it lives, so closing the desk lets the click replace the entry."
         },
         {
-          "for": "X12.12",
-          "page": "The hour log: the log's tools, loaded into the desk, whose plan loads an entry into the hour slot outside the desk, and Note the hour, whose step sets the log's status to Noting, then appends Noted at 02:00 to the hour slot's text, then sets the status to Noted.",
-          "gesture": "Open the desk, load the entry, then click Note the hour.",
-          "outcome": "The step stops with one console error: the status reads Noting, the entry stays, and its Acknowledge still shows Acknowledged.",
-          "opposite": "With the desk opened and closed and nothing loaded, the same click shows Noted at 02:00 in the hour slot and Noted in the status, with no console error.",
-          "defect": "An append written as a set with no content mark is not held, so it replaces the entry with its text and the status reads Noted."
-        },
-        {
           "for": "M5.X1",
           "page": "A note with Show and Hide buttons, and a button whose step sets text on an element the page lacks before it sets the status.",
           "gesture": "Click Hide, then Show, then the button with the missing element.",
@@ -317,6 +315,38 @@
           "outcome": "The arrivals line still reads Arrivals: and the status reads Noted.",
           "opposite": "Clicking Bea arrived, the line reads Arrivals: Bea and the status Noted.",
           "defect": "The missing nurse appended as the text undefined or null, or the missing value stopping the pipeline so the status keeps Waiting."
+        },
+        {
+          "for": "M5.X5",
+          "page": "The hour log: the log's tools, loaded into the desk, whose plan loads an entry into the hour slot outside the desk; Note the hour, whose step sets the log's status to Noting, then appends Noted at 02:00 to the hour slot's text, then sets the status to Noted; and Clear the hour, whose step sets the status to Clearing, then the hour slot's text to No entry this hour, then the status to Cleared.",
+          "gesture": "Open the desk, load the entry, then click Note the hour.",
+          "outcome": "The status reads Noted and the hour slot reads Hourly entry Turned at midnight. Acknowledge Entry: Not acknowledged Noted at 02:00, with no console error, and the entry's Acknowledge then shows Acknowledged.",
+          "opposite": "With the desk open and the entry loaded, Clear the hour stops with one console error: the status reads Clearing, the entry stays, and its Acknowledge still shows Acknowledged.",
+          "defect": "An append written as a content set of the joined text stops over the held slot, so the status reads Noting and nothing is added; written with no content mark, it leaves the hour slot one text, and the entry's Acknowledge is gone."
+        },
+        {
+          "for": "M5.X5",
+          "page": "The turn chart: the chart's tools, loaded into the desk, whose plan loads a turn plan into the turn slot outside the desk; Log a turn, whose step appends Turned at 02:00 to the turn slot's text; and Start again, whose step sets the chart's status to Starting, then the turn slot's text to No turns yet, then the status to Started.",
+          "gesture": "Open the desk, close the desk, click Log a turn, then click Start again.",
+          "outcome": "The turn slot reads Turned at 02:00 after Log a turn and No turns yet after Start again, and the status reads Started, with no console error.",
+          "opposite": "With the desk left open, Log a turn shows Turned at 02:00 and Start again stops with one console error: the status reads Starting and the turn slot still reads Turned at 02:00.",
+          "defect": "A slot's hold read from whether its element holds anything, so the text a step added holds the turn slot and Start again stops once the desk has closed."
+        },
+        {
+          "for": "M5.X5",
+          "page": "The meal card, one plan: Open the menu loads today's menu into the menu slot; Add a note, whose step appends Soft diet today to the menu slot's text, then sets the card's status to Note added; and Close the menu, whose step unloads the menu slot, then sets the status to Menu closed.",
+          "gesture": "Open the menu, click Add a note, then click Close the menu.",
+          "outcome": "The status reads Note added after the second click and Menu closed after the third, and the menu slot is then empty, with no console error.",
+          "opposite": "Clicking Add a note after the menu has closed, the menu slot reads Soft diet today and the status Note added.",
+          "defect": "An unload that removes the slot's child elements alone, so Soft diet today stays in the menu slot after the menu closed; or an append over a slot its own plan loads refused where the view renders, as a set is, so the card does not open."
+        },
+        {
+          "for": "M5.X5",
+          "page": "The night checks: a section Night checks that holds the Witness code box, a NativeTextBox, and Sign off, a NativeButton whose handler sets the sheet's status, which starts Not signed, to Signed off when the box reads 0200 and to Code refused otherwise; and Add a check, outside the section, whose step appends the paragraph Checked at 02:00 to the section's HTML.",
+          "gesture": "Type 0200 into Witness code, click Add a check, then click Sign off.",
+          "outcome": "The section shows Checked at 02:00 and the status reads Signed off.",
+          "opposite": "With nothing typed, the same two clicks show Checked at 02:00 and the status Code refused.",
+          "defect": "An append that writes the section's HTML again makes a new box and a new button, so the typed code is gone and Sign off runs nothing: the status keeps Not signed."
         }
       ],
       "verdicts": [

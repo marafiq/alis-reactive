@@ -428,7 +428,8 @@
         "SlotHolds.tla:AStepOverANamedSlotThatHoldsNoneStops",
         "SlotHolds.tla:AStepOverContentInASlotNoPlanNamesStops",
         "SlotHolds.tla:AStepOverAnElementHoldingAHeldSlotStops",
-        "SlotHolds.tla:OnlyAHeldSlotStopsAStep"
+        "SlotHolds.tla:OnlyAHeldSlotStopsAStep",
+        "SlotHolds.tla:AStepOverWhatAStepAddedWrites"
       ],
       "defects": [
         {

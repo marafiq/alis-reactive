@@ -35,9 +35,9 @@ public static class HourLogs
 {
     public static readonly AppEvent OpenTheDesk = AppEvent.Declare();
 
-    public static readonly AppEvent CloseTheDesk = AppEvent.Declare();
-
     public static readonly AppEvent NoteTheHour = AppEvent.Declare();
+
+    public static readonly AppEvent ClearTheHour = AppEvent.Declare();
 
     public static readonly AppEvent LoadTheEntry = AppEvent.Declare();
 

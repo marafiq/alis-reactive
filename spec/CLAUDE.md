@@ -1539,6 +1539,21 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   empty answer line, where native.json's care panel shows the item's name with unanswered when no handler set an
   answer. The opposite is now the second handler left out, a second view at its own address, the panel showing Payload
   text: Kappa and One unanswered, and the defect's words read the same line. The owner can overrule each.
+- The lead, 2026-11-14, deciding the append's form by the owner's answer to keep or split `Html`'s append, verbatim in
+  `spec/NOTES.md`: "i would opt for two things, better experience of dev, and quality". Neither: in Chromium 156 a
+  write of `textContent` or `innerHTML` to the content with the value after it made new nodes, so a listener, a
+  mounted component, a typed value and the focus were lost, while `append` and `insertAdjacentHTML("beforeend", ...)`
+  kept all of them. From a Fable agent's design at xhigh (APPEND-FORM.md and PROMISES.md of the session's scratch
+  folder, read at the source), `Text.Append` and `Html.Append` keep their place and signatures and write a `call` of
+  the element's `insertAdjacentText` and `insertAdjacentHTML` at "beforeend", the value's joined text, run only where
+  that text is not empty, since an empty insert adds a text node of no length in that browser. It removes nothing, so
+  it is no content write and no hold stops it; what it adds holds the slot for no one and leaves at that slot's next
+  load or unload. `SlotHolds.tla` gains the add, its sixth invariant AStepOverWhatAStepAddedWrites and the mutant
+  AddedContentHolds, TLC green with each of the six mutants failing its own invariant alone. X12.12's sixth promise
+  becomes M5.X5's first, the hour log, whose append adds where a set from Clear the hour stops, and M5.X5 gains three:
+  a set over a slot that holds only what a step added writes, what a step added leaves at its slot's unload, and an
+  append beside a typed box and a button keeps both. This reverses the lead's line of 2026-11-14 that declared the
+  append as a content set. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

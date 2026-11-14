@@ -431,7 +431,7 @@
         {
           "id": "noteInputs",
           "kind": "nativeSlice",
-          "role": "the record's NativeTextBox, NativeTextArea and NativeCheckBox inputs: the note box, the pain, balance, intake, target and name fields, the Starts and Allergies fields, and the room-free and include-note boxes",
+          "role": "the record's NativeTextBox, NativeTextArea and NativeCheckBox inputs: the note box, the pain, balance, intake, target and name fields, the Starts and Allergies fields, and the room-free and include-note boxes, and the night checks' Witness code box",
           "module": "NativeComponents"
         },
         {
@@ -459,7 +459,7 @@
         {
           "id": "recordButton",
           "kind": "nativeSlice",
-          "role": "the record's Call the nurse NativeButton",
+          "role": "the record's NativeButton buttons: Call the nurse, and the night checks' Sign off",
           "module": "NativeComponents"
         }
       ]
@@ -2365,8 +2365,8 @@
     },
     {
       "feature": "M5.F1",
-      "for": "X12.12",
-      "index": 5,
+      "for": "M5.X5",
+      "index": 0,
       "screen": "record",
       "hosts": [
         "net10"
@@ -2374,6 +2374,55 @@
       "parts": [
         "tabSlot",
         "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "M5.X5",
+      "index": 1,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "M5.X5",
+      "index": 2,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabSlot",
+        "notes"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M5.F1",
+      "for": "M5.X5",
+      "index": 3,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "notes",
+        "noteInputs",
+        "recordButton"
       ],
       "harness": [
         "seed"

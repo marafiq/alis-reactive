@@ -22,9 +22,11 @@ Each name is gate 2's; each door is the capability it carries.
 - `M5.N1` new: `Element`, a component declaration that mirrors lib.dom's `HTMLElement`: `Text` and `Html`, each an
   `ElementContent` over `textContent` and `innerHTML`, a source of that text whose `Set` takes a text literal or a
   source of D7.2 of any type, shown as the string table of `spec/Core/conversions.md` writes it (D7.3, D3.11, X3.8);
-  its `Append` takes the same two and writes the content again with the value after it, as a `Set` of
-  `pipeline.Concat(content, value)` writes it (N7.7), a content write as `Set`'s is (D12.9), so `Text` keeps the
-  element's text alone and `Html` makes its children again, and a value that reads nothing adds nothing (D7.6, M5.X4);
+  its `Append` takes the same two and adds the value after what the element holds, removing nothing: a `call` of
+  lib.dom's `insertAdjacentText` on `Text` and of `insertAdjacentHTML` on `Html`, at "beforeend", with the value's
+  joined text (N7.7), run only where that text is not empty (D7.6), so the element's children, a value a person typed
+  and a component inside it stay, it is no content write, and no hold stops it (D12.9, M5.X5); a value that reads
+  nothing adds nothing (M5.X4);
   `Classes`, the `ClassList` its `classList` holds; `Hidden`, a `Property<bool>` over `hidden`; `Children`, the
   `ElementChildren` its `children` holds; and `Show()` and `Hide()`, which set `Hidden` to false and true, the names
   both lines carry. `ElementContent` carries main's `SetText<TProp>(TypedSource<TProp>)` and the redesign's type of

@@ -2,7 +2,7 @@
 CONSTANT Mutant
 
 Mutants == {"none", "OwnSlotUnchecked", "ContentPlanHoldsNothing", "SlotOwnerHoldsNoKey", "OwnElementOnly",
-            "HoldSurvivesRelease"}
+            "HoldSurvivesRelease", "AddedContentHolds"}
 
 ASSUME Mutant \in Mutants
 
@@ -22,9 +22,9 @@ Contains(e) == CASE e = "cards" -> {"card", "inner"}
 
 ReleasedWith(s) == IF s = "card" THEN {"inner", "card"} ELSE {s}
 
-VARIABLES content, holds, left, write
+VARIABLES content, holds, left, write, added
 
-vars == <<content, holds, left, write>>
+vars == <<content, holds, left, write, added>>
 
 OnPage(e) == e # "inner" \/ content["card"] # "none"
 
@@ -42,7 +42,7 @@ Started(s) == ContentHold(s) \cup (IF s = "card" THEN PlanHolds("card") ELSE {})
 
 Kept(released) == IF Mutant = "HoldSurvivesRelease" THEN holds ELSE {h \in holds : h[1] \notin released}
 
-HeldKeys == {h[2] : h \in holds}
+HeldKeys == {h[2] : h \in holds} \cup (IF Mutant = "AddedContentHolds" THEN added ELSE {})
 
 Checked(p, e) ==
     CASE Mutant = "OwnSlotUnchecked" /\ e = p -> {}
@@ -60,6 +60,7 @@ Init ==
     /\ holds = PlanHolds("page") \cup UNION {Started(s) : s \in {x \in Slots : content[x] = "served"}}
     /\ left = {}
     /\ write = Unwritten
+    /\ added = {}
 
 Load(p, s) ==
     /\ Live(p)
@@ -69,6 +70,7 @@ Load(p, s) ==
     /\ holds' = Kept(ReleasedWith(s)) \cup Started(s)
     /\ left' = left \cup {x \in ReleasedWith(s) : content[x] # "none"}
     /\ write' = Unwritten
+    /\ added' = added \ ReleasedWith(s)
 
 Unload(p, s) ==
     /\ Live(p)
@@ -78,17 +80,25 @@ Unload(p, s) ==
     /\ holds' = Kept(ReleasedWith(s))
     /\ left' = left \cup {x \in ReleasedWith(s) : content[x] # "none"}
     /\ write' = Unwritten
+    /\ added' = added \ ReleasedWith(s)
 
 Write(p, e) ==
     /\ Live(p)
     /\ OnPage(e)
     /\ ~RefusedWhereTheViewRenders(p, e)
     /\ write' = [by |-> p, on |-> e, outcome |-> IF Checked(p, e) \cap HeldKeys # {} THEN "stopped" ELSE "wrote"]
+    /\ UNCHANGED <<content, holds, left, added>>
+
+Add(p, e) ==
+    /\ Live(p)
+    /\ OnPage(e)
+    /\ added' = added \cup ({e} \cap Slots)
+    /\ write' = Unwritten
     /\ UNCHANGED <<content, holds, left>>
 
 Next ==
     \/ \E p \in Plans, s \in Slots : Load(p, s) \/ Unload(p, s)
-    \/ \E p \in Plans, e \in Elements : Write(p, e)
+    \/ \E p \in Plans, e \in Elements : Write(p, e) \/ Add(p, e)
 
 Spec == Init /\ [][Next]_vars
 
@@ -116,6 +126,8 @@ AStepOverContentInASlotNoPlanNamesStops ==
 AStepOverAnElementHoldingAHeldSlotStops == (Done /\ write.on \notin Slots /\ IsOrHoldsAHeldSlot(write.on)) => Stopped
 
 OnlyAHeldSlotStopsAStep == (Done /\ ~IsOrHoldsAHeldSlot(write.on)) => ~Stopped
+
+AStepOverWhatAStepAddedWrites == (Done /\ write.on \in added /\ ~IsOrHoldsAHeldSlot(write.on)) => ~Stopped
 
 ReachACardsStepOverItsOwnSlotStops == ~At("card", "card", "stopped")
 
@@ -148,5 +160,9 @@ ReachNotesClearedBeforeTheirCardClosedTakeTheWrite ==
     ~(At("page", "notes", "wrote") /\ {"card", "notes"} \subseteq left)
 
 ReachAnElementHoldingNoSlotTakesTheWrite == ~At("card", "status", "wrote")
+
+ReachAStepAddsOverAHeldSlot == ~("notes" \in added /\ content["notes"] = "loaded" /\ content["card"] # "none")
+
+ReachAStepWritesOverWhatAStepAdded == ~(At("page", "notes", "wrote") /\ "notes" \in added)
 
 ====

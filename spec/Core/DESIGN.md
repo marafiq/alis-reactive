@@ -1297,12 +1297,16 @@ Terms used throughout:
   - A request sends a source to a member its endpoint binds by its own contract: a member with the same converter or
     number handling reads it back, so the request unit (Q9, the rewrite) compares the source's form, the live form
     for a live source, with the target member's and refuses a difference.
-- D7.6 A source that reads nothing writes `null` into a property, an argument and a payload member. At an
-  element's text and HTML it shows nothing, and at a class it changes nothing (D4.5): a class name is bound by a
-  `let`, and the element's `classList` method runs only where it holds a value, as the redesign's class change does
-  (`Alis.Reactive/PlanModel/Reactions/Steps.cs:133-140`). An element's attribute is no value position: neither line
-  writes one from a source; the redesign reads a child's attribute inside a lambda over the element's children. In a request it is
-  decided by Q9.
+- D7.6 A source that reads nothing writes `null` into a property, an argument and a payload member. At an element's
+  text and HTML it shows nothing, and at a class it changes nothing (D4.5): a class name is bound by a `let`, and the
+  element's `classList` method runs only where it holds a value, as the redesign's class change does
+  (`Alis.Reactive/PlanModel/Reactions/Steps.cs:133-140`). Appended to an element's text or HTML it adds nothing
+  (M5.N1, M5.X4): the element is bound by a `let`, so one the page lacks stops the step whether or not a value came
+  (D4.1), the value's joined text by a second `let`, and the element's `insertAdjacentText` or `insertAdjacentHTML`
+  runs only where that text is not empty, since `insertAdjacentText` adds a text node of no length for an empty text,
+  as the lead's run in Chromium 156 showed (2026-11-14). An element's attribute is no value position: neither line
+  writes one from a source; the redesign reads a child's attribute inside a lambda over the element's children. In a
+  request it is decided by Q9.
 
 **Schema nodes.** `lit`, `obj`, `list`, `get`, `as`, `call`, `set`, `op`; the request argument's members (Q9).
 
@@ -3033,17 +3037,20 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   split refuses it: within one plan where the view renders (R14.4), and across plans the step stops in the browser
   with one error naming the slot (R14.7), on the slot's element or on an element that holds it, which only the
   browser sees. No server object sees every plan of a response (D14.1). `Unload(element)` empties a slot.
-  - An element's `Text` and `Html` mark their `set` as a content write (`content`, schema.md), `Set`'s and `Append`'s
-    (M5.N1).
+  - An element's `Text` and `Html` mark their `set` as a content write (`content`, schema.md), which `Set` alone
+    writes (M5.N1). `Append` writes no `set`: it adds its value after what the element holds and removes nothing, so
+    R14.4 and R14.7 do not read it and no hold stops it (M5.X5). What it adds to a slot's element has no owner and
+    holds the slot for no one, and it leaves at that slot's next load or unload (D12.4).
   - The browser holds each slot a live plan names, as its plan starts, and each slot whose content has a live owner
     (what a load or the server put there); each hold leaves with its owner. So content a closed card loaded into a
     slot outside it stays held until that slot unloads.
-  - `spec/OwnershipAndState/SlotHolds.tla` checks the holds over every order of loads, unloads and content writes by a
-    page and a card, over the slot the card is loaded into, the card's own slot and a notes slot outside the card, the
-    server's content included: a step stops over a slot a live plan names that holds content, the card's own step over
-    the slot it was loaded into among them, over one a live plan names that holds none, over content in a slot no live
-    plan names and over an element that holds a held slot, and nothing else stops it. Every door that writes a content
-    `set` rests on the five.
+  - `spec/OwnershipAndState/SlotHolds.tla` checks the holds over every order of loads, unloads, content writes and
+    adds by a page and a card, over the slot the card is loaded into, the card's own slot and a notes slot outside the
+    card, the server's content included: a step stops over a slot a live plan names that holds content, the card's own
+    step over the slot it was loaded into among them, over one a live plan names that holds none, over content in a
+    slot no live plan names and over an element that holds a held slot, and nothing else stops it; a slot that holds
+    only what a step added takes the write. Every door that writes a content `set` rests on the five, and `Append` on
+    the sixth.
 
 **Schema nodes.** The plugin data `form` and `hub`, the plugin `alis.slot` (data `none`, its key the container id),
 the statement `listen`, and `Handler`. Ownership is not a node: a plan's owner is where its script is, and an owner's holds are what its
@@ -3070,6 +3077,7 @@ plans name.
 - `SlotHolds.tla:AStepOverContentInASlotNoPlanNamesStops`
 - `SlotHolds.tla:AStepOverAnElementHoldingAHeldSlotStops`
 - `SlotHolds.tla:OnlyAHeldSlotStopsAStep`
+- `SlotHolds.tla:AStepOverWhatAStepAddedWrites`
 - `Lanes.tla:FinallyRunsBeforeRelease`
 - `Run.tla:NothingRunsAfterAnAbort`
 - `probe:ej2-destroy-removes-instance`

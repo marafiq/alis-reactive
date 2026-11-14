@@ -35,7 +35,8 @@ D11.11), module 6's; a run that its owner's release ends is Q11's, module 17's, 
 and a time zone mean is module 15's (D3.11, D3.12); this module says where each lives. A step that writes over a
 slot across plans is module 5's (X12.12).
 The holds a slot keeps, by each live plan that names it and by the content a load or the server put in it, each
-leaving with its owner, are this module's, and a content write over a slot reads them (D12.9, `SlotHolds.tla`).
+leaving with its owner, are this module's, and a content write over a slot reads them, where what a step adds
+holds the slot for no one (D12.9, `SlotHolds.tla`).
 
 This module holds X13.4, where a failure the server sends shows, and M18.X1, where a plan's culture and time zone live.
 
