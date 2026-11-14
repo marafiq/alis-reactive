@@ -171,7 +171,8 @@ the class. A class met twice is held too low: it moves up a rung in that unit. A
 - A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it:
   one test rule to a landed rule's pattern, one module's half against the schema. Three at a time at most. None
   decides or words a rule. Its brief names the base SHA and carries the full bar, finished before anything reads it;
-  it reads no secret or file that holds a credential, and runs no git command beyond its own worktree and branch.
+  it reads no secret or file that holds a credential, runs no git command beyond its own worktree and branch, and
+  runs no command its brief does not name (the lead's correction of a fork, 2026-11-13).
 - A complex task or a critical decision, one whose error would drift the schema, spread across tests, a harness door
   or a spec line, or lower the bar, goes first to an agent on the latest Fable model at xhigh effort, briefed with its
   spec lines, the files and the constraints; the lead lands it from its answer, read at the source (the owner,

@@ -1392,6 +1392,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   sent part for its condition, which the owner adds; and D10.16's container's inputs, which the proposal leaves
   without a door, since a container fixes the body's format, which takes no condition. X10.10 stands on it, its test
   red.
+- The lead, 2026-11-13, landing three pages of a handler's policy, a Fable agent's work at xhigh read at the source,
+  and settling what it read into. Each endpoint reaches Lanes.tla's Respond with its own path, as the care actions of
+  the residents and admission screens reach theirs; the app's rule gives a gate other than the answer gate its filter
+  with the first page that holds it, and seven care actions now reach a gate inline, which one piece moves to a filter
+  for each gate. X11.6 and X17.36 take the policy from the page's model at two addresses each; X11.7 takes skip at one
+  address. X11.7's count of the posts the endpoint received is its answer, "Saved once" or "Saved twice", since no
+  member of the harness reads a count. X17.36's GET is the promise's "/Residents/{residentId}", and a page of links to
+  it lets the page sweep open the route. A read after a release names no state the release brings: the late answer of
+  X11.6's and X17.36's replace cases lands after the read can pass, since no harness verb reports a released answer
+  delivered, so the harness gains that verb before the unit that turns those two green, and their planted defects are
+  read then. X11.24 waits on an append to an element's text, which no door writes.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
