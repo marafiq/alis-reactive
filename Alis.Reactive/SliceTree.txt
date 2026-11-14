@@ -1,4 +1,5 @@
 Schema
+TypeKnowledge
 PathsAndWire
 OwnershipAndState Tracing
 Execution

@@ -22,6 +22,8 @@ public class WhenTheCoreIsCompiled
     [
         "RenderingAndDelivery/ViewPlans.cs System.Type.FullName",
         "TriggersAndPipelines/Pipeline.cs System.Activator.CreateInstance",
+        "TypeKnowledge/WrittenMembers.cs System.Reflection.MemberInfo.DeclaringType",
+        "TypeKnowledge/WrittenMembers.cs System.Reflection.MemberInfo.Name",
     ];
 
     private static readonly string[] HoldersOfTypeInformation =
