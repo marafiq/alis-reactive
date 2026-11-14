@@ -1,5 +1,5 @@
 import { assertNever, notBuilt, type Expression } from "../Schema/index";
-import { heldOrNull, value, type Read } from "../ValuesAndSources/index";
+import { converted, heldOrNull, value, type Read } from "../ValuesAndSources/index";
 import type { Context } from "./context";
 import { located } from "./objects";
 
@@ -15,9 +15,10 @@ export function evaluate(expression: Expression, context: Context): Read {
       return value(callable(expression.params, expression.body, context));
     case "signal":
       return value(context.signal);
+    case "as":
+      return converted(evaluate(expression.expr, context), expression.shape, context.plan.culture, context.plan.timeZone);
     case "get":
     case "data":
-    case "as":
     case "call":
     case "answer":
     case "record":

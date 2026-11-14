@@ -372,6 +372,21 @@ describe("when a step is one C# marked awaited (D11.2, D11.3, D4.3)", () => {
   });
 });
 
+describe("when a step's value is a conversion (D3.2)", () => {
+  test("an as value converts under the plan's culture and time zone", () => {
+    const chart = new Chart();
+    const kolkata: Raised["plan"] = { ...ward, timeZone: { kind: "zone", id: "Asia/Kolkata" } };
+    const lane = new Lane("overlap", [
+      charts({ kind: "as", expr: text("1,234.5"), shape: { kind: "number", of: "fraction", text: "view" } }),
+      charts({ kind: "as", expr: text("2026-11-09T08:30"), shape: { kind: "instant" } }),
+    ]);
+
+    lane.raise({ ...raisedWith({ chart }), plan: kolkata });
+
+    expect(chart.lines).toStrictEqual([1234.5, new Date("2026-11-09T03:00:00.000Z")]);
+  });
+});
+
 describe("when a block reads its abort signal (D11.12)", () => {
   test("a replace aborts the signal of the old run's blocks, and the new run's blocks hold one of their own", () => {
     const chart = new Chart();
