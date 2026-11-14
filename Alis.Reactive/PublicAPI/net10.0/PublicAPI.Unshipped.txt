@@ -156,6 +156,7 @@ Alis.Reactive.RequestsAndResponses.BrowserFile.Size.get -> Alis.Reactive.Declara
 Alis.Reactive.RequestsAndResponses.BrowserFile.Type.get -> Alis.Reactive.Declarations.ReadOnly<string!>!
 Alis.Reactive.RequestsAndResponses.Content
 Alis.Reactive.RequestsAndResponses.ErrorContent<TBody>
+Alis.Reactive.RequestsAndResponses.ErrorResponses
 Alis.Reactive.RequestsAndResponses.Failure
 Alis.Reactive.RequestsAndResponses.Failure.Headers.get -> Alis.Reactive.RequestsAndResponses.ResponseHeaders!
 Alis.Reactive.RequestsAndResponses.Failure.Outcome.get -> Alis.Reactive.Declarations.ReadOnly<Alis.Reactive.RequestsAndResponses.FailureOutcome!>!
@@ -718,6 +719,7 @@ static Alis.Reactive.RequestsAndResponses.Content.Html.get -> Alis.Reactive.Requ
 static Alis.Reactive.RequestsAndResponses.Content.Json<TBody>() -> Alis.Reactive.RequestsAndResponses.ErrorContent<TBody>!
 static Alis.Reactive.RequestsAndResponses.Content.None.get -> Alis.Reactive.RequestsAndResponses.NoContent!
 static Alis.Reactive.RequestsAndResponses.Content.Text.get -> Alis.Reactive.RequestsAndResponses.ErrorContent<string!>!
+static Alis.Reactive.RequestsAndResponses.ErrorResponses.ToErrorResponse(this Alis.Reactive.Validation.ValidationResult! result) -> Microsoft.AspNetCore.Mvc.ActionResult!
 static Alis.Reactive.TriggersAndPipelines.AppEvent.Declare(string? name = null, string! declaredBy = "") -> Alis.Reactive.TriggersAndPipelines.AppEvent!
 static Alis.Reactive.TriggersAndPipelines.AppEvent.Declare<TPayload>(string? name = null, string! declaredBy = "") -> Alis.Reactive.TriggersAndPipelines.AppEvent<TPayload>!
 static Alis.Reactive.TriggersAndPipelines.CondensedRequests.Download<TModel, TRequest>(this Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>! request) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, Alis.Reactive.RequestsAndResponses.ResponseFile!>!>!

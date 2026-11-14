@@ -1372,6 +1372,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   spelling of a door that names none. A consumer door that starts a handler off the core's doors adds its own overload
   and forwards the policy. X17.8 waits on a text joined from a source and a literal, which no door writes, and X11.15,
   X11.21 and X11.22 on the defaultHooks host. The owner decides the form.
+- The lead, 2026-11-13, declaring N10.1, the endpoint's error answer, as its line writes it:
+  `ValidationResult.ToErrorResponse()`, an extension of `RequestsAndResponses`, module 6's, in a file of each host,
+  returning that host's MVC `ActionResult`, so an action that returns `IActionResult` or `ActionResult` returns it
+  where it returns `ValidationProblem` today. On net10 it answers D10.8's body as MVC's validation problem, on net48
+  as a JSON result IIS keeps as written (D10.8). X10.5's admission form stands on it on net10, its test red;
+  X10.7, the same form under IIS, is placed on net48 and waits on that host.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
