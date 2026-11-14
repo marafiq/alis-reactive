@@ -177,6 +177,26 @@ public abstract class JsObject
         where TItem : JsObject, new()
         => throw new NotImplementedException();
 
+    /// <summary>Declares the object's iterator, which yields objects, each read through its declaration.</summary>
+    /// <remarks>
+    /// The list operations take the object as the list of the items its iterator yields when the operation runs. The
+    /// build refuses an iterator declared on a type that has none.
+    /// </remarks>
+    /// <typeparam name="TItem">The declaration of each object the iterator yields.</typeparam>
+    /// <returns>The items the iterator yields.</returns>
+    protected LiveObjects<TItem> LiveIterator<TItem>()
+        where TItem : JsObject, new()
+        => throw new NotImplementedException();
+
+    /// <summary>Declares the object's iterator, which yields data: texts, numbers or records.</summary>
+    /// <remarks>
+    /// The list operations take the object as the list of the items its iterator yields when the operation runs. The
+    /// build refuses an iterator declared on a type that has none.
+    /// </remarks>
+    /// <typeparam name="TItem">The type of each item the iterator yields.</typeparam>
+    /// <returns>A source of the items the iterator yields.</returns>
+    protected TypedSource<IReadOnlyList<TItem>> DataIterator<TItem>() => throw new NotImplementedException();
+
     /// <summary>Calls the object itself, a function, with no argument, where the pipeline reaches the line.</summary>
     /// <remarks>An object that is no function stops the pipeline.</remarks>
     protected void CallItself() => throw new NotImplementedException();

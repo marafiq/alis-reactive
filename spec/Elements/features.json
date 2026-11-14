@@ -85,7 +85,7 @@
         },
         {
           "line": "proposed",
-          "text": "pipeline.Element(\"table-4-risk-count\").Text.Set(pipeline.Element(\"table-4\").Classes.Count(flag => flag.StartsWith(\"risk-\")));",
+          "text": "pipeline.Element(\"table-4-risk-count\").Text.Set(pipeline.Element(\"table-4\").Classes.Count(flag => flag.StartsWith(\"risk-\", StringComparison.Ordinal)));",
           "doors": [
             "M5.N1",
             "M5.N2",

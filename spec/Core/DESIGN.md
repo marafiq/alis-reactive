@@ -624,8 +624,12 @@ Terms used throughout:
 - kept on a new holder: the whole declaration vocabulary on an event's payload, at any depth (D5.6), where the
   redesign's payload is already a `JsObject` (`Alis.Reactive/Components/Event.cs:14`).
 - `N5.7` new, its form gate 2's: a `JsObject`'s iterator, declared with the declaration of its items, live or data
-  (D5.13); the list operations of N6.1 and D6.10 take an object that declares one. It replaces the redesign's
-  `HtmlElement.Children` and `ElementClassList.Items`, each a `ReactiveArray` over a member read with no declaration
+  (D5.13); the list operations of N6.1 and D6.10 take an object that declares one. The lines write the view's half,
+  the object taking the operations beside its own members; no line wrote the declaration's half, so U3 declares the
+  lead's proposal as a signature (G13): `LiveIterator<TItem>()` and `DataIterator<TItem>()` on `JsObject`, and the
+  operations as extensions of `ILiveIterable<TItem>` and `IDataIterable<TItem>`, which the object implements (the
+  lead, 2026-11-13, `spec/CLAUDE.md`). It replaces the redesign's `HtmlElement.Children` and `ElementClassList.Items`,
+  each a `ReactiveArray` over a member read with no declaration
  
   (`Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:52-53`, `Alis.Reactive/PlanAuthoring/Elements/HtmlElement.cs:120-121`).
 

@@ -1434,6 +1434,19 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   browser's message with a 400 of the same words, and the test analyzers leave a page's requests to the harness, which
   reports none, so no page calls the endpoint check's rule-set overload yet. The startup call that names the two enums
   waits for U17, since `Flags<TEnum>()` throws until then and would stop the app.
+- The lead, 2026-11-13, declaring N5.7's iterator with M5.N3's `ElementChildren` and M5.N4's `ChildElement`, designed
+  by a Fable agent at xhigh (N5.7-FABLE.md of the handoff folder) and decided from its answer read at the source.
+  D5.13, N5.7 and M5.F1's proposed sentences write the view's half, the object taking the list operations beside its
+  own members (`Children.Count()`), so by G13 that is the form. No line wrote the declaration's half, and U3 declares
+  the lead's proposal as signatures: `LiveIterator<TItem>()` and `DataIterator<TItem>()`, protected on `JsObject` and
+  taking no name, since the member is always the iterator; `ILiveIterable<TItem>` and `IDataIterable<TItem>`, which an
+  iterable implements with the door as its body; and the nine operations of `LiveObjects<TItem>` and the eighteen of
+  `DataLists` as extensions of them in `Iterables`, each the operation over the items, so the build binds each to the
+  one it forwards and its docs are that one's. A live object that iterates and is no collection declares the door
+  under a member it names. M5.F1's class count is reworded to the ordinal `StartsWith`, the overload the translated
+  members' table takes. Two things wait for the owner: the form, against the smaller one the agent names,
+  `Children.Items.Count()`, two doors and no forwarder with D5.13's clause reworded; and an operation D6.2 gains
+  later, which needs its forwarder where no compiler asks for one. X6.56's and M5.X2's pages are the next piece's.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

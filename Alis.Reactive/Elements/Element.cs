@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
@@ -34,6 +35,9 @@ public sealed class Element : Component
 
     /// <summary>Gets the element's classes, <c>classList</c>.</summary>
     public ClassList Classes => throw new NotImplementedException();
+
+    /// <summary>Gets the element's child elements, <c>children</c>, which the list operations take as a list.</summary>
+    public ElementChildren Children => throw new NotImplementedException();
 
     /// <summary>Gets whether the element is hidden, <c>hidden</c>: a source of it that a step also sets.</summary>
     public Property<bool> Hidden => throw new NotImplementedException();
@@ -79,8 +83,10 @@ public sealed class ElementContent : ReadOnly<string?>
 /// <summary>
 /// An element's classes: a step adds, removes or toggles one by its name.
 /// </summary>
-public sealed class ClassList : JsObject
+public sealed class ClassList : JsObject, IDataIterable<string>
 {
+    TypedSource<IReadOnlyList<string>> IDataIterable<string>.Items => DataIterator<string>();
+
     /// <summary>Adds a class to the element.</summary>
     /// <param name="name">The class's name; null changes no class.</param>
     public void Add(string? name) => throw new NotImplementedException();
@@ -104,4 +110,30 @@ public sealed class ClassList : JsObject
     /// <summary>Adds or removes the class a source names when the step runs.</summary>
     /// <param name="name">The source of the class's name; one that holds null or cannot be read changes no class.</param>
     public void Toggle(ITypedSource<string?> name) => throw new NotImplementedException();
+}
+
+/// <summary>
+/// An element's child elements, which the list operations read as the elements it holds when they run.
+/// </summary>
+[Mirrors("lib.dom", "HTMLCollection")]
+public sealed class ElementChildren : JsObject, ILiveIterable<ChildElement>
+{
+    LiveObjects<ChildElement> ILiveIterable<ChildElement>.Items => LiveIterator<ChildElement>();
+}
+
+/// <summary>
+/// A child element of an element, whose attributes a list operation reads.
+/// </summary>
+[Mirrors("lib.dom", "Element")]
+public sealed class ChildElement : JsObject
+{
+    /// <summary>Reads the value of an attribute.</summary>
+    /// <param name="name">The attribute's name.</param>
+    /// <returns>The attribute's value: null when the element holds no such attribute, and an empty text for one written with no value.</returns>
+    public MethodResult<string?> GetAttribute(Arg<string> name) => Method<string?>([name]);
+
+    /// <summary>Tests that the element holds an attribute.</summary>
+    /// <param name="name">The attribute's name.</param>
+    /// <returns>A source that is true when the element holds the attribute, with a value or with none.</returns>
+    public MethodResult<bool> HasAttribute(Arg<string> name) => Method<bool>([name]);
 }
