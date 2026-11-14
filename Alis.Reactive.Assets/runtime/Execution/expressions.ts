@@ -1,3 +1,4 @@
+import { operated } from "../Conditions/index";
 import { assertNever, notBuilt, type Expression } from "../Schema/index";
 import { converted, got, heldOrNull, value, type Read } from "../ValuesAndSources/index";
 import type { Context } from "./context";
@@ -22,11 +23,12 @@ export function evaluate(expression: Expression, context: Context): Read {
       return got(evaluate(expression.target, context), expression.path, expression.members);
     case "data":
       return read(evaluate(expression.target, context), expression.path);
+    case "op":
+      return operated(expression.op, expression.args.map((arg) => () => evaluate(arg, context)));
     case "call":
     case "answer":
     case "record":
     case "list":
-    case "op":
       throw notBuilt("the expression '" + expression.kind + "'");
     default:
       return assertNever(expression);
