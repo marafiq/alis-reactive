@@ -36,7 +36,7 @@ export function evaluate(expression: Expression, context: Context): Read {
 function bound(name: string, context: Context): Read {
   const held = context.scope.get(name);
   if (held === undefined) throw new Error("The plan reads the name '" + name + "', which no block binds.");
-  return held;
+  return typeof held === "function" ? held() : held;
 }
 
 function callable(params: readonly string[], body: Expression, context: Context): (...args: unknown[]) => unknown {

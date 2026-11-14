@@ -59,7 +59,7 @@ function bound(statement: LetStatement, context: Context): Step {
       return { kind: "wait", on: Promise.resolve(heldOrNull(read)), settled: (settled) => bind(context, statement.name, settled) };
     }
     case "read":
-      throw notBuilt("a let bound where its name is read");
+      return { kind: "completed", context: bind(context, statement.name, () => evaluate(statement.expr, context)) };
     default:
       return assertNever(statement.binds);
   }

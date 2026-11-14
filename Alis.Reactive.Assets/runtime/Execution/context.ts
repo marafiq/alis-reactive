@@ -1,15 +1,17 @@
 import type { PlanDocument } from "../Schema/index";
 import type { Read } from "../ValuesAndSources/index";
 
+export type Binding = Read | (() => Read);
+
 export interface Context {
   readonly plan: PlanDocument;
-  readonly scope: ReadonlyMap<string, Read>;
+  readonly scope: ReadonlyMap<string, Binding>;
   readonly signal: AbortSignal;
 }
 
-export function bind(context: Context, name: string, read: Read): Context {
+export function bind(context: Context, name: string, binding: Binding): Context {
   const scope = new Map(context.scope);
-  scope.set(name, read);
+  scope.set(name, binding);
   return { ...context, scope };
 }
 
