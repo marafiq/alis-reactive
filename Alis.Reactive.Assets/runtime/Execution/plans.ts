@@ -1,13 +1,18 @@
 import { assertNever, readPlan, type PlanDocument } from "../Schema/index";
 import { planScriptsWithin } from "./plan-scripts";
 
-export function plansWithin(root: ParentNode): PlanDocument[] {
-  const plans: PlanDocument[] = [];
+export interface Found {
+  readonly plan: PlanDocument;
+  readonly script: HTMLScriptElement;
+}
+
+export function plansWithin(root: ParentNode): Found[] {
+  const found: Found[] = [];
   for (const script of planScriptsWithin(root)) {
     const read = readPlan(script.text);
     switch (read.kind) {
       case "plan":
-        plans.push(read.plan);
+        found.push({ plan: read.plan, script });
         break;
       case "refused":
         console.error(read.error);
@@ -16,5 +21,5 @@ export function plansWithin(root: ParentNode): PlanDocument[] {
         assertNever(read);
     }
   }
-  return plans;
+  return found;
 }

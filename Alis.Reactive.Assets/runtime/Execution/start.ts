@@ -1,4 +1,4 @@
-import type { Owner } from "../OwnershipAndState/index";
+import { holdSlots, slotsNamedBy, type Owner } from "../OwnershipAndState/index";
 import { assertNever, notBuilt, type Handler, type PlanDocument, type Policy } from "../Schema/index";
 import { Stop, value } from "../ValuesAndSources/index";
 import { subscribe } from "../Vendors/index";
@@ -10,6 +10,7 @@ const payloadName = "e";
 const argumentsName = "arguments";
 
 export function start(plan: PlanDocument, owner: Owner): void {
+  holdSlots(slotsNamedBy(plan), owner);
   const context: Context = { plan, owner, scope: new Map() };
   for (const handler of plan.handlers) {
     try {
@@ -30,7 +31,7 @@ function listen(handler: Handler, context: Context): void {
   const unsubscribe = subscribe(source.object, source.listen, handler.event, (...args: unknown[]) => {
     run(handler.do, bind(bind(context, payloadName, value(args)), argumentsName, value(args)));
   });
-  context.owner.holds(unsubscribe);
+  context.owner.listens(unsubscribe);
 }
 
 function requireBuilt(policy: Policy): void {
