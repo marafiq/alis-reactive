@@ -206,7 +206,9 @@ slip is about you invented so you can avoid accountability about mistakes").
   2026-11-13: "for complex tasks, use fabe xhigh, also for critical decisions use fable xhigh"). While the owner is
   away, a decision the work needs is made so: by quality, from the TLA+ specs, the agent's answer read at the source,
   and never by a shortcut around the spec (the owner, 2026-11-14: "if a decision is needed, Quality and fable xhigh
-  will decide with tla+ - step back and do the right - never do the hack").
+  will decide with tla+ - step back and do the right - never do the hack"). One such agent runs at a time, on the
+  task the specs leave open; what a spec line and a landed exemplar already shape, an analyzer or a test among
+  them, the lead writes itself (the owner, 2026-11-14: "U r overusing fable").
 - The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
   session, with the reason. A task whose check costs what the work costs is the lead's own.
 - No review is planned behind a writer. A review that runs is bounded before it starts: a fixed list of questions,
