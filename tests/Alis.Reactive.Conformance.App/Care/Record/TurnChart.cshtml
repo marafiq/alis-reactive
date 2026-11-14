@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model TurnChart
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Turn chart";
+    var plan = Html.ReactivePlan<TurnChart>();
+}
+<h1>Turn chart of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, TurnCharts.OpenTheDesk)>Open the desk</button>
+<button type="button" @Html.Raises(plan, TurnCharts.CloseTheDesk)>Close the desk</button>
+<button type="button" @Html.Raises(plan, TurnCharts.LogATurn)>Log a turn</button>
+<button type="button" @Html.Raises(plan, TurnCharts.StartAgain)>Start again</button>
+<section id="turn-desk" aria-label="Desk"></section>
+<section id="turn-slot" aria-label="Turns"></section>
+<p>Status: <output id="turn-status">Open</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(TurnCharts.OpenTheDesk, pipeline => pipeline.Get(TurnChartEndpoints.Tools).Into("turn-desk"))
+        .CustomEvent(TurnCharts.CloseTheDesk, pipeline => pipeline.Unload("turn-desk"))
+        .CustomEvent(TurnCharts.LogATurn, pipeline => pipeline.Element("turn-slot").Text.Append("Turned at 02:00"))
+        .CustomEvent(TurnCharts.StartAgain, pipeline =>
+        {
+            pipeline.Element("turn-status").Text.Set("Starting");
+            pipeline.Element("turn-slot").Text.Set("No turns yet");
+            pipeline.Element("turn-status").Text.Set("Started");
+        }));
+}
+@Html.RenderPlan(plan)

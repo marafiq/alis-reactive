@@ -1006,8 +1006,10 @@ adds no kind and no operator; `Schema.tla:JoinedPartsAreTexts` holds that every 
 five pages of the record screen test its invariants, X12.12's, each test red. An append to an element's text or HTML,
 `ElementContent.Append` (M5.N1), adds after what the element holds and removes nothing, a `call` of its
 `insertAdjacentText` or `insertAdjacentHTML` that no hold stops, `SlotHolds.tla`'s sixth invariant (M5.X5), and is
-declared, with M5.X5's hour log, an append beside a set that stops over the same held slot, and M5.X4's arrivals
-board, an append of a value that reads nothing, each test red.
+declared, with M5.X5's four pages: the hour log, an append beside a set that stops over the same held slot; the turn
+chart, a set that takes the write over what a step added once no live plan names the slot; the meal card, an append
+over the slot its own plan loads and unloads; and the night checks, an append that keeps the box and the button a
+section holds; and with M5.X4's arrivals board, an append of a value that reads nothing, each test red.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
 named by two declarations. Thirty-four more refusal pages stand, each beside the page of its opposite case and each
 test red, six forks' work read at the source and landed, and one the lead's: fifteen of module 4's, five of module
@@ -1024,35 +1026,34 @@ of the fusion-refusals screen's six stand on the Fusion layout, in `Refusals/Fus
 `Refusals/FusionTemplates/`, each beside its rendering twin and each test red (M21.X805, M22.X1, M22.X4); M21.X203's
 three wait on the grid's validation door, as M21.X205's do. A promise placed on a care screen is a page of its own in
 `Care/<Screen>/`, as a
-refusal's is, and two hundred and forty-one care pages stand, each test red: fifty-nine of the record screen's (ten of
-module 5's, nine of module 2's, eight each of modules 3 and 9, six of module 1's, four of module 17's, three each of
+refusal's is, and two hundred and forty-four care pages stand, each test red: sixty-two of the record screen's (thirteen
+of module 5's, nine of module 2's, eight each of modules 3 and 9, six of module 1's, four of module 17's, three each of
 modules 7 and 24, two each of modules 6, 8 and 12 and one each of modules 15 and 19), forty-six of the admission
 screen's (fifteen of module 8's, ten of module 7's, five of module 6's, four each of modules 3 and 24, two each of
-modules 1, 15 and 17 and one each of modules 9 and 18), forty-two of the residents screen's (twenty-five of module
-4's, nine of module 6's, two each of modules 2 and 5 and one each of modules 3, 17, 24 and 25), nineteen of the round
+modules 1, 15 and 17 and one each of modules 9 and 18), forty-two of the residents screen's (twenty-five of module 4's,
+nine of module 6's, two each of modules 2 and 5 and one each of modules 3, 17, 24 and 25), nineteen of the round
 screen's (five of module 2's, four of module 6's, three each of modules 3 and 8, two of module 1's and one each of
 modules 4 and 16), eighteen of the admission-clinical screen's (eighteen of module 21's), seventeen of the
 record-contacts screen's (seventeen of module 21's), sixteen of the bed-board screen's (eight each of modules 21 and
 22), thirteen of the handover screen's (thirteen of module 21's) and eleven of the shell screen's (nine of module 25's
 and one each of modules 14 and 17). Forty feature tests stand on the bench, sixteen of module 11's, fifteen of module
 12's, four each of modules 13 and 17 and one of module 14's, their pages in a folder a module (`Bench/Vendors/`,
-`Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`, `Bench/Schema/`), with a render helper for each of the
-four other conformance declarations. The app starts under the host its argument `--host` names, with the JSON options
+`Bench/Declarations/`, `Bench/Plugins/`, `Bench/Execution/`, `Bench/Schema/`), with a render helper for each of the four
+other conformance declarations. The app starts under the host its argument `--host` names, with the JSON options
 app.json gives that host: net10's camel-case members and enum names, or those options with the one change each of five
-other hosts names; X7.14 stands under numbersAsText, M11.X1 and M11.X2 under snakeCase, and X15.5 under pascalCase,
-its opposite case opened under net10 through `NewWorldUnder`, as X6.16's is opened under enumsAsNumbers. Of the care
-families attempted, fifty-six promises placed under net10 alone wait: twenty-five need a call of the app's startup that
-throws until its unit (request defaults, antiforgery, flags enums, a registered validator, the busy indicator); two need
-their pages on the append to an element's text, which the core declares now (M5.N1); three need their pages on the
-append that removes nothing, whose promises the spec states now (M5.X5); five need a request culture; three need a
-console error's words, which no line states; six need a browser zone or the view's time zone; two need the harness's
-clock verb; one needs the harness's restart verb; one needs the text box's Type, whose form N18.4 sends to gate 2; one
-needs a record whose code holds null, which native.json's type of it does not hold; three need an export held while it
-runs, which their placement does not name and no harness verb holds; two need a grid column's rules from the app's
-validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need the clipboard, which the harness
-grants no page, and the first of them the antiforgery startup call besides. Three more attempted promises are placed
-beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test typed where the promise's outcome
-is the value the server renders back, a rule the owner decides, and on net48 in the harness; X11.20 waits on the
+other hosts names; X7.14 stands under numbersAsText, M11.X1 and M11.X2 under snakeCase, and X15.5 under pascalCase, its
+opposite case opened under net10 through `NewWorldUnder`, as X6.16's is opened under enumsAsNumbers. Of the care
+families attempted, fifty-three promises placed under net10 alone wait: twenty-five need a call of the app's startup
+that throws until its unit (request defaults, antiforgery, flags enums, a registered validator, the busy indicator); two
+need their pages on the append to an element's text, which the core declares now (M5.N1); five need a request culture;
+three need a console error's words, which no line states; six need a browser zone or the view's time zone; two need the
+harness's clock verb; one needs the harness's restart verb; one needs the text box's Type, whose form N18.4 sends to
+gate 2; one needs a record whose code holds null, which native.json's type of it does not hold; three need an export
+held while it runs, which their placement does not name and no harness verb holds; two need a grid column's rules from
+the app's validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need the clipboard, which the
+harness grants no page, and the first of them the antiforgery startup call besides. Three more attempted promises are
+placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test typed where the promise's
+outcome is the value the server renders back, a rule the owner decides, and on net48 in the harness; X11.20 waits on the
 defaultHooks host and M21.X803's second on the net48 host. Of the bench's feature tests attempted, ten wait: six need an
 append to the callbacks object's log line, which neither native.json nor a core door gives; three need the harness's
 restart or gc verb; and one needs a list written as an element's rows, which no door writes. Of the bench's ninety-eight

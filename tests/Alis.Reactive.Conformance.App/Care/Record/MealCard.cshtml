@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MealCard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Meal card";
+    var plan = Html.ReactivePlan<MealCard>();
+}
+<h1>Meal card of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, MealCards.OpenTheMenu)>Open the menu</button>
+<button type="button" @Html.Raises(plan, MealCards.AddANote)>Add a note</button>
+<button type="button" @Html.Raises(plan, MealCards.CloseTheMenu)>Close the menu</button>
+<section id="menu-slot" aria-label="Menu"></section>
+<p>Status: <output id="meal-status">No note</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(MealCards.OpenTheMenu, pipeline => pipeline.Get(MealCardEndpoints.Menu).Into("menu-slot"))
+        .CustomEvent(MealCards.AddANote, pipeline =>
+        {
+            pipeline.Element("menu-slot").Text.Append("Soft diet today");
+            pipeline.Element("meal-status").Text.Set("Note added");
+        })
+        .CustomEvent(MealCards.CloseTheMenu, pipeline =>
+        {
+            pipeline.Unload("menu-slot");
+            pipeline.Element("meal-status").Text.Set("Menu closed");
+        }));
+}
+@Html.RenderPlan(plan)

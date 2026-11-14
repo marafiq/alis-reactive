@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conditions
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NightChecks
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Night checks";
+    var plan = Html.ReactivePlan<NightChecks>();
+}
+<h1>Night sheet of @Model.Resident</h1>
+<section id="night-checks" aria-label="Night checks">
+    <h2>Night checks</h2>
+    @(Html.InputField(plan, m => m.WitnessCode, options => options.Label("Witness code")).NativeTextBox())
+    @(Html.NativeButton("sign-off", "Sign off").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .When(pipeline.Input(m => m.WitnessCode).Component<NativeTextBox>().Value.Eq("0200"))
+        .Then(pipeline => pipeline.Element("sheet-status").Text.Set("Signed off"))
+        .Else(pipeline => pipeline.Element("sheet-status").Text.Set("Code refused"))))
+</section>
+<button type="button" @Html.Raises(plan, NightChecksButtons.AddACheck)>Add a check</button>
+<p>Status: <output id="sheet-status">Not signed</output></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(NightChecksButtons.AddACheck, pipeline => pipeline.Element("night-checks").Html.Append("<p>Checked at 02:00</p>")));
+}
+@Html.RenderPlan(plan)

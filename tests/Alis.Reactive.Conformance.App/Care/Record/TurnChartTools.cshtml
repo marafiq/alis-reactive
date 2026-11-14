@@ -1,0 +1,14 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model TurnChartTools
+@{
+    var plan = Html.ReactivePlan<TurnChartTools>();
+}
+<h2>@Model.Shift</h2>
+<button type="button" @Html.Raises(plan, TurnCharts.LoadTheTurnPlan)>Load the turn plan</button>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(TurnCharts.LoadTheTurnPlan, pipeline => pipeline.Get(TurnChartEndpoints.TurnPlan).Into("turn-slot")));
+}
+@Html.RenderPlan(plan)
