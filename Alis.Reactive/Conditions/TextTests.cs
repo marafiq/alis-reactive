@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Conditions;
@@ -16,37 +17,37 @@ public static class TextTests
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The text it looks for.</param>
     /// <returns>A source that is true when the text holds the value.</returns>
-    public static TypedSource<bool> Contains(this ITypedSource<string?> text, string value) => throw new NotImplementedException();
+    public static TypedSource<bool> Contains(this ITypedSource<string?> text, string value) => Tested(Operator.Contains, text, Literals.Text(value));
 
     /// <summary>Tests that the text holds the text another source reads, compared character by character as <c>StringComparison.Ordinal</c> compares.</summary>
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The source of the text it looks for.</param>
     /// <returns>A source that is true when the text holds the value.</returns>
-    public static TypedSource<bool> Contains(this ITypedSource<string?> text, ITypedSource<string?> value) => throw new NotImplementedException();
+    public static TypedSource<bool> Contains(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.Contains, text, Sources.Of(value));
 
     /// <summary>Tests that the text starts with a literal, compared character by character as <c>StringComparison.Ordinal</c> compares.</summary>
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The text it starts with.</param>
     /// <returns>A source that is true when the text starts with the value.</returns>
-    public static TypedSource<bool> StartsWith(this ITypedSource<string?> text, string value) => throw new NotImplementedException();
+    public static TypedSource<bool> StartsWith(this ITypedSource<string?> text, string value) => Tested(Operator.StartsWith, text, Literals.Text(value));
 
     /// <summary>Tests that the text starts with the text another source reads, compared character by character as <c>StringComparison.Ordinal</c> compares.</summary>
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The source of the text it starts with.</param>
     /// <returns>A source that is true when the text starts with the value.</returns>
-    public static TypedSource<bool> StartsWith(this ITypedSource<string?> text, ITypedSource<string?> value) => throw new NotImplementedException();
+    public static TypedSource<bool> StartsWith(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.StartsWith, text, Sources.Of(value));
 
     /// <summary>Tests that the text ends with a literal, compared character by character as <c>StringComparison.Ordinal</c> compares.</summary>
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The text it ends with.</param>
     /// <returns>A source that is true when the text ends with the value.</returns>
-    public static TypedSource<bool> EndsWith(this ITypedSource<string?> text, string value) => throw new NotImplementedException();
+    public static TypedSource<bool> EndsWith(this ITypedSource<string?> text, string value) => Tested(Operator.EndsWith, text, Literals.Text(value));
 
     /// <summary>Tests that the text ends with the text another source reads, compared character by character as <c>StringComparison.Ordinal</c> compares.</summary>
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The source of the text it ends with.</param>
     /// <returns>A source that is true when the text ends with the value.</returns>
-    public static TypedSource<bool> EndsWith(this ITypedSource<string?> text, ITypedSource<string?> value) => throw new NotImplementedException();
+    public static TypedSource<bool> EndsWith(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.EndsWith, text, Sources.Of(value));
 
     /// <summary>Tests that the text matches a regular expression, as <c>Regex.IsMatch</c> reads it.</summary>
     /// <remarks>
@@ -64,11 +65,22 @@ public static class TextTests
     /// <param name="text">The text the test reads.</param>
     /// <param name="length">The fewest characters the text holds; a number below zero is refused at build.</param>
     /// <returns>A source that is true when the text is that long or longer.</returns>
-    public static TypedSource<bool> MinLength(this ITypedSource<string?> text, int length) => throw new NotImplementedException();
+    public static TypedSource<bool> MinLength(this ITypedSource<string?> text, int length) => length < 0
+        ? throw new InvalidOperationException("Condition minimum text length must be zero or greater.")
+        : AtLeast(text, Sources.FormOf(text).Beside(length));
 
     /// <summary>Tests that the text is at least as many characters long as another source reads, counted as <c>string.Length</c> counts.</summary>
     /// <param name="text">The text the test reads.</param>
     /// <param name="length">The source of the fewest characters the text holds.</param>
     /// <returns>A source that is true when the text is that long or longer.</returns>
-    public static TypedSource<bool> MinLength(this ITypedSource<string?> text, ITypedSource<int> length) => throw new NotImplementedException();
+    public static TypedSource<bool> MinLength(this ITypedSource<string?> text, ITypedSource<int> length) => AtLeast(text, Sources.Of(length));
+
+    private static TypedSource<bool> Tested(Operator op, ITypedSource<string?> text, Expression part)
+        => new Computed<bool>(new OpExpression(op, [Sources.Of(text), part]), Sources.FormOf(text).Computed);
+
+    private static TypedSource<bool> AtLeast(ITypedSource<string?> text, Expression length)
+    {
+        var textLength = new GetExpression([new MemberStep("length")], PathMembers.RequiredIfHeld, Sources.Of(text));
+        return new Computed<bool>(new OpExpression(Operator.Gte, [textLength, length]), Sources.FormOf(text).Computed);
+    }
 }

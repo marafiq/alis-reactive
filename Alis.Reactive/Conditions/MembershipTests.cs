@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Conditions;
@@ -19,7 +22,7 @@ public static class MembershipTests
     /// <param name="source">The source the test reads.</param>
     /// <param name="values">The values, each written in the form the source holds its value in.</param>
     /// <returns>A source that is true when the value equals one of them.</returns>
-    public static TypedSource<bool> In<TValue>(this TypedSource<TValue> source, params TValue[] values) => throw new NotImplementedException();
+    public static TypedSource<bool> In<TValue>(this TypedSource<TValue> source, params TValue[] values) => Keys.IsDateOrTime<TValue>() ? AnyKeyEqual(source, values) : Included(source, values);
 
     /// <summary>Tests that the source's value equals one of the items a list holds when the condition runs, as <c>Any(item =&gt; item == value)</c> reads it.</summary>
     /// <param name="source">The source the test reads.</param>
@@ -31,7 +34,7 @@ public static class MembershipTests
     /// <param name="source">The source the test reads.</param>
     /// <param name="values">The values, each written in the form the source holds its value in.</param>
     /// <returns>A source that is true when the value equals none of them.</returns>
-    public static TypedSource<bool> NotIn<TValue>(this TypedSource<TValue> source, params TValue[] values) => throw new NotImplementedException();
+    public static TypedSource<bool> NotIn<TValue>(this TypedSource<TValue> source, params TValue[] values) => source.In(values).Not();
 
     /// <summary>Tests that the source's value equals none of the items a list holds when the condition runs.</summary>
     /// <param name="source">The source the test reads.</param>
@@ -46,7 +49,7 @@ public static class MembershipTests
     /// <returns>A source that is true when the value is neither below the low nor above the high.</returns>
     public static TypedSource<bool> Between<TValue>(this TypedSource<TValue> source, TValue low, TValue high)
         where TValue : struct, IComparable<TValue>
-        => throw new NotImplementedException();
+        => source.Gte(low).And(source.Lte(high));
 
     /// <summary>Tests that the source's value lies between the values two other sources read, both included.</summary>
     /// <param name="source">The source the test reads.</param>
@@ -55,7 +58,7 @@ public static class MembershipTests
     /// <returns>A source that is true when the value is neither below the low nor above the high.</returns>
     public static TypedSource<bool> Between<TValue>(this TypedSource<TValue> source, TypedSource<TValue> low, TypedSource<TValue> high)
         where TValue : struct, IComparable<TValue>
-        => throw new NotImplementedException();
+        => source.Gte(low).And(source.Lte(high));
 
     /// <summary>Tests that the source's value lies between two literals, both included; a source that holds null does not.</summary>
     /// <param name="source">The source the test reads.</param>
@@ -64,7 +67,7 @@ public static class MembershipTests
     /// <returns>A source that is true when the value is neither below the low nor above the high.</returns>
     public static TypedSource<bool> Between<TValue>(this TypedSource<TValue?> source, TValue low, TValue high)
         where TValue : struct, IComparable<TValue>
-        => throw new NotImplementedException();
+        => source.Gte(low).And(source.Lte(high));
 
     /// <summary>Tests that the source's value lies between the values two other sources read, both included; a source that holds null does not.</summary>
     /// <param name="source">The source the test reads.</param>
@@ -73,5 +76,16 @@ public static class MembershipTests
     /// <returns>A source that is true when the value is neither below the low nor above the high.</returns>
     public static TypedSource<bool> Between<TValue>(this TypedSource<TValue?> source, TypedSource<TValue?> low, TypedSource<TValue?> high)
         where TValue : struct, IComparable<TValue>
-        => throw new NotImplementedException();
+        => source.Gte(low).And(source.Lte(high));
+
+    private static TypedSource<bool> Included<TValue>(TypedSource<TValue> source, TValue[] values)
+    {
+        var written = source.Form.Beside(values);
+        var holdsAnObject = written.Value.EnumerateArray().Any(item => item.ValueKind is JsonValueKind.Object or JsonValueKind.Array);
+        if (holdsAnObject) throw Comparisons.ComparesObjects();
+        return new Computed<bool>(new OpExpression(Operator.Includes, [written, source.Expression]), source.Form.Computed);
+    }
+
+    private static TypedSource<bool> AnyKeyEqual<TValue>(TypedSource<TValue> source, TValue[] values)
+        => values.Length == 0 ? source.NotEq(source) : values.Select(source.Eq).Aggregate(Comparisons.Or);
 }

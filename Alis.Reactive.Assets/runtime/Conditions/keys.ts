@@ -1,5 +1,6 @@
 import { assertNever, type Operator } from "../Schema/index";
 import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
+import { described } from "./described";
 
 export type KeyOperator = Extract<Operator, "dateKey" | "wallKey" | "instantKey" | "dayKey" | "timeKey" | "spanKey">;
 
@@ -82,13 +83,6 @@ function typeOf(key: KeyOperator): string {
     default:
       return assertNever(key);
   }
-}
-
-function described(held: unknown): string {
-  if (held instanceof Date) return Number.isNaN(held.getTime()) ? "a Date of no time" : "the Date " + held.toISOString();
-  if (typeof held === "string") return JSON.stringify(held);
-  if (typeof held === "number" || typeof held === "boolean") return String(held);
-  return typeof held === "object" ? "an object" : "a " + typeof held;
 }
 
 function localKey(held: Date): Keyed {

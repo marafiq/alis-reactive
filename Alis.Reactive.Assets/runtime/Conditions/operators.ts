@@ -1,6 +1,8 @@
 import { assertNever, notBuilt, type Operator } from "../Schema/index";
 import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
 import { keyOf } from "./keys";
+import { empty, included } from "./lists";
+import { matched, nullOrEmpty, textTested } from "./texts";
 
 export type Term = () => Read;
 
@@ -35,8 +37,6 @@ export function operated(op: Operator, terms: readonly Term[]): Read {
     case "neg":
     case "nullableValue":
     case "nonNull":
-    case "empty":
-    case "matches":
     case "toArray":
     case "finite":
     case "compareNumbers":
@@ -53,16 +53,25 @@ export function operated(op: Operator, terms: readonly Term[]): Read {
     case "lower":
     case "upperTurkic":
     case "lowerTurkic":
-    case "contains":
-    case "startsWith":
-    case "endsWith":
-    case "nullOrEmpty":
-    case "includes":
     case "sumInt":
     case "sumDouble":
     case "sumDecimal":
     case "eqDecimal":
       throw notBuilt("the operator '" + op + "'");
+    case "contains":
+      return textTested(termOf(op, terms, 0)(), termOf(op, terms, 1)(), (held, sought) => held.includes(sought));
+    case "startsWith":
+      return textTested(termOf(op, terms, 0)(), termOf(op, terms, 1)(), (held, sought) => held.startsWith(sought));
+    case "endsWith":
+      return textTested(termOf(op, terms, 0)(), termOf(op, terms, 1)(), (held, sought) => held.endsWith(sought));
+    case "nullOrEmpty":
+      return nullOrEmpty(termOf(op, terms, 0)());
+    case "matches":
+      return matched(termOf(op, terms, 0)(), termOf(op, terms, 1)());
+    case "empty":
+      return empty(termOf(op, terms, 0)());
+    case "includes":
+      return included(termOf(op, terms, 0)(), termOf(op, terms, 1)());
     case "dateKey":
     case "wallKey":
     case "instantKey":

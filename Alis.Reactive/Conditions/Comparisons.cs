@@ -229,6 +229,6 @@ public static class Comparisons
     private static TypedSource<bool> Joined(Operator op, TypedSource<bool> left, TypedSource<bool> right)
         => new Computed<bool>(new OpExpression(op, [left.Expression, right.Expression]), left.Form.Computed);
 
-    private static InvalidOperationException ComparesObjects()
+    internal static InvalidOperationException ComparesObjects()
         => new("A condition compares objects, and the browser compares objects by reference; compare a member of each.");
 }
