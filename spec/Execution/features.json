@@ -227,6 +227,7 @@
         "Run.tla:ReleasedWhenEnded",
         "Run.tla:DisposedRunNeverWaits",
         "Run.tla:ReplacedFinallyGoesOn",
+        "Run.tla:TheOldFinallyRunsBeforeTheNewRun",
         "Lanes.tla:DisposedRunsNothingMore",
         "Lanes.tla:FinallyRunsBeforeRelease",
         "Lanes.tla:ReplacedRunRunsNoRoute",

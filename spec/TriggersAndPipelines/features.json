@@ -115,6 +115,7 @@
         "Run.tla:SyncRunEndsInItsTurn",
         "Run.tla:SecondHandlerStartsInTheTurn",
         "Run.tla:NothingRunsAfterAnAbort",
+        "Run.tla:TheOldFinallyRunsBeforeTheNewRun",
         "Lanes.tla:SkippedTriggerStartsNothing",
         "Lanes.tla:ReplacedRunRunsNothingAfter",
         "Absence.tla:StopEndsOnlyItsHandler",

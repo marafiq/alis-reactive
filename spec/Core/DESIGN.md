@@ -2735,9 +2735,10 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   - An abort the run's own step causes lands when that step returns, before the next (`Run.tla:NothingRunsAfterAnAbort`):
     a step that loads or unloads the slot its owner holds, whose release waits for that return (D12.4), and a step
     that raises its handler's own event under `replace`. The new run starts after the old run's cut has landed and its
-    `Finally` layers have run to their first awaited step, as when a `replace` lands on a wait, so what an old
-    `Finally` does before an await never undoes what the new run's `WhileLoading` shows. What it does after an await
-    runs after that `WhileLoading`, since under `replace` it goes on to its end (X11.22): an element an app shows in
+    `Finally` layers have run to their first awaited step, as when a `replace` lands on a wait
+    (`Run.tla:TheOldFinallyRunsBeforeTheNewRun`), so what an old `Finally` does before an await never undoes what
+    the new run's `WhileLoading` shows. What it does after an await runs after that `WhileLoading`, since under
+    `replace` it goes on to its end (X11.22): an element an app shows in
     `WhileLoading` and hides in `Finally` after an await is hidden by the old run while the new one loads, and the
     door for that is the busy indicator, which the core counts per target (D10.21, `spec/RequestsAndResponses/Composition.tla`). A
     hide before the old `Finally`'s first await runs before the new run starts. Neither TLA+ spec models the second
@@ -2797,6 +2798,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `Run.tla:ReleasedWhenEnded`
 - `Run.tla:DisposedRunNeverWaits`
 - `Run.tla:ReplacedFinallyGoesOn`
+- `Run.tla:TheOldFinallyRunsBeforeTheNewRun`
 - `probe:abort-signal-keeps-first-reason`
 - `probe:fetch-aborted-signal-sends-nothing`
 - `Absence.tla:UnawaitedPromiseStops`
