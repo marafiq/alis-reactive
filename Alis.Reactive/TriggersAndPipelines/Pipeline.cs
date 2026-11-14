@@ -163,6 +163,16 @@ public sealed class Pipeline<TModel>
     /// <returns>A source of the object.</returns>
     public TypedSource<T> Object<T>(Action<ObjectMembers<T>> members) => throw new NotImplementedException();
 
+    /// <summary>Joins a text from its parts when the step runs, in their order: texts the view holds and sources of any type.</summary>
+    /// <remarks>
+    /// A source part shows as an element's text shows it: a number as the server writes it under the view's culture,
+    /// a date as its day, with its time when that is not midnight. A part that cannot be read or holds null adds
+    /// nothing, and a part whose read stops the pipeline stops it here.
+    /// </remarks>
+    /// <param name="parts">The parts, each a text or a source.</param>
+    /// <returns>A source of the joined text, which never holds null.</returns>
+    public TypedSource<string> Concat(params TextPart[] parts) => throw new NotImplementedException();
+
     /// <summary>Reaches the page's own URL, read as the action that rendered the page bound it.</summary>
     /// <typeparam name="TPage">The type the page's action binds its URL to.</typeparam>
     /// <returns>The URL, whose members are sources.</returns>

@@ -691,3 +691,16 @@ them, each marked as the lead's slip, and are not copied here.
   of the session's waiting writer. Caught by the writer, whose assert refused the care list before section 4 was
   written. Cost: one rerun. The class moves up a rung, to the tool: the writer's assert, refused here and accepted on
   the rerun.
+- 2026-11-13, a command run on a guess of what it does, the class's third entry, the lead's. Running TLC on a copy of
+  the Schema spec and compiling the joined text's sentences in a scratch project, the lead ended two commands with a
+  `cd` into the scratch folder, and the harness put the shell back in the main checkout's root after each. Caught by
+  the harness's notice; no command ran there, since each opens with the cd to the worktree. Cost: none run, two
+  notices. The class moves up a rung: the session's commands enter a scratch folder only in a subshell, `( cd … )`,
+  and a script takes the folder as its argument; the tool rung is the hook proposed above, widened to refuse a `cd`
+  out of the worktree outside a subshell, which waits for the owner with it.
+- 2026-11-13, an edit by pattern changed text beside its target, the class's fourth entry, the lead's. Writing
+  Schema.tla's invariant plain in the owner line of spec/CLAUDE.md, the lead replaced "is `Schema.tla:…`" with the
+  plain name, and the sentence lost its verb. Caught by the lead reading the changed sentence back after the gate
+  started; the gate was stopped before its check ran, the verb restored. Cost: one gate start. The class stays on the
+  tool rung for the writers that assert their result; a replace by hand prints the sentence it changed and is read
+  before the stage, and the writer of prose edits proposed above, which waits for the owner, holds it for good.

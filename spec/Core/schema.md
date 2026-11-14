@@ -246,7 +246,7 @@ A listen release says when release removes the listener the step added (D12.8):
 | `fn` | `params`: names | `body`: an expression | a function the framework calls, whose parameters are bound in its body: a list operation's item read, a sort's comparison, a vendor's locate |
 | `answer` | `arguments`: a name | `body`: an expression | the function a vendor calls for an answer, set into a property or passed as an argument: each call binds the list of its arguments to the name and answers its body's value, and a stop its body raises is thrown to the vendor's call (D17.12) |
 | `record` | | `fields`: a list of `RecordField` | an object built member by member (D7.4) |
-| `list` | | `items`: expressions | a list built from sources (N7.2) |
+| `list` | | `items`: expressions | a list built from sources (N7.2), or the parts of a joined text (N7.7) |
 | `op` | `op`: an operator | `args`: expressions | the operator over its arguments; `and`, `or` and `cond` evaluate a term only when it is reached (D4.7); a comparison over an argument that reads nothing reads nothing, null compares as .NET's lifted operators compare it, and `not`, `and` and `or` are SQL's three-valued logic with nothing as its unknown (D8.9) |
 | `signal` | nothing | | the abort signal of the block it is read in (D11.12), passed only to a method whose declaration names that argument (D17.11) |
 
@@ -272,6 +272,9 @@ D16.11). The text operators carry .NET's meaning (`spec/Core/translated-members.
 differ: `trim` removes another set of characters, `toUpperCase` turns `ß` into two letters, and `includes` reads an
 argument that is nothing as the text "null". `includes` looks for an item in a list the view supplies, written as a
 `lit`, and reads nothing when the item reads nothing, where a `call` of JavaScript's `includes` would pass null.
+A joined text (N7.7) is a `call` of the array's `join` over a `list` of its parts with the separator `""`, and no
+operator: a text part is a `lit` and a source part the `coalesce` of its `as` text with `""`, so every item reaches
+`join` as a text and `join` converts none, as .NET's `string.Concat` adds texts (`Schema.tla:JoinedPartsAreTexts`).
 `sumInt`, `sumDouble` and `sumDecimal` take the list a `map` of the term reads and add it as .NET adds that number
 type (D6.11): one operator over the whole list, where JavaScript's `reduce` would add a decimal as a double and
 carry no range. `sumDecimal` reads each term by the one decimal reader: a JSON number at its double's shortest text,

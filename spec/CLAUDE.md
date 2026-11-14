@@ -1370,8 +1370,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   once per start of its owner and a slot's reload is a new owner (M1.D1, D12.4), so it writes overlap. `Overlap` stays
   public as the grammar's third value, so a consumer that forwards a policy names the default; its cost is a second
   spelling of a door that names none. A consumer door that starts a handler off the core's doors adds its own overload
-  and forwards the policy. X17.8 waits on a text joined from a source and a literal, which no door writes, and X11.15,
-  X11.21 and X11.22 on the defaultHooks host. The owner decides the form.
+  and forwards the policy. X17.8's text joined from a source and a literal is N7.7's, and X11.15,
+  X11.21 and X11.22 wait on the defaultHooks host. The owner decides the form.
 - The lead, 2026-11-13, declaring N10.1, the endpoint's error answer, as its line writes it:
   `ValidationResult.ToErrorResponse()`, an extension of `RequestsAndResponses`, module 6's, in a file of each host,
   returning that host's MVC `ActionResult`, so an action that returns `IActionResult` or `ActionResult` returns it
@@ -1465,6 +1465,18 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   sentence over them still builds, so M4.X3's census sort stands, red. Two things wait for the owner: D5.3 gaining
   that a member the API types as an array is declared `IReadOnlyList<T>`, and whether `NativeCheckList.Value`, a
   `Property<string[]>` by its own line, follows.
+- The owner, 2026-11-13, on the lead's line of 2026-11-12 that a door joining text waits for the owner's word
+  (verbatim in `spec/NOTES.md`): "ok if its align with quality, specs tla+ covers it - then add it - consult fable
+  xhigh to make sure its done right". A Fable agent at xhigh checked the form against the spec's lines, the schema and
+  the TLA+ specs (TEXT-VERIFY-FABLE.md of the handoff folder), and the lead decided from its answer read at the
+  source. A text joined from texts and sources is `pipeline.Concat(first, second, ..)` (N7.7), each part a `TextPart`,
+  which C# converts a text and a source of any type to. The plan writes a `call` of the array's `join` over a `list`
+  of the parts, so the grammar gains no kind and no operator: D6.6's array members gain `join` and D7.2's sources the
+  joined text. The one premise no spec held, that C# hands `join` every part as a text, is Schema.tla's
+  JoinedPartsAreTexts, which its mutant kills. An append to an element's text or HTML writes the content `set` that
+  `Set` writes, whose stop over a held slot (D12.9, X12.12) no spec holds, so the append is declared after that
+  ordering is written as a spec, as root CLAUDE.md requires, and the same spec covers `Set`. The lead's line of
+  2026-11-12 on event.poc15's three cells stands: their promises read the source alone.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

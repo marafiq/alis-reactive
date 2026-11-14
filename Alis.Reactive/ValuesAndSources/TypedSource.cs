@@ -1,3 +1,5 @@
+using System;
+
 namespace Alis.Reactive.ValuesAndSources;
 
 /// <summary>
@@ -24,4 +26,8 @@ public abstract class TypedSource<T> : ITypedSource<T>
     private protected TypedSource()
     {
     }
+
+    /// <summary>Joins what the source reads when the step runs, shown as an element's text shows it.</summary>
+    /// <param name="source">The source of the part; one that cannot be read or holds null adds nothing.</param>
+    public static implicit operator TextPart(TypedSource<T> source) => throw new NotImplementedException();
 }

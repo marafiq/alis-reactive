@@ -995,6 +995,10 @@ M4.X3's census sort on the residents screen and X16.20's resident admission on t
 red: the reference component's three array-valued properties are declared `Property<IReadOnlyList<T>>`, as the Fusion
 slices declare theirs, so a list operation's result sets into them; X16.20's two blocks are bare, live through the
 validator registered at startup, which U17 builds.
+A text joined from texts and sources (N7.7) is declared as the owner said yes to it: `pipeline.Concat` over parts C#
+converts a text and a source of any type to, its plan a `call` of the array's `join` over a `list` of the parts, which
+adds no kind and no operator; `Schema.tla:JoinedPartsAreTexts` holds that every part reaches `join` as a text. An
+append to an element's text waits for the spec of a write over a held slot, which `Set` shares.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
 named by two declarations. Thirty-four more refusal pages stand, each beside the page of its opposite case and each
 test red, six forks' work read at the source and landed, and one the lead's: fifteen of module 4's, five of module
@@ -1029,20 +1033,20 @@ camel-case members and enum names, or those options with the one change each of 
 under numbersAsText, M11.X1 and M11.X2 under snakeCase, and X15.5 under pascalCase, its opposite case opened under
 net10 through `NewWorldUnder`, as X6.16's is opened under enumsAsNumbers. Of the care families attempted, fifty-seven
 promises placed under net10 alone wait: twenty-five need a call of the app's startup that throws until its unit
-(request defaults, antiforgery, flags enums, a registered validator, the busy indicator); six need a door the core
-does not declare (an append to an element's text; a text joined from a source and a literal); five need a request
-culture; three need a console error's words, which no line states; six need a browser zone or the view's time zone;
-two need the harness's clock verb; one needs the harness's restart verb; one needs the text box's Type, whose form
-N18.4 sends to gate 2; one needs a record whose code holds null, which native.json's type of it does not hold; three
-need an export held while it runs, which their placement does not name and no harness verb holds; two need a grid
-column's rules from the app's validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need
-the clipboard, which the harness grants no page, and the first of them the antiforgery startup call besides. Three
-more attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the
-test typed where the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in
-the harness; X11.20 waits on the defaultHooks host and M21.X803's second on the net48 host. Of the bench's feature
-tests attempted, ten wait: six need an append to the callbacks object's log line, which neither native.json nor a core
-door gives; three need the harness's restart or gc verb; and one needs a list written as an element's rows, which no
-door writes.
+(request defaults, antiforgery, flags enums, a registered validator, the busy indicator); four need an append to an
+element's text, which waits for the spec of a write over a held slot (D12.9); two need their pages on the joined text,
+which the core declares now (N7.7); five need a request culture; three need a console error's words, which no line
+states; six need a browser zone or the view's time zone; two need the harness's clock verb; one needs the harness's
+restart verb; one needs the text box's Type, whose form N18.4 sends to gate 2; one needs a record whose code holds
+null, which native.json's type of it does not hold; three need an export held while it runs, which their placement
+does not name and no harness verb holds; two need a grid column's rules from the app's validator, whose door waits on
+the core door U17 names (M21.N23, N16.2); and two need the clipboard, which the harness grants no page, and the first
+of them the antiforgery startup call besides. Three more attempted promises are placed beyond net10 alone: M24.X10
+waits on TEST009, which refuses an expected value the test typed where the promise's outcome is the value the server
+renders back, a rule the owner decides, and on net48 in the harness; X11.20 waits on the defaultHooks host and
+M21.X803's second on the net48 host. Of the bench's feature tests attempted, ten wait: six need an append to the
+callbacks object's log line, which neither native.json nor a core door gives; three need the harness's restart or gc
+verb; and one needs a list written as an element's rows, which no door writes.
 Of the bench's ninety-eight placed cells, ninety-five stand, each test red: nine of its properties, nine of its
 methods, thirty-six of its events, thirty of them the cells of event.poc15, thirteen of its sources, its three
 absences, its sixteen requests and three of its lanes, a slot loaded on start, a slot's listener gone at its unload

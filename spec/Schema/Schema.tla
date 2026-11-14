@@ -5,7 +5,7 @@ CONSTANT Mutant
 
 Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARead", "AsOfAny", "PatternReadInBrowser",
             "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock", "DecimalTextComparedAsText", "SelectFieldUnchecked",
-            "DateComparedBare", "KeyAsAValue", "KeyFallbackComputed"}
+            "DateComparedBare", "KeyAsAValue", "KeyFallbackComputed", "PartJoinedUnconverted"}
 
 ASSUME Mutant \in Mutants
 
@@ -72,6 +72,21 @@ Paths == {<<"member">>, <<"each">>}
 
 WrittenOps == {"eq", "eqDecimal", "matches", "toNumber"}
 
+Node(k, c, p, s, o) == [k |-> k, c |-> c, p |-> p, s |-> s, o |-> o, h |-> "value"]
+
+TextPart(e) == Node("op", <<Node("as", <<e>>, <<>>, "string", "eq"), Leaf("lit")>>, <<>>, "string", "coalesce")
+
+Joined(parts) == Node("call", <<Node("list", parts, <<>>, "string", "eq"), Leaf("lit")>>, <<"join">>, "string", "eq")
+
+IsJoin(e) == e.k = "call" /\ e.p = <<"join">>
+
+IsTextPart(e) ==
+    \/ e.k = "lit"
+    \/ /\ e.k = "op" /\ e.o = "coalesce" /\ Len(e.c) = 2
+       /\ e.c[1].k = "as" /\ e.c[1].s = "string" /\ e.c[2].k = "lit"
+
+JoinedParts(e) == {e.c[1].c[i] : i \in DOMAIN e.c[1].c}
+
 RECURSIVE ExprsTo(_)
 ExprsTo(d) ==
     IF d = 0 THEN Leaves
@@ -84,6 +99,14 @@ ExprsTo(d) ==
         \cup {[k |-> "fn", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "eq", h |-> "value"] : e \in below}
         \cup {[k |-> "op", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "dateKey", h |-> "value"] : e \in below}
         \cup {[k |-> "op", c |-> <<e, x>>, p |-> <<>>, s |-> "string", o |-> "dateKey", h |-> "value"] : e \in below, x \in Leaves}
+
+PartReads == Leaves \cup {[k |-> "get", c |-> <<e>>, p |-> <<"member">>, s |-> "string", o |-> "eq", h |-> "value"] : e \in Leaves}
+
+Parts == PartReads \cup {TextPart(e) : e \in PartReads}
+
+JoinsOfParts == {Joined(<<e, x>>) : e \in Parts, x \in Parts}
+
+Joins == JoinsOfParts \cup {Joined(<<TextPart(j), x>>) : j \in JoinsOfParts, x \in Parts}
 
 RECURSIVE Nodes(_)
 Nodes(e) == {e} \cup UNION {Nodes(e.c[i]) : i \in DOMAIN e.c}
@@ -102,6 +125,7 @@ WriterAccepts(e) ==
     /\ (e.k = "op" /\ e.o \in Comparisons) => ((\A i \in DOMAIN e.c : e.c[i].h # "dateHeld") \/ Mutant = "DateComparedBare")
     /\ IsKey(e) => e.c[1].h = "dateHeld"
     /\ (IsKey(e) /\ Len(e.c) = 2) => (e.c[2].k = "lit" \/ Mutant = "KeyFallbackComputed")
+    /\ IsJoin(e) => ((\A part \in JoinedParts(e) : IsTextPart(part)) \/ Mutant = "PartJoinedUnconverted")
     /\ \A i \in DOMAIN e.c : IsKey(e.c[i]) =>
            ((e.k = "op" /\ e.o \in Comparisons /\ \A j \in DOMAIN e.c : IsKey(e.c[j])) \/ Mutant = "KeyAsAValue")
 
@@ -135,7 +159,7 @@ vars == <<plane, expr, shape, open, parent, log, writes>>
 
 Init ==
     /\ \/ /\ plane = "expr"
-          /\ expr \in {e \in ExprsTo(Depth) : WriterAccepts(e) /\ RootAccepts(e)}
+          /\ expr \in {e \in ExprsTo(Depth) \cup Joins : WriterAccepts(e) /\ RootAccepts(e)}
           /\ shape = NoShape
        \/ /\ plane = "shape"
           /\ shape \in {s \in ShapesTo(Depth) : ShapeAccepted(s)}
@@ -230,6 +254,8 @@ KeysOnlyCompared ==
 
 KeyFallbackIsALiteral == \A n \in Nodes(expr) : (IsKey(n) /\ Len(n.c) = 2) => n.c[2].k = "lit"
 
+JoinedPartsAreTexts == \A n \in Nodes(expr) : IsJoin(n) => \A part \in JoinedParts(n) : IsTextPart(part)
+
 NullableWrapsOnce == \A n \in ShapeNodes(shape) : n.k = "nullable" => n.c[1].k # "nullable"
 
 SetsWriteAMember == \A i \in DOMAIN log : log[i].k = "set" => log[i].len >= 1
@@ -253,6 +279,8 @@ ReachDecimalTextEquality == ~(plane = "expr" /\ expr.k = "op" /\ expr.o = "eqDec
 ReachDateKeyCompared == ~(plane = "expr" /\ expr.k = "op" /\ expr.o \in Comparisons
                           /\ (\A i \in DOMAIN expr.c : IsKey(expr.c[i]))
                           /\ (\E j \in DOMAIN expr.c : Len(expr.c[j].c) = 2))
+
+ReachJoinedSourcePart == ~(plane = "expr" /\ IsJoin(expr) /\ \E part \in JoinedParts(expr) : part.k = "op" /\ part.o = "coalesce" /\ part.c[1].c[1].k = "data")
 
 ReachSelectFieldStops == ~(plane = "expr" /\ expr.k = "fn" /\ expr.c[1].k = "op" /\ expr.c[1].o = "nonNull" /\ expr.c[1].c[1].h = "holdsNoNull")
 

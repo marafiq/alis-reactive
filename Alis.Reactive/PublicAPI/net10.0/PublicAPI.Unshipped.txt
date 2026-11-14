@@ -412,6 +412,7 @@ Alis.Reactive.TriggersAndPipelines.PartsGuard<TParts>.Then(System.Action<TParts!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Component<TComponent>() -> TComponent!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Component<TComponent>(string! id) -> TComponent!
+Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Concat(params Alis.Reactive.ValuesAndSources.TextPart![]! parts) -> Alis.Reactive.ValuesAndSources.TypedSource<string!>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Container<TContainer>(string! containerId) -> Alis.Reactive.RequestsAndResponses.RequestContainer<TContainer>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Delete(string! url) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, Alis.Reactive.TriggersAndPipelines.NoModel!>!
 Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>.Delete<TRequest>(string! url, System.Action<Alis.Reactive.TriggersAndPipelines.BodyParts<TRequest>!>! request) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
@@ -629,6 +630,7 @@ Alis.Reactive.ValuesAndSources.ObjectMembers<T>
 Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
 Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue>!>! member, TValue value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
 Alis.Reactive.ValuesAndSources.ObjectMembers<T>.Set<TValue>(System.Linq.Expressions.Expression<System.Func<T, TValue?>!>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! value) -> Alis.Reactive.ValuesAndSources.ObjectMembers<T>!
+Alis.Reactive.ValuesAndSources.TextPart
 Alis.Reactive.ValuesAndSources.TypedSource<T>
 Alis.Reactive.Vendors.Component
 Alis.Reactive.Vendors.Component.Component() -> void
@@ -899,6 +901,8 @@ static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.Val
 static Alis.Reactive.ValuesAndSources.Arg<T>.implicit operator Alis.Reactive.ValuesAndSources.Arg<T>!(T value) -> Alis.Reactive.ValuesAndSources.Arg<T>!
 static Alis.Reactive.ValuesAndSources.NullableReferences.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue!>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
 static Alis.Reactive.ValuesAndSources.NullableValues.OrNull<TValue>(this Alis.Reactive.ValuesAndSources.TypedSource<TValue>! source) -> Alis.Reactive.ValuesAndSources.TypedSource<TValue?>!
+static Alis.Reactive.ValuesAndSources.TextPart.implicit operator Alis.Reactive.ValuesAndSources.TextPart!(string? text) -> Alis.Reactive.ValuesAndSources.TextPart!
+static Alis.Reactive.ValuesAndSources.TypedSource<T>.implicit operator Alis.Reactive.ValuesAndSources.TextPart!(Alis.Reactive.ValuesAndSources.TypedSource<T>! source) -> Alis.Reactive.ValuesAndSources.TextPart!
 static Alis.Reactive.Vendors.ComponentVendor.Define(string! name, Alis.Reactive.Vendors.VendorLookup! lookup, string! subscribe, string! unsubscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
 static Alis.Reactive.Vendors.ComponentVendor.Define(string! name, string! objectPath, string! subscribe, string! unsubscribe, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!
 static Alis.Reactive.Vendors.ComponentVendor.DefineCallbackProperties(string! name, Alis.Reactive.Vendors.VendorLookup! lookup, string? elementPath = null) -> Alis.Reactive.Vendors.ComponentVendor!

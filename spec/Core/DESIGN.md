@@ -742,14 +742,15 @@ Terms used throughout:
   (`poc/runtime/src/sums.ts:7`). Any other term, null among them, stops the pipeline, as these three types have no null to add; a term that reads
   nothing, past a holder that holds null, is null in the `map`, so it stops too. A term member the item lacks reads
   its start first (D4.2), so `Sum(d => d.Refills)` adds 0 for a dose the app omitted at 0.
-- D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted` and
-  `length`, named at the vendor boundary of the built-in array and read `requiredIfHeld` (D6.3). The browser adds no
-  array function, and no operation changes the vendor's own array: a sort is `toSorted`, never `sort`. The redesign
+- D6.6 The JavaScript array members the plan reads are `map`, `filter`, `some`, `every`, `find`, `toSorted`, `join`
+  and `length`, named at the vendor boundary of the built-in array and read `requiredIfHeld` (D6.3). The browser adds
+  no array function, and no operation changes the vendor's own array: a sort is `toSorted`, never `sort`. The redesign
   calls `toSorted` and `reduce` (`Alis.Reactive/PlanAuthoring/Arrays/ArrayOperations.cs`); `reduce` leaves, because a
-  sum is an operator over the `map` of its terms (D6.11), and a list the view supplies is looked in by the
-  `includes` operator (schema.md).
-  `Any()` is `some` over a `fn` whose body is the literal `true`, so it needs no operator; `Count(predicate)` is the
-  `length` of `filter`.
+  sum is an operator over the `map` of its terms (D6.11), and a list the view supplies is looked in by the `includes`
+  operator (schema.md). `Any()` is `some` over a `fn` whose body is the literal `true`, so it needs no operator;
+  `Count(predicate)` is the `length` of `filter`. `join` is called only over the `list` a joined text builds (N7.7),
+  with the separator `""`: C# writes each item as a text, so `join` adds them in order as .NET's `string.Concat` does
+  and converts none by JavaScript's rules (`Schema.tla:JoinedPartsAreTexts`).
 - D6.9 `Find(predicate)` over a list of live objects is the first item the predicate keeps, a live object.
   Reading, writing or calling its member when no item matched stops the pipeline, as a member of a null object
   fails in .NET. `Find(predicate, field)` is the door that reads nothing when no item matched: `find` stops at the
@@ -1213,8 +1214,9 @@ Terms used throughout:
   (`Sources.EventPayloadField`, `Sources.PushedMessageField`), a field of a response body
   (`Sources.ResponseBodyField`), a member as its container sends it (N13.1, `Sources.ContainerMember`), the result of
   an array operation (`Sources.ArrayOperationResult`), a literal (`Sources.Literal`), an object built from sources
-  (`Sources.Object`), a list built from sources (`Sources.List`), and a value chosen from sources by `IfNull` or
-  `Choose` (D6.14, `Sources.IfNull`, `Sources.Choose`).
+  (`Sources.Object`), a list built from sources (`Sources.List`), a text joined from texts and sources
+  (`pipeline.Concat`, N7.7, `Sources.JoinedText`), and a value chosen from sources by `IfNull` or `Choose` (D6.14,
+  `Sources.IfNull`, `Sources.Choose`).
 - D7.3 Every position takes a literal of its type and every source whose type is assignable to it:
   `TypedSource<TSource>` with `TSource : TValue`, and a `TValue` source at a `TValue?` position. A condition operator's
   left operand is the one position that takes no literal: it is the source the operator tests, as `p.When(source)`
@@ -1222,13 +1224,15 @@ Terms used throughout:
   as `ITypedSource<out T>`, and so does an element's class name, `ClassList`'s `Add`, `Remove` and `Toggle` (M5.N2,
   gate 2's G9), so a narrower reference type and a text without null reach them as they are. A text test takes
   the text it tests and its operand the same way (M3.N1). An element's text
-  and HTML are the one position that takes a source of any type, `ElementContent`'s `Set` (M5.N1): what the source
-  reads is shown as the string table of `spec/Core/conversions.md` writes it (D3.11, X3.8). C# converts a
+  and HTML are the one position that takes a source of any type, `ElementContent`'s `Set` (M5.N1), and a joined
+  text's part takes one the same way (N7.7): what the source reads is shown as the string table of
+  `spec/Core/conversions.md` writes it (D3.11, X3.8). C# converts a
   method's `Arg<T>` only from a `TypedSource<T>`: it refuses a conversion from the covariant interface (CS0552), warns
   where only nullability differs (CS8620), which ALIS040 refuses as an error in every app (N18.14, gate 2's G8), has
   no conversion from a struct's source to its nullable's (CS1503), takes no
-  conversion operator in an extension block (CS9282), and a second operator on `TypedSource<T>` makes the plain case
-  ambiguous (CS0457). A struct's source reaches its nullable at a set as C# assignment widens it: `Set` on a
+  conversion operator in an extension block (CS9282), and an operator on `TypedSource<T>` toward `Arg<T?>` makes the
+  plain case ambiguous with `Arg<T>`'s own (CS0457); its operator toward `TextPart` (N7.7) converts to no `Arg` and is
+  no candidate there. A struct's source reaches its nullable at a set as C# assignment widens it: `Set` on a
   `Property<T?>` or `WriteOnly<T?>` takes a `T` source (N7.6). At an argument and in a comparison, where C# offers no
   such overload, it goes through `OrNull()` (N7.5), which writes nothing of its own, and a narrower reference type
   reaches an argument through the declaration's `Pass`, a door Q5 keeps for the component author.
@@ -1245,9 +1249,9 @@ Terms used throughout:
   - the live form, what a live object holds or hands: a member of a component, plugin or element, a method's result,
     an event's payload, argument or callback argument, one declared as data included (D5.6), since the vendor's
     JavaScript wrote it, and data read past any of these; a computed value (a count, a sum, a comparison), which the
-    browser computes as a JavaScript number or boolean (D6.11); an object or list built from sources (N7.2); and a
-    member as its container sends it (N13.1), read from the input that holds it and converted by the member's key, as
-    an input's value is (N3.3).
+    browser computes as a JavaScript number or boolean (D6.11); an object or list built from sources (N7.2); a text
+    joined from parts (N7.7), a JavaScript string; and a member as its container sends it (N13.1), read from the input
+    that holds it and converted by the member's key, as an input's value is (N3.3).
   The live form is System.Text.Json's writing of the type with the app's naming policies and its contract (its
   resolver, a source-generated context's included) and nothing else the options set: every number a JSON number,
   every null member written, and no converter but the plan's own `DateTime` converter (D3.9)
@@ -1292,10 +1296,11 @@ Terms used throughout:
   writes one from a source; the redesign reads a child's attribute inside a lambda over the element's children. In a request it is
   decided by Q9.
 
-**Schema nodes.** `lit`, `obj`, `list`, `get`, `call`, `set`, `op`; the request argument's members (Q9).
+**Schema nodes.** `lit`, `obj`, `list`, `get`, `as`, `call`, `set`, `op`; the request argument's members (Q9).
 
 **Checker.**
 - `Absence.tla:MissingValueWritesNull`
+- `Schema.tla:JoinedPartsAreTexts`: every item C# hands a joined text's `join` is a literal or a source part's text
 - `check:matrix`
 - `check:fluent`
 
@@ -1319,6 +1324,17 @@ Terms used throughout:
 - `N7.4` new, its form gate 2's: `IfNull` on a source of a nullable type, taking a literal or a source of the type
   without null and returning a source of it, and `Choose` on a `TypedSource<bool>`, taking a literal or a source for
   each branch; extension methods beside the comparisons of N8.2.
+- `N7.7` new, the owner's yes of 2026-11-13: `pipeline.Concat(first, second, ..)`, a `TypedSource<string>` joined from
+  its parts in order. A part is a text the view holds or a source of D7.2 of any type, taken as a `TextPart`, which C#
+  converts a `string?` and a `TypedSource<T>` to; a number the view holds is no part, and neither is a value typed as
+  the interface `ITypedSource<T>` (CS1503 for each). A source part is shown as an element's text shows it (D7.3,
+  D3.11); a part that reads nothing or holds null adds nothing, and so does a null text (D7.6). A part whose read
+  stops, a promise among them, stops the pipeline (D4.1, D4.3). C# warns on a null literal as a part or as the list of
+  parts (CS8625), and a null list is refused where the view renders. The plan writes
+  `call(list(parts), ["join"], [lit("")])` with `members` `requiredIfHeld` (D6.6): a text part is a `lit`, a source
+  part `op(coalesce, as(read, string), lit(""))`, its text as `ElementContent.Set` shows it, so every item reaches
+  `join` as a text (`Schema.tla:JoinedPartsAreTexts`). The result is in the live form (D7.7), never null, and reaches
+  a `string?` argument through `OrNull()` (N7.5).
 
 **Evidence.**
 - G8: a source of an assignable type fills a request member (`Alis.Reactive/PlanAuthoring/Requests/GatherBuilder.cs:70-73`).

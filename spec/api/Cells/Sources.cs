@@ -36,6 +36,8 @@ public static class Sources
 
     public static TypedSource<string?> List() => NoDoor.Source("N7.2: no List door");
 
+    public static TypedSource<string?> JoinedText() => NoDoor.Source("N7.7: no Concat door");
+
     public static TypedSource<string> IfNull(CellBoard board) => board.Wing.IfNull("none");
 
     public static TypedSource<string?> Choose(CellBoard board) => board.Full.Choose(board.Wing, "none");

@@ -45,7 +45,9 @@
         "data",
         "record",
         "list",
-        "ref"
+        "ref",
+        "call",
+        "op"
       ],
       "writes": [
         {
@@ -94,7 +96,8 @@
         "core:Q2",
         "core:Q7",
         "Absence.tla:MissingValueWritesNull",
-        "Schema.tla:ConversionsConvert"
+        "Schema.tla:ConversionsConvert",
+        "Schema.tla:JoinedPartsAreTexts"
       ],
       "defects": [
         {
