@@ -47,6 +47,7 @@ these whole, before anything else:
 1. **Rule lines applied**: each rule line you applied, by its file and line at the base SHA.
 2. **What you wrote**: each file, and each test's result line, copied as the runner printed it.
 3. **Gaps and questions**: each door or form the spec left open, with its use case.
-4. **Verified, assumed, not checked.**
+4. **Runs**: each command you ran on the finished files and the line it printed. A check your files meet is run
+   before you reply, so the lead runs it once where the work lands and never again.
 
 Plain text, no preamble, at most the lines your brief allows.

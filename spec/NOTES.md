@@ -1535,3 +1535,5 @@
   Evidence: the owner's message of 2026-11-14 in session 6c1184a9; the log's 135 entries are in git at 2a4a56b59.
 - 2026-11-14 the owner, verbatim, "Yes", to the lead's question whether `landings.py` lands each browser test in the unit of the last door its page calls.
   Evidence: the owner's message of 2026-11-14 in session 6c1184a9, answering the lead's status after the push of 7371c2c2c.
+- 2026-11-14 the owner, verbatim: "Please avoid double work if u and agents read all the harness which u must be doing it. I am not liking each one throwing it over the wall like quality is someone else business. Quantity is intrinsic behavior of everyone working on rewrite not otherwise".
+  Evidence: the lead re-ran two plants an agent had run on the runtime's conversions, and two agents' replies ended with questions and checks left for the lead; root `CLAUDE.md` and the two agent definitions state the rule now.

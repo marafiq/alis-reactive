@@ -14,4 +14,4 @@ classes and the checks that waited for the owner are in git at 2a4a56b59.
 | A number, a proof line or an absence not read from the run that proves it | 22 | The run's own result line, read when it prints; a search over every tracked file, with its count |
 | A shell command or a script wrong in its own terms | 43 | The script's asserts, before it writes any file; `echo "exit $?"` straight after the command |
 | Said to the owner in a way that hid or blurred what holds | 6 | A status says what works, how many units are left and each count; a question goes to the owner only for a principle or a scope the owner has not decided |
-| The lead's own process put before the product | 3 | A push per unit, no check of a check, and a mistake written as a count |
+| The lead's own process put before the product | 4 | A push per unit, no check of a check, and a mistake written as a count |

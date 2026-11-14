@@ -213,7 +213,11 @@ slip is about you invented so you can avoid accountability about mistakes").
   task the specs leave open; what a spec line and a landed exemplar already shape, an analyzer or a test among
   them, the lead writes itself (the owner, 2026-11-14: "U r overusing fable").
 - The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
-  session, with the reason. A task whose check costs what the work costs is the lead's own.
+  session, with the reason. A task whose check costs what the work costs is the lead's own. Quality is each
+  worker's own, never the next reader's: an agent runs every check its files meet before it replies, decides each
+  form the specs leave open by quality and names it decided, and returns no list of what it did not check; the lead
+  reads its answer at the source, runs the gate once where it lands, and re-runs none of its plants or commands (the
+  owner, 2026-11-14: "I am not liking each one throwing it over the wall like quality is someone else business").
 - No review is planned behind a writer. A review that runs is bounded before it starts: a fixed list of questions,
   each with the answer that passes; a finding is an answer that fails; one fix in the page it was read from, one
   second reading, then it ends, and what still fails, or anything raised outside the list, is one line to the owner.

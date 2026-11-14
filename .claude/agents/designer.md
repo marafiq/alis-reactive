@@ -36,7 +36,9 @@ read. Read these whole, before anything else:
   restore fails for the machine's sources, say so and stop that probe.
 - Write only under the scratch folder your brief names, and enter it only in a subshell, `( cd <folder> && … )`.
 - Run no git command that writes, and no command your brief does not name.
-- Decide only what your brief asks. A form the spec does not state is a question in your answer, never a decision.
+- Decide only what your brief asks. A form the spec does not state you decide by quality, from the TLA+ specs, the
+  principles and the owner's decisions, and name it decided; only a principle, a closed rule or a scope goes back,
+  as one line for the owner.
 
 ## What you return
 
@@ -44,7 +46,7 @@ read. Read these whole, before anything else:
 2. **The answer**, decision by decision, every claim with the file and line you read it at, and every number as the
    line the command that counted it printed.
 3. **Objections**: the two strongest against your design, each with your answer.
-4. **Verified, assumed, not checked**: what a run of yours showed, what you took without a run, and what you did not
-   reach.
+4. **Runs**: each command you ran on the finished files and the line it printed. A check your files meet is run
+   before you reply, so the lead runs it once where the work lands and never again.
 
 Plain text, no preamble, at most the lines your brief allows.
