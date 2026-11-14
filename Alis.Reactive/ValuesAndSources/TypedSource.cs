@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.ValuesAndSources;
 
@@ -21,11 +22,15 @@ public interface ITypedSource<out T>;
 /// can set, send, pass or compare. A view gets a source from the door that reads the value and never makes one.
 /// </remarks>
 /// <typeparam name="T">The type of the value the source reads.</typeparam>
-public abstract class TypedSource<T> : ITypedSource<T>
+public abstract class TypedSource<T> : ITypedSource<T>, IPlanSource
 {
     private protected TypedSource()
     {
     }
+
+    internal abstract Expression Expression { get; }
+
+    Expression IPlanSource.Expression => Expression;
 
     /// <summary>Joins what the source reads when the step runs, shown as an element's text shows it.</summary>
     /// <param name="source">The source of the part; one that cannot be read or holds null adds nothing.</param>

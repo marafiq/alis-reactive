@@ -11,9 +11,17 @@ namespace Alis.Reactive.Declarations;
 /// <typeparam name="TValue">The type the object's API gives the property, nullable where the API's is.</typeparam>
 public class ReadOnly<TValue> : TypedSource<TValue>
 {
-    private protected ReadOnly()
+    private protected ReadOnly(JsObject owner, string member)
     {
+        Owner = owner;
+        Member = new MemberStep(member);
     }
+
+    private protected JsObject Owner { get; }
+
+    private protected PathStep Member { get; }
+
+    internal override Schema.Expression Expression => new GetExpression([Member], PathMembers.Required, Owner.Bound.Target);
 
     /// <summary>Reads data past the property: a field of the value it holds, at any depth.</summary>
     /// <remarks>
@@ -31,19 +39,15 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 /// <typeparam name="TValue">The type the object's API gives the property, nullable where the API's is.</typeparam>
 public sealed class Property<TValue> : ReadOnly<TValue>
 {
-    private readonly JsObject _owner;
-    private readonly PathStep _member;
-
     internal Property(JsObject owner, string member)
+        : base(owner, member)
     {
-        _owner = owner;
-        _member = new MemberStep(member);
     }
 
     /// <summary>Sets the property to a literal when the step runs.</summary>
     /// <param name="value">The value to set, written into the plan where the view renders.</param>
     public void Set(TValue value)
-        => _owner.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, false, _owner.Bound.Target, Literals.Of(value, _owner.Bound.Writer.Content.Json)));
+        => Owner.Bound.Writer.Write(new SetStatement([Member], SetMembers.Required, false, Owner.Bound.Target, Literals.Of(value, Owner.Bound.Writer.Content.Json)));
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>

@@ -19,6 +19,8 @@ public sealed class Data<T> : TypedSource<T>
     {
     }
 
+    internal override Schema.Expression Expression => throw new NotImplementedException();
+
     /// <summary>Reads a member of the data, as <c>x =&gt; x.Pager.Number</c>.</summary>
     /// <typeparam name="TResult">The type of the member.</typeparam>
     /// <param name="path">The member, as a member path.</param>

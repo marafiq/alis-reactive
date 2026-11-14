@@ -59,19 +59,15 @@ public sealed class Element : Component
 /// </summary>
 public sealed class ElementContent : ReadOnly<string?>
 {
-    private readonly Element _element;
-    private readonly PathStep _member;
-
     internal ElementContent(Element element, string member)
+        : base(element, member)
     {
-        _element = element;
-        _member = new MemberStep(member);
     }
 
     /// <summary>Sets the content to a text when the step runs.</summary>
     /// <param name="text">The text, written into the plan where the view renders; null shows nothing.</param>
     public void Set(string? text)
-        => _element.Bound.Writer.Write(new SetStatement([_member], SetMembers.Required, true, _element.Bound.Target, Literals.Text(text)));
+        => Owner.Bound.Writer.Write(new SetStatement([Member], SetMembers.Required, true, Owner.Bound.Target, Literals.Text(text)));
 
     /// <summary>Sets the content to what a source reads when the step runs, shown as text.</summary>
     /// <remarks>
