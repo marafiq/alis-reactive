@@ -621,9 +621,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   spec file or a test only after the rules its file states are read against it; a question the TLA+ specs, the
   principles or the owner's decisions answer is decided from them and held; `spec/tools/check.py` and its plants change
   only where a check reports wrongly on correct content or passes a defect met in content, each fix with a refused and
-  an accepted plant, and a new check waits for the owner's yes; no agent decides or words anything, and a fork takes one
-  bounded task and is landed or dropped in its session; a unit is committed on its own full check and its own rules
-  test; progress is the open queue shrinking toward U1's cut.
+  an accepted plant, and a new check waits for the owner's yes; no agent words a rule, and an agent decides only the
+  forms its own task meets, by quality (the owner's words of 2026-11-14, root CLAUDE.md's forks section); a fork takes
+  one bounded task and is landed or dropped in its session; a unit is committed on its own full check and its own
+  rules test; progress is the open queue shrinking toward U1's cut.
 - The owner, 2026-11-11, as the next session read the POC's analyzers (verbatim in `spec/NOTES.md`): "i never said use
   poc analyzer as verbatim, do you know how to write good analyzers?" The handoff had asked for authoring rules read
   "from what the POC's analyzers already do"; that clause is void. An analyzer, a suppressor and a test rule are written
