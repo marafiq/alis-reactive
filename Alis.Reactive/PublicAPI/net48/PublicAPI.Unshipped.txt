@@ -261,6 +261,7 @@ Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.OnErr
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
@@ -278,6 +279,7 @@ Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnSuccess(Ali
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.DeleteRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.ElementSteps
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>
@@ -294,6 +296,7 @@ Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.OnError<
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
@@ -311,6 +314,7 @@ Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnSuccess(Alis.R
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.GetRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.Guard<TModel>
 Alis.Reactive.TriggersAndPipelines.Guard<TModel>.Then(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! branch) -> Alis.Reactive.TriggersAndPipelines.Branches<TModel>!
@@ -326,6 +330,7 @@ Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.NoValid
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.OnError(System.Action<Alis.Reactive.RequestsAndResponses.Failure!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! failed) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.OnError(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
@@ -338,6 +343,7 @@ Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.OnError(System.
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.OnError(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.OnSuccess(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest>!>!
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.HeadRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>
 Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>.Input<TMember, TValue>(System.Linq.Expressions.Expression<System.Func<TRequest, TMember>!>! member, Alis.Reactive.TriggersAndPipelines.BoundInput<TValue>! input) -> Alis.Reactive.TriggersAndPipelines.JsonBody<TRequest>!
@@ -370,6 +376,7 @@ Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.OnEr
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
@@ -387,6 +394,7 @@ Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess(Al
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.OptionsRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.PartsGuard<TParts>
 Alis.Reactive.TriggersAndPipelines.PartsGuard<TParts>.Then(System.Action<TParts!>! branch) -> TParts!
@@ -431,6 +439,7 @@ Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.OnError
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
@@ -447,6 +456,7 @@ Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnSuccess(Alis.
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PostRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
@@ -462,6 +472,7 @@ Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.OnError<
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.OnError<TError>(int status, Alis.Reactive.RequestsAndResponses.ErrorContent<TError>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.OnError<TError>(int status, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TError>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! error) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, TReply>!
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.Busy(params string![]! elementIds) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
@@ -479,6 +490,7 @@ Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnSuccess(Alis.R
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnSuccess<TBody>(Alis.Reactive.RequestsAndResponses.SuccessContent<TBody>! content, System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.OnSuccess<TBody>(System.Action<Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!, Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! success) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest, Alis.Reactive.RequestsAndResponses.Response<TRequest, TBody>!>!
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.Validate<TValidator>() -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
+Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.Validate<TValidator>(string! ruleSet) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>.WhileLoading(System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>! pipeline) -> Alis.Reactive.TriggersAndPipelines.PutRequest<TModel, TRequest>!
 Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>
 Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>.Header(string! name, string! value) -> Alis.Reactive.TriggersAndPipelines.QueriedParts<TRequest>!
@@ -569,6 +581,7 @@ Alis.Reactive.Validation.InlineValidator<T>
 Alis.Reactive.Validation.InlineValidator<T>.InlineValidator() -> void
 Alis.Reactive.Validation.ReactiveFluentValidationBuilder
 Alis.Reactive.Validation.ReactiveFluentValidationBuilder.Add<TValidator>() -> Alis.Reactive.Validation.ReactiveFluentValidationBuilder!
+Alis.Reactive.Validation.ReactiveFluentValidationBuilder.Flags<TEnum>() -> Alis.Reactive.Validation.ReactiveFluentValidationBuilder!
 Alis.Reactive.Validation.ReactiveValidator
 Alis.Reactive.Validation.ReactiveValidator<T>
 Alis.Reactive.Validation.ReactiveValidator<T>.Include(Alis.Reactive.Validation.IValidator<T>! rules) -> void
@@ -786,7 +799,9 @@ static Alis.Reactive.TriggersAndPipelines.RequestSteps.Parallel<TModel>(this Ali
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.ShowValidationErrors<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.ValuesAndSources.ITypedSource<Alis.Reactive.RequestsAndResponses.ValidationProblem!>! problem) -> void
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.Validate<TModel, TContainer>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.RequestsAndResponses.RequestContainer<TContainer>! container) -> void
 static Alis.Reactive.Validation.EndpointChecks.Validate<TRequest, TValidator>(this System.Web.Mvc.Controller! controller, TRequest request) -> Alis.Reactive.Validation.ValidationResult!
+static Alis.Reactive.Validation.EndpointChecks.Validate<TRequest, TValidator>(this System.Web.Mvc.Controller! controller, TRequest request, string! ruleSet) -> Alis.Reactive.Validation.ValidationResult!
 static Alis.Reactive.Validation.EndpointChecks.ValidateAsync<TRequest, TValidator>(this System.Web.Mvc.Controller! controller, TRequest request, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
+static Alis.Reactive.Validation.EndpointChecks.ValidateAsync<TRequest, TValidator>(this System.Web.Mvc.Controller! controller, TRequest request, string! ruleSet, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
 static Alis.Reactive.Validation.RuleBuilderExtensions.ChildRules<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Action<Alis.Reactive.Validation.InlineValidator<TProperty>!>! rules) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
 static Alis.Reactive.Validation.RuleBuilderExtensions.CreditCard<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
 static Alis.Reactive.Validation.RuleBuilderExtensions.Custom<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Action<TProperty, Alis.Reactive.Validation.CustomContext<T>!>! check) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!

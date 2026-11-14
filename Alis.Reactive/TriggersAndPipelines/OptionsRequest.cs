@@ -77,6 +77,14 @@ public sealed class OptionsRequest<TModel, TRequest>
         where TValidator : ReactiveValidator<TRequest>
         => throw new NotImplementedException();
 
+    /// <summary>Names the validator and the rule set that check what the request sends, before it is sent.</summary>
+    /// <remarks>The check runs the rules the validator declares inside that rule set and no other. A check that fails shows its failures at the request's container, sends nothing and runs neither <c>WhileLoading</c> nor <c>Finally</c>.</remarks>
+    /// <param name="ruleSet">The rule set's name, as the validator's <c>RuleSet</c> declares it.</param>
+    /// <returns>The request.</returns>
+    public OptionsRequest<TModel, TRequest> Validate<TValidator>(string ruleSet)
+        where TValidator : ReactiveValidator<TRequest>
+        => throw new NotImplementedException();
+
     /// <summary>Sends the request without checking what it sends.</summary>
     /// <returns>The request.</returns>
     public OptionsRequest<TModel, TRequest> NoValidation() => throw new NotImplementedException();
@@ -158,6 +166,14 @@ public sealed class OptionsRequest<TModel, TRequest, TReply>
     /// <remarks>A check that fails shows its failures at the request's container, sends nothing and runs neither <c>WhileLoading</c> nor <c>Finally</c>.</remarks>
     /// <returns>The request.</returns>
     public OptionsRequest<TModel, TRequest, TReply> Validate<TValidator>()
+        where TValidator : ReactiveValidator<TRequest>
+        => throw new NotImplementedException();
+
+    /// <summary>Names the validator and the rule set that check what the request sends, before it is sent.</summary>
+    /// <remarks>The check runs the rules the validator declares inside that rule set and no other. A check that fails shows its failures at the request's container, sends nothing and runs neither <c>WhileLoading</c> nor <c>Finally</c>.</remarks>
+    /// <param name="ruleSet">The rule set's name, as the validator's <c>RuleSet</c> declares it.</param>
+    /// <returns>The request.</returns>
+    public OptionsRequest<TModel, TRequest, TReply> Validate<TValidator>(string ruleSet)
         where TValidator : ReactiveValidator<TRequest>
         => throw new NotImplementedException();
 

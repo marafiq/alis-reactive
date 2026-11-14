@@ -1417,6 +1417,17 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   model state on net48, which no line states, read by an MVC 5 probe before U17 builds that half; and net48's hosts
   for X8.3 or X16.16, since no placed promise runs the net48 half. The bench's validation endpoints answer what they
   bound, which their promises read.
+- The lead, 2026-11-13, declaring N16.4's flags enum named at startup and D16.2's rule set a request names, designed
+  by a Fable agent at xhigh (N16.4-FABLE.md of the handoff folder) and decided from its answer read at the source. No
+  line wrote either form, so by G13 each is the owner's, and U3 declares the lead's proposals as signatures:
+  `Flags<TEnum>()` on `ReactiveFluentValidationBuilder`, the builder `AddReactiveFluentValidation` hands its callback,
+  since the registration names each validator and each flags enum once (spec/Validation/module.md); and
+  `Validate<TValidator>(ruleSet)` beside each of the twelve request doors' `Validate<TValidator>()`, with N16.1's
+  endpoint check taking the same name, a text as the validator's own `RuleSet` takes it. The callback keeps its
+  parameter's name; the agent's rename is no door's. Three things wait for the owner: the forms; a named enum's start
+  read by a rule in the browser, which under the net10 host's enum names is a text of names that no operator of the
+  grammar splits, so C# writes the start as its number or the grammar gains an operator; and the refusal of a rule set
+  the validator does not declare, which needs its X line before U17. X16.22's page is the next piece's.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

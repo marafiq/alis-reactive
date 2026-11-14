@@ -1087,6 +1087,20 @@
             "N16.1",
             "N10.1"
           ]
+        },
+        {
+          "line": "proposed",
+          "text": "services.AddReactiveFluentValidation(validators => validators.Add<CareRotaRules>().Flags<CareDays>().Flags<RotaDays>())",
+          "doors": [
+            "N16.4"
+          ]
+        },
+        {
+          "line": "proposed",
+          "text": "pipeline.Post<CareRota>(careSavesUrl, request => request.Form(careRota.Form)).Validate<CareRotaRules>(CareRotaRules.Care)",
+          "doors": [
+            "N10.7"
+          ]
         }
       ],
       "nodes": [

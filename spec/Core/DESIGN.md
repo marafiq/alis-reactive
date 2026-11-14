@@ -3572,7 +3572,9 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     carries.
   - The condensed default (D10.17): a request whose model has a registered validator is checked by it under the
     default rule set, whatever it sends, a container or none, with its failures placed by D16.13. Naming a rule set,
-    or no check (`NoValidation()`), overrides it; the form of the sentence goes to gate 2
+    or no check (`NoValidation()`), overrides it; the form of the sentence went to gate 2, and U3 declares the lead's
+    proposal as a signature (G13): `Validate<TValidator>(ruleSet)` beside each request's `Validate<TValidator>()`, and
+    the endpoint's check of N16.1 taking the same name (the lead, 2026-11-13, `spec/CLAUDE.md`)
     (`Validation.tla:OnlyTheNamedValidator`).
 - D16.3 A partial is attached or independent, and both nest (the owner, 2026-11-06).
   - Attached: a partial rendered for a member under MVC's prefix, by any of MVC's own doors (`EditorFor` by the
@@ -3835,7 +3837,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   `FlagsAttribute` (D18.3). An enum it does not name is one value to the framework: `IsInEnum` reads it as
   `Enum.IsDefined` does on both sides, and a combination a source holds stops its request (D9.13). A literal is
   `Enum.ToString`'s text whether or not the door names its enum (D9.13). D9.13's wire form and D16.10's `IsInEnum`, on
-  the server and in the browser, read the same declaration. Its form, and the startup call it is written in, go to gate 2.
+  the server and in the browser, read the same declaration. Its form, and the startup call it is written in, went to
+  gate 2; no line wrote them, so U3 declares the lead's proposal as a signature (G13): `Flags<TEnum>()` on the builder
+  that `AddReactiveFluentValidation` hands its callback (the lead, 2026-11-13, `spec/CLAUDE.md`).
 - `N16.5` new: ALIS038, the flags analyzer, which reads `[Flags]` and an enum's constants at build. It refuses
   `Flags<TEnum>()` over an enum `[Flags]` does not mark, over one with a value outside 0 to 9,007,199,254,740,991
   (D9.13), over one with two values that share a bit with neither holding the other, and over a type parameter, which
