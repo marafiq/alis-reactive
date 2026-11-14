@@ -30,7 +30,7 @@ this with less:
 7. **Production grade.** It holds on net48 and net10, fails loud at real boundaries, and a new
    engineer could take it to production from its docs.
 
-Read the root `CLAUDE.md`, the standing decisions of `spec/CLAUDE.md`, the classes table of `spec/MISTAKES.md`,
+Read the root `CLAUDE.md`, the standing decisions of `spec/CLAUDE.md`, the kinds table of `spec/MISTAKES.md`,
 `.claude/rules/csharp.md`, the rule file and the project's own `CLAUDE.md` of each kind of file your design touches
 (`.claude/agents/designer.md` lists them), and the spec files the brief names before you design.
 

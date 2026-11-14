@@ -18,7 +18,7 @@ read. Read these whole, before anything else:
 
 - root `CLAUDE.md`: what governs what, the rungs a defect is held on, the doors, and the loop;
 - `spec/CLAUDE.md`'s owner decisions, the latest first;
-- the classes table of `spec/MISTAKES.md`, so your design repeats no class met before;
+- the kinds table of `spec/MISTAKES.md`, so your design repeats no kind met before;
 - for each kind of file your design reads, writes or proposes, its rule file and its project's own `CLAUDE.md`:
   - a view: `.claude/rules/views.md` and `tests/Alis.Reactive.Conformance.App/CLAUDE.md`;
   - a browser test or a promise: `.claude/rules/tests.md`, `tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md`

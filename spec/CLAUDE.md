@@ -1567,14 +1567,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   a Fable agent at xhigh read both in the jar's bytecode and by runs, and the lead read the bytecode at the source. So
   a mutant is isolated when, on every behavior, its own invariant fails no later than any other. It is read by running
   the mutant with a history variable that holds whether its own invariant has failed, under the invariant that every
-  other holds, its own fails or it has failed before; and a spec's violates configs each list the invariant its
-  name carries first, so a state where two fail names its own. A mutant that modeled two defects is narrowed within
-  its own text, the base's states unchanged: Lanes' AllSettledEarly and ReplaceKeepsOld, Partials' IdWithoutPrefix,
+  other holds, its own fails or it has failed before; and a spec's violates configs each list the invariant its name
+  carries first, so a state where two fail names its own. A mutant that modeled two defects is narrowed within its own
+  text, the base's states unchanged: Lanes' AllSettledEarly and ReplaceKeepsOld, Partials' IdWithoutPrefix,
   CallbackProperty's Replace and Run's UnwindRestartsFinally and EnclosingRunsOn. Thirteen specs read every mutant
   isolated and list their own first, Ownership.tla among them. Run.tla lists its own first and reads thirteen of its
-  fourteen mutants isolated; AfterIfReadsBefore's read, Composition.tla's and Request.tla's run in the background,
-  and each lands in a commit of its own. A new TLC jar is read for both facts before its pin moves. The owner can
-  overrule it.
+  fourteen mutants isolated. The isolation is run no more, by the owner's yes to the lead's recommendations of
+  2026-11-14: AfterIfReadsBefore's pair, Composition.tla and Request.tla are not read for it, and a spec's mutants are
+  held by each one failing its own invariant, which the full check reads. A new TLC jar is read for both facts before
+  its pin moves. The owner can overrule it.
 - The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on the order of an app event's handlers across plans: "I'll
   go with your recommendation". An app event's handlers run in the order they subscribed, as D17.3 orders a
   callback property's listeners: a page's plans in the order the page holds their scripts, a slot's when its load
@@ -1593,6 +1594,24 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   overlap's log whole, rang 1 rang 2 finally 1 after 1 finally 2 after 2: the dispatch runs the new run to its
   request inside the old route's step (M1.D2, whose oracle is the DOM's dispatch), and no answer settles while a run
   runs (`Run.tla`'s Settle), so `Run.tla` gains no action for the order. The owner can overrule it.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on the tests U3 cannot write: "Okay, yes, you have the TLA plus
+  schema, you have a great deal of knowledge already proved." A browser test that waits on a later unit, a startup
+  call that throws until its unit, a host its startup builds, a door or a harness verb it builds, or a fact no spec
+  line states, is written, failing, first in that unit, before its code; each harness verb beyond seed and gate lands
+  with the first unit whose test uses it, and U3 is closed. Of the 469 placed browser tests, 330 stand written; the
+  139 that wait land with their units.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on a status and on the hedges check's stop: "you can keep
+  reporting [TLA+], but you gotta be specific what you're saying and how many units are left", and "Replace it with
+  must." A status says what works, how many of the plan's units are left and what of the unit in work is left, each by
+  its count, and a TLA+ run by its spec, what it reads and its count (root CLAUDE.md's Sessions). `should` in the
+  spec's prose, a quote of the owner's among it, is written `must`; `spec/NOTES.md` keeps the owner's words as said.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on the pace: "you are using it as an excuse to just slow the
+  delivery", "I'll go with your recommendations", and "Mistakes are supposed to be caught very quickly, not that they
+  become their own maintenance." The lead's faults, measured since the cut: 134 of 323 commits were STATE commits, a
+  morning went to the isolation of TLA+ mutants, and the log of mistakes grew to 903 lines; one working behavior, the
+  thin path. Decided: a push lands a unit or ends a session, behind the full check; the isolation is run no more;
+  `spec/MISTAKES.md` counts each mistake in its kind; a decision that follows from a yes of the owner's is the lead's,
+  stated as done.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

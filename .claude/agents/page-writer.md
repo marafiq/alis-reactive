@@ -13,7 +13,7 @@ Print the head of your worktree with `git rev-parse --short=9 HEAD` and stop if 
 these whole, before anything else:
 
 - root `CLAUDE.md`, and `spec/CLAUDE.md`'s owner decisions, the latest first;
-- the classes table of `spec/MISTAKES.md`, so your work repeats no class met before;
+- the kinds table of `spec/MISTAKES.md`, so your work repeats no kind met before;
 - `.claude/rules/views.md` and `tests/Alis.Reactive.Conformance.App/CLAUDE.md`, for every page;
 - `.claude/rules/tests.md`, `tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md` and
   `tests/Alis.Reactive.Conformance.World/CLAUDE.md`, for every test and every address;

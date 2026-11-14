@@ -1095,9 +1095,10 @@ declared (M5.N1), and a world names the version its component is built as. The a
 stand, each at the settle gate, and a seed makes one refuse. A hold names the endpoint that reaches its action where a
 test holds one action at two endpoints, and the harness's test of it is green and fails on each of its two planted
 defects. An MVC action reaches the answer gate by its filter, with its own address, so a care page's endpoint can be
-held, and the harness's test of it is green and fails on each of its two planted defects. Open of it, in order: the
-doors a view meets that are not yet declared, each with that view; every screen's view; every browser test, failing; the
-Playwright project's switch. The bindings check takes no view clause (section 2.5). The commit that lands a piece
+held, and the harness's test of it is green and fails on each of its two planted defects. U3 is closed: the
+tests that wait, the views and doors they meet, the harness verbs they use and the Playwright project's switch,
+which waits for the last test, land with their units (the owner, 2026-11-14).
+The bindings check takes no view clause (section 2.5). The commit that lands a piece
 rewrites this paragraph.
 
 ### U1. Tools, pins and tables
@@ -1128,8 +1129,10 @@ Doors: N14.2, M1.N1, M5.N5, M5.N1
 
 The schema's nodes, sealed, with the generated contract and its step in `scripts/check.sh`; the core's sixteen rows
 with their folders; every door of the public surface as a signature, as `spec/api` compiles it; the runtime's rows
-and its dispatch, a case for every kind; the harness's remaining verbs; every screen's view; every browser test, from
-its promise, failing. The module tests land here with their first tests, the schema's: the project
+and its dispatch, a case for every kind; every screen's view; every browser test, from its promise, failing, save
+one that waits on a later unit, which that unit writes first, each harness verb beyond seed and gate landing with
+the first unit whose test uses it (the owner, 2026-11-14). The module tests land here with their first tests, the
+schema's: the project
 `tests/Alis.Reactive.ModuleTests` with its rule file and its slice table, and vitest with the runtime's first
 `*.test.ts`. The thin path: one plan, opened and rendered by its view's two doors (N14.2), which ALIS041 holds and lands here
 (N18.15), with a load trigger (M1.N1) whose pipeline, one

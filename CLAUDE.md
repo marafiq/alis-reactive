@@ -60,8 +60,11 @@ no consumer, Fusion and Native get nothing an app does not, and any developer on
 keeps (section 10); the modules and the owner's decisions are `spec/CLAUDE.md`'s.
 - A unit runs in this order: its spec lines, TLC green with each mutant failing, its Playwright tests written from
   their promises and failing, the code until they pass, each test failing on its planted defect, commit.
-- From U3 on every Playwright test stands written and failing; a module's unit writes its pure tests from the
-  schema's lines before the half they prove, and turns green the browser tests `spec/tools/check.py` lands in it.
+- From U3 on every Playwright test stands written and failing, save one that waits on a later unit: a startup call
+  that throws until its unit, a host its startup builds, a door or a harness verb it builds, or a fact no spec line
+  states; that unit writes it first, failing, before its code (the owner, 2026-11-14). A module's unit writes its pure
+  tests from the schema's lines before the half they prove, and turns green the browser tests `spec/tools/check.py`
+  lands in it.
 - The server decides when async work happens and the test releases it through the harness; a test waits for the
   state it names, never for time, in a world of its own, and asserts literal outcomes.
 - Every unit closes one loop, and each exit is a line a tool printed, read when it printed:
@@ -146,10 +149,13 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
 - A session starts and ends at a stable state: every unit pushed, `git ls-remote` equal to HEAD, nothing uncommitted.
   The owner starts a new session; the lead ends none, and a reply to continue, given to a go or no-go ask, is the go:
   work that needs no answer never waits. A status to the owner says what is completed and what is open, in the plan's
-  own words, never where a head is (the owner, 2026-11-11). What is open is a piece of a unit. The lead's own
-  checking, a mutant's isolation or a check of the spec's tools, runs in the background, holds no finished piece and
-  is no item of a status or of a handoff's next (the owner, 2026-11-14: "you keep saying that it's open when your
-  behavior should be finishing the rewrite"). A long run is wrapped in `caffeinate`.
+  own words, never where a head is (the owner, 2026-11-11). It says what works, how many of the plan's units are left
+  and what of the unit in work is left, each by its count, and a TLA+ run by its spec, what it reads and its count.
+  What is open is a piece of a unit; the lead's own checking is no handoff's next and holds no finished piece (the
+  owner, 2026-11-14: "you keep saying that it's open when your behavior must be finishing the rewrite", then "you can
+  keep reporting [TLA+], but you gotta be specific what you're saying and how many units are left"). Work is pushed
+  when a unit lands and when a session ends, each push behind the full check; a commit between pushes is behind the
+  gate. A long run is wrapped in `caffeinate`.
 - A handoff is written after every push, since the harness compacts without warning. It holds the head, what landed
   with its proof line, what is next, and no time but one `date` printed then (the lead's mistake, 2026-11-11);
   the lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.
@@ -162,16 +168,17 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
 
 ## Corrections
 
-A correction has one home, where the work happens. An owner's correction, a reversal of the lead's with no new fact, a
-fork's or an agent's mistake the lead corrected, and a mistake of a session each become, the turn they happen, a line
-of the rule file that owns the subject: a test's in `.claude/rules/tests.md` or its project's own file, an analyzer's
-in `.claude/rules/analyzers.md`, C#'s in `.claude/rules/csharp.md` or its project's own file, the runtime's in
-`Alis.Reactive.Assets/CLAUDE.md`, the spec's and the owner's decisions in `spec/CLAUDE.md`, the plan's, the loop's, a
-session's and a fork's here. The line states the rule as a plain fact, with its date and whose words it is. Every
-mistake is also an entry of `spec/MISTAKES.md`, written the turn it is found, with its class, its cost and what holds
-the class. A class met twice is held too low: it moves up a rung in that unit. A piece begins by reading the classes.
-A mistake is called a mistake, in a rule line, a log entry, a commit and a message to the owner, never by a softer
-word (the owner, 2026-11-13: "know that slip is about you invented so you can avoid accountability about mistakes").
+A correction has one home, where the work happens. An owner's correction and a reversal of the lead's with no new fact
+each become, the turn they happen, a line of the rule file that owns the subject: a test's in `.claude/rules/tests.md`
+or its project's own file, an analyzer's in `.claude/rules/analyzers.md`, C#'s in `.claude/rules/csharp.md` or its
+project's own file, the runtime's in `Alis.Reactive.Assets/CLAUDE.md`, the spec's and the owner's decisions in
+`spec/CLAUDE.md`, the plan's, the loop's, a session's and a fork's here. The line states the rule as a plain fact,
+with its date and whose words it is. A mistake, the lead's, a fork's or an agent's, is fixed where it is found and
+counted in its kind in `spec/MISTAKES.md` the same turn: one count, or one new row, and nothing more (the owner,
+2026-11-14: "Mistakes are supposed to be caught very quickly, not that they become their own maintenance"). A kind
+whose count keeps growing gets one fix, in the tool or the rule file that owns it. A mistake is called a mistake, in a
+rule line, a log entry, a commit and a message to the owner, never by a softer word (the owner, 2026-11-13: "know that
+slip is about you invented so you can avoid accountability about mistakes").
 
 ## Forks, agents and reviews
 
@@ -184,7 +191,7 @@ word (the owner, 2026-11-13: "know that slip is about you invented so you can av
 - An agent starts from a definition of `.claude/agents/`, which carries the harness its kind of task meets and the
   reply it returns: `.claude/agents/designer.md` for a complex task or a critical decision, on the latest Fable model
   at xhigh, and `.claude/agents/page-writer.md` for pages and their tests. It reads this file, `spec/CLAUDE.md`'s
-  owner decisions, the classes of `spec/MISTAKES.md`, and the rule file and the project's own `CLAUDE.md` of each kind
+  owner decisions, the kinds of `spec/MISTAKES.md`, and the rule file and the project's own `CLAUDE.md` of each kind
   of file it reads, writes or proposes, and its reply opens with the rule lines it applied, by file and line at the
   base SHA, which the lead reads at the source before a word of it lands. A brief adds the task alone, and a task no
   definition covers gets its definition first (the owner, 2026-11-13: "Are you making your agents actually read the
