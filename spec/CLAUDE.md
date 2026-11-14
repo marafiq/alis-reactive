@@ -1403,6 +1403,20 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   X11.6's and X17.36's replace cases lands after the read can pass, since no harness verb reports a released answer
   delivered, so the harness gains that verb before the unit that turns those two green, and their planted defects are
   read then. X11.24 waits on an append to an element's text, which no door writes.
+- The lead, 2026-11-13, declaring N16.1, the endpoint's check, designed by a Fable agent at xhigh (N16.1-FABLE.md of
+  the handoff folder) and decided from its answer read at the source. No line wrote its form, so by G13 it is the
+  owner's, and U3 declares the lead's proposal as a signature: `EndpointChecks` of `Validation`, in a file of each
+  host, with `Validate` and `ValidateAsync`, extensions of the action's controller that take the request's model and
+  name the request's type and its validator as type arguments, the validator under the request's own constraint. MVC's
+  own binder binds the model, as the owner's line of 2026-11-07 keeps it; the door adds the binder's refusals (D16.4,
+  D16.7) and checks under the default rule set, since no request door names a rule set yet (D16.2). It returns the
+  result, and the action answers a failed one through N10.1, so one door writes D10.8's body. X16.16's endpoint checks
+  through it in place of its hand copy of the rule, and X8.3's visitor sign-in stands on it, its test red. Three
+  things wait for the owner: the form, which checks and leaves the answer to N10.1 where N16.1's line says the door
+  answers, so an action that ignores the result saves an unchecked model; how MVC 5's own validation stays out of the
+  model state on net48, which no line states, read by an MVC 5 probe before U17 builds that half; and net48's hosts
+  for X8.3 or X16.16, since no placed promise runs the net48 half. The bench's validation endpoints answer what they
+  bound, which their promises read.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

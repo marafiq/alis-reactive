@@ -1,0 +1,30 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitorSignIn
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visitor sign-in";
+    var plan = Html.ReactivePlan<VisitorSignIn>();
+}
+<h1>Visitor sign-in</h1>
+@using (var signIn = Html.BeginRequestForm(plan, "visitor-sign-in"))
+{
+    <fieldset>
+        <legend>Visitor</legend>
+        @(Html.InputField(plan, m => m.Visitor, options => options.Label("Visitor")).NativeTextBox())
+    </fieldset>
+    <fieldset>
+        <legend>Relation</legend>
+        @(Html.InputField(plan, m => m.Relation, options => options.Label("Relation")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("sign-in", "Sign in").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<VisitorSignIn>(VisitorSignInEndpoints.SignIns, request => request.Form(signIn.Form))
+        .Validate<VisitorSignInRules>()
+        .OnSuccess(Content.Text, (signedIn, pipeline) => pipeline.Element("signed-in").Text.Set(signedIn.Body))
+        .OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body))))
+}
+<p>Signed in: <span id="signed-in"></span></p>
+@Html.RenderPlan(plan)

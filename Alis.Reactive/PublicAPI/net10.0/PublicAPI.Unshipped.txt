@@ -541,6 +541,7 @@ Alis.Reactive.Validation.CustomContext<T>
 Alis.Reactive.Validation.CustomContext<T>.AddFailure(string! message) -> void
 Alis.Reactive.Validation.CustomContext<T>.AddFailure<TMember>(System.Linq.Expressions.Expression<System.Func<T, TMember>!>! member, string! message) -> void
 Alis.Reactive.Validation.CustomContext<T>.Model.get -> T
+Alis.Reactive.Validation.EndpointChecks
 Alis.Reactive.Validation.IConditionBuilder
 Alis.Reactive.Validation.IConditionBuilder.Otherwise(System.Action! rules) -> void
 Alis.Reactive.Validation.IRuleBuilder<T, TProperty>
@@ -781,6 +782,8 @@ static Alis.Reactive.TriggersAndPipelines.RequestSteps.Into<TModel>(this Alis.Re
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.Parallel<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, params System.Action<Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>!>![]! branches) -> void
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.ShowValidationErrors<TModel>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.ValuesAndSources.ITypedSource<Alis.Reactive.RequestsAndResponses.ValidationProblem!>! problem) -> void
 static Alis.Reactive.TriggersAndPipelines.RequestSteps.Validate<TModel, TContainer>(this Alis.Reactive.TriggersAndPipelines.Pipeline<TModel>! pipeline, Alis.Reactive.RequestsAndResponses.RequestContainer<TContainer>! container) -> void
+static Alis.Reactive.Validation.EndpointChecks.Validate<TRequest, TValidator>(this Microsoft.AspNetCore.Mvc.ControllerBase! controller, TRequest request) -> Alis.Reactive.Validation.ValidationResult!
+static Alis.Reactive.Validation.EndpointChecks.ValidateAsync<TRequest, TValidator>(this Microsoft.AspNetCore.Mvc.ControllerBase! controller, TRequest request, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Alis.Reactive.Validation.ValidationResult!>!
 static Alis.Reactive.Validation.RuleBuilderExtensions.ChildRules<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Action<Alis.Reactive.Validation.InlineValidator<TProperty>!>! rules) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!
 static Alis.Reactive.Validation.RuleBuilderExtensions.CreditCard<T>(this Alis.Reactive.Validation.IRuleBuilder<T, string?>! rule) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, string?>!
 static Alis.Reactive.Validation.RuleBuilderExtensions.Custom<T, TProperty>(this Alis.Reactive.Validation.IRuleBuilder<T, TProperty>! rule, System.Action<TProperty, Alis.Reactive.Validation.CustomContext<T>!>! check) -> Alis.Reactive.Validation.IRuleBuilderOptions<T, TProperty>!

@@ -3816,9 +3816,14 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - refused as public: `BrowserRuleSet`, `BrowserRule`, `BrowserField` and `IBrowserRuleSource`, the plan writer's
   inside, which no view, validator or component author writes; the browser rules are carried by the validator
   grammar.
-- `N16.1` new: the endpoint's validation door on both hosts. It binds, checks under the same validator and rule
-  set, and answers D10.8's body or the bound model; its form goes to gate 2. It carries the endpoints' own
-  `Validate` with `ErrorsByField`.
+- `N16.1` new: the endpoint's validation door on both hosts. It binds, checks under the same validator and rule set,
+  and answers D10.8's body or the bound model; its form went to gate 2. It carries the endpoints' own `Validate` with
+  `ErrorsByField`. No line and no compiled sentence wrote its form, so it is the owner's to decide (G13); U3 declares
+  the lead's proposal as a signature: `EndpointChecks.Validate<TRequest, TValidator>(request)` and `ValidateAsync`,
+  extensions of the action's controller on each host, which check the model MVC's binder bound by the validator the
+  app registered, under the default rule set, with the binder's refusals added; the action answers a failed check
+  through N10.1's `ToErrorResponse()`, so the door answers no body itself, and a rule set joins it with D16.2's
+  sentence (the lead, 2026-11-13, `spec/CLAUDE.md`).
 - `N16.2` new: the form plugin's typed data, a registration keyed by validator and rule set and by no element, with
   the starts of D16.6, and the containers table of `model`'s data, each with its summary and live check.
 - `N16.3` new: `pipeline.Validate(container)`, the check with no request: the container model's registered validator

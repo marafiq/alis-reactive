@@ -979,6 +979,9 @@ A condition on a part a request sends (N10.4) is declared as the lead's proposal
 red; the schema's contract holds no place yet for a part's condition.
 Three pages of a handler's policy stand, each test red: X11.6's room choice and X11.7's chart save on the admission
 screen, and X17.36's resident directory on the residents screen; X11.24 waits on an append to an element's text.
+The endpoint's check (N16.1) is declared as the lead's proposal for the owner, `this.Validate<TRequest,
+TValidator>(request)` and `ValidateAsync` on each host's controller, whose failed result the action answers through
+`ToErrorResponse()`; X16.16's endpoint checks through it, and X8.3's visitor sign-in stands on it, its test red.
 The refusals index and X3.12's linked record page stand, its test red, and so does M12.X2's call panel, an element
 named by two declarations. Thirty-four more refusal pages stand, each beside the page of its opposite case and each
 test red, six forks' work read at the source and landed, and one the lead's: fifteen of module 4's, five of module
@@ -995,10 +998,10 @@ of the fusion-refusals screen's six stand on the Fusion layout, in `Refusals/Fus
 `Refusals/FusionTemplates/`, each beside its rendering twin and each test red (M21.X805, M22.X1, M22.X4); M21.X203's
 three wait on the grid's validation door, as M21.X205's do. A promise placed on a care screen is a page of its own in
 `Care/<Screen>/`, as a
-refusal's is, and two hundred and twenty-three care pages stand, each test red: fifty-one of the record screen's (nine
+refusal's is, and two hundred and twenty-four care pages stand, each test red: fifty-one of the record screen's (nine
 of module 2's, eight each of modules 3 and 9, five of module 1's, four each of modules 5 and 17, three each of modules
-7 and 24, two each of modules 6 and 12 and one each of modules 8, 15 and 19), forty-three of the admission screen's
-(thirteen of module 8's, ten of module 7's, five of module 6's, four each of modules 3 and 24, two each of modules 1
+7 and 24, two each of modules 6 and 12 and one each of modules 8, 15 and 19), forty-four of the admission screen's
+(fourteen of module 8's, ten of module 7's, five of module 6's, four each of modules 3 and 24, two each of modules 1
 and 15 and one each of modules 9, 17 and 18), thirty-eight of the residents screen's (twenty-four of module 4's, eight
 of module 6's, two of module 2's and one each of modules 3, 17, 24 and 25), eighteen of the admission-clinical
 screen's (eighteen of module 21's), seventeen of the round screen's (four of module 6's, three each of modules 2, 3
@@ -1011,9 +1014,9 @@ and one of module 14's, their pages in a folder a module (`Bench/Vendors/`, `Ben
 app starts under the host its argument `--host` names, with the JSON options app.json gives that host: net10's
 camel-case members and enum names, or those options with the one change each of five other hosts names; X7.14 stands
 under numbersAsText, M11.X1 and M11.X2 under snakeCase, and X15.5 under pascalCase, its opposite case opened under
-net10 through `NewWorldUnder`, as X6.16's is opened under enumsAsNumbers. Of the care families attempted, sixty-three
+net10 through `NewWorldUnder`, as X6.16's is opened under enumsAsNumbers. Of the care families attempted, sixty-two
 promises placed under net10 alone wait: twenty-five need a call of the app's startup that throws until its unit
-(request defaults, antiforgery, flags enums, a registered validator, the busy indicator); twelve need a door the core
+(request defaults, antiforgery, flags enums, a registered validator, the busy indicator); eleven need a door the core
 does not declare (an append to an element's text; a text joined from a source and a literal; an element's children and
 attributes, M5.N3 and M5.N4; a list operation's result set into a property declared a List; the block's live check,
 D16.15; a validator's Flags<TEnum>(), N16.4, with a rule set a request names, D16.2's form); five need a request

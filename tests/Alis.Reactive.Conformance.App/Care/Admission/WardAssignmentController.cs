@@ -1,4 +1,5 @@
 using Alis.Reactive.Conformance.World;
+using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.Validation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +8,6 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class WardAssignmentController : Controller
 {
     private const string PlainText = "text/plain";
-    private const string WardRequired = "Ward is required.";
 
     [HttpGet(CarePages.WardAssignment)]
     public IActionResult OfAResident() => View("/Care/Admission/WardAssignment.cshtml", new WardAssignmentPage());
@@ -15,9 +15,9 @@ public sealed class WardAssignmentController : Controller
     [HttpPost(WardAssignmentEndpoints.Assignments)]
     public IActionResult Assign([FromForm] WardAssignment assignment)
     {
-        if (!string.IsNullOrEmpty(assignment.Ward)) return Content(assignment.Ward, PlainText);
-        ModelState.AddModelError(nameof(WardAssignment.Ward), WardRequired);
-        return ValidationProblem(ModelState);
+        var validation = this.Validate<WardAssignment, WardAssignmentRules>(assignment);
+        if (!validation.IsValid) return validation.ToErrorResponse();
+        return Content($"{assignment.Ward}", PlainText);
     }
 }
 

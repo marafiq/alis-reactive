@@ -1079,6 +1079,14 @@
           "line": "redesign",
           "text": "public ReactiveFluentValidationBuilder Add<TValidator>()",
           "cite": "Alis.Reactive/Validation/ReactiveFluentValidationServiceCollectionExtensions.cs:50"
+        },
+        {
+          "line": "proposed",
+          "text": "var validation = this.Validate<WardAssignment, WardAssignmentRules>(assignment); if (!validation.IsValid) return validation.ToErrorResponse();",
+          "doors": [
+            "N16.1",
+            "N10.1"
+          ]
         }
       ],
       "nodes": [
