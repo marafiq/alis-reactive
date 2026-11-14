@@ -52,7 +52,10 @@ no consumer, Fusion and Native get nothing an app does not, and any developer on
   nodes are sealed, with `internal` constructors, and developers author through builders. No internal is exposed to a
   test or to a consumer. Slices are self-contained: duplication between slices beats a shared base class.
 - **A defect is prevented on the highest rung that holds it:** the type, an analyzer, a refusal where the view
-  renders, then behavior in the browser. A defect a type or an analyzer prevents gets no browser test.
+  renders, then behavior in the browser. A defect a type or an analyzer prevents gets no browser test, and a shape
+  the compiler already refuses gets nothing below it: no analyzer condition, no refusal where the view renders and
+  no case, its refused case compiled once without them to read the compiler's error (the owner, 2026-11-14:
+  "Refusing where Types itself refuse it").
 
 ## Spec-first
 
