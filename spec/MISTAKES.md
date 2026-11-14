@@ -55,6 +55,7 @@ them, each marked as the lead's mistake, and are not copied here.
 | A wait on the harness with no page state read before it | 1 | A rule line: `tests/Alis.Reactive.Conformance.PlaywrightTests/CLAUDE.md`, a test whose held request leaves as its page loads reads the page's own heading before it waits for the hold. |
 | A slice's name written in another form than its declaration's | 1 | The tool: `spec/tools/check.py`'s app check, which reads a page's slice by the name its declaration gives it, held it before the push. |
 | A restore run on a file the next step reads | 1 | A step a script shows: the session's push script stops, with nothing pushed, when `spec/STATE.json` holds no change from the full check or anything else tracked is changed, its refused case met once with the remote unchanged. |
+| A standard stated for every spec and run on the new ones alone | 1 | A step a commit shows: the isolation is run over each TLA+ spec with none on record, each spec's last line quoted in its commit. |
 
 ## Waiting for the owner
 
@@ -809,3 +810,13 @@ them, each marked as the lead's mistake, and are not copied here.
   Cost: one more full check and this commit. Held by a step a script shows: the push script stops before any push
   when the STATE holds no change or anything else tracked is changed, its refused case run once with the remote
   unchanged at f19e32c56.
+- 2026-11-14, a standard stated for every spec and run on the new ones alone, the class's first entry, the lead's.
+  On 2026-11-13 the lead wrote in `spec/CLAUDE.md` that a spec's mutant fails its own invariant wherever it fails any,
+  and ran the isolation on ContainerRead.tla, then Schema.tla and SlotHolds.tla, and on no spec that stood before.
+  Run.tla's mutant UnwindRestartsFinally fails ReplacedFinallyGoesOn where FinallyRunsOnce holds: an Abort on the
+  await of the defaults' Finally unwinds, and the defaults' layer never ends. Caught by the orders designer's
+  isolation of its copy and read on the committed spec by the lead's own run, "Run UnwindRestartsFinally ->
+  FinallyRunsOnce: violated". Cost: the orders landing waits on a mutant-local fix and the rest of Run.tla's
+  isolation. The class's step: the isolation over each of the twelve specs with none on record (Absence,
+  CallbackProperty, Composition, ConfirmAsks, DateWire, Lanes, Partials, Realtime, Request, Tracing, Validation and
+  ValidationToday), run once the designer's run frees the cores, each spec's last line quoted in its commit.
