@@ -1532,6 +1532,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   since no model member changes a route's code. X17.8's Save is a click the page raises, whose handler dispatches the
   intake event with the resident's name, and its test arms the answer gate before it opens the page, since the GET it
   holds is sent as the page loads. The owner can overrule each.
+- The lead, 2026-11-14, writing X11.19's page, the record's answered alarm, after a page-writer on the latest Fable
+  model at xhigh reported its opposite case unwritable, read at the source. The opposite put an awaited step before
+  the second handler's write of the payload's Answer, a write to the payload itself after an await, which D11.4
+  refuses and X11.1 holds at build by ALIS032, so no page renders it and no browser test reads it; and it read an
+  empty answer line, where native.json's care panel shows the item's name with unanswered when no handler set an
+  answer. The opposite is now the second handler left out, a second view at its own address, the panel showing Payload
+  text: Kappa and One unanswered, and the defect's words read the same line. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
