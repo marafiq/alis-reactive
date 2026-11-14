@@ -47,7 +47,7 @@ them, each marked as the lead's slip, and are not copied here.
 | A start chosen to quiet the compiler where a spec line states it | 1 | A rule line: `tests/Alis.Reactive.Conformance.App/CLAUDE.md`, a data class's member starts at what native.json's type and every promise that reads the member lacking state, and the nullable compiler chooses no start. |
 | A name landed that departs from its siblings' name for one concept | 1 | A step a script shows: at each landing, a script of the session reads every render helper's builder callback and every options callback and stops on a name other than `build` and `options`; a landing quotes its line. |
 | A proof line picked by a pattern that matched another run's line | 1 | A step a script shows: a commit message's writer reads a test project's result line after that project's own `[check] dotnet test` marker in the gate's log and asserts the line names the project's assembly, as the handoff's writer reads it. |
-| A command run on a guess of what it does | 1 | A rule line: root CLAUDE.md's forks line, a fork runs no command its brief does not name. |
+| A command run on a guess of what it does | 2 | A rule line: root CLAUDE.md's forks line, a fork runs no command its brief does not name. Since its second entry, a step a script shows: the session's browser runner reads each option it passes against the usage block of `scripts/playwright.sh` and stops, with nothing run, on one the block does not name. |
 
 ## Waiting for the owner
 
@@ -681,3 +681,8 @@ them, each marked as the lead's slip, and are not copied here.
   agent named before declaring the door. Cost: three commits with a reason short; X8.3's page lands with N16.1. Held
   by a step a script shows: a reason leaves the writer only with every promise it serves, read from each promise's
   page line.
+- 2026-11-13, a command run on a guess of what it does, the class's second entry, the lead's. Proving X16.22's page
+  red, the lead ran `scripts/playwright.sh` with a `--filter` option, copied from the main checkout's root CLAUDE.md,
+  which this worktree's script does not take. Caught by the runner, which refused the option and ran nothing. Cost:
+  one start of the build. The class moves up a rung: the session's browser runner reads each option against the
+  script's usage block before it runs; it refused `--filter` with nothing run and ran `--test` to its result line.

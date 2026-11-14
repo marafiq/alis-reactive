@@ -1427,7 +1427,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   parameter's name; the agent's rename is no door's. Three things wait for the owner: the forms; a named enum's start
   read by a rule in the browser, which under the net10 host's enum names is a text of names that no operator of the
   grammar splits, so C# writes the start as its number or the grammar gains an operator; and the refusal of a rule set
-  the validator does not declare, which needs its X line before U17. X16.22's page is the next piece's.
+  the validator does not declare, which needs its X line before U17. X16.22's care rota stands on the record screen,
+  its test red. It has two models, since a member the body lacks reads the model's start and its opposite case starts
+  Rota at Early, each with a validator of two rule sets. Its endpoints echo what they bind, as the Playwright
+  project's file reads a check that sends nothing from the answer line: a check on the server would answer the
+  browser's message with a 400 of the same words, and the test analyzers leave a page's requests to the harness, which
+  reports none, so no page calls the endpoint check's rule-set overload yet. The startup call that names the two enums
+  waits for U17, since `Flags<TEnum>()` throws until then and would stop the app.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
