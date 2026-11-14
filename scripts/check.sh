@@ -73,7 +73,9 @@ dotnet build Alis.Reactive.slnx -c Release --no-restore
 
 doors=spec/Reference/page-doors.json
 step "the doors each browser test's pages call"
-dotnet run scripts/page-doors.cs -p:RestorePackagesWithLockFile=false
+dotnet run scripts/page-doors.cs -p:RestorePackagesWithLockFile=false -- \
+  tests/Alis.Reactive.Conformance.App/bin/Release/net10.0/Alis.Reactive.Conformance.App.dll \
+  tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll "$doors"
 git ls-files --error-unmatch "$doors" > /dev/null
 if ! git diff --exit-code -- "$doors"; then
   echo "[check] The built pages call other doors than the tracked table lands: stage the page-doors.json it wrote." >&2

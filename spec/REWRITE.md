@@ -159,7 +159,8 @@ tests/
                                               refuses a static a request can change, over each fresh app's build
                                               WhenAConsumerAppIsBuilt (section 2.9), and over the runner's selection
                                               and result WhenAPlaywrightRunStarts and WhenAPlaywrightRunEnds (section
-                                              2.5), over the lint's rules
+                                              2.5), over the reader of the doors a test's pages call
+                                              WhenAPagesDoorsAreRead (section 4), over the lint's rules
                                               WhenTheLintIsConfigured (section 2.7), and over the shipped packages
                                               and their slice tables WhenAPackageShips (M20.D1), each rule with its
                                               refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; over
@@ -922,7 +923,9 @@ module of each of its screen parts and the unit that holds the module of each do
 `[FailsFor]` through the pages it opens, the links it clicks by their text, each view's layout, partials and slot
 loads, and the app's code those views run, to each member of the framework they call whose body throws
 `NotImplementedException`, and it writes each test's views and the modules of those members to
-`spec/Reference/page-doors.json`, refusing a test whose pages it cannot read. `scripts/check.sh` alone writes that
+`spec/Reference/page-doors.json`, refusing a test whose pages it cannot read, a link a test names whose address it
+cannot read and a door it cannot place in a module, each held by a case of WhenAPagesDoorsAreRead over small
+assemblies the case compiles. `scripts/check.sh` alone writes that
 table, after its build, and fails when it differs from the tracked one, so a test lands by the doors the committed
 table records as not built and keeps its unit through the commit that builds its last door; a test not yet written
 lands by its feature and its parts. So a module's unit proves its two halves by its pure

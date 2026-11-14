@@ -6,31 +6,28 @@ using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Text.Json;
 
-const string AppFolder = "tests/Alis.Reactive.Conformance.App/bin/Release/net10.0";
-const string AppName = "Alis.Reactive.Conformance.App";
-const string TestsPath = "tests/Alis.Reactive.Conformance.PlaywrightTests/bin/Release/net10.0/Alis.Reactive.Conformance.PlaywrightTests.dll";
-const string Table = "spec/Reference/page-doors.json";
-
-if (args.Length != 0)
+if (args.Length != 3)
 {
-    Console.Error.WriteLine("usage: dotnet run scripts/page-doors.cs");
-    Console.Error.WriteLine($"Reads the Release build of the conformance app and its Playwright tests, and writes to {Table}, for each test's promise, the views its pages render and the modules of the framework's members those views call that throw NotImplementedException, the doors not built.");
+    Console.Error.WriteLine("usage: dotnet run scripts/page-doors.cs -- <the app's assembly> <its Playwright tests' assembly> <the table to write>");
+    Console.Error.WriteLine("Reads a Release build of an app and its Playwright tests, the framework's assemblies beside the app's, and writes to the table, for each test's promise, the views its pages render and the modules of the framework's members those views call that throw NotImplementedException, the doors not built.");
     return 2;
 }
 
-string[] inputs = [Path.Combine(AppFolder, AppName + ".dll"), TestsPath, .. Framework.Names.Select(name => Path.Combine(AppFolder, name + ".dll"))];
+var (appPath, testsPath, table) = (args[0], args[1], args[2]);
+var appFolder = Path.GetDirectoryName(Path.GetFullPath(appPath))!;
+string[] inputs = [appPath, testsPath, .. Framework.Names.Select(name => Path.Combine(appFolder, name + ".dll"))];
 var missing = inputs.Where(path => !File.Exists(path)).ToList();
 if (missing.Count > 0)
 {
-    Console.Error.WriteLine("[page-doors] the Release build holds no " + string.Join(", no ", missing) + "; build Alis.Reactive.slnx -c Release first.");
+    Console.Error.WriteLine("[page-doors] the build holds no " + string.Join(", no ", missing) + "; build Alis.Reactive.slnx -c Release first.");
     return 2;
 }
 
-var app = new Loaded(Path.Combine(AppFolder, AppName + ".dll"));
-var tests = new Loaded(TestsPath);
-var framework = new Framework(Framework.Names.ToDictionary(name => name, name => new Loaded(Path.Combine(AppFolder, name + ".dll"))));
+var app = new Loaded(appPath);
+var tests = new Loaded(testsPath);
+var framework = new Framework(Framework.Names.ToDictionary(name => name, name => new Loaded(Path.Combine(appFolder, name + ".dll"))));
 var pages = new Pages(app, framework);
-var problems = new List<string>(pages.Problems);
+var problems = new List<string>();
 var landed = new SortedDictionary<string, Landing>(StringComparer.Ordinal);
 
 foreach (var (promise, method) in Promised.Tests(tests))
@@ -42,10 +39,11 @@ foreach (var (promise, method) in Promised.Tests(tests))
         problems.Add($"{promise}: its test names no route an action of the app answers a GET on, so no page of it is read");
         continue;
     }
-    var landing = pages.Read(opened, reached.Strings);
+    var landing = pages.Read(promise, opened, reached.Strings);
     landed[promise] = landed.TryGetValue(promise, out var earlier) ? earlier.With(landing) : landing;
 }
 
+problems.AddRange(pages.Problems);
 problems.AddRange(framework.Problems);
 if (problems.Count > 0)
 {
@@ -53,8 +51,8 @@ if (problems.Count > 0)
     return 1;
 }
 
-File.WriteAllText(Table, Landing.Json(landed));
-Console.WriteLine($"[page-doors] the doors the built pages of {landed.Count} promises call, written to {Table}");
+File.WriteAllText(table, Landing.Json(landed));
+Console.WriteLine($"[page-doors] the doors the built pages of {landed.Count} promises call, written to {table}");
 return 0;
 
 internal sealed record Landing(ImmutableArray<string> Modules, ImmutableArray<string> Views)
@@ -62,7 +60,7 @@ internal sealed record Landing(ImmutableArray<string> Modules, ImmutableArray<st
     public static string Json(IReadOnlyDictionary<string, Landing> landed)
     {
         using var buffer = new MemoryStream();
-        using (var json = new Utf8JsonWriter(buffer, new JsonWriterOptions { Indented = true }))
+        using (var json = new Utf8JsonWriter(buffer, new JsonWriterOptions { Indented = true, NewLine = "\n" }))
         {
             json.WriteStartObject();
             foreach (var (promise, landing) in landed)
@@ -139,7 +137,7 @@ internal sealed class Framework(IReadOnlyDictionary<string, Loaded> assemblies)
     {
         if (!holder.Types.TryGetValue(type, out var declared))
         {
-            Problems.Add($"{holder.Name} declares no type {type}, which the app calls {member} on");
+            Problems.Add($"{holder.Name} declares no type {type}, which the app calls {member} on: the app is built against another {holder.Name}, so build the solution again");
             return null;
         }
         var names = new Names(holder.Reader);
@@ -152,7 +150,7 @@ internal sealed class Framework(IReadOnlyDictionary<string, Loaded> assemblies)
             if (module.Length == 0) Problems.Add($"{type}.{member} throws {NotBuilt} in {holder.Name}'s root namespace, which names no module");
             return module.Length == 0 ? null : module;
         }
-        Problems.Add($"{type} in {holder.Name} declares no {member}{signature}, which the app calls");
+        Problems.Add($"{type} in {holder.Name} declares no {member} of the signature the app calls: the app is built against another {holder.Name}, so build the solution again");
         return null;
     }
 
@@ -193,7 +191,7 @@ internal sealed class Pages
     public List<string> Opened(IReadOnlySet<string> named)
         => [.. named.SelectMany(Answering).Where(action => action.Get).SelectMany(action => action.Views).Distinct()];
 
-    public Landing Read(IEnumerable<string> opened, IReadOnlySet<string> named)
+    public Landing Read(string promise, IEnumerable<string> opened, IReadOnlySet<string> named)
     {
         var views = new SortedSet<string>(StringComparer.Ordinal);
         var modules = new SortedSet<string>(StringComparer.Ordinal);
@@ -203,11 +201,13 @@ internal sealed class Pages
             if (!views.Add(view)) continue;
             if (!_views.ContainsKey(view))
             {
-                Problems.Add($"{view} is named by the app's code and is no view the app compiles");
+                Problems.Add($"{promise}: its pages name {view}, no view the app compiles");
                 continue;
             }
             var walked = WalkedView(view);
             modules.UnionWith(walked.Modules);
+            foreach (var text in walked.Unaddressed.Where(named.Contains))
+                Problems.Add($"{promise}: its test names the link '{text}' of {view}, whose address is written by no route before it, so the page it opens is not read");
             foreach (var next in walked.Strings.Where(text => text.EndsWith(ViewSuffix, StringComparison.Ordinal))) waiting.Enqueue(next);
             var slotted = walked.Strings.SelectMany(Answering).Where(action => action.Partial);
             var linked = walked.Links.Where(link => named.Contains(link.Text)).SelectMany(link => Answering(link.Route)).Where(action => action.Get);
@@ -285,7 +285,7 @@ internal sealed class Pages
     private sealed record Action(bool Get, bool Partial, List<string> Views);
 }
 
-internal sealed record Walked(IReadOnlySet<string> Strings, IReadOnlySet<string> Calls, IReadOnlySet<string> Modules, IReadOnlyList<(string Text, string Route)> Links);
+internal sealed record Walked(IReadOnlySet<string> Strings, IReadOnlySet<string> Calls, IReadOnlySet<string> Modules, IReadOnlyList<(string Text, string Route)> Links, IReadOnlySet<string> Unaddressed);
 
 internal static class Walk
 {
@@ -296,6 +296,7 @@ internal static class Walk
         var calls = new HashSet<string>(StringComparer.Ordinal);
         var modules = new HashSet<string>(StringComparer.Ordinal);
         var links = new List<(string, string)>();
+        var unaddressed = new HashSet<string>(StringComparer.Ordinal);
         var seen = new HashSet<MethodDefinitionHandle>();
         var taken = new HashSet<TypeDefinitionHandle>();
         var initialized = new HashSet<TypeDefinitionHandle>();
@@ -390,7 +391,10 @@ internal static class Walk
                     case ILOpCode.Ldstr:
                         var text = reader.GetUserString(MetadataTokens.UserStringHandle(token));
                         strings.Add(text);
-                        if (route is not null && text.StartsWith('>') && text.IndexOf('<') > 1) links.Add((text[1..text.IndexOf('<')].Trim(), route));
+                        var closed = text.IndexOf(AnchorEnd, StringComparison.Ordinal);
+                        var anchor = text.StartsWith('>') && closed > 1 && closed == text.IndexOf('<') ? text[1..closed].Trim() : null;
+                        if (anchor is not null && route is not null) links.Add((anchor, route));
+                        if (anchor is not null && route is null) unaddressed.Add(anchor);
                         route = text.StartsWith('/') ? text : route is not null && text.Length == 0 ? route : null;
                         break;
                     case ILOpCode.Call or ILOpCode.Callvirt or ILOpCode.Ldftn or ILOpCode.Ldvirtftn:
@@ -406,8 +410,10 @@ internal static class Walk
             }
         }
 
-        return new Walked(strings, calls, modules, links);
+        return new Walked(strings, calls, modules, links, unaddressed);
     }
+
+    private const string AnchorEnd = "</a>";
 }
 
 internal static class Promised

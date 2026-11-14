@@ -17,8 +17,9 @@ expects none.
   defect is and the cure: the file and the line of what is tracked, the member or the address of what the app holds.
 - A rule reads tracked files, so a unit is staged before the rules run on it.
 - A defect planted in a rule's reader fails a case named for it; one that no case fails on names a missing case.
-  The build refuses an unread member or parameter, so a planted defect that leaves one does not compile and proves
-  nothing: it is redone as a mutation that compiles. A copy the sweep restores is touched, since the build reads a
+  The build refuses an unread member or parameter and unreachable code, so a planted defect that leaves one does not
+  compile and proves nothing: it is redone as a mutation that compiles (the lead's mistake again, 2026-11-14, in the
+  reader `WhenAPagesDoorsAreRead` runs). A copy the sweep restores is touched, since the build reads a
   file's time, and a stale build passes for the restored code (the lead's mistakes, 2026-11-11). The copy is built
   and read green before the first plant, with what the fixture runs beside the code, `node_modules` among it: a plant
   on a copy that already fails proves nothing (the lead's mistake, 2026-11-11).
@@ -41,6 +42,9 @@ expects none.
 - `WhenThePlanContractIsGenerated` runs the contract generator's reader, which this project references for it, over
   small grammars its cases declare, and expects each refusal's own words and the TypeScript and the schema of an
   accepted one as literals. The core's own contract is held by the first step of `scripts/check.sh`.
+- `WhenAPagesDoorsAreRead` runs `scripts/page-doors.cs` over the assemblies each case compiles, an app, its tests and a
+  framework with doors built and not built, and expects the exit, each refusal's own line and the table as one literal.
+  The conformance app's own table is held by `scripts/check.sh`'s step after its build.
 - `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
   result, over the tables and TRX files their cases write, and expect each refusal's own line. A case's tables
   hold what the real tools write: a fixture in the namespace of its first folder, as ALIS011 holds every test,

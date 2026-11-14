@@ -12,5 +12,13 @@ internal sealed class WrittenFolder : IDisposable
         return path;
     }
 
+    internal string Write(string name, byte[] bytes)
+    {
+        var path = Path.Combine(_folder, name);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllBytes(path, bytes);
+        return path;
+    }
+
     public void Dispose() => Directory.Delete(_folder, recursive: true);
 }
