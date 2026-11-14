@@ -20,6 +20,8 @@ public sealed class MethodResult<TResult> : TypedSource<TResult>
 
     internal override Schema.Expression Expression => throw new NotImplementedException();
 
+    internal override HeldForm Form => throw new NotImplementedException();
+
     /// <summary>Reads data past the result: a field of the value the method returned, at any depth.</summary>
     /// <remarks>
     /// A field the value lacks reads as a new instance of its holder's type would hold it, and a field past an

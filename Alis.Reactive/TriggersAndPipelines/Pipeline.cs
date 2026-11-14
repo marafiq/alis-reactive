@@ -82,7 +82,7 @@ public sealed class Pipeline<TModel>
     /// <summary>Starts a condition, read when the pipeline reaches it.</summary>
     /// <param name="condition">The condition; its branch runs only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public Guard<TModel> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public Guard<TModel> When(TypedSource<bool> condition) => new(_writer, condition.Expression, arm => IfChain.Opened(_writer, arm));
 
     /// <summary>Sends a GET request with no member.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI.</param>

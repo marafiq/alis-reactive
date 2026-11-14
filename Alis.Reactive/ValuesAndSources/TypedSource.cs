@@ -30,6 +30,8 @@ public abstract class TypedSource<T> : ITypedSource<T>, IPlanSource
 
     internal abstract Expression Expression { get; }
 
+    internal abstract HeldForm Form { get; }
+
     Expression IPlanSource.Expression => Expression;
 
     /// <summary>Joins what the source reads when the step runs, shown as an element's text shows it.</summary>
