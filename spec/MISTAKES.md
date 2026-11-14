@@ -50,6 +50,7 @@ them, each marked as the lead's mistake, and are not copied here.
 | A command run on a guess of what it does | 3 | A rule line: root CLAUDE.md's forks line, a fork runs no command its brief does not name. Since its second entry, a step a script shows: the session's browser runner reads each option it passes against the usage block of `scripts/playwright.sh` and stops, with nothing run, on one the block does not name. Since its third entry, a step a command shows: the session's commands enter a scratch folder only in a subshell, `( cd … )`. |
 | A refusal written as a member that exists only to fail, where no type can stage it | 1 | A rule line: `.claude/rules/csharp.md`, the public surface, no member exists only to refuse a call, and a defect no type stages is an analyzer's. The tool, since the removal of D6.10's twelve overloads, which an earlier session landed before this log and the owner named with this entry: the core's `Alis.Reactive/BannedSymbols.txt` refuses the obsolete mark that makes a use an error, its refused case and the accepted mark of a warning in `WhenTheCoreIsCompiled`. |
 | A softer word for the lead's mistake, which hides whose it is | 1 | A rule line: root CLAUDE.md's Corrections, a mistake is called a mistake in a rule line, a log entry, a commit and a message to the owner. |
+| A harness piece stated in force before it was seen to run | 1 | A step a commit shows: a change to the session's harness, an agent definition, a hook or a setting, is run live in the session before a rule line states it in force, and its commit quotes the line that ran it. It reached the owner in a pushed rule line, so it starts on this rung. |
 
 ## Waiting for the owner
 
@@ -741,3 +742,12 @@ them, each marked as the lead's mistake, and are not copied here.
   `spec/REWRITE.md` section 2, which keeps every path the repository holds. Caught by the full check at d78439ecf,
   which read 38 of 40, the paths check and its plants, before any push. Cost: one full check. The class moves up a
   rung: the session's gate script runs the paths check when a commit adds a file.
+- 2026-11-14, a harness piece stated in force before it was seen to run, the class's first entry, the lead's. Root
+  CLAUDE.md's forks section, the commit that added `.claude/agents/designer.md` and `.claude/agents/page-writer.md`,
+  and the handoff stated that every agent starts from a definition of `.claude/agents/`, and no Agent call had named
+  one. A definition loads as an agent type from the folder the session starts in, here the main checkout, whose
+  `.claude/agents/` holds the architect's alone, and the first call by type answered "Agent type 'designer' not
+  found". Caught by the lead, after the push and before any agent was sent. Cost: a pushed rule line stated a harness
+  that did not run, and where the definitions load is the owner's choice. Held by a step a commit shows, the class's
+  row; until that choice, a brief names its definition file as the agent's first read and the call passes the model
+  and effort the definition names, as root CLAUDE.md's forks section states.

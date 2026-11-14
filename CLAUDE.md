@@ -183,7 +183,10 @@ word (the owner, 2026-11-13: "know that slip is about you invented so you can av
   base SHA, which the lead reads at the source before a word of it lands. A brief adds the task alone, and a task no
   definition covers gets its definition first (the owner, 2026-11-13: "Are you making your agents actually read the
   harness, like all the setup we have, or you are just going, do whatever you want?", and the owner's yes to the
-  definitions the same night).
+  definitions the same night). A definition loads as an agent type from the `.claude/agents/` of the folder the
+  session starts in, and a session started in the main checkout lists the architect's alone; until the owner chooses
+  where the definitions load, a brief names its definition file as the agent's first read and the call passes the
+  model and effort the definition names (the lead's mistake, 2026-11-14).
 - A complex task or a critical decision, one whose error would drift the schema, spread across tests, a harness door
   or a spec line, or lower the bar, goes first to an agent on the latest Fable model at xhigh effort, briefed with its
   spec lines, the files and the constraints; the lead lands it from its answer, read at the source (the owner,
