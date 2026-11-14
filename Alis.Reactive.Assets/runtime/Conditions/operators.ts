@@ -1,5 +1,6 @@
 import { assertNever, notBuilt, type Operator } from "../Schema/index";
 import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
+import { keyOf } from "./keys";
 
 export type Term = () => Read;
 
@@ -61,13 +62,14 @@ export function operated(op: Operator, terms: readonly Term[]): Read {
     case "sumDouble":
     case "sumDecimal":
     case "eqDecimal":
+      throw notBuilt("the operator '" + op + "'");
     case "dateKey":
     case "wallKey":
     case "instantKey":
     case "dayKey":
     case "timeKey":
     case "spanKey":
-      throw notBuilt("the operator '" + op + "'");
+      return keyOf(op, termOf(op, terms, 0)(), terms[1]);
     default:
       return assertNever(op);
   }

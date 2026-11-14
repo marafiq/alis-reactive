@@ -42,8 +42,9 @@ neither npm nor node, so each script that builds runs `build.mjs` first.
 
 A runtime module's pure tests sit beside its code, in files named for it that end in .test.ts, and vitest runs
 them (the root's `vitest.config.js`). A test imports its own module's index and nothing else of the runtime, so it reads the module's public
-surface and never its internals: the lint refuses any other import of the runtime there (`no-restricted-imports`). It runs in node with no DOM and expects literals written from the schema's lines,
-never a recorded output. What touches the DOM has no pure test: a Playwright test proves it.
+surface and never its internals: the lint refuses any other import of the runtime there (`no-restricted-imports`). It runs in node with no DOM, under the time zone America/New_York that the root `vitest.config.js` sets, so a
+date's local fields differ from its UTC ones on every machine (the lead, 2026-11-14), and expects literals written
+from the schema's lines, never a recorded output. What touches the DOM has no pure test: a Playwright test proves it.
 
 ## Commands
 
