@@ -207,6 +207,8 @@ internal sealed class ItemLambda
         if (leftReadsAnItem && rightReadsAnItem)
         {
             RefuseAMemberInItsOwnFormBesideAnother(comparison, left, right);
+            RefuseADateTheAppsConverterWrites(comparison, left.Type);
+            RefuseADateTheAppsConverterWrites(comparison, right.Type);
             RequireComparableMembers(comparison, left.Type, right.Type, orders);
             return new OpExpression(op, [Keys.Of(left.Type, Read(left), _form), Keys.Of(right.Type, Read(right), _form)]);
         }
@@ -214,6 +216,7 @@ internal sealed class ItemLambda
         var member = leftReadsAnItem ? left : right;
         var held = leftReadsAnItem ? right : left;
         if (ReadsItsOwnForm(member, out var inItsOwnForm)) return ComparedInItsOwnForm(comparison, op, orders, inItsOwnForm, held, leftReadsAnItem);
+        RefuseADateTheAppsConverterWrites(comparison, member.Type);
         var writtenAs = WrittenAs(member, held);
         var written = TranslatedMembers.ReadsADayOfTheWeek(member) ? DayNumber(ViewValues.Of(held)) : _form.Base.Beside(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
         RequireComparableValue(comparison, written.Value, member.Type, orders);
@@ -250,6 +253,11 @@ internal sealed class ItemLambda
         if (!comparedAsDecimals) return new OpExpression(op, operands);
         var equal = new OpExpression(Operator.EqDecimal, operands);
         return op == Operator.Eq ? equal : new OpExpression(Operator.Not, [equal]);
+    }
+
+    private void RefuseADateTheAppsConverterWrites(BinaryExpression comparison, Type compared)
+    {
+        if (Keys.WrittenByAConverterOfTheApps(compared, _form)) throw Keys.ComparesADateTheAppsConverterWrites(Printed.Of(comparison), compared);
     }
 
     private void RefuseAMemberInItsOwnFormBesideAnother(BinaryExpression comparison, LinqExpression left, LinqExpression right)

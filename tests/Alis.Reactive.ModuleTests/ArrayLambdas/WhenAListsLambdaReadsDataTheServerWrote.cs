@@ -90,6 +90,50 @@ public sealed class WhenAListsLambdaReadsDataTheServerWrote
             Throws.InvalidOperationException.With.Message.EqualTo(
                 "'d.Charted > DoseStatus.Due' orders 'd.Charted', which its own JSON converter writes unlike the app's options, so the browser does not order it as .NET does; order it on the server."));
 
+    [Test]
+    public void a_date_the_apps_converter_writes_is_not_compared_with_a_value_the_view_holds()
+    {
+        var cutoff = ThreeOnTheNight;
+
+        Assert.That(
+            () => Rendered(doses => doses.Count(d => d.Due < cutoff), json => json.Converters.Add(new DayText())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Due < cutoff' compares a DateTime the app's JSON options write by a converter of their own, whose text the browser cannot read as the value .NET holds; compare it on the server."));
+    }
+
+    [Test]
+    public void two_dates_the_apps_converter_writes_are_not_compared()
+        => Assert.That(
+            () => Rendered(doses => doses.Count(d => d.Given < d.Due), json => json.Converters.Add(new DayText())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Given < d.Due' compares a DateTime the app's JSON options write by a converter of their own, whose text the browser cannot read as the value .NET holds; compare it on the server."));
+
+    [Test]
+    public void a_date_the_apps_converter_writes_is_not_looked_up_in_a_list_the_view_holds()
+    {
+        var dues = new[] { ThreeOnTheNight };
+
+        Assert.That(
+            () => Rendered(doses => doses.Count(d => dues.Contains(d.Due)), json => json.Converters.Add(new DayText())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'dues.Contains(d.Due)' compares a DateTime the app's JSON options write by a converter of their own, whose text the browser cannot read as the value .NET holds; compare it on the server."));
+    }
+
+    [Test]
+    public void a_list_is_not_ordered_by_a_date_the_apps_converter_writes()
+        => Assert.That(
+            () => Rendered(doses => doses.OrderBy(d => d.Due).Count(), json => json.Converters.Add(new DayText())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Due' compares a DateTime the app's JSON options write by a converter of their own, whose text the browser cannot read as the value .NET holds; compare it on the server."));
+
+    [Test]
+    public void a_list_is_ordered_by_a_date_the_app_writes_by_system_text_jsons_own_converter()
+    {
+        var plan = Rendered(doses => doses.OrderBy(d => d.Due).Count(), _ => { });
+
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
     private static string Rendered(Func<TypedSource<List<CartDose>>, TypedSource<int>> count, Action<JsonSerializerOptions> json)
     {
         var html = Views.Of(new MedicationRound("North", null), json);

@@ -15,22 +15,25 @@ internal sealed class HeldForm
     private readonly JsonSerializerOptions _baseOptions;
     private readonly bool _fromApp;
 
-    private HeldForm(AppJson json, CultureInfo rendersUnder, JsonSerializerOptions baseOptions, bool fromApp, OwnWriting? own)
+    private HeldForm(AppJson json, CultureInfo rendersUnder, JsonSerializerOptions baseOptions, bool fromApp, OwnWriting? own, string? readTheAppsConverterWrites)
     {
         _json = json;
         _baseOptions = baseOptions;
         _fromApp = fromApp;
         RendersUnder = rendersUnder;
         Own = own;
+        ReadTheAppsConverterWrites = readTheAppsConverterWrites;
     }
 
     internal CultureInfo RendersUnder { get; }
 
     internal OwnWriting? Own { get; }
 
+    internal string? ReadTheAppsConverterWrites { get; }
+
     internal HeldForm Computed => Live(_json, RendersUnder);
 
-    internal HeldForm Base => Own is null ? this : new(_json, RendersUnder, _baseOptions, _fromApp, null);
+    internal HeldForm Base => Own is null ? this : new(_json, RendersUnder, _baseOptions, _fromApp, null, null);
 
     internal string BaseFormName => _fromApp ? "the app's options" : "JavaScript's value";
 
@@ -41,11 +44,20 @@ internal sealed class HeldForm
     internal bool HoldsAListItsConverterWrites
         => Own is { Member: { HasItsOwnConverter: true } member } && member.Contract.Kind is JsonTypeInfoKind.Enumerable or JsonTypeInfoKind.Dictionary;
 
-    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.LiveForm, false, own: null);
+    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.LiveForm, false, own: null, null);
 
-    internal static HeldForm App(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.App, true, null);
+    internal static HeldForm App(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, json.App, true, null, null);
 
-    internal HeldForm WrittenBy(WrittenMember member, string read) => new(_json, RendersUnder, _baseOptions, _fromApp, new OwnWriting(member, read));
+    internal HeldForm WrittenBy(WrittenMember member, string read) => new(_json, RendersUnder, _baseOptions, _fromApp, new OwnWriting(member, read), null);
+
+    internal HeldForm ReadAs(string read, Type type) => WritesByAConverterOfTheApps(type) ? new(_json, RendersUnder, _baseOptions, _fromApp, Own, read) : this;
+
+    internal bool WritesByAConverterOfTheApps(Type type)
+    {
+        var scalar = Nullable.GetUnderlyingType(type) ?? type;
+        return _fromApp && Own is null && WritesAsAScalar(scalar) &&
+            !ReferenceEquals(DataOptions.GetTypeInfo(scalar).Converter, PlanJson.Options.GetTypeInfo(scalar).Converter);
+    }
 
     internal OwnWriting? WritesOtherwiseThan(HeldForm other)
     {

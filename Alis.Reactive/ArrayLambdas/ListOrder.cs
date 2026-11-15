@@ -14,6 +14,7 @@ internal static class ListOrder
     internal static Operator ComparisonOf<TKey>(LambdaExpression key, HeldForm form)
     {
         if (typeof(TKey) == typeof(string)) return TextOrder(key, form.RendersUnder);
+        if (Keys.WrittenByAConverterOfTheApps(typeof(TKey), form)) throw Keys.ComparesADateTheAppsConverterWrites(Printed.Of(key.Body), typeof(TKey));
         if (Keys.IsDateOrTime<TKey>()) return Operator.CompareOrdinal;
         return form.Beside(default(TKey)).Value.ValueKind switch
         {

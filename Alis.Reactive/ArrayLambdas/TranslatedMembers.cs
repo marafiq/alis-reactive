@@ -185,6 +185,7 @@ internal static partial class TranslatedMembers
             throw Refused(printed, "looks in a collection that can compare by its own rules, as a HashSet's comparer does; copy it into an array before the lambda, such as var wards = Model.Wards.ToArray();.");
         var itemsForm = read.FormOf(item);
         if (itemsForm.Own is { Member.HasItsOwnConverter: true }) itemsForm.RefuseAComputation();
+        if (Keys.WrittenByAConverterOfTheApps(item.Type, itemsForm)) throw Keys.ComparesADateTheAppsConverterWrites(printed, item.Type);
         var list = itemsForm.Beside(held, values.Type);
         var written = list.Value.EnumerateArray().ToList();
         var holdsAnObject = written.Any(value => value.ValueKind is JsonValueKind.Object or JsonValueKind.Array);

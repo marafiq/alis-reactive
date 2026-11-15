@@ -1133,6 +1133,17 @@ defects. An MVC action reaches the answer gate by its filter, with its own addre
 held, and the harness's test of it is green and fails on each of its two planted defects. U3 is closed: the
 tests that wait, the views and doors they meet, the harness verbs they use and the Playwright project's switch,
 which waits for the last test, land with their units (the owner, 2026-11-14).
+U7's pieces are landed: `AddReactiveTracing` and the server's activities, a view's render and an endpoint's check,
+each handler a door writes carrying its caller's file and line (D20.7); the plan's trace context and the runtime's
+Tracing slice, a boot span per plan with its error or its stop and traceparent sent to the page's origin alone (D20.4,
+D20.5); and `Alis.Reactive.OpenTelemetry` with its layout helper (N20.2). A request records no span until U18 calls
+the trace port's send, and U7's browser tests are not run yet.
+U11's lambdas are built: a list's lambda translated where the view renders, its orderings by the key's type and the
+view's culture, a page under the culture its address names, a member read in its own form, and the refusals where
+the view renders, each naming its term or its read and the app's options, X6.57's date the app's own JSON converter
+writes among them; its 18 browser tests pass, and each fails on its planted defect. ALIS033's conditions (N18.10),
+ALIS028 (X6.52), the step a list's lambda refuses (X6.8, X5.13) and D6.14's suppressor (X6.46) are open, and X6.57's
+validator half waits on a date picker bound to a DateTime (N18.4).
 U12's C# half is built: a declared method called at its line, its result bound there or at its term (D4.7, D5.11),
 its typed arguments, a `Field` and the run's abort signal among them, the objects and lists a member holds or a method
 returns, and the lambdas over live items; `Event`, `Data<T>`, callbacks and answers, `Argument`, `MethodAt`,
@@ -1145,21 +1156,29 @@ the contract's table written before the compiler reads it, the conformance libra
 beside their declarations, boot's plugin queue and `alis:mount`, the plugin script of every page that links one, and
 the contract's reader with ALIS014 and ALIS015, the core and the conformance app opting in to the table; the contract's
 rules ALIS016 to ALIS022 and ALIS037 are open, and of the 48 browser tests U13 lands, 47 pass, each run alone, and
-X4.9's is not written.
+X4.9's is not written; the 50 more the page table moved in with U20's triggers are not run yet.
 U14 is landed: `Plugin` and its name's check, `pipeline.Plugin<TPlugin>()` with one locator a name,
 `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`, with their module tests. A host is ready once MVC has
 rendered a view with a plan (section 2.5).
 U15 is landed: every door of `Element`, `ClassList`, `ElementChildren` and `ChildElement`, `JsObject`'s iterators, the
 runtime's `list` node, and a world whose browser runs in the zone a promise names (`NewWorldInZone`, section 2.5);
 M5.X2's test and the zone's harness test pass, X17.3's, X17.12's and X17.17's, U13's, pass on the conformance
-library's TypeScript, and a run through U13 or later waits on X4.9's test.
+library's TypeScript, and a run through U13 or later waits on X4.9's test. Of the 29 browser tests U15 lands now, 27
+pass; the two the page table moved in, a sorted list set into another component and a method's argument that falls
+back from a null, fail.
 U16 is landed: `IdGenerator.For`, `Html.InputField` with its options on both hosts, `ComponentInput.Of`,
 `AddReactiveClassNames`, `Html.PartialFor`, the request form and container blocks, `pipeline.Input`,
 `pipeline.Container` and `container.Read`, with their refusals where the view renders; the runtime's page tables of
 inputs and containers, R14.6 where the page composes its plans, and `alis.model`'s `sent`. U16 holds no browser test:
 every test of its features lands in U23, whose Native inputs its pages render, and X7.13 lands in U9, where it waits on
 the owner's yes to its Type.Name read. U17's first piece is landed: the validator grammar as the server runs it, every
-check and option FluentValidation 12.1.1 defines, with its messages. A date shown as an element's text is
+check and option FluentValidation 12.1.1 defines, with its messages. Its second piece is landed: a container checked
+in the browser by the rules its validator's set carries, over the body its request sends, each member read as the
+endpoint binds it; M8.F3's browser tests land with M8.F4's showing of failures.
+U18's first piece is landed: the C# request writer for Get, Head and Options, with the URL's parts, the query, the
+headers and the reply's success and error scopes, on both hosts. U20's app events are landed: `AppEvent.Declare`, the
+document's load and custom-event triggers under a handler's policy, a payload member read at the event's detail, and a
+raise from markup; most of the browser tests U20 lands wait on U18's other methods. A date shown as an element's text is
 its declared type's, C# writing on the `string` shape whether it holds a `DateTime` or a `DateTimeOffset`. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
 pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). The commit that lands
 a piece rewrites this paragraph.

@@ -15,7 +15,7 @@ internal static class DataReads
         if (!MemberPath.TryOf(path, options, out var members)) throw MemberPath.NoMemberPath(path);
         var read = path.Body.ToString();
         members.RefuseAReadPastItsOwnConverter(read);
-        var form = members.Member.HoldsItsOwnForm ? holdersForm.WrittenBy(members.Member, read) : holdersForm;
+        var form = members.Member.HoldsItsOwnForm ? holdersForm.WrittenBy(members.Member, read) : holdersForm.ReadAs(read, typeof(TResult));
         return new Computed<TResult>(new DataExpression(members.DataSteps(), holder), form);
     }
 
