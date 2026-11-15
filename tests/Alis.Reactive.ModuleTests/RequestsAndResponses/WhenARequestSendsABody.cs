@@ -233,6 +233,11 @@ public sealed class WhenARequestSendsABody
             Throws.InstanceOf<NotImplementedException>().With.Message.StartsWith("'r => r.Shift' holds an enum a source reads, and a JSON body sends it as its endpoint binds it (D9.13)"));
 
     [Test]
+    public void a_json_body_literals_member_past_javascripts_whole_numbers_is_refused_naming_its_path()
+        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<BillRequest>("/bills", request => request.Json(body => body.Set(r => r.Charge, new BilledCharge(9007199254740993m))))),
+            Throws.InvalidOperationException.With.Message.EqualTo("'r => r.Charge.amount' holds a JavaScript number, and 9007199254740993 is a whole number past 9007199254740991, which JavaScript reads as another value; write a finite number of at most 15 significant digits."));
+
+    [Test]
     public void a_member_sent_in_the_path_and_set_in_the_body_is_refused()
         => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Post<SearchRequest>("/notes/{id}", request => request.Path(r => r.Id, 7).Json(body => body.Set(r => r.Id, 8)))),
             Throws.InvalidOperationException.With.Message.EqualTo("Request member 'Id' overlaps a member already supplied; send each member once, and send either an object or its members."));

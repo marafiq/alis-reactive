@@ -92,6 +92,7 @@ internal static class RequestValues
             return ContractRecord<ValueRead>.Literal(name);
         }
 
+        Literals.RefuseWhereJavaScriptReadsAnother(value, member);
         var written = Literals.Of(value, type, writer.Content.Json);
         if (written.Value.ValueKind is JsonValueKind.Object or JsonValueKind.Array)
             throw new InvalidOperationException($"'{member}' holds an object or a nested list; send its scalar members by their paths, or send it in a JSON body.");

@@ -39,7 +39,7 @@ internal static class JsonBodyValues
 {
     internal static JsonLeaf Literal<TValue>(TValue value, BlockWriter writer, LambdaExpression member)
     {
-        Literals.RefuseWhereJavaScriptReadsAnother(value, member.ToString());
+        Literals.RefuseAtAnyDepth(value, writer.Content.Json.BodyForm, member.ToString());
         var written = new LitExpression(JsonSerializer.SerializeToElement(value, writer.Content.Json.BodyForm));
         return value is null ? Leaf<TValue>(written, writer, member) : JsonLeaf.NullWhenNothing(written);
     }

@@ -132,6 +132,16 @@ public sealed class WhenARequestPartIsWritten
             Throws.InvalidOperationException.With.Message.EqualTo(message));
 
     [Test]
+    public void a_query_literal_past_javascripts_whole_numbers_is_refused_naming_its_member()
+        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Get<BillRequest>("/bills", request => request.Query(r => r.Amount, 9007199254740993m))),
+            Throws.InvalidOperationException.With.Message.EqualTo("'r => r.Amount' holds a JavaScript number, and 9007199254740993 is a whole number past 9007199254740991, which JavaScript reads as another value; write a finite number of at most 15 significant digits."));
+
+    [Test]
+    public void a_query_lists_item_past_them_is_refused_naming_its_member()
+        => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Get<BillRequest>("/bills", request => request.Query(r => r.Tickets, new[] { 7L, 9007199254740992L }))),
+            Throws.InvalidOperationException.With.Message.EqualTo("'r => r.Tickets' holds a JavaScript number, and 9007199254740992 is a whole number past 9007199254740991, which JavaScript reads as another value; write a finite number of at most 15 significant digits."));
+
+    [Test]
     public void an_unnamed_enum_number_is_refused()
         => Assert.That(() => RequestPage.Rendered(pipeline => pipeline.Get<SearchRequest>("/staff", request => request.Query(r => r.Shift, (RequestShift)8))),
             Throws.InvalidOperationException.With.Message.EqualTo("'r => r.Shift' is set to 8, which no value of its enum names: net10 refuses it and MVC 5 binds it, so the hosts bind it apart; set a value its enum names."));

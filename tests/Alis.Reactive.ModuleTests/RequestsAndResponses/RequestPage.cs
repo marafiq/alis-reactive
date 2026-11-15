@@ -79,6 +79,17 @@ public sealed class SearchAddress
     public string Ward { get; init; } = "";
 }
 
+public sealed class BillRequest
+{
+    public decimal Amount { get; init; }
+
+    public long[] Tickets { get; init; } = [];
+
+    public BilledCharge Charge { get; init; } = new(0m);
+}
+
+public sealed record BilledCharge(decimal Amount);
+
 public enum RequestShift
 {
     None,
