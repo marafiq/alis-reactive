@@ -341,8 +341,8 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   calls fails its unit's run, and its placement then lists the part that needs it.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
   host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
-  "Now listening on:" line and ready once `WorldEndpoints.Ready` answers, so a test's first wait never meets a cold
-  server; its process culture is fr-FR, which no request names, so a page that reads the process's culture in place of
+  "Now listening on:" line and ready once `WorldEndpoints.Ready` answers, a view MVC renders through the shared
+  layout with a plan, as a page does, so a test's first wait never meets a cold server, MVC's first request among it; its process culture is fr-FR, which no request names, so a page that reads the process's culture in place of
   its request's shows it; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
   server alive fails. A promise whose opposite case holds under another net10 host's options opens that case's
   world under it: `NewWorldUnder` takes the other host by its name of `Hosts`, starts its server on first use as a
