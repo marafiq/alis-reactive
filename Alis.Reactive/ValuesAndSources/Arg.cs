@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.Execution;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 
@@ -10,22 +11,22 @@ internal interface IArgumentValue
 }
 
 /// <summary>
-/// One argument of a call the browser makes: a literal or a source.
+/// One argument of a call the browser makes: a literal, a source or a callback's answer.
 /// </summary>
 /// <remarks>
-/// A declaration that takes its arguments as one list takes them as this type; each is written as an
+/// A declaration that takes its arguments as one list takes them as this type; a value or source is written as an
 /// <see cref="Arg{T}"/>, so it stays typed.
 /// </remarks>
 public abstract class Arg
 {
-    private readonly Func<AppJson, Expression> _write;
+    private readonly Func<BlockWriter, Expression> _write;
 
-    private protected Arg(Func<AppJson, Expression> write)
+    private protected Arg(Func<BlockWriter, Expression> write)
     {
         _write = write;
     }
 
-    internal Expression Written(AppJson json) => _write(json);
+    internal Expression Written(BlockWriter writer) => _write(writer);
 }
 
 /// <summary>
@@ -38,7 +39,7 @@ public abstract class Arg
 /// <typeparam name="T">The type of the parameter the argument fills.</typeparam>
 public sealed class Arg<T> : Arg
 {
-    private Arg(Func<AppJson, Expression> write) : base(write)
+    private Arg(Func<AppJson, Expression> write) : base(writer => write(writer.Content.Json))
     {
     }
 

@@ -26,7 +26,6 @@
   },
   "M1.F1 X11.19 0": {
     "modules": [
-      "Declarations",
       "InputsAndIds",
       "TriggersAndPipelines",
       "ValuesAndSources"
@@ -423,7 +422,6 @@
   },
   "M12.F1 X17.14 0": {
     "modules": [
-      "Declarations",
       "InputsAndIds"
     ],
     "views": [
@@ -452,7 +450,6 @@
   },
   "M12.F1 X17.20 0": {
     "modules": [
-      "Declarations",
       "InputsAndIds",
       "NativeComponents",
       "RenderingAndDelivery",
@@ -465,7 +462,6 @@
   },
   "M12.F1 X17.21 0": {
     "modules": [
-      "Declarations",
       "InputsAndIds",
       "RenderingAndDelivery",
       "TriggersAndPipelines"
@@ -477,7 +473,6 @@
   },
   "M12.F1 X17.22 0": {
     "modules": [
-      "Declarations",
       "InputsAndIds"
     ],
     "views": [
@@ -487,7 +482,6 @@
   },
   "M12.F1 X17.23 0": {
     "modules": [
-      "Declarations",
       "InputsAndIds"
     ],
     "views": [
@@ -4167,7 +4161,6 @@
   },
   "cell event.poc15.callback.held.after": {
     "modules": [
-      "Declarations",
       "InputsAndIds"
     ],
     "views": [
@@ -4177,7 +4170,6 @@
   },
   "cell event.poc15.callback.held.before": {
     "modules": [
-      "Declarations",
       "InputsAndIds"
     ],
     "views": [
@@ -4187,7 +4179,6 @@
   },
   "cell event.poc15.callback.payload.before": {
     "modules": [
-      "Declarations",
       "InputsAndIds"
     ],
     "views": [

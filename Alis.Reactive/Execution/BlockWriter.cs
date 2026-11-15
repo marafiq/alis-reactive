@@ -13,6 +13,8 @@ internal sealed class BlockWriter
     private readonly Stack<LambdaResults> _lambdas = new();
     private int _results;
     private int _liveItems;
+    private int _answers;
+    private int _answerDepth;
 
     internal BlockWriter(PlanContent content)
     {
@@ -23,6 +25,7 @@ internal sealed class BlockWriter
 
     internal ResultBinding Result(CallExpression call, bool awaits)
     {
+        if (_answerDepth > 0 && awaits) throw AsyncInAnswer();
         if (_lambdas.Count > 0 && awaits) throw AsyncInLambda();
         var name = ResultBinding.NameStem + (++_results).ToString(CultureInfo.InvariantCulture);
         if (_lambdas.Count > 0) return _lambdas.Peek().Add(name, call);
@@ -31,6 +34,25 @@ internal sealed class BlockWriter
     }
 
     internal string NextLiveItem() => "liveItem" + (++_liveItems).ToString(CultureInfo.InvariantCulture);
+
+    internal string NextAnswer() => "answer" + (++_answers).ToString(CultureInfo.InvariantCulture);
+
+    internal AnswerExpression Answer(string arguments, Func<Expression> body)
+    {
+        var results = new LambdaResults();
+        _lambdas.Push(results);
+        _answerDepth++;
+        try
+        {
+            return new AnswerExpression(arguments, results.Complete(body()));
+        }
+        finally
+        {
+            results.Closed = true;
+            _lambdas.Pop();
+            _answerDepth--;
+        }
+    }
 
     internal (Expression Body, TValue Value) Lambda<TValue>(Func<(Expression Body, TValue Value)> body)
     {
@@ -87,6 +109,12 @@ internal sealed class BlockWriter
 
     internal void Write(Statement statement)
     {
+        if (_answerDepth > 0)
+        {
+            if (statement is DoStatement { Await: true }) throw AsyncInAnswer();
+            throw new InvalidOperationException("A step is written inside a callback's answer, which answers its vendor with one value. Write the step in a pipeline.");
+        }
+
         if (_lambdas.Count > 0)
         {
             if (statement is DoStatement { Await: true }) throw AsyncInLambda();
@@ -128,6 +156,9 @@ internal sealed class BlockWriter
 
         return block;
     }
+
+    private static InvalidOperationException AsyncInAnswer()
+        => new("A callback answers its vendor at once, so its answer cannot wait for an async method or a request.");
 
     private static InvalidOperationException AsyncInLambda()
         => new("An async method is called inside a list's lambda, which reads every item in one turn and waits for nothing. Call the method in the pipeline and read its result in the lambda.");

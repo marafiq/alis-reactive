@@ -76,3 +76,21 @@ internal sealed class Received(BlockWriter writer) : Binding
 
     internal override PathMembers Reads(bool optional) => optional ? PathMembers.OptionalMember : PathMembers.Required;
 }
+
+internal sealed class AnswerArguments : Binding
+{
+    internal AnswerArguments(BlockWriter writer, string name)
+    {
+        Writer = writer;
+        Arguments = new RefExpression(name);
+        Target = new GetExpression([new IndexStep(0)], PathMembers.Required, Arguments);
+    }
+
+    internal override Expression Target { get; }
+
+    internal override Expression Arguments { get; }
+
+    internal override BlockWriter Writer { get; }
+
+    internal override PathMembers Reads(bool optional) => optional ? PathMembers.OptionalMember : PathMembers.Required;
+}

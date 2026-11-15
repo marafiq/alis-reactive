@@ -11,6 +11,7 @@ namespace Alis.Reactive.Declarations;
 /// <remarks>
 /// The call runs at its line, or, read once by the next step under a later term, where that term is reached.
 /// Every read keeps what the call returned, so a later step that changes the object leaves the result as it was.
+/// Inside a list's lambda or a callback's answer, each invocation has its own result.
 /// </remarks>
 /// <typeparam name="TResult">The type the object's API gives the method's result.</typeparam>
 public sealed class MethodResult<TResult> : TypedSource<TResult>

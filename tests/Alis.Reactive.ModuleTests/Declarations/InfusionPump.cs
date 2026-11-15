@@ -14,6 +14,18 @@ public sealed class InfusionPump : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Native;
 
+    public Callback<PumpReading, string> ReadingLabel => Callback<PumpReading, string>();
+
+    public Callback<PumpReading, string> BackupLabel => Callback<PumpReading, string>(name: "label-format", optional: true);
+
+    public Callback<PumpReading, int> AdjustedRate => Callback<PumpReading, int>();
+
+    public Callback<PumpReading, bool> CanDeliver => Callback<PumpReading, bool>();
+
+    public void SortReadings(Func<PumpReading, TypedSource<int>> key) => Method([Answer(key)]);
+
+    public MethodResult<int> SelectRate(Func<PumpReading, TypedSource<int>> key) => Method<int>([Answer(key)]);
+
     public ReadOnly<int> FlowRate => ReadOnly<int>();
 
     public ReadOnly<int> Volume => ReadOnly<int>(name: "VTBI");
@@ -249,4 +261,19 @@ public sealed class PumpChannel : JsObject
     public MethodResult<bool> IsRunningAsync() => MethodAsync<bool>();
 
     public MethodResult<bool> CheckAsync(Arg<int> threshold) => MethodAsync<bool>([threshold]);
+}
+
+public sealed class PumpReading : JsObject
+{
+    public ReadOnly<string> Label => ReadOnly<string>();
+
+    public ReadOnly<int> Rate => ReadOnly<int>();
+
+    public ReadOnly<Prescription> Row => Argument<Prescription>(1);
+
+    public MethodResult<int> Measure() => Method<int>();
+
+    public void Continue() => MethodAt(1);
+
+    public void ContinueWith(Arg<int> rate) => MethodAt(1, [rate]);
 }

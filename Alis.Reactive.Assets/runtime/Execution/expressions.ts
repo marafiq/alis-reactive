@@ -28,6 +28,11 @@ export function evaluate(expression: Expression, context: Context): Read {
     case "call":
       return called(evaluate(expression.target, context), expression.path, expression.members, () => expression.args.map((arg) => heldOrNull(evaluate(arg, context))));
     case "answer":
+      return value((...args: unknown[]): unknown => {
+        const scope = new Map(context.scope);
+        scope.set(expression.arguments, value(args));
+        return heldOrNull(evaluate(expression.body, { ...context, scope }));
+      });
     case "record":
     case "list":
       throw notBuilt("the expression '" + expression.kind + "'");

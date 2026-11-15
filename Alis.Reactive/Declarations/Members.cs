@@ -129,14 +129,26 @@ public static class NullableWrites
 public sealed class Callback<TArgs, TResult>
     where TArgs : JsObject, new()
 {
-    internal Callback()
+    private readonly JsObject _owner;
+    private readonly PathStep _member;
+    private readonly bool _optional;
+
+    internal Callback(JsObject owner, string member, bool optional)
     {
+        _owner = owner;
+        _member = new MemberStep(member);
+        _optional = optional;
     }
 
     /// <summary>Sets the function to one that answers each call with an expression over the call's arguments.</summary>
     /// <remarks>The answer holds no step and waits for nothing; it is read again on every call.</remarks>
     /// <param name="answer">The answer, read from the arguments of each call.</param>
-    public void Set(Func<TArgs, TypedSource<TResult>> answer) => throw new NotImplementedException();
+    public void Set(Func<TArgs, TypedSource<TResult>> answer)
+    {
+        var writer = _owner.Bound.Writer;
+        var value = JsObject.WrittenAnswer(writer, answer);
+        writer.Write(new SetStatement([_member], _optional ? SetMembers.Optional : SetMembers.Required, false, _owner.Bound.Target, value));
+    }
 }
 
 /// <summary>

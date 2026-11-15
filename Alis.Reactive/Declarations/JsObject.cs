@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Alis.Reactive.Execution;
 using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 
@@ -86,7 +87,7 @@ public abstract class JsObject
         => Bound.Writer.Write(new DoStatement(false, Call(arguments, name, optional, declaredBy)));
 
     /// <summary>Declares a method that takes no argument and returns a value.</summary>
-    /// <remarks>The call runs at its line, or, read once by the next step under a later term, where that term is reached.</remarks>
+    /// <remarks>The call runs at its line, or, read once by the next step under a later term, where that term is reached. Inside a list's lambda or a callback's answer, each invocation has its own result.</remarks>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="optional">True when the API marks the method optional: a call of an absent one runs nothing, and its result reads nothing.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
@@ -95,7 +96,7 @@ public abstract class JsObject
         => ResultOf<TResult>([], false, name, optional, declaredBy);
 
     /// <summary>Declares a method that returns a value and calls it with its arguments.</summary>
-    /// <remarks>The call runs at its line, or, read once by the next step under a later term, where that term is reached.</remarks>
+    /// <remarks>The call runs at its line, or, read once by the next step under a later term, where that term is reached. Inside a list's lambda or a callback's answer, each invocation has its own result.</remarks>
     /// <param name="arguments">The call's arguments in order, each read when the call runs.</param>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="optional">True when the API marks the method optional: a call of an absent one runs nothing, and its result reads nothing.</param>
@@ -256,7 +257,7 @@ public abstract class JsObject
     /// <returns>The callback, which a step sets to an answer.</returns>
     protected Callback<TArgs, TResult> Callback<TArgs, TResult>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => new(this, JavaScriptName(name, declaredBy), optional);
 
     /// <summary>Makes an argument of a function the object calls for an answer.</summary>
     /// <remarks>
@@ -269,7 +270,7 @@ public abstract class JsObject
     /// <returns>The argument to list among a method's arguments.</returns>
     protected static Arg Answer<TArgs, TResult>(Func<TArgs, TypedSource<TResult>> answer)
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => new AnswerArgument<TArgs, TResult>(answer);
 
     /// <summary>Makes an argument of a value the declaration itself gives, the same on every call.</summary>
     /// <param name="value">The value the method receives.</param>
@@ -311,11 +312,22 @@ public abstract class JsObject
         where TArgs : JsObject, new()
         => new(this, JavaScriptName(name, declaredBy), [new IndexStep(0)]);
 
+    internal static AnswerExpression WrittenAnswer<TArgs, TResult>(BlockWriter writer, Func<TArgs, TypedSource<TResult>> answer)
+        where TArgs : JsObject, new()
+    {
+        var name = writer.NextAnswer();
+        return writer.Answer(name, () =>
+        {
+            var source = answer(Reaching<TArgs>(new AnswerArguments(writer, name)));
+            return source.Form.IntoLive<TResult>(source.Expression);
+        });
+    }
+
     private void CallArgument(int position, IReadOnlyList<Arg> arguments)
     {
         var received = Bound.Arguments;
         var call = new CallExpression([ArgumentPosition(position)], PathMembers.Required, received,
-            arguments.Select(argument => argument?.Written(Bound.Writer.Content.Json) ?? Literals.Text(null)).ToArray());
+            arguments.Select(argument => argument?.Written(Bound.Writer) ?? Literals.Text(null)).ToArray());
         Bound.Writer.Write(new DoStatement(false, call));
     }
 
@@ -356,7 +368,11 @@ public abstract class JsObject
 
     private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, bool optional, string declaredBy)
         => new([new MemberStep(JavaScriptName(name, declaredBy))], Bound.Reads(optional), Bound.Target,
-            arguments.Select(argument => argument?.Written(Bound.Writer.Content.Json) ?? Literals.Text(null)).ToArray());
+            arguments.Select(argument => argument?.Written(Bound.Writer) ?? Literals.Text(null)).ToArray());
 
     private static string JavaScriptName(string? name, string declaredBy) => name ?? JsonNamingPolicy.CamelCase.ConvertName(declaredBy);
+
+    private sealed class AnswerArgument<TArgs, TResult>(Func<TArgs, TypedSource<TResult>> answer)
+        : Arg(writer => WrittenAnswer(writer, answer))
+        where TArgs : JsObject, new();
 }
