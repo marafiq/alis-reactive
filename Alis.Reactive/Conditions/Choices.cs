@@ -29,7 +29,7 @@ public static class Choices
     /// <returns>A source of the type without null.</returns>
     public static TypedSource<TValue> IfNull<TValue>(this TypedSource<TValue?> source, TypedSource<TValue> fallback)
         where TValue : class
-        => Chosen<TValue>(Operator.Coalesce, source.Form, source.Expression, fallback.Expression);
+        => Chosen<TValue>(Operator.Coalesce, Joined(source.Form, fallback.Form), source.Expression, fallback.Expression);
 
     /// <summary>Reads the source's value, or a literal when the source holds null or cannot be read.</summary>
     /// <param name="source">The source read first.</param>
@@ -46,7 +46,7 @@ public static class Choices
     /// <returns>A source of the type without null.</returns>
     public static TypedSource<TValue> IfNull<TValue>(this TypedSource<TValue?> source, TypedSource<TValue> fallback)
         where TValue : struct
-        => Chosen<TValue>(Operator.Coalesce, source.Form, source.Expression, fallback.Expression);
+        => Chosen<TValue>(Operator.Coalesce, Joined(source.Form, fallback.Form), source.Expression, fallback.Expression);
 
     /// <summary>Reads one literal when the condition is true and the other when it is false or cannot be read.</summary>
     /// <param name="test">The condition that chooses.</param>
@@ -61,7 +61,7 @@ public static class Choices
     /// <param name="whenTrue">The source read when the condition is true.</param>
     /// <param name="whenFalse">The source read otherwise.</param>
     /// <returns>A source of the value chosen.</returns>
-    public static TypedSource<TValue> Choose<TValue>(this TypedSource<bool> test, TypedSource<TValue> whenTrue, TypedSource<TValue> whenFalse) => Chosen<TValue>(Operator.Cond, whenTrue.Form, test.Expression, whenTrue.Expression, whenFalse.Expression);
+    public static TypedSource<TValue> Choose<TValue>(this TypedSource<bool> test, TypedSource<TValue> whenTrue, TypedSource<TValue> whenFalse) => Chosen<TValue>(Operator.Cond, Joined(whenTrue.Form, whenFalse.Form), test.Expression, whenTrue.Expression, whenFalse.Expression);
 
     /// <summary>Reads a literal when the condition is true and a source when it is false or cannot be read.</summary>
     /// <param name="test">The condition that chooses.</param>
@@ -82,6 +82,13 @@ public static class Choices
         if (value is IPlanSource)
             throw new InvalidOperationException("A choice takes a source as a value the view holds, since C# bound it to Choose's form for two values: name the type the sources read, as test.Choose<string?>(first, second), and each is read when the step runs.");
         return test.Form.Computed.Beside(value);
+    }
+
+    private static HeldForm Joined(HeldForm first, HeldForm second)
+    {
+        if (first.WritesOtherwiseThan(second) is not { } own) return first;
+        throw new InvalidOperationException(
+            $"A choice joins '{own.Read}', which {own.Cause} writes unlike {first.BaseFormName}, with another value read from the page; choose between it and a value the view writes, or choose on the server.");
     }
 
     private static TypedSource<TValue> Chosen<TValue>(Operator op, HeldForm form, params Expression[] terms)

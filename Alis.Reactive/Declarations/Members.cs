@@ -56,7 +56,7 @@ public sealed class Property<TValue> : ReadOnly<TValue>
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>
-    public void Set(ITypedSource<TValue> source) => Written(Sources.FormOf(source).IntoLive(Sources.Of(source)));
+    public void Set(ITypedSource<TValue> source) => Written(Sources.FormOf(source).IntoLive<TValue>(Sources.Of(source)));
 
     internal void Written(Schema.Expression value)
         => Owner.Bound.Writer.Write(new SetStatement([Member], Optional ? SetMembers.Optional : SetMembers.Required, false, Owner.Bound.Target, value));
@@ -85,7 +85,7 @@ public sealed class WriteOnly<TValue>
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>
-    public void Set(ITypedSource<TValue> source) => Written(Sources.FormOf(source).IntoLive(Sources.Of(source)));
+    public void Set(ITypedSource<TValue> source) => Written(Sources.FormOf(source).IntoLive<TValue>(Sources.Of(source)));
 
     internal void Written(Schema.Expression value)
         => _owner.Bound.Writer.Write(new SetStatement([_member], _optional ? SetMembers.Optional : SetMembers.Required, false, _owner.Bound.Target, value));
@@ -101,14 +101,14 @@ public static class NullableWrites
     /// <param name="source">The source of the value to set.</param>
     public static void Set<TValue>(this Property<TValue?> property, ITypedSource<TValue> source)
         where TValue : struct
-        => property.Written(Sources.FormOf(source).IntoLive(Sources.Of(source)));
+        => property.Written(Sources.FormOf(source).IntoLive<TValue>(Sources.Of(source)));
 
     /// <summary>Sets a write-only property of a nullable value type to what a source of the type itself reads.</summary>
     /// <param name="member">The property to set.</param>
     /// <param name="source">The source of the value to set.</param>
     public static void Set<TValue>(this WriteOnly<TValue?> member, ITypedSource<TValue> source)
         where TValue : struct
-        => member.Written(Sources.FormOf(source).IntoLive(Sources.Of(source)));
+        => member.Written(Sources.FormOf(source).IntoLive<TValue>(Sources.Of(source)));
 }
 
 /// <summary>

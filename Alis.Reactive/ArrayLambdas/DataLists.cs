@@ -46,7 +46,11 @@ public static class DataLists
     /// <param name="field">The field read from each item.</param>
     /// <returns>A source of a new list of the field's values, in the list's order.</returns>
     public static TypedSource<IReadOnlyList<TResult>> Select<TItem, TResult>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TResult>> field)
-        => new Computed<IReadOnlyList<TResult>>(ListForms.Map(Sources.Of(Checked(list, nameof(Select))), ItemLambda.Selecting(field, Sources.FormOf(list), fieldHoldsNull: default(TResult) is null)), Sources.FormOf(list));
+    {
+        var items = Sources.Of(Checked(list, nameof(Select)));
+        var selected = ItemLambda.Selecting(field, Sources.FormOf(list), fieldHoldsNull: default(TResult) is null);
+        return new Computed<IReadOnlyList<TResult>>(ListForms.Map(items, selected.Function), selected.Form);
+    }
 
     /// <summary>Tests that the list holds an item.</summary>
     /// <returns>A source that is true when the list holds at least one item.</returns>
@@ -163,7 +167,8 @@ public static class DataLists
     public static TypedSource<decimal> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, decimal>> term) => Summed<TItem, decimal>(Operator.SumDecimal, Checked(list, nameof(Sum)), term);
 
     private static ITypedSource<IEnumerable<TItem>> Checked<TItem>(ITypedSource<IEnumerable<TItem>> list, string operation)
-        => list is ITypedSource<string>
+        => Sources.FormOf(list).HoldsAListItsConverterWrites ? throw new NotImplementedException()
+            : list is ITypedSource<string>
             ? throw new InvalidOperationException(
                 $"The source passed to {operation} is text, and a text is no list in the browser; run {operation} over a list, such as a List<T> or an array, or test the text with Contains, StartsWith, EndsWith, MinLength or Matches.")
             : list;

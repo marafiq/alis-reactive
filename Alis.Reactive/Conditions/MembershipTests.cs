@@ -22,7 +22,7 @@ public static class MembershipTests
     /// <param name="source">The source the test reads.</param>
     /// <param name="values">The values, each written in the form the source holds its value in.</param>
     /// <returns>A source that is true when the value equals one of them.</returns>
-    public static TypedSource<bool> In<TValue>(this TypedSource<TValue> source, params TValue[] values) => Keys.IsDateOrTime<TValue>() ? AnyKeyEqual(source, values) : Included(source, values);
+    public static TypedSource<bool> In<TValue>(this TypedSource<TValue> source, params TValue[] values) => Keys.IsDateOrTime<TValue>() || source.Form.Own is not null ? AnyKeyEqual(source, values) : Included(source, values);
 
     /// <summary>Tests that the source's value equals one of the items a list holds when the condition runs, as <c>Any(item =&gt; item == value)</c> reads it.</summary>
     /// <param name="source">The source the test reads.</param>

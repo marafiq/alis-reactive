@@ -269,8 +269,8 @@ Terms used throughout:
   (D5.3).
   - C# writes `as(value, shape)` where that type holds a date: `DateTime` is `date` and `DateTimeOffset` is
     `instant`, each `nullable` when it is nullable, inside `object(fields)` that names only the members holding one,
-    and `array(item)`. The same walk writes `number{of, text: invariant}` at each number a source in the app's form
-    holds as text, so it reaches the live member as its number (D7.7). A type that holds no date and no such number is
+    and `array(item)`. The same walk writes `number{of, text: invariant}` at each number a source in the app's form,
+    or in the form of a member's own number handling, holds as text, so it reaches the live member as its number (D7.7). A type that holds no date and no such number is
     written as the plan writes it, with no `as`.
   - The shape comes from the app's contract (D18.1): a type test of the member's `JsonTypeInfo` against
     `JsonTypeInfo<DateTime>` and its kin, its members and its item type, with no read of a `System.Type` member.
@@ -1289,15 +1289,17 @@ Terms used throughout:
   - What a step writes into a live object (a property set, a method's or plugin's argument, a vendor's answer, an
     element's text and HTML, a render helper's start, D17.13) is in the live form. A literal is written in it, and a
     source in the live form as it is held. A source in the app's form is written as held where both forms write its
-    type alike; a number the app's form writes as text is converted to the live form's number by `as` (D3.13,
-    X7.14); an enum the two forms write otherwise is mapped through D9.13's rows, whose enum read D18.1 lists since
+    type alike; a number the app's form or a member's own number handling writes as text is converted to the live
+    form's number by `as` (D3.13, X7.14); an enum the two forms write otherwise is mapped through D9.13's rows, whose enum read D18.1 lists since
     gate 1 (C37); any other difference, a converter the
     app's options add or a member's own converter, is refused where the view renders (X7.10), and a value its own
     converter writes is shown by the server.
   - Two sources a choice or a comparison joins (`IfNull`, `Choose`, D8.10) are taken in one form by the same rules:
     a number the app's form writes as text is converted, an enum is mapped by D9.13's rows, and
-    any other difference is refused (X7.11, X8.21). A date or a time a comparison joins is read by its key (D6.12),
-    so a `DateTime` in the app's form meets a live one by its wall time.
+    any other difference is refused (X7.11, X8.21). Two forms write alike when both are one base form, both are one
+    member's own form, or both are number handling with the same writing bits, and a choice between them keeps that
+    form. A date or a time a comparison joins is read by its key (D6.12), so a `DateTime` in the app's form meets a
+    live one by its wall time.
   - A live number is a JavaScript number, so a literal written into one that JavaScript would read as another value
     is refused where the view renders, and by ALIS033 at build when it is a constant (X7.13): NaN and ±Infinity,
     which no JSON number holds (`probe:core-stj-live-nan`); a `decimal` of more than 15 significant digits, the
@@ -1389,8 +1391,9 @@ Terms used throughout:
 - `X7.9` behavior (D7.3, N7.6): a census whose count is `int?`, as its TypeScript reads `number | null`, shows the
   count a step writes from an `int` sum or count.
 - `X7.10` refusal (D7.7): a source in the app's form, or in its own form, that the live form writes otherwise, set
-  into a property, passed as an argument or answered to a vendor: "A live object takes '{type}' as JavaScript holds
-  it, and '{read}' is written by {its own JSON converter | the app's JSON converter}; pass the value from the server."
+  into a property, passed as an argument or answered to a vendor: "A live object takes '{read}' as JavaScript holds
+  its type, and {its own JSON converter | the app's JSON converter} writes it otherwise; pass the value from the
+  server."
 - `X7.11` refusal (D7.7): `IfNull` or `Choose` between two sources the two forms write otherwise: "A choice joins
   '{read}', which {cause} writes unlike {base}, with another value read from the page; choose between it and a value
   the view writes, or choose on the server."

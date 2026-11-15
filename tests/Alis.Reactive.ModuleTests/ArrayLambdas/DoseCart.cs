@@ -119,6 +119,15 @@ public sealed class CartDose
 
     [JsonConverter(typeof(DayText))]
     public DateTime Stamped { get; set; }
+
+    [JsonConverter(typeof(LotsText))]
+    public List<string> Lots { get; set; } = [];
+
+    [JsonConverter(typeof(SignedText))]
+    public DoseStatus Signed { get; set; } = DoseStatus.Due;
+
+    [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
+    public List<int> Counts { get; set; } = [];
 }
 
 [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
@@ -163,3 +172,12 @@ public sealed class DayText : JsonConverter<DateTime>
 
     public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToString("yyyyMMdd", CultureInfo.InvariantCulture));
 }
+
+public sealed class LotsText : JsonConverter<List<string>>
+{
+    public override List<string> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => [.. (reader.GetString() ?? "").Split(',')];
+
+    public override void Write(Utf8JsonWriter writer, List<string> value, JsonSerializerOptions options) => writer.WriteStringValue(string.Join(",", value));
+}
+
+public sealed class SignedText() : JsonStringEnumConverter<DoseStatus>(null, allowIntegerValues: false);

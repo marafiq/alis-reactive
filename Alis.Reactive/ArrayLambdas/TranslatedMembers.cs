@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Alis.Reactive.Conditions;
 using Alis.Reactive.Schema;
+using Alis.Reactive.TypeKnowledge;
 using Alis.Reactive.ValuesAndSources;
 using LinqExpression = System.Linq.Expressions.Expression;
 using PlanExpression = Alis.Reactive.Schema.Expression;

@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Text.Json;
 using Alis.Reactive.Conditions;
 using Alis.Reactive.Schema;
+using Alis.Reactive.TypeKnowledge;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.ArrayLambdas;

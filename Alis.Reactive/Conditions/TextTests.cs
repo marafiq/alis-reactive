@@ -68,7 +68,7 @@ public static class TextTests
     /// <returns>A source that is true when the text is that long or longer.</returns>
     public static TypedSource<bool> MinLength(this ITypedSource<string?> text, int length) => length < 0
         ? throw new InvalidOperationException("Condition minimum text length must be zero or greater.")
-        : AtLeast(text, Sources.FormOf(text).Beside(length));
+        : AtLeast(text, TestedText(text).Beside(length));
 
     /// <summary>Tests that the text is at least as many characters long as another source reads, counted as <c>string.Length</c> counts.</summary>
     /// <param name="text">The text the test reads.</param>
@@ -77,11 +77,14 @@ public static class TextTests
     public static TypedSource<bool> MinLength(this ITypedSource<string?> text, ITypedSource<int> length) => AtLeast(text, Sources.Of(length));
 
     private static TypedSource<bool> Tested(Operator op, ITypedSource<string?> text, Expression part)
-        => new Computed<bool>(new OpExpression(op, [Sources.Of(text), part]), Sources.FormOf(text).Computed);
+        => new Computed<bool>(new OpExpression(op, [Sources.Of(text), part]), TestedText(text).Computed);
 
     private static TypedSource<bool> AtLeast(ITypedSource<string?> text, Expression length)
     {
         var textLength = new GetExpression([new MemberStep("length")], PathMembers.RequiredIfHeld, Sources.Of(text));
-        return new Computed<bool>(new OpExpression(Operator.Gte, [textLength, length]), Sources.FormOf(text).Computed);
+        return new Computed<bool>(new OpExpression(Operator.Gte, [textLength, length]), TestedText(text).Computed);
     }
+
+    private static HeldForm TestedText(ITypedSource<string?> text)
+        => Sources.FormOf(text) is { Own: null } form ? form : throw new NotImplementedException();
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.ArrayLambdas;
+using Alis.Reactive.Conditions;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.ValuesAndSources;
@@ -57,6 +58,194 @@ public sealed class WhenAListsLambdaReadsAMemberInItsOwnForm
 
     private const string HeldInJavaScriptsValueByItsClass =
         "'d.Supply.Vials' is written by its class's JSON number handling, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.";
+
+    private const string OnCart =
+        "{\"version\":7,\"planId\":\"Alis.Reactive.ModuleTests.ArrayLambdas.MedicationRound\"," +
+        "\"culture\":{\"name\":\"en-US\",\"collation\":\"en-US\",\"decimal\":\".\",\"group\":\",\"," +
+        "\"integer\":{\"group\":false,\"exponent\":false},\"fraction\":{\"group\":true,\"exponent\":true}}," +
+        "\"timeZone\":{\"kind\":\"clock\"},\"trace\":{\"kind\":\"off\"}," +
+        "\"vendors\":{\"native\":{\"locate\":{\"kind\":\"fn\",\"params\":[\"element\"],\"body\":{\"kind\":\"ref\",\"name\":\"element\"}}," +
+        "\"listen\":{\"kind\":\"method\",\"subscribe\":\"addEventListener\",\"unsubscribe\":\"removeEventListener\"}}}," +
+        "\"objects\":{" +
+        "\"$document\":{\"kind\":\"plugin\",\"name\":\"alis.document\",\"key\":\"\"," +
+        "\"listen\":{\"kind\":\"method\",\"subscribe\":\"addEventListener\",\"unsubscribe\":\"removeEventListener\"},\"data\":{\"kind\":\"none\"}}," +
+        "\"cart\":{\"kind\":\"element\",\"id\":\"cart\",\"vendor\":\"native\"}}," +
+        "\"handlers\":[{\"on\":\"$document\",\"path\":[],\"event\":\"ready\",\"payload\":[],\"members\":\"required\",\"policy\":\"overlap\",\"do\":[";
+
+    private const string Doses = "{\"kind\":\"get\",\"path\":[\"doses\"],\"members\":\"required\",\"target\":{\"kind\":\"obj\",\"id\":\"cart\"}}";
+
+    private const string Counted = "{\"kind\":\"set\",\"path\":[\"counted\"],\"members\":\"required\",\"content\":false,\"target\":{\"kind\":\"obj\",\"id\":\"cart\"},\"value\":";
+
+    private const string Charged = "{\"kind\":\"set\",\"path\":[\"charged\"],\"members\":\"required\",\"content\":false,\"target\":{\"kind\":\"obj\",\"id\":\"cart\"},\"value\":";
+
+    private const string SelectedCharts =
+        "{\"kind\":\"call\",\"path\":[\"map\"],\"members\":\"requiredIfHeld\",\"target\":" + Doses + ",\"args\":[" +
+        "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"nonNull\",\"args\":[" + ItsCharting + "]}}]}";
+
+    private const string SelectedRebates =
+        "{\"kind\":\"call\",\"path\":[\"map\"],\"members\":\"requiredIfHeld\",\"target\":" + Doses + ",\"args\":[" +
+        "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"nonNull\",\"args\":[" + ItsRebate + "]}}]}";
+
+    [Test]
+    public void a_selected_chart_is_compared_in_its_converters_form_and_its_count_is_live()
+    {
+        const string expected = OnCart + Counted +
+            "{\"kind\":\"get\",\"path\":[\"length\"],\"members\":\"requiredIfHeld\",\"target\":" +
+            "{\"kind\":\"call\",\"path\":[\"filter\"],\"members\":\"requiredIfHeld\",\"target\":" + SelectedCharts + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"eq\",\"args\":[" + Item + "," + GivenAsItsConverterWritesIt + "]}}]}}}]}]}";
+
+        Assert.That(Rendered(cart => cart.Counted.Set(cart.Doses.Select(d => d.Charted).Count(s => s == DoseStatus.Given))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void selecting_a_chart_again_keeps_its_converters_form()
+    {
+        const string selectedAgain =
+            "{\"kind\":\"call\",\"path\":[\"map\"],\"members\":\"requiredIfHeld\",\"target\":" + SelectedCharts + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"nonNull\",\"args\":[" + Item + "]}}]}";
+        const string expected = OnCart + Counted +
+            "{\"kind\":\"get\",\"path\":[\"length\"],\"members\":\"requiredIfHeld\",\"target\":" +
+            "{\"kind\":\"call\",\"path\":[\"filter\"],\"members\":\"requiredIfHeld\",\"target\":" + selectedAgain + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"eq\",\"args\":[" + Item + "," + GivenAsItsConverterWritesIt + "]}}]}}}]}]}";
+
+        Assert.That(Rendered(cart => cart.Counted.Set(cart.Doses.Select(d => d.Charted).Select(s => s).Count(s => s == DoseStatus.Given))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void a_decimal_sum_reads_its_members_number_handling_text()
+    {
+        const string expected = OnCart + Charged +
+            "{\"kind\":\"op\",\"op\":\"sumDecimal\",\"args\":[{\"kind\":\"call\",\"path\":[\"map\"],\"members\":\"requiredIfHeld\",\"target\":" + Doses + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":" + ItsRebate + "}]}]}}]}]}";
+
+        Assert.That(Rendered(cart => cart.Charged.Set(cart.Doses.Sum(d => d.Rebate))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void a_decimal_sum_reads_selected_items_as_their_number_handling_text()
+    {
+        const string expected = OnCart + Charged +
+            "{\"kind\":\"op\",\"op\":\"sumDecimal\",\"args\":[{\"kind\":\"call\",\"path\":[\"map\"],\"members\":\"requiredIfHeld\",\"target\":" + SelectedRebates + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":" + Item + "}]}]}}]}]}";
+
+        Assert.That(Rendered(cart => cart.Charged.Set(cart.Doses.Select(d => d.Rebate).Sum(rebate => rebate))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void selected_decimal_text_is_compared_by_value()
+    {
+        const string expected = OnCart + Counted +
+            "{\"kind\":\"get\",\"path\":[\"length\"],\"members\":\"requiredIfHeld\",\"target\":" +
+            "{\"kind\":\"call\",\"path\":[\"filter\"],\"members\":\"requiredIfHeld\",\"target\":" + SelectedRebates + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"eqDecimal\",\"args\":[" + Item + "," + ATenthAsText + "]}}]}}}]}]}";
+
+        Assert.That(Rendered(cart => cart.Counted.Set(cart.Doses.Select(d => d.Rebate).Count(rebate => rebate == 0.10m))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void a_selected_whole_number_written_as_text_is_not_a_sum_term()
+        => Assert.That(
+            () => Rendered(cart => cart.Counted.Set(cart.Doses.Select(d => d.Supply.Vials).Sum(v => v))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'v' is written by its class's JSON number handling, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_selected_decimal_written_by_its_converter_is_not_a_sum_term()
+        => Assert.That(
+            () => Rendered(cart => cart.Charged.Set(cart.Doses.Select(d => d.Tariff).Sum(tariff => tariff))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'tariff' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_selected_object_written_by_its_converter_is_not_compared()
+    {
+        var seal = new Seal { Tag = "S4" };
+
+        Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Select(d => d.Tagged).Any(s => s == seal))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'s == seal' compares 's', which its own JSON converter writes unlike JavaScript's value, and .NET compares the object it holds; compare it on the server."));
+    }
+
+    [Test]
+    public void a_value_the_view_holds_beside_a_selected_chart_is_written_as_javascripts_value()
+    {
+        const string expected = OnCart +
+            "{\"kind\":\"set\",\"path\":[\"units\"],\"members\":\"required\",\"content\":false,\"target\":{\"kind\":\"obj\",\"id\":\"cart\"},\"value\":" +
+            "{\"kind\":\"call\",\"path\":[\"map\"],\"members\":\"requiredIfHeld\",\"target\":" + SelectedCharts + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"nonNull\",\"args\":[{\"kind\":\"op\",\"op\":\"cond\",\"args\":[" +
+            "{\"kind\":\"op\",\"op\":\"eq\",\"args\":[" + Item + "," + GivenAsItsConverterWritesIt + "]}," +
+            "{\"kind\":\"lit\",\"value\":1},{\"kind\":\"lit\",\"value\":2}]}]}}]}}]}]}";
+
+        Assert.That(Rendered(cart => cart.Units.Set(cart.Doses.Select(d => d.Charted).Select(s => s == DoseStatus.Given ? 1 : 2))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void a_selected_chart_its_converter_reads_only_as_text_is_compared_with_that_text()
+    {
+        const string selectedSignatures =
+            "{\"kind\":\"call\",\"path\":[\"map\"],\"members\":\"requiredIfHeld\",\"target\":" + Doses + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"nonNull\",\"args\":[" +
+            "{\"kind\":\"data\",\"path\":[{\"name\":\"signed\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"Due\"}}],\"target\":" + Item + "}]}}]}";
+        const string expected = OnCart + Counted +
+            "{\"kind\":\"get\",\"path\":[\"length\"],\"members\":\"requiredIfHeld\",\"target\":" +
+            "{\"kind\":\"call\",\"path\":[\"filter\"],\"members\":\"requiredIfHeld\",\"target\":" + selectedSignatures + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"eq\",\"args\":[" + Item + "," + GivenAsItsConverterWritesIt + "]}}]}}}]}]}";
+
+        Assert.That(Rendered(cart => cart.Counted.Set(cart.Doses.Select(d => d.Signed).Count(s => s == DoseStatus.Given))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void a_found_selected_rebate_carries_its_read_into_a_conditions_refusal()
+        => Assert.That(
+            () => Refused(cart => cart.Flagged.Set(cart.Doses.Select(d => d.Rebate).Find(rebate => true).Gt(5m))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "A condition orders 'd.Rebate', which its own JSON number handling writes unlike JavaScript's value, so the browser does not order it as .NET does; order it on the server."));
+
+    [Test]
+    public void a_number_in_a_list_its_number_handling_writes_as_text_is_compared_with_that_text()
+    {
+        const string foundCounts =
+            "{\"kind\":\"data\",\"path\":[{\"name\":\"counts\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":[]}}],\"target\":" +
+            "{\"kind\":\"call\",\"path\":[\"find\"],\"members\":\"requiredIfHeld\",\"target\":" + Doses + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"eq\",\"args\":[" +
+            "{\"kind\":\"data\",\"path\":[{\"name\":\"drug\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"none\"}}],\"target\":" + Item + "}," +
+            "{\"kind\":\"lit\",\"value\":\"Digoxin\"}]}}]}}";
+        const string expected = OnCart + Counted +
+            "{\"kind\":\"get\",\"path\":[\"length\"],\"members\":\"requiredIfHeld\",\"target\":" +
+            "{\"kind\":\"call\",\"path\":[\"filter\"],\"members\":\"requiredIfHeld\",\"target\":" + foundCounts + ",\"args\":[" +
+            "{\"kind\":\"fn\",\"params\":[\"item1\"],\"body\":{\"kind\":\"op\",\"op\":\"eq\",\"args\":[" + Item + "," + TwoAsText + "]}}]}}}]}]}";
+
+        Assert.That(Rendered(cart => cart.Counted.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Counts).Count(c => c == 2))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void a_lambda_reading_past_a_selected_item_its_converter_writes_is_refused()
+        => Assert.That(
+            () => Refused(cart => cart.Counted.Set(cart.Doses.Select(d => d.Tagged).Count(s => s.Tag == "S4"))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'s.Tag' reads past 's', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 's' itself, or read past it on the server."));
+
+    [Test]
+    public void a_found_field_past_a_selected_item_its_converter_writes_is_refused()
+        => Assert.That(
+            () => Refused(cart => cart.Flagged.Set(cart.Doses.Select(d => d.Tagged).Find(s => true, s => s.Tag).Eq("S4"))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'s.Tag' reads past 's', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 's' itself, or read past it on the server."));
+
+    [Test]
+    public void a_list_operation_over_a_list_its_own_converter_writes_whole_waits_for_its_meaning()
+        => Assert.That(
+            () => Refused(cart => cart.Counted.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Lots).Count())),
+            Throws.TypeOf<NotImplementedException>().With.Message.EqualTo("The method or operation is not implemented."));
 
     [Test]
     public void an_enum_its_own_converter_writes_is_compared_with_the_value_written_by_that_converter()
@@ -199,6 +388,14 @@ public sealed class WhenAListsLambdaReadsAMemberInItsOwnForm
             var cart = pipeline.Component<DoseCart>("cart");
             cart.Flagged.Set(cart.Doses.Any(predicate));
         }));
+        return Views.TextOf(html.RenderPlan(plan));
+    }
+
+    private static string Rendered(Action<DoseCart> step)
+    {
+        var html = Views.Of(new MedicationRound("North", null));
+        var plan = html.ReactivePlan<MedicationRound>();
+        html.On(plan, trigger => trigger.DomReady(pipeline => step(pipeline.Component<DoseCart>("cart"))));
         return Views.TextOf(html.RenderPlan(plan));
     }
 

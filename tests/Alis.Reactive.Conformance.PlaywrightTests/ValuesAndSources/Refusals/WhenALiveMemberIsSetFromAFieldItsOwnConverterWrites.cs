@@ -18,7 +18,7 @@ public sealed class WhenALiveMemberIsSetFromAFieldItsOwnConverterWrites(string h
         await refused.Page.GotoAsync(RefusalPages.StatementOfABalanceWrittenAsText);
         await Expect(refused.Page.GetByRole(AriaRole.Heading, new PageGetByRoleOptions
         {
-            Name = "InvalidOperationException: A live object takes 'decimal' as JavaScript holds it, and 'owed.Due' is written by its own JSON converter; "
+            Name = "InvalidOperationException: A live object takes 'owed.Due' as JavaScript holds its type, and its own JSON converter writes it otherwise; "
                 + "pass the value from the server.",
             Exact = true,
         })).ToBeVisibleAsync();

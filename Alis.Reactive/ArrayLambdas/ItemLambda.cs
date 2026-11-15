@@ -43,11 +43,11 @@ internal sealed class ItemLambda
 
     internal static FnExpression Of(LambdaExpression lambda, HeldForm form) => Outermost(lambda, form).Fn(lambda, body => body);
 
-    internal static FnExpression Selecting(LambdaExpression field, HeldForm form, bool fieldHoldsNull)
+    internal static (FnExpression Function, HeldForm Form) Selecting(LambdaExpression field, HeldForm form, bool fieldHoldsNull)
         => Outermost(field, form).Fn(field, body => fieldHoldsNull ? body : new OpExpression(Operator.NonNull, [body]), takenAsHeld: _ => true);
 
     internal static FnExpression Totalling(LambdaExpression term, HeldForm form)
-        => Outermost(term, form).Fn(term, body => body, takenAsHeld: member => !member.HasItsOwnConverter && ComparedTypes.IsDecimal(member.Contract.Type));
+        => Outermost(term, form).Fn(term, body => body, takenAsHeld: member => !member.HasItsOwnConverter && ComparedTypes.IsDecimal(member.Contract.Type)).Function;
 
     internal static FnExpression EveryItem() => new([Item + "1"], new LitExpression(JsonSerializer.SerializeToElement(true)));
 
@@ -67,15 +67,16 @@ internal sealed class ItemLambda
 
     private string NextItem => Item + (_items.Count + 1).ToString(CultureInfo.InvariantCulture);
 
-    private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped) => Fn(lambda, shaped, takenAsHeld: _ => false);
+    private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped) => Fn(lambda, shaped, takenAsHeld: _ => false).Function;
 
-    private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped, Func<WrittenMember, bool> takenAsHeld)
+    private (FnExpression Function, HeldForm Form) Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped, Func<WrittenMember, bool> takenAsHeld)
     {
         var name = NextItem;
         var items = new Dictionary<ParameterExpression, string>(_items) { [lambda.Parameters[0]] = name };
         var body = new ItemLambda(_lambda, items, _form);
-        if (body.ReadsItsOwnForm(lambda.Body, out var read) && takenAsHeld(read.Path.Member)) throw new NotImplementedException();
-        return new FnExpression([name], shaped(body.Term(lambda.Body)));
+        if (body.ReadsItsOwnForm(lambda.Body, out var read) && takenAsHeld(read.Written))
+            return (new FnExpression([name], shaped(read.Value)), _form.WrittenBy(read.Written, Printed.Of(read.Member)));
+        return (new FnExpression([name], shaped(body.Term(lambda.Body))), _form.Computed);
     }
 
     private FnExpression Sort(LambdaExpression key, Operator comparison, bool descending)
@@ -106,8 +107,14 @@ internal sealed class ItemLambda
     private PlanExpression Read(LinqExpression node)
     {
         var read = Unconverted(node);
-        if (!ReadsAnItem(read)) return _form.Beside(ViewValues.Of(read), read.Type);
+        if (!ReadsAnItem(read)) return _form.Base.Beside(ViewValues.Of(read), read.Type);
         if (TranslatedMembers.TryTranslating(read, this, out var translated)) return translated;
+        if (ReadsItsOwnForm(read, out var own))
+        {
+            throw new InvalidOperationException(
+                $"'{Printed.Of(read)}' is written by {own.Written.WhatWritesItsOwnForm}, unlike {_form.BaseFormName}, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.");
+        }
+
         return read switch
         {
             ParameterExpression item when _items.TryGetValue(item, out var name) => new RefExpression(name),
@@ -122,15 +129,20 @@ internal sealed class ItemLambda
 
     private DataExpression DataRead(MemberExpression member)
     {
+        RefuseAReadPastAnItemItsConverterWrites(member);
         if (!ReadsAPath(member, out var root)) throw NoBrowserForm(member);
         var path = PathOf(member, root);
-        if (path.Member.HoldsItsOwnForm)
-        {
-            throw new InvalidOperationException(
-                $"'{Printed.Of(member)}' is written by {path.Member.WhatWritesItsOwnForm}, unlike {_form.BaseFormName}, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.");
-        }
-
         return Data(path, root);
+    }
+
+    private void RefuseAReadPastAnItemItsConverterWrites(MemberExpression member)
+    {
+        if (_form.Own is not { Member.HasItsOwnConverter: true }) return;
+        LinqExpression node = member;
+        while (node is MemberExpression { Expression: { } holder }) node = holder;
+        if (node is not ParameterExpression item || !_items.ContainsKey(item)) return;
+        throw new InvalidOperationException(
+            $"'{Printed.Of(member)}' reads past '{Printed.Of(item)}', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read '{Printed.Of(item)}' itself, or read past it on the server.");
     }
 
     private DataExpression Data(MemberPath path, ParameterExpression root) => new(path.DataSteps(), new RefExpression(_items[root]));
@@ -162,10 +174,16 @@ internal sealed class ItemLambda
 
     private bool ReadsItsOwnForm(LinqExpression node, [NotNullWhen(true)] out OwnFormRead? read)
     {
+        if (node is ParameterExpression item && _items.TryGetValue(item, out var name) && _form.Own is { } own)
+        {
+            read = new OwnFormRead(item, own.Member, new RefExpression(name));
+            return true;
+        }
+
         read = null;
         if (node is not MemberExpression member || TranslatedMembers.Translates(member) || !ReadsAPath(member, out var root)) return false;
         var path = PathOf(member, root);
-        read = path.Member.HoldsItsOwnForm ? new OwnFormRead(member, path, root) : null;
+        read = path.Member.HoldsItsOwnForm ? new OwnFormRead(member, path.Member, Data(path, root)) : null;
         return read is not null;
     }
 
@@ -194,7 +212,7 @@ internal sealed class ItemLambda
         var held = leftReadsAnItem ? right : left;
         if (ReadsItsOwnForm(member, out var inItsOwnForm)) return ComparedInItsOwnForm(comparison, op, orders, inItsOwnForm, held, leftReadsAnItem);
         var writtenAs = WrittenAs(member, held);
-        var written = TranslatedMembers.ReadsADayOfTheWeek(member) ? DayNumber(ViewValues.Of(held)) : _form.Beside(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
+        var written = TranslatedMembers.ReadsADayOfTheWeek(member) ? DayNumber(ViewValues.Of(held)) : _form.Base.Beside(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
         RequireComparableValue(comparison, written.Value, member.Type, orders);
         var memberRead = Keys.Of(member.Type, Read(member));
         var value = Keys.Of(member.Type, written);
@@ -210,18 +228,19 @@ internal sealed class ItemLambda
     private OpExpression ComparedInItsOwnForm(BinaryExpression comparison, Operator op, bool orders, OwnFormRead read, LinqExpression held, bool memberOnTheLeft)
     {
         var member = read.Member;
-        var written = read.Path.Member;
+        var written = read.Written;
         var unlikeTheBase = $"'{Printed.Of(member)}', which {written.WhatWritesItsOwnForm} writes unlike {_form.BaseFormName}";
         if (orders) throw Refused(comparison, $"orders {unlikeTheBase}, so the browser does not order it as .NET does; order it on the server.");
-        if (!_form.WritesAsAScalar(member.Type)) throw Refused(comparison, $"compares {unlikeTheBase}, and .NET compares the object it holds; compare it on the server.");
+        if (!_form.Computed.WritesAsAScalar(member.Type)) throw Refused(comparison, $"compares {unlikeTheBase}, and .NET compares the object it holds; compare it on the server.");
         if (Keys.IsDateOrTime(member.Type)) throw Refused(comparison, "compares a date or a time its own converter writes, whose text the converter decides; compare it on the server.");
-        var value = written.Written(Held(ViewValues.Of(held), held.Type, WrittenAs(member, held)));
+        var writtenAs = WrittenAs(member, held);
+        var value = written.Written(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
         var writtenAsText = value.ValueKind == JsonValueKind.String;
         if (writtenAsText && ComparedTypes.IsBinaryFraction(member.Type))
             throw Refused(comparison, "compares a float or double the JSON writes as text, whose text does not equal as the number does, as -0 and 0 or NaN and NaN; compare it on the server.");
         if (writtenAsText && ComparedTypes.IsDecimal(member.Type) && written.HasItsOwnConverter)
             throw Refused(comparison, "compares a decimal its own converter writes as text, whose text the converter decides; compare it on the server.");
-        var data = Data(read.Path, read.Root);
+        var data = read.Value;
         var literal = new LitExpression(value);
         PlanExpression[] operands = memberOnTheLeft ? [data, literal] : [literal, data];
         var comparedAsDecimals = ComparedTypes.IsDecimal(member.Type) && !written.HasItsOwnConverter;
@@ -233,7 +252,7 @@ internal sealed class ItemLambda
     private void RefuseAMemberInItsOwnFormBesideAnother(BinaryExpression comparison, LinqExpression left, LinqExpression right)
     {
         if (!ReadsItsOwnForm(left, out var read) && !ReadsItsOwnForm(right, out read)) return;
-        throw Refused(comparison, $"compares two members, and {read.Path.Member.WhatWritesItsOwnForm} writes '{Printed.Of(read.Member)}' unlike {_form.BaseFormName}, so the browser does not compare them as .NET does; compare them on the server.");
+        throw Refused(comparison, $"compares two members, and {read.Written.WhatWritesItsOwnForm} writes '{Printed.Of(read.Member)}' unlike {_form.BaseFormName}, so the browser does not compare them as .NET does; compare them on the server.");
     }
 
     private void RequireComparableMembers(BinaryExpression comparison, Type left, Type right, bool orders)
@@ -263,7 +282,8 @@ internal sealed class ItemLambda
     {
         if (value is null || heldAs == writtenAs) return value;
         if (value is int code && ComparedTypes.IsChar(writtenAs)) return Convert.ToChar(code, CultureInfo.InvariantCulture);
-        return JsonSerializer.SerializeToElement(value, heldAs, _form.DataOptions).Deserialize(writtenAs, _form.DataOptions);
+        var options = _form.Base.DataOptions;
+        return JsonSerializer.SerializeToElement(value, heldAs, options).Deserialize(writtenAs, options);
     }
 
     private static LitExpression DayNumber(object? day) => new(JsonSerializer.SerializeToElement(day is null ? (int?)null : Convert.ToInt32(day, CultureInfo.InvariantCulture)));
@@ -309,7 +329,7 @@ internal sealed class ItemLambda
 
     private static InvalidOperationException Refused(LinqExpression term, string reason) => new($"'{Printed.Of(term)}' {reason}");
 
-    private sealed record OwnFormRead(MemberExpression Member, MemberPath Path, ParameterExpression Root);
+    private sealed record OwnFormRead(LinqExpression Member, WrittenMember Written, PlanExpression Value);
 
     private sealed class ItemFinder(Dictionary<ParameterExpression, string> items) : ExpressionVisitor
     {

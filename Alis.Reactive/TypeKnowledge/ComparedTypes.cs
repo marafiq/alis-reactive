@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Alis.Reactive.ArrayLambdas;
+namespace Alis.Reactive.TypeKnowledge;
 
 internal static class ComparedTypes
 {

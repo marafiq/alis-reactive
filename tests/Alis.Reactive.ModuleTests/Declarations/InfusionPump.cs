@@ -45,6 +45,9 @@ public sealed class Prescription
 
     public int MaxDailyDoses { get; set; } = 4;
 
+    [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
+    public int Refills { get; set; } = 2;
+
     [JsonPropertyName("Route")]
     public string Route { get; set; } = "oral";
 

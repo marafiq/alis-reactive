@@ -46,7 +46,15 @@ internal sealed class WrittenMember
 
     internal object? ReadFrom(object holder) => _get(holder);
 
-    internal JsonElement Written(object? value) => JsonSerializer.SerializeToElement(value, OwnForm().GetTypeInfo(_property.PropertyType));
+    internal bool WritesAlike(WrittenMember other)
+    {
+        if (ReferenceEquals(_property, other._property)) return true;
+        var bothByNumberHandling = !HasItsOwnConverter && !other.HasItsOwnConverter;
+        return bothByNumberHandling && (Handling & WritingBits) == (other.Handling & WritingBits);
+    }
+
+    internal JsonElement Written(object? value, Type type)
+        => JsonSerializer.SerializeToElement(value, OwnForm().GetTypeInfo(HasItsOwnConverter ? _property.PropertyType : type));
 
     internal static WrittenMember Of(MemberExpression access, JsonTypeInfo holder, LambdaExpression read)
     {
@@ -55,7 +63,7 @@ internal sealed class WrittenMember
         return written is { Get: { } get } ? new WrittenMember(holder, written, get) : throw NotWritten(read, holder);
     }
 
-    private JsonSerializerOptions OwnForm()
+    internal JsonSerializerOptions OwnForm()
     {
         var options = Holder.Options;
         if (_property.CustomConverter is { } converter)
@@ -65,10 +73,11 @@ internal sealed class WrittenMember
             return byItsConverter;
         }
 
-        var handling = _property.NumberHandling ?? Holder.NumberHandling ?? options.NumberHandling;
-        var writesAsTheOptionsDo = (handling & WritingBits) == (options.NumberHandling & WritingBits) || !HoldsNumbers(Contract);
-        return writesAsTheOptionsDo ? options : new JsonSerializerOptions(options) { NumberHandling = handling };
+        var writesAsTheOptionsDo = (Handling & WritingBits) == (options.NumberHandling & WritingBits) || !HoldsNumbers(Contract);
+        return writesAsTheOptionsDo ? options : new JsonSerializerOptions(options) { NumberHandling = Handling };
     }
+
+    private JsonNumberHandling Handling => _property.NumberHandling ?? Holder.NumberHandling ?? Holder.Options.NumberHandling;
 
     private static bool HoldsNumbers(JsonTypeInfo type)
     {

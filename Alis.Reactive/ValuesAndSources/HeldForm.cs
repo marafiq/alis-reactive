@@ -4,40 +4,64 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
+using Alis.Reactive.TypeKnowledge;
 
 namespace Alis.Reactive.ValuesAndSources;
 
 internal sealed class HeldForm
 {
     private readonly AppJson _json;
-    private readonly bool _ownForm;
 
-    private HeldForm(AppJson json, CultureInfo rendersUnder, bool ownForm)
+    private HeldForm(AppJson json, CultureInfo rendersUnder, OwnWriting? own)
     {
         _json = json;
         RendersUnder = rendersUnder;
-        _ownForm = ownForm;
+        Own = own;
     }
 
     internal CultureInfo RendersUnder { get; }
 
-    internal HeldForm Computed => _ownForm ? throw new NotImplementedException() : Live(_json, RendersUnder);
+    internal OwnWriting? Own { get; }
 
-    internal HeldForm OwnForm => new(_json, RendersUnder, ownForm: true);
+    internal HeldForm Computed => Live(_json, RendersUnder);
 
-    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, ownForm: false);
+    internal HeldForm Base => Own is null ? this : Computed;
 
-    internal LitExpression Beside<TValue>(TValue value) => _ownForm ? throw new NotImplementedException() : Literals.Of(value, _json);
+    internal string BaseFormName => "JavaScript's value";
 
-    internal LitExpression Beside(object? value, Type type) => _ownForm ? throw new NotImplementedException() : Literals.Of(value, type, _json);
+    internal JsonSerializerOptions DataOptions => Own is { } own ? own.Member.OwnForm() : _json.LiveForm;
 
-    internal string BaseFormName => _ownForm ? throw new NotImplementedException() : "JavaScript's value";
+    internal bool HoldsAListItsConverterWrites
+        => Own is { Member: { HasItsOwnConverter: true } member } && member.Contract.Kind is JsonTypeInfoKind.Enumerable or JsonTypeInfoKind.Dictionary;
 
-    internal JsonSerializerOptions DataOptions => _ownForm ? throw new NotImplementedException() : _json.LiveForm;
+    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, own: null);
 
-    internal Expression IntoLive(Expression held) => held;
+    internal HeldForm WrittenBy(WrittenMember member, string read) => new(_json, RendersUnder, new OwnWriting(member, read));
+
+    internal OwnWriting? WritesOtherwiseThan(HeldForm other)
+    {
+        var alike = Own is { } own ? other.Own is { } others && own.Member.WritesAlike(others.Member) : other.Own is null;
+        return alike ? null : Own ?? other.Own;
+    }
+
+    internal LitExpression Beside<TValue>(TValue value) => Own is { } own ? new(own.Member.Written(value, typeof(TValue))) : Literals.Of(value, _json);
+
+    internal LitExpression Beside(object? value, Type type) => Own is { } own ? new(own.Member.Written(value, type)) : Literals.Of(value, type, _json);
+
+    internal Expression IntoLive<TValue>(Expression held)
+    {
+        if (Own is not { } own) return held;
+        if (own.Member.HasItsOwnConverter)
+            throw new InvalidOperationException($"A live object takes '{own.Read}' as JavaScript holds its type, and its own JSON converter writes it otherwise; pass the value from the server.");
+        return LiveShapes.Converts(own.Member.OwnForm().GetTypeInfo(typeof(TValue)), out var shape) ? new AsExpression(held, shape) : held;
+    }
 
     internal bool WritesAsAScalar<TValue>() => WritesAsAScalar(typeof(TValue));
 
-    internal bool WritesAsAScalar(Type type) => _ownForm ? throw new NotImplementedException() : _json.LiveForm.GetTypeInfo(type).Kind == JsonTypeInfoKind.None;
+    internal bool WritesAsAScalar(Type type) => DataOptions.GetTypeInfo(type).Kind == JsonTypeInfoKind.None;
+
+    internal sealed record OwnWriting(WrittenMember Member, string Read)
+    {
+        internal string Cause => Member.WhatWritesItsOwnForm;
+    }
 }

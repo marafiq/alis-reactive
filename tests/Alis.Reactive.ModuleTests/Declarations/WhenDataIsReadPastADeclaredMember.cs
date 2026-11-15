@@ -52,9 +52,10 @@ public sealed class WhenDataIsReadPastADeclaredMember
         "{\"name\":\"prescriber\",\"requires\":[],\"absent\":{\"kind\":\"nothing\"}}," +
         "{\"name\":\"name\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"unnamed\"}}],\"target\":" + ThePrescription + "}}" + Ends;
 
-    private const string TheSealAsItsConverterWritesIt = OnLoad +
-        "{\"kind\":\"set\",\"path\":[\"seal\"],\"members\":\"required\",\"content\":false,\"target\":" + Pump + ",\"value\":" +
-        "{\"kind\":\"data\",\"path\":[{\"name\":\"seal\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"\"}}],\"target\":" + ThePrescription + "}}" + Ends;
+    private const string RefillsAsTheirNumber = OnLoad + SetsTheRate +
+        "{\"kind\":\"as\",\"expr\":" +
+        "{\"kind\":\"data\",\"path\":[{\"name\":\"refills\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"2\"}}],\"target\":" + ThePrescription + "}," +
+        "\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\"}}}" + Ends;
 
     [Test]
     public void a_member_of_the_data_is_named_by_the_apps_naming_where_the_declared_member_keeps_camel_case()
@@ -121,19 +122,41 @@ public sealed class WhenDataIsReadPastADeclaredMember
     }
 
     [Test]
-    public void a_member_its_own_converter_writes_is_read_whole_with_its_start_as_the_converter_writes_it()
+    public void a_member_its_own_converter_writes_is_refused_where_a_live_member_takes_it()
+    {
+        var html = Views.Of(new Infusion("North"));
+        var plan = html.ReactivePlan<Infusion>();
+
+        Action theView = () =>
+        {
+            html.On(plan, trigger => trigger.DomReady(pipeline =>
+            {
+                var pump = pipeline.Component<InfusionPump>("pump");
+                pump.Seal.Set(pump.CurrentPrescription.Read(prescription => prescription.Seal));
+            }));
+            html.RenderPlan(plan);
+        };
+
+        Assert.That(
+            () => theView(),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "A live object takes 'prescription.Seal' as JavaScript holds its type, and its own JSON converter writes it otherwise; pass the value from the server."));
+    }
+
+    [Test]
+    public void a_number_its_own_number_handling_writes_as_text_reaches_a_live_member_as_its_number()
     {
         var html = Views.Of(new Infusion("North"));
         var plan = html.ReactivePlan<Infusion>();
         html.On(plan, trigger => trigger.DomReady(pipeline =>
         {
             var pump = pipeline.Component<InfusionPump>("pump");
-            pump.Seal.Set(pump.CurrentPrescription.Read(prescription => prescription.Seal));
+            pump.Rate.Set(pump.CurrentPrescription.Read(prescription => prescription.Refills));
         }));
 
         var rendered = Views.TextOf(html.RenderPlan(plan));
 
-        Assert.That(rendered, Is.EqualTo(ScriptOpen + TheSealAsItsConverterWritesIt + ScriptClose));
+        Assert.That(rendered, Is.EqualTo(ScriptOpen + RefillsAsTheirNumber + ScriptClose));
     }
 
     [Test]
@@ -143,7 +166,7 @@ public sealed class WhenDataIsReadPastADeclaredMember
         Assert.That(PlanSchema.ProblemsOf(RouteByItsOwnName), Is.Empty);
         Assert.That(PlanSchema.ProblemsOf(UnitsPastTheDose), Is.Empty);
         Assert.That(PlanSchema.ProblemsOf(NamePastThePrescriber), Is.Empty);
-        Assert.That(PlanSchema.ProblemsOf(TheSealAsItsConverterWritesIt), Is.Empty);
+        Assert.That(PlanSchema.ProblemsOf(RefillsAsTheirNumber), Is.Empty);
     }
 
     [Test]

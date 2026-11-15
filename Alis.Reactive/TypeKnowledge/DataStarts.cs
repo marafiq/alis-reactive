@@ -46,6 +46,7 @@ internal static class DataStarts
             held = member.ReadFrom(held);
         }
 
-        return new StartAbsence(path[path.Count - 1].Written(held));
+        var last = path[path.Count - 1];
+        return new StartAbsence(last.Written(held, last.Contract.Type));
     }
 }

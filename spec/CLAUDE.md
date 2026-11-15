@@ -1646,6 +1646,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   helper's argument nor reaches an MVC 5 view at C# 8, so ALIS042 keeps its message and the render's names the
   operation (M4.X1, D18.6). It finds a text by `list is ITypedSource<string>`, an interface test as `Alis.Reactive/Conditions/Choices.cs`
   makes one, so no read of a type's identity joins the owner's list. The owner can overrule it.
+- The lead, 2026-11-15, landing a source's own form in a condition, a choice and a live write (D7.7, D8.10), from
+  Codex's piece read at the source, under the owner's "I'll go with your recommendation" (2026-11-14): X7.10's
+  message names the read and not its type, so no type's name is read and the owner's list is unchanged; a number a
+  member's own number handling writes as text reaches a live member as its number by `as`, as the app's form's does;
+  `In` over literal values compares a source in its own form by `Eq` (M3.D1); and a text test, an emptiness test or a
+  list operation over a value its own converter writes whole throws `NotImplementedException` until a line states
+  it. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
