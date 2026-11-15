@@ -37,6 +37,9 @@ internal sealed class WorldData
     private volatile string? _componentBetaConstructor;
     private volatile int _recordCount = 125;
     private volatile bool _checkAnswer = true;
+    private volatile int _bindingsBetaCount;
+    private volatile string? _bindingsBetaStarted;
+    private volatile string? _bindingStarted;
 
     internal IReadOnlyCollection<string> Residents => _residents;
 
@@ -96,6 +99,12 @@ internal sealed class WorldData
 
     internal bool CheckAnswer => _checkAnswer;
 
+    internal int BindingsBetaCount => _bindingsBetaCount;
+
+    internal string? BindingsBetaStarted => _bindingsBetaStarted;
+
+    internal string? BindingStarted => _bindingStarted;
+
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
@@ -127,6 +136,9 @@ internal sealed class WorldData
         if (seed.ComponentBetaConstructor is { } betaConstructor) _componentBetaConstructor = betaConstructor;
         if (seed.RecordCount is { } recordCount) _recordCount = recordCount;
         if (seed.CheckAnswer is { } checkAnswer) _checkAnswer = checkAnswer;
+        if (seed.BindingsBetaCount is { } betaCount) _bindingsBetaCount = betaCount;
+        if (seed.BindingsBetaStarted is { } betaStarted) _bindingsBetaStarted = betaStarted;
+        if (seed.BindingStarted is { } bindingStarted) _bindingStarted = bindingStarted;
     }
 
     internal void Arm(GateOrder order) => _gates[(order.Gate, order.At)] = new WorldGate();

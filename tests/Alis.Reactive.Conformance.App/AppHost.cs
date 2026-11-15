@@ -32,8 +32,13 @@ internal static class AppHost
                 return;
             case HostNames.EnumsAsNumbers:
                 return;
+            case HostNames.JsonContract:
+                WriteEnumNames(json);
+                json.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
+                json.RespectRequiredConstructorParameters = true;
+                return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase} and {HostNames.EnumsAsNumbers}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers} and {HostNames.JsonContract}.");
         }
     }
 

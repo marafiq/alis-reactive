@@ -68,6 +68,12 @@ public sealed class Seed
 
     public bool? CheckAnswer { get; set; }
 
+    public int? BindingsBetaCount { get; set; }
+
+    public string? BindingsBetaStarted { get; set; }
+
+    public string? BindingStarted { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed Carer(string name) => new Seed().AndCarer(name);
@@ -131,6 +137,10 @@ public sealed class Seed
     public static Seed TheRecordEndpointsCount(int count) => new() { RecordCount = count };
 
     public static Seed TheCheckEndpointsAnswer(bool answer) => new() { CheckAnswer = answer };
+
+    public static Seed TheBindingsBeta(int count, string started) => new() { BindingsBetaCount = count, BindingsBetaStarted = started };
+
+    public static Seed TheBindingsStarted(string started) => new() { BindingStarted = started };
 
     public Seed AndCarer(string name)
     {

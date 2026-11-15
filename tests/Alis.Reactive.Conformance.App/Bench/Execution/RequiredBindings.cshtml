@@ -1,0 +1,42 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RequiredBindingsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Required bindings";
+    var plan = Html.ReactivePlan<RequiredBindingsBoard>();
+}
+<h1>Required bindings</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart()))
+<button type="button" @Html.Raises(plan, RequiredBindingsButtons.CountTheZeroCounts)>Count the zero counts</button>
+<button type="button" @Html.Raises(plan, RequiredBindingsButtons.ShowGammasCount)>Show Gamma's count</button>
+<dl>
+    <dt>Bindings</dt>
+    <dd id="binding-status"></dd>
+    <dt>Zero counts</dt>
+    <dd id="zero-count">unknown</dd>
+    <dt>Gamma's count</dt>
+    <dd id="gamma-count"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(RequiredBindingsButtons.CountTheZeroCounts, pipeline => pipeline.Get(Model.Bindings)
+            .OnSuccess<IReadOnlyList<Binding>>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Bindings.Set(loaded.Body);
+                pipeline.Element("binding-status").Text.Set("Counting");
+                pipeline.Element("zero-count").Text.Set(conformance.Bindings.Count(binding => binding.Count == 0));
+            }))
+        .CustomEvent(RequiredBindingsButtons.ShowGammasCount, pipeline => pipeline.Get(Model.Binding)
+            .OnSuccess<Binding>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Binding.Set(loaded.Body);
+                pipeline.Element("gamma-count").Text.Set(conformance.Binding.Read(binding => binding.Count));
+            })));
+}
+@Html.RenderPlan(plan)

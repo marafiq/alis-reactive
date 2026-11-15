@@ -844,6 +844,19 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M17.F1 X4.10 0": {
+    "modules": [
+      "Elements",
+      "InputsAndIds",
+      "RenderingAndDelivery",
+      "RequestsAndResponses",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Bench/Execution/RequiredBindings.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M17.F1 X4.11 0": {
     "modules": [
       "Elements",
@@ -896,6 +909,19 @@
     ],
     "views": [
       "/Care/Admission/FreeBed.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M17.F1 X4.6 0": {
+    "modules": [
+      "Elements",
+      "InputsAndIds",
+      "RenderingAndDelivery",
+      "RequestsAndResponses",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Bench/Execution/BindingDefaults.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

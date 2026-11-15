@@ -8,4 +8,5 @@ public static class HostNames
     public const string SnakeCase = "snakeCase";
     public const string PascalCase = "pascalCase";
     public const string EnumsAsNumbers = "enumsAsNumbers";
+    public const string JsonContract = "jsonContract";
 }

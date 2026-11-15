@@ -1,0 +1,59 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Bench
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model BindingDefaultsBoard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Binding defaults";
+    var plan = Html.ReactivePlan<BindingDefaultsBoard>();
+}
+<h1>Binding defaults</h1>
+@(plan.ConformanceComponent("conformance", new ConformanceStart()))
+<button type="button" @Html.Raises(plan, BindingDefaultsButtons.CountTheZeroCounts)>Count the zero counts</button>
+<button type="button" @Html.Raises(plan, BindingDefaultsButtons.CountTheStarted)>Count the started</button>
+<button type="button" @Html.Raises(plan, BindingDefaultsButtons.ShowBetasStarted)>Show Beta's started</button>
+<button type="button" @Html.Raises(plan, BindingDefaultsButtons.ShowTheBindingsStarted)>Show the binding's started</button>
+<dl>
+    <dt>Zero counts</dt>
+    <dd id="zero-count"></dd>
+    <dt>Started</dt>
+    <dd id="started-count"></dd>
+    <dt>Beta's started</dt>
+    <dd id="beta-started"></dd>
+    <dt>The binding's started</dt>
+    <dd id="binding-started"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(BindingDefaultsButtons.CountTheZeroCounts, pipeline => pipeline.Get(Model.Bindings)
+            .OnSuccess<IReadOnlyList<Binding>>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Bindings.Set(loaded.Body);
+                pipeline.Element("zero-count").Text.Set(conformance.Bindings.Count(binding => binding.Count == 0));
+            }))
+        .CustomEvent(BindingDefaultsButtons.CountTheStarted, pipeline => pipeline.Get(Model.Bindings)
+            .OnSuccess<IReadOnlyList<Binding>>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Bindings.Set(loaded.Body);
+                pipeline.Element("started-count").Text.Set(conformance.Bindings.Count(binding => binding.Started == "start"));
+            }))
+        .CustomEvent(BindingDefaultsButtons.ShowBetasStarted, pipeline => pipeline.Get(Model.Bindings)
+            .OnSuccess<IReadOnlyList<Binding>>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Bindings.Set(loaded.Body);
+                pipeline.Element("beta-started").Text.Set(conformance.Bindings.Find(binding => binding.Name == "Beta", binding => binding.Started));
+            }))
+        .CustomEvent(BindingDefaultsButtons.ShowTheBindingsStarted, pipeline => pipeline.Get(Model.Binding)
+            .OnSuccess<Binding>((loaded, pipeline) =>
+            {
+                var conformance = pipeline.Component<ConformanceComponent>("conformance");
+                conformance.Binding.Set(loaded.Body);
+                pipeline.Element("binding-started").Text.Set(conformance.Binding.Read(binding => binding.Started));
+            })));
+}
+@Html.RenderPlan(plan)

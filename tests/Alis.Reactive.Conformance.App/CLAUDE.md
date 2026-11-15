@@ -11,7 +11,8 @@ its views.
 - The app starts under the host its argument `--host` names, a host of `spec/Reference/app.json`, and `AppHost.cs`
   sets the JSON options that definition gives it: net10's camel-case members and enum names, and for each of
   numbersAsText, dateConverter, snakeCase, pascalCase and enumsAsNumbers, those options with the one change its
-  definition names. An app started under no host, or under one it does not serve, stops and names the hosts it serves.
+  definition names; jsonContract's are net10's that ignore a member holding its default and respect required
+  constructor parameters, and its resolver lands with the page that reads an admission's pharmacy. An app started under no host, or under one it does not serve, stops and names the hosts it serves.
   The harness passes the host a fixture runs under, `scripts/run.sh` passes net10, and the page sweep sets it. What
   else a host's definition names lands with the door or the page that needs it.
 - A request names the culture the app binds and renders it under in its query "culture": "en-US", "de-DE",

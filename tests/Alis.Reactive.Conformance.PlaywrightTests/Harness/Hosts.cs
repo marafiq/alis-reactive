@@ -27,4 +27,8 @@ public static class Hosts
     public const string EnumsAsNumbersName = HostNames.EnumsAsNumbers;
 
     public static readonly string[] EnumsAsNumbers = [EnumsAsNumbersName];
+
+    public const string JsonContractName = HostNames.JsonContract;
+
+    public static readonly string[] JsonContract = [JsonContractName];
 }
