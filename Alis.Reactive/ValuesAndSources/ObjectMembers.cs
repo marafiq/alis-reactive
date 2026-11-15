@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
@@ -49,9 +48,9 @@ public sealed class ObjectMembers<T>
     {
         var path = Path(member);
         var hasOwnForm = path.Member.HoldsItsOwnForm;
-        if (!hasOwnForm) RefuseAnInexactNumber(value, member.Body.ToString());
+        if (!hasOwnForm) Literals.RefuseWhereJavaScriptReadsAnother(value, member.Body.ToString());
         var written = path.Member.Written(value, typeof(TValue));
-        if (hasOwnForm && written.ValueKind == JsonValueKind.Number) RefuseAnInexactNumber(value, member.Body.ToString());
+        if (hasOwnForm && written.ValueKind == JsonValueKind.Number) Literals.RefuseWhereJavaScriptReadsAnother(value, member.Body.ToString());
         return Add(path.WireNames, new LitExpression(written), member);
     }
 
@@ -115,22 +114,6 @@ public sealed class ObjectMembers<T>
     private static RecordExpression Record(IEnumerable<Field> fields, int depth)
         => new([.. fields.GroupBy(field => field.Path[depth], StringComparer.Ordinal).Select(group =>
             new RecordField(group.Key, group.First().Path.Count == depth + 1 ? group.First().Value : Record(group, depth + 1)))]);
-
-    private static void RefuseAnInexactNumber<TValue>(TValue value, string member)
-    {
-        var reason = value switch
-        {
-            double number when double.IsNaN(number) || double.IsInfinity(number) => "NaN or an infinity, which no JSON number holds",
-            float number when float.IsNaN(number) || float.IsInfinity(number) => "NaN or an infinity, which no JSON number holds",
-            decimal number when number.ToString(CultureInfo.InvariantCulture).Replace(".", "").TrimStart('-', '0').TrimEnd('0').Length > 15
-                => "a decimal of more than 15 significant digits",
-            long number when number is < -9007199254740991L or > 9007199254740991L => "a whole number past 9007199254740991",
-            ulong number when number > 9007199254740991UL => "a whole number past 9007199254740991",
-            _ => string.Empty,
-        };
-        if (reason.Length == 0) return;
-        throw new InvalidOperationException($"'{member}' holds a JavaScript number, and {Convert.ToString(value, CultureInfo.InvariantCulture)} is {reason}, which JavaScript reads as another value; write a finite number of at most 15 significant digits.");
-    }
 
     private sealed record Field(IReadOnlyList<string> Path, Expression Value);
 }

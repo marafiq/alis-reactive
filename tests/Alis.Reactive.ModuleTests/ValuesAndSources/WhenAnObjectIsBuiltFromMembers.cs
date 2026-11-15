@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -215,6 +216,23 @@ public sealed class WhenAnObjectIsBuiltFromMembers
         => Assert.That(() => Rendered((pipeline, panel) => panel.Order.Set(pipeline.Object<TransferOrder>(order => order.Set(x => x.Ticket, number)))),
             Throws.InvalidOperationException.With.Message.EqualTo(
                 "'x.Ticket' holds a JavaScript number, and " + written + " is a whole number past 9007199254740991, which JavaScript reads as another value; write a finite number of at most 15 significant digits."));
+
+    [TestCase("9007199254740993")]
+    [TestCase("-9007199254740993")]
+    public void a_whole_decimal_past_javascripts_safe_integer_is_refused_as_a_whole_number(string written)
+    {
+        var number = decimal.Parse(written, CultureInfo.InvariantCulture);
+        Assert.That(() => Rendered((pipeline, panel) => panel.Order.Set(pipeline.Object<TransferOrder>(order => order.Set(x => x.Amount, number)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'x.Amount' holds a JavaScript number, and " + written + " is a whole number past 9007199254740991, which JavaScript reads as another value; write a finite number of at most 15 significant digits."));
+    }
+
+    [Test]
+    public void a_whole_decimal_of_sixteen_digits_within_javascripts_safe_integer_is_written()
+    {
+        var rendered = Rendered((pipeline, panel) => panel.Order.Set(pipeline.Object<TransferOrder>(order => order.Set(x => x.Amount, 9007199254740991m))));
+        Assert.That(RecordOf(rendered), Is.EqualTo("{\"kind\":\"record\",\"fields\":[{\"name\":\"amount\",\"value\":{\"kind\":\"lit\",\"value\":9007199254740991}}]}"));
+    }
 
     [Test]
     public void a_members_own_form_keeps_numbers_written_as_text()
