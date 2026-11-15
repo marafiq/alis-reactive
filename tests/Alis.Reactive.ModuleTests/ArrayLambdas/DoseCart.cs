@@ -34,6 +34,10 @@ public sealed class DoseCart : Component
     public Property<IReadOnlyList<string>> Drugs => Property<IReadOnlyList<string>>();
 
     public Property<CartDose> Chosen => Property<CartDose>();
+
+    public ReadOnly<string> Note => ReadOnly<string>();
+
+    public ReadOnly<char[]> Letters => ReadOnly<char[]>();
 }
 
 public enum DoseStatus

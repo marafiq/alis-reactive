@@ -479,7 +479,7 @@
         {
           "id": "M4.X1",
           "rung": "analyzer",
-          "defect": "A care note's text counted, filtered, summed or ordered as a list of its characters, since the covariant source of N6.4 takes a string as a list of char (D6.10): \"'{source}' is a source of text, and a text is no list in the browser; run {operation} over a list, such as a List<T> or an array, or test the text with Contains, StartsWith, EndsWith, MinLength or Matches.\" At build by ALIS042, and where the view renders on code it does not follow (D18.6): new:N18.16."
+          "defect": "A care note's text counted, filtered, summed or ordered as a list of its characters, since the covariant source of N6.4 takes a string as a list of char (D6.10): \"'{source}' is a source of text, and a text is no list in the browser; run {operation} over a list, such as a List<T> or an array, or test the text with Contains, StartsWith, EndsWith, MinLength or Matches.\" At build by ALIS042, {source} the view's own text of the receiver, and where the view renders on code it does not follow, which holds no view text, so the operation names itself (D18.6): \"The source passed to {operation} is text, and a text is no list in the browser; run {operation} over a list, such as a List<T> or an array, or test the text with Contains, StartsWith, EndsWith, MinLength or Matches.\" new:N18.16."
         },
         {
           "id": "M4.X2",

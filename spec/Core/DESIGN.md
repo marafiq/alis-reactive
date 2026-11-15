@@ -4793,7 +4793,9 @@ plans (Q19).
   cannot see, a closed set: the app's options (its JSON options, its culture, its startup choices), a value the view
   holds when it renders, and the plan as the render composes it (partials, slots, ids). Each analyzer runs the same
   check, with the same message, that the render keeps for code the analyzer does not follow (a helper method a block
-  calls); a line of this design that says a rule the build sees is refused where the view renders means both.
+  calls), but where the build's message names the view's own text, which the render never holds: there the render's
+  message names what it holds, as M4.X1 states for a list's operation over a text. A line of this design that says a
+  rule the build sees is refused where the view renders means both.
   - Moved to an analyzer, by family: ALIS030, the request (X9.5, X9.6, X9.7, X9.12, X10.18, X10.25, X14.6, X20.6;
     N18.7); ALIS031, `ShowValidationErrors` outside a route (X16.21; N18.8); ALIS032, blocks (X5.13, X5.14, X6.8, X8.5, X8.9,
     X8.16, X8.17, X8.18, X8.25, X11.1, X17.13, X17.19; N18.9); ALIS033, lambdas, member lambdas and literals (X2.5,

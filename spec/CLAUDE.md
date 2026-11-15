@@ -1641,6 +1641,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   name is "de-DE" (`spec/REWRITE.md` section 2.5). A host's process culture is fr-FR, which no request names, and a host
   is ready once it answers the world's ready endpoint. X6.36's page stands on it, its test red until its doors land.
   The owner can overrule it.
+- The lead, 2026-11-14, on D6.10's refusal where the view renders, a Codex consult at max read at the source: the
+  render holds a source's plan expression and never the view's text, and `CallerArgumentExpression` neither follows a
+  helper's argument nor reaches an MVC 5 view at C# 8, so ALIS042 keeps its message and the render's names the
+  operation (M4.X1, D18.6). It finds a text by `list is ITypedSource<string>`, an interface test as `Alis.Reactive/Conditions/Choices.cs`
+  makes one, so no read of a type's identity joins the owner's list. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
