@@ -363,7 +363,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TEnum> IsInEnum<T, TEnum>(this IRuleBuilder<T, TEnum> rule)
         where TEnum : struct, Enum
-        => Add(rule, new ValueCheck<T, TEnum>(value => Enum.IsDefined(typeof(TEnum), value), Templates.InEnum));
+        => Add(rule, new EnumCheck<T, TEnum, TEnum>(value => value));
 
     /// <summary>Requires a value the enum declares.</summary>
     /// <remarks>
@@ -373,7 +373,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TEnum?> IsInEnum<T, TEnum>(this IRuleBuilder<T, TEnum?> rule)
         where TEnum : struct, Enum
-        => Add(rule, new ValueCheck<T, TEnum?>(value => value is null || Enum.IsDefined(typeof(TEnum), value.Value), Templates.InEnum));
+        => Add(rule, new EnumCheck<T, TEnum?, TEnum>(value => value));
 
     /// <summary>Requires the member's value to pass a test written in C#.</summary>
     /// <remarks>

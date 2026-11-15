@@ -45,6 +45,8 @@ public interface IValidator<in T>
 /// <remarks>Derive from <see cref="ReactiveValidator{T}"/>.</remarks>
 public abstract class ReactiveValidator
 {
+    internal abstract Type ModelType { get; }
+
     private protected ReactiveValidator()
     {
     }
@@ -63,6 +65,7 @@ public abstract class ReactiveValidator
 /// <typeparam name="T">The model the rules are written for.</typeparam>
 public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
 {
+    internal sealed override Type ModelType => typeof(T);
     private List<ValidationRule<T>> _rules = [];
     private IReadOnlyList<string> _sets = [];
 
@@ -168,10 +171,12 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
     public ValidationResult Validate(T instance) => Validate(instance, "default");
 
     /// <inheritdoc />
-    public ValidationResult Validate(T instance, string ruleSet)
+    public ValidationResult Validate(T instance, string ruleSet) => CheckBound(instance, ruleSet, [], []);
+
+    internal ValidationResult CheckBound(T instance, string ruleSet, IReadOnlyList<ValidationFailure> binding, IReadOnlyCollection<Type> flags)
     {
         if (instance is null) throw new ArgumentNullException(nameof(instance));
-        var run = new ValidationRun(true, CancellationToken.None, ruleSet);
+        var run = new ValidationRun(true, CancellationToken.None, ruleSet, binding, flags);
         RunRules(new ValidationContext<T>(instance, "", run)).GetAwaiter().GetResult();
         return new ValidationResult(run.Failures.ToArray());
     }
@@ -180,10 +185,13 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
     public Task<ValidationResult> ValidateAsync(T instance, CancellationToken cancellation = default) => ValidateAsync(instance, "default", cancellation);
 
     /// <inheritdoc />
-    public async Task<ValidationResult> ValidateAsync(T instance, string ruleSet, CancellationToken cancellation = default)
+    public Task<ValidationResult> ValidateAsync(T instance, string ruleSet, CancellationToken cancellation = default)
+        => CheckBoundAsync(instance, ruleSet, [], [], cancellation);
+
+    internal async Task<ValidationResult> CheckBoundAsync(T instance, string ruleSet, IReadOnlyList<ValidationFailure> binding, IReadOnlyCollection<Type> flags, CancellationToken cancellation)
     {
         if (instance is null) throw new ArgumentNullException(nameof(instance));
-        var run = new ValidationRun(false, cancellation, ruleSet);
+        var run = new ValidationRun(false, cancellation, ruleSet, binding, flags);
         await RunRules(new ValidationContext<T>(instance, "", run)).ConfigureAwait(false);
         return new ValidationResult(run.Failures.ToArray());
     }

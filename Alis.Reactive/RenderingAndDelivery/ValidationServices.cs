@@ -1,13 +1,14 @@
 using System;
 using Alis.Reactive.Validation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Alis.Reactive.RenderingAndDelivery;
 
 /// <summary>
 /// The startup call that registers the app's validators.
 /// </summary>
-public static class ValidationServices
+public static partial class ValidationServices
 {
     /// <summary>Registers the app's validators, once at startup.</summary>
     /// <remarks>
@@ -18,5 +19,12 @@ public static class ValidationServices
     /// <param name="validators">Registers each validator.</param>
     /// <returns>The app's services.</returns>
     public static IServiceCollection AddReactiveFluentValidation(this IServiceCollection services, Action<ReactiveFluentValidationBuilder> validators)
-        => throw new NotImplementedException();
+    {
+        validators(new ReactiveFluentValidationBuilder(services));
+        services.TryAddSingleton(provider => new ValidatorCatalog(provider.GetRequiredService<IServiceScopeFactory>(), provider.GetServices<ValidatorRegistration>(), provider.GetServices<FlagsRegistration>()));
+        ConfigureHost(services);
+        return services;
+    }
+
+    static partial void ConfigureHost(IServiceCollection services);
 }

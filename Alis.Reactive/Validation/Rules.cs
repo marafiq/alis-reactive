@@ -8,12 +8,15 @@ using System.Threading.Tasks;
 
 namespace Alis.Reactive.Validation;
 
-internal sealed class ValidationRun(bool synchronous, CancellationToken cancellation, string selection)
+internal sealed class ValidationRun(bool synchronous, CancellationToken cancellation, string selection, IReadOnlyList<ValidationFailure> binding, IReadOnlyCollection<Type> flags)
 {
     internal bool Synchronous { get; } = synchronous;
     internal CancellationToken Cancellation { get; } = cancellation;
     internal string Selection { get; } = selection;
-    internal List<ValidationFailure> Failures { get; } = [];
+    internal IReadOnlyCollection<Type> Flags { get; } = flags;
+    internal List<ValidationFailure> Failures { get; } = [.. binding];
+
+    internal bool Refused(string path) => binding.Any(failure => string.Equals(failure.PropertyName, path, StringComparison.OrdinalIgnoreCase));
 
     internal bool Selects(IReadOnlyList<string> sets, bool include = false)
     {
@@ -96,12 +99,13 @@ internal abstract class ValidationRule<T>(IReadOnlyList<string> sets)
     internal async Task Validate(ValidationContext<T> context)
     {
         context.Run.Cancellation.ThrowIfCancellationRequested();
-        if (!context.Run.Selects(Sets, this is IncludeRule<T>)) return;
+        if (!context.Run.Selects(Sets, this is IncludeRule<T>) || Refused(context)) return;
         foreach (var guard in Guards)
             if (!await guard.Holds(context).ConfigureAwait(false)) return;
         await Check(context).ConfigureAwait(false);
     }
 
+    protected virtual bool Refused(ValidationContext<T> context) => false;
     protected abstract Task Check(ValidationContext<T> context);
 }
 
@@ -187,6 +191,8 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
         return this;
     }
 
+    protected override bool Refused(ValidationContext<T> context) => context.Run.Refused(context.Prefix + _path);
+
     protected override async Task Check(ValidationContext<T> context)
     {
         var before = context.Run.Failures.Count;
@@ -224,6 +230,11 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
         foreach (var value in _values(context.Model))
         {
             var fieldPath = _path + "[" + index.ToString(CultureInfo.InvariantCulture) + "]";
+            if (context.Run.Refused(context.Prefix + fieldPath))
+            {
+                index++;
+                continue;
+            }
             foreach (var part in active)
             {
                 var arguments = new MessageArguments(_displayName, context.Prefix + fieldPath, value).With("CollectionIndex", index);

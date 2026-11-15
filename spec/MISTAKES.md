@@ -9,10 +9,10 @@ classes and the checks that waited for the owner are in git at 2a4a56b59.
 
 | Kind | Count | What catches it |
 |---|---:|---|
-| Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering | 95 | Reading the line, the signature or the page at HEAD before writing; the compiler, the analyzers, `spec/tools/check.py` and the gate |
-| A rule or a tool's list not applied before the change | 142 | The gate before the commit: the rule names, the hedges and the paths; `should` is written `must` (the owner, 2026-11-14) |
+| Written from memory, not read at its source at HEAD: a design line, a signature, a path, a name, a page's expected value, a case's shape or a TLA+ ordering | 109 | Reading the line, the signature or the page at HEAD before writing; the compiler, the analyzers, `spec/tools/check.py` and the gate |
+| A rule or a tool's list not applied before the change | 147 | The gate before the commit: the rule names, the hedges and the paths; `should` is written `must` (the owner, 2026-11-14) |
 | A number, a proof line or an absence not read from the run that proves it | 29 | The run's own result line, read when it prints; a search over every tracked file, with its count |
-| A shell command or a script wrong in its own terms | 145 | The script's asserts, before it writes any file; `echo "exit $?"` straight after the command |
+| A shell command or a script wrong in its own terms | 153 | The script's asserts, before it writes any file; `echo "exit $?"` straight after the command |
 | Said to the owner in a way that hid or blurred what holds | 7 | A status says what works, how many units are left and each count; a question goes to the owner only for a principle or a scope the owner has not decided |
 | The lead's own process put before the product | 5 | A push per unit, no check of a check, and a mistake written as a count |
 | A costly agent run started before its environment was proven to run the brief's commands | 5 | A low-effort probe of the exact build and test commands in the agent's sandbox before a max-effort run, and the brief names those commands (the owner, 2026-11-14: "please use codex efficiently, do not waste very priced resources") |

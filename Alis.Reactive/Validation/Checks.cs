@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Alis.Reactive.Conditions;
+using Alis.Reactive.TypeKnowledge;
 
 namespace Alis.Reactive.Validation;
 
@@ -214,5 +216,17 @@ internal sealed class AsyncPredicateCheck<T, TValue>(Func<T, TValue, Cancellatio
     {
         run.RequireAsync();
         return predicate(model, value, run.Cancellation);
+    }
+}
+
+internal sealed class EnumCheck<T, TValue, TEnum>(Func<TValue, TEnum?> read) : Check<T, TValue> where TEnum : struct, Enum
+{
+    internal override string Template => Templates.InEnum;
+
+    internal override Task<bool> Passes(T model, TValue value, MessageArguments arguments, ValidationRun run)
+    {
+        if (read(value) is not { } enumeration) return Task.FromResult(true);
+        if (!run.Flags.Contains(typeof(TEnum))) return Task.FromResult(Enum.IsDefined(typeof(TEnum), enumeration));
+        return Task.FromResult(EnumNames.NamesFlags(enumeration));
     }
 }

@@ -1,8 +1,13 @@
 #if NET48
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Alis.Reactive.Validation;
 
@@ -14,7 +19,7 @@ public static class EndpointChecks
     /// <summary>Checks the model the action bound by the validator named, and adds each value the binder refused under the name it was sent under.</summary>
     /// <remarks>
     /// The validator is the one the app registered. Return the result's <c>ToErrorResponse()</c> when it is not valid.
-    /// MVC's own validation adds nothing to the result.
+    /// The app supplies its registered validator through MVC's dependency resolver.
     /// </remarks>
     /// <param name="controller">The action's controller.</param>
     /// <param name="request">The model the action bound.</param>
@@ -23,12 +28,12 @@ public static class EndpointChecks
     /// <returns>The check's result.</returns>
     public static ValidationResult Validate<TRequest, TValidator>(this Controller controller, TRequest request)
         where TValidator : ReactiveValidator<TRequest>
-        => throw new NotImplementedException();
+        => Validate<TRequest, TValidator>(controller, request, "default");
 
     /// <summary>Checks the model the action bound by the validator named, with its asynchronous rules, and adds each value the binder refused under the name it was sent under.</summary>
     /// <remarks>
     /// The validator is the one the app registered. Return the result's <c>ToErrorResponse()</c> when it is not valid.
-    /// MVC's own validation adds nothing to the result.
+    /// The app supplies its registered validator through MVC's dependency resolver.
     /// </remarks>
     /// <param name="controller">The action's controller.</param>
     /// <param name="request">The model the action bound.</param>
@@ -38,7 +43,7 @@ public static class EndpointChecks
     /// <returns>The check's result.</returns>
     public static Task<ValidationResult> ValidateAsync<TRequest, TValidator>(this Controller controller, TRequest request, CancellationToken cancellation = default)
         where TValidator : ReactiveValidator<TRequest>
-        => throw new NotImplementedException();
+        => ValidateAsync<TRequest, TValidator>(controller, request, "default", cancellation);
 
     /// <summary>Checks the model the action bound by the validator and the rule set named, and adds each value the binder refused under the name it was sent under.</summary>
     /// <remarks>
@@ -53,7 +58,12 @@ public static class EndpointChecks
     /// <returns>The check's result.</returns>
     public static ValidationResult Validate<TRequest, TValidator>(this Controller controller, TRequest request, string ruleSet)
         where TValidator : ReactiveValidator<TRequest>
-        => throw new NotImplementedException();
+    {
+        var services = new ResolverServices();
+        var catalog = services.GetService<ValidatorCatalog>() ?? throw ValidatorCatalog.Missing<TRequest, TValidator>();
+        var validator = catalog.Resolve<TRequest, TValidator>(services);
+        return validator.CheckBound(request, ruleSet, BindingFailures(controller), catalog.Flags);
+    }
 
     /// <summary>Checks the model the action bound by the validator and the rule set named, with its asynchronous rules, and adds each value the binder refused under the name it was sent under.</summary>
     /// <remarks>
@@ -69,6 +79,21 @@ public static class EndpointChecks
     /// <returns>The check's result.</returns>
     public static Task<ValidationResult> ValidateAsync<TRequest, TValidator>(this Controller controller, TRequest request, string ruleSet, CancellationToken cancellation = default)
         where TValidator : ReactiveValidator<TRequest>
-        => throw new NotImplementedException();
+    {
+        var services = new ResolverServices();
+        var catalog = services.GetService<ValidatorCatalog>() ?? throw ValidatorCatalog.Missing<TRequest, TValidator>();
+        var validator = catalog.Resolve<TRequest, TValidator>(services);
+        return validator.CheckBoundAsync(request, ruleSet, BindingFailures(controller), catalog.Flags, cancellation);
+    }
+
+    private static IReadOnlyList<ValidationFailure> BindingFailures(Controller controller)
+        => controller.ModelState.SelectMany(entry => entry.Value!.Errors.Select(error => new ValidationFailure(entry.Key,
+            error.ErrorMessage.Length > 0 ? error.ErrorMessage : string.Format(CultureInfo.CurrentCulture,
+                "The value '{0}' is not valid for {1}.", entry.Value.Value?.AttemptedValue, entry.Key.Substring(entry.Key.LastIndexOf('.') + 1))))).ToArray();
+
+    private sealed class ResolverServices : IServiceProvider
+    {
+        public object? GetService(Type serviceType) => DependencyResolver.Current.GetService(serviceType);
+    }
 }
 #endif
