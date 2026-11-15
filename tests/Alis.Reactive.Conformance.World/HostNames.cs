@@ -9,4 +9,6 @@ public static class HostNames
     public const string PascalCase = "pascalCase";
     public const string EnumsAsNumbers = "enumsAsNumbers";
     public const string JsonContract = "jsonContract";
+    public const string NoRequests = "noRequests";
+    public const string NoAntiforgeryChoice = "noAntiforgeryChoice";
 }

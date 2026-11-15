@@ -24,7 +24,7 @@ export function routeFor(reply: HttpResponse, routes: Routes): Route {
 export async function attempt(request: PreparedRequest, routes: Routes, signal: AbortSignal, pageUrl: string): Promise<HttpResponse> {
   let response: Response;
   try {
-    response = await fetch(request.url, { method: request.method, headers: request.headers, redirect: "follow", signal });
+    response = await fetch(request.url, { method: request.method, headers: request.headers, body: request.body, redirect: "follow", signal });
   } catch {
     return networkFailure(request);
   }

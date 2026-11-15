@@ -129,7 +129,7 @@ export class RequestFrame {
         };
       }
       case "guard":
-        this.#state = { kind: "attempt", request: prepare(state.send, this.#context.plan.timeZone) };
+        this.#state = { kind: "attempt", request: prepare(state.send, this.#context.plan.timeZone, this.#context.plan.culture) };
         return completed;
       case "attempt":
         return {

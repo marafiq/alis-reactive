@@ -70,7 +70,7 @@ public sealed class WhenAConditionReadsDataTheServerWrote
 
     private static string Rendered(Func<TypedSource<DateTime>, DoseCart, TypedSource<bool>> condition, Action<JsonSerializerOptions> json)
     {
-        var html = Views.Of(new DoseRound("North"), json);
+        var html = Views.Of(new DoseRound("North"), json, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
         var plan = html.ReactivePlan<DoseRound>();
         html.On(plan, trigger => trigger.DomReady(pipeline =>
         {

@@ -136,7 +136,7 @@ public sealed class WhenAListsLambdaReadsDataTheServerWrote
 
     private static string Rendered(Func<TypedSource<List<CartDose>>, TypedSource<int>> count, Action<JsonSerializerOptions> json)
     {
-        var html = Views.Of(new MedicationRound("North", null), json);
+        var html = Views.Of(new MedicationRound("North", null), json, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
         var plan = html.ReactivePlan<MedicationRound>();
         html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get("/doses")
             .OnSuccess<List<CartDose>>((doses, pipeline) => pipeline.Element("count").Text.Set(count(doses.Body)))));

@@ -1,6 +1,7 @@
 using System;
 using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Alis.Reactive.RenderingAndDelivery;
 
@@ -15,5 +16,8 @@ public static class RequestServices
     /// <param name="requests">The requests' defaults.</param>
     /// <returns>The app's services.</returns>
     public static IServiceCollection AddReactiveRequests(this IServiceCollection services, Action<RequestDefaults> requests)
-        => throw new NotImplementedException();
+    {
+        services.TryAddSingleton(RequestDefaults.Configured(requests));
+        return services;
+    }
 }

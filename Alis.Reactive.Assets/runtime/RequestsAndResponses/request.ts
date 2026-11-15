@@ -1,20 +1,21 @@
-import { assertNever, notBuilt, type HttpSend, type PathPart, type PathStep, type SentHeader, type SentInput, type SentInputs, type TimeZone } from "../Schema/index";
+import {
+  assertNever, notBuilt, type Culture, type HttpSend, type MultipartPart, type PathPart, type PathStep, type SentBody, type SentField, type SentHeader, type SentInput,
+  type SentInputs, type TimeZone,
+} from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
-import { fieldTexts, held, scalarText } from "./wire";
+import { fieldTexts, formDataPlace, held, invariantPlace, scalarText, type TextPlace } from "./wire";
 
 export interface PreparedRequest {
-  readonly method: "GET" | "HEAD" | "OPTIONS";
+  readonly method: HttpSend["method"];
   readonly url: string;
   readonly headers: Headers;
+  readonly body: BodyInit | null;
   readonly request: object;
   readonly inputs: readonly SentInput[];
   readonly respondedJson: boolean;
 }
 
-export function prepare(send: HttpSend, zone: TimeZone): PreparedRequest {
-  const method = bodylessMethod(send.method);
-  bodyless(send.body);
-  noAntiforgery(send.antiforgery);
+export function prepare(send: HttpSend, zone: TimeZone, culture: Culture): PreparedRequest {
   noRetry(send.retry);
   noBusy(send.busy);
   for (const contract of send.contracts) {
@@ -27,68 +28,103 @@ export function prepare(send: HttpSend, zone: TimeZone): PreparedRequest {
         assertNever(contract);
     }
   }
-  const inputs = sentInputs(send.query.inputs);
   const request = {};
   const path = send.url.parts.map(part => pathText(part, zone, request)).join("");
   const query = new URLSearchParams();
-  for (const field of send.query.fields) {
-    const texts = fieldTexts(field, zone);
-    for (const text of texts) query.append(field.name, text);
-    if (texts.length > 0) write(request, field.path, snapshot(held(field.value)));
-  }
+  appendFields(query, send.query.fields, zone, invariantPlace, request);
   const ownQuery = send.url.query === "" ? "" : "?" + send.url.query;
   const appended = query.toString();
   const url = path + ownQuery + (appended === "" ? "" : (ownQuery === "" ? "?" : "&") + appended);
   const headers = new Headers();
   for (const header of send.headers) appendHeader(headers, header, zone);
-  return { method, url, headers, request, inputs, respondedJson: send.respondedJson };
+  const token = send.antiforgery;
+  if (token.kind === "token" && token.place.kind === "header") headers.set(token.place.name, token.value);
+  const field = token.kind === "token" && token.place.kind === "field" ? { name: token.place.name, value: token.value } : undefined;
+  const body = bodyOf(send.body, headers, { zone, place: formDataPlace(culture), request, token: field });
+  const inputs = [...sentInputs(send.query.inputs), ...sentInputs(send.body.kind === "none" ? noInputs : send.body.inputs)];
+  return { method: send.method, url, headers, body, request, inputs, respondedJson: send.respondedJson };
 }
 
-function bodylessMethod(method: HttpSend["method"]): PreparedRequest["method"] {
-  switch (method) {
-    case "GET":
-    case "HEAD":
-    case "OPTIONS":
-      return method;
-    case "POST":
-      throw notBuilt("POST: U18's request bodies");
-    case "PUT":
-      throw notBuilt("PUT: U18's request bodies");
-    case "DELETE":
-      throw notBuilt("DELETE: U18's request bodies");
-    default:
-      return assertNever(method);
-  }
+interface FormWriting {
+  readonly zone: TimeZone;
+  readonly place: TextPlace;
+  readonly request: object;
+  readonly token: { readonly name: string; readonly value: string } | undefined;
 }
 
-function bodyless(body: HttpSend["body"]): void {
+const noInputs: SentInputs = { container: { kind: "none" }, individual: [] };
+
+function bodyOf(body: SentBody, headers: Headers, writing: FormWriting): BodyInit | null {
   switch (body.kind) {
     case "none":
-      return;
+      return null;
     case "json":
-      throw notBuilt("a JSON request body: U18's request bodies");
-    case "urlEncoded":
-      throw notBuilt("a URL-encoded request body: U18's request bodies");
-    case "multipart":
-      throw notBuilt("a multipart request body: U18's request bodies");
-    case "text":
-      throw notBuilt("a text request body: U18's request bodies");
-    case "file":
-      throw notBuilt("a file request body: U18's request bodies");
+      refuseFiles(body.value);
+      headers.set("Content-Type", "application/json");
+      return JSON.stringify(body.value);
+    case "urlEncoded": {
+      const form = new URLSearchParams();
+      appendFields(form, body.fields, writing.zone, writing.place, writing.request);
+      if (writing.token !== undefined) form.set(writing.token.name, writing.token.value);
+      return form;
+    }
+    case "multipart": {
+      const form = new FormData();
+      for (const part of body.parts) appendPart(form, part, writing);
+      if (writing.token !== undefined) form.set(writing.token.name, writing.token.value);
+      return form;
+    }
+    case "text": {
+      const text = held(body.value);
+      if (text === undefined || text === null) throw notBuilt("a text body that reads nothing: no line states what such a request sends");
+      if (typeof text !== "string") throw new Stop("The request's text body must hold text.");
+      return text;
+    }
+    case "file": {
+      const file = held(body.value);
+      if (file === undefined || file === null) throw notBuilt("a file body that reads nothing: no line states what such a request sends");
+      if (!(file instanceof Blob)) throw new Stop("The request's file body must hold a file.");
+      return file;
+    }
     default:
-      assertNever(body);
+      return assertNever(body);
   }
 }
 
-function noAntiforgery(antiforgery: HttpSend["antiforgery"]): void {
-  switch (antiforgery.kind) {
-    case "none":
-      return;
-    case "token":
-      throw notBuilt("an antiforgery token: U18's antiforgery");
-    default:
-      assertNever(antiforgery);
+function appendFields(form: URLSearchParams | FormData, fields: readonly SentField[], zone: TimeZone, place: TextPlace, request: object): void {
+  for (const field of fields) {
+    const texts = fieldTexts(field, zone, place);
+    for (const text of texts) form.append(field.name, text);
+    if (texts.length > 0) write(request, field.path, snapshot(held(field.value)));
   }
+}
+
+function appendPart(form: FormData, part: MultipartPart, writing: FormWriting): void {
+  switch (part.kind) {
+    case "field":
+      appendFields(form, [part.field], writing.zone, writing.place, writing.request);
+      return;
+    case "file": {
+      const files = held(part.value);
+      if (files === undefined || files === null) return;
+      for (const file of files as readonly unknown[]) {
+        if (!(file instanceof File)) throw new Stop("The request's file part '" + part.name + "' must hold a file in each item.");
+        form.append(part.name, file);
+      }
+      return;
+    }
+    default:
+      assertNever(part);
+  }
+}
+
+function refuseFiles(value: unknown): void {
+  if (value instanceof Blob) throw new Stop("The request's JSON body holds a file, which is sent only in form data or as the whole body.");
+  if (Array.isArray(value)) {
+    for (const item of value as readonly unknown[]) refuseFiles(item);
+    return;
+  }
+  if (typeof value === "object" && value !== null) for (const member of Object.values(value)) refuseFiles(member);
 }
 
 function noRetry(retry: HttpSend["retry"]): void {
@@ -148,7 +184,7 @@ function pathText(part: PathPart, zone: TimeZone, request: object): string {
       return part.text;
     case "member": {
       const value = held(part.value);
-      const text = value === undefined || value === null ? "" : scalarText(value, part.form, part.name, zone);
+      const text = value === undefined || value === null ? "" : scalarText(value, part.form, part.name, zone, invariantPlace);
       if (text === "" || text.includes("/")) throw new Stop("The request's path member '" + part.name + "' must hold nonempty text with no '/'.");
       write(request, [part.name], snapshot(value));
       try {
@@ -165,7 +201,7 @@ function pathText(part: PathPart, zone: TimeZone, request: object): string {
 function appendHeader(headers: Headers, header: SentHeader, zone: TimeZone): void {
   const value = held(header.value);
   if (value === undefined || value === null) return;
-  const text = scalarText(value, header.form, header.name, zone);
+  const text = scalarText(value, header.form, header.name, zone, invariantPlace);
   for (const character of text) {
     const code = character.charCodeAt(0);
     if (code !== 9 && (code < 32 || code > 126)) {

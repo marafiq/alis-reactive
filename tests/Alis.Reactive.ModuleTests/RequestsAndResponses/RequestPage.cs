@@ -13,8 +13,15 @@ namespace Alis.Reactive.ModuleTests.RequestsAndResponses;
 internal static class RequestPage
 {
     internal static string Rendered(Action<Pipeline<RequestDesk>> write, Action<JsonSerializerOptions>? json = null, Action<IServiceCollection>? services = null)
+        => RenderedIn(app =>
+        {
+            services?.Invoke(app);
+            app.AddReactiveRequests(requests => requests.NoAntiforgery());
+        }, write, json);
+
+    internal static string RenderedIn(Action<IServiceCollection> app, Action<Pipeline<RequestDesk>> write, Action<JsonSerializerOptions>? json = null)
     {
-        var html = Views.Of(new RequestDesk(), json ?? (_ => { }), services ?? (_ => { }));
+        var html = Views.Of(new RequestDesk(), json ?? (_ => { }), app);
         var plan = html.ReactivePlan<RequestDesk>();
         html.On(plan, trigger => trigger.DomReady(write));
         var rendered = Views.TextOf(html.RenderPlan(plan));

@@ -29,7 +29,8 @@ public static class PlanHtml
             HtmlHelper.GenerateIdFromName,
             () => ViewPaths.Of(html),
             type => DependencyResolver.Current.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true,
-            () => new ResolverServices());
+            () => new ResolverServices(),
+            () => RequestAntiforgery.Of(html.ViewContext.HttpContext));
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>

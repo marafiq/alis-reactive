@@ -1,4 +1,5 @@
 using Alis.Reactive.Conformance.World;
+using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Alis.Reactive.Conformance.App.World;
@@ -6,7 +7,7 @@ namespace Alis.Reactive.Conformance.App.World;
 public sealed class ReadyController : Controller
 {
     [HttpGet(WorldEndpoints.Ready)]
-    public ViewResult Ready() => View("/World/Ready.cshtml", new ReadyPage("North"));
+    public ViewResult Ready() => View("/World/Ready.cshtml", new ReadyPage("North", HttpContext.RequestServices.GetService<RequestDefaults>() is not null));
 
     [HttpGet(ReadyEndpoints.Doses)]
     public IActionResult Doses() => Json(new List<ReadyDose>
@@ -17,7 +18,7 @@ public sealed class ReadyController : Controller
     });
 }
 
-public sealed record ReadyPage(string Ward);
+public sealed record ReadyPage(string Ward, bool SendsRequests);
 
 public sealed record ReadyDose(string Ward, bool Given);
 

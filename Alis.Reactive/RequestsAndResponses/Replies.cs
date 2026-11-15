@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Schema;
@@ -9,8 +10,10 @@ namespace Alis.Reactive.RequestsAndResponses;
 /// The reply a request's route reads: its status and its headers, each a source in the route and in the blocks inside it.
 /// </summary>
 /// <typeparam name="TRequest">The request's type, whose members the reply reads back as they were sent.</typeparam>
-public class Response<TRequest> : JsObject
+public class Response<TRequest> : JsObject, ISentRequestReply
 {
+    private RequestPartsWriter? _sentBy;
+
     internal Response()
     {
     }
@@ -23,7 +26,9 @@ public class Response<TRequest> : JsObject
 
     /// <summary>Gets the request's members as it sent them; <c>Read</c> reads one.</summary>
     /// <remarks>A read of an input cannot give what was sent once the user edits the input during the send.</remarks>
-    public ReadOnly<TRequest> Request => new SentRequestValue<TRequest>(this);
+    public ReadOnly<TRequest> Request => new SentRequestValue<TRequest>(this, _sentBy ?? throw new InvalidOperationException("A reply is read only inside the route its request hands it to."));
+
+    void ISentRequestReply.SentBy(RequestPartsWriter parts) => _sentBy = parts;
 }
 
 /// <summary>

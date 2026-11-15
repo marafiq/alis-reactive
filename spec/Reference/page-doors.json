@@ -433,8 +433,7 @@
   },
   "M15.F1 X2.3 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/GivenName.cshtml",
@@ -1198,8 +1197,7 @@
   },
   "M21.F39 M21.X306 2": {
     "modules": [
-      "FusionComponents",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/RecordContacts/RotaWeekShifts.cshtml",
@@ -2372,9 +2370,7 @@
     ]
   },
   "M6.F1 X9.8 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/BedCount.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2428,9 +2424,7 @@
     ]
   },
   "M6.F2 X10.13 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/SupplyRound.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2477,8 +2471,7 @@
   },
   "M7.F1 X14.10 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/Circle.cshtml",
@@ -2488,8 +2481,7 @@
   },
   "M7.F1 X14.15 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/InputsAndIds/DoseOrderCountOfItems.cshtml",
@@ -2499,8 +2491,7 @@
   },
   "M7.F1 X14.16 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/InputsAndIds/FamilyPrefixLeftAsItsPlanStarted.cshtml",
@@ -2511,8 +2502,7 @@
   },
   "M7.F1 X14.4 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/InputsAndIds/MoveInPrefixAfterItsPlan.cshtml",
@@ -2554,8 +2544,7 @@
   },
   "M7.F2 X14.5 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/InputsAndIds/DepartureRoomOnce.cshtml",
@@ -3268,9 +3257,7 @@
     ]
   },
   "cell http.beside.header": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpBesideHeader.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3294,18 +3281,14 @@
     ]
   },
   "cell http.beside.route": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpBesideRoute.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell http.beside.static": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpBesideStatic.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3321,18 +3304,14 @@
     ]
   },
   "cell http.delete": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpDelete.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell http.finally": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpFinally.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3365,36 +3344,28 @@
     ]
   },
   "cell http.post": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpPost.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell http.put": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpPut.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell http.response.error": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpResponseError.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell http.response.success": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpResponseSuccess.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3610,9 +3581,7 @@
     ]
   },
   "cell source.Header": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceHeader.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3640,9 +3609,7 @@
     ]
   },
   "cell source.RequestMember": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceRequestMember.cshtml",
       "/Shared/_Layout.cshtml"

@@ -18,6 +18,7 @@ public sealed class Program
         var builder = WebApplication.CreateBuilder(args);
         var host = builder.Configuration[Host] ?? throw new InvalidOperationException("The conformance app starts under a host spec/Reference/app.json defines: --host <name>.");
         builder.Services.AddControllersWithViews().AddJsonOptions(json => AppHost.SetJsonOptions(host, json.JsonSerializerOptions));
+        AppHost.AddRequests(host, builder.Services);
         builder.Services.AddDistributedMemoryCache();
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();
 

@@ -23,7 +23,7 @@ const routes = (kind: Routes["success"]["kind"] = "json"): Routes => ({
 });
 const pageUrl = "https://care.example/Ward";
 const signal = (): AbortSignal => new AbortController().signal;
-const prepared = (send: Send = get) => prepare(send, { kind: "clock" });
+const prepared = (send: Send = get) => prepare(send, { kind: "clock" }, { name: "en-US", collation: "en-US", decimal: ".", group: ",", integer: { group: false, exponent: false }, fraction: { group: true, exponent: true } });
 const fetches = (response: Response) => {
   const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(response);
   vi.stubGlobal("fetch", fetch);
@@ -41,7 +41,7 @@ describe("when one Attempt reaches fetch, D10 chooses and decodes its answer", (
     const abort = signal();
     const reply = await attempt(prepared({ ...get, method }), routes("none"), abort, pageUrl);
     expect(fetch.mock.calls.map(([url, init]) => [url, init?.method, init?.redirect, init?.body])).toStrictEqual([
-      ["/Residents", method, "follow", undefined],
+      ["/Residents", method, "follow", null],
     ]);
     expect(fetch.mock.calls[0]?.[1]?.signal).toBe(abort);
     expect(fetch.mock.calls[0]?.[1]?.headers).toStrictEqual(new Headers({ Accept: "application/json" }));

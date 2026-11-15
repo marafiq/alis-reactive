@@ -25,6 +25,8 @@ public sealed class LiveObjects<TItem>
         _bound = bound;
     }
 
+    internal Schema.Expression Target => _bound.Target;
+
     private HeldForm Form => HeldForm.Live(_bound.Writer.Content.Json, _bound.Writer.Content.RendersUnder);
 
     /// <summary>Reaches the item at a position.</summary>

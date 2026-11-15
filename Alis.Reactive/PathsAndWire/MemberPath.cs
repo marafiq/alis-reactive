@@ -22,6 +22,8 @@ internal sealed partial class MemberPath
 
     internal partial IReadOnlyList<PathStep> BodyPath { get; }
 
+    internal partial IReadOnlyList<string> BodyNames { get; }
+
     internal IReadOnlyList<PathStep> DataPath => [.. _links.Select(link => new MemberStep(link.Written.Name))];
 
     internal IReadOnlyList<string> WireNames => [.. _links.Select(link => link.Written.Name)];

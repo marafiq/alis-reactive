@@ -7,6 +7,7 @@ namespace Alis.Reactive.RequestsAndResponses;
 internal sealed class RequestUrlParts
 {
     private readonly List<Part> _parts = [];
+    private readonly string _origin = "";
 
     internal RequestUrlParts(string url)
     {
@@ -58,12 +59,16 @@ internal sealed class RequestUrlParts
             var authorityEnds = path.IndexOf('/', path.IndexOf("://", StringComparison.Ordinal) + 3);
             var firstPlaceholder = path.IndexOf('{');
             if (firstPlaceholder >= 0 && (authorityEnds < 0 || firstPlaceholder < authorityEnds)) throw Invalid();
+            _origin = absolute.GetLeftPart(UriPartial.Authority);
         }
     }
 
     internal string Url { get; }
     internal string Query { get; }
     internal IReadOnlyList<Part> Parts => _parts;
+
+    internal bool OnOrigin(string pageOrigin)
+        => _origin.Length == 0 || (Uri.TryCreate(pageOrigin, UriKind.Absolute, out var page) && string.Equals(page.GetLeftPart(UriPartial.Authority), _origin, StringComparison.OrdinalIgnoreCase));
 
     internal bool Has(string name)
     {

@@ -39,6 +39,8 @@ internal sealed class HeldForm
 
     internal Operator KeyOfADateTime => _fromApp ? Operator.WallKey : Operator.DateKey;
 
+    internal bool IsTheAppsOwn => _fromApp && Own is null;
+
     internal JsonSerializerOptions DataOptions => Own is { } own ? own.Member.OwnForm() : _baseOptions;
 
     internal bool HoldsAListItsConverterWrites
@@ -55,7 +57,7 @@ internal sealed class HeldForm
     internal bool WritesByAConverterOfTheApps(Type type)
     {
         var scalar = Nullable.GetUnderlyingType(type) ?? type;
-        return _fromApp && Own is null && WritesAsAScalar(scalar) &&
+        return IsTheAppsOwn && WritesAsAScalar(scalar) &&
             !ReferenceEquals(DataOptions.GetTypeInfo(scalar).Converter, PlanJson.Options.GetTypeInfo(scalar).Converter);
     }
 

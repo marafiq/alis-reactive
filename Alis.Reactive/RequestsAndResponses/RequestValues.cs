@@ -31,20 +31,40 @@ internal static class RequestValues
         return (Held(LiteralValue(value, type, writer, member)), LiteralForm(type));
     }
 
-    internal static (Expression Value, WireForm Form) Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, string member, Action<Statement> capture)
+    internal static (Expression Value, WireForm Form, RefExpression Captured) Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, string member, Action<Statement> capture)
     {
         var form = Sources.FormOf(source);
         var wire = SourceForm(typeof(TValue), form, writer, member);
+        var captured = Captured(ReadsDate(wire) ? form.IntoLive<TValue>(Sources.Of(source)) : Sources.Of(source), writer, capture);
+        return (Read(captured), wire, captured);
+    }
+
+    internal static RefExpression Captured(Expression value, BlockWriter writer, Action<Statement> capture)
+    {
         var captured = writer.NextBinding("requestValue");
-        var value = ReadsDate(wire) ? form.IntoLive<TValue>(Sources.Of(source)) : Sources.Of(source);
         capture(new LetStatement(captured.Name, false, LetBinds.Line, value));
+        return captured;
+    }
+
+    internal static OpExpression Read(Expression captured) => Read(captured, captured);
+
+    internal static OpExpression ReadUnlessNull(Expression captured, Expression held)
+        => new(Operator.Cond,
+        [
+            new OpExpression(Operator.Neq, [captured, ContractRecord<ValueRead>.Literal<string?>(null)]),
+            Held(held),
+            new ContractRecord<NothingValueRead>().Set(read => read.Kind, "nothing").Written,
+        ]);
+
+    internal static OpExpression Read(Expression captured, Expression held)
+    {
         var nil = ContractRecord<ValueRead>.Literal<string?>(null);
-        return (new OpExpression(Operator.Cond,
+        return new OpExpression(Operator.Cond,
         [
             new OpExpression(Operator.Or, [new OpExpression(Operator.Eq, [captured, nil]), new OpExpression(Operator.Neq, [captured, nil])]),
-            Held(captured),
+            Held(held),
             new ContractRecord<NothingValueRead>().Set(read => read.Kind, "nothing").Written,
-        ]), wire);
+        ]);
     }
 
     internal static RecordExpression Held(Expression value)
@@ -54,7 +74,7 @@ internal static class RequestValues
 
     private static ItemWhenNothing ItemAbsence(Type type) => Absence(type) == WhenNothing.Empty ? ItemWhenNothing.Empty : ItemWhenNothing.Stop;
 
-    private static bool IsEnum(Type type) => new JsonStringEnumConverter().CanConvert(Nullable.GetUnderlyingType(type) ?? type);
+    internal static bool IsEnum(Type type) => new JsonStringEnumConverter().CanConvert(Nullable.GetUnderlyingType(type) ?? type);
 
     private static ScalarWireForm LiteralForm(Type type)
     {

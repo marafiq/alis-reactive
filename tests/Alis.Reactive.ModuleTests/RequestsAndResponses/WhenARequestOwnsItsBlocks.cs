@@ -129,7 +129,7 @@ public sealed class WhenARequestOwnsItsBlocks
 
     private static string WithPayload(Action<RequestRaised, Pipeline<RequestDesk>> write)
     {
-        var html = Views.Of(new RequestDesk());
+        var html = Views.Of(new RequestDesk(), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
         var plan = html.ReactivePlan<RequestDesk>();
         plan.Render<RequestPanel>("request", HtmlString.Empty).Reactive(panel => panel.Raised, write);
         var rendered = Views.TextOf(html.RenderPlan(plan));

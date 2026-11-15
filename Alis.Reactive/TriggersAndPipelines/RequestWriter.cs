@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Execution;
+using Alis.Reactive.OwnershipAndState;
 using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.Schema;
 
@@ -40,9 +41,16 @@ internal sealed class RequestWriter<TModel>
     }
 
     internal static RequestWriter<TModel> Open<TRequest>(BlockWriter writer, string url, RequestMethod method, Action<QueryParts<TRequest>> parts)
+        => Open(writer, url, method, request => parts(new QueryParts<TRequest>(request, 0)));
+
+    internal static RequestWriter<TModel> Open<TRequest>(BlockWriter writer, string url, RequestMethod method, Action<BodyParts<TRequest>> parts)
+        => Open(writer, url, method, request => parts(new BodyParts<TRequest>(request, 0)));
+
+    private static RequestWriter<TModel> Open(BlockWriter writer, string url, RequestMethod method, Action<RequestPartsWriter> parts)
     {
+        if (writer.Content.Antiforgery.Choice == AntiforgeryChoice.NoRequestsCall) throw new InvalidOperationException(RequestHost.NoRequestsCall(method.Text + " " + url));
         var request = new RequestPartsWriter(writer, url);
-        parts(new QueryParts<TRequest>(request, 0));
+        parts(request);
         request.Complete();
         return new RequestWriter<TModel>(writer, request, method);
     }
@@ -102,6 +110,7 @@ internal sealed class RequestWriter<TModel>
     private IReadOnlyList<Statement> Route<TReply>(TReply reply, Action<TReply, Pipeline<TModel>> body) where TReply : JsObject
     {
         reply.Reach(new Reached(_reply, _writer));
+        if (reply is ISentRequestReply sent) sent.SentBy(_parts);
         return _writer.Branch(true, () => body(reply, new Pipeline<TModel>(_writer))).Block;
     }
 

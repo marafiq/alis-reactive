@@ -148,38 +148,41 @@ public sealed class Pipeline<TModel>
     /// <summary>Sends a POST request with no member.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI.</param>
     /// <returns>The request, which takes its routes.</returns>
-    public PostRequest<TModel, NoModel> Post(string url) => throw new NotImplementedException();
+    public PostRequest<TModel, NoModel> Post(string url) => Post<NoModel>(url, request => { });
 
     /// <summary>Sends a POST request whose members fill the URL's placeholders, its query and its body.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
     /// <returns>The request, which takes its routes.</returns>
-    public PostRequest<TModel, TRequest> Post<TRequest>(string url, Action<BodyParts<TRequest>> request) => throw new NotImplementedException();
+    public PostRequest<TModel, TRequest> Post<TRequest>(string url, Action<BodyParts<TRequest>> request)
+        => new(RequestWriter<TModel>.Open(_writer, url, RequestMethod.Post, request), 0);
 
     /// <summary>Sends a PUT request with no member.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI.</param>
     /// <returns>The request, which takes its routes.</returns>
-    public PutRequest<TModel, NoModel> Put(string url) => throw new NotImplementedException();
+    public PutRequest<TModel, NoModel> Put(string url) => Put<NoModel>(url, request => { });
 
     /// <summary>Sends a PUT request whose members fill the URL's placeholders, its query and its body.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
     /// <returns>The request, which takes its routes.</returns>
-    public PutRequest<TModel, TRequest> Put<TRequest>(string url, Action<BodyParts<TRequest>> request) => throw new NotImplementedException();
+    public PutRequest<TModel, TRequest> Put<TRequest>(string url, Action<BodyParts<TRequest>> request)
+        => new(RequestWriter<TModel>.Open(_writer, url, RequestMethod.Put, request), 0);
 
     /// <summary>Sends a DELETE request with no member.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI.</param>
     /// <returns>The request, which takes its routes.</returns>
-    public DeleteRequest<TModel, NoModel> Delete(string url) => throw new NotImplementedException();
+    public DeleteRequest<TModel, NoModel> Delete(string url) => Delete<NoModel>(url, request => { });
 
     /// <summary>Sends a DELETE request whose members fill the URL's placeholders, its query and its body.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
     /// <returns>The request, which takes its routes.</returns>
-    public DeleteRequest<TModel, TRequest> Delete<TRequest>(string url, Action<BodyParts<TRequest>> request) => throw new NotImplementedException();
+    public DeleteRequest<TModel, TRequest> Delete<TRequest>(string url, Action<BodyParts<TRequest>> request)
+        => new(RequestWriter<TModel>.Open(_writer, url, RequestMethod.Delete, request), 0);
 
     /// <summary>Builds an object from sources when the step runs, member by member.</summary>
     /// <remarks>The object is a source wherever one of its class goes: an app event's payload, an argument, a property.</remarks>

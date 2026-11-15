@@ -1,5 +1,16 @@
-import { assertNever, notBuilt, type FlagValue, type ScalarWireForm, type SentField, type TimeZone, type ValueRead } from "../Schema/index";
+import { assertNever, notBuilt, type Culture, type FlagValue, type ScalarWireForm, type SentField, type TimeZone, type ValueRead } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
+
+export interface TextPlace {
+  readonly decimal: string;
+  readonly dateWithTime: boolean;
+}
+
+export const invariantPlace: TextPlace = { decimal: ".", dateWithTime: false };
+
+export function formDataPlace(culture: Culture): TextPlace {
+  return { decimal: culture.decimal, dateWithTime: true };
+}
 
 export function held(read: ValueRead): unknown {
   switch (read.kind) {
@@ -12,7 +23,7 @@ export function held(read: ValueRead): unknown {
   }
 }
 
-export function fieldTexts(field: SentField, zone: TimeZone): readonly string[] {
+export function fieldTexts(field: SentField, zone: TimeZone, place: TextPlace): readonly string[] {
   const value = held(field.value);
   if (value === undefined || value === null) {
     switch (field.whenNothing) {
@@ -39,7 +50,7 @@ export function fieldTexts(field: SentField, zone: TimeZone): readonly string[] 
               return assertNever(form.itemWhenNothing);
           }
         }
-        return scalarText(item, form.item, field.name, zone);
+        return scalarText(item, form.item, field.name, zone, place);
       });
     case "text":
     case "number":
@@ -49,28 +60,30 @@ export function fieldTexts(field: SentField, zone: TimeZone): readonly string[] 
     case "instant":
     case "enum":
     case "flags":
-      return [scalarText(value, form, field.name, zone)];
+      return [scalarText(value, form, field.name, zone, place)];
     default:
       return assertNever(form);
   }
 }
 
-export function scalarText(value: unknown, form: ScalarWireForm, name: string, zone: TimeZone): string {
+export function scalarText(value: unknown, form: ScalarWireForm, name: string, zone: TimeZone, place: TextPlace): string {
   switch (form.kind) {
     case "text":
       if (typeof value !== "string") throw invalid(name, "text");
       return value;
     case "number":
       if (typeof value !== "number" || !Number.isFinite(value)) throw invalid(name, "a finite number");
-      return String(value);
+      return String(value).split(".").join(place.decimal);
     case "boolean":
       if (typeof value !== "boolean") throw invalid(name, "a boolean");
       return value ? "true" : "false";
     case "written":
       if (typeof value !== "string" && (typeof value !== "number" || !Number.isFinite(value))) throw invalid(name, "written text or a finite number");
       return String(value);
-    case "date":
-      return dateText(dateValue(value, name));
+    case "date": {
+      const date = dateValue(value, name);
+      return place.dateWithTime ? dayText(date) + timeText(date) : dateText(date);
+    }
     case "instant":
       return instantText(dateValue(value, name), zone);
     case "enum": {

@@ -55,9 +55,25 @@ internal sealed class ReplyBody<TValue> : ReadOnly<TValue>
         : ContractRecord<FileResponseBody>.Name(body => body.Value);
 }
 
-internal sealed class SentRequestValue<TRequest>(JsObject reply)
+internal interface ISentRequestReply
+{
+    void SentBy(RequestPartsWriter parts);
+}
+
+internal sealed class SentRequestValue<TRequest>(JsObject reply, RequestPartsWriter parts)
     : ReadOnly<TRequest>(reply, ContractRecord<HttpResponse>.Name(response => response.Request), false)
 {
+    internal override Schema.Expression Expression
+        => parts.SendsAnyInJson ? throw JsonReadBack("The request, read whole, sends members") : base.Expression;
+
     internal override TypedSource<TResult> ReadPast<TResult>(LambdaExpression path)
-        => new Computed<TResult>(new GetExpression(new RequestMember(path).Path, PathMembers.Optional, Expression), Form);
+    {
+        var member = new RequestMember(path);
+        if (parts.SendsInJson(member.Name)) throw JsonReadBack($"'{path}' is sent");
+        return new Computed<TResult>(new GetExpression(member.Path, PathMembers.Optional, base.Expression), Form);
+    }
+
+    private static NotImplementedException JsonReadBack(string read)
+        => new($"{read} in the request's JSON body, and a reply reads a sent member back by its C# path, which the plan's JSON body does not carry (schema.md, HttpSend's json body: its value and inputs); " +
+            "read the value from its source, or send the member in the path, query or form data.");
 }

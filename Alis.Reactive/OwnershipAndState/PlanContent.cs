@@ -27,9 +27,11 @@ internal sealed class PlanContent
     private readonly SortedDictionary<string, Container> _containers = new(StringComparer.Ordinal);
     private readonly Func<string, (string Prefix, string Name, string Id)> _nameInput;
     private readonly Func<IServiceProvider> _services;
+    private readonly Lazy<PageAntiforgery> _antiforgery;
     private bool _rendered;
 
-    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json, Func<string, (string Prefix, string Name, string Id)> nameInput, Func<Type, bool> namesFlags, Func<IServiceProvider> services)
+    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json, Func<string, (string Prefix, string Name, string Id)> nameInput, Func<Type, bool> namesFlags,
+        Func<IServiceProvider> services, Func<PageAntiforgery> antiforgery)
     {
         _planId = planId;
         _culture = ViewCulture.Of(rendersUnder);
@@ -39,11 +41,14 @@ internal sealed class PlanContent
         _nameInput = nameInput;
         _namesFlags = namesFlags;
         _services = services;
+        _antiforgery = new Lazy<PageAntiforgery>(antiforgery);
     }
 
     internal IServiceProvider Services => _services();
 
     internal AppJson Json { get; }
+
+    internal PageAntiforgery Antiforgery => _antiforgery.Value;
 
     internal bool NamesFlags(Type type) => _namesFlags(type);
 

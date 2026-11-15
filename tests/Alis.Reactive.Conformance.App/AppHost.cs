@@ -2,6 +2,8 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Conformance.World;
+using Alis.Reactive.RenderingAndDelivery;
+using Alis.Reactive.TriggersAndPipelines;
 
 namespace Alis.Reactive.Conformance.App;
 
@@ -12,6 +14,8 @@ internal static class AppHost
         switch (host)
         {
             case HostNames.Net10:
+            case HostNames.NoRequests:
+            case HostNames.NoAntiforgeryChoice:
                 WriteEnumNames(json);
                 return;
             case HostNames.NumbersAsText:
@@ -38,7 +42,22 @@ internal static class AppHost
                 json.RespectRequiredConstructorParameters = true;
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers} and {HostNames.JsonContract}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests} and {HostNames.NoAntiforgeryChoice}.");
+        }
+    }
+
+    internal static void AddRequests(string host, IServiceCollection services)
+    {
+        switch (host)
+        {
+            case HostNames.NoRequests:
+                return;
+            case HostNames.NoAntiforgeryChoice:
+                services.AddReactiveRequests(requests => { });
+                return;
+            default:
+                services.AddReactiveRequests(requests => requests.Antiforgery(AntiforgeryIn.Header));
+                return;
         }
     }
 

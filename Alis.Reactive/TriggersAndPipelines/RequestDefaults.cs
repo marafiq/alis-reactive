@@ -1,4 +1,5 @@
 using System;
+using Alis.Reactive.OwnershipAndState;
 using Alis.Reactive.RequestsAndResponses;
 
 namespace Alis.Reactive.TriggersAndPipelines;
@@ -32,14 +33,24 @@ public sealed class RequestDefaults
     {
     }
 
+    internal AntiforgeryChoice AntiforgeryChoice { get; private set; } = AntiforgeryChoice.NotChosen;
+
+    internal static RequestDefaults Configured(Action<RequestDefaults> requests)
+    {
+        var defaults = new RequestDefaults();
+        requests(defaults);
+        return defaults;
+    }
+
     /// <summary>Sends the host's antiforgery token with every POST, PUT and DELETE to the page's origin.</summary>
     /// <param name="place">Where the token is sent: the header or the form field.</param>
     /// <returns>The defaults.</returns>
-    public RequestDefaults Antiforgery(AntiforgeryIn place) => throw new NotImplementedException();
+    public RequestDefaults Antiforgery(AntiforgeryIn place)
+        => Chosen((place ?? throw new ArgumentNullException(nameof(place))) == AntiforgeryIn.Header ? AntiforgeryChoice.Header : AntiforgeryChoice.Field);
 
     /// <summary>Sends no antiforgery token: the app's endpoints do not ask for one.</summary>
     /// <returns>The defaults.</returns>
-    public RequestDefaults NoAntiforgery() => throw new NotImplementedException();
+    public RequestDefaults NoAntiforgery() => Chosen(AntiforgeryChoice.NoToken);
 
     /// <summary>Sends a header with a fixed text on every request; a request's own header of the same name replaces it.</summary>
     /// <param name="name">The header's name.</param>
@@ -97,4 +108,12 @@ public sealed class RequestDefaults
     /// <param name="firstWait">The wait before the first retry; each later wait is longer.</param>
     /// <returns>The defaults.</returns>
     public RequestDefaults Retry(int attempts, TimeSpan firstWait) => throw new NotImplementedException();
+
+    private RequestDefaults Chosen(AntiforgeryChoice choice)
+    {
+        if (AntiforgeryChoice != AntiforgeryChoice.NotChosen)
+            throw new InvalidOperationException("AddReactiveRequests makes one antiforgery choice; call Antiforgery(AntiforgeryIn.Header), Antiforgery(AntiforgeryIn.FormField) or NoAntiforgery() once.");
+        AntiforgeryChoice = choice;
+        return this;
+    }
 }

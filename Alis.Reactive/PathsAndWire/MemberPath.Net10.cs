@@ -8,5 +8,7 @@ namespace Alis.Reactive.PathsAndWire;
 internal sealed partial class MemberPath
 {
     internal partial IReadOnlyList<PathStep> BodyPath => [.. _links.Select(link => new MemberStep(link.Written.Name))];
+
+    internal partial IReadOnlyList<string> BodyNames => [.. _links.Select(link => link.Written.Name)];
 }
 #endif
