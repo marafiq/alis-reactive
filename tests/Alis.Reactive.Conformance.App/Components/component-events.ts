@@ -3,10 +3,11 @@ export interface Change {
     readonly previousValue: string | null;
     readonly isInteracted: boolean;
 }
+export type ComponentListener = EventListenerOrEventListenerObject | ((...args: never[]) => void);
 export class ComponentEvents extends EventTarget {
     private readonly arguments = new WeakMap<Event, unknown[]>();
-    private readonly listeners = new Map<EventListenerOrEventListenerObject, Map<string, EventListener>>();
-    override addEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void {
+    private readonly listeners = new Map<ComponentListener, Map<string, EventListener>>();
+    override addEventListener(type: string, callback: ComponentListener | null, options?: boolean | AddEventListenerOptions): void {
         if (callback === null)
             return;
         const capture = typeof options === "boolean" ? options : options?.capture === true;
@@ -29,7 +30,7 @@ export class ComponentEvents extends EventTarget {
         }
         super.addEventListener(type, listener, options);
     }
-    override removeEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: boolean | EventListenerOptions): void {
+    override removeEventListener(type: string, callback: ComponentListener | null, options?: boolean | EventListenerOptions): void {
         if (callback === null)
             return;
         const capture = typeof options === "boolean" ? options : options?.capture === true;

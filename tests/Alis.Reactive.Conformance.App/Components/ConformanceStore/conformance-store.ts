@@ -2,9 +2,12 @@ import { ComponentView, mountMarked } from "../component-view";
 interface StoreElement extends HTMLElement {
     conformanceStore?: ConformanceStore;
 }
+interface Posted {
+    readonly message: string;
+}
 interface Subscription {
     readonly event: string;
-    readonly listener: (...args: unknown[]) => void;
+    readonly listener: (posted: Posted) => void;
 }
 export class ConformanceStore {
     private readonly element: StoreElement;
@@ -17,7 +20,7 @@ export class ConformanceStore {
         this.view.button("Post an update", () => { this.post("posted", { message: "Bed 4 needs water" }); });
         element.conformanceStore = this;
     }
-    subscribe(event: string, listener: (...args: unknown[]) => void): () => void {
+    subscribe(event: "posted", listener: (posted: Posted) => void): () => void {
         const subscription: Subscription = { event, listener };
         this.subscriptions.push(subscription);
         this.count();

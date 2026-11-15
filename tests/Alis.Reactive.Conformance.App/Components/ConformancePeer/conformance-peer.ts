@@ -1,4 +1,5 @@
 import { ComponentEvents } from "../component-events";
+import type { Change, ComponentListener } from "../component-events";
 import { ComponentView } from "../component-view";
 interface PeerElement extends HTMLElement {
     conformancePeer?: ConformancePeer;
@@ -8,6 +9,11 @@ export class ConformancePeer extends ComponentEvents {
     private readonly view: ComponentView;
     private heldRatio = 0;
     private heldText = "";
+    override addEventListener(type: "change", callback: ((value: Change) => void) | null, options?: boolean | AddEventListenerOptions): void;
+    override addEventListener(type: string, callback: ComponentListener | null, options?: boolean | AddEventListenerOptions): void;
+    override addEventListener(type: string, callback: ComponentListener | null, options?: boolean | AddEventListenerOptions): void {
+        super.addEventListener(type, callback, options);
+    }
     constructor(element: PeerElement) {
         super();
         this.element = element;

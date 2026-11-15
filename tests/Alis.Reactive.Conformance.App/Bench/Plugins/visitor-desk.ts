@@ -1,4 +1,10 @@
 class VisitorBook extends EventTarget {
+  override addEventListener(type: "signed", callback: ((event: Event) => void) | null, options?: boolean | AddEventListenerOptions): void;
+  override addEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void;
+  override addEventListener(type: string, callback: EventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void {
+    super.addEventListener(type, callback, options);
+  }
+
   readonly visits = 3;
 }
 

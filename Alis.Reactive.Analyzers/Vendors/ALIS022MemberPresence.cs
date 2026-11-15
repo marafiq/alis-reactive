@@ -36,6 +36,7 @@ public sealed class ALIS022MemberPresence : DiagnosticAnalyzer
 
     private static void Read(OperationAnalysisContext context, RootMemberDoor door)
     {
+        if (door.IsEvent) return;
         if (door.Vendor is not { } member) return;
         var optional = door.Flag("optional");
         if (optional.Value is not { } declared || declared == member.Optional) return;

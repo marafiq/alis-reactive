@@ -30,9 +30,16 @@ internal sealed class VendorContract
         return true;
     }
 
+    internal bool DeclaresEvent(string module, string type, string name, CancellationToken cancellationToken)
+    {
+        if (Count(module, type) != 1) return false;
+        var root = _roots[(module, type)];
+        return root.Table.DeclaresEvent(root.Id, name, cancellationToken);
+    }
+
     internal sealed class Member
     {
-        internal Member(string kind, bool callable, bool hasSignatures, bool returnsPromise, bool optional, bool readsNull, bool writesNull, bool resultReadsNull, bool? callbackTakesNull, (string Module, string Location)? documentedNull)
+        internal Member(string kind, bool callable, bool hasSignatures, bool returnsPromise, bool optional, bool readsNull, bool writesNull, bool resultReadsNull, bool? callbackTakesNull, (string Module, string Location)? documentedNull, ImmutableArray<(string Kind, string Value)> events, bool returnsNonFunction, string? eventAnswer)
         {
             Kind = kind;
             Callable = callable;
@@ -44,8 +51,14 @@ internal sealed class VendorContract
             ResultReadsNull = resultReadsNull;
             CallbackTakesNull = callbackTakesNull;
             DocumentedNull = documentedNull;
+            Events = events;
+            ReturnsNonFunction = returnsNonFunction;
+            EventAnswer = eventAnswer;
         }
 
+        internal ImmutableArray<(string Kind, string Value)> Events { get; }
+        internal bool ReturnsNonFunction { get; }
+        internal string? EventAnswer { get; }
         internal string Kind { get; }
         internal bool Callable { get; }
         internal bool HasSignatures { get; }
@@ -62,11 +75,41 @@ internal sealed class VendorContract
     {
         private readonly ImmutableDictionary<(string Type, string Name), Member> _members;
         private readonly ImmutableDictionary<string, ImmutableArray<string>> _bases;
+        private readonly ImmutableDictionary<string, ImmutableArray<(string Name, Member Member)>> _byType;
 
         internal Table(ImmutableDictionary<(string Type, string Name), Member> members, ImmutableDictionary<string, ImmutableArray<string>> bases)
         {
             _members = members;
             _bases = bases;
+            _byType = members.GroupBy(pair => pair.Key.Type).ToImmutableDictionary(group => group.Key, group => group.Select(pair => (pair.Key.Name, pair.Value)).ToImmutableArray());
+        }
+
+        internal bool DeclaresEvent(string type, string name, CancellationToken cancellationToken)
+        {
+            if (Find(type, name, new HashSet<string>(StringComparer.Ordinal), cancellationToken) is { Kind: "property" or "readonly", Callable: true }) return true;
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var member in Members(type, new HashSet<string>(StringComparer.Ordinal), cancellationToken))
+            {
+                if (!names.Add(member.Name) || member.Member.Kind != "method") continue;
+                foreach (var selector in member.Member.Events)
+                {
+                    if (selector.Kind == "name" && selector.Value == name) return true;
+                    if (selector.Kind == "keys" && Find(selector.Value, name, new HashSet<string>(StringComparer.Ordinal), cancellationToken) is not null) return true;
+                }
+            }
+
+            return false;
+        }
+
+        private IEnumerable<(string Name, Member Member)> Members(string type, HashSet<string> visited, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!visited.Add(type)) yield break;
+            if (_byType.TryGetValue(type, out var members))
+                foreach (var member in members) yield return member;
+            if (!_bases.TryGetValue(type, out var bases)) yield break;
+            foreach (var parent in bases)
+                foreach (var member in Members(parent, visited, cancellationToken)) yield return member;
         }
 
         internal Member? Find(string type, string name, HashSet<string> visited, CancellationToken cancellationToken)
@@ -107,7 +150,10 @@ internal sealed class VendorContract
             var declarations = new List<(string Module, string Name, string Id)>();
             var members = new List<string[]>();
             var bases = new Dictionary<string, SortedDictionary<int, string>>(StringComparer.Ordinal);
-            var signatures = new Dictionary<string, List<(string Id, string PromiseMode, bool ReadsNull)>>(StringComparer.Ordinal);
+            var signatures = new Dictionary<string, List<(string Id, string PromiseMode, bool ReadsNull, bool TakesUndefined)>>(StringComparer.Ordinal);
+            var events = new Dictionary<string, List<(string Kind, string Value)>>(StringComparer.Ordinal);
+            var results = new Dictionary<string, List<(string Kind, string Reference, string Text)>>(StringComparer.Ordinal);
+            var returnTypes = new Dictionary<string, string>(StringComparer.Ordinal);
             var resultNulls = new Dictionary<string, bool>(StringComparer.Ordinal);
             var defaultNulls = new Dictionary<string, (string Module, string Location)>(StringComparer.Ordinal);
             foreach (var line in text.Lines)
@@ -126,6 +172,11 @@ internal sealed class VendorContract
                     case "member" when columns.Length == 9 && columns[4] is "method" or "property" or "readonly" or "writeonly":
                         members.Add(columns);
                         break;
+                    case "event" when columns.Length == 6 && columns[3] is "name" or "keys":
+                        var eventMember = Unescape(columns[1]);
+                        if (!events.TryGetValue(eventMember, out var selectors)) events[eventMember] = selectors = [];
+                        selectors.Add((columns[3], Unescape(columns[4])));
+                        break;
                     case "base" when columns.Length == 4 && int.TryParse(columns[2], NumberStyles.None, CultureInfo.InvariantCulture, out var ordinal):
                         var owner = Unescape(columns[1]);
                         if (!bases.TryGetValue(owner, out var parents)) bases[owner] = parents = new SortedDictionary<int, string>();
@@ -134,10 +185,15 @@ internal sealed class VendorContract
                     case "signature" when columns.Length == 8 && columns[2] == "member" && columns[5] is "none" or "promise" or "mixed":
                         var id = Unescape(columns[3]);
                         if (!signatures.TryGetValue(id, out var overloads)) signatures[id] = overloads = [];
-                        overloads.Add((Unescape(columns[1]), columns[5], columns[6] == "true"));
+                        overloads.Add((Unescape(columns[1]), columns[5], columns[6] == "true", columns[7] == "true"));
+                        break;
+                    case "return-type" when columns.Length == 3:
+                        returnTypes[Unescape(columns[1])] = Unescape(columns[2]);
                         break;
                     case "holds" when columns.Length == 9 && columns[2] == "signature" && columns[4] == "returns":
                         var signature = Unescape(columns[3]);
+                        if (!results.TryGetValue(signature, out var held)) results[signature] = held = [];
+                        held.Add((columns[6], Unescape(columns[7]), Unescape(columns[8])));
                         resultNulls.TryGetValue(signature, out var takesNull);
                         resultNulls[signature] = takesNull || columns[6] == "null" || columns[6] == "other" && columns[8] is "any" or "unknown";
                         break;
@@ -159,9 +215,19 @@ internal sealed class VendorContract
                 bool? callbackTakesNull = !hasSignatures ? null
                     : overloads!.Any(signature => signature.PromiseMode == "promise" || resultNulls.TryGetValue(signature.Id, out var takesNull) && !takesNull) ? false
                     : overloads.All(signature => signature.PromiseMode == "none" && resultNulls.ContainsKey(signature.Id)) ? true : null;
+                var returnsNonFunction = overloads?.Any(signature => results.TryGetValue(signature.Id, out var held) && held.Any(value => value.Kind is not ("function" or "null" or "undefined"))) == true;
+                string? eventAnswer = null;
+                foreach (var signature in overloads ?? [])
+                {
+                    if (signature.TakesUndefined && signature.PromiseMode != "promise" || !returnTypes.TryGetValue(signature.Id, out var answer)) continue;
+                    eventAnswer = answer;
+                    break;
+                }
+
+                events.TryGetValue(id, out var memberEvents);
                 var documentedNull = defaultNulls.TryGetValue(id, out var tag) ? tag : ((string Module, string Location)?)null;
                 publicMembers[(Unescape(member[2]), Unescape(member[3]))] = new Member(member[4], member[8] == "true", hasSignatures, returnsPromise,
-                    member[5] == "true", member[6] == "true", member[7] == "true", resultReadsNull, callbackTakesNull, documentedNull);
+                    member[5] == "true", member[6] == "true", member[7] == "true", resultReadsNull, callbackTakesNull, documentedNull, memberEvents?.ToImmutableArray() ?? [], returnsNonFunction, eventAnswer);
             }
 
             var table = new Table(publicMembers.ToImmutable(), bases.ToImmutableDictionary(pair => pair.Key, pair => pair.Value.Values.ToImmutableArray()));

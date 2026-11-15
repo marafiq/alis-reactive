@@ -57,17 +57,36 @@ public sealed class ALIS019ValueNullability : DiagnosticAnalyzer
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(ReadNull, WriteNull, LiveNull, AnswerNull, DocumentedReadNull, DocumentedLiveNull);
+    private static readonly DiagnosticDescriptor NullableRemover = new(
+        Id,
+        "A returned unsubscriber always returns its remover",
+        "Declaration '{0}' listens through '{1}', whose return admits null or undefined; name a subscribe method that always returns its remover",
+        "Alis.Reactive.Analyzers",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(ReadNull, WriteNull, LiveNull, AnswerNull, DocumentedReadNull, DocumentedLiveNull, NullableRemover);
 
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        context.RegisterCompilationStartAction(start => RootMemberDoor.Register(start, Read));
+        context.RegisterCompilationStartAction(start =>
+        {
+            RootMemberDoor.Register(start, Read);
+            RootListening.Register(start, ReadListening);
+        });
+    }
+
+    private static void ReadListening(SymbolAnalysisContext context, RootListening listening)
+    {
+        if (listening.Returned && listening.Member is { Callable: true, ResultReadsNull: true, Kind: not "writeonly" })
+            context.ReportDiagnostic(Diagnostic.Create(NullableRemover, listening.Location, listening.Declaration, listening.Name));
     }
 
     private static void Read(OperationAnalysisContext context, RootMemberDoor door)
     {
+        if (door.IsEvent) return;
         if (door.Vendor is not { } member) return;
         var readsNull = door.IsMethod ? member.ResultReadsNull : member.ReadsNull;
         if (door.Door is "LiveObject" or "LiveObjects" or "ReturnedObject" or "ReturnedObjects")

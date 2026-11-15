@@ -15,7 +15,7 @@ internal sealed class RootMemberDoor
     private readonly GenericNameSyntax? _genericName;
     private readonly bool _partial;
 
-    private RootMemberDoor(string member, string name, string module, string type, string door, Location nameLocation, Location doorLocation, VendorContract.Member? vendor, IInvocationOperation call, Location memberLocation, GenericNameSyntax? genericName, bool partial)
+    private RootMemberDoor(string member, string name, string module, string type, string door, Location nameLocation, Location doorLocation, VendorContract.Member? vendor, IInvocationOperation call, Location memberLocation, GenericNameSyntax? genericName, bool partial, bool declaredEvent, INamedTypeSymbol owner)
     {
         Member = member;
         Name = name;
@@ -29,6 +29,8 @@ internal sealed class RootMemberDoor
         _memberLocation = memberLocation;
         _genericName = genericName;
         _partial = partial;
+        DeclaredEvent = declaredEvent;
+        Owner = owner;
     }
 
     internal string Member { get; }
@@ -39,6 +41,9 @@ internal sealed class RootMemberDoor
     internal Location NameLocation { get; }
     internal Location DoorLocation { get; }
     internal VendorContract.Member? Vendor { get; }
+    internal bool IsEvent => Door == "Event";
+    internal bool DeclaredEvent { get; }
+    internal INamedTypeSymbol Owner { get; }
     internal bool IsMethod => Door is "Method" or "MethodAsync" or "ReturnedObject" or "ReturnedObjects";
     internal ITypeSymbol? ValueType => _call.TargetMethod.TypeArguments.LastOrDefault();
     internal Location ValueLocation => !_partial && _genericName is not null ? _genericName.TypeArgumentList.Arguments.Last().GetLocation() : _memberLocation;
@@ -67,7 +72,7 @@ internal sealed class RootMemberDoor
     private static RootMemberDoor? Read(OperationAnalysisContext context, INamedTypeSymbol declarations, INamedTypeSymbol mirrors, VendorContract table)
     {
         var call = (IInvocationOperation)context.Operation;
-        if (!DeclarationDoor.Is(call.TargetMethod, declarations) || call.TargetMethod.Name is not ("Property" or "ReadOnly" or "WriteOnly" or "Method" or "MethodAsync" or "LiveObject" or "LiveObjects" or "ReturnedObject" or "ReturnedObjects" or "Callback")) return null;
+        if (!DeclarationDoor.Is(call.TargetMethod, declarations) || call.TargetMethod.Name is not ("Property" or "ReadOnly" or "WriteOnly" or "Method" or "MethodAsync" or "LiveObject" or "LiveObjects" or "ReturnedObject" or "ReturnedObjects" or "Callback" or "Event")) return null;
         if (call.Instance is not IInstanceReferenceOperation { ReferenceKind: InstanceReferenceKind.ContainingTypeInstance }) return null;
         if (context.ContainingSymbol is not IMethodSymbol { MethodKind: MethodKind.Ordinary or MethodKind.PropertyGet } author || author.AssociatedSymbol is IPropertySymbol { IsIndexer: true }) return null;
         IOperation body = call;
@@ -109,7 +114,7 @@ internal sealed class RootMemberDoor
         if (calledName is null) return null;
         var nameLocation = definition is not null || constant.Value is null ? identifier.GetLocation() : nameArgument.Value.Syntax.GetLocation();
         var doorLocation = definition is not null ? identifier.GetLocation() : calledName.Identifier.GetLocation();
-        return new RootMemberDoor(DeclarationDoor.Named(member), name, module, type, call.TargetMethod.Name, nameLocation, doorLocation, vendor, call, identifier.GetLocation(), calledName as GenericNameSyntax, definition is not null);
+        return new RootMemberDoor(DeclarationDoor.Named(member), name, module, type, call.TargetMethod.Name, nameLocation, doorLocation, vendor, call, identifier.GetLocation(), calledName as GenericNameSyntax, definition is not null, call.TargetMethod.Name == "Event" && table.DeclaresEvent(module, type, name, context.CancellationToken), author.ContainingType);
     }
 
     private static string CamelCase(string name)

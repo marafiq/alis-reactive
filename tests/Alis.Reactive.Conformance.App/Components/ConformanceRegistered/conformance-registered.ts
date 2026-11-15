@@ -25,7 +25,7 @@ export class ConformanceRegistered {
     }
     raise(): void { this.view.status("Alarm", "Alarm raised"); }
     lower(): void { this.view.status("Alarm", "Alarm lowered"); }
-    on(event: string, listener: Listener): void {
+    on(event: "alarmed", listener: Listener): void {
         let listeners = this.listeners.get(event);
         if (listeners === undefined) {
             listeners = new Set();
@@ -33,7 +33,7 @@ export class ConformanceRegistered {
         }
         listeners.add(listener);
     }
-    off(event: string, listener: Listener): void { this.listeners.get(event)?.delete(listener); }
+    off(event: "alarmed", listener: Listener): void { this.listeners.get(event)?.delete(listener); }
     destroy(): void { this.view.lifetime.abort(); }
     private emit(event: string): void {
         for (const listener of [...(this.listeners.get(event) ?? [])])

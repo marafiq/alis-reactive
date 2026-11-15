@@ -64,6 +64,7 @@ public sealed class WhenAVendorDeclaresCalls
         var table = await program.Extract();
         Assert.That(table, Does.Contain("member\tapi:Gauge@1.changed\tapi:Gauge@1\tchanged\tproperty\tfalse\tfalse\tfalse\ttrue"));
         Assert.That(table, Does.Contain("signature\tapi:Gauge@1.changed/s0\tmember\tapi:Gauge@1.changed\t0\tnone\tfalse\ttrue"));
+        Assert.That(table, Does.Contain("return-type\tapi:Gauge@1.changed/s0\tvoid"));
     }
 
     [RefusedCase]
@@ -115,5 +116,21 @@ public sealed class WhenAVendorDeclaresCalls
         Assert.That(table, Does.Contain("parameter\tapi:read@1/s0/p0\tapi:read@1/s0\t0\ttrue\tfalse"));
         Assert.That(table, Does.Contain("parameter\tapi:read@1/s0/p1\tapi:read@1/s0\t1\tfalse\ttrue"));
         Assert.That(table, Does.Contain("holds\tapi:read@1/s0/p1/value/0\tparameter\tapi:read@1/s0/p1\tvalue\t0\tother\t\tstring"));
+    }
+    [RefusedCase]
+    public async Task a_promise_of_void_does_not_take_undefined_as_its_answer()
+    {
+        using var program = new VendorProgram("interface Promise<T> { then(done: (value: T) => unknown): unknown; } export interface Gauge { changed: () => Promise<void>; }");
+        var table = await program.Extract();
+        Assert.That(table, Does.Contain("signature\tapi:Gauge@1.changed/s0\tmember\tapi:Gauge@1.changed\t0\tpromise\tfalse\tfalse"));
+        Assert.That(table, Does.Contain("return-type\tapi:Gauge@1.changed/s0\tPromise<void>"));
+    }
+
+    [AcceptedCase]
+    public async Task a_promise_union_that_holds_undefined_takes_it_as_an_answer()
+    {
+        using var program = new VendorProgram("interface Promise<T> { then(done: (value: T) => unknown): unknown; } export interface Gauge { changed: () => Promise<void> | undefined; }");
+        var table = await program.Extract();
+        Assert.That(table, Does.Contain("signature\tapi:Gauge@1.changed/s0\tmember\tapi:Gauge@1.changed\t0\tmixed\ttrue\ttrue"));
     }
 }

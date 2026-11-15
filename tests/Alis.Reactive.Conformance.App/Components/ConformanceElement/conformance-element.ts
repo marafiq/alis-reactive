@@ -1,4 +1,9 @@
 import { ComponentView, mountComponents } from "../component-view";
+declare global {
+    interface HTMLElementEventMap {
+        opened: CustomEvent<{ room: string } | null>;
+    }
+}
 interface ElementStart {
     room: string;
 }

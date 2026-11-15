@@ -1,4 +1,5 @@
 import { ComponentEvents } from "../component-events";
+import type { Change, ComponentListener } from "../component-events";
 import { ComponentView, mountComponents } from "../component-view";
 import { ConformancePeer } from "../ConformancePeer/conformance-peer";
 import type { BindingData, Linked, RecordData, TakenRecord } from "./data";
@@ -49,6 +50,13 @@ export class ConformanceComponent extends ComponentEvents {
     nullableItems: Item[] | null;
     answer: ((item: Item) => string) | null = null;
     pair: ((key: string, record: RecordData) => string) | null = null;
+    override addEventListener(type: "change" | "commit", callback: ((value: Change) => void) | null, options?: boolean | AddEventListenerOptions): void;
+    override addEventListener(type: "raised", callback: ((value: Raised) => void) | null, options?: boolean | AddEventListenerOptions): void;
+    override addEventListener(type: "handed", callback: ((value: ConformancePeer) => void) | null, options?: boolean | AddEventListenerOptions): void;
+    override addEventListener(type: string, callback: ComponentListener | null, options?: boolean | AddEventListenerOptions): void;
+    override addEventListener(type: string, callback: ComponentListener | null, options?: boolean | AddEventListenerOptions): void {
+        super.addEventListener(type, callback, options);
+    }
     constructor(element: ComponentElement, start: ConformanceStart) {
         super();
         this.element = element;

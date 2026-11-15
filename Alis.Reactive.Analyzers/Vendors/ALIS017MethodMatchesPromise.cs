@@ -33,13 +33,31 @@ public sealed class ALIS017MethodMatchesPromise : DiagnosticAnalyzer
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(NeedsAsync, NeedsSync, NeedsSynchronousObject);
+    private static readonly DiagnosticDescriptor AsyncListening = new(
+        Id,
+        "A returned unsubscriber is returned synchronously",
+        "Declaration '{0}' listens through '{1}', whose signatures return a promise; name a subscribe method that returns its remover synchronously",
+        "Alis.Reactive.Analyzers",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(NeedsAsync, NeedsSync, NeedsSynchronousObject, AsyncListening);
 
     public override void Initialize(AnalysisContext context)
     {
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
-        context.RegisterCompilationStartAction(start => RootMemberDoor.Register(start, Read));
+        context.RegisterCompilationStartAction(start =>
+        {
+            RootMemberDoor.Register(start, Read);
+            RootListening.Register(start, ReadListening);
+        });
+    }
+
+    private static void ReadListening(SymbolAnalysisContext context, RootListening listening)
+    {
+        if (listening.Returned && listening.Member is { Callable: true, ReturnsPromise: true, Kind: not "writeonly" })
+            context.ReportDiagnostic(Diagnostic.Create(AsyncListening, listening.Location, listening.Declaration, listening.Name));
     }
 
     private static void Read(OperationAnalysisContext context, RootMemberDoor door)

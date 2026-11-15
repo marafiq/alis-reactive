@@ -211,7 +211,8 @@ const signatureRows = (ownerKind, ownerId, signatures, context, aliasArgument) =
     const promised = returned.filter((type) => promiseValue(type) !== undefined);
     const promiseMode = promised.length === 0 ? "none" : promised.length === returned.length ? "promise" : "mixed";
     const values = returned.flatMap((type) => parts(promiseValue(type) ?? type));
-    write("signature", id, ownerKind, ownerId, ordinal, promiseMode, readsNull(values), acceptsUndefined(values));
+    write("signature", id, ownerKind, ownerId, ordinal, promiseMode, readsNull(values), acceptsUndefined(returned));
+    write("return-type", id, textOf(signature.getReturnType()));
     emitHolds("signature", id, "returns", values, context);
     for (const [position, parameter] of signature.getParameters().entries()) {
       const declaration = parameter.valueDeclaration ?? parameter.declarations?.[0];

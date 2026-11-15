@@ -11,8 +11,8 @@ function listenersOf(event: string): Set<Listener> {
 }
 
 interface CardRadio {
-  on(event: string, listener: Listener): void;
-  off(event: string, listener: Listener): void;
+  on(event: "call", listener: Listener): void;
+  off(event: "call", listener: Listener): void;
   transmit(): void;
 }
 

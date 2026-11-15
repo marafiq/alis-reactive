@@ -13,8 +13,8 @@ function listenersOf(event: string): Set<Listener> {
 let offThrows = false;
 
 interface BenchClock {
-  on(event: string, listener: Listener): void;
-  off(event: string, listener: Listener): void;
+  on(event: "tick", listener: Listener): void;
+  off(event: "tick", listener: Listener): void;
 }
 
 const benchClock: BenchClock = {
