@@ -832,6 +832,13 @@
             "X17.3",
             "X19.4"
           ]
+        },
+        {
+          "behavior": "It draws its controls in its open shadow root on alis:mount: the key field, its one text box, a keydown in it reaching the element composed, then Open with room and Open with no room, the room its start's.",
+          "tests": [
+            "X17.3",
+            "X19.4"
+          ]
         }
       ]
     },
@@ -941,6 +948,13 @@
           "tests": [
             "X17.15"
           ]
+        },
+        {
+          "behavior": "It shows its threshold in its Threshold status, 0 at its start, and Raise() and Lower() write Alarm raised and Alarm lowered into its Alarm status. A start that names a button makes the gauge when that button is clicked, and until then the lookup finds none for its element.",
+          "tests": [
+            "X17.10",
+            "X17.15"
+          ]
         }
       ]
     },
@@ -972,6 +986,13 @@
       "behaviors": [
         {
           "behavior": "Its Post an update button posts the message Bed 4 needs water, and it shows the count of listeners it holds as subscribers: n.",
+          "tests": [
+            "X17.11",
+            "X17.17"
+          ]
+        },
+        {
+          "behavior": "Its count of listeners is its Subscribers status, subscribers: 0 at its start, and the function its subscribe returns removes that one listener once.",
           "tests": [
             "X17.11",
             "X17.17"
@@ -1033,6 +1054,15 @@
             "X17.50",
             "X17.51",
             "X17.52"
+          ]
+        },
+        {
+          "behavior": "Its log is a log named Log, each line a list item that holds the texts one Raise room 7 appends, parted by a space. Its search box is the search box Search, and show draws the names it is handed as the list Names, empty at its start. Check writes own or other into its Holds status, and a throw its Raise room 7 meets shows its message in its Error status.",
+          "tests": [
+            "X17.12",
+            "X17.17",
+            "X17.49",
+            "X17.50"
           ]
         }
       ]

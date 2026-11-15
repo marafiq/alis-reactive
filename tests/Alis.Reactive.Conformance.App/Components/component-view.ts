@@ -1,8 +1,8 @@
 export class ComponentView {
-    readonly element: HTMLElement;
+    readonly element: HTMLElement | ShadowRoot;
     readonly lifetime = new AbortController();
     private readonly statuses = new Map<string, HTMLElement>();
-    constructor(element: HTMLElement) { this.element = element; }
+    constructor(element: HTMLElement | ShadowRoot) { this.element = element; }
     status(name: string, text: string): HTMLElement {
         let line = this.statuses.get(name);
         if (line === undefined) {
@@ -15,7 +15,7 @@ export class ComponentView {
         line.textContent = text;
         return line;
     }
-    list(name: string, lines: string[], parent: HTMLElement = this.element): HTMLUListElement {
+    list(name: string, lines: string[], parent: ParentNode = this.element): HTMLUListElement {
         const list = document.createElement("ul");
         list.setAttribute("aria-label", name);
         for (const text of lines) {
@@ -42,6 +42,15 @@ export class ComponentView {
     }
 }
 export function mountComponents(marker: string, build: (element: HTMLElement, start: unknown) => () => void): void {
+    mountMarked(marker, (element) => build(element, startOf(element, marker)));
+}
+function startOf(element: HTMLElement, marker: string): unknown {
+    const text = element.getAttribute(marker);
+    if (text === null)
+        throw new Error("The component start is missing: " + marker);
+    return JSON.parse(text);
+}
+export function mountMarked(marker: string, build: (element: HTMLElement) => () => void): void {
     const mounted = new WeakMap<HTMLElement, () => void>();
     function rootOf(event: Event): HTMLElement {
         if (!(event instanceof CustomEvent))
@@ -56,11 +65,7 @@ export function mountComponents(marker: string, build: (element: HTMLElement, st
         for (const element of rootOf(event).querySelectorAll<HTMLElement>("[" + marker + "]")) {
             if (mounted.has(element))
                 continue;
-            const text = element.getAttribute(marker);
-            if (text === null)
-                throw new Error("The component start is missing: " + marker);
-            const start: unknown = JSON.parse(text);
-            mounted.set(element, build(element, start));
+            mounted.set(element, build(element));
         }
     });
     document.addEventListener("alis:unmount", (event) => {
