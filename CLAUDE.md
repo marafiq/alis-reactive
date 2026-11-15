@@ -212,7 +212,11 @@ slip is about you invented so you can avoid accountability about mistakes").
   and never by a shortcut around the spec (the owner, 2026-11-14: "if a decision is needed, Quality and fable xhigh
   will decide with tla+ - step back and do the right - never do the hack"). One such agent runs at a time, on the
   task the specs leave open; what a spec line and a landed exemplar already shape, an analyzer or a test among
-  them, the lead writes itself (the owner, 2026-11-14: "U r overusing fable").
+  them, the lead writes itself (the owner, 2026-11-14: "U r overusing fable"). Codex's top model at max effort
+  consults on such a task or takes it, scoped as a fork's task is: one decision or one piece, its spec lines, files and
+  proving command named in the brief, the repository read at the base SHA and nothing written outside its own folder;
+  its answer is a lead, read at the source (the owner, 2026-11-14: "you can use codex astra max to consult or do the
+  work but must be scoped work with clearly defined so you do not waste or drift").
 - The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
   session, with the reason. A task whose check costs what the work costs is the lead's own. Quality is each
   worker's own, never the next reader's: an agent runs every check its files meet before it replies, decides each
