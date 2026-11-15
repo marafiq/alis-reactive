@@ -609,8 +609,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/IntakeAssessment.cshtml",
@@ -3286,8 +3285,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/RoomNumbering.cshtml",
@@ -3298,8 +3296,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/CareRota.cshtml",
@@ -3311,8 +3308,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/HouseholdContacts.cshtml",
@@ -3323,8 +3319,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/HomeLead.cshtml",
@@ -3335,8 +3330,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/DeputyAppointment.cshtml",
@@ -3348,8 +3342,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Round/SupplyCount.cshtml",
@@ -3360,8 +3353,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/ArrivalIntake.cshtml",
@@ -3385,8 +3377,7 @@
       "NativeComponents",
       "RenderingAndDelivery",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/RoomAdmission.cshtml",
@@ -3398,8 +3389,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Round/RoundDosing.cshtml",
@@ -3425,8 +3415,7 @@
       "NativeAppLevelObjects",
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/BedAssignment.cshtml",
@@ -3438,8 +3427,7 @@
       "NativeAppLevelObjects",
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/WardAssignment.cshtml",
@@ -3498,8 +3486,7 @@
       "NativeComponents",
       "RenderingAndDelivery",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/StateMoveIn.cshtml",
@@ -3512,8 +3499,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/CarePlan.cshtml",
@@ -3524,8 +3510,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/VisitorSignIn.cshtml",
@@ -4483,8 +4468,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Validation/StrictCodeForm.cshtml",
@@ -4495,8 +4479,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Validation/EntriesForm.cshtml",
@@ -4507,8 +4490,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",
@@ -4519,8 +4501,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Validation/EntryCode.cshtml",
@@ -4532,8 +4513,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",
@@ -4544,8 +4524,7 @@
     "modules": [
       "NativeComponents",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "Validation"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",

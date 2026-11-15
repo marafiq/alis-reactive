@@ -38,6 +38,7 @@ public class WhenTheCoreIsCompiled
         "TypeKnowledge/ClassNames.cs System.Type.IsInterface",
         "TypeKnowledge/WrittenMember.cs System.Reflection.MemberInfo.DeclaringType",
         "TypeKnowledge/WrittenMember.cs System.Reflection.MemberInfo.Name",
+        "Validation/ServerExpressions.cs System.Linq.Expressions.Expression<TDelegate>.Compile",
     ];
 
     private static readonly string[] HoldersOfTypeInformation =
@@ -66,6 +67,18 @@ public class WhenTheCoreIsCompiled
         Assert.That(sources, Is.Not.Empty, "No tracked C# of the core was found");
         Assert.That(Problems(sources, TypeReadsTheOwnerLists), Is.Empty, "A read of type information outside the owner's list: " + OnlyWhereListed + ".");
     }
+
+    [RefusedCase]
+    public void compiling_a_validation_expression_is_refused_outside_its_listed_file()
+        => Assert.That(
+            Problems([new("Ward/Nurse.cs", "namespace Ward;\ninternal static class Nurse\n{\n    internal static System.Func<int, bool> Read(System.Linq.Expressions.Expression<System.Func<int, bool>> predicate) => predicate.Compile();\n}\n")], []),
+            Is.EqualTo(new[] { "Ward/Nurse.cs:4: reads System.Linq.Expressions.Expression<TDelegate>.Compile; " + OnlyWhereListed }));
+
+    [AcceptedCase]
+    public void compiling_a_validation_expression_is_accepted_in_its_listed_file()
+        => Assert.That(
+            Problems([new("Ward/Nurse.cs", "namespace Ward;\ninternal static class Nurse\n{\n    internal static System.Func<int, bool> Read(System.Linq.Expressions.Expression<System.Func<int, bool>> predicate) => predicate.Compile();\n}\n")], ["Ward/Nurse.cs System.Linq.Expressions.Expression<TDelegate>.Compile"]),
+            Is.Empty);
 
     [RefusedCase]
     public void a_member_of_a_type_is_refused_where_it_is_read()
@@ -235,6 +248,8 @@ public class WhenTheCoreIsCompiled
     private static string? TypeInformationOf(ISymbol? symbol) => symbol switch
     {
         INamedTypeSymbol type when IsOfReflection(type) => type.ToDisplayString(),
+        IMethodSymbol { Name: "Compile", ContainingType: { } expression } when expression.OriginalDefinition.ToDisplayString() is "System.Linq.Expressions.Expression<TDelegate>" or "System.Linq.Expressions.LambdaExpression"
+            => $"{expression.OriginalDefinition.ToDisplayString()}.{symbol.Name}",
         IMethodSymbol or IPropertySymbol or IFieldSymbol or IEventSymbol when symbol.ContainingType is { } holder && HoldsTypeInformation(holder)
             => $"{holder.OriginalDefinition.ToDisplayString()}.{symbol.Name}",
         _ => null,

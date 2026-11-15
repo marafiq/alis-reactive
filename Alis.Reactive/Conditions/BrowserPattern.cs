@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Alis.Reactive.Conditions;
 
@@ -55,6 +57,13 @@ internal sealed class BrowserPattern
     }
 
     internal static string CopyOf(string pattern, Func<string, InvalidOperationException> refused) => new BrowserPattern(pattern, refused).Copied();
+
+    [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "D16.11 runs the developer's pattern in the one pattern reader; the framework writes none (D16.10).")]
+    internal static Func<string?, bool> OnServer(string pattern, RegexOptions options)
+    {
+        var expression = new Regex(pattern, options, TimeSpan.FromSeconds(2));
+        return value => value is null || expression.IsMatch(value);
+    }
 
     private string Copied()
     {

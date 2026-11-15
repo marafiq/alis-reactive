@@ -1,0 +1,284 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Alis.Reactive.Validation;
+
+internal sealed class ValidationRun(bool synchronous, CancellationToken cancellation, string selection)
+{
+    internal bool Synchronous { get; } = synchronous;
+    internal CancellationToken Cancellation { get; } = cancellation;
+    internal string Selection { get; } = selection;
+    internal List<ValidationFailure> Failures { get; } = [];
+
+    internal bool Selects(IReadOnlyList<string> sets, bool include = false)
+    {
+        if (Selection == "*") return true;
+        if (sets.Count == 0) return include || string.Equals(Selection, "default", StringComparison.OrdinalIgnoreCase);
+        return sets.Contains(Selection, StringComparer.OrdinalIgnoreCase);
+    }
+
+    internal void RequireAsync()
+    {
+        if (Synchronous) throw new InvalidOperationException("A rule that waits (MustAsync, CustomAsync or WhenAsync) runs only in ValidateAsync.");
+    }
+
+    internal async Task Child<T>(IValidator<T> validator, T instance, string prefix)
+    {
+        if (validator is ReactiveValidator<T> reactive)
+        {
+            await reactive.RunRules(new ValidationContext<T>(instance, prefix, this)).ConfigureAwait(false);
+            return;
+        }
+
+        var result = Synchronous
+            ? validator.Validate(instance, Selection)
+            : await validator.ValidateAsync(instance, Selection, Cancellation).ConfigureAwait(false);
+        foreach (var failure in result.Errors) Failures.Add(new ValidationFailure(prefix + failure.PropertyName, failure.ErrorMessage));
+    }
+}
+
+internal static class RuleSets
+{
+    internal static string[] Named(string names) => names.Split([',', ';']).Select(name => name.Trim()).ToArray();
+}
+
+internal sealed class ValidationContext<T>(T model, string prefix, ValidationRun run)
+{
+    private readonly Dictionary<RuleCondition<T>, bool> _conditions = [];
+    internal T Model { get; } = model;
+    internal string Prefix { get; } = prefix;
+    internal ValidationRun Run { get; } = run;
+
+    internal async Task<bool> Holds(RuleCondition<T> condition)
+    {
+        if (!condition.Shared) return await condition.Evaluate(Model, Run).ConfigureAwait(false);
+        if (_conditions.TryGetValue(condition, out var held)) return held;
+        var answer = await condition.Evaluate(Model, Run).ConfigureAwait(false);
+        _conditions.Add(condition, answer);
+        return answer;
+    }
+}
+
+internal sealed class RuleCondition<T>(Func<T, ValidationRun, Task<bool>> evaluate, bool shared)
+{
+    internal bool Shared { get; } = shared;
+    internal Task<bool> Evaluate(T model, ValidationRun run) => evaluate(model, run);
+
+    internal static RuleCondition<T> Of(Expression<Func<T, bool>> expression, bool shared)
+    {
+        var predicate = ServerExpressions.Read(expression);
+        return new RuleCondition<T>((model, _) => Task.FromResult(predicate(model)), shared);
+    }
+
+    internal static RuleCondition<T> Awaited(Func<T, CancellationToken, Task<bool>> predicate)
+        => new((model, run) =>
+        {
+            run.RequireAsync();
+            return predicate(model, run.Cancellation);
+        }, true);
+}
+
+internal sealed class RuleGuard<T>(RuleCondition<T> condition, bool negated)
+{
+    internal async Task<bool> Holds(ValidationContext<T> context) => await context.Holds(condition).ConfigureAwait(false) != negated;
+}
+
+internal abstract class ValidationRule<T>(IReadOnlyList<string> sets)
+{
+    internal IReadOnlyList<string> Sets { get; } = sets;
+    internal List<RuleGuard<T>> Guards { get; } = [];
+
+    internal async Task Validate(ValidationContext<T> context)
+    {
+        context.Run.Cancellation.ThrowIfCancellationRequested();
+        if (!context.Run.Selects(Sets, this is IncludeRule<T>)) return;
+        foreach (var guard in Guards)
+            if (!await guard.Holds(context).ConfigureAwait(false)) return;
+        await Check(context).ConfigureAwait(false);
+    }
+
+    protected abstract Task Check(ValidationContext<T> context);
+}
+
+internal sealed class IncludeRule<T>(IValidator<T> validator, IReadOnlyList<string> sets) : ValidationRule<T>(sets)
+{
+    protected override Task Check(ValidationContext<T> context) => context.Run.Child(validator, context.Model, context.Prefix);
+}
+
+internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOptions<T, TValue>
+{
+    private readonly ReactiveValidator<T> _owner;
+    private readonly Func<T, IEnumerable<TValue>> _values;
+    private readonly bool _each;
+    private readonly string _path;
+    private readonly List<RulePart<T, TValue>> _parts = [];
+    private readonly List<ValidationRule<T>> _dependents = [];
+    private Func<CascadeMode> _cascade;
+    private string _displayName;
+
+    internal MemberRule(ReactiveValidator<T> owner, string path, Func<T, IEnumerable<TValue>> values, bool each, IReadOnlyList<string> sets, Func<CascadeMode> cascade) : base(sets)
+    {
+        _owner = owner;
+        _path = path;
+        _displayName = DisplayName.Of(path);
+        _values = values;
+        _each = each;
+        _cascade = cascade;
+    }
+
+    internal IRuleBuilderOptions<T, TValue> Add(RulePart<T, TValue> part)
+    {
+        _parts.Add(part);
+        return this;
+    }
+
+    internal static MemberRule<T, TValue> Of(IRuleBuilder<T, TValue> rule)
+        => rule as MemberRule<T, TValue> ?? throw new ArgumentException("Write a check on a rule a ReactiveValidator declares: RuleFor(x => x.Member).", nameof(rule));
+
+    public IRuleBuilderOptions<T, TValue> SetValidator(IValidator<TValue> validator) => Add(new ChildPart<T, TValue>(validator));
+
+    public IRuleBuilder<T, TValue> Cascade(CascadeMode mode)
+    {
+        _cascade = () => mode;
+        return this;
+    }
+
+    public IRuleBuilderOptions<T, TValue> WithName(string displayName)
+    {
+        if (displayName.Length == 0) throw new ArgumentException("The value cannot be an empty string", "overridePropertyName");
+        _displayName = displayName;
+        return this;
+    }
+
+    public IRuleBuilderOptions<T, TValue> WithMessage(string message)
+    {
+        if (message.Length == 0) throw new ArgumentException("The value cannot be an empty string", "errorMessage");
+        return WithMessage(_ => message);
+    }
+
+    public IRuleBuilderOptions<T, TValue> WithMessage(Func<T, string> message)
+    {
+        _parts[_parts.Count - 1].Message = message;
+        return this;
+    }
+
+    public IRuleBuilderOptions<T, TValue> DependentRules(Action rules)
+    {
+        _dependents.AddRange(_owner.Capture(rules, Sets));
+        return this;
+    }
+
+    public IRuleBuilderOptions<T, TValue> When(Expression<Func<T, bool>> predicate) => Conditioned(predicate, false);
+    public IRuleBuilderOptions<T, TValue> Unless(Expression<Func<T, bool>> predicate) => Conditioned(predicate, true);
+    public IRuleBuilderOptions<T, TValue> WhenOnServer(Expression<Func<T, bool>> predicate) => Conditioned(predicate, false);
+    public IRuleBuilderOptions<T, TValue> UnlessOnServer(Expression<Func<T, bool>> predicate) => Conditioned(predicate, true);
+    public IRuleBuilderOptions<T, TValue> ServerOnly() => this;
+
+    private IRuleBuilderOptions<T, TValue> Conditioned(Expression<Func<T, bool>> predicate, bool negated)
+    {
+        var guard = new RuleGuard<T>(RuleCondition<T>.Of(predicate, false), negated);
+        foreach (var part in _parts) part.Guards.Insert(0, guard);
+        foreach (var dependent in _dependents) dependent.Guards.Insert(0, guard);
+        return this;
+    }
+
+    protected override async Task Check(ValidationContext<T> context)
+    {
+        var before = context.Run.Failures.Count;
+        if (_each && !await CheckItems(context, before).ConfigureAwait(false)) return;
+        if (!_each) await CheckMember(context, before).ConfigureAwait(false);
+        if (context.Run.Failures.Count != before) return;
+        foreach (var dependent in _dependents) await dependent.Validate(context).ConfigureAwait(false);
+    }
+
+    private async Task CheckMember(ValidationContext<T> context, int before)
+    {
+        var read = false;
+        var value = default(TValue)!;
+        foreach (var part in _parts)
+        {
+            if (!await part.Applies(context).ConfigureAwait(false)) continue;
+            if (!read)
+            {
+                value = _values(context.Model).First();
+                read = true;
+            }
+            var arguments = new MessageArguments(_displayName, context.Prefix + _path, value);
+            await part.Validate(context, value, _path, arguments).ConfigureAwait(false);
+            if (_cascade() == CascadeMode.Stop && context.Run.Failures.Count > before) return;
+        }
+    }
+
+    private async Task<bool> CheckItems(ValidationContext<T> context, int before)
+    {
+        var active = new List<RulePart<T, TValue>>();
+        foreach (var part in _parts)
+            if (await part.Applies(context).ConfigureAwait(false)) active.Add(part);
+        if (active.Count == 0) return false;
+        var index = 0;
+        foreach (var value in _values(context.Model))
+        {
+            var fieldPath = _path + "[" + index.ToString(CultureInfo.InvariantCulture) + "]";
+            foreach (var part in active)
+            {
+                var arguments = new MessageArguments(_displayName, context.Prefix + fieldPath, value).With("CollectionIndex", index);
+                await part.Validate(context, value, fieldPath, arguments).ConfigureAwait(false);
+                if (_cascade() == CascadeMode.Stop && context.Run.Failures.Count > before) return true;
+            }
+            index++;
+        }
+        return true;
+    }
+}
+
+internal abstract class RulePart<T, TValue>
+{
+    internal List<RuleGuard<T>> Guards { get; } = [];
+    internal Func<T, string> Message { get; set; } = _ => "";
+
+    internal async Task<bool> Applies(ValidationContext<T> context)
+    {
+        foreach (var guard in Guards)
+            if (!await guard.Holds(context).ConfigureAwait(false)) return false;
+        return true;
+    }
+
+    internal abstract Task Validate(ValidationContext<T> context, TValue value, string fieldPath, MessageArguments arguments);
+}
+
+internal sealed class CheckPart<T, TValue> : RulePart<T, TValue>
+{
+    private readonly Check<T, TValue> _check;
+
+    internal CheckPart(Check<T, TValue> check)
+    {
+        _check = check;
+        Message = _ => check.Template;
+    }
+
+    internal override async Task Validate(ValidationContext<T> context, TValue value, string fieldPath, MessageArguments arguments)
+    {
+        var passes = await _check.Passes(context.Model, value, arguments, context.Run).ConfigureAwait(false);
+        if (!passes) context.Run.Failures.Add(new ValidationFailure(context.Prefix + fieldPath, arguments.Fill(Message(context.Model))));
+    }
+}
+
+internal sealed class ChildPart<T, TValue>(IValidator<TValue> validator) : RulePart<T, TValue>
+{
+    internal override Task Validate(ValidationContext<T> context, TValue value, string fieldPath, MessageArguments arguments)
+        => value is null ? Task.CompletedTask : context.Run.Child(validator, value, context.Prefix + fieldPath + ".");
+}
+
+internal sealed class CustomPart<T, TValue>(Func<TValue, CustomContext<T>, CancellationToken, Task> check, bool waits) : RulePart<T, TValue>
+{
+    internal override Task Validate(ValidationContext<T> context, TValue value, string fieldPath, MessageArguments arguments)
+    {
+        if (waits) context.Run.RequireAsync();
+        return check(value, new CustomContext<T>(context.Model, context.Run.Failures, context.Prefix, fieldPath), context.Run.Cancellation);
+    }
+}
