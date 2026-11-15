@@ -10,7 +10,7 @@ import {
 } from "../Schema/index";
 import { got, heldOrNull, Stop, type Read } from "../ValuesAndSources/index";
 import { bind, isAnObject, type Context } from "./context";
-import { evaluate } from "./expressions";
+import { awaited, evaluate } from "./expressions";
 import { listenTo } from "./listen";
 import { elementById } from "./objects";
 
@@ -48,17 +48,18 @@ export function execute(statement: Statement, context: Context): Step {
 }
 
 function done(statement: DoStatement, context: Context): Step {
-  const read = evaluate(statement.expr, context);
-  if (!statement.await) return { kind: "completed", context };
-  return { kind: "wait", on: Promise.resolve(heldOrNull(read)), settled: () => context };
+  if (!statement.await) {
+    evaluate(statement.expr, context);
+    return { kind: "completed", context };
+  }
+  return { kind: "wait", on: Promise.resolve(heldOrNull(awaited(statement.expr, context))), settled: () => context };
 }
 
 function bound(statement: LetStatement, context: Context): Step {
   switch (statement.binds) {
     case "line": {
-      const read = evaluate(statement.expr, context);
-      if (!statement.await) return { kind: "completed", context: bind(context, statement.name, read) };
-      return { kind: "wait", on: Promise.resolve(heldOrNull(read)), settled: (settled) => bind(context, statement.name, settled) };
+      if (!statement.await) return { kind: "completed", context: bind(context, statement.name, evaluate(statement.expr, context)) };
+      return { kind: "wait", on: Promise.resolve(heldOrNull(awaited(statement.expr, context))), settled: (settled) => bind(context, statement.name, settled) };
     }
     case "read":
       return { kind: "completed", context: bind(context, statement.name, () => evaluate(statement.expr, context)) };

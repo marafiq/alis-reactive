@@ -102,6 +102,7 @@ function stopsLogged() {
 }
 
 const named = (name: string): Source => ({ kind: "ref", name });
+const calls = (holder: string, method: string): Source => ({ kind: "call", path: [method], members: "required", target: named(holder), args: [] });
 const text = (value: string): Source => ({ kind: "lit", value });
 const charts = (value: Source): Step => ({ kind: "set", path: ["line"], members: "required", content: false, target: named("chart"), value });
 const chartsItsSignal: Step = { kind: "set", path: ["signal"], members: "required", content: false, target: named("chart"), value: { kind: "signal" } };
@@ -352,6 +353,44 @@ describe("when a step is one C# marked awaited (D11.2, D11.3, D4.3)", () => {
     await everyPromiseJobRan();
 
     expect(chart.lines).toStrictEqual([125]);
+  });
+
+  test("a let that awaits a method's call binds the value the promise the method returns resolves to", async () => {
+    const chart = new Chart();
+    const record = gate();
+    const lane = new Lane("overlap", [{ kind: "let", name: "count", await: true, binds: "line", expr: calls("record", "count") }, charts(named("count"))], aRoundsOwner);
+    lane.raise(raisedWith({ chart, record: { count: () => record.held } }));
+
+    record.opens(125);
+    await everyPromiseJobRan();
+
+    expect(chart.lines).toStrictEqual([125]);
+  });
+
+  test("a do that awaits a method's call runs the step after it once the promise the method returns resolves", async () => {
+    const chart = new Chart();
+    const settle = gate();
+    const lane = new Lane("overlap", [{ kind: "do", await: true, expr: calls("desk", "settle") }, charts(text("Settled"))], aRoundsOwner);
+    lane.raise(raisedWith({ chart, desk: { settle: () => settle.held } }));
+
+    expect(chart.lines).toStrictEqual([]);
+    settle.opens(null);
+    await everyPromiseJobRan();
+    expect(chart.lines).toStrictEqual(["Settled"]);
+  });
+
+  test("PromiseWhereValueStops: a let that does not await a method's call that returns a promise stops the run, and the step after it never runs", async () => {
+    const logged = stopsLogged();
+    const chart = new Chart();
+    const record = gate();
+    const lane = new Lane("overlap", [{ kind: "let", name: "count", await: false, binds: "line", expr: calls("record", "count") }, charts(named("count"))], aRoundsOwner);
+    lane.raise(raisedWith({ chart, record: { count: () => record.held } }));
+
+    record.opens(125);
+    await everyPromiseJobRan();
+
+    expect(chart.lines).toStrictEqual([]);
+    expect(logged.mock.calls).toStrictEqual([["The method 'count' returned a promise where its declaration reads a value; a method that returns one is declared with MethodAsync."]]);
   });
 
   test("a value that is no promise is awaited as that value, so the step after it runs after the turn", async () => {

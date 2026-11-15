@@ -1,7 +1,7 @@
 import { operated } from "../Conditions/index";
 import { plugin } from "../Plugins/index";
-import { assertNever, notBuilt, type Expression } from "../Schema/index";
-import { called, converted, got, heldOrNull, value, type Read } from "../ValuesAndSources/index";
+import { assertNever, notBuilt, type CallExpression, type Expression } from "../Schema/index";
+import { called, converted, got, heldOrNull, value, type Read, type Returns } from "../ValuesAndSources/index";
 import type { Context } from "./context";
 import { read } from "./data";
 import { elementById, located } from "./objects";
@@ -27,7 +27,7 @@ export function evaluate(expression: Expression, context: Context): Read {
     case "op":
       return operated(expression.op, expression.args.map((arg) => () => evaluate(arg, context)), context.plan.culture.collation);
     case "call":
-      return called(evaluate(expression.target, context), expression.path, expression.members, () => expression.args.map((arg) => heldOrNull(evaluate(arg, context))));
+      return call(expression, context, "value");
     case "answer":
       return value((...args: unknown[]): unknown => {
         const scope = new Map(context.scope);
@@ -55,4 +55,12 @@ function callable(params: readonly string[], body: Expression, context: Context)
     params.forEach((name, position) => scope.set(name, value(args[position])));
     return heldOrNull(evaluate(body, { ...context, scope }));
   };
+}
+
+export function awaited(expression: Expression, context: Context): Read {
+  return expression.kind === "call" ? call(expression, context, "awaited") : evaluate(expression, context);
+}
+
+function call(expression: CallExpression, context: Context, returns: Returns): Read {
+  return called(evaluate(expression.target, context), expression.path, expression.members, () => expression.args.map((arg) => heldOrNull(evaluate(arg, context))), returns);
 }
