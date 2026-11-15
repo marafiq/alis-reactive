@@ -45,7 +45,7 @@ public static class PlanHtml
     /// <param name="plan">The plan the view opened.</param>
     /// <param name="appEvent">The event, as the app declares it.</param>
     /// <returns>The attributes that mark the element.</returns>
-    public static IHtmlContent Raises<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, AppEvent appEvent) => throw new NotImplementedException();
+    public static IHtmlContent Raises<TModel>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, AppEvent appEvent) => new HtmlString(MarkupRaise.Of(appEvent));
 
     /// <summary>Marks an element so that a click at or inside it raises an app event that declares a payload, with none.</summary>
     /// <remarks>Each member of the payload reads nothing in the event's handlers, as it reads when a step dispatches the event with no payload.</remarks>
@@ -55,10 +55,10 @@ public static class PlanHtml
     /// <param name="plan">The plan the view opened.</param>
     /// <param name="appEvent">The event, as the app declares it.</param>
     /// <returns>The attributes that mark the element.</returns>
-    public static IHtmlContent Raises<TModel, TPayload>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, AppEvent<TPayload> appEvent) => throw new NotImplementedException();
+    public static IHtmlContent Raises<TModel, TPayload>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, AppEvent<TPayload> appEvent) => new HtmlString(MarkupRaise.Of(appEvent));
 
     /// <summary>Marks an element so that a click at or inside it raises an app event with a payload.</summary>
-    /// <remarks>Write it inside the element's tag. The payload is written as the app's JSON writes it.</remarks>
+    /// <remarks>Write it inside the element's tag. Each member is named as the app's JSON names it, and the event's handlers read the payload as they read a step's dispatch of it.</remarks>
     /// <typeparam name="TModel">The model of the view.</typeparam>
     /// <typeparam name="TPayload">The class of the payload.</typeparam>
     /// <param name="html">The view's HTML helper.</param>
@@ -66,7 +66,8 @@ public static class PlanHtml
     /// <param name="appEvent">The event, as the app declares it.</param>
     /// <param name="payload">The payload each click raises the event with.</param>
     /// <returns>The attributes that mark the element.</returns>
-    public static IHtmlContent Raises<TModel, TPayload>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, AppEvent<TPayload> appEvent, TPayload payload) => throw new NotImplementedException();
+    public static IHtmlContent Raises<TModel, TPayload>(this IHtmlHelper<TModel> html, ReactivePlan<TModel> plan, AppEvent<TPayload> appEvent, TPayload payload)
+        => new HtmlString(MarkupRaise.Of(appEvent, payload, plan.Writer.Content.Json));
 
     /// <summary>Writes the view's plan into the page, as the view's last line.</summary>
     /// <remarks>

@@ -1,7 +1,7 @@
 import { pageInputs } from "../InputsAndIds/index";
 import { ownerAround, slotsNamedBy } from "../OwnershipAndState/index";
 import { plugin, provide, readQueue, type PluginRegistration } from "../Plugins/index";
-import { documentPlugin, started } from "../TriggersAndPipelines/index";
+import { DocumentPlugin, raisesOnClick } from "../TriggersAndPipelines/index";
 import { elementById } from "./objects";
 import { plansWithin } from "./plans";
 import { start } from "./start";
@@ -13,6 +13,8 @@ declare global {
 }
 
 export function boot(): void {
+  const documentPlugin = new DocumentPlugin(document);
+  raisesOnClick(document, documentPlugin);
   provide("alis.document", () => documentPlugin);
   provide("alis.model", () => pageInputs);
   readQueue(window.__alisPlugins ??= []);
@@ -20,5 +22,5 @@ export function boot(): void {
   const found = plansWithin(document);
   const named = new Set(found.flatMap(({ plan }) => slotsNamedBy(plan)));
   for (const { plan, script } of found) start(plan, ownerAround(script, named), elementById, plugin);
-  started();
+  documentPlugin.started();
 }

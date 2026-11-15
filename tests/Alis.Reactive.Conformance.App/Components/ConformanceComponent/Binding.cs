@@ -13,7 +13,7 @@ public sealed record Binding(string Name, string Code) : BindingBase
 
     public SealedSpot Sealed { get; init; } = null!;
 
-    public PolySpot Polymorphic { get; init; } = new();
+    public PolySpot Polymorphic { get; init; } = new NamedPolySpot();
 
     public Shape Shaped { get; init; } = new();
 

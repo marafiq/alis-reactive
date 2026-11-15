@@ -81,19 +81,23 @@ public sealed class Pipeline<TModel>
     /// <summary>Raises an app event that carries no payload.</summary>
     /// <remarks>Each handler of the event runs up to its first awaited step before the step after this one runs.</remarks>
     /// <param name="appEvent">The event, as the app declares it.</param>
-    public void Dispatch(AppEvent appEvent) => throw new NotImplementedException();
+    public void Dispatch(AppEvent appEvent) => _writer.Write(DocumentPlugin.Dispatches(_writer.Content, appEvent.Name, Literals.Text(null)));
 
     /// <summary>Raises an app event with a payload the view writes.</summary>
+    /// <remarks>Each handler of the event runs up to its first awaited step before the step after this one runs.</remarks>
     /// <typeparam name="TPayload">The class of the payload.</typeparam>
     /// <param name="appEvent">The event, as the app declares it.</param>
     /// <param name="payload">The payload, written into the plan where the view renders.</param>
-    public void Dispatch<TPayload>(AppEvent<TPayload> appEvent, TPayload payload) => throw new NotImplementedException();
+    public void Dispatch<TPayload>(AppEvent<TPayload> appEvent, TPayload payload)
+        => _writer.Write(DocumentPlugin.Dispatches(_writer.Content, appEvent.Name, Literals.Of(payload, _writer.Content.Json)));
 
     /// <summary>Raises an app event with a payload read when the step runs.</summary>
+    /// <remarks>Each handler of the event runs up to its first awaited step before the step after this one runs.</remarks>
     /// <typeparam name="TPayload">The class of the payload.</typeparam>
     /// <param name="appEvent">The event, as the app declares it.</param>
     /// <param name="payload">The source the payload is read from.</param>
-    public void Dispatch<TPayload>(AppEvent<TPayload> appEvent, TypedSource<TPayload> payload) => throw new NotImplementedException();
+    public void Dispatch<TPayload>(AppEvent<TPayload> appEvent, TypedSource<TPayload> payload)
+        => _writer.Write(DocumentPlugin.Dispatches(_writer.Content, appEvent.Name, Sources.FormOf(payload).IntoLive<TPayload>(Sources.Of(payload))));
 
     /// <summary>Starts a condition, read when the pipeline reaches it.</summary>
     /// <param name="condition">The condition; its branch runs only when it is true.</param>

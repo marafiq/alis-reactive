@@ -376,3 +376,81 @@ function withInput(planId: string, event: string): Plan {
     },
   } } };
 }
+
+const anEventTarget = { kind: "method", subscribe: "addEventListener", unsubscribe: "removeEventListener" } as const;
+const lineOf = (name: string) => ({ kind: "set", path: ["line"], members: "required", content: false, target: read("e", ["chart"]), value: read("e", [name]) }) as const;
+const aSave: Handler["do"] = [lineOf("starts"), { kind: "do", await: true, expr: { kind: "call", path: ["settle"], members: "required", target: named("e"), args: [] } }, lineOf("ends")];
+
+class Chart {
+  readonly lines: unknown[] = [];
+
+  set line(written: unknown) {
+    this.lines.push(written);
+  }
+}
+
+function settled(): { readonly held: Promise<unknown>; readonly opens: () => void } {
+  let opens = (): void => undefined;
+  const held = new Promise<unknown>((resolve) => { opens = () => { resolve(null); }; });
+  return { held, opens: () => { opens(); } };
+}
+
+function anAppEventsPlan(policy: Handler["policy"]): Plan {
+  const plan = planOf({ on: "$document", path: [], event: "chartSaveRequested", payload: [0, "detail"], members: "required", policy, do: aSave });
+  return { ...plan, objects: { $document: { kind: "plugin", name: "alis.document", key: "", listen: anEventTarget, data: { kind: "none" } } } };
+}
+
+function theDocument(events: EventTarget) {
+  return (name: string) => name === "alis.document" ? events : undefined;
+}
+
+describe("when an app event's handler hears the event on the document, its policy keeps Lanes.tla's invariants", () => {
+  test("SkippedTriggerStartsNothing: a raise of the event while the handler's run waits starts nothing, and one after it ended starts a run", async () => {
+    const events = new EventTarget();
+    const chart = new Chart();
+    const first = settled();
+    start(anAppEventsPlan("skip"), new Ward(), elementsOf(new Map()), theDocument(events));
+
+    events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => first.held, starts: "saving 1", ends: "saved 1" } }));
+    events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => settled().held, starts: "saving 2", ends: "saved 2" } }));
+    first.opens();
+    await nextTask();
+    events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => settled().held, starts: "saving 3", ends: "saved 3" } }));
+
+    expect(chart.lines).toStrictEqual(["saving 1", "saved 1", "saving 3"]);
+  });
+
+  test("ReplacedRunRunsNothingAfter: a raise of the event while the handler's run waits ends that run, whose later step never runs", async () => {
+    const events = new EventTarget();
+    const chart = new Chart();
+    const first = settled();
+    const second = settled();
+    start(anAppEventsPlan("replace"), new Ward(), elementsOf(new Map()), theDocument(events));
+
+    events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => first.held, starts: "saving 1", ends: "saved 1" } }));
+    events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => second.held, starts: "saving 2", ends: "saved 2" } }));
+    second.opens();
+    await nextTask();
+    first.opens();
+    await nextTask();
+
+    expect(chart.lines).toStrictEqual(["saving 1", "saving 2", "saved 2"]);
+  });
+
+  test("under overlap a raise while the handler's run waits starts a second run beside it, each going on as its own promise resolves", async () => {
+    const events = new EventTarget();
+    const chart = new Chart();
+    const first = settled();
+    const second = settled();
+    start(anAppEventsPlan("overlap"), new Ward(), elementsOf(new Map()), theDocument(events));
+
+    events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => first.held, starts: "saving 1", ends: "saved 1" } }));
+    events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => second.held, starts: "saving 2", ends: "saved 2" } }));
+    second.opens();
+    await nextTask();
+    first.opens();
+    await nextTask();
+
+    expect(chart.lines).toStrictEqual(["saving 1", "saving 2", "saved 2", "saved 1"]);
+  });
+});

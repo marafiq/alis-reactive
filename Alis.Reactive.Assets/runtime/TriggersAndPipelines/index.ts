@@ -1,1 +1,1 @@
-export { documentPlugin, started } from "./document";
+export { DocumentPlugin, markupDetail, raisesOnClick, type MarkedAttribute } from "./document";

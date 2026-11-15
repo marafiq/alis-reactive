@@ -1,7 +1,6 @@
 {
   "M1.F1 M1.X1 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -12,10 +11,7 @@
     ]
   },
   "M1.F1 X11.10 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/NurseCall.cshtml",
       "/Care/Round/NurseCallCopiedFirst.cshtml",
@@ -35,8 +31,6 @@
   },
   "M1.F1 X11.24 0": {
     "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
       "TriggersAndPipelines",
       "ValuesAndSources"
     ],
@@ -59,7 +53,6 @@
   "M1.F1 X11.7 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -68,21 +61,14 @@
     ]
   },
   "M1.F2 M1.X10 0": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/EscortDesk.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M1.F2 M1.X2 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/CallDesk.cshtml",
       "/Care/Round/CallDeskWithNoLogHandler.cshtml",
@@ -91,10 +77,7 @@
   },
   "M1.F2 M1.X3 0": {
     "modules": [
-      "Declarations",
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/WardTransfer.cshtml",
@@ -102,33 +85,21 @@
     ]
   },
   "M1.F2 M1.X4 0": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/VisitorList.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M1.F2 M1.X5 0": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PartyBell.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M1.F2 M1.X8 0": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/TriggersAndPipelines/GateOfAVisitorsType.cshtml",
       "/Refusals/TriggersAndPipelines/GateOfAnEscortedVisitor.cshtml",
@@ -136,11 +107,7 @@
     ]
   },
   "M1.F2 M1.X9 0": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/TriggersAndPipelines/SignedVisitNamedInCamelCase.cshtml",
       "/Refusals/TriggersAndPipelines/SignedVisitNamedInPascalCase.cshtml",
@@ -148,130 +115,91 @@
     ]
   },
   "M11.F1 M11.X1 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/NamesUnderTheAppsNaming.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 M11.X2 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/RecordsSortedByAField.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 M11.X3 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/ReturnedItems.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 X11.3 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/PromisedPing.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 X4.2 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/OlderReadOnlyText.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 X4.5 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/PromisedPing.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 X5.11 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/BoundTotals.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 X5.12 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/MembersOffTheirDeclaration.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 X5.3 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/ItemWithoutAct.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 X5.4 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/RecordFields.cshtml",
       "/Bench/Declarations/_ScriptedLayout.cshtml"
     ]
   },
   "M11.F1 X7.9 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/RecordCount.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F1 X7.9 1": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/RecordTotal.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M11.F2 X4.3 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Declarations/RequiredPayloadText.cshtml",
       "/Shared/_Layout.cshtml"
@@ -300,7 +228,6 @@
   },
   "M12.F1 X12.10 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -311,7 +238,6 @@
   },
   "M12.F1 X12.16 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -328,10 +254,7 @@
     ]
   },
   "M12.F1 X17.10 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Vendors/RegisteredGauges.cshtml",
       "/Shared/_Layout.cshtml"
@@ -339,7 +262,6 @@
   },
   "M12.F1 X17.11 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -378,9 +300,7 @@
   },
   "M12.F1 X17.20 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Vendors/LiveAnswers.cshtml",
@@ -388,10 +308,7 @@
     ]
   },
   "M12.F1 X17.21 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Vendors/AnswerAskedByAWrite.cshtml",
       "/Shared/_Layout.cshtml"
@@ -419,10 +336,7 @@
     ]
   },
   "M12.F2 M12.X2 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Vendors/CallPanelOfOneDeclaration.cshtml",
       "/Refusals/Vendors/CallPanelOfTwoDeclarations.cshtml",
@@ -430,10 +344,7 @@
     ]
   },
   "M12.F2 M12.X4 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Vendors/ComponentBuilt.cshtml",
       "/Shared/_Layout.cshtml"
@@ -441,7 +352,6 @@
   },
   "M12.F2 X12.7 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -451,20 +361,14 @@
     ]
   },
   "M12.F2 X17.4 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Vendors/BroughtComponent.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M13.F1 M13.X2 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Plugins/NightDesk.cshtml",
       "/Bench/Plugins/NightDeskFaceFirst.cshtml",
@@ -472,40 +376,28 @@
     ]
   },
   "M13.F1 X17.25 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Plugins/VisitorDesk.cshtml",
       "/Bench/Plugins/_ScriptedLayout.cshtml"
     ]
   },
   "M13.F1 X17.26 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Plugins/NightWard.cshtml",
       "/Bench/Plugins/_ScriptedLayout.cshtml"
     ]
   },
   "M13.F2 X17.24 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Plugins/ShiftLogDesk.cshtml",
       "/Bench/Plugins/_ScriptedLayout.cshtml"
     ]
   },
   "M14.F1 M14.X1 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Shell/WardOverview.cshtml",
       "/Shared/_Layout.cshtml"
@@ -530,7 +422,6 @@
   "M15.F1 X1.4 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -543,7 +434,6 @@
   "M15.F1 X2.3 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -554,7 +444,6 @@
   "M15.F1 X2.4 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -564,20 +453,14 @@
     ]
   },
   "M15.F1 X3.10 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/VisitPlanner.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M15.F1 X3.12 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Index/Index.cshtml",
       "/Refusals/PathsAndWire/LinkedDays.cshtml",
@@ -606,30 +489,21 @@
     ]
   },
   "M15.F1 X3.8 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/ResidentAccount.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M16.F1 X18.7 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/RoundStaff.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M16.F1 X18.8 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Index/Index.cshtml",
       "/Refusals/TypeKnowledge/IgnoredMember.cshtml",
@@ -663,7 +537,6 @@
   },
   "M17.F1 X11.14 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -674,7 +547,6 @@
   },
   "M17.F1 X11.16 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -710,30 +582,21 @@
     ]
   },
   "M17.F1 X4.10 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Execution/RequiredBindings.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M17.F1 X4.11 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Execution/SelfTest.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M17.F1 X4.13 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Execution/ConvertedNamesCounted.cshtml",
       "/Refusals/Execution/WrittenNamesCounted.cshtml",
@@ -742,10 +605,7 @@
     ]
   },
   "M17.F1 X4.13 1": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Execution/ConvertedNameFound.cshtml",
       "/Refusals/Execution/WrittenNameFound.cshtml",
@@ -755,7 +615,6 @@
   },
   "M17.F1 X4.4 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -764,30 +623,21 @@
     ]
   },
   "M17.F1 X4.6 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Execution/BindingDefaults.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M17.F1 X4.7 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Execution/SpotStarts.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M17.F1 X4.8 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Execution/BindingConstructors.cshtml",
       "/Shared/_Layout.cshtml"
@@ -796,7 +646,6 @@
   "M18.F1 M18.X1 1": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -807,7 +656,6 @@
   "M18.F1 X13.4 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -817,10 +665,7 @@
     ]
   },
   "M19.F1 M19.X3 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/ResidentNameCard.cshtml",
       "/Shared/_Layout.cshtml"
@@ -836,9 +681,7 @@
   },
   "M2.F1 X7.11 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/ValuesAndSources/BedsideDoseFallingBackToGiven.cshtml",
@@ -848,9 +691,7 @@
   },
   "M2.F1 X7.11 1": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/ValuesAndSources/BedsideDoseChosenAsGiven.cshtml",
@@ -859,10 +700,7 @@
     ]
   },
   "M2.F1 X7.12 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/MedicationCheck.cshtml",
       "/Shared/_Layout.cshtml"
@@ -870,9 +708,7 @@
   },
   "M2.F1 X7.12 1": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Round/MedicationTestCheck.cshtml",
@@ -887,10 +723,7 @@
     ]
   },
   "M2.F1 X7.14 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/SupplyScan.cshtml",
       "/Shared/_Layout.cshtml"
@@ -898,7 +731,6 @@
   },
   "M2.F1 X7.17 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines",
       "ValuesAndSources"
     ],
@@ -909,7 +741,6 @@
   },
   "M2.F1 X7.18 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines",
       "ValuesAndSources"
     ],
@@ -933,30 +764,21 @@
     ]
   },
   "M2.F1 X7.6 1": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PumpLog.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M2.F1 X7.6 2": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/WeightCheck.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M2.F1 X7.6 3": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/FluidOrders.cshtml",
       "/Shared/_Layout.cshtml"
@@ -964,9 +786,7 @@
   },
   "M2.F1 X7.7 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/IntakeRecord.cshtml",
@@ -975,9 +795,7 @@
   },
   "M2.F1 X7.7 1": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/FluidTargetCheck.cshtml",
@@ -985,10 +803,7 @@
     ]
   },
   "M2.F1 X7.7 2": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PumpCaption.cshtml",
       "/Shared/_Layout.cshtml"
@@ -1027,7 +842,6 @@
   "M21.F1 M21.X2 0": {
     "modules": [
       "FusionComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1037,9 +851,7 @@
   },
   "M21.F1 M21.X2 1": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/WardAllergies.cshtml",
@@ -1057,9 +869,7 @@
   },
   "M21.F11 M21.X401 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/AllergyTags.cshtml",
@@ -1068,9 +878,7 @@
   },
   "M21.F12 M21.X1007 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/BedBoard/Wristband.cshtml",
@@ -1080,7 +888,6 @@
   "M21.F13 M21.X505 0": {
     "modules": [
       "FusionComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1126,9 +933,7 @@
   },
   "M21.F18 M21.X1011 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/Handover/DischargeChecklist.cshtml",
@@ -1146,9 +951,7 @@
   },
   "M21.F2 M21.X3 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/ResidentPreview.cshtml",
@@ -1158,7 +961,6 @@
   "M21.F20 M21.X507 0": {
     "modules": [
       "FusionComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1168,9 +970,7 @@
   },
   "M21.F20 M21.X507 1": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/HomeWards.cshtml",
@@ -1189,7 +989,6 @@
   "M21.F22 M21.X1014 0": {
     "modules": [
       "FusionComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1253,9 +1052,7 @@
   },
   "M21.F27 M21.X1018 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/RecordContacts/DiningCompanions.cshtml",
@@ -1264,9 +1061,7 @@
   },
   "M21.F28 M21.X509 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/Handover/RoundSelection.cshtml",
@@ -1275,9 +1070,7 @@
   },
   "M21.F28 M21.X509 1": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/Handover/RoundUnselection.cshtml",
@@ -1306,7 +1099,6 @@
   "M21.F31 M21.X512 0": {
     "modules": [
       "FusionComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1316,9 +1108,7 @@
   },
   "M21.F31 M21.X512 1": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/OpenBeds.cshtml",
@@ -1345,9 +1135,7 @@
   },
   "M21.F34 M21.X1020 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/BedBoard/WardCensus.cshtml",
@@ -1356,9 +1144,7 @@
   },
   "M21.F35 M21.X1021 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/Handover/ReportSending.cshtml",
@@ -1367,9 +1153,7 @@
   },
   "M21.F36 M21.X1022 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/RoomType.cshtml",
@@ -1424,9 +1208,7 @@
   },
   "M21.F4 M21.X1001 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/RecordContacts/CareSections.cshtml",
@@ -1435,9 +1217,7 @@
   },
   "M21.F41 M21.X615 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/RecordContacts/RoomComfort.cshtml",
@@ -1464,9 +1244,7 @@
   },
   "M21.F44 M21.X1025 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/RecordContacts/VisitActions.cshtml",
@@ -1475,9 +1253,7 @@
   },
   "M21.F45 M21.X1026 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/AdmissionSteps.cshtml",
@@ -1495,9 +1271,7 @@
   },
   "M21.F47 M21.X1028 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/RecordContacts/CareTabs.cshtml",
@@ -1525,7 +1299,6 @@
   "M21.F5 M21.X503 0": {
     "modules": [
       "FusionComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1535,9 +1308,7 @@
   },
   "M21.F5 M21.X503 1": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/WardMedications.cshtml",
@@ -1555,9 +1326,7 @@
   },
   "M21.F52 M21.X1033 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/RecordContacts/AllergyTip.cshtml",
@@ -1575,9 +1344,7 @@
   },
   "M21.F8 M21.X1004 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/Handover/DoseCard.cshtml",
@@ -1586,9 +1353,7 @@
   },
   "M21.F9 M21.X1005 0": {
     "modules": [
-      "FusionComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/BedBoard/WardTour.cshtml",
@@ -1690,10 +1455,8 @@
   },
   "M22.F3 X15.4 0": {
     "modules": [
-      "Declarations",
       "FusionComponents",
-      "FusionTemplates",
-      "TriggersAndPipelines"
+      "FusionTemplates"
     ],
     "views": [
       "/Care/BedBoard/WingReview.cshtml",
@@ -1720,9 +1483,7 @@
   },
   "M24.F4 M24.X4 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/VisitSchedule.cshtml",
@@ -1749,9 +1510,7 @@
   },
   "M24.F6 M24.X2 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/IntakeBed.cshtml",
@@ -1760,9 +1519,7 @@
   },
   "M24.F7 M24.X3 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/WingMove.cshtml",
@@ -1793,7 +1550,6 @@
   "M25.F1 M25.X2 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1816,7 +1572,6 @@
   "M25.F4 M25.X12 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1829,7 +1584,6 @@
   "M25.F4 M25.X5 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1841,7 +1595,6 @@
     "modules": [
       "NativeAppLevelObjects",
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1852,7 +1605,6 @@
   "M25.F4 M25.X7 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1863,7 +1615,6 @@
   "M25.F4 X17.6 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1874,7 +1625,6 @@
   "M25.F4 X17.7 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -1885,9 +1635,7 @@
   },
   "M25.F4 X17.8 0": {
     "modules": [
-      "Declarations",
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
       "TriggersAndPipelines",
       "ValuesAndSources"
     ],
@@ -1905,9 +1653,7 @@
   },
   "M3.F1 X8.11 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/RoomBooking.cshtml",
@@ -1916,9 +1662,7 @@
   },
   "M3.F1 X8.13 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/PainReliefCheckedBeforeItsWhen.cshtml",
@@ -1928,9 +1672,7 @@
   },
   "M3.F1 X8.14 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/PainEscalation.cshtml",
@@ -1938,10 +1680,7 @@
     ]
   },
   "M3.F1 X8.15 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/FluidBalanceMeasuredAfterItsWrite.cshtml",
       "/Care/Record/FluidBalanceMeasuredBeforeItsWrite.cshtml",
@@ -1949,10 +1688,7 @@
     ]
   },
   "M3.F1 X8.19 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Conditions/DoseStrengthWrittenAsANumber.cshtml",
       "/Refusals/Conditions/DoseStrengthWrittenAsText.cshtml",
@@ -1960,10 +1696,7 @@
     ]
   },
   "M3.F1 X8.20 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Conditions/ResidentAddressItsConverterWrites.cshtml",
       "/Refusals/Conditions/ResidentAddressPostcode.cshtml",
@@ -1971,10 +1704,7 @@
     ]
   },
   "M3.F1 X8.21 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Conditions/DoseStatusesWrittenByTheApp.cshtml",
       "/Refusals/Conditions/DoseStatusesWrittenInTwoForms.cshtml",
@@ -1982,20 +1712,14 @@
     ]
   },
   "M3.F1 X8.22 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Conditions/FluidRatioAtZero.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M3.F1 X8.22 1": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/Conditions/DoseGivenAtAConvertedTime.cshtml",
       "/Refusals/Conditions/DoseGivenAtATime.cshtml",
@@ -2003,40 +1727,28 @@
     ]
   },
   "M3.F1 X8.23 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/MedicationChart.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M3.F1 X8.26 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/DoseCart.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M3.F1 X8.27 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/OpenDayBooking.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M3.F1 X8.27 1": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/StayPlan.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2054,7 +1766,6 @@
   },
   "M3.F1 X8.27 3": {
     "modules": [
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines"
     ],
@@ -2067,9 +1778,7 @@
   },
   "M3.F1 X8.4 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/PainAssessment.cshtml",
@@ -2078,9 +1787,7 @@
   },
   "M3.F1 X8.6 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/DischargeAccount.cshtml",
@@ -2088,41 +1795,28 @@
     ]
   },
   "M3.F2 X8.12 0": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/VitalSigns.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M3.F2 X8.7 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/DoseRound.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M3.F2 X8.8 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/VisitCounts.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M4.F1 M4.X3 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusSort.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2193,10 +1887,7 @@
     ]
   },
   "M4.F1 X6.3 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/UnnamedRoster.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2246,11 +1937,7 @@
     ]
   },
   "M4.F1 X6.4 0": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/WardBoard.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2361,10 +2048,7 @@
     ]
   },
   "M4.F1 X6.57 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/ArrayLambdas/BookedVisitCount.cshtml",
       "/Refusals/ArrayLambdas/BookedVisits.cshtml",
@@ -2372,10 +2056,7 @@
     ]
   },
   "M4.F1 X6.57 1": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/ArrayLambdas/WardHandoverCheck.cshtml",
       "/Refusals/ArrayLambdas/WardHandovers.cshtml",
@@ -2383,10 +2064,7 @@
     ]
   },
   "M4.F1 X6.58 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusDays.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2400,30 +2078,21 @@
     ]
   },
   "M4.F1 X6.7 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusPanelRecords.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M4.F1 X6.9 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/Billing.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M4.F2 M4.X4 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusItemPositions.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2437,50 +2106,35 @@
     ]
   },
   "M4.F2 M4.X6 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusItemChecks.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M4.F2 M4.X7 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusFirstActiveItems.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M4.F2 M4.X8 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusActiveCounts.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M4.F2 M4.X9 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusScores.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M5.F1 M5.X1 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PinnedNote.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2501,11 +2155,7 @@
     ]
   },
   "M5.F1 M5.X4 0": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/ArrivalsBoard.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2513,7 +2163,6 @@
   },
   "M5.F1 M5.X5 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2525,7 +2174,6 @@
   },
   "M5.F1 M5.X5 1": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2537,7 +2185,6 @@
   },
   "M5.F1 M5.X5 2": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2548,9 +2195,7 @@
   },
   "M5.F1 M5.X5 3": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/NightChecks.cshtml",
@@ -2559,7 +2204,6 @@
   },
   "M5.F1 X12.12 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2571,7 +2215,6 @@
   },
   "M5.F1 X12.12 1": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2582,7 +2225,6 @@
   },
   "M5.F1 X12.12 2": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2593,7 +2235,6 @@
   },
   "M5.F1 X12.12 3": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2605,7 +2246,6 @@
   },
   "M5.F1 X12.12 4": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2616,30 +2256,21 @@
     ]
   },
   "M5.F1 X6.56 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/LunchSeating.cshtml",
       "/Care/Residents/_ScriptedLayout.cshtml"
     ]
   },
   "M5.F1 X7.8 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/RecordCard.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F1 M6.X5 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/PhotoBadge.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2648,7 +2279,6 @@
   "M6.F1 X10.10 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2658,9 +2288,7 @@
   },
   "M6.F1 X9.10 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/OpenRoom.cshtml",
@@ -2669,9 +2297,7 @@
   },
   "M6.F1 X9.11 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Residents/ResidentSearch.cshtml",
@@ -2681,7 +2307,6 @@
   "M6.F1 X9.16 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2691,7 +2316,6 @@
   },
   "M6.F1 X9.18 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2701,7 +2325,6 @@
   },
   "M6.F1 X9.19 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2712,7 +2335,6 @@
   "M6.F1 X9.20 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2723,7 +2345,6 @@
   },
   "M6.F1 X9.21 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2743,7 +2364,6 @@
   },
   "M6.F1 X9.23 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2753,7 +2373,6 @@
   },
   "M6.F1 X9.8 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2762,30 +2381,21 @@
     ]
   },
   "M6.F1 X9.9 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/ResidentChart.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F2 M6.X1 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/TransferSummary.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F2 M6.X2 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/DietNote.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2793,7 +2403,6 @@
   },
   "M6.F2 M6.X3 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2802,10 +2411,7 @@
     ]
   },
   "M6.F2 M6.X4 0": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/WardNotice.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2814,7 +2420,6 @@
   "M6.F2 X10.11 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2824,7 +2429,6 @@
   },
   "M6.F2 X10.13 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2834,7 +2438,6 @@
   },
   "M6.F2 X10.14 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2845,7 +2448,6 @@
   "M6.F2 X10.29 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2857,7 +2459,6 @@
   "M6.F2 X10.5 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2867,7 +2468,6 @@
   },
   "M6.F2 X10.6 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2878,7 +2478,6 @@
   "M7.F1 X14.10 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2890,7 +2489,6 @@
   "M7.F1 X14.15 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2902,7 +2500,6 @@
   "M7.F1 X14.16 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2915,7 +2512,6 @@
   "M7.F1 X14.4 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2927,7 +2523,6 @@
   "M7.F1 X14.9 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2938,9 +2533,7 @@
   },
   "M7.F2 M7.X4 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/Lobby.cshtml",
@@ -2951,7 +2544,6 @@
   "M7.F2 X14.12 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2963,7 +2555,6 @@
   "M7.F2 X14.5 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2975,7 +2566,6 @@
   "M7.F2 X14.7 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2996,7 +2586,6 @@
   "M7.F3 X13.1 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3009,7 +2598,6 @@
   "M7.F3 X13.10 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3021,7 +2609,6 @@
   "M7.F3 X13.2 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3035,7 +2622,6 @@
   "M7.F3 X13.6 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3045,9 +2631,7 @@
   },
   "M7.F3 X13.7 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/ShortStay.cshtml",
@@ -3057,7 +2641,6 @@
   "M7.F3 X13.8 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3068,9 +2651,7 @@
   },
   "M7.F3 X13.9 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/RespitePreviousStay.cshtml",
@@ -3153,7 +2734,6 @@
   "M8.F4 X1.5 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3164,7 +2744,6 @@
   "M8.F4 X12.4 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3187,7 +2766,6 @@
   "M8.F4 X13.5 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3221,7 +2799,6 @@
   "M8.F4 X16.17 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3244,7 +2821,6 @@
   "M8.F4 X16.19 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3265,7 +2841,6 @@
   "M8.F4 X16.5 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3297,7 +2872,6 @@
   },
   "M9.F2 M9.X2 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3309,8 +2883,6 @@
   },
   "M9.F2 M9.X3 0": {
     "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3322,7 +2894,6 @@
   },
   "M9.F2 M9.X4 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3333,8 +2904,6 @@
   },
   "M9.F2 M9.X5 0": {
     "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3346,8 +2915,6 @@
   },
   "M9.F2 X12.1 0": {
     "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3359,7 +2926,6 @@
   },
   "M9.F2 X12.11 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3371,7 +2937,6 @@
   },
   "M9.F2 X12.14 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3382,7 +2947,6 @@
   },
   "M9.F2 X12.15 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3395,7 +2959,6 @@
   },
   "M9.F2 X12.17 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3406,7 +2969,6 @@
   },
   "M9.F2 X12.2 0": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3417,9 +2979,7 @@
   },
   "M9.F2 X12.8 0": {
     "modules": [
-      "Declarations",
       "NativeComponents",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3430,30 +2990,21 @@
     ]
   },
   "cell absence.member": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Absences/AbsenceMember.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell absence.past": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Absences/AbsencePast.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell absence.promise": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Absences/AbsencePromise.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3718,7 +3269,6 @@
   },
   "cell http.beside.header": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3728,7 +3278,6 @@
   },
   "cell http.beside.hidden": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3737,10 +3286,7 @@
     ]
   },
   "cell http.beside.query": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpBesideQuery.cshtml",
       "/Bench/Http/HttpGet.cshtml",
@@ -3749,7 +3295,6 @@
   },
   "cell http.beside.route": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3759,7 +3304,6 @@
   },
   "cell http.beside.static": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3769,7 +3313,6 @@
   },
   "cell http.chained": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3779,7 +3322,6 @@
   },
   "cell http.delete": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3789,7 +3331,6 @@
   },
   "cell http.finally": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3798,10 +3339,7 @@
     ]
   },
   "cell http.get": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpGet.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3809,7 +3347,6 @@
   },
   "cell http.into": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3820,7 +3357,6 @@
   },
   "cell http.parallel": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3830,7 +3366,6 @@
   },
   "cell http.post": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3840,7 +3375,6 @@
   },
   "cell http.put": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3850,7 +3384,6 @@
   },
   "cell http.response.error": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3860,7 +3393,6 @@
   },
   "cell http.response.success": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3870,7 +3402,6 @@
   },
   "cell http.whileLoading": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3881,7 +3412,6 @@
   "cell lane.confirm": {
     "modules": [
       "NativeAppLevelObjects",
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3901,7 +3431,6 @@
   },
   "cell lane.slot.unloadListener": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -3911,190 +3440,133 @@
     ]
   },
   "cell method.arg.list": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodArgList.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell method.arg.object": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodArgObject.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell method.arg.scalar": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodArgScalar.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell method.async.value": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodAsyncValue.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell method.async.void": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodAsyncVoid.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell method.object.memberRead": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodObjectMemberRead.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell method.object.methodCall": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodObjectMethodCall.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell method.value": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodValue.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell method.void": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Methods/MethodVoid.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.dotted.read": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropDottedRead.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.dotted.write": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropDottedWrite.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.list.lambda": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropListLambda.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.object.memberRead": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropObjectMemberRead.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.object.memberWrite": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropObjectMemberWrite.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.readOnly": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropReadOnly.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.scalar.read": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropScalarRead.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.scalar.write": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropScalarWrite.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell prop.writeOnly": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Properties/PropWriteOnly.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell source.ConditionLeft": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceConditionLeft.cshtml",
       "/Shared/_Layout.cshtml"
@@ -4102,9 +3574,7 @@
   },
   "cell source.ConditionRight": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Sources/SourceConditionRight.cshtml",
@@ -4112,41 +3582,28 @@
     ]
   },
   "cell source.DispatchPayloadMember": {
-    "modules": [
-      "Declarations",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceDispatchPayloadMember.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell source.ElementClass": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceElementClass.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell source.ElementHtml": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceElementHtml.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell source.ElementText": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceElementText.cshtml",
       "/Shared/_Layout.cshtml"
@@ -4154,7 +3611,6 @@
   },
   "cell source.Header": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -4163,30 +3619,21 @@
     ]
   },
   "cell source.MethodArgument": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceMethodArgument.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "cell source.PluginArgument": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourcePluginArgument.cshtml",
       "/Bench/Sources/_ScriptedLayout.cshtml"
     ]
   },
   "cell source.PropertySet": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourcePropertySet.cshtml",
       "/Shared/_Layout.cshtml"
@@ -4194,7 +3641,6 @@
   },
   "cell source.RequestMember": {
     "modules": [
-      "RenderingAndDelivery",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -4204,9 +3650,7 @@
   },
   "cell source.TextTestOperand": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Sources/SourceTextTestOperand.cshtml",
@@ -4214,10 +3658,7 @@
     ]
   },
   "cell source.WriteOnlySet": {
-    "modules": [
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Sources/SourceWriteOnlySet.cshtml",
       "/Shared/_Layout.cshtml"
