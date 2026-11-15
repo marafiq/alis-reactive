@@ -55,3 +55,13 @@ public sealed class Arg<T> : Arg
     /// <param name="source">The source the call's argument is read from.</param>
     public static implicit operator Arg<T>(TypedSource<T> source) => FromSource(source);
 }
+
+internal sealed class TheRunsAbortSignal : Arg
+{
+    internal static readonly TheRunsAbortSignal Instance = new();
+
+    private TheRunsAbortSignal()
+        : base(_ => SignalExpression.Instance)
+    {
+    }
+}

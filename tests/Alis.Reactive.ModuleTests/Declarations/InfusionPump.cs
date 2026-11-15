@@ -111,6 +111,10 @@ public sealed class InfusionPump : Component
     public MethodResult<int> TotalAsync() => MethodAsync<int>();
 
     public MethodResult<int> EstimateAsync(Arg<int> volume) => MethodAsync<int>([volume], name: "estimate-async", optional: true);
+
+    public MethodResult<string?> AskToSilence(Arg<string> question) => MethodAsync<string?>([question, AbortSignal()], name: "ask");
+
+    public void Purge(Arg<int> volume) => Method([AbortSignal(), volume]);
 }
 
 public sealed class Prescription

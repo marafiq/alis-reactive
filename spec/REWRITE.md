@@ -1126,7 +1126,11 @@ defects. An MVC action reaches the answer gate by its filter, with its own addre
 held, and the harness's test of it is green and fails on each of its two planted defects. U3 is closed: the
 tests that wait, the views and doors they meet, the harness verbs they use and the Playwright project's switch,
 which waits for the last test, land with their units (the owner, 2026-11-14).
-The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
+U12's C# half is built: a declared method called at its line, its result bound there or at its term (D4.7, D5.11),
+its typed arguments, a `Field` and the run's abort signal among them, the objects and lists a member holds or a method
+returns, and the lambdas over live items; `Event`, `Data<T>`, callbacks and answers, `Argument`, `MethodAt`,
+`CallItself`, `EventListening` and the iterators are built with their first consumer, U13 to U20, and U12's browser
+tests land by the doors their pages call. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
 pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). The commit that lands
 a piece rewrites this paragraph.
 

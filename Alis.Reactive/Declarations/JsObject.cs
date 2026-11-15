@@ -290,7 +290,7 @@ public abstract class JsObject
     /// view passes nothing for it.
     /// </remarks>
     /// <returns>The argument to list among a method's arguments.</returns>
-    protected static Arg AbortSignal() => throw new NotImplementedException();
+    protected static Arg AbortSignal() => TheRunsAbortSignal.Instance;
 
     /// <summary>Declares an event the object raises with no payload.</summary>
     /// <param name="name">The event's JavaScript name, when it is not the C# member's name in camel case.</param>
