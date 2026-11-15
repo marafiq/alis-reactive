@@ -1138,12 +1138,14 @@ each handler a door writes carrying its caller's file and line (D20.7); the plan
 Tracing slice, a boot span per plan with its error or its stop and traceparent sent to the page's origin alone (D20.4,
 D20.5); and `Alis.Reactive.OpenTelemetry` with its layout helper (N20.2). A request records no span until U18 calls
 the trace port's send, and U7's browser tests are not run yet.
-U11's lambdas are built: a list's lambda translated where the view renders, its orderings by the key's type and the
+U4, U5 and U10 are closed: their modules build every door they declare, the browser tests the spec places in them
+pass in one run (1, 1 and 5), their analyzers wait until after 1.0 (the owner, 2026-11-15), and each promise of
+theirs whose page calls a later unit's door is proven in that unit. U11's lambdas are built: a list's lambda translated where the view renders, its orderings by the key's type and the
 view's culture, a page under the culture its address names, a member read in its own form, and the refusals where
 the view renders, each naming its term or its read and the app's options, X6.57's date the app's own JSON converter
-writes among them; its 18 browser tests pass, and each fails on its planted defect. ALIS033's conditions (N18.10),
-ALIS028 (X6.52), the step a list's lambda refuses (X6.8, X5.13) and D6.14's suppressor (X6.46) are open, and X6.57's
-validator half waits on a date picker bound to a DateTime (N18.4).
+writes among them; its 18 browser tests pass, and each fails on its planted defect. ALIS033's conditions (N18.10), ALIS028 (X6.52), the step a list's lambda refuses (X6.8, X5.13) and D6.14's
+suppressor (X6.46) wait until after 1.0 with the analyzers (the owner, 2026-11-15), and X6.57's validator half, which
+waits on a date picker bound to a DateTime (N18.4), is placed in U18. U11 is closed.
 U12's C# half is built: a declared method called at its line, its result bound there or at its term (D4.7, D5.11),
 its typed arguments, a `Field` and the run's abort signal among them, the objects and lists a member holds or a method
 returns, and the lambdas over live items; `Event`, `Data<T>`, callbacks and answers, `Argument`, `MethodAt`,
@@ -1156,7 +1158,7 @@ the contract's table written before the compiler reads it, the conformance libra
 beside their declarations, boot's plugin queue and `alis:mount`, the plugin script of every page that links one, and
 the contract's reader with ALIS014 and ALIS015, the core and the conformance app opting in to the table; the contract's
 rules ALIS016 to ALIS022 and ALIS037 wait until after 1.0 with the analyzers that repeat a refusal where the view
-renders (the owner, 2026-11-15), and the 98 browser tests the spec lands in U13 pass in one run.
+renders (the owner, 2026-11-15), and the 98 browser tests the spec lands in U13 pass in one run. U13 is closed.
 U14 is landed: `Plugin` and its name's check, `pipeline.Plugin<TPlugin>()` with one locator a name,
 `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`, with their module tests. A host is ready once MVC has
 rendered a view with a plan (section 2.5).
