@@ -57,7 +57,7 @@ public abstract class JsObject
     /// <returns>The object, whose members are read, set and called through its declaration.</returns>
     protected TObject LiveObject<TObject>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()
-        => throw new NotImplementedException();
+        => Reaching<TObject>(Member(name, optional, nullable, declaredBy));
 
     /// <summary>Declares a property that holds an array of objects.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -68,7 +68,7 @@ public abstract class JsObject
     /// <returns>The list, with the operations a list of objects takes.</returns>
     protected LiveObjects<TItem> LiveObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TItem : JsObject, new()
-        => throw new NotImplementedException();
+        => new(Member(name, optional, nullable, declaredBy));
 
     /// <summary>Declares a method that takes no argument and returns nothing, and calls it where the pipeline reaches the line.</summary>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -145,7 +145,7 @@ public abstract class JsObject
     /// <returns>The object the call returned, whose members are read, set and called through its declaration.</returns>
     protected TObject ReturnedObject<TObject>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()
-        => throw new NotImplementedException();
+        => Reaching<TObject>(Returned([], name, optional, nullable, declaredBy));
 
     /// <summary>Declares a method that returns another object, and calls it with its arguments where the pipeline reaches the line.</summary>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
@@ -157,7 +157,7 @@ public abstract class JsObject
     /// <returns>The object the call returned, whose members are read, set and called through its declaration.</returns>
     protected TObject ReturnedObject<TObject>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TObject : JsObject, new()
-        => throw new NotImplementedException();
+        => Reaching<TObject>(Returned(arguments, name, optional, nullable, declaredBy));
 
     /// <summary>Declares a method that takes no argument and returns an array of objects, and calls it where the pipeline reaches the line.</summary>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -168,7 +168,7 @@ public abstract class JsObject
     /// <returns>The list the call returned, with the operations a list of objects takes.</returns>
     protected LiveObjects<TItem> ReturnedObjects<TItem>(string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TItem : JsObject, new()
-        => throw new NotImplementedException();
+        => new(Returned([], name, optional, nullable, declaredBy));
 
     /// <summary>Declares a method that returns an array of objects, and calls it with its arguments where the pipeline reaches the line.</summary>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
@@ -180,7 +180,7 @@ public abstract class JsObject
     /// <returns>The list the call returned, with the operations a list of objects takes.</returns>
     protected LiveObjects<TItem> ReturnedObjects<TItem>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, bool nullable = false, [CallerMemberName] string declaredBy = "")
         where TItem : JsObject, new()
-        => throw new NotImplementedException();
+        => new(Returned(arguments, name, optional, nullable, declaredBy));
 
     /// <summary>Declares the object's iterator, which yields objects, each read through its declaration.</summary>
     /// <remarks>
@@ -306,6 +306,27 @@ public abstract class JsObject
     protected Event<TArgs> Event<TArgs>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
+
+    private Binding Member(string? name, bool optional, bool nullable, string declaredBy)
+    {
+        var member = new MemberStep(JavaScriptName(name, declaredBy));
+        return new Reached(() => new GetExpression([member], Bound.Reads(optional), Bound.Target), Bound.Writer, optional || nullable);
+    }
+
+    private Binding Returned(IReadOnlyList<Arg> arguments, string? name, bool optional, bool nullable, string declaredBy)
+    {
+        var writer = Bound.Writer;
+        var result = writer.Result(Call(arguments, name, optional, declaredBy), false);
+        return new Reached(result.Read, writer, optional || nullable);
+    }
+
+    internal static TObject Reaching<TObject>(Binding bound)
+        where TObject : JsObject, new()
+    {
+        var reached = new TObject();
+        reached.Reach(bound);
+        return reached;
+    }
 
     private MethodResult<TResult> ResultOf<TResult>(IReadOnlyList<Arg> arguments, bool awaits, string? name, bool optional, string declaredBy)
     {

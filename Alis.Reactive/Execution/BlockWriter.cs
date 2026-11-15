@@ -10,7 +10,9 @@ internal sealed class BlockWriter
 {
     private readonly Stack<List<Statement>> _open = new();
     private readonly Stack<HandlerResults> _handlers = new();
+    private readonly Stack<LambdaResults> _lambdas = new();
     private int _results;
+    private int _liveItems;
 
     internal BlockWriter(PlanContent content)
     {
@@ -21,9 +23,29 @@ internal sealed class BlockWriter
 
     internal ResultBinding Result(CallExpression call, bool awaits)
     {
+        if (_lambdas.Count > 0 && awaits) throw AsyncInLambda();
         var name = ResultBinding.NameStem + (++_results).ToString(CultureInfo.InvariantCulture);
+        if (_lambdas.Count > 0) return _lambdas.Peek().Add(name, call);
         Write(new LetStatement(name, awaits, LetBinds.Line, call));
         return _handlers.Peek().Add(name);
+    }
+
+    internal string NextLiveItem() => "liveItem" + (++_liveItems).ToString(CultureInfo.InvariantCulture);
+
+    internal (Expression Body, TValue Value) Lambda<TValue>(Func<(Expression Body, TValue Value)> body)
+    {
+        var lambda = new LambdaResults();
+        _lambdas.Push(lambda);
+        try
+        {
+            var written = body();
+            return (lambda.Complete(written.Body), written.Value);
+        }
+        finally
+        {
+            lambda.Closed = true;
+            _lambdas.Pop();
+        }
     }
 
     internal IReadOnlyList<Statement> Handler(Action body)
@@ -65,6 +87,12 @@ internal sealed class BlockWriter
 
     internal void Write(Statement statement)
     {
+        if (_lambdas.Count > 0)
+        {
+            if (statement is DoStatement { Await: true }) throw AsyncInLambda();
+            throw new InvalidOperationException("A step is written inside a list's lambda, which reads each item and writes nothing. Write the step in the pipeline.");
+        }
+
         if (_open.Count == 0)
             throw new InvalidOperationException("A step is written inside a pipeline, the callback its trigger runs: no pipeline is open here.");
         _open.Peek().Add(statement);
@@ -100,6 +128,9 @@ internal sealed class BlockWriter
 
         return block;
     }
+
+    private static InvalidOperationException AsyncInLambda()
+        => new("An async method is called inside a list's lambda, which reads every item in one turn and waits for nothing. Call the method in the pipeline and read its result in the lambda.");
 
     internal sealed record Place(List<Statement> Block, int Index);
 }

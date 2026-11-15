@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Declarations;
@@ -40,6 +41,30 @@ public sealed class InfusionPump : Component
     public Property<Seal> Seal => Property<Seal>();
 
     public ReadOnly<ScheduledOrder> PendingOrder => ReadOnly<ScheduledOrder>();
+
+    public PumpPanel Panel => LiveObject<PumpPanel>();
+
+    public PumpPanel BackupPanel => LiveObject<PumpPanel>(optional: true);
+
+    public PumpPanel DetachedPanel => LiveObject<PumpPanel>(nullable: true);
+
+    public PumpPanel SparePanel => LiveObject<PumpPanel>(name: "spare-panel", optional: true, nullable: true);
+
+    public PumpPanel OpenPanel() => ReturnedObject<PumpPanel>();
+
+    public PumpPanel LocatePanel() => ReturnedObject<PumpPanel>(nullable: true);
+
+    public PumpPanel TryPanel() => ReturnedObject<PumpPanel>(name: "try-panel", optional: true);
+
+    public PumpPanel OpenPanelAt(Arg<int> position) => ReturnedObject<PumpPanel>([position], name: "open-panel", optional: true, nullable: true);
+
+    public LiveObjects<PumpChannel> OpenChannels() => ReturnedObjects<PumpChannel>();
+
+    public LiveObjects<PumpChannel> LocateChannels(Arg<int> position) => ReturnedObjects<PumpChannel>([position], name: "locate-channels", optional: true, nullable: true);
+
+    public Property<IReadOnlyList<int>> Readings => Property<IReadOnlyList<int>>();
+
+    public Property<bool> Ready => Property<bool>();
 
     public void Start() => Method();
 
@@ -143,4 +168,81 @@ public abstract class InfusionOrder
 public sealed class ScheduledOrder : InfusionOrder
 {
     public DateTime ReviewedAt { get; set; }
+}
+
+public sealed class PumpPanel : JsObject
+{
+    public Property<string?> Caption => Property<string?>();
+
+    public Property<string?> Hint => Property<string?>(optional: true);
+
+    public PumpDisplay Display => LiveObject<PumpDisplay>();
+
+    public PumpDisplay BackupDisplay => LiveObject<PumpDisplay>(optional: true);
+
+    public PumpDisplay DetachedDisplay => LiveObject<PumpDisplay>(nullable: true);
+
+    public PumpDisplay SpareDisplay => LiveObject<PumpDisplay>(optional: true, nullable: true);
+
+    public LiveObjects<PumpChannel> Channels => LiveObjects<PumpChannel>();
+
+    public LiveObjects<PumpChannel> BackupChannels => LiveObjects<PumpChannel>(optional: true);
+
+    public LiveObjects<PumpChannel> DetachedChannels => LiveObjects<PumpChannel>(nullable: true);
+
+    public LiveObjects<PumpChannel> SpareChannels => LiveObjects<PumpChannel>(name: "spare-channels", optional: true, nullable: true);
+
+    public ReadOnly<Prescription> Prescription => ReadOnly<Prescription>();
+
+    public void Refresh() => Method();
+
+    public void Silence() => Method(optional: true);
+
+    public MethodResult<bool> IsReady() => Method<bool>();
+
+    public MethodResult<bool> CanStart() => Method<bool>(optional: true);
+}
+
+public sealed class PumpDisplay : JsObject
+{
+    public ReadOnly<string?> Caption => ReadOnly<string?>();
+
+    public ReadOnly<string?> Hint => ReadOnly<string?>(optional: true);
+
+    public WriteOnly<string?> Message => WriteOnly<string?>(optional: true);
+
+    public void Show(Arg<string> text) => Method([text]);
+}
+
+public sealed class PumpChannel : JsObject
+{
+    public Property<int> Rate => Property<int>();
+
+    public Property<string?> Label => Property<string?>(optional: true);
+
+    public ReadOnly<Prescription> Prescription => ReadOnly<Prescription>();
+
+    public ReadOnly<IReadOnlyList<Prescription>> Prescriptions => ReadOnly<IReadOnlyList<Prescription>>();
+
+    public LiveObjects<PumpChannel> Channels => LiveObjects<PumpChannel>();
+
+    public MethodResult<bool> IsRunning() => Method<bool>();
+
+    public MethodResult<int> Measure() => Method<int>();
+
+    public MethodResult<int> Echo(Arg<int> value) => Method<int>([value]);
+
+    public PumpPanel OpenPanel() => ReturnedObject<PumpPanel>();
+
+    public void Stop() => Method();
+
+    public void StopWith(Arg<int> reason) => Method([reason]);
+
+    public void FlushAsync() => MethodAsync();
+
+    public void FlushWithAsync(Arg<int> volume) => MethodAsync([volume]);
+
+    public MethodResult<bool> IsRunningAsync() => MethodAsync<bool>();
+
+    public MethodResult<bool> CheckAsync(Arg<int> threshold) => MethodAsync<bool>([threshold]);
 }

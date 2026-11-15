@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.Execution;
@@ -11,6 +12,16 @@ internal static class ExpressionReads
         if (expression is RefExpression reference)
         {
             yield return new Read(reference, later, inFunction);
+            yield break;
+        }
+
+        if (expression is FnExpression function)
+        {
+            foreach (var read in In(function.Body, later, true))
+            {
+                if (!function.Params.Contains(read.Reference.Name)) yield return read;
+            }
+
             yield break;
         }
 
@@ -32,7 +43,6 @@ internal static class ExpressionReads
             DataExpression data => new[] { data.Target },
             AsExpression converted => new[] { converted.Expr },
             CallExpression call => CallParts(call),
-            FnExpression function => new[] { function.Body },
             AnswerExpression answer => new[] { answer.Body },
             RecordExpression record => Fields(record),
             ListExpression list => list.Items,

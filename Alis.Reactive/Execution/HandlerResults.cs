@@ -15,7 +15,7 @@ internal sealed class HandlerResults
 
     internal ResultBinding Add(string name)
     {
-        var result = new ResultBinding(name, this);
+        var result = new ResultBinding(name, () => Closed);
         _results.Add(name, result);
         return result;
     }

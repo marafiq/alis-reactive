@@ -28,6 +28,7 @@ public class WhenTheCoreIsCompiled
         "ArrayLambdas/ViewValues.cs System.Reflection.FieldInfo.GetValue",
         "ArrayLambdas/ViewValues.cs System.Reflection.PropertyInfo",
         "ArrayLambdas/ViewValues.cs System.Reflection.PropertyInfo.GetValue",
+        "Declarations/JsObject.cs System.Activator.CreateInstance",
         "RenderingAndDelivery/ViewPlans.cs System.Type.FullName",
         "TriggersAndPipelines/Pipeline.cs System.Activator.CreateInstance",
         "TypeKnowledge/WrittenMember.cs System.Reflection.MemberInfo.DeclaringType",

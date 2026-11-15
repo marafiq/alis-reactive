@@ -7,12 +7,12 @@ internal sealed class ResultBinding
 {
     internal const string NameStem = "result";
 
-    private readonly HandlerResults _handler;
+    private readonly Func<bool> _closed;
 
-    internal ResultBinding(string name, HandlerResults handler)
+    internal ResultBinding(string name, Func<bool> closed)
     {
         Reference = new RefExpression(name);
-        _handler = handler;
+        _closed = closed;
     }
 
     internal RefExpression Reference { get; }
@@ -21,7 +21,7 @@ internal sealed class ResultBinding
 
     internal RefExpression Read()
     {
-        if (_handler.Closed) throw OutsideBlock();
+        if (_closed()) throw OutsideBlock();
         return Reference;
     }
 

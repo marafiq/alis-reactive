@@ -38,15 +38,27 @@ internal sealed class NotReached : Binding
 
 internal sealed class Reached : Binding
 {
-    internal Reached(Expression target, BlockWriter writer)
+    private readonly Func<Expression> _target;
+    private readonly bool _mayBeAbsent;
+
+    internal Reached(Expression target, BlockWriter writer, bool mayBeAbsent = false)
+        : this(() => target, writer, mayBeAbsent)
     {
-        Target = target;
-        Writer = writer;
     }
 
-    internal override Expression Target { get; }
+    internal Reached(Func<Expression> target, BlockWriter writer, bool mayBeAbsent)
+    {
+        _target = target;
+        Writer = writer;
+        _mayBeAbsent = mayBeAbsent;
+    }
+
+    internal override Expression Target => _target();
 
     internal override BlockWriter Writer { get; }
 
-    internal override PathMembers Reads(bool optional) => optional ? PathMembers.OptionalMember : PathMembers.Required;
+    internal override PathMembers Reads(bool optional)
+        => _mayBeAbsent
+            ? optional ? PathMembers.Optional : PathMembers.RequiredIfHeld
+            : optional ? PathMembers.OptionalMember : PathMembers.Required;
 }
