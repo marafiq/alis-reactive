@@ -22,6 +22,10 @@ public sealed class DoseCart : Component
 
     public Property<decimal> Charged => Property<decimal>();
 
+    public Property<decimal> Ceiling => Property<decimal>();
+
+    public Property<decimal?> Copay => Property<decimal?>();
+
     public ReadOnly<List<DoseStatus>> Allowed => ReadOnly<List<DoseStatus>>();
 
     public Property<DateTime> Due => Property<DateTime>();
