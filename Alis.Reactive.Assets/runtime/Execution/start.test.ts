@@ -8,6 +8,7 @@ type Listener = (...args: unknown[]) => void;
 class Ward {
   readonly endings: (() => void)[] = [];
   readonly removals: (() => void)[] = [];
+  readonly drops: (() => void)[] = [];
 
   runs(end: () => void): void {
     this.endings.push(end);
@@ -19,11 +20,12 @@ class Ward {
 
   mounts(): void { return undefined; }
   holds(): void { return undefined; }
-  registers(): void { return undefined; }
+  registers(drop: () => void): void { this.drops.push(drop); }
 
   release(): void {
     for (const end of this.endings.splice(0)) end();
     for (const remove of this.removals.splice(0)) remove();
+    for (const drop of this.drops.splice(0)) drop();
   }
 }
 
@@ -338,4 +340,39 @@ function startedOn(ward: Ward, bell: Bell): WeakRef<Host> {
   const element: Host = { current: bell };
   start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined));
   return new WeakRef(element);
+}
+
+describe("when a plan contributes an input already held on the page", () => {
+  test("R14.6 starts none of the conflicting plan's handlers and logs one complete error", () => {
+    const first = new Ward();
+    const second = new Ward();
+    const desk = new Bell();
+    const lines: unknown[] = [];
+    const note = (line: unknown) => { lines.push(line); };
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    start(withInput("first", "first"), first, elementsOf(new Map()), deskOf(desk));
+    start(withInput("second", "second"), second, elementsOf(new Map()), deskOf(desk));
+    desk.raise("first", { text: "first heard" }, note);
+    desk.raise("second", { text: "second heard" }, note);
+    second.release();
+
+    expect(lines).toStrictEqual(["first heard"]);
+    expect(logged.mock.calls).toStrictEqual([["Input 'repeated' is already held by plan 'first' on the page; plan 'second' on the page did not start."]]);
+    first.release();
+    start(withInput("third", "third"), second, elementsOf(new Map()), deskOf(desk));
+    desk.raise("third", { text: "after release" }, note);
+    expect(lines).toStrictEqual(["first heard", "after release"]);
+    second.release();
+  });
+});
+
+function withInput(planId: string, event: string): Plan {
+  const plan = planOf(handler("desk", event));
+  return { ...plan, planId, objects: { ...plan.objects, $model: {
+    kind: "plugin", name: "alis.model", key: "", listen: onAndOff, data: {
+      kind: "model", containers: {}, inputs: {
+        repeated: { name: "Nights", path: ["nights"], value: { kind: "lit", value: 5 }, committed: "change", invalidClass: "invalid", message: "" },
+      },
+    },
+  } } };
 }

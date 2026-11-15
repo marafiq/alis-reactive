@@ -72,9 +72,9 @@ public sealed class Pipeline<TModel>
         var text = MvcText.Of(member);
         var names = _writer.Content.NameInput(text);
         var lambda = MemberLambda.Of(member, text, names.Name, typeof(TModel));
-        var app = _writer.Content.Json.App;
-        var input = InputsAndIds.BoundInput.Of(lambda, new MvcNames(names.Prefix, names.Name, names.Id), app,
-            () => JsonSerializer.SerializeToElement(default(TValue), app.GetTypeInfo(typeof(TValue))));
+        var live = _writer.Content.Json.LiveForm;
+        var input = InputsAndIds.BoundInput.Of(lambda, new MvcNames(names.Prefix, names.Name, names.Id), _writer.Content.Json,
+            () => JsonSerializer.SerializeToElement(default(TValue), live.GetTypeInfo(typeof(TValue))));
         return new BoundInput<TValue>(input.Id, _writer);
     }
 
@@ -204,7 +204,7 @@ public sealed class Pipeline<TModel>
     /// <param name="containerId">The id of the container's element.</param>
     /// <typeparam name="TContainer">The model the container's block was rendered for.</typeparam>
     /// <returns>The container, which a request sends and a step validates.</returns>
-    public RequestContainer<TContainer> Container<TContainer>(string containerId) => new(containerId);
+    public RequestContainer<TContainer> Container<TContainer>(string containerId) => new(containerId, _writer.Content);
 
     /// <summary>Unloads what a request loaded into an element: its plans stop, its components leave and the element empties.</summary>
     /// <param name="elementId">The id of the element a request loaded HTML into.</param>

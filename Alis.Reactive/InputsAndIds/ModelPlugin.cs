@@ -21,6 +21,13 @@ internal static class ModelPlugin
         DeclaredIn(plan);
     }
 
+    internal static Expression Sent(PlanContent plan, string containerId, string model)
+    {
+        DeclaredIn(plan);
+        return new CallExpression([new MemberStep("sent")], PathMembers.Required, new ObjExpression(ObjectId),
+            [ValuesAndSources.Literals.Text(containerId), ValuesAndSources.Literals.Text(model)]);
+    }
+
     private static void DeclaredIn(PlanContent plan)
         => plan.Declares(ObjectId, new PluginLocator(Name, NoKey, VendorListening.OfAnEventTarget, plan.ModelData));
 }

@@ -1,5 +1,7 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.InputsAndIds;
+using Alis.Reactive.OwnershipAndState;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.RequestsAndResponses;
@@ -10,9 +12,12 @@ namespace Alis.Reactive.RequestsAndResponses;
 /// <typeparam name="TModel">The model the container's block was rendered for.</typeparam>
 public class RequestContainer<TModel>
 {
-    internal RequestContainer(string elementId)
+    private readonly PlanContent _plan;
+
+    internal RequestContainer(string elementId, PlanContent plan)
     {
         ElementId = elementId;
+        _plan = plan;
     }
 
     internal string ElementId { get; }
@@ -20,15 +25,16 @@ public class RequestContainer<TModel>
     /// <summary>Reads a member of the container's model as the container sends it: the value of the input inside the container that binds the member.</summary>
     /// <remarks>
     /// The value has the member's type, so a number typed into a text box reads as that number. An input left blank, or
-    /// whose text does not convert to the member's type, reads as a new <typeparamref name="TModel"/> would hold the member,
-    /// and so does a member that no input inside the container binds. The read takes the inputs inside the container when
-    /// its step runs, and two of them that bind the member stop the pipeline, as they stop a request that sends the
-    /// container.
+    /// whose text does not convert to the member's type, reads the member's declared start. A member a present holder
+    /// lacks reads its start; a null holder, or a list position or dictionary key the sent body lacks, reads nothing.
+    /// A holder missing a required member, or an absent member whose start the JSON contract cannot obtain, stops the pipeline.
+    /// The read takes the inputs inside the container when its step runs. Two inputs that bind one name, a missing
+    /// container element, or no live view rendering the container for this model stops the pipeline.
     /// </remarks>
     /// <param name="member">The member to read, as a member path.</param>
     /// <typeparam name="TValue">The type of the member.</typeparam>
     /// <returns>A source of the member's value.</returns>
-    public TypedSource<TValue> Read<TValue>(Expression<Func<TModel, TValue>> member) => throw new NotImplementedException();
+    public TypedSource<TValue> Read<TValue>(Expression<Func<TModel, TValue>> member) => ContainerReads.Of(_plan, ElementId, member);
 }
 
 /// <summary>
@@ -37,7 +43,7 @@ public class RequestContainer<TModel>
 /// <typeparam name="TModel">The model the form's block was rendered for.</typeparam>
 public sealed class RequestForm<TModel> : RequestContainer<TModel>
 {
-    internal RequestForm(string elementId) : base(elementId)
+    internal RequestForm(string elementId, PlanContent plan) : base(elementId, plan)
     {
     }
 }

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
+using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 using Alis.Reactive.TypeKnowledge;
 
@@ -32,8 +33,10 @@ internal sealed partial class BoundInput
 
     internal string MessageId => Id + MessageOf;
 
-    internal static BoundInput Of(MemberLambda lambda, MvcNames names, JsonSerializerOptions app, Func<JsonElement> positionStart)
+    internal static BoundInput Of(MemberLambda lambda, MvcNames names, AppJson json, Func<JsonElement> positionStart)
     {
+        var app = json.App;
+        var live = json.LiveForm;
         var path = new List<PathStep>(PrefixSteps(names.Prefix, app));
         var sinceTheItem = new List<WrittenMember>();
         foreach (var step in lambda.Steps)
@@ -49,12 +52,19 @@ internal sealed partial class BoundInput
             var access = (MemberExpression)step.Node;
             if (holder.Kind != JsonTypeInfoKind.Object) throw NoBodyPath(lambda, step.Text, WrittenMember.DeclaringClass(access), holder);
             var member = WrittenMember.Of(access, holder, lambda.Lambda);
-            sinceTheItem.Add(member);
+            sinceTheItem.Add(WrittenMember.Of(access, live.GetTypeInfo(holder.Type), lambda.Lambda));
             path.Add(new MemberStep(NameOf(member, step.Text)));
         }
 
         var blank = lambda.EndsAtAPosition ? positionStart() : StartOf(lambda, sinceTheItem);
-        return new BoundInput(lambda.Scope + "__" + names.IdOfTheName, names.Name, path, InputShapes.Of(app.GetTypeInfo(lambda.Lambda.Body.Type), blank), new LitExpression(blank));
+        var shape = InputShapes.Of(live.GetTypeInfo(lambda.Lambda.Body.Type), blank);
+        if (shape is NumberShape && blank.ValueKind == JsonValueKind.String)
+        {
+            using var number = JsonDocument.Parse(blank.GetString()!);
+            blank = number.RootElement.Clone();
+        }
+
+        return new BoundInput(lambda.Scope + "__" + names.IdOfTheName, names.Name, path, shape, new LitExpression(blank));
     }
 
     internal InputBinding Binding(ComponentInput input, string invalidClass, bool hidden)

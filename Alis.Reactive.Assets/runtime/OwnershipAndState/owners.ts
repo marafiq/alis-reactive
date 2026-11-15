@@ -36,6 +36,11 @@ export function ownerAround(placed: Placed, named: ReadonlySet<string>): Owner {
   return innermost === undefined ? page : slotOwner(innermost);
 }
 
+export function placeOf(owner: Owner): string {
+  const slot = [...liveSlots.values()].find(live => live.owner === owner);
+  return slot === undefined ? "on the page" : "in slot '" + slot.container.id + "'";
+}
+
 export function releaseSlot(container: Placed): Thrown[] {
   const leaving = [...insideInnermostFirst(container), ...liveAt(container)];
   for (const slot of leaving) liveSlots.delete(slot.container.id);

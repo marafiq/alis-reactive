@@ -1,3 +1,4 @@
+import { pageInputs } from "../InputsAndIds/index";
 import { ownerAround, slotsNamedBy } from "../OwnershipAndState/index";
 import { plugin, provide, readQueue, type PluginRegistration } from "../Plugins/index";
 import { documentPlugin, started } from "../TriggersAndPipelines/index";
@@ -13,6 +14,7 @@ declare global {
 
 export function boot(): void {
   provide("alis.document", () => documentPlugin);
+  provide("alis.model", () => pageInputs);
   readQueue(window.__alisPlugins ??= []);
   document.dispatchEvent(new CustomEvent("alis:mount", { detail: { root: document.body } }));
   const found = plansWithin(document);

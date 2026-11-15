@@ -51,7 +51,7 @@ internal sealed class MemberLambda
         return new MemberLambda(lambda, steps, member, declaring);
     }
 
-    private static IReadOnlyList<Step>? StepsOf(LambdaExpression lambda, string mvcText)
+    internal static IReadOnlyList<Step>? StepsOf(LambdaExpression lambda, string mvcText)
     {
         var taken = new List<System.Linq.Expressions.Expression>();
         var node = lambda.Body;

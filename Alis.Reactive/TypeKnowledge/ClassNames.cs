@@ -12,6 +12,9 @@ internal static class ClassNames
     private const char ArityMark = '`';
     private const char ArgumentsOpen = '[';
 
+    internal static string ModelKey(Type model)
+        => model.FullName ?? throw new InvalidOperationException("A plan's model is a type with a full name.");
+
     internal static string InNamespace(Type declaring)
     {
         var full = declaring.FullName ?? throw new InvalidOperationException("A member's declaring class is a type with a full name.");

@@ -142,3 +142,21 @@ describe("when a data read meets its record, it keeps Absence.tla's reads", () =
     expect(charted(JSON.parse('{"constructor":"held"}'), step("constructor", starts("none")))).toStrictEqual(["before", "held"]);
   });
 });
+
+describe("when a container's data read uses the sent body", () => {
+  test("AnUnsentMemberReadsWhatTheEndpointBinds: an absent number reads its literal start", () => {
+    expect(charted({}, step("nights", { kind: "start", value: 5 }))).toStrictEqual(["before", 5]);
+  });
+
+  test("ReadIsWhatTheEndpointBinds and ReachBlankReadsItsStart: the binding's cleared number reads its live start", () => {
+    const chart = new Chart();
+    const blank: Source = {
+      kind: "op", op: "coalesce", args: [
+        { kind: "as", expr: record, shape: { kind: "nullable", inner: { kind: "number", of: "integer", text: "view" } } },
+        { kind: "lit", value: 5 },
+      ],
+    };
+    new Lane("overlap", [before, charts(blank)], aRoundsOwner).raise(raisedWith({ chart, record: "   " }));
+    expect(chart.lines).toStrictEqual(["before", 5]);
+  });
+});

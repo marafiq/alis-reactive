@@ -8,6 +8,7 @@ using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 using Alis.Reactive.Tracing;
 using Alis.Reactive.TriggersAndPipelines;
+using Alis.Reactive.TypeKnowledge;
 
 namespace Alis.Reactive.RenderingAndDelivery;
 
@@ -41,5 +42,5 @@ internal static class ViewPlans
         => ScriptOpen + JsonSerializer.Serialize(plan.Writer.Content.Document(RenderTrace.OfTheRender()), PlanJson.Options) + ScriptClose;
 
     private static string IdOf<TModel>()
-        => typeof(TModel).FullName ?? throw new InvalidOperationException("A plan's model is a type with a full name.");
+        => ClassNames.ModelKey(typeof(TModel));
 }

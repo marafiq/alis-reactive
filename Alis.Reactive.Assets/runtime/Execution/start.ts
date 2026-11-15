@@ -1,8 +1,10 @@
-import { holdSlots, slotsNamedBy, type Owner } from "../OwnershipAndState/index";
+import { pageInputs } from "../InputsAndIds/index";
+import { holdSlots, placeOf, slotsNamedBy, type Owner } from "../OwnershipAndState/index";
 import { assertNever, type Handler, type Locator, type PlanDocument } from "../Schema/index";
-import { got, Stop, value } from "../ValuesAndSources/index";
+import { got, heldOrNull, Stop, value } from "../ValuesAndSources/index";
 import { subscribe } from "../Vendors/index";
 import { bind, isAnObject, type Context } from "./context";
+import { evaluate } from "./expressions";
 import { Lane } from "./lane";
 import { heldBy, located, locatorOf, type ElementFor, type Located, type PluginFor } from "./objects";
 
@@ -10,8 +12,15 @@ const payloadName = "e";
 const argumentsName = "arguments";
 
 export function start(plan: PlanDocument, owner: Owner, elementFor: ElementFor, pluginFor: PluginFor): void {
-  holdSlots(slotsNamedBy(plan), owner);
   const context: Context = { plan, owner, scope: new Map(), signal: new AbortController().signal };
+  try {
+    pageInputs.join(plan, owner, placeOf(owner), expression => heldOrNull(evaluate(expression, context)));
+  } catch (stopped) {
+    if (!(stopped instanceof Stop)) throw stopped;
+    console.error(stopped.reason);
+    return;
+  }
+  holdSlots(slotsNamedBy(plan), owner);
   for (const handler of plan.handlers) {
     try {
       listen(handler, context, elementFor, pluginFor);

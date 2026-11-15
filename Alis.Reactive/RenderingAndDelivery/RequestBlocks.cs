@@ -21,7 +21,7 @@ public sealed class RequestFormBlock<TModel> : IDisposable
     internal RequestFormBlock(TextWriter writer, ReactivePlan<TModel> plan, string id, Action checkPrefix)
     {
         _block = new RequestBlock(writer, plan.Writer.Content, id, ContainerKind.Form, checkPrefix);
-        Form = new RequestForm<TModel>(id);
+        Form = new RequestForm<TModel>(id, plan.Writer.Content);
     }
 
     /// <summary>Gets the form's handle, which a request sends and a step validates.</summary>
@@ -46,7 +46,7 @@ public sealed class RequestContainerBlock<TModel> : IDisposable
     internal RequestContainerBlock(TextWriter writer, ReactivePlan<TModel> plan, string id, Action checkPrefix)
     {
         _block = new RequestBlock(writer, plan.Writer.Content, id, ContainerKind.Element, checkPrefix);
-        Container = new RequestContainer<TModel>(id);
+        Container = new RequestContainer<TModel>(id, plan.Writer.Content);
     }
 
     /// <summary>Gets the container's handle, which a request sends and a step validates.</summary>

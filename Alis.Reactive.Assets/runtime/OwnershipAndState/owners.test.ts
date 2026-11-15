@@ -26,6 +26,14 @@ const aScriptInTheBedList = { id: "", parentElement: bedList };
 const aScriptInThePanel = { id: "", parentElement: panel };
 
 describe("when a plan's owner is found", () => {
+  test("R14.6 names the page or the innermost slot holding the plan's script", async () => {
+    const { ownerAround, placeOf } = await aPage();
+    const named = new Set(["card", "bed-list"]);
+    expect(placeOf(ownerAround(aScriptOfThePage, named))).toBe("on the page");
+    expect(placeOf(ownerAround(aScriptInTheCard, named))).toBe("in slot 'card'");
+    expect(placeOf(ownerAround(aScriptInTheBedList, named))).toBe("in slot 'bed-list'");
+  });
+
   test("a plan the server rendered inside a slot leaves at the slot's first release, and the page's plan stays", async () => {
     const { ownerAround, releaseSlot } = await aPage();
     const named = new Set(["card"]);

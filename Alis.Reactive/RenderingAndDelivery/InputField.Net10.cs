@@ -50,9 +50,9 @@ public sealed partial class InputField<TModel, TValue>
         var text = MvcText.Of(member);
         var name = html.ViewData.TemplateInfo.GetFullHtmlFieldName(text);
         FieldPrefixes.RefuseAMoveAfterThePlanStarted(plan.StartPrefix, prefix, () => ViewPaths.Of(html), name);
-        var app = plan.Writer.Content.Json.App;
+        var live = plan.Writer.Content.Json.LiveForm;
         var lambda = MemberLambda.Of(member, text, name, typeof(TModel));
-        _bound = BoundInput.Of(lambda, new MvcNames(prefix, name, html.GenerateIdFromName(name)), app, () => JsonSerializer.SerializeToElement(default(TValue), app.GetTypeInfo(typeof(TValue))));
+        _bound = BoundInput.Of(lambda, new MvcNames(prefix, name, html.GenerateIdFromName(name)), plan.Writer.Content.Json, () => JsonSerializer.SerializeToElement(default(TValue), live.GetTypeInfo(typeof(TValue))));
         var services = html.ViewContext.HttpContext.RequestServices;
         _classNames = services.GetService<ReactiveClassNames>() ?? new ReactiveClassNames();
         ValueJson = services.GetRequiredService<ModelExpressionProvider>().CreateModelExpression(html.ViewData, member).Model is TValue held ? plan.Json(held) : "null";
