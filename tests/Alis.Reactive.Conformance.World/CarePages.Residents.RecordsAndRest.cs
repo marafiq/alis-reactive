@@ -5,6 +5,7 @@ public static partial class CarePages
     public const string CensusDaysWithADayHeldAsSlashedText = Residents + "census/days/a-day-held-as-slashed-text";
     public const string CensusDaysWithEveryDayHeldAsADate = Residents + "census/days/every-day-held-as-a-date";
     public const string CensusDaysWithADayNoMonthHolds = Residents + "census/days/a-day-no-month-holds";
+    public const string CensusRaisedTime = Residents + "census/raised-time";
     public const string CensusItemPositions = Residents + "census/item-positions";
     public const string CensusFirstActiveItems = Residents + "census/first-active-items";
     public const string CensusActiveCounts = Residents + "census/active-counts";

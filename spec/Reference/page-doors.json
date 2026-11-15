@@ -2852,6 +2852,15 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M4.F1 X6.58 1": {
+    "modules": [
+      "InputsAndIds"
+    ],
+    "views": [
+      "/Care/Residents/CensusRaisedTime.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M4.F1 X6.7 0": {
     "modules": [
       "Elements",
