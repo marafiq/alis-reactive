@@ -19,7 +19,7 @@ public sealed class WhenARouteValueIsSentBesideAComponentsMember(string host) : 
         var sent = await bench.Page.RunAndWaitForRequestAsync(() => bench.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Load", Exact = true }).ClickAsync(), "**/groups/*/notes");
         Assert.That(sent.Method, Is.EqualTo("POST"));
         Assert.That(sent.Url, Does.EndWith("/groups/Alpha/notes"));
-        Assert.That(sent.PostData, Is.EqualTo("{\"code\":\"a-1\"}"));
+        Assert.That(sent.PostData, Is.EqualTo("{\"group\":\"Alpha\",\"code\":\"a-1\"}"));
         await Expect(bench.Page.Locator("#shown")).ToHaveTextAsync("Alpha: a-1");
 
         var regrouped = await NewWorld();

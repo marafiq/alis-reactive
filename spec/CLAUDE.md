@@ -1774,3 +1774,8 @@ and push the spec branch the one way section 16 of the brief allows, then `spec/
 A plant names the text it replaces, so a commit that rewrites a line of the spec moves the anchor of each plant that
 names it in the same commit, and the plants of the checks that read the line run before the full check (the lead's
 mistakes, 2026-11-11).
+- The lead, 2026-11-15, on the owner's words of 2026-11-14 ("I'll go with your recommendation ... you keep bringing up
+  these issues which you can decide for yourself pretty easily. The quality must hold.") and of 2026-11-15 ("But
+  exactly wait on my direction after all this time."): a form, a wording or a harness setting no line writes, which
+  G13 sent back to the owner, is the lead's, decided from the spec, the POCs and the TLA+ specs by quality and
+  recorded as one line; only a principle, a closed rule or the scope goes to the owner, as root CLAUDE.md states.

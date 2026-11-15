@@ -17,13 +17,13 @@ public sealed class WhenAMethodsArgumentFallsBackFromANull(string host) : Confor
         var silent = await NewWorld();
         await silent.Page.GotoAsync(CarePages.PumpLogWithNoAlarm);
         await silent.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Log value", Exact = true }).ClickAsync();
-        await Expect(silent.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
+        await Expect(silent.Page.Locator("#care-panel").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(new[] { "text No value" });
 
         var alarmed = await NewWorld();
         await alarmed.Page.GotoAsync(CarePages.PumpLogWithAnAlarm);
         await alarmed.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Log value", Exact = true }).ClickAsync();
-        await Expect(alarmed.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
+        await Expect(alarmed.Page.Locator("#care-panel").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(new[] { "text Air in line" });
     }
 }

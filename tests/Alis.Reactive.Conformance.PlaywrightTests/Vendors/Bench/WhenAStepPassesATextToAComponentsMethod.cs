@@ -17,12 +17,12 @@ public sealed class WhenAStepPassesATextToAComponentsMethod(string host) : Confo
         var bench = await NewWorld();
         await bench.Page.GotoAsync(BenchPages.MethodArgScalar);
         await bench.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Log", Exact = true }).ClickAsync();
-        await Expect(bench.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
-            .ToHaveTextAsync(new[] { "Checked at 14:00" });
+        await Expect(bench.Page.Locator("#conformance").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
+            .ToHaveTextAsync(new[] { "text Checked at 14:00" });
 
         var unlogged = await NewWorld();
         await unlogged.Page.GotoAsync(BenchPages.MethodArgScalar);
-        await Expect(unlogged.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
+        await Expect(unlogged.Page.Locator("#conformance").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveCountAsync(0);
     }
 }

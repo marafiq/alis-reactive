@@ -759,8 +759,8 @@
         },
         {
           "for": "M4.X3",
-          "page": "The census panel, the residents screen's ConformanceComponent, whose Records property holds a plain array of Martin, Adams and Lee in the order of admission, and a second ConformanceComponent beside it, census-sorted; a Sort button sets census-sorted's Records from the census panel's Records ordered by Name, then shows the census panel's first name, Records.Find(r => true, r => r.Name).",
-          "gesture": "Click Sort.",
+          "page": "The census panel, the residents screen's ConformanceComponent, whose Records property holds a plain array of Martin, Adams and Lee in the order of admission, and a second ConformanceComponent beside it, census-sorted; a Copy sorted button sets census-sorted's Records from the census panel's Records ordered by Name, then shows the census panel's first name, Records.Find(r => true, r => r.Name).",
+          "gesture": "Click Copy sorted.",
           "outcome": "census-sorted lists Adams, Lee and Martin, and the first name shows Martin.",
           "opposite": "Ordered by name descending, census-sorted lists Martin, Lee and Adams, and the first name shows Martin.",
           "defect": "The sort runs in place on the census panel's own array, so the first name shows Adams."

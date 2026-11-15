@@ -16,14 +16,14 @@ public sealed class WhenASortedListIsSetIntoAnotherComponent(string host) : Conf
     {
         var byName = await NewWorld();
         await byName.Page.GotoAsync(CarePages.CensusSortedByName);
-        await byName.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Sort", Exact = true }).ClickAsync();
+        await byName.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Copy sorted", Exact = true }).ClickAsync();
         await Expect(byName.Page.Locator("#census-sorted").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Records", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(["Adams", "Lee", "Martin"]);
         await Expect(byName.Page.Locator("#first-name")).ToHaveTextAsync("Martin");
 
         var descending = await NewWorld();
         await descending.Page.GotoAsync(CarePages.CensusSortedByNameDescending);
-        await descending.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Sort", Exact = true }).ClickAsync();
+        await descending.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Copy sorted", Exact = true }).ClickAsync();
         await Expect(descending.Page.Locator("#census-sorted").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Records", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(["Martin", "Lee", "Adams"]);
         await Expect(descending.Page.Locator("#first-name")).ToHaveTextAsync("Martin");

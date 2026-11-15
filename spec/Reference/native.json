@@ -2089,9 +2089,9 @@
       "promise": {
         "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Log button whose click calls conformance.Log(\"Checked at 14:00\").",
         "gesture": "Click Log.",
-        "outcome": "The component's log line reads Checked at 14:00.",
+        "outcome": "The component's log line reads text Checked at 14:00.",
         "opposite": "Before the click the log line is empty.",
-        "defect": "The argument is passed as a one-item list, so the log line reads [\"Checked at 14:00\"]."
+        "defect": "The argument does not reach the method, so the log line reads text undefined."
       }
     },
     "method.arg.object": {
@@ -2851,7 +2851,7 @@
       "promise": {
         "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Log button whose click calls conformance.Log(conformance.Value.IfNull(\"none\")), since a text without null takes a nullable source through IfNull (D7.3).",
         "gesture": "Click the page's button.",
-        "outcome": "The component's log line reads a-1.",
+        "outcome": "The component's log line reads text a-1.",
         "opposite": "Before the click the log line is empty.",
         "defect": "The component's member read at Positions.MethodArgument reads its name instead of its value, so the log line reads nothing."
       }
@@ -2947,7 +2947,7 @@
       "promise": {
         "page": "A page that renders the ConformanceComponent conformance, its text Alpha and its value a-1, with an element shown, and a Load button whose click sends a POST to /groups/{group}/notes with Group set to Alpha and conformance.Value as Code, the endpoint answering the group and code as shown's text.",
         "gesture": "Click Load.",
-        "outcome": "The request is POST /groups/Alpha/notes, its body holds Code a-1, and shown reads Alpha: a-1.",
+        "outcome": "The request is POST /groups/Alpha/notes, its body holds Group Alpha and Code a-1, since a member that fills a placeholder is sent in the body too (D9.9), and shown reads Alpha: a-1.",
         "opposite": "With Group set to Beta the same click posts to /groups/Beta/notes.",
         "defect": "The placeholder is filled from the component's value instead of Group, so the request goes to /groups/a-1/notes.",
         "observes": "Request.tla:Route"

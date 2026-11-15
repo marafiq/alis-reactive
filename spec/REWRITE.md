@@ -1163,9 +1163,8 @@ rendered a view with a plan (section 2.5).
 U15 is landed: every door of `Element`, `ClassList`, `ElementChildren` and `ChildElement`, `JsObject`'s iterators, the
 runtime's `list` node, and a world whose browser runs in the zone a promise names (`NewWorldInZone`, section 2.5);
 M5.X2's test and the zone's harness test pass, X17.3's, X17.12's and X17.17's, U13's, pass on the conformance
-library's TypeScript, and a run through U13 or later waits on X4.9's test. Of the 29 browser tests U15 lands now, 27
-pass; the two the page table moved in, a sorted list set into another component and a method's argument that falls
-back from a null, fail.
+library's TypeScript, and a run through U13 or later waits on X4.9's test. The 29 browser tests U15 lands pass, each
+failing on its plant.
 U16 is landed: `IdGenerator.For`, `Html.InputField` with its options on both hosts, `ComponentInput.Of`,
 `AddReactiveClassNames`, `Html.PartialFor`, the request form and container blocks, `pipeline.Input`,
 `pipeline.Container` and `container.Read`, with their refusals where the view renders; the runtime's page tables of
@@ -1180,8 +1179,8 @@ headers and the reply's success and error scopes, on both hosts. U20's app event
 document's load and custom-event triggers under a handler's policy, a payload member read at the event's detail, and a
 raise from markup; most of the browser tests U20 lands wait on U18's other methods. A date shown as an element's text is
 its declared type's, C# writing on the `string` shape whether it holds a `DateTime` or a `DateTimeOffset`. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
-pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). The commit that lands
-a piece rewrites this paragraph.
+pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). A unit's last commit
+rewrites this paragraph, as root `CLAUDE.md` states.
 
 ### U1. Tools, pins and tables
 Features: M20.F1

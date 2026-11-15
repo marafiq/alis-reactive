@@ -28,7 +28,7 @@ public sealed class WhenAValueHoldsItsOwnTypeAndADate(string host) : Conformance
         await passed.Page.GotoAsync(RefusalPages.Index);
         await passed.Page.GetByRole(AriaRole.Link, new PageGetByRoleOptions { Name = "Open the linked days" }).ClickAsync();
         await passed.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Take the linked" }).ClickAsync();
-        await Expect(passed.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log" }).GetByRole(AriaRole.Listitem))
+        await Expect(passed.Page.Locator("#conformance").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(new[] { "Date 2026-03-01 08:00", "Date 2026-02-28 08:00" });
     }
 }

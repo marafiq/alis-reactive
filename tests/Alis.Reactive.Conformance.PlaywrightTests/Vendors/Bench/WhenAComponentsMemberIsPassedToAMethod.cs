@@ -16,8 +16,8 @@ public sealed class WhenAComponentsMemberIsPassedToAMethod(string host) : Confor
     {
         var bench = await NewWorld();
         await bench.Page.GotoAsync(BenchPages.SourceMethodArgument);
-        await Expect(bench.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem)).ToHaveCountAsync(0);
+        await Expect(bench.Page.Locator("#conformance").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem)).ToHaveCountAsync(0);
         await bench.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Log", Exact = true }).ClickAsync();
-        await Expect(bench.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem)).ToHaveTextAsync(new[] { "a-1" });
+        await Expect(bench.Page.Locator("#conformance").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem)).ToHaveTextAsync(new[] { "text a-1" });
     }
 }

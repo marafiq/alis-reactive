@@ -18,7 +18,7 @@ public sealed class WhenAComponentReceivesDatesAnInstantANullAndItsOwnRecord(str
         await planner.Page.GotoAsync(CarePages.VisitPlanner);
         await planner.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Take the week", Exact = true }).ClickAsync();
         await planner.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Raise", Exact = true }).ClickAsync();
-        await Expect(planner.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
+        await Expect(planner.Page.Locator("#care-panel").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(new[]
             {
                 "Date 2026-11-09 09:00",
@@ -35,7 +35,7 @@ public sealed class WhenAComponentReceivesDatesAnInstantANullAndItsOwnRecord(str
         var texted = await NewWorld();
         await texted.Page.GotoAsync(CarePages.VisitPlanner);
         await texted.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Log text", Exact = true }).ClickAsync();
-        await Expect(texted.Page.GetByRole(AriaRole.Log, new PageGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
+        await Expect(texted.Page.Locator("#care-panel").GetByRole(AriaRole.List, new LocatorGetByRoleOptions { Name = "Log", Exact = true }).GetByRole(AriaRole.Listitem))
             .ToHaveTextAsync(new[] { "text 2026-11-09T09:00:00" });
     }
 }

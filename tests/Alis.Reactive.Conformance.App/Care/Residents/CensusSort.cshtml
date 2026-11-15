@@ -13,7 +13,7 @@
 @(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Records = Model.Admissions }))
 @(plan.ConformanceComponent("census-sorted", new ConformanceStart { Text = "Sorted" }))
 <p>First admitted: <span id="first-name"></span></p>
-<button type="button" @Html.Raises(plan, CensusSorts.Sort)>Sort</button>
+<button type="button" @Html.Raises(plan, CensusSorts.Sort)>Copy sorted</button>
 @{
     Html.On(plan, trigger => trigger.CustomEvent(CensusSorts.Sort, pipeline =>
     {

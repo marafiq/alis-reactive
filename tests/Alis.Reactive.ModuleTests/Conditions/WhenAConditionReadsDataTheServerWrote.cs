@@ -1,7 +1,9 @@
 using System;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Alis.Reactive.Conditions;
+using Alis.Reactive.Declarations;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.TriggersAndPipelines;
@@ -20,6 +22,12 @@ public sealed class WhenAConditionReadsDataTheServerWrote
     private const string HandedOverAt = "{\"kind\":\"op\",\"op\":\"wallKey\",\"args\":[" +
         "{\"kind\":\"data\",\"path\":[{\"name\":\"at\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"0001-01-01T00:00:00\"}}],\"target\":" +
         "{\"kind\":\"get\",\"path\":[\"value\"],\"members\":\"optional\",\"target\":{\"kind\":\"get\",\"path\":[\"body\"],\"members\":\"required\",\"target\":{\"kind\":\"ref\",\"name\":\"reply1\"}}}}]}";
+
+    private const string FluidsRatio = "{\"kind\":\"data\",\"path\":[{\"name\":\"ratio\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":0}}],\"target\":" +
+        "{\"kind\":\"get\",\"path\":[\"value\"],\"members\":\"optional\",\"target\":{\"kind\":\"get\",\"path\":[\"body\"],\"members\":\"required\",\"target\":{\"kind\":\"ref\",\"name\":\"reply1\"}}}}";
+
+    private const string FluidsCopay = "{\"kind\":\"data\",\"path\":[{\"name\":\"copay\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"0\"}}],\"target\":" +
+        "{\"kind\":\"get\",\"path\":[\"value\"],\"members\":\"optional\",\"target\":{\"kind\":\"get\",\"path\":[\"body\"],\"members\":\"required\",\"target\":{\"kind\":\"ref\",\"name\":\"reply1\"}}}}";
 
     [Test]
     public void a_date_the_server_wrote_is_ordered_by_its_wall_key()
@@ -68,6 +76,40 @@ public sealed class WhenAConditionReadsDataTheServerWrote
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
 
+    [Test]
+    public void a_double_the_apps_options_write_as_text_is_not_compared_with_a_value()
+        => Assert.That(
+            () => RenderedFluids(fluids => fluids.Read(f => f.Ratio).Eq(0.0), json => json.NumberHandling = JsonNumberHandling.WriteAsString),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "A condition compares a float or double the JSON writes as text, whose text does not equal as the number does, as -0 and 0 or NaN and NaN; compare it on the server."));
+
+    [Test]
+    public void a_double_the_apps_options_write_as_a_number_is_compared_with_a_value()
+    {
+        var plan = RenderedFluids(fluids => fluids.Read(f => f.Ratio).Eq(0.0), _ => { });
+
+        Assert.That(Condition(plan).GetRawText(), Is.EqualTo("{\"kind\":\"op\",\"op\":\"eq\",\"args\":[" + FluidsRatio + ",{\"kind\":\"lit\",\"value\":0}]}"));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void a_decimal_the_apps_options_write_as_text_is_compared_by_its_value()
+    {
+        var plan = RenderedFluids(fluids => fluids.Read(f => f.Copay).Eq(0.10m), json => json.NumberHandling = JsonNumberHandling.WriteAsString);
+
+        Assert.That(Condition(plan).GetRawText(), Is.EqualTo("{\"kind\":\"op\",\"op\":\"eqDecimal\",\"args\":[" + FluidsCopay + ",{\"kind\":\"lit\",\"value\":\"0.10\"}]}"));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
+    public void a_decimal_the_apps_options_write_as_text_differs_by_its_value()
+    {
+        var plan = RenderedFluids(fluids => fluids.Read(f => f.Copay).NotEq(0.10m), json => json.NumberHandling = JsonNumberHandling.WriteAsString);
+
+        Assert.That(Condition(plan).GetRawText(), Is.EqualTo("{\"kind\":\"op\",\"op\":\"not\",\"args\":[{\"kind\":\"op\",\"op\":\"eqDecimal\",\"args\":[" + FluidsCopay + ",{\"kind\":\"lit\",\"value\":\"0.10\"}]}]}"));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
     private static string Rendered(Func<TypedSource<DateTime>, DoseCart, TypedSource<bool>> condition, Action<JsonSerializerOptions> json)
     {
         var html = Views.Of(new DoseRound("North"), json, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
@@ -83,6 +125,17 @@ public sealed class WhenAConditionReadsDataTheServerWrote
         return rendered[ScriptOpen.Length..^ScriptClose.Length];
     }
 
+    private static string RenderedFluids(Func<ReadOnly<WardFluids>, TypedSource<bool>> condition, Action<JsonSerializerOptions> json)
+    {
+        var html = Views.Of(new DoseRound("North"), json, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
+        var plan = html.ReactivePlan<DoseRound>();
+        html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get("/fluids").OnSuccess<WardFluids>((fluids, pipeline) => pipeline
+            .When(condition(fluids.Body))
+            .Then(pipeline => pipeline.Element("fluids").Text.Set("balanced")))));
+        var rendered = Views.TextOf(html.RenderPlan(plan));
+        return rendered[ScriptOpen.Length..^ScriptClose.Length];
+    }
+
     private static JsonElement Condition(string plan)
     {
         var request = JsonDocument.Parse(plan).RootElement.GetProperty("handlers")[0].GetProperty("do").EnumerateArray()
@@ -92,3 +145,5 @@ public sealed class WhenAConditionReadsDataTheServerWrote
 }
 
 public sealed record WardHandover(string Ward, DateTime At);
+
+public sealed record WardFluids(string Ward, double Ratio, decimal Copay);

@@ -208,6 +208,8 @@ public static class Comparisons
         var written = left.Form.Beside(right);
         var writtenAsAnObject = written.Value.ValueKind is JsonValueKind.Object or JsonValueKind.Array;
         if (writtenAsAnObject) throw ComparesObjects();
+        RefuseAFractionWrittenAsText<TValue>(written);
+        if (IsADecimalWrittenAsText<TValue>(written)) return EqualByValue(op, left, written);
         return Compared<TValue>(op, left, written, left.Form);
     }
 
@@ -226,13 +228,26 @@ public static class Comparisons
         if (Keys.IsDateOrTime<TValue>())
             throw new InvalidOperationException("A condition compares a date or a time its own converter writes, whose text the converter decides; compare it on the server.");
         var written = left.Form.Beside(right);
-        var writtenAsText = written.Value.ValueKind == JsonValueKind.String;
-        if (writtenAsText && ComparedTypes.IsBinaryFraction(typeof(TValue)))
-            throw new InvalidOperationException("A condition compares a float or double the JSON writes as text, whose text does not equal as the number does, as -0 and 0 or NaN and NaN; compare it on the server.");
-        var decimalText = writtenAsText && ComparedTypes.IsDecimal(typeof(TValue));
+        RefuseAFractionWrittenAsText<TValue>(written);
+        var decimalText = IsADecimalWrittenAsText<TValue>(written);
         if (decimalText && own.Member.HasItsOwnConverter)
             throw new InvalidOperationException("A condition compares a decimal its own converter writes as text, whose text the converter decides; compare it on the server.");
         if (!decimalText) return new Computed<bool>(new OpExpression(op, [left.Expression, written]), left.Form.Computed);
+        return EqualByValue(op, left, written);
+    }
+
+    private static void RefuseAFractionWrittenAsText<TValue>(LitExpression written)
+    {
+        var fractionWrittenAsText = written.Value.ValueKind == JsonValueKind.String && ComparedTypes.IsBinaryFraction(typeof(TValue));
+        if (fractionWrittenAsText)
+            throw new InvalidOperationException("A condition compares a float or double the JSON writes as text, whose text does not equal as the number does, as -0 and 0 or NaN and NaN; compare it on the server.");
+    }
+
+    private static bool IsADecimalWrittenAsText<TValue>(LitExpression written)
+        => written.Value.ValueKind == JsonValueKind.String && ComparedTypes.IsDecimal(typeof(TValue));
+
+    private static TypedSource<bool> EqualByValue<TValue>(Operator op, TypedSource<TValue> left, LitExpression written)
+    {
         var equal = new OpExpression(Operator.EqDecimal, [left.Expression, written]);
         return new Computed<bool>(op == Operator.Eq ? equal : new OpExpression(Operator.Not, [equal]), left.Form.Computed);
     }
