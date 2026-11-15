@@ -3246,7 +3246,9 @@ plans name.
   binds reads its start (D4.2); two inputs under the name stop it (D13.4), and so does a container whose element the
   page lacks, as each stops the container's request (D9.15) (`ContainerRead.tla`). A page-wide read by binding name is
   refused: two views can bind one name, so on a page a name names no single input. That ends the chain of guesses that
-  read the last contributed input, then the plan's own. A read of a member's input outside a container is
+  read the last contributed input, then the plan's own. C# writes the read as a `data` read of the member's steps
+  over `alis.model`'s `sent` of the container (schema.md), in the live form (D7.7), a list position between its steps
+  a `get` of the item with `optional`. A read of a member's input outside a container is
   `pipeline.Input(m => m.Member)` (N14.4), by the element id Q14 derives the same way in every view that renders the
   member.
 - D13.4 Two inputs a request or a check sends under one scalar binding name (two inside its container, or an

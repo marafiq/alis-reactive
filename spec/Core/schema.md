@@ -118,6 +118,13 @@ contracts a component provides and the core alone calls: `busy`, with `show(targ
 as any plugin is: a contract the app's choices name and no script provides stops the request before it sends (D10.21),
 or the connection before it opens (D21.11).
 
+`alis.model`'s `sent`, called with a request container's id and the key of its model, returns the body that container
+sends, built when it is called: each framework input of the page's input table whose element is inside the container's
+element, under its `InputBinding.path`, its value its `InputBinding.value` evaluated in the plan that contributed it.
+The page lacking the container's element, no live plan rendering that container for that model (D14.8), and two
+inputs inside it under one scalar binding name (D13.4) each stop the pipeline. A container read is a `data` read over
+it (N13.1, D13.3), and `Live.body` is that call.
+
 ## Plugin data
 
 | Kind | Carries | Holds | Meaning |

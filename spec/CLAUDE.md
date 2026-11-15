@@ -1678,6 +1678,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   listen step hears it by, EventTarget where nothing hears it, and a plan that hears one name by two listenings is
   refused where the view renders, naming each declaration by its event and its listening, since its class's name is
   type information off the owner's list (M13.D1, D17.14). The owner can overrule it.
+- The lead, 2026-11-15, writing N13.1's plan form, which no line and no compiled sentence wrote, from two consults of
+  Codex read at the source, the second an adversarial reading under which `ContainerRead.tla`'s six invariants hold: a
+  container read is a `data` read over `alis.model`'s `sent`, called with the container's id and the key of its model,
+  which returns the body the container sends, built in the read's step (D13.3, D14.8, schema.md). Its steps are the
+  member's by wire name, each absence as D4.2 writes it, in the live form (D7.7); a list position between them is a
+  `get` of the item with `optional`, so an item the body lacks reads nothing, and a dictionary entry is a data step of
+  its key, which reads nothing when the body lacks it, since a new instance's dictionary holds no entry. `Live.body`
+  and a request's `Inputs(container)` read the same method, so a container's send has one reader. No node kind and
+  no field is added. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
