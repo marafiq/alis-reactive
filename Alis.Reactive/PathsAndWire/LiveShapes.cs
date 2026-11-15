@@ -26,13 +26,13 @@ internal static class LiveShapes
     {
         JsonTypeInfo<DateTime> => DateShape.Instance,
         JsonTypeInfo<DateTime?> => new NullableShape(DateShape.Instance),
-        JsonTypeInfo<DateTimeOffset> => InstantShape.Instance,
-        JsonTypeInfo<DateTimeOffset?> => new NullableShape(InstantShape.Instance),
+        JsonTypeInfo<DateTimeOffset> => new InstantShape(DateMeaning.Instant),
+        JsonTypeInfo<DateTimeOffset?> => new NullableShape(new InstantShape(DateMeaning.Instant)),
         _ when (handling & JsonNumberHandling.WriteAsString) == 0 => null,
-        _ when Integers.Contains(type.Type) => new NumberShape(NumberOf.Integer, NumberCulture.Invariant),
-        _ when Fractions.Contains(type.Type) => new NumberShape(NumberOf.Fraction, NumberCulture.Invariant),
-        _ when NullableIntegers.Contains(type.Type) => new NullableShape(new NumberShape(NumberOf.Integer, NumberCulture.Invariant)),
-        _ when NullableFractions.Contains(type.Type) => new NullableShape(new NumberShape(NumberOf.Fraction, NumberCulture.Invariant)),
+        _ when Integers.Contains(type.Type) => new NumberShape(NumberOf.Integer, NumberCulture.Invariant, ConversionShapes.OverflowOf(type)),
+        _ when Fractions.Contains(type.Type) => new NumberShape(NumberOf.Fraction, NumberCulture.Invariant, ConversionShapes.OverflowOf(type)),
+        _ when NullableIntegers.Contains(type.Type) => new NullableShape(new NumberShape(NumberOf.Integer, NumberCulture.Invariant, ConversionShapes.OverflowOf(type))),
+        _ when NullableFractions.Contains(type.Type) => new NullableShape(new NumberShape(NumberOf.Fraction, NumberCulture.Invariant, ConversionShapes.OverflowOf(type))),
         _ => null,
     };
 
@@ -41,7 +41,7 @@ internal static class LiveShapes
         DateShape or InstantShape => true,
         NullableShape nullable => HoldsADate(nullable.Inner),
         ArrayShape array => HoldsADate(array.Item),
-        ObjectShape holder => holder.Fields.Values.Any(HoldsADate),
+        ObjectShape holder => holder.Fields.Values.Any(field => HoldsADate(field.Shape)),
         _ => false,
     };
 
@@ -87,11 +87,13 @@ internal static class LiveShapes
 
         private ObjectShape? Object(JsonTypeInfo type)
         {
-            var fields = new Dictionary<string, Shape>(StringComparer.Ordinal);
+            var fields = new Dictionary<string, FieldConversion>(StringComparer.Ordinal);
             foreach (var property in type.Properties.Where(property => property.Get is not null))
             {
                 var handling = property.NumberHandling ?? type.NumberHandling ?? type.Options.NumberHandling;
-                if (Of(type.Options.GetTypeInfo(property.PropertyType), handling) is { } field) fields[property.Name] = field;
+                var member = type.Options.GetTypeInfo(property.PropertyType);
+                if (Of(member, handling) is not { } field) continue;
+                fields[property.Name] = new FieldConversion(field, ConversionShapes.NothingOf(member));
             }
 
             return fields.Count == 0 ? null : new ObjectShape(fields);

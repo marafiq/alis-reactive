@@ -23,24 +23,31 @@ internal abstract class Shape
 
 internal sealed class StringShape : Shape
 {
-    internal static readonly StringShape Instance = new();
-
-    private StringShape()
+    internal StringShape(DateMeaning date, string negativeZero)
     {
+        Date = date;
+        NegativeZero = negativeZero;
     }
+
+    public DateMeaning Date { get; }
+
+    public string NegativeZero { get; }
 }
 
 internal sealed class NumberShape : Shape
 {
-    internal NumberShape(NumberOf of, NumberCulture text)
+    internal NumberShape(NumberOf of, NumberCulture text, NumberOverflow overflow)
     {
         Of = of;
         Text = text;
+        Overflow = overflow;
     }
 
     public NumberOf Of { get; }
 
     public NumberCulture Text { get; }
+
+    public NumberOverflow Overflow { get; }
 }
 
 [JsonConverter(typeof(ChoiceConverter<NumberOf>))]
@@ -91,11 +98,12 @@ internal sealed class DateShape : Shape
 
 internal sealed class InstantShape : Shape
 {
-    internal static readonly InstantShape Instance = new();
-
-    private InstantShape()
+    internal InstantShape(DateMeaning from)
     {
+        From = from;
     }
+
+    public DateMeaning From { get; }
 }
 
 internal sealed class FileShape : Shape
@@ -138,10 +146,66 @@ internal sealed class NullableShape : Shape
 
 internal sealed class ObjectShape : Shape
 {
-    internal ObjectShape(IReadOnlyDictionary<string, Shape> fields)
+    internal ObjectShape(IReadOnlyDictionary<string, FieldConversion> fields)
     {
         Fields = fields;
     }
 
-    public IReadOnlyDictionary<string, Shape> Fields { get; }
+    public IReadOnlyDictionary<string, FieldConversion> Fields { get; }
+}
+
+internal sealed class FieldConversion
+{
+    internal FieldConversion(Shape shape, FieldNothing nothing)
+    {
+        Shape = shape;
+        Nothing = nothing;
+    }
+
+    public Shape Shape { get; }
+
+    public FieldNothing Nothing { get; }
+}
+
+[JsonConverter(typeof(ChoiceConverter<DateMeaning>))]
+internal sealed class DateMeaning : IChoice
+{
+    internal static readonly DateMeaning None = new("none");
+    internal static readonly DateMeaning Date = new("date");
+    internal static readonly DateMeaning Instant = new("instant");
+
+    private DateMeaning(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}
+
+[JsonConverter(typeof(ChoiceConverter<NumberOverflow>))]
+internal sealed class NumberOverflow : IChoice
+{
+    internal static readonly NumberOverflow Nothing = new("nothing");
+    internal static readonly NumberOverflow Infinity = new("infinity");
+
+    private NumberOverflow(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
+}
+
+[JsonConverter(typeof(ChoiceConverter<FieldNothing>))]
+internal sealed class FieldNothing : IChoice
+{
+    internal static readonly FieldNothing Omit = new("omit");
+    internal static readonly FieldNothing Null = new("null");
+
+    private FieldNothing(string text)
+    {
+        Text = text;
+    }
+
+    public string Text { get; }
 }

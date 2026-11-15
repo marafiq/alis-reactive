@@ -98,7 +98,7 @@ public sealed class WhenAContainerReadsAMember
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
         using var document = JsonDocument.Parse(json);
         Assert.That(document.RootElement.GetProperty("handlers")[0].GetProperty("do")[0].GetProperty("when").GetRawText(),
-            Is.EqualTo("""{"kind":"op","op":"eq","args":[{"kind":"as","expr":{"kind":"data","path":[{"name":"extra","requires":[],"absent":{"kind":"start","value":"7"}}],"target":{"kind":"call","path":["sent"],"members":"required","target":{"kind":"obj","id":"$model"},"args":[{"kind":"lit","value":"intake"},{"kind":"lit","value":"Alis.Reactive.ModuleTests.InputsAndIds.NumberCard"}]}},"shape":{"kind":"number","of":"integer","text":"invariant"}},{"kind":"lit","value":7}]}"""));
+            Is.EqualTo("""{"kind":"op","op":"eq","args":[{"kind":"as","expr":{"kind":"data","path":[{"name":"extra","requires":[],"absent":{"kind":"start","value":"7"}}],"target":{"kind":"call","path":["sent"],"members":"required","target":{"kind":"obj","id":"$model"},"args":[{"kind":"lit","value":"intake"},{"kind":"lit","value":"Alis.Reactive.ModuleTests.InputsAndIds.NumberCard"}]}},"shape":{"kind":"number","of":"integer","text":"invariant","overflow":"nothing"}},{"kind":"lit","value":7}]}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 

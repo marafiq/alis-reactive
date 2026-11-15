@@ -71,7 +71,7 @@ internal sealed partial class BoundInput
         => new(
             Name,
             _path,
-            new OpExpression(Operator.Coalesce, [new AsExpression(input.Read, new NullableShape(_shape)), _blank]),
+            new OpExpression(Operator.Coalesce, [new AsExpression(input.Read, new NullableShape(InputShapes.From(_shape, input.Text))), _blank]),
             input.Committed,
             invalidClass,
             hidden ? "" : MessageId);

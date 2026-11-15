@@ -204,7 +204,7 @@ describe("when a list's operation reads an operator over its items, the plan's o
   });
 });
 
-const textPart = (read: Source): Source => ({ kind: "op", op: "coalesce", args: [{ kind: "as", expr: read, shape: { kind: "string" } }, lit("")] });
+const textPart = (read: Source): Source => ({ kind: "op", op: "coalesce", args: [{ kind: "as", expr: read, shape: { kind: "string", date: "none", negativeZero: "0" } }, lit("")] });
 const joined = (...parts: Source[]): Source => ({ kind: "call", path: ["join"], members: "requiredIfHeld", target: { kind: "list", items: parts }, args: [lit("")] });
 
 describe("when a list is built from its items, each item is read when the step runs", () => {

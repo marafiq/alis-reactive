@@ -1702,6 +1702,15 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   or a `DateTimeOffset` wherever the browser converts it, and the plan carries the view's time zone, so the browser
   chooses nothing. The runtime's conversions that stop because the shape does not say which (a `Date`'s text, a
   `Date`'s instant under a zone) take that statement from the plan, and no date question goes to the owner again.
+- The lead, 2026-11-15, landing the owner's date line in the conversions, built by Codex from a scoped brief and read
+  at the source: the string shape carries "date" ("none", "date" or "instant") and "negativeZero", the text the
+  declared number type writes for minus zero on the rendering host under the view's culture; the instant shape carries
+  "from"; the number shape carries "overflow" ("infinity" for net10's double and float, "nothing" for every other
+  type and host); and each object field is a `FieldConversion` whose "nothing" is "omit" or "null", as the member's
+  JSON binding reads it. An item that converts to nothing joins a list's text as empty text, as .NET joins a null. A
+  wall time daylight saving skips or repeats takes the zone's standard offset, as .NET's GetUtcOffset gives it on
+  net10 (D3.12 cites the probe), its net48 half resting on the same API's documentation;
+  under the browser's clock the browser reads it, since the server names no zone then. The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

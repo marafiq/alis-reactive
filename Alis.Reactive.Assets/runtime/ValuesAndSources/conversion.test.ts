@@ -21,19 +21,24 @@ const americanOnNet10: Culture = { ...germanOnNet10, name: "en-US", collation: "
 const clock: TimeZone = { kind: "clock" };
 const newYork: TimeZone = { kind: "zone", id: "America/New_York" };
 const kolkata: TimeZone = { kind: "zone", id: "Asia/Kolkata" };
+const sydney: TimeZone = { kind: "zone", id: "Australia/Sydney" };
 
-const text: Shape = { kind: "string" };
-const fraction: Shape = { kind: "number", of: "fraction", text: "view" };
-const integer: Shape = { kind: "number", of: "integer", text: "view" };
-const invariantNumber: Shape = { kind: "number", of: "fraction", text: "invariant" };
+const text: Shape = { kind: "string", date: "none", negativeZero: "0" };
+const wallText: Shape = { kind: "string", date: "date", negativeZero: "0" };
+const instantText: Shape = { kind: "string", date: "instant", negativeZero: "0" };
+const floatingText: Shape = { kind: "string", date: "none", negativeZero: "-0" };
+const fraction: Shape = { kind: "number", of: "fraction", text: "view", overflow: "nothing" };
+const integer: Shape = { kind: "number", of: "integer", text: "view", overflow: "nothing" };
+const invariantNumber: Shape = { kind: "number", of: "fraction", text: "invariant", overflow: "nothing" };
 const truth: Shape = { kind: "boolean" };
 const date: Shape = { kind: "date" };
-const instant: Shape = { kind: "instant" };
+const instant: Shape = { kind: "instant", from: "instant" };
+const wallInstant: Shape = { kind: "instant", from: "date" };
 const file: Shape = { kind: "file" };
 const any: Shape = { kind: "any" };
 const nullable = (inner: Shape): Shape => ({ kind: "nullable", inner });
 const list = (item: Shape): Shape => ({ kind: "array", item });
-const record = (fields: Readonly<Record<string, Shape>>): Shape => ({ kind: "object", fields });
+const record = (fields: Readonly<Record<string, Shape>>): Shape => ({ kind: "object", fields: Object.fromEntries(Object.entries(fields).map(([name, shape]) => [name, { shape, nothing: "omit" }])) });
 
 const none = { kind: "nothing" };
 
@@ -160,14 +165,37 @@ describe("as(expr, string)", () => {
     expect(as([[1, 2], 3], text)).toStrictEqual({ kind: "value", value: "1,2,3" });
   });
 
-  test("a Date's text is not built, since the shape does not say whether it holds a DateTime or a DateTimeOffset, and a Date that is no moment converts to nothing", () => {
-    expect(() => as(new Date(2026, 10, 9), text)).toThrow("This page cannot run the text of a Date");
-    expect(as(new Date(Number.NaN), text)).toStrictEqual(none);
+  test("a DateTime shows its local wall without an offset, the day alone at midnight (D3.8, D3.9)", () => {
+    expect(asIn(newYork, new Date(2026, 10, 9), wallText)).toStrictEqual({ kind: "value", value: "2026-11-09" });
+    expect(asIn(kolkata, new Date(2026, 10, 9, 8, 30, 15, 123), wallText)).toStrictEqual({ kind: "value", value: "2026-11-09T08:30:15.123" });
+    expect(as(new Date(2026, 10, 9, 0, 0, 0, 1), wallText)).toStrictEqual({ kind: "value", value: "2026-11-09T00:00:00.001" });
+    expect(as(new Date(2026, 10, 9, 8, 30), wallText)).toStrictEqual({ kind: "value", value: "2026-11-09T08:30:00" });
+    expect(as(new Date(Number.NaN), wallText)).toStrictEqual(none);
+    expect(as(new Date(2026, 10, 9), text)).toStrictEqual(none);
   });
 
-  test("a list with an item that converts to nothing is not built, and negative zero's text is not built", () => {
-    expect(() => as(["Bed 4", null], text)).toThrow("This page cannot run the text of a list with an item that converts to nothing");
-    expect(() => as(-0, text)).toThrow("This page cannot run the text of negative zero");
+  test("a DateTimeOffset shows the view zone's wall and offset for its own day, keeping milliseconds (D3.12)", () => {
+    expect(asIn(newYork, new Date("2026-11-09T13:30:15.123Z"), instantText)).toStrictEqual({ kind: "value", value: "2026-11-09T08:30:15.123-05:00" });
+    expect(asIn(newYork, new Date("2026-07-09T12:30:00Z"), instantText)).toStrictEqual({ kind: "value", value: "2026-07-09T08:30:00-04:00" });
+    expect(asIn(kolkata, new Date("2026-11-09T20:00:00Z"), instantText)).toStrictEqual({ kind: "value", value: "2026-11-10T01:30:00+05:30" });
+    expect(asIn({ kind: "zone", id: "UTC" }, new Date("2026-11-09T00:00:00Z"), instantText)).toStrictEqual({ kind: "value", value: "2026-11-09T00:00:00Z" });
+    expect(as(new Date("2026-11-09T13:30:00Z"), instantText)).toStrictEqual({ kind: "value", value: "2026-11-09T22:30:00+09:00" });
+  });
+
+  test("a list keeps an empty slot for every item that converts to nothing, as string.Join joins null", () => {
+    expect(as(["Bed 4", null, undefined, {}, Number.NaN, "Bed 5"], text)).toStrictEqual({ kind: "value", value: "Bed 4,,,,,Bed 5" });
+    expect(as([null, "Bed 4", null], text)).toStrictEqual({ kind: "value", value: ",Bed 4," });
+    expect(as([], text)).toStrictEqual({ kind: "value", value: "" });
+    expect(asIn(newYork, [[new Date("2026-07-09T12:30:00Z"), null]], instantText)).toStrictEqual({ kind: "value", value: "2026-07-09T08:30:00-04:00," });
+  });
+
+  test("negative zero shows the declared number type's text on the rendering host (D3.11)", () => {
+    expect(as(-0, floatingText)).toStrictEqual({ kind: "value", value: "-0" });
+    expect(as(-0, text)).toStrictEqual({ kind: "value", value: "0" });
+    expect(asUnder(germanOnNet48, -0, text)).toStrictEqual({ kind: "value", value: "0" });
+    expect(as(-0, { kind: "string", date: "none", negativeZero: "\u200e−0" })).toStrictEqual({ kind: "value", value: "\u200e−0" });
+    expect(as(0, floatingText)).toStrictEqual({ kind: "value", value: "0" });
+    expect(as([-0, 0], floatingText)).toStrictEqual({ kind: "value", value: "-0,0" });
   });
 });
 
@@ -237,8 +265,14 @@ describe("as(expr, number)", () => {
     expect(as(new Date(Number.NaN), integer)).toStrictEqual(none);
   });
 
-  test("a number text past the double's range is not built", () => {
-    expect(() => as("1e400", fraction)).toThrow("This page cannot run a number text past the double's range");
+  test("overflow text binds infinity for net10 floating types and nothing for decimal, integers and net48 numbers", () => {
+    expect(as("1e400", { kind: "number", of: "fraction", text: "view", overflow: "infinity" })).toStrictEqual({ kind: "value", value: Number.POSITIVE_INFINITY });
+    expect(as("-1e400", { kind: "number", of: "fraction", text: "invariant", overflow: "infinity" })).toStrictEqual({ kind: "value", value: Number.NEGATIVE_INFINITY });
+    expect(as("1e400", fraction)).toStrictEqual(none);
+    expect(as("1e400", integer)).toStrictEqual(none);
+    expect(asUnder(germanOnNet48, "1e400", { kind: "number", of: "fraction", text: "view", overflow: "nothing" })).toStrictEqual(none);
+    expect(asUnder(germanOnNet48, "-1e400", { kind: "number", of: "fraction", text: "invariant", overflow: "nothing" })).toStrictEqual(none);
+    expect(as("1e300", { kind: "number", of: "fraction", text: "invariant", overflow: "infinity" })).toStrictEqual({ kind: "value", value: 1e300 });
   });
 });
 
@@ -329,8 +363,17 @@ describe("as(expr, instant)", () => {
     expect(asIn(clock, new Date(Number.NaN), instant)).toStrictEqual(none);
   });
 
-  test("a Date under the view's zone is not built, since the shape does not say whether it holds a DateTimeOffset or a DateTime", () => {
-    expect(() => asIn(newYork, new Date("2026-11-09T13:30:00Z"), instant)).toThrow("This page cannot run the instant of a Date under the time zone 'America/New_York'");
+  test("a DateTimeOffset keeps its moment under every view zone, while a DateTime's wall takes that day's offset", () => {
+    const seen = new Date("2026-11-09T13:30:00Z");
+    expect(heldOf(asIn(newYork, seen, instant))).toBe(seen);
+    expect(heldOf(asIn(kolkata, seen, instant))).toBe(seen);
+    expect(momentOf(asIn(newYork, new Date(2026, 10, 9, 8, 30), wallInstant))).toBe("2026-11-09T13:30:00.000Z");
+    expect(momentOf(asIn(newYork, new Date(2026, 6, 9, 8, 30), wallInstant))).toBe("2026-07-09T12:30:00.000Z");
+    expect(momentOf(asIn(kolkata, new Date(2026, 10, 9, 8, 30), wallInstant))).toBe("2026-11-09T03:00:00.000Z");
+    expect(momentOf(asIn(clock, new Date(2026, 10, 9, 8, 30), wallInstant))).toBe("2026-11-08T23:30:00.000Z");
+    expect(asIn(newYork, seen, { kind: "instant", from: "none" })).toStrictEqual(none);
+    expect(asIn(newYork, new Date(Number.NaN), wallInstant)).toStrictEqual(none);
+    expect(momentOf(asIn(kolkata, new Date(9999, 11, 31, 23, 59), wallInstant))).toBe("9999-12-31T18:29:00.000Z");
   });
 
   test("text with no offset takes the view's zone's offset for its own day (D3.12)", () => {
@@ -338,6 +381,16 @@ describe("as(expr, instant)", () => {
     expect(momentOf(asIn(newYork, "2026-07-09T08:30", instant))).toBe("2026-07-09T12:30:00.000Z");
     expect(momentOf(asIn(kolkata, "2026-11-09T08:30", instant))).toBe("2026-11-09T03:00:00.000Z");
     expect(momentOf(asIn(newYork, "2026-11-09", instant))).toBe("2026-11-09T05:00:00.000Z");
+  });
+
+  test("a wall time daylight saving skips or repeats takes the zone's standard offset, as .NET's GetUtcOffset reads it", () => {
+    expect(momentOf(asIn(newYork, "2026-03-08T02:30", instant))).toBe("2026-03-08T07:30:00.000Z");
+    expect(momentOf(asIn(newYork, "2026-03-08T03:30", instant))).toBe("2026-03-08T07:30:00.000Z");
+    expect(momentOf(asIn(newYork, "2026-11-01T01:30", instant))).toBe("2026-11-01T06:30:00.000Z");
+    expect(momentOf(asIn(newYork, "2026-11-01T00:30", instant))).toBe("2026-11-01T04:30:00.000Z");
+    expect(momentOf(asIn(sydney, "2026-10-04T02:30", instant))).toBe("2026-10-03T16:30:00.000Z");
+    expect(momentOf(asIn(sydney, "2026-04-05T02:30", instant))).toBe("2026-04-04T16:30:00.000Z");
+    expect(momentOf(asIn(newYork, new Date(2026, 10, 1, 1, 30), wallInstant))).toBe("2026-11-01T06:30:00.000Z");
   });
 
   test("text with no offset under the browser's clock takes the clock's offset", () => {
@@ -420,8 +473,17 @@ describe("as(expr, object(fields))", () => {
     expect(as(["2026-11-09"], record({ seen: date }))).toStrictEqual(none);
   });
 
-  test("a copy whose declared field converts to nothing is not built", () => {
-    expect(() => as({ seen: "abc" }, record({ seen: date }))).toThrow("This page cannot run a copy of an object whose field 'seen' converts to nothing");
+  test("a copy omits a non-nullable field that converts to nothing, keeping its server initializer (D3.13, D9.10)", () => {
+    const visit = { seen: "abc", bed: "Bed 4" };
+    expect(as(visit, record({ seen: date }))).toStrictEqual({ kind: "value", value: { bed: "Bed 4" } });
+    expect(visit).toStrictEqual({ seen: "abc", bed: "Bed 4" });
+  });
+
+  test("a copy writes null for a nullable field that converts to nothing, clearing its server initializer (D3.13, D9.10)", () => {
+    expect(as({ seen: "abc", bed: "Bed 4" }, { kind: "object", fields: { seen: { shape: nullable(date), nothing: "null" } } })).toStrictEqual({ kind: "value", value: { seen: null, bed: "Bed 4" } });
+    expect(as({ seen: null, bed: "Bed 4" }, { kind: "object", fields: { seen: { shape: nullable(date), nothing: "null" } } })).toStrictEqual({ kind: "value", value: { seen: null, bed: "Bed 4" } });
+    expect(as({ seen: ["bad"], bed: "Bed 4" }, { kind: "object", fields: { seen: { shape: record({ at: date }), nothing: "null" } } })).toStrictEqual({ kind: "value", value: { seen: null, bed: "Bed 4" } });
+    expect(as({ seen: "bad", bed: "Bed 4" }, { kind: "object", fields: { seen: { shape: list(date), nothing: "omit" } } })).toStrictEqual({ kind: "value", value: { bed: "Bed 4" } });
   });
 });
 

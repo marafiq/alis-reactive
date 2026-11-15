@@ -58,7 +58,7 @@ public sealed class WhenADeclaredMethodIsCalled
     private const string SetsTheWindow = OnLoad +
         "{\"kind\":\"do\",\"await\":false,\"expr\":{\"kind\":\"call\",\"path\":[\"window\"],\"members\":\"required\",\"target\":" + Pump + ",\"args\":[" +
         "{\"kind\":\"as\",\"expr\":{\"kind\":\"lit\",\"value\":{\"starts_at\":\"2026-11-14T08:30:00\"}}," +
-        "\"shape\":{\"kind\":\"object\",\"fields\":{\"starts_at\":{\"kind\":\"date\"}}}}]}}" + Ends;
+        "\"shape\":{\"kind\":\"object\",\"fields\":{\"starts_at\":{\"shape\":{\"kind\":\"date\"},\"nothing\":\"omit\"}}}}]}}" + Ends;
 
     private const string Primes = OnLoad +
         "{\"kind\":\"do\",\"await\":false,\"expr\":{\"kind\":\"call\",\"path\":[\"prime\"],\"members\":\"required\",\"target\":" + Pump + ",\"args\":[" +
@@ -67,12 +67,12 @@ public sealed class WhenADeclaredMethodIsCalled
     private const string Refills = OnLoad +
         "{\"kind\":\"do\",\"await\":false,\"expr\":{\"kind\":\"call\",\"path\":[\"refill\"],\"members\":\"required\",\"target\":" + Pump + ",\"args\":[" +
         "{\"kind\":\"as\",\"expr\":{\"kind\":\"data\",\"path\":[{\"name\":\"refills\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"2\"}}]," +
-        "\"target\":" + Prescription + "},\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\"}}]}}" + Ends;
+        "\"target\":" + Prescription + "},\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\",\"overflow\":\"nothing\"}}]}}" + Ends;
 
     private const string Repeats = OnLoad +
         "{\"kind\":\"do\",\"await\":false,\"expr\":{\"kind\":\"call\",\"path\":[\"repeat\"],\"members\":\"required\",\"target\":" + Pump + ",\"args\":[" +
         "{\"kind\":\"as\",\"expr\":{\"kind\":\"data\",\"path\":[{\"name\":\"refills\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"2\"}}]," +
-        "\"target\":" + Prescription + "},\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\"}}]}}" + Ends;
+        "\"target\":" + Prescription + "},\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\",\"overflow\":\"nothing\"}}]}}" + Ends;
 
     private const string Reviews = OnLoad +
         "{\"kind\":\"do\",\"await\":false,\"expr\":{\"kind\":\"call\",\"path\":[\"review\"],\"members\":\"required\",\"target\":" + Pump + ",\"args\":[" +
@@ -109,7 +109,7 @@ public sealed class WhenADeclaredMethodIsCalled
     private const string RefillsFromTheSummary = OnLoad + Summarizes + "," +
         "{\"kind\":\"do\",\"await\":false,\"expr\":{\"kind\":\"call\",\"path\":[\"refill\"],\"members\":\"required\",\"target\":" + Pump + ",\"args\":[" +
         "{\"kind\":\"as\",\"expr\":{\"kind\":\"data\",\"path\":[{\"name\":\"refills\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"2\"}}]," +
-        "\"target\":" + FirstResult + "},\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\"}}]}}" + Ends;
+        "\"target\":" + FirstResult + "},\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\",\"overflow\":\"nothing\"}}]}}" + Ends;
 
     private const string Estimates = OnLoad +
         "{\"kind\":\"let\",\"name\":\"result1\",\"await\":false,\"binds\":\"line\",\"expr\":" +

@@ -326,16 +326,18 @@ and nothing where it holds null (D6.14).
 
 | Kind | Carries | Holds | Converts |
 |------|---------|-------|----------|
-| `string` | | | yes |
-| `number` | `of`: `integer` or `fraction`; `text`: `view` or `invariant` | | yes: a text under the view's culture with the culture's number text for `of`, or under the invariant culture with `NumberStyles.Float` (D3.11) |
+| `string` | `date`: `none`, `date` or `instant`; `negativeZero`: text | | yes: C# states the source's declared date type and the text its number type writes for negative zero on this host under the view's culture; a list takes its leaf item's facts (D3.4, D3.11) |
+| `number` | `of`: `integer` or `fraction`; `text`: `view` or `invariant`; `overflow`: `nothing` or `infinity` | | yes: C# states whether this host binds text past the double's range for the member's .NET type; a text under the view's culture with the culture's number text for `of`, or under the invariant culture with `NumberStyles.Float` (D3.11) |
 | `boolean` | | | yes |
 | `date` | | | yes |
-| `instant` | | | yes |
+| `instant` | `from`: `none`, `date` or `instant` | | yes: the source's declared date type; `none` admits text alone, `date` reads a Date's wall at the view's zone, and `instant` keeps its moment (D3.12) |
 | `file` | | | yes: a file input's chosen file; sent only in form data (D9.16, N3.2) |
 | `any` | | | no: `as` never carries it |
 | `array` | | `item`: a shape | yes |
 | `nullable` | | `inner`: a shape that is not `nullable` | yes |
-| `object` | | `fields`: a map from wire name to shape | yes |
+| `object` | | `fields`: a map from wire name to `FieldConversion` | yes: C# states what a copied field that converts to nothing holds, as the member's JSON binding reads it (D3.13, D9.10) |
+
+`FieldConversion` carries `shape`, a shape, and `nothing`, `omit` or `null`: the member's binding when its conversion reads nothing (D3.13, D9.10).
 
 ## Contracts
 
@@ -520,7 +522,8 @@ The diff beyond the kinds, each with the decision that makes it:
   `live` move to `model`'s `containers` as `Container`; and `FormField`'s `items` and `value` functions leave (D16.2,
   D14.8, D16.14);
 - `PlanDocument` gains `culture` (N3.4), `timeZone` (N3.5) and `trace` (Q20), and `version` becomes 7;
-- `number` gains `of` and `text` (D3.11);
+- `number` gains `of`, `text` and `overflow` (D3.11);
+- `string` gains `date` and `negativeZero`, `instant` gains `from`, and each `object` field gains `nothing` beside its `shape` (D3.4, D3.11, D3.12, D3.13);
 - the operator set loses four conversions (N3.1), `truthy`, whose writers `Truthy` and `Falsy` are refused (M3.D1), and
   `order`, which compared whatever came (D6.13); it gains `nullableValue` (D6.14), `nonNull` (D6.16), `compareNumbers`,
   `compareOrdinal`, `compareBooleans` and `compareCulture` (D6.13), the text operators `trim`, `trimStart`, `trimEnd`,

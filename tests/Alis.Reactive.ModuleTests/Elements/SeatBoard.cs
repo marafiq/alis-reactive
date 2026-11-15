@@ -52,7 +52,7 @@ internal static class SeatPlans
 
     internal static string Text(string text) => "{\"kind\":\"lit\",\"value\":\"" + text + "\"}";
 
-    internal static string ShownAsText(string expression) => "{\"kind\":\"as\",\"expr\":" + expression + ",\"shape\":{\"kind\":\"string\"}}";
+    internal static string ShownAsText(string expression) => "{\"kind\":\"as\",\"expr\":" + expression + ",\"shape\":{\"kind\":\"string\",\"date\":\"none\",\"negativeZero\":\"0\"}}";
 
     internal static string Loaded(string objects, string statements) => Head + Document + "," + objects + OnLoad + statements + Ends;
 

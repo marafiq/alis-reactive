@@ -1156,8 +1156,8 @@ U16 is landed: `IdGenerator.For`, `Html.InputField` with its options on both hos
 inputs and containers, R14.6 where the page composes its plans, and `alis.model`'s `sent`. U16 holds no browser test:
 every test of its features lands in U23, whose Native inputs its pages render, and X7.13 lands in U9, where it waits on
 the owner's yes to its Type.Name read. U17's first piece is landed: the validator grammar as the server runs it, every
-check and option FluentValidation 12.1.1 defines, with its messages. A date shown as an element's text waits
-on a date kind for the `string` shape, the owner's to decide. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
+check and option FluentValidation 12.1.1 defines, with its messages. A date shown as an element's text is
+its declared type's, C# writing on the `string` shape whether it holds a `DateTime` or a `DateTimeOffset`. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
 pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). The commit that lands
 a piece rewrites this paragraph.
 

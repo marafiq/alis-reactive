@@ -21,11 +21,11 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | Source | Result |
 |--------|--------|
 | text | itself |
-| number, finite | its text as .NET writes it under the view's culture (D3.11): the shortest digits, the culture's decimal separator, no group separator, and below 1E-04 or from 1E+17 up the form `1,234565E+17` |
+| number, finite | its text as .NET writes it under the view's culture (D3.11): the shortest digits, the culture's decimal separator, no group separator, and below 1E-04 or from 1E+17 up the form `1,234565E+17`; negative zero reads the shape's `negativeZero`, the text C# writes from the declared .NET number type on the rendering host |
 | boolean | `"true"` or `"false"` |
-| date | its local day `"yyyy-MM-dd"`, with `"THH:mm:ss"` and `".fff"` when not midnight (`spec/PathsAndWire/DateWire.tla`) |
-| instant | its wall time in the view's time zone with that zone's offset for its own day (D3.12), `"yyyy-MM-ddTHH:mm:ss-08:00"`, `"Z"` at zero |
-| list | each item converted to string, joined by `","` |
+| date, the shape's `date` is `date` | its local day `"yyyy-MM-dd"`, with `"THH:mm:ss"` when not midnight and `".fff"` when its milliseconds are nonzero (`spec/PathsAndWire/DateWire.tla`) |
+| instant, the shape's `date` is `instant` | its wall time in the view's time zone with that zone's offset for its own day (D3.12), `"yyyy-MM-ddTHH:mm:ss-08:00"`, with `".fff"` before the offset when its milliseconds are nonzero, `"Z"` at zero offset |
+| list | each item converted to string using the shape's leaf item facts, joined by `","`; an item that converts to nothing joins as empty text, keeping its position, as .NET's `string.Join` joins a null text |
 
 ## number
 
@@ -33,8 +33,8 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 |--------|--------|
 | number, finite | itself |
 | text, blank | nothing |
-| an input's text | that number, parsed as the endpoint's host binds the member's .NET type under the view's culture (D3.11); text that host refuses converts to nothing |
-| a URL parameter's text, or a number the app's form holds as text (D7.7) | that number, parsed under the invariant culture with `NumberStyles.Float` |
+| an input's text | that number, parsed as the endpoint's host binds the member's .NET type under the view's culture (D3.11); text that host refuses converts to nothing; past the double's range the shape's `overflow` states `infinity` for net10's `double` and `float`, `nothing` for integers, `decimal` and net48's numbers |
+| a URL parameter's text, or a number the app's form holds as text (D7.7) | that number, parsed under the invariant culture with `NumberStyles.Float`, with the shape's `overflow` for its .NET type and host |
 | boolean | 1 or 0 |
 | date or instant | its milliseconds since 1970-01-01T00:00:00Z |
 
@@ -59,9 +59,9 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 
 | Source | Result |
 |--------|--------|
-| instant | itself |
-| date | that moment, at the view's time zone's offset for its own day (D3.12) |
-| text a date converts from | that moment, at the offset the text gives, else the view's time zone's offset for its own day (D3.12) |
+| instant, the shape's `from` is `instant` | itself, its moment unchanged under `clock` and `zone` |
+| date, the shape's `from` is `date` | its local wall fields at the view's time zone's offset for its own day, the zone's standard offset for a wall time daylight saving skips or repeats (D3.12) |
+| text a date converts from | that moment, at the offset the text gives, else the view's time zone's offset for its own day, the zone's standard offset for a wall time daylight saving skips or repeats (D3.12) |
 
 ## file
 
@@ -81,7 +81,7 @@ date (`Alis.Reactive.Assets/runtime/grammar/shape.ts:93-94`), and a scalar read 
 | Source | Result |
 |--------|--------|
 | an object whose declared fields each convert to themselves | the object itself, its identity and prototype kept |
-| a plain object a declared field of which converts to another value | a copy, each declared field converted to its shape; fields it does not declare stay as they are |
+| a plain object a declared field of which converts to another value | a copy, each declared field converted to its shape; a field that converts to nothing follows its `nothing` entry, `omit` removing it and `null` writing null, as D9.10's JSON member binding reads it; fields it does not declare stay as they are |
 
 ## any
 

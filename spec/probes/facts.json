@@ -577,6 +577,15 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-zone-offset-skipped-and-repeated",
+      "statement": ".NET 10's TimeZoneInfo.GetUtcOffset gives a wall time daylight saving skips or repeats the zone's standard offset, in either hemisphere.",
+      "host": "net10",
+      "oracle": ".NET 10 TimeZoneInfo, spec/probes/AspNetCoreBinding",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-zone-offset-skipped-and-repeated: America/New_York takes -05:00:00 at 02:30 on 2026-03-08 and -05:00:00 at 01:30 on 2026-11-01; Australia/Sydney takes 10:00:00 at 02:30 on 2026-10-04 and 10:00:00 at 02:30 on 2026-04-05",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
       "id": "net48-time-zones-from-registry",
       "statement": ".NET Framework's TimeZoneInfo reads its zones from the Windows registry, by Windows id, and names no IANA id.",
       "host": "net48",

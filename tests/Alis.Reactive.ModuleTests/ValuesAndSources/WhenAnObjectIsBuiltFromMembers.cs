@@ -132,7 +132,7 @@ public sealed class WhenAnObjectIsBuiltFromMembers
 
         Assert.That(RecordOf(rendered), Is.EqualTo(
             "{\"kind\":\"record\",\"fields\":[{\"name\":\"optionalCount\",\"value\":{\"kind\":\"as\",\"expr\":{\"kind\":\"data\",\"path\":[{\"name\":\"textCount\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"0\"}}]," +
-            "\"target\":{\"kind\":\"get\",\"path\":[\"previous\"],\"members\":\"required\",\"target\":" + Panel + "}},\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\"}}}]}"));
+            "\"target\":{\"kind\":\"get\",\"path\":[\"previous\"],\"members\":\"required\",\"target\":" + Panel + "}},\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\",\"overflow\":\"nothing\"}}}]}"));
     }
 
     [Test]

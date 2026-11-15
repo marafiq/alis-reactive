@@ -55,7 +55,7 @@ public sealed class WhenDataIsReadPastADeclaredMember
     private const string RefillsAsTheirNumber = OnLoad + SetsTheRate +
         "{\"kind\":\"as\",\"expr\":" +
         "{\"kind\":\"data\",\"path\":[{\"name\":\"refills\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"2\"}}],\"target\":" + ThePrescription + "}," +
-        "\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\"}}}" + Ends;
+        "\"shape\":{\"kind\":\"number\",\"of\":\"integer\",\"text\":\"invariant\",\"overflow\":\"nothing\"}}}" + Ends;
 
     [Test]
     public void a_member_of_the_data_is_named_by_the_apps_naming_where_the_declared_member_keeps_camel_case()

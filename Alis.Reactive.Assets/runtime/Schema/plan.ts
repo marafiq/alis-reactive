@@ -125,17 +125,24 @@ export type Shape = StringShape | NumberShape | BooleanShape | DateShape | Insta
 
 export interface StringShape {
   readonly kind: "string";
+  readonly date: DateMeaning;
+  readonly negativeZero: string;
 }
+
+export type DateMeaning = "none" | "date" | "instant";
 
 export interface NumberShape {
   readonly kind: "number";
   readonly of: NumberOf;
   readonly text: NumberCulture;
+  readonly overflow: NumberOverflow;
 }
 
 export type NumberOf = "integer" | "fraction";
 
 export type NumberCulture = "view" | "invariant";
+
+export type NumberOverflow = "nothing" | "infinity";
 
 export interface BooleanShape {
   readonly kind: "boolean";
@@ -147,6 +154,7 @@ export interface DateShape {
 
 export interface InstantShape {
   readonly kind: "instant";
+  readonly from: DateMeaning;
 }
 
 export interface FileShape {
@@ -169,8 +177,15 @@ export interface NullableShape {
 
 export interface ObjectShape {
   readonly kind: "object";
-  readonly fields: Readonly<Record<string, Shape>>;
+  readonly fields: Readonly<Record<string, FieldConversion>>;
 }
+
+export interface FieldConversion {
+  readonly shape: Shape;
+  readonly nothing: FieldNothing;
+}
+
+export type FieldNothing = "omit" | "null";
 
 export interface CallExpression {
   readonly kind: "call";

@@ -1,4 +1,6 @@
 using Alis.Reactive.Declarations;
+using Alis.Reactive.PathsAndWire;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.InputsAndIds;
 
@@ -24,15 +26,18 @@ public interface IInputComponent
 /// </remarks>
 public sealed class ComponentInput
 {
-    private ComponentInput(Schema.Expression read, string committed)
+    private ComponentInput(Schema.Expression read, string committed, StringShape text)
     {
         Read = read;
         Committed = committed;
+        Text = text;
     }
 
     internal Schema.Expression Read { get; }
 
     internal string Committed { get; }
+
+    internal StringShape Text { get; }
 
     /// <summary>Declares the input's value property and the event that commits it.</summary>
     /// <param name="value">The property that holds the value, declared on the component.</param>
@@ -42,5 +47,5 @@ public sealed class ComponentInput
     /// <returns>The input's declaration.</returns>
     public static ComponentInput Of<TValue, TArgs>(ReadOnly<TValue> value, Event<TArgs> committedBy)
         where TArgs : JsObject, new()
-        => new(value.Expression, committedBy.Name);
+        => new(value.Expression, committedBy.Name, ConversionShapes.TextOf(value.Form.DataOptions.GetTypeInfo(typeof(TValue)), value.Form.RendersUnder));
 }

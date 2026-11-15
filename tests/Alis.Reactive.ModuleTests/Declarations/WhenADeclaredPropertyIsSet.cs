@@ -52,7 +52,7 @@ public sealed class WhenADeclaredPropertyIsSet
         "{\"kind\":\"set\",\"path\":[\"stopsAt\"],\"members\":\"required\",\"content\":false,\"target\":" + Pump + "," +
         "\"value\":{\"kind\":\"as\",\"expr\":{\"kind\":\"lit\",\"value\":null},\"shape\":{\"kind\":\"nullable\",\"inner\":{\"kind\":\"date\"}}}}," +
         "{\"kind\":\"set\",\"path\":[\"pausedUntil\"],\"members\":\"required\",\"content\":false,\"target\":" + Pump + "," +
-        "\"value\":{\"kind\":\"as\",\"expr\":{\"kind\":\"lit\",\"value\":\"2026-11-14T08:30:00-05:00\"},\"shape\":{\"kind\":\"instant\"}}}" + Ends;
+        "\"value\":{\"kind\":\"as\",\"expr\":{\"kind\":\"lit\",\"value\":\"2026-11-14T08:30:00-05:00\"},\"shape\":{\"kind\":\"instant\",\"from\":\"instant\"}}}" + Ends;
 
     private const string OptionalWrites = OnLoad +
         "{\"kind\":\"set\",\"path\":[\"label\"],\"members\":\"optional\",\"content\":false,\"target\":" + Pump + ",\"value\":{\"kind\":\"lit\",\"value\":\"Night shift\"}}," +

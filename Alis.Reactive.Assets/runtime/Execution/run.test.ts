@@ -424,8 +424,8 @@ describe("when a step's value is a conversion (D3.2)", () => {
     const chart = new Chart();
     const kolkata: Raised["plan"] = { ...ward, timeZone: { kind: "zone", id: "Asia/Kolkata" } };
     const lane = new Lane("overlap", [
-      charts({ kind: "as", expr: text("1,234.5"), shape: { kind: "number", of: "fraction", text: "view" } }),
-      charts({ kind: "as", expr: text("2026-11-09T08:30"), shape: { kind: "instant" } }),
+      charts({ kind: "as", expr: text("1,234.5"), shape: { kind: "number", of: "fraction", text: "view", overflow: "nothing" } }),
+      charts({ kind: "as", expr: text("2026-11-09T08:30"), shape: { kind: "instant", from: "none" } }),
     ], aRoundsOwner);
 
     lane.raise({ ...raisedWith({ chart }), plan: kolkata });

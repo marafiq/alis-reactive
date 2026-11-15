@@ -174,7 +174,10 @@ Terms used throughout:
 - D3.3 A conversion of a present value the shape cannot hold yields nothing. No conversion passes the
   unconverted value on (`Absence.tla:FailedConversionReadsNothing`).
 - D3.4 The conversions are the table of `spec/Core/conversions.md`, one row per source kind and shape; the
-  browser implements exactly that table.
+  browser implements exactly that table. A string shape carries the source's declared date type and its number type's
+  negative-zero text on the rendering host; an input reads these facts from its component value's declaration. A
+  list's string shape carries its leaf item's facts; an item that converts to nothing joins as empty text, as .NET's
+  `string.Join` joins null.
 - D3.5 Blank is nothing, or text that is empty or white space as .NET's `string.IsNullOrWhiteSpace` defines it.
 - D3.6 What a blank input binds as is a literal C# writes into the input's binding: the member's value in a
   new instance of the item or model that holds it, written in the live form (D7.7), the form the input's value
@@ -240,12 +243,17 @@ Terms used throughout:
     surrounding white space (`probe:core-form-decimal-group`). On net48, it takes `NumberStyles.Float`, which
     refuses a group separator (`probe:mvc5-decimal-float-style`, `probe:mvc5-number-format-from-culture`).
     An integer refuses both separators on both hosts (`probe:core-form-int-culture`, `probe:mvc5-int-integer-style`).
-    So under de-DE, `1.5` reads 15 on net10 and nothing on net48, as each server binds it.
+    So under de-DE, `1.5` reads 15 on net10 and nothing on net48, as each server binds it. C# writes a number shape's
+    `overflow` from that host's parsing of the member's .NET type: text past the double's range binds infinity for
+    net10's `float` and `double`, and nothing for integers, `decimal` and net48's numbers.
   - A URL parameter's text converts to a number under the invariant culture, as both hosts bind the query.
   - A number shows as text the way .NET writes it under the view's culture: JavaScript's shortest digits,
     the culture's decimal separator, no group separator. A double below 1E-04 or from 1E+17 up is written in
     .NET's exponent form, `E`, a sign and at least two digits (`probe:core-number-text-culture`,
     `probe:core-number-text-exponent`).
+    Negative zero reads the shape's `negativeZero`: C# formats the declared number type's zero on this host under
+    the view's culture, retaining the sign for net10's `float` and `double`, and writing unsigned zero for integers,
+    `decimal` and net48's numbers.
   - A number goes into form data as D3.7 states.
 - D3.12 The time zone a view renders under is the app's choice, made per request where the view renders, as
   culture is (the owner, 2026-11-06: the framework allows the server to decide). The framework knows no
@@ -263,7 +271,11 @@ Terms used throughout:
     - A Windows id the table does not hold is refused where the view renders, naming the id.
   - Every conversion of an instant uses the view's zone. An instant shows as its wall time and offset in
     that zone for its own day, and a wall time a user picks becomes an instant at that zone's offset for
-    that day. DateWire's offset per day is the zone's.
+    that day. DateWire's offset per day is the zone's. A wall time daylight saving skips or repeats takes the zone's
+    standard offset, as .NET's `TimeZoneInfo.GetUtcOffset` gives it (`probe:core-zone-offset-skipped-and-repeated`).
+    C# states the source's declared date type at each conversion:
+    a `DateTimeOffset` keeps its moment when converted to an instant, and a `DateTime` supplies its wall fields to
+    that zone. An input's source type is its component value's declaration, not the model member it binds.
   - A `DateTime` is a wall time with no zone, so it is shown and sent as it is under any zone (D3.9).
 - D3.13 A value a step writes into a live object, a property's set and a method's argument, reaches it in the shape
   of the type its declaration gives, so a date reaches the vendor as a JavaScript `Date`, as its typed API holds one
@@ -279,7 +291,9 @@ Terms used throughout:
     ahead, and a type that holds itself and a date, since its shape would not end.
   - A value whose dates are already `Date`s reaches the member as it is, so an object a live method returns, a class
     instance, keeps its identity and prototype; only a plain object or array that holds a date as text is copied
-    with it converted (`spec/Core/conversions.md`).
+    with it converted (`spec/Core/conversions.md`). C# writes each declared field's `nothing` from its type: a
+    non-nullable value type or a list is omitted from the copy, and a nullable value type or object becomes null,
+    as D9.10's JSON member binding reads it; an omitted member keeps its start, and null clears a nullable member.
   - Data a step sends to the server keeps the wire text (D3.8).
   - The shape is the declared type's: a type the app's options make polymorphic is shaped by the members of the type
     the declaration names, so a date only a derived type holds reaches the vendor as its text. A date a callback's
@@ -322,6 +336,7 @@ Terms used throughout:
 - `probe:intl-iana-zone-offsets`
 - `probe:intl-windows-zone-id`
 - `probe:core-windows-zone-to-iana`
+- `probe:core-zone-offset-skipped-and-repeated`
 - `probe:net48-time-zones-from-registry`
 - `probe:cldr-windows-zone-default`
 

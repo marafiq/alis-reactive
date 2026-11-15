@@ -152,7 +152,7 @@ describe("when a container's data read uses the sent body", () => {
     const chart = new Chart();
     const blank: Source = {
       kind: "op", op: "coalesce", args: [
-        { kind: "as", expr: record, shape: { kind: "nullable", inner: { kind: "number", of: "integer", text: "view" } } },
+        { kind: "as", expr: record, shape: { kind: "nullable", inner: { kind: "number", of: "integer", text: "view", overflow: "nothing" } } },
         { kind: "lit", value: 5 },
       ],
     };

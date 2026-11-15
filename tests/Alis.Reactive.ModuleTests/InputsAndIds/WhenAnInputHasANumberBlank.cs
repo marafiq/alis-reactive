@@ -23,7 +23,7 @@ public sealed class WhenAnInputHasANumberBlank
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
         using var document = JsonDocument.Parse(json);
         Assert.That(document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs").GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Nights").GetProperty("value").GetRawText(),
-            Is.EqualTo("""{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Nights"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view"}}},{"kind":"lit","value":5}]}"""));
+            Is.EqualTo("""{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Nights"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}},{"kind":"lit","value":5}]}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 
@@ -37,7 +37,7 @@ public sealed class WhenAnInputHasANumberBlank
         var json = MoveInPlans.JsonOf(html.RenderPlan(plan));
         using var document = JsonDocument.Parse(json);
         Assert.That(document.RootElement.GetProperty("objects").GetProperty("$model").GetProperty("data").GetProperty("inputs").GetProperty("Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Extra").GetProperty("value").GetRawText(),
-            Is.EqualTo("""{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Extra"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view"}}},{"kind":"lit","value":7}]}"""));
+            Is.EqualTo("""{"kind":"op","op":"coalesce","args":[{"kind":"as","expr":{"kind":"get","path":["value"],"members":"required","target":{"kind":"obj","id":"Alis_Reactive_ModuleTests_InputsAndIds_NumberCard__Extra"}},"shape":{"kind":"nullable","inner":{"kind":"number","of":"integer","text":"view","overflow":"nothing"}}},{"kind":"lit","value":7}]}"""));
         Assert.That(PlanSchema.ProblemsOf(json), Is.Empty);
     }
 }

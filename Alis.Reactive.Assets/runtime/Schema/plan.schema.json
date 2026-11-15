@@ -513,12 +513,27 @@
       "properties": {
         "kind": {
           "const": "string"
+        },
+        "date": {
+          "$ref": "#/$defs/DateMeaning"
+        },
+        "negativeZero": {
+          "type": "string"
         }
       },
       "required": [
-        "kind"
+        "kind",
+        "date",
+        "negativeZero"
       ],
       "additionalProperties": false
+    },
+    "DateMeaning": {
+      "enum": [
+        "none",
+        "date",
+        "instant"
+      ]
     },
     "NumberShape": {
       "type": "object",
@@ -531,12 +546,16 @@
         },
         "text": {
           "$ref": "#/$defs/NumberCulture"
+        },
+        "overflow": {
+          "$ref": "#/$defs/NumberOverflow"
         }
       },
       "required": [
         "kind",
         "of",
-        "text"
+        "text",
+        "overflow"
       ],
       "additionalProperties": false
     },
@@ -550,6 +569,12 @@
       "enum": [
         "view",
         "invariant"
+      ]
+    },
+    "NumberOverflow": {
+      "enum": [
+        "nothing",
+        "infinity"
       ]
     },
     "BooleanShape": {
@@ -581,10 +606,14 @@
       "properties": {
         "kind": {
           "const": "instant"
+        },
+        "from": {
+          "$ref": "#/$defs/DateMeaning"
         }
       },
       "required": [
-        "kind"
+        "kind",
+        "from"
       ],
       "additionalProperties": false
     },
@@ -653,7 +682,7 @@
         "fields": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/$defs/Shape"
+            "$ref": "#/$defs/FieldConversion"
           }
         }
       },
@@ -662,6 +691,28 @@
         "fields"
       ],
       "additionalProperties": false
+    },
+    "FieldConversion": {
+      "type": "object",
+      "properties": {
+        "shape": {
+          "$ref": "#/$defs/Shape"
+        },
+        "nothing": {
+          "$ref": "#/$defs/FieldNothing"
+        }
+      },
+      "required": [
+        "shape",
+        "nothing"
+      ],
+      "additionalProperties": false
+    },
+    "FieldNothing": {
+      "enum": [
+        "omit",
+        "null"
+      ]
     },
     "CallExpression": {
       "type": "object",

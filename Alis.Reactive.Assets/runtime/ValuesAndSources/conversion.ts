@@ -1,4 +1,4 @@
-import { assertNever, notBuilt, type Culture, type NumberOf, type NumberShape, type Shape, type TimeZone } from "../Schema/index";
+import { assertNever, type Culture, type DateMeaning, type FieldConversion, type FieldNothing, type NumberOf, type NumberOverflow, type NumberShape, type Shape, type StringShape, type TimeZone } from "../Schema/index";
 import { nothing, value, type Read } from "./read";
 
 interface WallTime {
@@ -35,12 +35,14 @@ const latestInstant = 253_402_300_799_999;
 
 const latestOffsetMinutes = 14 * 60;
 
+const dayMilliseconds = 86_400_000;
+
 export function converted(read: Read, shape: Shape, culture: Culture, timeZone: TimeZone): Read {
   if (read.kind === "nothing") return nothing;
   const held = read.value;
   switch (shape.kind) {
     case "string":
-      return asText(held, culture);
+      return asText(held, shape, culture, timeZone);
     case "number":
       return asNumber(held, shape, culture);
     case "boolean":
@@ -48,7 +50,7 @@ export function converted(read: Read, shape: Shape, culture: Culture, timeZone: 
     case "date":
       return asDate(held);
     case "instant":
-      return asInstant(held, timeZone);
+      return asInstant(held, shape.from, timeZone);
     case "file":
       return held instanceof File ? read : nothing;
     case "any":
@@ -65,34 +67,40 @@ export function converted(read: Read, shape: Shape, culture: Culture, timeZone: 
   }
 }
 
-function asText(held: unknown, culture: Culture): Read {
-  const text = textOf(held, culture);
+function asText(held: unknown, shape: StringShape, culture: Culture, timeZone: TimeZone): Read {
+  const text = textOf(held, shape, culture, timeZone);
   return text === undefined ? nothing : value(text);
 }
 
-function textOf(held: unknown, culture: Culture): string | undefined {
+function textOf(held: unknown, shape: StringShape, culture: Culture, timeZone: TimeZone): string | undefined {
   if (typeof held === "string") return held;
-  if (typeof held === "number") return Number.isFinite(held) ? numberText(held, culture) : undefined;
+  if (typeof held === "number") return Number.isFinite(held) ? numberText(held, shape.negativeZero, culture) : undefined;
   if (typeof held === "boolean") return held ? "true" : "false";
-  if (isList(held)) return listText(held, culture);
+  if (isList(held)) return listText(held, shape, culture, timeZone);
   if (!(held instanceof Date) || !isMoment(held)) return undefined;
-  throw notBuilt(
-    "the text of a Date: the string shape does not say whether it holds a DateTime, shown as its local day and time, or a DateTimeOffset, shown at the view's time zone with its offset",
-  );
+  switch (shape.date) {
+    case "none":
+      return undefined;
+    case "date":
+      return shownWall(localWall(held), false);
+    case "instant":
+      return shownInstant(held, timeZone);
+    default:
+      return assertNever(shape.date);
+  }
 }
 
-function listText(items: readonly unknown[], culture: Culture): string {
+function listText(items: readonly unknown[], shape: StringShape, culture: Culture, timeZone: TimeZone): string {
   const texts: string[] = [];
   for (const item of items) {
-    const text = item === undefined ? undefined : textOf(item, culture);
-    if (text === undefined) throw notBuilt("the text of a list with an item that converts to nothing: the table does not say whether the list reads nothing or the item joins as empty text");
-    texts.push(text);
+    const text = textOf(item, shape, culture, timeZone);
+    texts.push(text ?? "");
   }
   return texts.join(",");
 }
 
-function numberText(held: number, culture: Culture): string {
-  if (Object.is(held, -0)) throw notBuilt("the text of negative zero: no fact states whether .NET writes the number it came from as 0 or -0");
+function numberText(held: number, negativeZero: string, culture: Culture): string {
+  if (Object.is(held, -0)) return negativeZero;
   const written = held.toExponential();
   const at = written.indexOf("e");
   const exponent = Number(written.slice(at + 1));
@@ -112,7 +120,7 @@ function asNumber(held: unknown, shape: NumberShape, culture: Culture): Read {
   if (typeof held === "boolean") return value(held ? 1 : 0);
   if (held instanceof Date) return isMoment(held) ? value(held.getTime()) : nothing;
   if (typeof held !== "string" || isBlank(held)) return nothing;
-  return numberOf(held, styleOf(shape, culture));
+  return numberOf(held, styleOf(shape, culture), shape.overflow);
 }
 
 function styleOf(shape: NumberShape, culture: Culture): NumberStyle {
@@ -137,7 +145,7 @@ function viewStyle(of: NumberOf, culture: Culture): NumberStyle {
   }
 }
 
-function numberOf(text: string, style: NumberStyle): Read {
+function numberOf(text: string, style: NumberStyle, overflow: NumberOverflow): Read {
   let at = pastNumberWhite(text, 0);
   let written = "";
   if (text.startsWith("+", at)) at += 1;
@@ -170,7 +178,16 @@ function numberOf(text: string, style: NumberStyle): Read {
   }
   if (pastNumberWhite(text, at) !== text.length) return nothing;
   const read = Number(written);
-  if (!Number.isFinite(read)) throw notBuilt("a number text past the double's range: no fact states whether the host binds it as infinity or refuses it");
+  if (!Number.isFinite(read)) {
+    switch (overflow) {
+      case "nothing":
+        return nothing;
+      case "infinity":
+        return value(read);
+      default:
+        return assertNever(overflow);
+    }
+  }
   if (!style.whole) return value(read);
   return Number.isInteger(read) ? value(read + 0) : nothing;
 }
@@ -249,8 +266,8 @@ function asDate(held: unknown): Read {
   return text === undefined ? nothing : value(localDate(text.wall));
 }
 
-function asInstant(held: unknown, timeZone: TimeZone): Read {
-  if (held instanceof Date) return isMoment(held) ? instantOfDate(held, timeZone) : nothing;
+function asInstant(held: unknown, from: DateMeaning, timeZone: TimeZone): Read {
+  if (held instanceof Date) return isMoment(held) ? instantOfDate(held, from, timeZone) : nothing;
   const text = typeof held === "string" ? dateText(held) : undefined;
   if (text === undefined) return nothing;
   const moment = momentOf(text, timeZone);
@@ -259,19 +276,74 @@ function asInstant(held: unknown, timeZone: TimeZone): Read {
   return value(new Date(moment));
 }
 
-function instantOfDate(held: Date, timeZone: TimeZone): Read {
+function instantOfDate(held: Date, from: DateMeaning, timeZone: TimeZone): Read {
+  switch (from) {
+    case "none":
+      return nothing;
+    case "instant":
+      return value(held);
+    case "date": {
+      const moment = zonedMoment(localWall(held), timeZone);
+      return moment < earliestInstant || moment > latestInstant ? nothing : value(new Date(moment));
+    }
+    default:
+      return assertNever(from);
+  }
+}
+
+function localWall(held: Date): WallTime {
+  return {
+    year: held.getFullYear(),
+    month: held.getMonth() + 1,
+    day: held.getDate(),
+    hour: held.getHours(),
+    minute: held.getMinutes(),
+    second: held.getSeconds(),
+    millisecond: held.getMilliseconds(),
+  };
+}
+
+function shownWall(wall: WallTime, withTime: boolean): string {
+  const day = String(wall.year).padStart(4, "0") + "-" + twoDigits(wall.month) + "-" + twoDigits(wall.day);
+  if (!withTime && wall.hour === 0 && wall.minute === 0 && wall.second === 0 && wall.millisecond === 0) return day;
+  const time = "T" + twoDigits(wall.hour) + ":" + twoDigits(wall.minute) + ":" + twoDigits(wall.second);
+  const fraction = wall.millisecond === 0 ? "" : "." + String(wall.millisecond).padStart(3, "0");
+  return day + time + fraction;
+}
+
+function shownInstant(held: Date, timeZone: TimeZone): string {
+  const offset = shownOffset(held, timeZone);
+  const wall = new Date(held.getTime() + offset);
+  return shownWall({
+    year: wall.getUTCFullYear(),
+    month: wall.getUTCMonth() + 1,
+    day: wall.getUTCDate(),
+    hour: wall.getUTCHours(),
+    minute: wall.getUTCMinutes(),
+    second: wall.getUTCSeconds(),
+    millisecond: wall.getUTCMilliseconds(),
+  }, true) + offsetText(offset);
+}
+
+function shownOffset(held: Date, timeZone: TimeZone): number {
   switch (timeZone.kind) {
     case "clock":
-      return value(held);
+      return -held.getTimezoneOffset() * 60_000;
     case "zone":
-      throw notBuilt(
-        "the instant of a Date under the time zone '" +
-          timeZone.id +
-          "': the instant shape does not say whether the Date holds a DateTimeOffset, which keeps its moment, or a DateTime, whose wall time takes the zone's offset",
-      );
+      return offsetIn(timeZone.id, held.getTime());
     default:
       return assertNever(timeZone);
   }
+}
+
+function offsetText(offset: number): string {
+  if (offset === 0) return "Z";
+  const minutes = Math.abs(offset) / 60_000;
+  return (offset < 0 ? "-" : "+") + twoDigits(Math.floor(minutes / 60)) + ":" + twoDigits(minutes % 60);
+}
+
+function twoDigits(value: number): string {
+  return String(value).padStart(2, "0");
 }
 
 function momentOf(text: DateText, timeZone: TimeZone): number {
@@ -291,12 +363,21 @@ function zonedMoment(wall: WallTime, timeZone: TimeZone): number {
       return localDate(wall).getTime();
     case "zone": {
       const asIfUtc = utcOf(wall);
-      const first = asIfUtc - offsetIn(timeZone.id, asIfUtc);
-      return asIfUtc - offsetIn(timeZone.id, first);
+      return asIfUtc - wallOffset(timeZone.id, asIfUtc);
     }
     default:
       return assertNever(timeZone);
   }
+}
+
+function wallOffset(zone: string, asIfUtc: number): number {
+  const before = offsetIn(zone, asIfUtc - dayMilliseconds);
+  const after = offsetIn(zone, asIfUtc + dayMilliseconds);
+  if (before === after) return before;
+  const beforeHolds = offsetIn(zone, asIfUtc - before) === before;
+  const afterHolds = offsetIn(zone, asIfUtc - after) === after;
+  if (beforeHolds !== afterHolds) return beforeHolds ? before : after;
+  return Math.min(before, after);
 }
 
 function offsetIn(zone: string, moment: number): number {
@@ -424,19 +505,30 @@ function asList(items: readonly unknown[], item: (read: Read) => Read): Read {
   return value(reads.map((read) => (read.kind === "value" ? read.value : undefined)));
 }
 
-function asRecord(held: object, fields: readonly (readonly [string, Shape])[], field: (read: Read, shape: Shape) => Read): Read {
-  const changed: [string, Read][] = [];
-  for (const [name, shape] of fields) {
+function asRecord(held: object, fields: readonly (readonly [string, FieldConversion])[], field: (read: Read, shape: Shape) => Read): Read {
+  const changed: [string, Read, FieldNothing][] = [];
+  for (const [name, conversion] of fields) {
     const member: unknown = Reflect.get(held, name);
-    const read = field(value(member), shape);
-    if (!keeps(member, read)) changed.push([name, read]);
+    const read = field(value(member), conversion.shape);
+    if (!keeps(member, read)) changed.push([name, read, conversion.nothing]);
   }
   if (changed.length === 0) return value(held);
   if (!isPlainObject(held)) return nothing;
   const copy: Record<string, unknown> = { ...held };
-  for (const [name, read] of changed) {
-    if (read.kind === "nothing") throw notBuilt("a copy of an object whose field '" + name + "' converts to nothing: the table does not say whether the copy lacks the field or holds it as nothing");
-    copy[name] = read.value;
+  for (const [name, read, absent] of changed) {
+    if (read.kind === "value") copy[name] = read.value;
+    else {
+      switch (absent) {
+        case "omit":
+          Reflect.deleteProperty(copy, name);
+          break;
+        case "null":
+          copy[name] = null;
+          break;
+        default:
+          return assertNever(absent);
+      }
+    }
   }
   return value(copy);
 }

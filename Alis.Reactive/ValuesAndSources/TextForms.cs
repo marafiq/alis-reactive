@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.ValuesAndSources;
@@ -7,7 +8,11 @@ internal static class TextForms
 {
     private const string Join = "join";
 
-    internal static AsExpression Shown<T>(ITypedSource<T> source) => new(Sources.Of(source), StringShape.Instance);
+    internal static AsExpression Shown<T>(ITypedSource<T> source)
+    {
+        var form = Sources.FormOf(source);
+        return new AsExpression(form.IntoLive<T>(Sources.Of(source)), ConversionShapes.TextOf(form.DataOptions.GetTypeInfo(typeof(T)), form.RendersUnder));
+    }
 
     internal static LitExpression Part(string? text) => Literals.Text(text ?? string.Empty);
 
