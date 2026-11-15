@@ -47,7 +47,7 @@ internal static class ExpressionReads
             RecordExpression record => Fields(record),
             ListExpression list => list.Items,
             LitExpression or ObjExpression or SignalExpression => Array.Empty<Expression>(),
-            _ => throw new NotImplementedException(),
+            _ => throw new InvalidOperationException("A plan expression has no walk of the references it reads."),
         };
         foreach (var child in children)
         {

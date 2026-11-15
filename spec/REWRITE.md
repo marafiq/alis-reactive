@@ -1140,7 +1140,9 @@ D20.5); and `Alis.Reactive.OpenTelemetry` with its layout helper (N20.2). A requ
 the trace port's send, and U7's browser tests are not run yet.
 U4, U5 and U10 are closed: their modules build every door they declare, the browser tests the spec places in them
 pass in one run (1, 1 and 5), their analyzers wait until after 1.0 (the owner, 2026-11-15), and each promise of
-theirs whose page calls a later unit's door is proven in that unit. U11's lambdas are built: a list's lambda translated where the view renders, its orderings by the key's type and the
+theirs whose page calls a later unit's door is proven in that unit. U8 is closed: Execution builds every part it
+declares, the walk of a parallel's results among them, whose proof lands with U18's `Parallel`, the one door that
+writes it, and its 2 browser tests pass in one run. U11's lambdas are built: a list's lambda translated where the view renders, its orderings by the key's type and the
 view's culture, a page under the culture its address names, a member read in its own form, and the refusals where
 the view renders, each naming its term or its read and the app's options, X6.57's date the app's own JSON converter
 writes among them; its 18 browser tests pass, and each fails on its planted defect. ALIS033's conditions (N18.10), ALIS028 (X6.52), the step a list's lambda refuses (X6.8, X5.13) and D6.14's
@@ -1149,8 +1151,9 @@ waits on a date picker bound to a DateTime (N18.4), is placed in U18. U11 is clo
 U12's C# half is built: a declared method called at its line, its result bound there or at its term (D4.7, D5.11),
 its typed arguments, a `Field` and the run's abort signal among them, the objects and lists a member holds or a method
 returns, and the lambdas over live items; `Event`, `Data<T>`, callbacks and answers, `Argument`, `MethodAt`,
-`CallItself`, `EventListening` and the iterators are built with their first consumer, U13 to U20, and U12's browser
-tests land by the doors their pages call.
+`CallItself`, `EventListening` and the iterators are built with their first consumer, U13 to U20, and U12's browser tests land by the doors their pages call. U12 is closed: its module builds every door it
+declares, the 16 browser tests of its promises, which land in U13 and U18, pass in one run, and its two analyzers wait
+until after 1.0 (the owner, 2026-11-15).
 U13's pieces are landed: a vendor defined by `ComponentVendor`'s kinds, a component rendered with its handlers and
 their policy, a handler started and released as its row states, a pipeline's listen released by how the step
 reached its object, a callback's answer, ALIS032, ALIS034 and ALIS009's reach to a declaration and a render helper,

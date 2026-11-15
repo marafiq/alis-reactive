@@ -50,7 +50,7 @@ internal sealed class LambdaResults
             ListExpression list => new ListExpression(list.Items.Select(item => Replace(item, reference, value)).ToArray()),
             OpExpression operation => new OpExpression(operation.Op, operation.Args.Select(argument => Replace(argument, reference, value)).ToArray()),
             RefExpression or LitExpression or ObjExpression or SignalExpression => expression,
-            _ => throw new NotImplementedException(),
+            _ => throw new InvalidOperationException("A plan expression has no replacement of the result it reads."),
         };
     }
 

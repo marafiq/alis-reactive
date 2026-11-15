@@ -91,6 +91,9 @@ internal sealed class HandlerResults
                     Read(statement, branch.When, visible);
                     written.Add(new IfStatement(branch.When, Walk(branch.Then, visible), Walk(branch.Else, visible)));
                     break;
+                case AllStatement parallel:
+                    written.Add(new AllStatement(parallel.Blocks.Select(block => Walk(block, visible)).ToArray()));
+                    break;
                 case RequestStatement request:
                     Read(statement, request.Send, visible);
                     var replied = new HashSet<RefExpression>(visible) { _replies[request.Reply] };
@@ -110,7 +113,7 @@ internal sealed class HandlerResults
                     written.Add(statement);
                     break;
                 default:
-                    throw new NotImplementedException();
+                    throw new InvalidOperationException("A plan statement has no walk of the results it reads.");
             }
         }
 
