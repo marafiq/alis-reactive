@@ -662,7 +662,6 @@
   },
   "M13.F1 X17.26 0": {
     "modules": [
-      "Declarations",
       "Elements",
       "RenderingAndDelivery",
       "TriggersAndPipelines"
@@ -1341,7 +1340,6 @@
   },
   "M21.F1 M21.X2 1": {
     "modules": [
-      "Declarations",
       "FusionComponents",
       "InputsAndIds",
       "RenderingAndDelivery",
@@ -1500,7 +1498,6 @@
   },
   "M21.F20 M21.X507 1": {
     "modules": [
-      "Declarations",
       "FusionComponents",
       "InputsAndIds",
       "RenderingAndDelivery",
@@ -1674,7 +1671,6 @@
   },
   "M21.F31 M21.X512 1": {
     "modules": [
-      "Declarations",
       "FusionComponents",
       "InputsAndIds",
       "RenderingAndDelivery",
@@ -1931,7 +1927,6 @@
   },
   "M21.F5 M21.X503 1": {
     "modules": [
-      "Declarations",
       "FusionComponents",
       "InputsAndIds",
       "RenderingAndDelivery",
@@ -2001,7 +1996,6 @@
   },
   "M22.F1 M22.X3 0": {
     "modules": [
-      "Declarations",
       "FusionComponents",
       "FusionTemplates",
       "RequestsAndResponses",
@@ -2014,7 +2008,6 @@
   },
   "M22.F1 X15.1 0": {
     "modules": [
-      "Declarations",
       "FusionComponents",
       "FusionTemplates",
       "RequestsAndResponses",
@@ -2027,7 +2020,6 @@
   },
   "M22.F1 X15.2 0": {
     "modules": [
-      "Declarations",
       "FusionComponents",
       "FusionTemplates",
       "RequestsAndResponses",
@@ -2040,7 +2032,6 @@
   },
   "M22.F1 X15.5 0": {
     "modules": [
-      "Declarations",
       "FusionComponents",
       "FusionTemplates",
       "RequestsAndResponses",

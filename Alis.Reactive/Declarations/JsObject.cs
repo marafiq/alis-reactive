@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Declarations;
@@ -27,7 +28,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>The property, a source of its value.</returns>
     protected ReadOnly<TValue> ReadOnly<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => new(this, JavaScriptName(name, declaredBy), optional);
 
     /// <summary>Declares a property the browser reads and sets.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -35,7 +36,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>The property, a source of its value that a step also sets.</returns>
     protected Property<TValue> Property<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => new(this, JavaScriptName(name, declaredBy), optional);
 
     /// <summary>Declares a property the browser only sets.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -43,7 +44,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>The property, which a step sets.</returns>
     protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => new(this, JavaScriptName(name, declaredBy), optional);
 
     /// <summary>Declares a property that holds another object.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -301,4 +302,6 @@ public abstract class JsObject
     protected Event<TArgs> Event<TArgs>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
+
+    private static string JavaScriptName(string? name, string declaredBy) => name ?? JsonNamingPolicy.CamelCase.ConvertName(declaredBy);
 }

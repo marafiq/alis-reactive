@@ -60,7 +60,7 @@ public sealed class Element : Component
 public sealed class ElementContent : ReadOnly<string?>
 {
     internal ElementContent(Element element, string member)
-        : base(element, member)
+        : base(element, member, optional: false)
     {
     }
 

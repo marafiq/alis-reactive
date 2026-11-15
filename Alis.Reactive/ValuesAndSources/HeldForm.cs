@@ -19,5 +19,7 @@ internal sealed class HeldForm
 
     internal LitExpression Beside<TValue>(TValue value) => Literals.Of(value, _json);
 
+    internal Expression IntoLive(Expression held) => held;
+
     internal bool WritesAsAScalar<TValue>() => _json.LiveForm.GetTypeInfo(typeof(TValue)).Kind == JsonTypeInfoKind.None;
 }

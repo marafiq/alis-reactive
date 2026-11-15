@@ -11,17 +11,20 @@ namespace Alis.Reactive.Declarations;
 /// <typeparam name="TValue">The type the object's API gives the property, nullable where the API's is.</typeparam>
 public class ReadOnly<TValue> : TypedSource<TValue>
 {
-    private protected ReadOnly(JsObject owner, string member)
+    internal ReadOnly(JsObject owner, string member, bool optional)
     {
         Owner = owner;
         Member = new MemberStep(member);
+        Optional = optional;
     }
 
     private protected JsObject Owner { get; }
 
     private protected PathStep Member { get; }
 
-    internal override Schema.Expression Expression => new GetExpression([Member], PathMembers.Required, Owner.Bound.Target);
+    private protected bool Optional { get; }
+
+    internal override Schema.Expression Expression => new GetExpression([Member], Owner.Bound.Reads(Optional), Owner.Bound.Target);
 
     internal override HeldForm Form => HeldForm.Live(Owner.Bound.Writer.Content.Json);
 
@@ -41,19 +44,21 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 /// <typeparam name="TValue">The type the object's API gives the property, nullable where the API's is.</typeparam>
 public sealed class Property<TValue> : ReadOnly<TValue>
 {
-    internal Property(JsObject owner, string member)
-        : base(owner, member)
+    internal Property(JsObject owner, string member, bool optional)
+        : base(owner, member, optional)
     {
     }
 
     /// <summary>Sets the property to a literal when the step runs.</summary>
     /// <param name="value">The value to set, written into the plan where the view renders.</param>
-    public void Set(TValue value)
-        => Owner.Bound.Writer.Write(new SetStatement([Member], SetMembers.Required, false, Owner.Bound.Target, Literals.Of(value, Owner.Bound.Writer.Content.Json)));
+    public void Set(TValue value) => Written(Literals.IntoLive(value, Owner.Bound.Writer.Content.Json));
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>
-    public void Set(ITypedSource<TValue> source) => throw new NotImplementedException();
+    public void Set(ITypedSource<TValue> source) => Written(Sources.FormOf(source).IntoLive(Sources.Of(source)));
+
+    internal void Written(Schema.Expression value)
+        => Owner.Bound.Writer.Write(new SetStatement([Member], Optional ? SetMembers.Optional : SetMembers.Required, false, Owner.Bound.Target, value));
 }
 
 /// <summary>
@@ -62,17 +67,27 @@ public sealed class Property<TValue> : ReadOnly<TValue>
 /// <typeparam name="TValue">The type the object's API gives the property, nullable where the API's is.</typeparam>
 public sealed class WriteOnly<TValue>
 {
-    internal WriteOnly()
+    private readonly JsObject _owner;
+    private readonly PathStep _member;
+    private readonly bool _optional;
+
+    internal WriteOnly(JsObject owner, string member, bool optional)
     {
+        _owner = owner;
+        _member = new MemberStep(member);
+        _optional = optional;
     }
 
     /// <summary>Sets the property to a literal when the step runs.</summary>
     /// <param name="value">The value to set, written into the plan where the view renders.</param>
-    public void Set(TValue value) => throw new NotImplementedException();
+    public void Set(TValue value) => Written(Literals.IntoLive(value, _owner.Bound.Writer.Content.Json));
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>
-    public void Set(ITypedSource<TValue> source) => throw new NotImplementedException();
+    public void Set(ITypedSource<TValue> source) => Written(Sources.FormOf(source).IntoLive(Sources.Of(source)));
+
+    internal void Written(Schema.Expression value)
+        => _owner.Bound.Writer.Write(new SetStatement([_member], _optional ? SetMembers.Optional : SetMembers.Required, false, _owner.Bound.Target, value));
 }
 
 /// <summary>
@@ -85,14 +100,14 @@ public static class NullableWrites
     /// <param name="source">The source of the value to set.</param>
     public static void Set<TValue>(this Property<TValue?> property, ITypedSource<TValue> source)
         where TValue : struct
-        => throw new NotImplementedException();
+        => property.Written(Sources.FormOf(source).IntoLive(Sources.Of(source)));
 
     /// <summary>Sets a write-only property of a nullable value type to what a source of the type itself reads.</summary>
     /// <param name="member">The property to set.</param>
     /// <param name="source">The source of the value to set.</param>
     public static void Set<TValue>(this WriteOnly<TValue?> member, ITypedSource<TValue> source)
         where TValue : struct
-        => throw new NotImplementedException();
+        => member.Written(Sources.FormOf(source).IntoLive(Sources.Of(source)));
 }
 
 /// <summary>
