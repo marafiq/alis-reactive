@@ -1,5 +1,7 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.Execution;
+using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Declarations;
@@ -14,13 +16,17 @@ namespace Alis.Reactive.Declarations;
 /// <typeparam name="TResult">The type the object's API gives the method's result.</typeparam>
 public sealed class MethodResult<TResult> : TypedSource<TResult>
 {
-    internal MethodResult()
+    private readonly BlockWriter _writer;
+
+    internal MethodResult(string name, BlockWriter writer)
     {
+        Expression = new RefExpression(name);
+        _writer = writer;
     }
 
-    internal override Schema.Expression Expression => throw new NotImplementedException();
+    internal override Schema.Expression Expression { get; }
 
-    internal override HeldForm Form => throw new NotImplementedException();
+    internal override HeldForm Form => HeldForm.Live(_writer.Content.Json, _writer.Content.RendersUnder);
 
     /// <summary>Reads data past the result: a field of the value the method returned, at any depth.</summary>
     /// <remarks>
@@ -29,5 +35,6 @@ public sealed class MethodResult<TResult> : TypedSource<TResult>
     /// </remarks>
     /// <param name="path">The field to read, as a member path from the result.</param>
     /// <returns>A source of the field's value.</returns>
-    public TypedSource<TRead> Read<TRead>(Expression<Func<TResult, TRead>> path) => throw new NotImplementedException();
+    public TypedSource<TRead> Read<TRead>(Expression<Func<TResult, TRead>> path)
+        => DataReads.Past<TRead>(Expression, Form, path, _writer.Content.Json.LiveForm);
 }

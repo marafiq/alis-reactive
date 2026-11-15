@@ -1236,6 +1236,11 @@ Features: M6.F1, M6.F2
 
 The request door's XML doc names MVC's binding of a parameter prefix and of a parameter named like its type's member (C25).
 
+`Pass<TDeclared, TSource>` writes its source at `TDeclared` (DESIGN's argument bullet under D17.5). Until the app's form lands here,
+every source that holds a class reads in JavaScript's value, since System.Text.Json takes a member's own number
+handling only on a number or a list of numbers, so the two types write one plan; this unit writes the module test that
+tells them apart, a derived member the app's form writes as text.
+
 ### U19. Realtime
 Features: M10.F1, M10.F2
 

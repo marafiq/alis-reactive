@@ -1,4 +1,6 @@
 using System;
+using Alis.Reactive.PathsAndWire;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.ValuesAndSources;
 
@@ -11,9 +13,14 @@ namespace Alis.Reactive.ValuesAndSources;
 /// </remarks>
 public abstract class Arg
 {
-    private protected Arg()
+    private readonly Func<AppJson, Expression> _write;
+
+    private protected Arg(Func<AppJson, Expression> write)
     {
+        _write = write;
     }
+
+    internal Expression Written(AppJson json) => _write(json);
 }
 
 /// <summary>
@@ -26,15 +33,19 @@ public abstract class Arg
 /// <typeparam name="T">The type of the parameter the argument fills.</typeparam>
 public sealed class Arg<T> : Arg
 {
-    private Arg()
+    private Arg(Func<AppJson, Expression> write) : base(write)
     {
     }
 
+    internal static Arg<T> FromSource<TSource>(TypedSource<TSource> source)
+        where TSource : T
+        => new(_ => Sources.FormOf(source).IntoLive<T>(Sources.Of(source)));
+
     /// <summary>Passes a literal, written into the plan where the view renders.</summary>
     /// <param name="value">The value the call receives.</param>
-    public static implicit operator Arg<T>(T value) => throw new NotImplementedException();
+    public static implicit operator Arg<T>(T value) => new(json => Literals.IntoLive(value, json));
 
     /// <summary>Passes what a source reads when the call runs.</summary>
     /// <param name="source">The source the call's argument is read from.</param>
-    public static implicit operator Arg<T>(TypedSource<T> source) => throw new NotImplementedException();
+    public static implicit operator Arg<T>(TypedSource<T> source) => FromSource(source);
 }

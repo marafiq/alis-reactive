@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Alis.Reactive.OwnershipAndState;
 using Alis.Reactive.Schema;
 
@@ -8,6 +9,7 @@ namespace Alis.Reactive.Execution;
 internal sealed class BlockWriter
 {
     private readonly Stack<List<Statement>> _open = new();
+    private int _results;
 
     internal BlockWriter(PlanContent content)
     {
@@ -15,6 +17,8 @@ internal sealed class BlockWriter
     }
 
     internal PlanContent Content { get; }
+
+    internal string NextResult() => "result" + (++_results).ToString(CultureInfo.InvariantCulture);
 
     internal void Write(Statement statement)
     {

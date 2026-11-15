@@ -221,7 +221,13 @@ slip is about you invented so you can avoid accountability about mistakes").
   or one piece, its lines and files named, a reply of bounded length, and a sandbox a low-effort probe proved runs the
   brief's build and test commands before a run that needs them (the owner, 2026-11-14: "please use codex efficiently,
   do not waste very priced resources, show some responsiblity", then "no, use highest model at critical thinking so u
-  get best results - but efficieny in scope and what you want").
+  get best results - but efficieny in scope and what you want"). Codex's top model advises as well as builds, and the
+  lead keeps it working: a piece a landed exemplar shapes goes to it as a build while the open question beside it goes
+  to it as a consult, the two at once, so the lead's own reading is never the bottleneck (the owner, 2026-11-15: "use
+  codex highes tmodel think for advising as well sir", then "lets move quicker , i am giving you resources, bottlneck
+  is on your side"). A run whose scope is clean runs in fast mode too, the CLI's service tier "fast", which the CLI
+  sends for its top model and drops with a warning for a tier the model does not offer (the owner, 2026-11-15: "when
+  scope is clean - u can use codex top model and max effort in fast mode as well").
 - The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
   session, with the reason. A task whose check costs what the work costs is the lead's own. Quality is each
   worker's own, never the next reader's: an agent runs every check its files meet before it replies, decides each

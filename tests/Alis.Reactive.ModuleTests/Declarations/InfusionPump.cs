@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Alis.Reactive.Declarations;
+using Alis.Reactive.ValuesAndSources;
 using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.ModuleTests.Declarations;
@@ -37,6 +38,42 @@ public sealed class InfusionPump : Component
     public ReadOnly<Prescription> CurrentPrescription => ReadOnly<Prescription>();
 
     public Property<Seal> Seal => Property<Seal>();
+
+    public ReadOnly<ScheduledOrder> PendingOrder => ReadOnly<ScheduledOrder>();
+
+    public void Start() => Method();
+
+    public void Silence() => Method(optional: true);
+
+    public void Deliver() => Method(name: "deliver-dose");
+
+    public void Program(Arg<int> rate, Arg<int> volume, Arg<string?> label) => Method([rate, volume, label]);
+
+    public void Schedule(Arg<DateTime> at) => Method([at]);
+
+    public void Window(Arg<DeliveryWindow> window) => Method([window]);
+
+    public void Prime() => Method([Fixed(2), Fixed("saline")]);
+
+    public void Refill(Arg<int> count) => Method([count]);
+
+    public void SealDose(Arg<Seal> seal) => Method([seal]);
+
+    public void Repeat(TypedSource<int> refills) => Method([Pass<int, int>(refills)]);
+
+    public void Review<TOrder>(TypedSource<TOrder> order)
+        where TOrder : InfusionOrder
+        => Method([Pass<InfusionOrder, TOrder>(order)]);
+
+    public MethodResult<int> MeasuredRate() => Method<int>();
+
+    public MethodResult<Prescription> Summary() => Method<Prescription>();
+
+    public MethodResult<int> Estimate(Arg<int> volume) => Method<int>([volume], name: "estimate-dose", optional: true);
+
+    public MethodResult<string?> LastAlarm() => Method<string?>(name: "last-alarm", optional: true);
+
+    public MethodResult<DateTime> NextStart() => Method<DateTime>();
 }
 
 public sealed class Prescription
@@ -82,4 +119,16 @@ public sealed class SealText : JsonConverter<Seal>
     public override Seal Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => new() { Tag = reader.GetString() ?? "" };
 
     public override void Write(Utf8JsonWriter writer, Seal value, JsonSerializerOptions options) => writer.WriteStringValue(value.Tag);
+}
+
+public sealed record DeliveryWindow(DateTime StartsAt);
+
+public abstract class InfusionOrder
+{
+    public string Drug { get; set; } = "saline";
+}
+
+public sealed class ScheduledOrder : InfusionOrder
+{
+    public DateTime ReviewedAt { get; set; }
 }

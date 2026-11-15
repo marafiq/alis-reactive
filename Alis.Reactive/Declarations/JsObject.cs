@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Declarations;
@@ -73,7 +75,7 @@ public abstract class JsObject
     /// <param name="optional">True when the API marks the method optional: a call of an absent one runs nothing.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     protected void Method(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => Bound.Writer.Write(new DoStatement(false, Call([], name, optional, declaredBy)));
 
     /// <summary>Declares a method that returns nothing, and calls it with its arguments where the pipeline reaches the line.</summary>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
@@ -81,7 +83,7 @@ public abstract class JsObject
     /// <param name="optional">True when the API marks the method optional: a call of an absent one runs nothing.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     protected void Method(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => Bound.Writer.Write(new DoStatement(false, Call(arguments, name, optional, declaredBy)));
 
     /// <summary>Declares a method that takes no argument and returns a value, and calls it where the pipeline reaches the line.</summary>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -89,7 +91,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>What the call returned at that line, a source every later read reads as it was then.</returns>
     protected MethodResult<TResult> Method<TResult>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => ResultOf<TResult>([], name, optional, declaredBy);
 
     /// <summary>Declares a method that returns a value, and calls it with its arguments where the pipeline reaches the line.</summary>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
@@ -98,7 +100,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>What the call returned at that line, a source every later read reads as it was then.</returns>
     protected MethodResult<TResult> Method<TResult>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => ResultOf<TResult>(arguments, name, optional, declaredBy);
 
     /// <summary>Declares a method that takes no argument and returns a promise of nothing; the pipeline waits for it before its next step.</summary>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -268,7 +270,7 @@ public abstract class JsObject
     /// <returns>The argument to list among a method's arguments.</returns>
     protected static Arg Fixed<TValue>(TValue value)
         where TValue : notnull
-        => throw new NotImplementedException();
+        => (Arg<TValue>)value;
 
     /// <summary>Makes an argument of a source whose type derives from the type the method declares.</summary>
     /// <param name="value">The source the view passes.</param>
@@ -277,7 +279,7 @@ public abstract class JsObject
     /// <returns>The argument to list among a method's arguments.</returns>
     protected static Arg Pass<TDeclared, TSource>(TypedSource<TSource> value)
         where TSource : TDeclared
-        => throw new NotImplementedException();
+        => Arg<TDeclared>.FromSource(value);
 
     /// <summary>Makes the argument that hands the method the abort signal of the steps that call it.</summary>
     /// <remarks>
@@ -302,6 +304,19 @@ public abstract class JsObject
     protected Event<TArgs> Event<TArgs>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
+
+    private MethodResult<TResult> ResultOf<TResult>(IReadOnlyList<Arg> arguments, string? name, bool optional, string declaredBy)
+    {
+        var writer = Bound.Writer;
+        var call = Call(arguments, name, optional, declaredBy);
+        var result = writer.NextResult();
+        writer.Write(new LetStatement(result, false, LetBinds.Line, call));
+        return new MethodResult<TResult>(result, writer);
+    }
+
+    private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, bool optional, string declaredBy)
+        => new([new MemberStep(JavaScriptName(name, declaredBy))], Bound.Reads(optional), Bound.Target,
+            arguments.Select(argument => argument?.Written(Bound.Writer.Content.Json) ?? Literals.Text(null)).ToArray());
 
     private static string JavaScriptName(string? name, string declaredBy) => name ?? JsonNamingPolicy.CamelCase.ConvertName(declaredBy);
 }
