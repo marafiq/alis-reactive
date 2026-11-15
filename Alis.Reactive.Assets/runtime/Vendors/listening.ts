@@ -1,23 +1,44 @@
-import { assertNever, notBuilt, type Listening } from "../Schema/index";
+import { assertNever, type Listening } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
+import { assignListener } from "./callback-properties";
 
 export type Listener = (...args: unknown[]) => void;
 
 export type Unsubscribe = () => void;
 
 export function subscribe(raiser: object, listening: Listening, event: string, listener: Listener): Unsubscribe {
+  let active = false;
+  const guarded: Listener = (...args) => {
+    if (active) listener(...args);
+  };
+  const remove = listen(raiser, listening, event, guarded);
+  active = true;
+  return () => {
+    if (!active) return;
+    active = false;
+    remove();
+  };
+}
+
+function listen(raiser: object, listening: Listening, event: string, listener: Listener): Unsubscribe {
   switch (listening.kind) {
     case "method": {
       const add = methodOf(raiser, listening.subscribe);
       const remove = methodOf(raiser, listening.unsubscribe);
-      Reflect.apply(add, raiser, [event, listener]);
+      add(event, listener);
       return () => {
-        Reflect.apply(remove, raiser, [event, listener]);
+        remove(event, listener);
       };
     }
     case "assignment":
-    case "returned":
-      throw notBuilt("a listener by '" + listening.kind + "'");
+      return assignListener(raiser, event, listener);
+    case "returned": {
+      const remove = methodOf(raiser, listening.subscribe)(event, listener);
+      if (typeof remove !== "function") throw new Stop("The subscribe method '" + listening.subscribe + "' returned no unsubscriber.");
+      return () => {
+        Reflect.apply(remove, undefined, []);
+      };
+    }
     default:
       return assertNever(listening);
   }
