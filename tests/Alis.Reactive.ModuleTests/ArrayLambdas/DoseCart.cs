@@ -77,6 +77,22 @@ public sealed class CartDose
 
     [JsonConverter(typeof(SealText))]
     public Seal Tagged { get; set; } = new();
+
+    public string? Note { get; set; }
+
+    public decimal Copay { get; set; }
+
+    public DateTimeOffset Seen { get; set; }
+
+    public DateTime? Recorded { get; set; }
+
+    public List<Carer> Checks { get; set; } = [];
+
+    public List<int> Hours { get; set; } = [];
+
+    public IReadOnlyList<int> Rounds { get; set; } = [];
+
+    public int[] Slots { get; set; } = [];
 }
 
 public sealed class Carer

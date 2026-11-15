@@ -49,11 +49,22 @@ internal sealed class ItemLambda
     internal static FnExpression Comparing(LambdaExpression key, HeldForm form, Operator comparison, bool descending)
         => Outermost(key, form).Sort(key, comparison, descending);
 
+    internal HeldForm Form => _form;
+
+    internal FnExpression Inner(LambdaExpression inner) => Fn(inner, body => body);
+
+    internal FnExpression EveryInnerItem() => new([NextItem], new LitExpression(JsonSerializer.SerializeToElement(true)));
+
+    internal static InvalidOperationException NoBrowserForm(LinqExpression term)
+        => Refused(term, "has no browser form in a list's lambda; use a member the framework translates, or move the work to the server.");
+
     private static ItemLambda Outermost(LambdaExpression lambda, HeldForm form) => new(lambda, [], form);
+
+    private string NextItem => Item + (_items.Count + 1).ToString(CultureInfo.InvariantCulture);
 
     private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped)
     {
-        var name = Item + (_items.Count + 1).ToString(CultureInfo.InvariantCulture);
+        var name = NextItem;
         var items = new Dictionary<ParameterExpression, string>(_items) { [lambda.Parameters[0]] = name };
         return new FnExpression([name], shaped(new ItemLambda(_lambda, items, _form).Term(lambda.Body)));
     }
@@ -74,7 +85,7 @@ internal sealed class ItemLambda
         return Keys.Of(key.Body.Type, new ItemLambda(_lambda, items, _form).Term(key.Body));
     }
 
-    private PlanExpression Term(LinqExpression node) => node switch
+    internal PlanExpression Term(LinqExpression node) => node switch
     {
         BinaryExpression { NodeType: ExpressionType.AndAlso } both => new OpExpression(Operator.And, [Term(both.Left), Term(both.Right)]),
         BinaryExpression { NodeType: ExpressionType.OrElse } either => new OpExpression(Operator.Or, [Term(either.Left), Term(either.Right)]),
@@ -87,9 +98,11 @@ internal sealed class ItemLambda
     {
         var read = Unconverted(node);
         if (!ReadsAnItem(read)) return _form.Beside(ViewValues.Of(read), read.Type);
+        if (TranslatedMembers.TryTranslating(read, this, out var translated)) return translated;
         return read switch
         {
             ParameterExpression item when _items.TryGetValue(item, out var name) => new RefExpression(name),
+            UnaryExpression { NodeType: ExpressionType.ArrayLength } length => ListForms.Length(Read(length.Operand)),
             UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked } valueOf => new OpExpression(Operator.NullableValue, [Read(valueOf.Operand)]),
             BinaryExpression { NodeType: ExpressionType.Coalesce } coalesce => Coalesced(coalesce),
             ConditionalExpression choice => new OpExpression(Operator.Cond, [Term(choice.Test), Term(choice.IfTrue), Term(choice.IfFalse)]),
@@ -196,7 +209,7 @@ internal sealed class ItemLambda
         return node;
     }
 
-    private bool ReadsAnItem(LinqExpression node)
+    internal bool ReadsAnItem(LinqExpression node)
     {
         var finder = new ItemFinder(_items);
         finder.Visit(node);
@@ -210,9 +223,6 @@ internal sealed class ItemLambda
         if (castsADecimal) return new($"'{operand}' is cast to or from decimal, which rounds as C# computes it and not as the browser does; keep the member's own type, or move the work to the server.");
         return new($"'{operand}' is converted by a user-defined conversion, which the browser does not have; compare a member it reads, such as d => d.Seal.Tag == \"S4\", or move the work to the server.");
     }
-
-    private static InvalidOperationException NoBrowserForm(LinqExpression term)
-        => Refused(term, "has no browser form in a list's lambda; use a member the framework translates, or move the work to the server.");
 
     private static InvalidOperationException ComparesObjects(BinaryExpression comparison)
         => Refused(comparison, "compares objects, and the browser compares objects by reference; compare a member of each, such as d => d.Carer.Name == lead.");

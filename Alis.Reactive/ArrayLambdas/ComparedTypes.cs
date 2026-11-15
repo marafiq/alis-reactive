@@ -35,6 +35,8 @@ internal static class ComparedTypes
 
     internal static bool IsNumber(Type type) => WholeNumbers.ContainsKey(type) || Fractions.Contains(type);
 
+    internal static bool IsFraction(Type type) => Fractions.Contains(type);
+
     internal static bool IsChar(Type type) => Chars.Contains(type);
 
     internal static bool IsDecimal(Type type) => Decimals.Contains(type);
