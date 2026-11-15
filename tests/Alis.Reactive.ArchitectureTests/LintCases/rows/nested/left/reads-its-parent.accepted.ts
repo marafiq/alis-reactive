@@ -1,0 +1,1 @@
+export { residents } from "../index";

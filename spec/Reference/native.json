@@ -663,6 +663,64 @@
           "tests": [
             "M12.X4"
           ]
+        },
+        {
+          "behavior": "The component's Text is its heading; its Ping status starts at Pinged 0 times and reads Pinged 1 time after one Ping(), then times for more. Its Write-only status starts at Unwritten and reads Written and the text last written. Its Calls status reads the number of calls, starting at 0. Its Records status starts at None and Take and TakeAll show each name in its code, Alpha in C7; Beta in C8 for those two records, beside its Records list.",
+          "tests": [
+            "method.void",
+            "method.arg.object",
+            "method.arg.list",
+            "prop.writeOnly",
+            "X5.11"
+          ]
+        },
+        {
+          "behavior": "Its Items list reads each item's name and value separated by a space. An item's status is named Item and its name, One, not acted before Act() and One, acted after; its Checks status starts at 0 and shows each check. The Answer status holds the list its Ask button draws, and Error holds the thrown message. Its Raise status starts at Waiting and reads Acted after the payload's Act(), beside the Payload action status that reads Payload acted. Payload starts at Payload text: none and reads Payload text: and the written text after WriteOnlyText.",
+          "tests": [
+            "X5.3",
+            "X5.11",
+            "X17.22",
+            "event.poc15.callback.payload.before",
+            "event.poc15.writeOnly.payload.before",
+            "X11.11"
+          ]
+        },
+        {
+          "behavior": "Raise's payload has Count 14 where the box holds no number, a day of 2026-11-12T10:00:00 and its box text as Time. Raise is flagged, Raise plain is not. Their outer's middle is named M-14 and M-12. Before listeners return, the flagged payload's Total() is 3, its Current() is One, two of its three Items are named Missed and Matching() holds two items; the plain payload's Total() is 1, its Current() is Two and no item matches or is named Missed. After listeners return, Total() is 2, Current() is Two and the first item is named Done, leaving one Missed in the flagged payload. Held.ItemAt uses positions starting at 1 and Held.Item is One.",
+          "tests": [
+            "event.poc15.methodValue.payload.before",
+            "event.poc15.methodValue.payload.after",
+            "event.poc15.returnedObject.payload.before",
+            "event.poc15.returnedObject.payload.after",
+            "event.poc15.liveObjects.payload.after",
+            "event.poc15.returnedObject.held.before"
+          ]
+        },
+        {
+          "behavior": "Sort orders Records by name and Edit first increases the first record's Count by one. Paged puts a result object with result and count into NullableRecords, the deliberate non-list that X6.7 reads; Clear puts null there. The Day field sets both Day and NullableDay to the selected local day; clearing it puts null in NullableDay and an invalid date in Day.",
+          "tests": [
+            "X10.13",
+            "X6.7",
+            "X8.27 #0",
+            "X8.27 #3"
+          ]
+        },
+        {
+          "behavior": "Error starts empty and is cleared when Ask answers. A payload's WriteOnlyText also shows that text in Note; its Fill() replaces the list named Names with the names it receives.",
+          "tests": [
+            "X17.22",
+            "X11.8"
+          ]
+        },
+        {
+          "behavior": "The record, the records, the bindings and the starts the render helper gives it are held as that data holds them, each member the data lacks absent, so a member a page leaves out reads its start; its Binding holds no member, and a text the start holds as null is its Text. Once destroyed, it refuses the removal of a listener with the error The component was destroyed before its listener was removed.",
+          "tests": [
+            "X4.7",
+            "X4.8",
+            "M3.X1",
+            "X12.7",
+            "X7.7 #2"
+          ]
         }
       ]
     },
@@ -722,6 +780,13 @@
             "event.poc15.component.payload.after",
             "event.poc15.component.held.before",
             "event.poc15.component.held.after"
+          ]
+        },
+        {
+          "behavior": "The parent's mount builds its peer beside it, with Ratio 25 and empty Text, before any Raise or Hand a peer. Its Text is shown in its Text status. A new peer starts at those same values.",
+          "tests": [
+            "event.poc15.component.payload.before",
+            "event.poc15.component.held.before"
           ]
         }
       ]

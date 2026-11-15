@@ -37,7 +37,10 @@ its views.
   (`Components/ConformanceComponent/ConformanceStart.cs`), written as the plan writes a literal; the class gains a
   member when a page first needs the component to start with it, each member named for the component's code by
   `[JsonPropertyName]`, so a start reads the same under every host's naming (D17.13), and what its payload's held object holds is
-  `Components/ConformanceComponent/HeldStart.cs`, what its record holds `Components/ConformanceComponent/RecordStart.cs`. Its `Version` is the build of the component a
+  `Components/ConformanceComponent/HeldStart.cs`, what its record holds `Components/ConformanceComponent/RecordStart.cs`. The component's code
+  holds the data its start holds as that JSON holds it, adding and dropping no member, so a data member a promise needs absent is
+  written absent in C#, `[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]` on a member whose null must read its start
+  (`Components/ConformanceComponent/BindingStart.cs`, X4.8) (the lead, 2026-11-15). Its `Version` is the build of the component a
   world names, `ComponentVersion` of the world contract, one of the versions `spec/Reference/native.json` lists, and its endpoint members name the endpoints of
   `World/WorldArea.cs` its methods await, each at the settle gate and answering as a seed says: a 500, a count or the
   check's answer. A page's layout is `Shared/_Layout.cshtml`, which

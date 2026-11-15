@@ -1,10 +1,15 @@
+using System.Text.Json.Serialization;
+
 namespace Alis.Reactive.Conformance.App.Components;
 
 public sealed class StartsStart
 {
-    public string? PopulatedPlace { get; init; }
+    [JsonPropertyName("populated")]
+    public SpotStart Populated { get; init; } = new();
 
-    public string? GetterOnlyPlace { get; init; }
+    [JsonPropertyName("getterOnly")]
+    public SpotStart GetterOnly { get; init; } = new();
 
-    public string? ReplacedPlace { get; init; }
+    [JsonPropertyName("replaced")]
+    public SpotStart Replaced { get; init; } = new();
 }

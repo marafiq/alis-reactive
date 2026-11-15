@@ -1,3 +1,6 @@
 first
+nested
+nested/left nested/right
+unread/*
 .
 second third

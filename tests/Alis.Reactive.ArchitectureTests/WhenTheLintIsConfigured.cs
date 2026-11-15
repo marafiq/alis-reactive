@@ -7,6 +7,7 @@ namespace Alis.Reactive.ArchitectureTests;
 [TestFixture]
 public class WhenTheLintIsConfigured
 {
+    private const string App = "tests/Alis.Reactive.Conformance.App/";
     private const string Cases = "tests/Alis.Reactive.ArchitectureTests/LintCases/";
     private const string BesideTheFileThatFindsARootsPlans = "Alis.Reactive.Assets/runtime/Execution/";
     private const string Equality = "eqeqeq";
@@ -30,6 +31,88 @@ public class WhenTheLintIsConfigured
         Assert.That(files, Is.Not.Empty, "The lint read no file under Alis.Reactive.Assets");
         Assert.That(messages, Is.Empty, "The lint reports:\n" + string.Join("\n", messages));
     }
+
+    [Test]
+    public void the_conformance_apps_typescript_passes_the_lint_with_no_warning()
+    {
+        var (files, messages) = Lint(App);
+
+        Assert.That(files, Is.Not.Empty, "The lint read no conformance TypeScript");
+        Assert.That(messages, Is.Empty, "The lint reports:\n" + string.Join("\n", messages));
+    }
+
+    [RefusedCase]
+    [TestCase("equals.refused.ts", Equality, 2)]
+    [TestCase("text-as-a-condition.refused.ts", BooleanCondition, 2)]
+    [TestCase("number-as-a-condition.refused.ts", BooleanCondition, 2)]
+    [TestCase("missing-value-as-a-condition.refused.ts", BooleanCondition, 2)]
+    [TestCase("missing-value-asserted-away.refused.ts", NonNullAssertion, 2)]
+    [TestCase("switch-with-a-default.refused.ts", ExhaustiveSwitch, 4)]
+    [TestCase("promise-left-floating.refused.ts", FloatingPromise, 2)]
+    [TestCase("default-for-a-value-that-is-there.refused.ts", UnnecessaryCondition, 2)]
+    public void a_consumers_typescript_is_held_to_each_typed_rule(string source, string rule, int line)
+    {
+        var written = WriteIn(App, File.ReadAllText(Path.Combine(Repository.Root, Cases + source)));
+        try
+        {
+            var (_, messages) = Lint(written);
+
+            Assert.That(messages, Is.EqualTo(new[] { new Message(written, rule, Error, line) }));
+        }
+        finally
+        {
+            File.Delete(Path.Combine(Repository.Root, written));
+        }
+    }
+
+    [AcceptedCase]
+    [TestCase("equals.accepted.ts")]
+    [TestCase("text-as-a-condition.accepted.ts")]
+    [TestCase("number-as-a-condition.accepted.ts")]
+    [TestCase("missing-value-as-a-condition.accepted.ts")]
+    [TestCase("switch-over-every-kind.accepted.ts")]
+    [TestCase("promise-awaited.accepted.ts")]
+    [TestCase("default-for-a-value-that-can-be-missing.accepted.ts")]
+    [TestCase("wide-queries.refused.ts")]
+    public void a_consumers_typed_code_and_its_own_marker_queries_are_accepted(string source)
+    {
+        var written = WriteIn(App, File.ReadAllText(Path.Combine(Repository.Root, Cases + source)));
+        try
+        {
+            var (files, messages) = Lint(written);
+
+            Assert.That(files, Is.EqualTo(new[] { written }));
+            Assert.That(messages, Is.Empty);
+        }
+        finally
+        {
+            File.Delete(Path.Combine(Repository.Root, written));
+        }
+    }
+
+    [RefusedCase]
+    public void a_nested_slice_that_imports_a_slice_of_its_own_row_is_refused()
+        => AssertRefused("rows/nested/left/reads-a-sibling.refused.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
+    public void a_nested_slice_that_imports_a_later_row_is_refused()
+        => AssertRefused("rows/nested/left/reads-a-later-row.refused.ts", RestrictedImport, line: 1);
+
+    [AcceptedCase]
+    public void a_nested_slice_that_imports_its_parent_row_by_its_own_relative_path_is_accepted()
+        => AssertAccepted("rows/nested/left/reads-its-parent.accepted.ts");
+
+    [AcceptedCase]
+    public void a_nested_slice_that_imports_its_own_file_is_accepted()
+        => AssertAccepted("rows/nested/left/reads-its-own-file.accepted.ts");
+
+    [AcceptedCase]
+    public void a_nested_slice_that_imports_an_earlier_row_is_accepted()
+        => AssertAccepted("rows/nested/left/reads-an-earlier-row.accepted.ts");
+
+    [RefusedCase]
+    public void a_file_under_an_entry_with_a_star_stands_as_a_file_with_no_row()
+        => AssertRefused("rows/unread/under/reads-an-earlier-row.refused.ts", RestrictedImport, line: 1);
 
     [RefusedCase]
     public void a_loose_equality_is_refused() => AssertRefused("equals.refused.ts", Equality, line: 2);
@@ -162,9 +245,11 @@ public class WhenTheLintIsConfigured
     public void a_member_named_like_a_query_that_is_read_and_not_called_is_accepted() => AssertAccepted("member-named-like-a-query.accepted.ts");
 
     [RefusedCase]
-    public void an_inline_disable_changes_no_result()
+    [TestCase(Cases + "written/")]
+    [TestCase(App)]
+    public void an_inline_disable_changes_no_result(string folder)
     {
-        var written = Write("export function same(left: number, right: number): boolean {\n  // eslint-disable-next-line eqeqeq\n  return left == right;\n}\n");
+        var written = WriteIn(folder, "export function same(left: number, right: number): boolean {\n  // eslint-disable-next-line eqeqeq\n  return left == right;\n}\n");
         try
         {
             var (_, messages) = Lint(written);
@@ -178,12 +263,14 @@ public class WhenTheLintIsConfigured
     }
 
     [RefusedCase]
-    public void an_enum_is_refused_by_the_compiler()
+    [TestCase(Cases + "written/", Cases)]
+    [TestCase(App, App)]
+    public void an_enum_is_refused_by_the_compiler(string folder, string project)
     {
-        var written = Write("export enum Kind {\n  Set,\n  Call,\n}\n");
+        var written = WriteIn(folder, "export enum Kind {\n  Set,\n  Call,\n}\n");
         try
         {
-            var (exitCode, output) = TypeCheckTheCases();
+            var (exitCode, output) = TypeCheckTheCases(project);
 
             Assert.That(exitCode, Is.Not.Zero, output);
             Assert.That(output, Does.Contain(written + "(1,13): error TS1294"));
@@ -195,12 +282,14 @@ public class WhenTheLintIsConfigured
     }
 
     [AcceptedCase]
-    public void a_union_of_literals_is_accepted_by_the_compiler()
+    [TestCase(Cases + "written/", Cases)]
+    [TestCase(App, App)]
+    public void a_union_of_literals_is_accepted_by_the_compiler(string folder, string project)
     {
-        var written = Write("export type Kind = \"set\" | \"call\";\n");
+        var written = WriteIn(folder, "export type Kind = \"set\" | \"call\";\n");
         try
         {
-            var (exitCode, output) = TypeCheckTheCases();
+            var (exitCode, output) = TypeCheckTheCases(project);
 
             Assert.That(exitCode, Is.Zero, output);
         }
@@ -225,8 +314,6 @@ public class WhenTheLintIsConfigured
         Assert.That(messages, Is.Empty);
     }
 
-    private static string Write(string source) => WriteIn(Cases + "written/", source);
-
     private static string WriteIn(string folder, string source)
     {
         var written = folder + "written-" + Guid.NewGuid().ToString("N") + ".ts";
@@ -236,9 +323,9 @@ public class WhenTheLintIsConfigured
         return written;
     }
 
-    private static (int ExitCode, string Output) TypeCheckTheCases()
+    private static (int ExitCode, string Output) TypeCheckTheCases(string project)
     {
-        var (exitCode, output, errors) = Node("node_modules/typescript/bin/tsc", "-p", Cases);
+        var (exitCode, output, errors) = Node("node_modules/typescript/bin/tsc", "-p", project);
         return (exitCode, output + errors);
     }
 

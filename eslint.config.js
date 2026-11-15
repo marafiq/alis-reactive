@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
+import { posix } from "node:path";
 import eslint from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-const sliceTables = ["Alis.Reactive.Assets/runtime", "tests/Alis.Reactive.ArchitectureTests/LintCases/rows"];
+const sliceTables = ["tests/Alis.Reactive.Conformance.App", "Alis.Reactive.Assets/runtime", "tests/Alis.Reactive.ArchitectureTests/LintCases/rows"];
 
 const beyondItsModulesIndex = "^(\\.\\./|\\./(?!index(\\.ts)?$))";
 
@@ -16,10 +17,13 @@ const aWideQuery =
 
 const aFile = "[^/]+";
 
+const aStar = "/*";
+
 function rowsOf(table) {
   return readFileSync(new URL(table + "/SliceTree.txt", import.meta.url), "utf8")
     .split("\n")
     .map((line) => line.split(/\s+/u).filter((entry) => entry !== ""))
+    .map((row) => row.filter((entry) => !entry.endsWith(aStar)))
     .filter((row) => row.length > 0);
 }
 
@@ -27,14 +31,12 @@ function literal(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }
 
-function toTheTable(slice) {
-  return slice === besideTheTable ? "./" : "../".repeat(slice.split("/").length);
-}
-
 function filesOf(slice, from, slices) {
-  if (slice !== besideTheTable) return literal(toTheTable(from) + slice + "/") + aFile;
+  const relative = posix.relative(from, slice) || ".";
+  const prefix = (relative.startsWith(".") ? relative : "./" + relative) + "/";
+  if (slice !== besideTheTable) return literal(prefix) + aFile;
   const folders = slices.filter((other) => other !== besideTheTable).map(literal);
-  return literal(toTheTable(from)) + "(?!(?:" + folders.join("|") + ")$)" + aFile;
+  return literal(prefix) + "(?!(?:" + folders.join("|") + ")$)" + aFile;
 }
 
 function ownFilesOf(slice, slices) {
@@ -70,7 +72,7 @@ function rowsRule(table) {
 
 export default defineConfig(
   {
-    files: ["Alis.Reactive.Assets/runtime/**/*.ts", "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.ts"],
+    files: ["tests/Alis.Reactive.Conformance.App/**/*.ts", "Alis.Reactive.Assets/runtime/**/*.ts", "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.ts"],
     extends: [eslint.configs.recommended, tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
     linterOptions: { noInlineConfig: true },
     languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname } },

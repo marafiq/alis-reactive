@@ -9,7 +9,7 @@
     var plan = Html.ReactivePlan<AbsenceBoard>();
 }
 <h1>The bench</h1>
-@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Record = new RecordStart { DetailName = Model.RecordDetail } }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Record = new RecordStart { Detail = new DetailStart { Name = Model.RecordDetail } } }))
 <p id="shown"></p>
 <button type="button" @Html.Raises(plan, AbsenceCells.Show)>Show</button>
 @{

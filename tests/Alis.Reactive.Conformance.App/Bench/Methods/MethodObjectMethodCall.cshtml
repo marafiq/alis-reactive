@@ -9,7 +9,7 @@
     var plan = Html.ReactivePlan<MethodBoard>();
 }
 <h1>The bench</h1>
-@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, CurrentItem = Model.CurrentItem }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, CurrentItem = Model.CurrentItem, Items = [new ItemStart { Name = "Two" }] }))
 <p id="shown"></p>
 <button type="button" @Html.Raises(plan, MethodCells.Act)>Act</button>
 @{

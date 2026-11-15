@@ -10,7 +10,7 @@
     var plan = Html.ReactivePlan<ResidentChartPanel>();
 }
 <h1>Residents</h1>
-@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Record = new RecordStart { DetailName = Model.Resident } }))
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census", Record = new RecordStart { Detail = new DetailStart { Name = Model.Resident } } }))
 <button type="button" @Html.Raises(plan, ResidentCharts.Show)>Show chart</button>
 <p>Chart: <span id="chart-status">Waiting</span></p>
 <p>Chart log: <span id="chart-log">-</span></p>

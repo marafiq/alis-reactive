@@ -15,6 +15,7 @@
     <aside aria-label="Today's rounds">
         @Html.Raw(await Cache.GetStringAsync(CachedRounds.Key))
     </aside>
+    <script src="~/js/alis-reactive-conformance.js" asp-append-version="true"></script>
     <script src="~/_content/AlisReactive/js/alis-reactive.js" asp-append-version="true"></script>
 </body>
 </html>

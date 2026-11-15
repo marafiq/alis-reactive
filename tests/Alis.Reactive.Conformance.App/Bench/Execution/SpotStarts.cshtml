@@ -9,7 +9,7 @@
     var plan = Html.ReactivePlan<SpotStartsBoard>();
 }
 <h1>Spots</h1>
-@(plan.ConformanceComponent("conformance", new ConformanceStart { Starts = new StartsStart { PopulatedPlace = Model.Place, GetterOnlyPlace = Model.Place, ReplacedPlace = Model.Place } }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Starts = new StartsStart { Populated = new SpotStart { Place = Model.Place }, GetterOnly = new SpotStart { Place = Model.Place }, Replaced = new SpotStart { Place = Model.Place } } }))
 <button type="button" @Html.Raises(plan, SpotStartButtons.ShowTheSpots)>Show the spots</button>
 <dl>
     <dt>Populated spot</dt>
