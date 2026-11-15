@@ -27,6 +27,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Include="../Alis.Reactive.Analyzers/Vendors/VendorContract.targets" Pack="true" PackagePath="build/Vendors/" />
+        <None Include="../Alis.Reactive.Analyzers/Vendors/vendor-contract.mjs" Pack="true" PackagePath="build/Vendors/" />
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" />

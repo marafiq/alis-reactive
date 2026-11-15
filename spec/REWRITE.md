@@ -516,7 +516,9 @@ and `scripts/playwright-result.mjs`, which list the built tests, select a run's 
 Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
 `scripts/plant-defect.sh`, which plants one defect and reads the runner's result line for its one test,
 `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`.
-MSBuild never runs npm or node: `build.mjs` writes each bundle, the core's to `Alis.Reactive/wwwroot/js/alis-reactive.js`,
+MSBuild never runs npm, and runs node only for the vendor contract a project opts into, whose target writes the
+table before the compiler reads it (D17.5, `Alis.Reactive.Analyzers/Vendors/VendorContract.targets`): `build.mjs` writes each bundle, the core's to
+`Alis.Reactive/wwwroot/js/alis-reactive.js`,
 which git ignores and the core's static web assets serve at `_content/AlisReactive/js/alis-reactive.js`, and each
 script that builds runs it first (`scripts/check.sh`, `scripts/playwright.sh`, `scripts/build.sh`, `scripts/run.sh`).
 An app whose bundle is missing refuses to start.
