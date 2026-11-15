@@ -237,7 +237,7 @@ public static class Comparisons
         return new Computed<bool>(op == Operator.Eq ? equal : new OpExpression(Operator.Not, [equal]), left.Form.Computed);
     }
 
-    private static void RefuseTwoValuesWhereOneIsInItsOwnForm(HeldForm form)
+    internal static void RefuseTwoValuesWhereOneIsInItsOwnForm(HeldForm form)
     {
         if (form.Own is not { } own) return;
         throw new InvalidOperationException(

@@ -18,6 +18,8 @@ namespace Alis.Reactive.Conditions;
 /// </remarks>
 public static class MembershipTests
 {
+    private const string Item = "item1";
+
     /// <summary>Tests that the source's value equals one of the values.</summary>
     /// <param name="source">The source the test reads.</param>
     /// <param name="values">The values, each written in the form the source holds its value in.</param>
@@ -28,7 +30,7 @@ public static class MembershipTests
     /// <param name="source">The source the test reads.</param>
     /// <param name="values">The source of the list.</param>
     /// <returns>A source that is true when the value equals one of the list's items.</returns>
-    public static TypedSource<bool> In<TValue>(this TypedSource<TValue> source, ITypedSource<IReadOnlyList<TValue>> values) => throw new NotImplementedException();
+    public static TypedSource<bool> In<TValue>(this TypedSource<TValue> source, ITypedSource<IReadOnlyList<TValue>> values) => AnyItemEqual(source, values);
 
     /// <summary>Tests that the source's value equals none of the values.</summary>
     /// <param name="source">The source the test reads.</param>
@@ -40,7 +42,7 @@ public static class MembershipTests
     /// <param name="source">The source the test reads.</param>
     /// <param name="values">The source of the list.</param>
     /// <returns>A source that is true when the value equals none of the list's items.</returns>
-    public static TypedSource<bool> NotIn<TValue>(this TypedSource<TValue> source, ITypedSource<IReadOnlyList<TValue>> values) => throw new NotImplementedException();
+    public static TypedSource<bool> NotIn<TValue>(this TypedSource<TValue> source, ITypedSource<IReadOnlyList<TValue>> values) => source.In(values).Not();
 
     /// <summary>Tests that the source's value lies between two literals, both included.</summary>
     /// <param name="source">The source the test reads.</param>
@@ -84,6 +86,18 @@ public static class MembershipTests
         var holdsAnObject = written.Value.EnumerateArray().Any(item => item.ValueKind is JsonValueKind.Object or JsonValueKind.Array);
         if (holdsAnObject) throw Comparisons.ComparesObjects();
         return new Computed<bool>(new OpExpression(Operator.Includes, [written, source.Expression]), source.Form.Computed);
+    }
+
+    private static TypedSource<bool> AnyItemEqual<TValue>(TypedSource<TValue> source, ITypedSource<IReadOnlyList<TValue>> values)
+    {
+        Comparisons.RefuseTwoValuesWhereOneIsInItsOwnForm(source.Form);
+        Comparisons.RefuseTwoValuesWhereOneIsInItsOwnForm(Sources.FormOf(values));
+        if (!source.Form.WritesAsAScalar<TValue>()) throw Comparisons.ComparesObjects();
+        var value = Keys.Of<TValue>(source.Expression);
+        var itemEqualsTheValue = new FnExpression([Item], new OpExpression(Operator.Eq, [Keys.Of<TValue>(new RefExpression(Item)), value]));
+        var anyItem = new CallExpression([new MemberStep("some")], PathMembers.RequiredIfHeld, Sources.Of(values), [itemEqualsTheValue]);
+        var valueIsRead = new OpExpression(Operator.Eq, [value, value]);
+        return new Computed<bool>(new OpExpression(Operator.Cond, [valueIsRead, anyItem, valueIsRead]), source.Form.Computed);
     }
 
     private static TypedSource<bool> AnyKeyEqual<TValue>(TypedSource<TValue> source, TValue[] values)
