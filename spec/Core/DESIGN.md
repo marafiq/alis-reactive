@@ -1118,8 +1118,13 @@ Terms used throughout:
   digits, a trailing `\`, a `]` first in a class, a `[` inside one, a range that runs backwards, a `-` right after a
   range, a class or a group left open, a `)` or a `]` that closes nothing, a quantifier or a count with nothing to
   repeat, a `{` that is no count and a count whose least is above its most, each naming the escape that writes it;
-  `IgnoreCase`, naming the spelled cases; any other option but `CultureInvariant`; a pattern read from the item; a
-  pattern that is null when the view renders. At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
+  `IgnoreCase`: "'{term}' passes RegexOptions.IgnoreCase, which no browser flag folds as .NET does; spell both cases,
+  such as [Aa]spirin."; any other option but `CultureInvariant`: "'{term}' passes an option other than
+  RegexOptions.CultureInvariant, which the browser does not read as .NET does; move the work to the server."; a
+  pattern read from the item: "'{term}' reads its pattern from the item, and a pattern read in the browser cannot be
+  checked; pass a pattern the view holds, or move the work to the server."; a pattern that is null when the view
+  renders: "'{term}' matches a pattern that is null when the view renders."; options read from the item, X6.2's
+  message. `{term}` is the call as the expression tree prints it, `IsMatch(n.Text, "food$")`. At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.36` refusal (D6.13): text ordered by the culture under a culture with an alternate sort: "'{key}' orders text by
   the alternate sort '{sort}', which the browser has no tag for; pass StringComparer.Ordinal, or order on the
   server."

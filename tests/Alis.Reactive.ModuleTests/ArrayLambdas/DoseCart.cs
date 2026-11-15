@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Vendors;
 
@@ -79,6 +80,8 @@ public sealed class CartDose
     public Seal Tagged { get; set; } = new();
 
     public string? Note { get; set; }
+
+    public RegexOptions Matching { get; set; }
 
     public decimal Copay { get; set; }
 

@@ -6,8 +6,10 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Alis.Reactive.Conditions;
 using Alis.Reactive.Schema;
+using Alis.Reactive.ValuesAndSources;
 using LinqExpression = System.Linq.Expressions.Expression;
 using PlanExpression = Alis.Reactive.Schema.Expression;
 
@@ -80,6 +82,8 @@ internal static partial class TranslatedMembers
             [Method((string text) => text.EndsWith(""))] = ByTheCulture(),
             [Static(() => string.IsNullOrEmpty(""))] = Unary(Operator.NullOrEmpty),
             [Static(() => string.IsNullOrWhiteSpace(""))] = (_, operands, read) => new OpExpression(Operator.NullOrEmpty, [new OpExpression(Operator.Trim, [read.Term(operands[0])])]),
+            [Static(RegexMembers.IsMatch)] = Matched,
+            [Static(RegexMembers.IsMatchWithOptions)] = Matched,
             [Method((IEnumerable<int> items) => items.Any())] = (_, operands, read) => ListForms.AnyOf(read.Term(operands[0]), read.EveryInnerItem()),
             [Method((IEnumerable<int> items) => items.Any(item => true))] = (_, operands, read) => ListForms.AnyOf(read.Term(operands[0]), read.Inner((LambdaExpression)operands[1])),
             [Method((IEnumerable<int> items) => items.All(item => true))] = (_, operands, read) => ListForms.AllOf(read.Term(operands[0]), read.Inner((LambdaExpression)operands[1])),
@@ -125,6 +129,22 @@ internal static partial class TranslatedMembers
     private static Translation DatePart(Operator part) => (_, operands, read) => new OpExpression(part, [Keys.Of(operands[0].Type, read.Term(operands[0]))]);
 
     private static Translation OffsetPart(Operator part) => (_, operands, read) => new OpExpression(part, [new OpExpression(Operator.WallKey, [read.Term(operands[0])])]);
+
+    private static PlanExpression Matched(LinqExpression term, IReadOnlyList<LinqExpression> operands, ItemLambda read)
+    {
+        if (operands.Count == 3) RequireOptionsTheBrowserReads(term, operands[2], read);
+        if (read.ReadsAnItem(operands[1])) throw Refused(term, "reads its pattern from the item, and a pattern read in the browser cannot be checked; pass a pattern the view holds, or move the work to the server.");
+        var pattern = ViewValues.Of(operands[1]) as string ?? throw Refused(term, "matches a pattern that is null when the view renders.");
+        return new OpExpression(Operator.Matches, [read.Term(operands[0]), Literals.Text(BrowserPattern.CopyOf(pattern, reason => Refused(term, reason)))]);
+    }
+
+    private static void RequireOptionsTheBrowserReads(LinqExpression term, LinqExpression passed, ItemLambda read)
+    {
+        if (read.ReadsAnItem(passed)) throw ItemLambda.NoBrowserForm(term);
+        var options = (RegexOptions)ViewValues.Of(passed)!;
+        if (options.HasFlag(RegexOptions.IgnoreCase)) throw Refused(term, "passes RegexOptions.IgnoreCase, which no browser flag folds as .NET does; spell both cases, such as [Aa]spirin.");
+        if ((options & ~RegexOptions.CultureInvariant) != RegexOptions.None) throw Refused(term, "passes an option other than RegexOptions.CultureInvariant, which the browser does not read as .NET does; move the work to the server.");
+    }
 
     private static Translation Binary(Operator op) => (_, operands, read) => new OpExpression(op, [read.Term(operands[0]), read.Term(operands[1])]);
 

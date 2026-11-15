@@ -30,7 +30,6 @@ culture rule the browser cannot follow is refused, as `StartsWith(text)` is.
 | `string.IsNullOrEmpty(text)` | the `nullOrEmpty` operator: holds on nothing, null and `""` |
 | `Regex.IsMatch(text, pattern)`, `Regex.IsMatch(text, pattern, options)` | the `matches` operator over the pattern's browser copy, which D16.11's reader writes where the view renders from a pattern the view holds; the options are `None` or `CultureInvariant` (D6.15) |
 | `string.IsNullOrWhiteSpace(text)` | `nullOrEmpty` of `trim`: blank, as `spec/Core/conversions.md` defines it |
-| `Regex.IsMatch(text, pattern)` | JavaScript's `RegExp` test of the pattern; a pattern JavaScript reads differently from .NET is refused. The core's ban on `Regex` refuses its key, and the owner decides between an exception for the key and refusing the member with the server as its door (`spec/NOTES.md`, 2026-11-06) |
 
 The probe behind the rows (`spec/NOTES.md`, 2026-11-06) maps every code point in .NET 10 and in Chromium 153: the
 operators above agree with .NET on all 1,112,064, and JavaScript's own methods disagree on 103 in upper case, 1 in
