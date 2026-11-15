@@ -216,7 +216,12 @@ slip is about you invented so you can avoid accountability about mistakes").
   consults on such a task or takes it, scoped as a fork's task is: one decision or one piece, its spec lines, files and
   proving command named in the brief, the repository read at the base SHA and nothing written outside its own folder;
   its answer is a lead, read at the source (the owner, 2026-11-14: "you can use codex astra max to consult or do the
-  work but must be scoped work with clearly defined so you do not waste or drift").
+  work but must be scoped work with clearly defined so you do not waste or drift"). Critical thinking, a decision or a
+  piece of the core, goes to the highest model at max effort; the efficiency is in the scope and the ask: one question
+  or one piece, its lines and files named, a reply of bounded length, and a sandbox a low-effort probe proved runs the
+  brief's build and test commands before a run that needs them (the owner, 2026-11-14: "please use codex efficiently,
+  do not waste very priced resources, show some responsiblity", then "no, use highest model at critical thinking so u
+  get best results - but efficieny in scope and what you want").
 - The lead runs the task's proof command once, where the result lands, and lands or drops the work in the same
   session, with the reason. A task whose check costs what the work costs is the lead's own. Quality is each
   worker's own, never the next reader's: an agent runs every check its files meet before it replies, decides each

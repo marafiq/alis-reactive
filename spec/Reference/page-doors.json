@@ -790,6 +790,47 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M15.F1 X3.5 0": {
+    "modules": [
+      "Elements",
+      "InputsAndIds",
+      "NativeComponents",
+      "RenderingAndDelivery",
+      "RequestsAndResponses",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Admission/StrengthIntake.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M15.F1 X3.6 0": {
+    "modules": [
+      "Elements",
+      "InputsAndIds",
+      "NativeComponents",
+      "RenderingAndDelivery",
+      "RequestsAndResponses",
+      "TriggersAndPipelines",
+      "Validation"
+    ],
+    "views": [
+      "/Care/Admission/IntakeAssessment.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M15.F1 X3.8 0": {
+    "modules": [
+      "Elements",
+      "RenderingAndDelivery",
+      "RequestsAndResponses",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Record/ResidentAccount.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M16.F1 X18.7 0": {
     "modules": [
       "Declarations",
@@ -1011,6 +1052,20 @@
     ],
     "views": [
       "/Bench/Execution/BindingConstructors.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M18.F1 M18.X1 1": {
+    "modules": [
+      "Elements",
+      "InputsAndIds",
+      "NativeComponents",
+      "RenderingAndDelivery",
+      "RequestsAndResponses",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Round/DoseStrengths.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

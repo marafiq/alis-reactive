@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model ResidentAccount
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident account";
+    var plan = Html.ReactivePlan<ResidentAccount>();
+}
+<h1>Account of @Model.Resident</h1>
+<dl>
+    <dt>Statement balance</dt>
+    <dd id="server-balance">@Model.Balance</dd>
+    <dt>Current balance</dt>
+    <dd id="balance">Not loaded</dd>
+</dl>
+<button type="button" @Html.Raises(plan, ResidentAccountButtons.ShowTheBalance)>Show the balance</button>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(ResidentAccountButtons.ShowTheBalance, pipeline => pipeline
+        .Get(ResidentAccountEndpoints.Balance)
+        .OnSuccess<AccountBalance>((account, pipeline) => pipeline.Element("balance").Text.Set(account.Body.Read(balance => balance.Balance)))));
+}
+@Html.RenderPlan(plan)
