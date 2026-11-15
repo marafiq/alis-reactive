@@ -34,7 +34,6 @@ export interface RecordStart {
     count: number;
     day?: string;
     detail: DetailStart | null;
-    multiWord: number;
 }
 export interface DetailStart {
     name?: string;

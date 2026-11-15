@@ -16,7 +16,4 @@ public sealed class RecordStart
 
     [JsonPropertyName("detail")]
     public DetailStart? Detail { get; init; } = new();
-
-    [JsonPropertyName("multiWord")]
-    public int MultiWord { get; init; }
 }
