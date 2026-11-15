@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { operated, type Term } from "./index";
+import { operated as operatedUnder, type Term } from "./index";
 
 type Read = ReturnType<Term>;
+
+const operated = (op: Parameters<typeof operatedUnder>[0], terms: readonly Term[]): Read => operatedUnder(op, terms, "en-US");
 
 const nothing: Read = { kind: "nothing" };
 const value = (read: unknown): Read => ({ kind: "value", value: read });
@@ -23,7 +25,7 @@ describe("when a text is tested for a part, it compares ordinally, as .NET's Con
   });
 
   test("startsWith compares code units, so a soft hyphen before the part is not skipped as a culture's test skips it", () => {
-    expect(operated("startsWith", [held("­ward"), held("ward")])).toStrictEqual(value(false));
+    expect(operated("startsWith", [held("\u00ADward"), held("ward")])).toStrictEqual(value(false));
   });
 
   test("endsWith holds where the text ends with the part", () => {

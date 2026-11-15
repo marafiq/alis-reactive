@@ -260,8 +260,10 @@ Native's table is `NativeComponents` over `NativeAppLevelObjects/* NativeCompone
 `FusionComponents FusionTemplates` over `FusionAppLevelObjects/* FusionComponents/*`; OpenTelemetry's is `Tracing`
 alone. The runtime has its own table,
 `Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top, and its last row is the dot, the bundle's entry beside
-the table: `Schema`, `ValuesAndSources`, `OwnershipAndState`, `Plugins`, `Vendors`, `TriggersAndPipelines`,
-`Execution` and the dot today, a row entering with its first file. The test app
+the table: `Schema`, `ValuesAndSources`, `ArrayLambdas`, `Conditions`, `OwnershipAndState`, `Plugins`, `Vendors`,
+`TriggersAndPipelines`, `Execution` and the dot today, a row entering with its first file. `ArrayLambdas` stands above
+`Conditions` there, the reverse of the core's rows, since the one switch over the operators is `Conditions`' and runs
+a list's operators too; the decimal reader both share is `ArrayLambdas`' (D6.11). The test app
 holds `Components`, what its components share, over `Components/ConformancePeer`, which ConformanceComponent's
 events hand over, over the other components' folders, over `World HostVariants` over `Care/* Bench/* Refusals/*`, so
 no screen reaches into another's model, and last the files beside the table, its entry point, a class in the app's namespace, since ALIS011 refuses a

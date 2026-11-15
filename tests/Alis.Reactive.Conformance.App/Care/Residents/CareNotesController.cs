@@ -15,7 +15,7 @@ public sealed class CareNotesController : Controller
     public IActionResult Notes() => Json(new List<CareNote>
     {
         new(new CareNoteDetail("a\u0085")),
-        new(new CareNoteDetail("﻿a")),
+        new(new CareNoteDetail("\uFEFFa")),
         new(new CareNoteDetail("straße")),
         new(new CareNoteDetail("ΟΔΟΣ")),
         new(new CareNoteDetail("\u0085")),

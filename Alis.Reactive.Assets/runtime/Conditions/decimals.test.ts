@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { operated, type Term } from "./index";
+import { operated as operatedUnder, type Term } from "./index";
 
 type Read = ReturnType<Term>;
+
+const operated = (op: Parameters<typeof operatedUnder>[0], terms: readonly Term[]): Read => operatedUnder(op, terms, "en-US");
 
 const nothing: Read = { kind: "nothing" };
 const value = (read: unknown): Read => ({ kind: "value", value: read });

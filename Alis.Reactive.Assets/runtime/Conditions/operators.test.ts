@@ -1,7 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { operated, type Term } from "./index";
+import { operated as operatedUnder, type Term } from "./index";
 
 type Read = ReturnType<Term>;
+
+const operated = (op: Parameters<typeof operatedUnder>[0], terms: readonly Term[]): Read => operatedUnder(op, terms, "en-US");
 
 const nothing: Read = { kind: "nothing" };
 const value = (read: unknown): Read => ({ kind: "value", value: read });
@@ -150,5 +152,41 @@ describe("when a value is chosen from terms, only the term it reads is reached",
 
   test("cond reads its third argument when its first reads nothing", () => {
     expect(operated("cond", [readsNothing, neverReached, held("else")])).toStrictEqual(value("else"));
+  });
+});
+
+describe("when the op switch runs a list's operator, each operator reaches its own executor", () => {
+  test("nullableValue reads nothing on null, nonNull stops on it, and toArray is the array an iterator yields", () => {
+    expect(operated("nullableValue", [held(null)])).toStrictEqual(nothing);
+    expect(() => operated("nonNull", [held(null)])).toThrow("A list's field holds null, and its type holds no null.");
+    expect(operated("toArray", [held("ab")])).toStrictEqual(value(["a", "b"]));
+  });
+
+  test("compareNumbers, compareOrdinal, compareBooleans and compareCulture each compare by their own order", () => {
+    expect(operated("compareNumbers", [held(2), held(10)])).toStrictEqual(value(-1));
+    expect(operated("compareOrdinal", [held("a"), held("B")])).toStrictEqual(value(1));
+    expect(operated("compareBooleans", [held(true), held(false)])).toStrictEqual(value(1));
+    expect(operated("compareCulture", [held("a"), held("B")])).toStrictEqual(value(-1));
+  });
+
+  test("trim, trimStart and trimEnd each remove white space from their own ends", () => {
+    expect(operated("trim", [held("\u0085 Ward 4 ")])).toStrictEqual(value("Ward 4"));
+    expect(operated("trimStart", [held(" Ward 4 ")])).toStrictEqual(value("Ward 4 "));
+    expect(operated("trimEnd", [held(" Ward 4 ")])).toStrictEqual(value(" Ward 4"));
+  });
+
+  test("each casing operator takes its own rule for the Turkish letters", () => {
+    expect(operated("upperInvariant", [held("\u0131")])).toStrictEqual(value("\u0131"));
+    expect(operated("upper", [held("\u0131")])).toStrictEqual(value("I"));
+    expect(operated("upperTurkic", [held("i")])).toStrictEqual(value("\u0130"));
+    expect(operated("lowerInvariant", [held("\u0130")])).toStrictEqual(value("\u0130"));
+    expect(operated("lower", [held("\u0130")])).toStrictEqual(value("i"));
+    expect(operated("lowerTurkic", [held("I")])).toStrictEqual(value("\u0131"));
+  });
+
+  test("sumInt, sumDouble and sumDecimal each add as their number type adds", () => {
+    expect(() => operated("sumInt", [held([0.5])])).toThrow("The term 0.5 is no int, which an int sum adds.");
+    expect(operated("sumDouble", [held([0.1, 0.2])])).toStrictEqual(value(0.30000000000000004));
+    expect(operated("sumDecimal", [held([0.1, 0.2])])).toStrictEqual(value(0.3));
   });
 });

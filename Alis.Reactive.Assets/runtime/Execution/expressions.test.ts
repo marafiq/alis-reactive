@@ -44,15 +44,15 @@ const rounds = [
   { ward: "North", by: "Ada Byron", bed: 3 },
 ];
 
-function raisedWith(bound: Readonly<Record<string, unknown>>): Raised {
+function raisedWith(bound: Readonly<Record<string, unknown>>, plan: Raised["plan"] = ward): Raised {
   const scope = new Map<string, Held>();
   for (const [name, value] of Object.entries(bound)) scope.set(name, { kind: "value", value });
-  return { plan: ward, scope, signal: new AbortController().signal };
+  return { plan, scope, signal: new AbortController().signal };
 }
 
-function charted(bound: Readonly<Record<string, unknown>>, read: Source): unknown[] {
+function charted(bound: Readonly<Record<string, unknown>>, read: Source, plan: Raised["plan"] = ward): unknown[] {
   const chart = new Chart();
-  new Lane("overlap", [{ kind: "set", path: ["line"], members: "required", content: false, target: { kind: "ref", name: "chart" }, value: read }]).raise(raisedWith({ ...bound, chart }));
+  new Lane("overlap", [{ kind: "set", path: ["line"], members: "required", content: false, target: { kind: "ref", name: "chart" }, value: read }]).raise(raisedWith({ ...bound, chart }, plan));
   return chart.lines;
 }
 
@@ -68,6 +68,22 @@ const over = (list: Source, operation: string, param: string, body: Source): Sou
   args: [{ kind: "fn", params: [param], body }],
 });
 const isNorth = (item: string): Source => ({ kind: "op", op: "eq", args: [member(ref(item), "ward"), lit("North")] });
+const sorted = (list: Source, compare: "compareNumbers" | "compareCulture", key: string, descending: boolean): Source => {
+  const keys = [member(ref("left"), key), member(ref("right"), key)];
+  return {
+    kind: "call",
+    path: ["toSorted"],
+    members: "requiredIfHeld",
+    target: list,
+    args: [{ kind: "fn", params: ["left", "right"], body: { kind: "op", op: compare, args: descending ? keys.reverse() : keys } }],
+  };
+};
+const doses = [
+  { medicine: "aspirin", units: 5 },
+  { medicine: "Digoxin", units: 1 },
+  { medicine: "insulin", units: 5 },
+  { medicine: "Bisoprolol", units: 2 },
+];
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -140,5 +156,42 @@ describe("when a step calls a method, each argument is read when the line runs",
     new Lane("overlap", [notes]).raise(raisedWith({ chart, round: rounds[0] }));
 
     expect(chart.lines).toStrictEqual([["Ada Hart", null]]);
+  });
+});
+
+describe("when a list's operation reads an operator over its items, the plan's operator runs in the evaluator", () => {
+  test("OrderBy sorts by toSorted over a comparison of each item's key, the smallest first, equal keys in the list's order", () => {
+    expect(charted({ doses }, sorted(ref("doses"), "compareNumbers", "units", false))).toStrictEqual([[doses[1], doses[3], doses[0], doses[2]]]);
+  });
+
+  test("OrderByDescending swaps the two keys, the greatest first, equal keys in the list's order", () => {
+    expect(charted({ doses }, sorted(ref("doses"), "compareNumbers", "units", true))).toStrictEqual([[doses[0], doses[2], doses[3], doses[1]]]);
+  });
+
+  test("a text key compared by the culture orders under the plan's collation, a before B", () => {
+    expect(charted({ doses }, sorted(ref("doses"), "compareCulture", "medicine", false))).toStrictEqual([[doses[0], doses[3], doses[1], doses[2]]]);
+  });
+
+  test("the culture's order is the plan's own collation, so Zeta comes before Örn under sv-SE", () => {
+    const swedish: Raised["plan"] = { ...ward, culture: { ...ward.culture, name: "sv-SE", collation: "sv-SE" } };
+    const carers = [{ name: "Örn" }, { name: "Zeta" }];
+
+    expect(charted({ doses: carers }, sorted(ref("doses"), "compareCulture", "name", false), swedish)).toStrictEqual([[carers[1], carers[0]]]);
+    expect(charted({ doses: carers }, sorted(ref("doses"), "compareCulture", "name", false))).toStrictEqual([[carers[0], carers[1]]]);
+  });
+
+  test("Sum adds the map of its term by its operator, exactly for decimals", () => {
+    const sum = (op: "sumInt" | "sumDecimal", key: string): Source => ({ kind: "op", op, args: [over(ref("doses"), "map", "dose", member(ref("dose"), key))] });
+
+    expect(charted({ doses }, sum("sumInt", "units"))).toStrictEqual([13]);
+    expect(charted({ doses: [{ mg: 0.1 }, { mg: 0.2 }] }, sum("sumDecimal", "mg"))).toStrictEqual([0.3]);
+  });
+
+  test("a Select's field of a type that holds no null stops the pipeline where an item's field reads nothing", () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const units = over(ref("doses"), "map", "dose", { kind: "op", op: "nonNull", args: [member(ref("dose"), "units", "optional")] });
+
+    expect(charted({ doses }, units)).toStrictEqual([[5, 1, 5, 2]]);
+    expect(charted({ doses: [...doses, { medicine: "warfarin" }] }, units)).toStrictEqual([]);
   });
 });

@@ -1,5 +1,6 @@
 import { assertNever, notBuilt, type Operator } from "../Schema/index";
 import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
+import { arrayOf, comparedBooleans, comparedCulture, comparedNumbers, comparedOrdinal, lower, nonNull, nullableValue, summedDecimals, summedDoubles, summedInts, trimmed, upper } from "../ArrayLambdas/index";
 import { decimalsEqual } from "./decimals";
 import { keyOf } from "./keys";
 import { empty, included } from "./lists";
@@ -7,7 +8,7 @@ import { matched, nullOrEmpty, textTested } from "./texts";
 
 export type Term = () => Read;
 
-export function operated(op: Operator, terms: readonly Term[]): Read {
+export function operated(op: Operator, terms: readonly Term[], collation: string): Read {
   switch (op) {
     case "eq":
       return compared(op, terms, (left, right) => left === right);
@@ -36,28 +37,47 @@ export function operated(op: Operator, terms: readonly Term[]): Read {
     case "mul":
     case "mod":
     case "neg":
-    case "nullableValue":
-    case "nonNull":
-    case "toArray":
     case "finite":
-    case "compareNumbers":
-    case "compareOrdinal":
-    case "compareBooleans":
-    case "compareCulture":
     case "merge":
-    case "trim":
-    case "trimStart":
-    case "trimEnd":
-    case "upperInvariant":
-    case "lowerInvariant":
-    case "upper":
-    case "lower":
-    case "upperTurkic":
-    case "lowerTurkic":
-    case "sumInt":
-    case "sumDouble":
-    case "sumDecimal":
       throw notBuilt("the operator '" + op + "'");
+    case "nullableValue":
+      return nullableValue(termOf(op, terms, 0)());
+    case "nonNull":
+      return nonNull(termOf(op, terms, 0)());
+    case "toArray":
+      return arrayOf(termOf(op, terms, 0)());
+    case "compareNumbers":
+      return comparedNumbers(termOf(op, terms, 0)(), termOf(op, terms, 1)());
+    case "compareOrdinal":
+      return comparedOrdinal(termOf(op, terms, 0)(), termOf(op, terms, 1)());
+    case "compareBooleans":
+      return comparedBooleans(termOf(op, terms, 0)(), termOf(op, terms, 1)());
+    case "compareCulture":
+      return comparedCulture(termOf(op, terms, 0)(), termOf(op, terms, 1)(), collation);
+    case "trim":
+      return trimmed(termOf(op, terms, 0)(), "both");
+    case "trimStart":
+      return trimmed(termOf(op, terms, 0)(), "start");
+    case "trimEnd":
+      return trimmed(termOf(op, terms, 0)(), "end");
+    case "upperInvariant":
+      return upper(termOf(op, terms, 0)(), "invariant");
+    case "lowerInvariant":
+      return lower(termOf(op, terms, 0)(), "invariant");
+    case "upper":
+      return upper(termOf(op, terms, 0)(), "linguistic");
+    case "lower":
+      return lower(termOf(op, terms, 0)(), "linguistic");
+    case "upperTurkic":
+      return upper(termOf(op, terms, 0)(), "turkic");
+    case "lowerTurkic":
+      return lower(termOf(op, terms, 0)(), "turkic");
+    case "sumInt":
+      return summedInts(termOf(op, terms, 0)());
+    case "sumDouble":
+      return summedDoubles(termOf(op, terms, 0)());
+    case "sumDecimal":
+      return summedDecimals(termOf(op, terms, 0)());
     case "eqDecimal":
       return decimalsEqual(termOf(op, terms, 0)(), termOf(op, terms, 1)());
     case "contains":

@@ -99,8 +99,8 @@ describe("as(expr, shape): the rules every row keeps (spec/Core/conversions.md)"
   });
 
   test("blank is .NET's char.IsWhiteSpace: next line, no-break space, line separator and ideographic space are blank, the byte order mark is not", () => {
-    expect(as("\u0085  　", nullable(text))).toStrictEqual(none);
-    expect(as("﻿", nullable(text))).toStrictEqual({ kind: "value", value: "﻿" });
+    expect(as("\u0085\u00A0\u2028\u3000", nullable(text))).toStrictEqual(none);
+    expect(as("\uFEFF", nullable(text))).toStrictEqual({ kind: "value", value: "\uFEFF" });
   });
 
   test("a nullable shape holds null, so a nullable date's null reads null where a date reads nothing for it (X3.10)", () => {
@@ -180,7 +180,7 @@ describe("as(expr, number)", () => {
 
   test("a blank text converts to nothing, never to 0, where the text 0 reads 0", () => {
     expect(as("", fraction)).toStrictEqual(none);
-    expect(as("  ", integer)).toStrictEqual(none);
+    expect(as(" \u00A0", integer)).toStrictEqual(none);
     expect(as("", invariantNumber)).toStrictEqual(none);
     expect(as("0", integer)).toStrictEqual({ kind: "value", value: 0 });
   });
@@ -248,16 +248,16 @@ describe("as(expr, boolean)", () => {
   });
 
   test("text that is true or false in any case, with .NET white space trimmed, reads that boolean", () => {
-    expect(as(" TRUE ", truth)).toStrictEqual({ kind: "value", value: true });
+    expect(as(" TRUE\u00A0", truth)).toStrictEqual({ kind: "value", value: true });
     expect(as("False", truth)).toStrictEqual({ kind: "value", value: false });
-    expect(as("　true\u0085", truth)).toStrictEqual({ kind: "value", value: true });
+    expect(as("\u3000true\u0085", truth)).toStrictEqual({ kind: "value", value: true });
   });
 
   test("any other text converts to nothing", () => {
     expect(as("yes", truth)).toStrictEqual(none);
     expect(as("1", truth)).toStrictEqual(none);
     expect(as("t rue", truth)).toStrictEqual(none);
-    expect(as("﻿true", truth)).toStrictEqual(none);
+    expect(as("\uFEFFtrue", truth)).toStrictEqual(none);
   });
 });
 

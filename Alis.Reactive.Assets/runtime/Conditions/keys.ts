@@ -1,6 +1,5 @@
 import { assertNever, type Operator } from "../Schema/index";
-import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
-import { described } from "./described";
+import { described, nothing, Stop, value, type Read } from "../ValuesAndSources/index";
 
 export type KeyOperator = Extract<Operator, "dateKey" | "wallKey" | "instantKey" | "dayKey" | "timeKey" | "spanKey">;
 

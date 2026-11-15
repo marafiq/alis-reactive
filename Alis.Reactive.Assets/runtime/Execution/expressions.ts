@@ -24,7 +24,7 @@ export function evaluate(expression: Expression, context: Context): Read {
     case "data":
       return read(evaluate(expression.target, context), expression.path);
     case "op":
-      return operated(expression.op, expression.args.map((arg) => () => evaluate(arg, context)));
+      return operated(expression.op, expression.args.map((arg) => () => evaluate(arg, context)), context.plan.culture.collation);
     case "call":
       return called(evaluate(expression.target, context), expression.path, expression.members, () => expression.args.map((arg) => heldOrNull(evaluate(arg, context))));
     case "answer":

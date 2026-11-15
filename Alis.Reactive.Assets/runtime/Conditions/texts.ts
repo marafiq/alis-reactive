@@ -1,5 +1,4 @@
-import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
-import { described } from "./described";
+import { described, nothing, Stop, value, type Read } from "../ValuesAndSources/index";
 
 export function textTested(text: Read, part: Read, holds: (held: string, sought: string) => boolean): Read {
   if (text.kind === "nothing" || text.value === null || part.kind === "nothing") return nothing;
