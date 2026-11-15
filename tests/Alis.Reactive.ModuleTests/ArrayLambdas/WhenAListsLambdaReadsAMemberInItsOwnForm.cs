@@ -242,10 +242,11 @@ public sealed class WhenAListsLambdaReadsAMemberInItsOwnForm
                 "'s.Tag' reads past 's', which its own JSON converter writes, so the browser holds what the converter writes, not its members; read 's' itself, or read past it on the server."));
 
     [Test]
-    public void a_list_operation_over_a_list_its_own_converter_writes_whole_waits_for_its_meaning()
+    public void a_list_operation_over_a_list_its_own_converter_writes_whole_is_refused()
         => Assert.That(
             () => Refused(cart => cart.Counted.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Lots).Count())),
-            Throws.TypeOf<NotImplementedException>().With.Message.EqualTo("The method or operation is not implemented."));
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Lots' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
 
     [Test]
     public void an_enum_its_own_converter_writes_is_compared_with_the_value_written_by_that_converter()

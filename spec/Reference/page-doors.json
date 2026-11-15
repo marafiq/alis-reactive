@@ -223,8 +223,7 @@
   "M11.F1 X5.12 0": {
     "modules": [
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Declarations/MembersOffTheirDeclaration.cshtml",
@@ -737,8 +736,7 @@
   "M17.F1 X4.11 0": {
     "modules": [
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Execution/SelfTest.cshtml",
@@ -864,8 +862,7 @@
       "NativeComponents",
       "RenderingAndDelivery",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Refusals/ValuesAndSources/BedsideDoseFallingBackToGiven.cshtml",
@@ -890,8 +887,7 @@
     "modules": [
       "RenderingAndDelivery",
       "RequestsAndResponses",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Round/MedicationCheck.cshtml",
@@ -1002,8 +998,7 @@
     "modules": [
       "NativeComponents",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/IntakeRecord.cshtml",
@@ -1014,8 +1009,7 @@
     "modules": [
       "NativeComponents",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/FluidTargetCheck.cshtml",
@@ -1025,8 +1019,7 @@
   "M2.F1 X7.7 2": {
     "modules": [
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/PumpCaption.cshtml",
@@ -1903,8 +1896,7 @@
       "NativeAppLevelObjects",
       "NativeComponents",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Shell/DischargeNote.cshtml",
@@ -4324,8 +4316,7 @@
     "modules": [
       "NativeComponents",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Sources/SourceConditionRight.cshtml",

@@ -167,11 +167,14 @@ public static class DataLists
     public static TypedSource<decimal> Sum<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, decimal>> term) => Summed<TItem, decimal>(Operator.SumDecimal, Checked(list, nameof(Sum)), term);
 
     private static ITypedSource<IEnumerable<TItem>> Checked<TItem>(ITypedSource<IEnumerable<TItem>> list, string operation)
-        => Sources.FormOf(list).HoldsAListItsConverterWrites ? throw new NotImplementedException()
-            : list is ITypedSource<string>
+    {
+        var form = Sources.FormOf(list);
+        if (form.HoldsAListItsConverterWrites) form.RefuseAComputation();
+        return list is ITypedSource<string>
             ? throw new InvalidOperationException(
                 $"The source passed to {operation} is text, and a text is no list in the browser; run {operation} over a list, such as a List<T> or an array, or test the text with Contains, StartsWith, EndsWith, MinLength or Matches.")
             : list;
+    }
 
     private static CallExpression Found<TItem>(ITypedSource<IEnumerable<TItem>> list, LambdaExpression predicate)
         => ListForms.Find(Sources.Of(list), ItemLambda.Of(predicate, Sources.FormOf(list)));

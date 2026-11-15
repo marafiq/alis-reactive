@@ -362,8 +362,9 @@ describe("as(expr, instant)", () => {
     expect(asIn(newYork, 1794231000000, instant)).toStrictEqual(none);
   });
 
-  test("an instant past the year 9999 is not built", () => {
-    expect(() => asIn(newYork, "9999-12-31T23:30-05:00", instant)).toThrow("This page cannot run an instant past the year 9999");
+  test("an instant past the year 9999 converts to nothing, where the last millisecond converts", () => {
+    expect(asIn(newYork, "9999-12-31T23:30-05:00", instant)).toStrictEqual(none);
+    expect(momentOf(asIn(newYork, "9999-12-31T23:59:59.9999999Z", instant))).toBe("9999-12-31T23:59:59.999Z");
   });
 });
 

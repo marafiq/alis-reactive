@@ -23,7 +23,7 @@ public static class TextTests
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The source of the text it looks for.</param>
     /// <returns>A source that is true when the text holds the value.</returns>
-    public static TypedSource<bool> Contains(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.Contains, text, Sources.Of(value));
+    public static TypedSource<bool> Contains(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.Contains, text, Operand(value));
 
     /// <summary>Tests that the text starts with a literal, compared character by character as <c>StringComparison.Ordinal</c> compares.</summary>
     /// <param name="text">The text the test reads.</param>
@@ -35,7 +35,7 @@ public static class TextTests
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The source of the text it starts with.</param>
     /// <returns>A source that is true when the text starts with the value.</returns>
-    public static TypedSource<bool> StartsWith(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.StartsWith, text, Sources.Of(value));
+    public static TypedSource<bool> StartsWith(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.StartsWith, text, Operand(value));
 
     /// <summary>Tests that the text ends with a literal, compared character by character as <c>StringComparison.Ordinal</c> compares.</summary>
     /// <param name="text">The text the test reads.</param>
@@ -47,7 +47,7 @@ public static class TextTests
     /// <param name="text">The text the test reads.</param>
     /// <param name="value">The source of the text it ends with.</param>
     /// <returns>A source that is true when the text ends with the value.</returns>
-    public static TypedSource<bool> EndsWith(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.EndsWith, text, Sources.Of(value));
+    public static TypedSource<bool> EndsWith(this ITypedSource<string?> text, ITypedSource<string?> value) => Tested(Operator.EndsWith, text, Operand(value));
 
     /// <summary>Tests that the text matches a regular expression, as <c>Regex.IsMatch</c> reads it.</summary>
     /// <remarks>
@@ -74,7 +74,7 @@ public static class TextTests
     /// <param name="text">The text the test reads.</param>
     /// <param name="length">The source of the fewest characters the text holds.</param>
     /// <returns>A source that is true when the text is that long or longer.</returns>
-    public static TypedSource<bool> MinLength(this ITypedSource<string?> text, ITypedSource<int> length) => AtLeast(text, Sources.Of(length));
+    public static TypedSource<bool> MinLength(this ITypedSource<string?> text, ITypedSource<int> length) => AtLeast(text, Operand(length));
 
     private static TypedSource<bool> Tested(Operator op, ITypedSource<string?> text, Expression part)
         => new Computed<bool>(new OpExpression(op, [Sources.Of(text), part]), TestedText(text).Computed);
@@ -86,5 +86,15 @@ public static class TextTests
     }
 
     private static HeldForm TestedText(ITypedSource<string?> text)
-        => Sources.FormOf(text) is { Own: null } form ? form : throw new NotImplementedException();
+    {
+        var form = Sources.FormOf(text);
+        form.RefuseAComputation();
+        return form;
+    }
+
+    private static Expression Operand<T>(ITypedSource<T> source)
+    {
+        Sources.FormOf(source).RefuseAComputation();
+        return Sources.Of(source);
+    }
 }

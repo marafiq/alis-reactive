@@ -255,7 +255,7 @@ function asInstant(held: unknown, timeZone: TimeZone): Read {
   if (text === undefined) return nothing;
   const moment = momentOf(text, timeZone);
   if (moment < earliestInstant) return nothing;
-  if (moment > latestInstant) throw notBuilt("an instant past the year 9999: no fact states that the host refuses it");
+  if (moment > latestInstant) return nothing;
   return value(new Date(moment));
 }
 

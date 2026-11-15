@@ -56,6 +56,12 @@ internal sealed class HeldForm
         return LiveShapes.Converts(own.Member.OwnForm().GetTypeInfo(typeof(TValue)), out var shape) ? new AsExpression(held, shape) : held;
     }
 
+    internal void RefuseAComputation()
+    {
+        if (Own is not { } own) return;
+        throw new InvalidOperationException($"'{own.Read}' is written by {own.Cause}, unlike {BaseFormName}, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.");
+    }
+
     internal bool WritesAsAScalar<TValue>() => WritesAsAScalar(typeof(TValue));
 
     internal bool WritesAsAScalar(Type type) => DataOptions.GetTypeInfo(type).Kind == JsonTypeInfoKind.None;

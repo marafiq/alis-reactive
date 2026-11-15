@@ -228,16 +228,106 @@ public sealed class WhenAConditionReadsAMemberInItsOwnForm
             Is.EqualTo(ScriptOpen + RebateInATenth + ScriptClose));
 
     [Test]
-    public void a_text_test_of_a_text_its_own_converter_writes_waits_for_its_meaning()
+    public void a_text_test_of_a_text_its_own_converter_writes_is_refused()
         => Assert.That(
             () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Note).StartsWith("Ad"))),
-            Throws.TypeOf<NotImplementedException>().With.Message.EqualTo("The method or operation is not implemented."));
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
 
     [Test]
-    public void an_emptiness_test_of_a_list_its_own_converter_writes_waits_for_its_meaning()
+    public void an_emptiness_test_of_a_list_its_own_converter_writes_is_refused()
         => Assert.That(
             () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Lots).IsEmpty())),
-            Throws.TypeOf<NotImplementedException>().With.Message.EqualTo("The method or operation is not implemented."));
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Lots' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_contains_test_refuses_a_text_its_own_converter_writes()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Note).Contains("Ad"))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void an_ends_with_test_refuses_a_text_its_own_converter_writes()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Note).EndsWith("Ad"))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_pattern_test_refuses_a_text_its_own_converter_writes()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Note).Matches("[Aa]d"))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_length_test_refuses_a_text_its_own_converter_writes()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Note).MinLength(2))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void an_emptiness_test_refuses_a_text_its_own_converter_writes()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Note).IsEmpty())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_nonempty_test_refuses_a_text_its_own_converter_writes()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Note).NotEmpty())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_nonempty_test_refuses_a_list_its_own_converter_writes()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Lots).NotEmpty())),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Lots' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_contains_operand_its_own_converter_writes_is_refused()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Drug).Contains(cart.Doses.Find(d => d.Drug == "Aspirin", d => d.Note)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_starts_with_operand_its_own_converter_writes_is_refused()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Drug).StartsWith(cart.Doses.Find(d => d.Drug == "Aspirin", d => d.Note)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void an_ends_with_operand_its_own_converter_writes_is_refused()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Drug).EndsWith(cart.Doses.Find(d => d.Drug == "Aspirin", d => d.Note)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Note' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_length_operand_its_own_number_handling_writes_is_refused()
+        => Assert.That(
+            () => Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Drug).MinLength(cart.Doses.Find(d => d.Drug == "Aspirin", d => d.Minimum)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Minimum' is written by its own JSON number handling, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+
+    [Test]
+    public void a_length_operand_in_the_live_form_is_read_as_a_number()
+    {
+        var expected = OnLoad + SetsFlagged +
+            "{\"kind\":\"op\",\"op\":\"gte\",\"args\":[{\"kind\":\"get\",\"path\":[\"length\"],\"members\":\"requiredIfHeld\",\"target\":" +
+            "{\"kind\":\"data\",\"path\":[{\"name\":\"drug\",\"requires\":[],\"absent\":{\"kind\":\"start\",\"value\":\"none\"}}],\"target\":" + Digoxin + "}}," +
+            "{\"kind\":\"get\",\"path\":[\"length\"],\"members\":\"requiredIfHeld\",\"target\":" + Doses + "}]}}" + Ends;
+        Assert.That(Rendered(cart => cart.Flagged.Set(cart.Doses.Find(d => d.Drug == "Digoxin", d => d.Drug).MinLength(cart.Doses.Count()))), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
 
     [Test]
     public void the_plans_of_each_condition_are_valid_by_the_plan_schema()

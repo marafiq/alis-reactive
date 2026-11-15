@@ -191,24 +191,25 @@ slip is about you invented so you can avoid accountability about mistakes").
 - A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it: one
   test rule to a landed rule's pattern, one module's half against the schema. Six at a time at most, three of Codex
   and three Opus agents at xhigh, each in a worktree of its own (the owner, 2026-11-15: "Spin more agents ver clear
-  scope and outcome of opus xhigh as well"). None words a rule, and each decides the forms its own task meets, as the line below on quality states. Its brief names the
-  base SHA and carries the full bar, finished before anything reads it, and every spec file, D line and TLA+ action
-  it cites is found at that SHA by a command before it goes out (the lead's mistake, 2026-11-14); it reads no secret
-  or file that holds a credential, runs no git command beyond its own worktree and branch, and runs no command its
-  brief does not name (the lead's correction of a fork, 2026-11-13).
+  scope and outcome of opus xhigh as well"). None words a rule, and each decides the forms its own task meets, as
+  the line below on quality states. Its brief names the base SHA and carries the full bar, finished before anything
+  reads it, and every spec file, D line and TLA+ action it cites is found at that SHA by a command before it goes out
+  (the lead's mistake, 2026-11-14); it reads no secret or file that holds a credential, runs no git command beyond
+  its own worktree and branch, and runs no command its brief does not name (the lead's correction of a fork,
+  2026-11-13).
 - An agent starts from a definition of `.claude/agents/`, which carries the harness its kind of task meets and the
   reply it returns: `.claude/agents/designer.md` for a complex task or a critical decision, on the latest Fable model
   at xhigh, `.claude/agents/page-writer.md` for pages and their tests, and `.claude/agents/builder.md` for a piece
-  to build, on Opus at xhigh. It reads this file, `spec/CLAUDE.md`'s
-  owner decisions, the kinds of `spec/MISTAKES.md`, and the rule file and the project's own `CLAUDE.md` of each kind
-  of file it reads, writes or proposes, and its reply opens with the rule lines it applied, by file and line at the
-  base SHA, which the lead reads at the source before a word of it lands. A brief adds the task alone, and a task no
-  definition covers gets its definition first (the owner, 2026-11-13: "Are you making your agents actually read the
-  harness, like all the setup we have, or you are just going, do whatever you want?", and the owner's yes to the
-  definitions the same night). A definition loads as an agent type from the `.claude/agents/` of the folder the
-  session starts in, and a session started in the main checkout lists the architect's alone; until the owner chooses
-  where the definitions load, a brief names its definition file as the agent's first read and the call passes the
-  model and effort the definition names (the lead's mistake, 2026-11-14).
+  to build, on Opus at xhigh. It reads this file, `spec/CLAUDE.md`'s owner decisions, the kinds of `spec/MISTAKES.md`,
+  and the rule file and the project's own `CLAUDE.md` of each kind of file it reads, writes or proposes, and its reply
+  opens with the rule lines it applied, by file and line at the base SHA, which the lead reads at the source before a
+  word of it lands. A brief adds the task alone, and a task no definition covers gets its definition first (the owner,
+  2026-11-13: "Are you making your agents actually read the harness, like all the setup we have, or you are just
+  going, do whatever you want?", and the owner's yes to the definitions the same night). A definition loads as an
+  agent type from the `.claude/agents/` of the folder the session starts in, and a session started in the main
+  checkout lists the architect's alone; until the owner chooses where the definitions load, a brief names its
+  definition file as the agent's first read and the call passes the model and effort the definition names (the lead's
+  mistake, 2026-11-14).
 - A complex task or a critical decision, one whose error would drift the schema, spread across tests, a harness door
   or a spec line, or lower the bar, goes first to an agent on the latest Fable model at xhigh effort, briefed with its
   spec lines, the files and the constraints; the lead lands it from its answer, read at the source (the owner,

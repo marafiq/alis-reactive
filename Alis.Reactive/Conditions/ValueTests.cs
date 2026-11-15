@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
@@ -48,14 +47,22 @@ public static class ValueTests
     /// <param name="text">The text the test reads.</param>
     /// <returns>A source that is true when the text is null, empty or not there.</returns>
     public static TypedSource<bool> IsEmpty(this ITypedSource<string?> text)
-        => Sources.FormOf(text).Own is null ? Emptiness(Operator.NullOrEmpty, Sources.Of(text), Sources.FormOf(text)) : throw new NotImplementedException();
+    {
+        var form = Sources.FormOf(text);
+        form.RefuseAComputation();
+        return Emptiness(Operator.NullOrEmpty, Sources.Of(text), form);
+    }
 
     /// <summary>Tests that the list is null or holds no item.</summary>
     /// <remarks>A list the page cannot read is empty too.</remarks>
     /// <param name="list">The list the test reads.</param>
     /// <returns>A source that is true when the list is null, holds no item or is not there.</returns>
     public static TypedSource<bool> IsEmpty<TItem>(this ITypedSource<IReadOnlyList<TItem>?> list)
-        => Sources.FormOf(list).HoldsAListItsConverterWrites ? throw new NotImplementedException() : Emptiness(Operator.Empty, Sources.Of(list), Sources.FormOf(list));
+    {
+        var form = Sources.FormOf(list);
+        if (form.HoldsAListItsConverterWrites) form.RefuseAComputation();
+        return Emptiness(Operator.Empty, Sources.Of(list), form);
+    }
 
     /// <summary>Tests that the text holds at least one character.</summary>
     /// <param name="text">The text the test reads.</param>

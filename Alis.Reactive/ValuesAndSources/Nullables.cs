@@ -1,5 +1,3 @@
-using System;
-
 namespace Alis.Reactive.ValuesAndSources;
 
 /// <summary>
@@ -17,7 +15,7 @@ public static class NullableValues
     /// <returns>A source that reads the same value, typed as nullable.</returns>
     public static TypedSource<TValue?> OrNull<TValue>(this TypedSource<TValue> source)
         where TValue : struct
-        => throw new NotImplementedException();
+        => new Computed<TValue?>(source.Expression, source.Form);
 }
 
 /// <summary>
@@ -35,5 +33,5 @@ public static class NullableReferences
     /// <returns>A source that reads the same value, typed as nullable.</returns>
     public static TypedSource<TValue?> OrNull<TValue>(this TypedSource<TValue> source)
         where TValue : class
-        => throw new NotImplementedException();
+        => new Computed<TValue?>(source.Expression, source.Form);
 }

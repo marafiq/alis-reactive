@@ -55,6 +55,9 @@ public sealed class CartDose
     [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
     public double Fill { get; set; }
 
+    [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
+    public int Minimum { get; set; }
+
     [JsonConverter(typeof(DecimalText))]
     public decimal Tariff { get; set; }
 
