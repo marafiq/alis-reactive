@@ -13,6 +13,8 @@ internal abstract class Binding
 
     internal abstract Expression Target { get; }
 
+    internal virtual Expression WriteTarget => Target;
+
     internal virtual Expression Arguments
         => throw new InvalidOperationException("An argument at a position is what a listener or a callback receives: declare it on an event's payload or a callback's arguments.");
 
@@ -66,11 +68,18 @@ internal sealed class Reached : Binding
             : optional ? PathMembers.OptionalMember : PathMembers.Required;
 }
 
-internal sealed class Received(BlockWriter writer) : Binding
+internal sealed class Received(BlockWriter writer, string payload = "e", string arguments = "arguments") : Binding
 {
-    internal override Expression Target { get; } = new RefExpression("e");
+    private readonly int _listenDepth = writer.ListenDepth;
 
-    internal override Expression Arguments { get; } = new RefExpression("arguments");
+    internal override Expression Target { get; } = new RefExpression(payload);
+
+    internal override Expression WriteTarget
+        => Writer.ListenDepth > _listenDepth
+            ? throw new InvalidOperationException("A listen cannot write the payload of the event around it: the vendor read that payload when its listener returned. Write it before the listen step.")
+            : Target;
+
+    internal override Expression Arguments { get; } = new RefExpression(arguments);
 
     internal override BlockWriter Writer { get; } = writer;
 

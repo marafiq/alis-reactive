@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { Lane } from "./index";
 
+const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
+  runs: () => undefined,
+  mounts: () => undefined,
+  listens: () => undefined,
+  holds: () => undefined,
+  registers: () => undefined,
+};
+
 type Block = ConstructorParameters<typeof Lane>[1];
 type Step = Block[number];
 type Source = Extract<Step, { kind: "do" }>["expr"];
@@ -122,7 +130,7 @@ afterEach(() => {
 describe("when a handler's event is raised, its run keeps Run.tla's invariants", () => {
   test("SyncRunEndsInItsTurn: a run with no awaited step ends in its trigger's turn, its branch and the step after it included", () => {
     const chart = new Chart();
-    const lane = new Lane("overlap", [charts(text("admitted")), when("flagged", [charts(text("flagged"))], []), charts(text("charted"))]);
+    const lane = new Lane("overlap", [charts(text("admitted")), when("flagged", [charts(text("flagged"))], []), charts(text("charted"))], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, flagged: true }));
 
@@ -132,8 +140,8 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
   test("SecondHandlerStartsInTheTurn: the second handler of an event runs to its end while the first waits, and the first goes on when its promise resolves", async () => {
     const chart = new Chart();
     const settle = gate();
-    const first = new Lane("overlap", [charts(text("first writes")), awaits("settle"), charts(text("first goes on"))]);
-    const second = new Lane("overlap", [charts(text("second writes"))]);
+    const first = new Lane("overlap", [charts(text("first writes")), awaits("settle"), charts(text("first goes on"))], aRoundsOwner);
+    const second = new Lane("overlap", [charts(text("second writes"))], aRoundsOwner);
     const raised = raisedWith({ chart, settle: settle.held });
 
     first.raise(raised);
@@ -148,7 +156,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
   test("NothingRunsWhileItWaits: the step after an if runs after the whole of the branch it ran, its awaited step included", async () => {
     const chart = new Chart();
     const settle = gate();
-    const lane = new Lane("overlap", [when("flagged", [awaits("settle"), charts(text("branch"))], []), charts(text("after the if"))]);
+    const lane = new Lane("overlap", [when("flagged", [awaits("settle"), charts(text("branch"))], []), charts(text("after the if"))], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, flagged: true, settle: settle.held }));
 
@@ -165,7 +173,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
       charts(text("before")),
       when("flagged", [stops("The bed is taken."), charts(text("after the stop"))], []),
       charts(text("after the if")),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, flagged: true }));
 
@@ -175,7 +183,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
 
   test("NothingRunsAfterAnAbort: a step that raises its handler's own event under replace is the last step of its run", () => {
     const chart = new Chart();
-    const lane = new Lane("replace", [charts(named("round")), rings, charts(named("after"))]);
+    const lane = new Lane("replace", [charts(named("round")), rings, charts(named("after"))], aRoundsOwner);
     const quiet = new Bell(() => undefined);
     const bell = new Bell(() => {
       lane.raise(raisedWith({ chart, bell: quiet, round: "round 2", after: "after 2" }));
@@ -195,7 +203,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
         layer([charts(text("loading")), stops("No bed is free.")], [charts(text("finally"))]),
       ),
       charts(text("after the request")),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(raisedWith({ chart }));
 
@@ -208,7 +216,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
     const second = gate();
     const lane = new Lane("replace", [
       request(layer([], [charts(named("defaultsFinally"))]), layer([awaits("settle"), charts(named("busy"))], [charts(named("finally"))])),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, settle: first.held, defaultsFinally: "defaults finally 1", busy: "busy 1", finally: "finally 1" }));
     lane.raise(raisedWith({ chart, settle: second.held, defaultsFinally: "defaults finally 2", busy: "busy 2", finally: "finally 2" }));
@@ -228,7 +236,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
         layer([], [charts(text("finally starts")), stops("The chart is locked."), charts(text("finally ends"))]),
         layer([stops("No bed is free.")], [charts(text("never loaded"))]),
       ),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(raisedWith({ chart }));
 
@@ -250,7 +258,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
         layer([beds, charts(text("after beds"))], []),
       ),
       charts(text("after admission")),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(raisedWith({ chart }));
 
@@ -267,7 +275,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
         layer([awaits("settle"), charts(text("busy"))], [charts(text("finally"))]),
       ),
       charts(text("after the request")),
-    ]);
+    ], aRoundsOwner);
     lane.raise(raisedWith({ chart, settle: settle.held, flush: flush.held }));
 
     lane.dispose();
@@ -291,7 +299,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
         layer([stops("The roster is held.")], []),
       ),
       charts(named("after")),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(
       raisedWith({ chart, settle: first.held, defaultsFinally: "defaults finally 1", finallyStarts: "finally start 1", finallyEnds: "finally end 1", after: "after 1" }),
@@ -312,7 +320,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
       charts(named("rang")),
       request(layer([], [charts(named("finally"))]), layer([rings, stops("The round ends at its send.")], [])),
       charts(named("after")),
-    ]);
+    ], aRoundsOwner);
     const quiet = new Bell(() => undefined);
     const bell = new Bell(() => {
       lane.raise(raisedWith({ chart, bell: quiet, rang: "rang 2", finally: "finally 2", after: "after 2" }));
@@ -327,7 +335,7 @@ describe("when a handler's event is raised, its run keeps Run.tla's invariants",
 describe("when a step is one C# marked awaited (D11.2, D11.3, D4.3)", () => {
   test("a step C# did not mark awaited runs on in its turn, whatever its value holds", () => {
     const chart = new Chart();
-    const lane = new Lane("overlap", [{ kind: "do", await: false, expr: named("settle") }, charts(text("next"))]);
+    const lane = new Lane("overlap", [{ kind: "do", await: false, expr: named("settle") }, charts(text("next"))], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, settle: gate().held }));
 
@@ -337,7 +345,7 @@ describe("when a step is one C# marked awaited (D11.2, D11.3, D4.3)", () => {
   test("a let that awaits binds the value its promise resolves to", async () => {
     const chart = new Chart();
     const record = gate();
-    const lane = new Lane("overlap", [{ kind: "let", name: "count", await: true, binds: "line", expr: named("record") }, charts(named("count"))]);
+    const lane = new Lane("overlap", [{ kind: "let", name: "count", await: true, binds: "line", expr: named("record") }, charts(named("count"))], aRoundsOwner);
     lane.raise(raisedWith({ chart, record: record.held }));
 
     record.opens(125);
@@ -348,7 +356,7 @@ describe("when a step is one C# marked awaited (D11.2, D11.3, D4.3)", () => {
 
   test("a value that is no promise is awaited as that value, so the step after it runs after the turn", async () => {
     const chart = new Chart();
-    const lane = new Lane("overlap", [{ kind: "let", name: "count", await: true, binds: "line", expr: { kind: "lit", value: 90 } }, charts(named("count"))]);
+    const lane = new Lane("overlap", [{ kind: "let", name: "count", await: true, binds: "line", expr: { kind: "lit", value: 90 } }, charts(named("count"))], aRoundsOwner);
 
     lane.raise(raisedWith({ chart }));
 
@@ -361,7 +369,7 @@ describe("when a step is one C# marked awaited (D11.2, D11.3, D4.3)", () => {
     const logged = stopsLogged();
     const chart = new Chart();
     const settle = gate();
-    const lane = new Lane("overlap", [charts(text("Testing")), awaits("settle"), charts(text("Self-test passed"))]);
+    const lane = new Lane("overlap", [charts(text("Testing")), awaits("settle"), charts(text("Self-test passed"))], aRoundsOwner);
     lane.raise(raisedWith({ chart, settle: settle.held }));
 
     settle.refuses(new Error("500"));
@@ -379,7 +387,7 @@ describe("when a step's value is a conversion (D3.2)", () => {
     const lane = new Lane("overlap", [
       charts({ kind: "as", expr: text("1,234.5"), shape: { kind: "number", of: "fraction", text: "view" } }),
       charts({ kind: "as", expr: text("2026-11-09T08:30"), shape: { kind: "instant" } }),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise({ ...raisedWith({ chart }), plan: kolkata });
 
@@ -390,7 +398,7 @@ describe("when a step's value is a conversion (D3.2)", () => {
 describe("when a block reads its abort signal (D11.12)", () => {
   test("a replace aborts the signal of the old run's blocks, and the new run's blocks hold one of their own", () => {
     const chart = new Chart();
-    const lane = new Lane("replace", [when("flagged", [chartsItsSignal], []), awaits("settle")]);
+    const lane = new Lane("replace", [when("flagged", [chartsItsSignal], []), awaits("settle")], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, flagged: true, settle: gate().held }));
     lane.raise(raisedWith({ chart, flagged: true, settle: gate().held }));
@@ -401,7 +409,7 @@ describe("when a block reads its abort signal (D11.12)", () => {
   test("a Finally layer holds a new signal, which a replace that lands in it leaves and a dispose aborts", () => {
     stopsLogged();
     const chart = new Chart();
-    const lane = new Lane("replace", [request(layer([], [chartsItsSignal, awaits("settle")]), layer([stops("The roster is held.")], []))]);
+    const lane = new Lane("replace", [request(layer([], [chartsItsSignal, awaits("settle")]), layer([stops("The roster is held.")], []))], aRoundsOwner);
     lane.raise(raisedWith({ chart, settle: gate().held }));
 
     lane.raise(raisedWith({ chart, settle: gate().held }));

@@ -87,6 +87,11 @@ internal sealed class HandlerResults
                     Read(statement, branch.When, visible);
                     written.Add(new IfStatement(branch.When, Walk(branch.Then, visible), Walk(branch.Else, visible)));
                     break;
+                case ListenStatement listen:
+                    Read(statement, listen.Object, visible);
+                    written.Add(new ListenStatement(listen.Event, listen.Listen, listen.Release, listen.Payload, listen.Members,
+                        listen.Policy, listen.PayloadName, listen.ArgumentsName, listen.Object, Walk(listen.Do, visible)));
+                    break;
                 case StopStatement:
                     written.Add(statement);
                     break;

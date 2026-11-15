@@ -44,6 +44,14 @@ const rounds = [
   { ward: "North", by: "Ada Byron", bed: 3 },
 ];
 
+const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
+  runs: () => undefined,
+  mounts: () => undefined,
+  listens: () => undefined,
+  holds: () => undefined,
+  registers: () => undefined,
+};
+
 function raisedWith(bound: Readonly<Record<string, unknown>>, plan: Raised["plan"] = ward): Raised {
   const scope = new Map<string, Held>();
   for (const [name, value] of Object.entries(bound)) scope.set(name, { kind: "value", value });
@@ -52,7 +60,7 @@ function raisedWith(bound: Readonly<Record<string, unknown>>, plan: Raised["plan
 
 function charted(bound: Readonly<Record<string, unknown>>, read: Source, plan: Raised["plan"] = ward): unknown[] {
   const chart = new Chart();
-  new Lane("overlap", [{ kind: "set", path: ["line"], members: "required", content: false, target: { kind: "ref", name: "chart" }, value: read }]).raise(raisedWith({ ...bound, chart }, plan));
+  new Lane("overlap", [{ kind: "set", path: ["line"], members: "required", content: false, target: { kind: "ref", name: "chart" }, value: read }], aRoundsOwner).raise(raisedWith({ ...bound, chart }, plan));
   return chart.lines;
 }
 
@@ -153,7 +161,7 @@ describe("when a step calls a method, each argument is read when the line runs",
       await: false,
       expr: { kind: "call", path: ["note"], members: "required", target: ref("chart"), args: [lit("Ada Hart"), member(ref("round"), "bed", "optional")] },
     };
-    new Lane("overlap", [notes]).raise(raisedWith({ chart, round: rounds[0] }));
+    new Lane("overlap", [notes], aRoundsOwner).raise(raisedWith({ chart, round: rounds[0] }));
 
     expect(chart.lines).toStrictEqual([["Ada Hart", null]]);
   });

@@ -6,42 +6,58 @@ export type Listener = (...args: unknown[]) => void;
 
 export type Unsubscribe = () => void;
 
+interface SubscriptionState {
+  active: boolean;
+}
+
 export function subscribe(raiser: object, listening: Listening, event: string, listener: Listener): Unsubscribe {
-  let active = false;
-  const guarded: Listener = (...args) => {
-    if (active) listener(...args);
+  const state = { active: false };
+  const remove = listen(raiser, listening, event, guarding(listener, state));
+  state.active = true;
+  return removing(remove, state);
+}
+
+function guarding(listener: Listener, state: SubscriptionState): Listener {
+  return (...args) => {
+    if (state.active) listener(...args);
   };
-  const remove = listen(raiser, listening, event, guarded);
-  active = true;
+}
+
+function removing(remove: Unsubscribe, state: SubscriptionState): Unsubscribe {
   return () => {
-    if (!active) return;
-    active = false;
+    if (!state.active) return;
+    state.active = false;
     remove();
   };
 }
 
 function listen(raiser: object, listening: Listening, event: string, listener: Listener): Unsubscribe {
   switch (listening.kind) {
-    case "method": {
-      const add = methodOf(raiser, listening.subscribe);
-      const remove = methodOf(raiser, listening.unsubscribe);
-      add(event, listener);
-      return () => {
-        remove(event, listener);
-      };
-    }
+    case "method":
+      return methodPair(raiser, listening.subscribe, listening.unsubscribe, event, listener);
     case "assignment":
       return assignListener(raiser, event, listener);
-    case "returned": {
-      const remove = methodOf(raiser, listening.subscribe)(event, listener);
-      if (typeof remove !== "function") throw new Stop("The subscribe method '" + listening.subscribe + "' returned no unsubscriber.");
-      return () => {
-        Reflect.apply(remove, undefined, []);
-      };
-    }
+    case "returned":
+      return returned(methodOf(raiser, listening.subscribe)(event, listener), listening.subscribe);
     default:
       return assertNever(listening);
   }
+}
+
+function methodPair(raiser: object, subscribe: string, unsubscribe: string, event: string, listener: Listener): Unsubscribe {
+  const add = methodOf(raiser, subscribe);
+  const remove = methodOf(raiser, unsubscribe);
+  add(event, listener);
+  return () => {
+    remove(event, listener);
+  };
+}
+
+function returned(remove: unknown, subscribe: string): Unsubscribe {
+  if (typeof remove !== "function") throw new Stop("The subscribe method '" + subscribe + "' returned no unsubscriber.");
+  return () => {
+    Reflect.apply(remove, undefined, []);
+  };
 }
 
 function methodOf(holder: object, name: string): (...args: unknown[]) => unknown {

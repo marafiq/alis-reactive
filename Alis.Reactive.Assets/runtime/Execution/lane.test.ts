@@ -52,6 +52,14 @@ function gate(): Gate {
   };
 }
 
+const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
+  runs: () => undefined,
+  mounts: () => undefined,
+  listens: () => undefined,
+  holds: () => undefined,
+  registers: () => undefined,
+};
+
 function raisedWith(bound: Readonly<Record<string, unknown>>): Raised {
   const scope = new Map<string, Held>();
   for (const [name, value] of Object.entries(bound)) scope.set(name, { kind: "value", value });
@@ -95,7 +103,7 @@ describe("when a handler's event is raised while its last run is in flight, its 
     const chart = new Chart();
     const first = gate();
     const second = gate();
-    const lane = new Lane("overlap", aRound);
+    const lane = new Lane("overlap", aRound, aRoundsOwner);
 
     lane.raise(raisedWith({ chart, settle: first.held, starts: "start 1", ends: "end 1" }));
     lane.raise(raisedWith({ chart, settle: second.held, starts: "start 2", ends: "end 2" }));
@@ -110,7 +118,7 @@ describe("when a handler's event is raised while its last run is in flight, its 
   test("SkippedTriggerStartsNothing: under skip a raise starts nothing while a run is in flight, and the next raise after it ended starts one", async () => {
     const chart = new Chart();
     const first = gate();
-    const lane = new Lane("skip", aRound);
+    const lane = new Lane("skip", aRound, aRoundsOwner);
 
     lane.raise(raisedWith({ chart, settle: first.held, starts: "start 1", ends: "end 1" }));
     lane.raise(raisedWith({ chart, settle: gate().held, starts: "start 2", ends: "end 2" }));
@@ -125,7 +133,7 @@ describe("when a handler's event is raised while its last run is in flight, its 
     const chart = new Chart();
     const first = gate();
     const second = gate();
-    const lane = new Lane("replace", aRound);
+    const lane = new Lane("replace", aRound, aRoundsOwner);
 
     lane.raise(raisedWith({ chart, settle: first.held, starts: "start 1", ends: "end 1" }));
     lane.raise(raisedWith({ chart, settle: second.held, starts: "start 2", ends: "end 2" }));
@@ -140,7 +148,7 @@ describe("when a handler's event is raised while its last run is in flight, its 
   test("DisposedRunsNothingMore: after its owner's dispose a run in flight runs no later step, and a raise starts nothing", async () => {
     const chart = new Chart();
     const first = gate();
-    const lane = new Lane("overlap", aRound);
+    const lane = new Lane("overlap", aRound, aRoundsOwner);
     lane.raise(raisedWith({ chart, settle: first.held, starts: "start 1", ends: "end 1" }));
 
     lane.dispose();
@@ -153,7 +161,7 @@ describe("when a handler's event is raised while its last run is in flight, its 
 
   test("FinallyRunsBeforeRelease: a dispose returns after the Finally of each run in flight ran, so its owner releases after it", () => {
     const chart = new Chart();
-    const lane = new Lane("overlap", [request(layer([charts(text("loading"))], [charts(text("finally"))]), layer([awaits("settle")], []))]);
+    const lane = new Lane("overlap", [request(layer([charts(text("loading"))], [charts(text("finally"))]), layer([awaits("settle")], []))], aRoundsOwner);
     lane.raise(raisedWith({ chart, settle: gate().held }));
 
     lane.dispose();
@@ -171,7 +179,7 @@ describe("when a block runs Parallel, its join keeps Lanes.tla's invariants", ()
     const lane = new Lane("overlap", [
       parallel([charts(text("residents sent")), awaits("residents"), charts(text("residents shown"))], [charts(text("staff sent")), awaits("staff"), charts(text("staff shown"))]),
       charts(text("Board ready")),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, residents: residents.held, staff: staff.held }));
 
@@ -191,7 +199,7 @@ describe("when a block runs Parallel, its join keeps Lanes.tla's invariants", ()
     const lane = new Lane("overlap", [
       parallel([stops("No resident is admitted."), charts(text("residents shown"))], [awaits("staff"), charts(text("staff shown"))]),
       charts(text("Board ready")),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, staff: staff.held }));
     staff.opens(null);
@@ -209,7 +217,7 @@ describe("when a block runs Parallel, its join keeps Lanes.tla's invariants", ()
     const lane = new Lane("overlap", [
       parallel([awaits("residents"), charts(text("residents shown")), awaits("allergies"), charts(text("allergies shown"))], [awaits("staff"), charts(text("staff shown"))]),
       charts(text("Board ready")),
-    ]);
+    ], aRoundsOwner);
 
     lane.raise(raisedWith({ chart, residents: residents.held, allergies: allergies.held, staff: staff.held }));
     residents.opens(null);

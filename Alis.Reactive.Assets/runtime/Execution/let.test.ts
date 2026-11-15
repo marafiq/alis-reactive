@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { Lane } from "./index";
 
+const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
+  runs: () => undefined,
+  mounts: () => undefined,
+  listens: () => undefined,
+  holds: () => undefined,
+  registers: () => undefined,
+};
+
 type Block = ConstructorParameters<typeof Lane>[1];
 type Step = Block[number];
 type Source = Extract<Step, { kind: "do" }>["expr"];
@@ -47,7 +55,7 @@ const charts = (value: Source): Step => ({ kind: "set", path: ["line"], members:
 
 function charted(...block: Step[]): unknown[] {
   const chart = new Chart();
-  new Lane("overlap", block).raise(raisedWith({ chart, station: { pager: { number: "4" } } }));
+  new Lane("overlap", block, aRoundsOwner).raise(raisedWith({ chart, station: { pager: { number: "4" } } }));
   return chart.lines;
 }
 

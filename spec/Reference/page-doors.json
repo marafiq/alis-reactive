@@ -611,8 +611,7 @@
   },
   "M14.F1 X19.4 0": {
     "modules": [
-      "Elements",
-      "TriggersAndPipelines"
+      "Elements"
     ],
     "views": [
       "/Bench/Schema/ElementKeypad.cshtml",

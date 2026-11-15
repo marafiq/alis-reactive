@@ -11,7 +11,7 @@ const argumentsName = "arguments";
 
 export function start(plan: PlanDocument, owner: Owner): void {
   holdSlots(slotsNamedBy(plan), owner);
-  const context: Context = { plan, scope: new Map(), signal: new AbortController().signal };
+  const context: Context = { plan, owner, scope: new Map(), signal: new AbortController().signal };
   for (const handler of plan.handlers) {
     try {
       listen(handler, context, owner);
@@ -27,7 +27,7 @@ function listen(handler: Handler, context: Context, owner: Owner): void {
   if (handler.payload.length > 0) throw notBuilt("a handler that reads its payload");
   const source = located(context, handler.on);
   if (!isAnObject(source.object)) throw new Stop("The object that raises '" + handler.event + "' is not on the page.");
-  const lane = new Lane(handler.policy, handler.do);
+  const lane = new Lane(handler.policy, handler.do, owner);
   const unsubscribe = subscribe(source.object, source.listen, handler.event, (...args: unknown[]) => {
     lane.raise(bind(bind(context, payloadName, value(args)), argumentsName, value(args)));
   });

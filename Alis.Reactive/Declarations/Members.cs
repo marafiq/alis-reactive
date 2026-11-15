@@ -69,7 +69,7 @@ public sealed class Property<TValue> : ReadOnly<TValue>
     public void Set(ITypedSource<TValue> source) => Written(Sources.FormOf(source).IntoLive<TValue>(Sources.Of(source)));
 
     internal void Written(Schema.Expression value)
-        => Owner.Bound.Writer.Write(new SetStatement([Member], Optional ? SetMembers.Optional : SetMembers.Required, false, Owner.Bound.Target, value));
+        => Owner.Bound.Writer.Write(new SetStatement([Member], Optional ? SetMembers.Optional : SetMembers.Required, false, Owner.WriteTarget, value));
 }
 
 /// <summary>
@@ -98,7 +98,7 @@ public sealed class WriteOnly<TValue>
     public void Set(ITypedSource<TValue> source) => Written(Sources.FormOf(source).IntoLive<TValue>(Sources.Of(source)));
 
     internal void Written(Schema.Expression value)
-        => _owner.Bound.Writer.Write(new SetStatement([_member], _optional ? SetMembers.Optional : SetMembers.Required, false, _owner.Bound.Target, value));
+        => _owner.Bound.Writer.Write(new SetStatement([_member], _optional ? SetMembers.Optional : SetMembers.Required, false, _owner.WriteTarget, value));
 }
 
 /// <summary>
@@ -147,7 +147,7 @@ public sealed class Callback<TArgs, TResult>
     {
         var writer = _owner.Bound.Writer;
         var value = JsObject.WrittenAnswer(writer, answer);
-        writer.Write(new SetStatement([_member], _optional ? SetMembers.Optional : SetMembers.Required, false, _owner.Bound.Target, value));
+        writer.Write(new SetStatement([_member], _optional ? SetMembers.Optional : SetMembers.Required, false, _owner.WriteTarget, value));
     }
 }
 

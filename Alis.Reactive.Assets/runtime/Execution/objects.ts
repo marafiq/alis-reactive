@@ -1,5 +1,5 @@
 import { plugin } from "../Plugins/index";
-import { assertNever, type Listening } from "../Schema/index";
+import { assertNever, type Listening, type Vendor } from "../Schema/index";
 import { Stop, type Read } from "../ValuesAndSources/index";
 import { isAnObject, type Context } from "./context";
 import { evaluate } from "./expressions";
@@ -14,8 +14,7 @@ export function located(context: Context, id: string): Located {
   if (locator === undefined) throw new Error("The plan names the object '" + id + "', which it does not declare.");
   switch (locator.kind) {
     case "element": {
-      const vendor = context.plan.vendors[locator.vendor];
-      if (vendor === undefined) throw new Error("The plan names the vendor '" + locator.vendor + "', which it does not declare.");
+      const vendor = vendorOf(context, locator.vendor);
       return { object: heldOn(elementOf(locator.id), locator.vendor, evaluate(vendor.locate, context)), listen: vendor.listen };
     }
     case "plugin":
@@ -25,7 +24,13 @@ export function located(context: Context, id: string): Located {
   }
 }
 
-function elementOf(id: string): HTMLElement {
+export function vendorOf(context: Context, name: string): Vendor {
+  const vendor = context.plan.vendors[name];
+  if (vendor === undefined) throw new Error("The plan names the vendor '" + name + "', which it does not declare.");
+  return vendor;
+}
+
+export function elementOf(id: string): HTMLElement {
   const element = document.getElementById(id);
   if (element === null) throw new Stop("No element has the id '" + id + "'.");
   return element;

@@ -25,6 +25,8 @@ public abstract class JsObject
 
     internal void Reach(Binding bound) => Bound = bound;
 
+    internal virtual Schema.Expression WriteTarget => Bound.WriteTarget;
+
     /// <summary>Declares a property the browser only reads.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="optional">True when the API marks the property optional: an absent one reads nothing.</param>

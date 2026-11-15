@@ -17,4 +17,6 @@ public abstract class Component : EventedObject
 
     /// <inheritdoc />
     protected internal sealed override EventListening Listening => Vendor.Listening;
+
+    internal override Schema.Expression WriteTarget => Bound.Target;
 }

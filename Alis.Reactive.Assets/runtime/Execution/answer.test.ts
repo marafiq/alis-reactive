@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { Lane } from "./index";
 
+const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
+  runs: () => undefined,
+  mounts: () => undefined,
+  listens: () => undefined,
+  holds: () => undefined,
+  registers: () => undefined,
+};
+
 type Block = ConstructorParameters<typeof Lane>[1];
 type Step = Block[number];
 type Source = Extract<Step, { kind: "do" }>["expr"];
@@ -42,7 +50,7 @@ function installed(body: Source, bound: Readonly<Record<string, unknown>> = {}, 
     kind: "set", path: ["answer"], members: "required", content: false,
     target: { kind: "ref", name: "pump" },
     value: { kind: "answer", arguments: name, body },
-  }]).raise(raisedWith({ ...bound, pump }));
+  }], aRoundsOwner).raise(raisedWith({ ...bound, pump }));
   return pump.answer;
 }
 
@@ -180,7 +188,7 @@ describe("when a vendor calls an answer", () => {
           body: { kind: "get", path: [0, "rate"], members: "required", target: { kind: "ref", name: "answer1" } },
         }],
       },
-    }]).raise(raisedWith({ pump, result }));
+    }], aRoundsOwner).raise(raisedWith({ pump, result }));
 
     expect(result.rates).toStrictEqual([2, 8]);
   });
@@ -229,7 +237,7 @@ describe("when a vendor calls an answer", () => {
       { kind: "set", path: ["reading"], members: "required", content: false, target: { kind: "ref", name: "pump" }, value: { kind: "ref", name: "good" } },
       { kind: "set", path: ["reading"], members: "required", content: false, target: { kind: "ref", name: "pump" }, value: { kind: "ref", name: "missing" } },
       { kind: "set", path: ["status"], members: "required", content: false, target: { kind: "ref", name: "after" }, value: { kind: "lit", value: "Finished" } },
-    ]).raise(raisedWith({ pump, after, good: { label: "Running" }, missing: {} }));
+    ], aRoundsOwner).raise(raisedWith({ pump, after, good: { label: "Running" }, missing: {} }));
 
     expect(pump.labels).toStrictEqual(["Primed", "Running"]);
     expect(after.status).toBe("Waiting");
@@ -247,7 +255,7 @@ describe("when a vendor calls an answer", () => {
         args: [{ kind: "ref", name: "good" }],
       } },
       { kind: "set", path: ["status"], members: "required", content: false, target: { kind: "ref", name: "after" }, value: { kind: "lit", value: "Finished" } },
-    ]).raise(raisedWith({ pump, after, good: { label: "Running" } }));
+    ], aRoundsOwner).raise(raisedWith({ pump, after, good: { label: "Running" } }));
 
     expect(pump.labels).toStrictEqual(["Primed", "Running"]);
     expect(after.status).toBe("Finished");

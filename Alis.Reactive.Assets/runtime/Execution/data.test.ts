@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { Lane } from "./index";
 
+const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
+  runs: () => undefined,
+  mounts: () => undefined,
+  listens: () => undefined,
+  holds: () => undefined,
+  registers: () => undefined,
+};
+
 type Block = ConstructorParameters<typeof Lane>[1];
 type Step = Block[number];
 type Source = Extract<Step, { kind: "do" }>["expr"];
@@ -57,7 +65,7 @@ const read = (...path: Walked[]): Source => ({ kind: "data", path, target: recor
 
 function charted(held: unknown, ...path: Walked[]): unknown[] {
   const chart = new Chart();
-  new Lane("overlap", [before, charts(read(...path))]).raise(raisedWith({ chart, record: held }));
+  new Lane("overlap", [before, charts(read(...path))], aRoundsOwner).raise(raisedWith({ chart, record: held }));
   return chart.lines;
 }
 

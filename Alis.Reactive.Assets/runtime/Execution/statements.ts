@@ -1,6 +1,5 @@
 import {
   assertNever,
-  notBuilt,
   type DoStatement,
   type LetStatement,
   type PathStep,
@@ -12,6 +11,8 @@ import {
 import { got, heldOrNull, Stop, type Read } from "../ValuesAndSources/index";
 import { bind, isAnObject, type Context } from "./context";
 import { evaluate } from "./expressions";
+import { listenTo } from "./listen";
+import { elementOf } from "./objects";
 
 export type Step =
   | { readonly kind: "completed"; readonly context: Context }
@@ -39,7 +40,8 @@ export function execute(statement: Statement, context: Context): Step {
     case "stop":
       return { kind: "stop", reason: statement.reason };
     case "listen":
-      throw notBuilt("the statement '" + statement.kind + "'");
+      listenTo(statement, context, elementOf);
+      return { kind: "completed", context };
     default:
       return assertNever(statement);
   }

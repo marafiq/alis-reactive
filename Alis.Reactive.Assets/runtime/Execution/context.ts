@@ -1,9 +1,11 @@
+import type { Owner } from "../OwnershipAndState/index";
 import type { PlanDocument } from "../Schema/index";
 import type { Read } from "../ValuesAndSources/index";
 
 export type Binding = Read | (() => Read);
 
 export interface Context {
+  readonly owner: Owner;
   readonly plan: PlanDocument;
   readonly scope: ReadonlyMap<string, Binding>;
   readonly signal: AbortSignal;

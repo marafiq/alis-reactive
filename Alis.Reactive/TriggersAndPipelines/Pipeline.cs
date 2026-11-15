@@ -205,7 +205,7 @@ public sealed class Pipeline<TModel>
     public void Listen<TObject, TArgs>(TObject source, Func<TObject, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
         where TObject : EventedObject
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => Listen(source, raised, HandlerPolicy.Overlap, pipeline);
 
     /// <summary>Listens to an event of an object the pipeline reaches, from this step on, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <remarks>
@@ -219,7 +219,30 @@ public sealed class Pipeline<TModel>
     public void Listen<TObject, TArgs>(TObject source, Func<TObject, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
         where TObject : EventedObject
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+    {
+        if (source.Bound.Reads(false) != PathMembers.Required)
+            throw new InvalidOperationException("A listen needs its object when the step runs: an object declared optional or nullable cannot be listened to.");
+        var selected = raised(source);
+        var target = source.Bound.Target;
+        var release = ReleaseOf(source, target);
+        var names = _writer.NextListen();
+        var body = _writer.Listening(() => pipeline(
+            JsObject.Reaching<TArgs>(new Received(_writer, names.Payload, names.Arguments)), new Pipeline<TModel>(_writer)));
+        _writer.Write(new ListenStatement(selected.Name, source.Listening.Grammar, release, selected.Payload,
+            PathMembers.Required, policy.Grammar, names.Payload, names.Arguments, target, body));
+    }
+
+    private Release ReleaseOf(EventedObject source, Schema.Expression target)
+    {
+        if (source is not Component component) return LivingRelease.Instance;
+        var vendor = component.Vendor;
+        _writer.Content.Uses(vendor.Name, vendor.Grammar);
+        if (target is ObjExpression located) return new LocatedRelease(located.Id);
+        var element = vendor.Grammar.ElementPath;
+        if (element is null)
+            throw new InvalidOperationException("A listen on a component handed over by a payload or a returned object needs its vendor to name an element path, so release can tell a destroyed component from a living one.");
+        return new HeldRelease(vendor.Name, element);
+    }
 }
 
 /// <summary>

@@ -15,6 +15,9 @@ internal sealed class BlockWriter
     private int _liveItems;
     private int _answers;
     private int _answerDepth;
+    private int _listens;
+
+    internal int ListenDepth { get; private set; }
 
     internal BlockWriter(PlanContent content)
     {
@@ -34,6 +37,25 @@ internal sealed class BlockWriter
     }
 
     internal string NextLiveItem() => "liveItem" + (++_liveItems).ToString(CultureInfo.InvariantCulture);
+
+    internal (string Payload, string Arguments) NextListen()
+    {
+        var count = (++_listens).ToString(CultureInfo.InvariantCulture);
+        return ("listenPayload" + count, "listenArguments" + count);
+    }
+
+    internal IReadOnlyList<Statement> Listening(Action body)
+    {
+        ListenDepth++;
+        try
+        {
+            return Block(body);
+        }
+        finally
+        {
+            ListenDepth--;
+        }
+    }
 
     internal string NextAnswer() => "answer" + (++_answers).ToString(CultureInfo.InvariantCulture);
 
