@@ -15,7 +15,7 @@ public sealed class RecordStart
     public string? Day { get; init; }
 
     [JsonPropertyName("detail")]
-    public DetailStart Detail { get; init; } = new();
+    public DetailStart? Detail { get; init; } = new();
 
     [JsonPropertyName("multiWord")]
     public int MultiWord { get; init; }

@@ -25,8 +25,8 @@ public sealed class WhenAnElementIsNamedByTwoDeclarations(string host) : Conform
 
         var rendered = await NewWorld();
         await rendered.Page.GotoAsync(RefusalPages.CallPanelOfOneDeclaration);
-        await rendered.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Ping and write" }).ClickAsync();
-        await Expect(rendered.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Ping" })).ToHaveTextAsync("Pinged 1 time");
-        await Expect(rendered.Page.GetByRole(AriaRole.Status, new PageGetByRoleOptions { Name = "Ratio" })).ToHaveTextAsync("0.5");
+        await rendered.Page.GetByRole(AriaRole.Button, new PageGetByRoleOptions { Name = "Ping and write", Exact = true }).ClickAsync();
+        await Expect(rendered.Page.Locator("#conformance").GetByRole(AriaRole.Status, new LocatorGetByRoleOptions { Name = "Ping", Exact = true })).ToHaveTextAsync("Pinged 1 time");
+        await Expect(rendered.Page.Locator("#conformance").GetByRole(AriaRole.Status, new LocatorGetByRoleOptions { Name = "Ratio", Exact = true })).ToHaveTextAsync("0.5");
     }
 }

@@ -23,7 +23,11 @@ public sealed class TransferSummaryController : Controller
     public IActionResult SummaryMovedWithinThisOrigin() => Redirect(TransferSummaryEndpoints.Summary);
 
     [HttpGet(TransferSummaryEndpoints.Summary)]
-    public IActionResult Summary() => Json(new TransferSummary("Ada Hart", "North wing"));
+    public IActionResult Summary()
+    {
+        Response.Headers.AccessControlAllowOrigin = $"{Request.Scheme}://{TheOtherNameOfThisHost()}";
+        return Json(new TransferSummary("Ada Hart", "North wing"));
+    }
 
     private string TheOtherNameOfThisHost()
     {

@@ -642,6 +642,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M17.F1 X4.9 0": {
+    "modules": [],
+    "views": [
+      "/Bench/Execution/StrictBindings.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M18.F1 M18.X1 1": {
     "modules": [
       "NativeComponents",

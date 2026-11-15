@@ -12,6 +12,7 @@ export interface ConformanceStart {
     currentItem: string | null;
     currentItemLacksAct: boolean;
     currentItemLacksValue: boolean;
+    bindingCountPending: boolean;
     enabled: boolean;
     starts: StartsStart;
     bindings: BindingStart[];
@@ -32,7 +33,7 @@ export interface RecordStart {
     name: string | null;
     count: number;
     day?: string;
-    detail: DetailStart;
+    detail: DetailStart | null;
     multiWord: number;
 }
 export interface DetailStart {

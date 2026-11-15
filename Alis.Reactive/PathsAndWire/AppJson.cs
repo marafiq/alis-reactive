@@ -26,6 +26,7 @@ internal sealed class AppJson
     {
         PropertyNamingPolicy = app.PropertyNamingPolicy,
         DictionaryKeyPolicy = app.DictionaryKeyPolicy,
+        RespectRequiredConstructorParameters = app.RespectRequiredConstructorParameters,
         TypeInfoResolver = app.TypeInfoResolver,
         Converters = { new WallTimeConverter() },
     };

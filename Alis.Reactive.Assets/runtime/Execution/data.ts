@@ -7,7 +7,8 @@ export function read(target: Read, path: readonly DataStep[]): Read {
   if (step === undefined) return target;
   if (target.kind === "nothing" || target.value === null) return nothing;
   const holder = target.value;
-  if (!isAnObject(holder)) throw new Stop("The data that should hold '" + step.name + "' is not an object.");
+  const holdsMembers = isAnObject(holder) && !Array.isArray(holder);
+  if (!holdsMembers) throw new Stop("The data that should hold '" + step.name + "' is not an object.");
   const lacking = step.requires.find((name) => !holds(holder, name));
   if (lacking !== undefined) throw new Stop("The data that holds '" + step.name + "' lacks '" + lacking + "', which its type requires.");
   if (!holds(holder, step.name)) return absent(step.absent, step.name);

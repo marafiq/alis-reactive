@@ -74,6 +74,8 @@ public sealed class Seed
 
     public string? BindingStarted { get; set; }
 
+    public bool? BindingsWhole { get; set; }
+
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
     public static Seed Carer(string name) => new Seed().AndCarer(name);
@@ -141,6 +143,8 @@ public sealed class Seed
     public static Seed TheBindingsBeta(int count, string started) => new() { BindingsBetaCount = count, BindingsBetaStarted = started };
 
     public static Seed TheBindingsStarted(string started) => new() { BindingStarted = started };
+
+    public static Seed TheBindingsWhole() => new() { BindingsWhole = true };
 
     public Seed AndCarer(string name)
     {

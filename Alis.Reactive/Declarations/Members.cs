@@ -58,14 +58,17 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 /// <typeparam name="TValue">The type the object's API gives the property, nullable where the API's is.</typeparam>
 public sealed class Property<TValue> : ReadOnly<TValue>
 {
-    internal Property(JsObject owner, string member, bool optional)
+    private readonly string _declaredBy;
+
+    internal Property(JsObject owner, string member, bool optional, string declaredBy)
         : base(owner, member, optional)
     {
+        _declaredBy = declaredBy;
     }
 
     /// <summary>Sets the property to a literal when the step runs.</summary>
     /// <param name="value">The value to set, written into the plan where the view renders.</param>
-    public void Set(TValue value) => Written(Literals.IntoLive(value, Owner.Bound.Writer.Content.Json));
+    public void Set(TValue value) => Written(Literals.IntoLive(value, Owner.Bound.Writer.Content.Json, Owner.DeclaredName(_declaredBy)));
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>
@@ -84,17 +87,19 @@ public sealed class WriteOnly<TValue>
     private readonly JsObject _owner;
     private readonly PathStep _member;
     private readonly bool _optional;
+    private readonly string _declaredBy;
 
-    internal WriteOnly(JsObject owner, string member, bool optional)
+    internal WriteOnly(JsObject owner, string member, bool optional, string declaredBy)
     {
         _owner = owner;
         _member = new MemberStep(member);
         _optional = optional;
+        _declaredBy = declaredBy;
     }
 
     /// <summary>Sets the property to a literal when the step runs.</summary>
     /// <param name="value">The value to set, written into the plan where the view renders.</param>
-    public void Set(TValue value) => Written(Literals.IntoLive(value, _owner.Bound.Writer.Content.Json));
+    public void Set(TValue value) => Written(Literals.IntoLive(value, _owner.Bound.Writer.Content.Json, _owner.DeclaredName(_declaredBy)));
 
     /// <summary>Sets the property to what a source reads when the step runs.</summary>
     /// <param name="source">The source of the value to set.</param>

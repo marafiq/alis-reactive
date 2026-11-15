@@ -45,6 +45,9 @@ public sealed class ConformanceStart
     [JsonPropertyName("currentItemLacksValue")]
     public bool CurrentItemLacksValue { get; init; }
 
+    [JsonPropertyName("bindingCountPending")]
+    public bool BindingCountPending { get; init; }
+
     [JsonPropertyName("enabled")]
     public bool Enabled { get; init; } = true;
 

@@ -1,3 +1,4 @@
+using Alis.Reactive.Conformance.App.Components;
 using Alis.Reactive.Conformance.World;
 using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,13 @@ public sealed class ResidentChartController : Controller
     public IActionResult OfNoResident() => View("/Care/Residents/ResidentChart.cshtml", new ResidentChartPanel(null));
 
     [HttpGet(CarePages.ResidentChartOfAda)]
-    public IActionResult OfAda() => View("/Care/Residents/ResidentChart.cshtml", new ResidentChartPanel("Ada"));
+    public IActionResult OfAda() => View("/Care/Residents/ResidentChart.cshtml", new ResidentChartPanel(new DetailStart { Name = "Ada" }));
 
     [HttpGet(CareEndpoints.ResidentChart)]
     public IActionResult Chart(string residentName) => Content($"Chart of {residentName}", PlainText);
 }
 
-public sealed record ResidentChartPanel(string? Resident);
+public sealed record ResidentChartPanel(DetailStart? Detail);
 
 public sealed class ResidentChartRequest
 {

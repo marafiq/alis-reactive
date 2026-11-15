@@ -10,10 +10,13 @@
     var plan = Html.ReactivePlan<SortedRecordsBoard>();
 }
 <h1>The bench</h1>
-@(plan.ConformanceComponent("conformance", new ConformanceStart { Records = Model.Records }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart()))
 <button type="button" @Html.Raises(plan, NameButtons.SortByMultiWord)>Sort by multi-word</button>
 @{
-    Html.On(plan, trigger => trigger.CustomEvent(NameButtons.SortByMultiWord, pipeline => pipeline
-        .Component<ConformanceComponent>("conformance").SortBy(Field.Of((Record r) => r.MultiWord))));
+    Html.On(plan, trigger => trigger
+        .DomReady(pipeline => pipeline.Get(Model.Records)
+            .OnSuccess<IReadOnlyList<Record>>((loaded, pipeline) => pipeline.Component<ConformanceComponent>("conformance").Records.Set(loaded.Body)))
+        .CustomEvent(NameButtons.SortByMultiWord, pipeline => pipeline
+            .Component<ConformanceComponent>("conformance").SortBy(Field.Of((Record r) => r.MultiWord))));
 }
 @Html.RenderPlan(plan)

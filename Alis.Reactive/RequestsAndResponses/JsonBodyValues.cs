@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
@@ -101,6 +102,7 @@ internal static class JsonBodyValues
         if (appWritesItItself || !form.WritesAsAScalar(scalar.Type))
         {
             if (form.IsTheAppsOwn && !LiveShapes.Converts(held, out _)) return captured;
+            if (form.IsTheAppsOwn && !appWritesItItself) return InTheBodysForm<TValue>(captured, form, held, writer.Content.RendersUnder, member);
             throw new NotImplementedException(
                 $"'{member}' holds what {form.BaseFormName} writes, and a JSON body sends it as the app's JSON options write it (D9.7, D9.19): no node of the plan carries that writing from this source yet; send it from the server's JSON, or set its scalar members.");
         }
@@ -110,6 +112,53 @@ internal static class JsonBodyValues
         if (text.Date == DateMeaning.None) return live;
         return new AsExpression(live, isList ? new ArrayShape(text) : text);
     }
+
+    private static Expression InTheBodysForm<TValue>(Expression captured, HeldForm form, JsonTypeInfo held, CultureInfo culture, string member)
+    {
+        var live = form.IntoLive<TValue>(captured);
+        return DatesAsText(held, culture, member, []) is { } texts ? new AsExpression(live, texts) : live;
+    }
+
+    private static Shape? DatesAsText(JsonTypeInfo type, CultureInfo culture, string member, HashSet<JsonTypeInfo> path)
+    {
+        if (IsADate(type)) return ConversionShapes.TextOf(type, culture);
+        if (!path.Add(type)) return null;
+        try
+        {
+            if (type.IsList(out var item)) return DatesAsText(item, culture, member, path) is { } itemTexts ? new ArrayShape(itemTexts) : null;
+            if (type.Kind != JsonTypeInfoKind.Object) return null;
+            var fields = new Dictionary<string, FieldConversion>(StringComparer.Ordinal);
+            foreach (var property in type.Properties.Where(property => property.Get is not null))
+            {
+                var held = type.Options.GetTypeInfo(property.PropertyType);
+                RefuseAWritingTheLiveFormMisreads(type, property, held, member);
+                if (DatesAsText(held, culture, member, path) is not { } texts) continue;
+                fields[property.Name] = new FieldConversion(texts, ConversionShapes.NothingOf(held));
+            }
+
+            return fields.Count == 0 ? null : new ObjectShape(fields);
+        }
+        finally
+        {
+            path.Remove(type);
+        }
+    }
+
+    private static void RefuseAWritingTheLiveFormMisreads(JsonTypeInfo holder, JsonPropertyInfo property, JsonTypeInfo held, string member)
+    {
+        var scalar = held.IsList(out var item) ? item : held;
+        var handling = property.NumberHandling ?? holder.NumberHandling ?? holder.Options.NumberHandling;
+        var convertedIntoTheLiveForm = IsADate(scalar) || ComparedTypes.IsNumber(scalar.Type) && (handling & JsonNumberHandling.WriteAsString) != 0;
+        if (!convertedIntoTheLiveForm) return;
+        var writesIt = property.CustomConverter is not null ? "its own JSON converter"
+            : holder.Options.Converters.Any(converter => converter.CanConvert(scalar.Type)) ? "a JSON converter of the app's"
+            : null;
+        if (writesIt is null) return;
+        throw new NotImplementedException(
+            $"'{member}' holds '{property.Name}', which {writesIt} writes, and a JSON body sends it in the form its endpoint binds (D9.7): no node of the plan reads that writing into it yet; set it from a literal, or set its other members.");
+    }
+
+    private static bool IsADate(JsonTypeInfo type) => type is JsonTypeInfo<DateTime> or JsonTypeInfo<DateTime?> or JsonTypeInfo<DateTimeOffset> or JsonTypeInfo<DateTimeOffset?>;
 
     private static Shape Kept<TValue>(JsonTypeInfo body, string member)
     {

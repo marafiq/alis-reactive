@@ -59,9 +59,26 @@ public sealed class ExecutionFeaturesController : Controller
     public IActionResult Names(NameFilterQuery query)
         => Json(TheWardsNames().Where(name => query.Text is null || name.StartsWith(query.Text, StringComparison.OrdinalIgnoreCase)).ToList());
 
+    [HttpGet(BenchPages.ExecutionStrictBindings)]
+    public IActionResult StrictBindings() => View("/Bench/Execution/StrictBindings.cshtml", new StrictBindingsBoard(StrictBindingsEndpoints.Bindings, StrictBindingsEndpoints.Binding, !World.BindingsWhole));
+
+    [HttpGet(StrictBindingsEndpoints.Bindings)]
+    public IActionResult BindingsWithTheirSpots() => Json(new[] { AlphasBinding(), BetasBinding(World.BindingsWhole) });
+
+    [HttpGet(StrictBindingsEndpoints.Binding)]
+    public IActionResult BindingWithItsShape() => Json(new { Name = "Gamma", Code = "G-3", Count = 42, Shaped = GammasShape(World.BindingsWhole) });
+
     private WorldData World => HttpContext.RequestServices.GetRequiredService<CurrentWorld>().Data;
 
     private static List<string> TheWardsNames() => ["Alpha", "Alpine", "Beta"];
+
+    private static object AlphasBinding() => new { Name = "Alpha", Code = "A-1", Strict = new { Place = "here", Name = "A-1" }, Sealed = new { Name = "S-1" }, Polymorphic = new { Name = "P-1" } };
+
+    private static object BetasBinding(bool whole) => whole
+        ? new { Name = "Beta", Code = "B-2", Strict = new { Place = "here", Name = "B-2" }, Sealed = new { Name = "S-2" }, Polymorphic = new { Name = "P-2" } }
+        : new { Name = "Beta", Code = "B-2", Strict = new { Name = "B-2" }, Sealed = new { }, Polymorphic = new { } };
+
+    private static object GammasShape(bool whole) => whole ? new { Number = 4410 } : new[] { new { Number = 4410 } };
 }
 
 public sealed record SpotStartsBoard(string? Place);
@@ -141,4 +158,28 @@ public static class SelfTestButtons
     public static readonly AppEvent ReadOldersCount = AppEvent.Declare();
 
     public static readonly AppEvent TakeTheMissingRecord = AppEvent.Declare();
+}
+
+public sealed record StrictBindingsBoard(string Bindings, string Binding, bool CountPending);
+
+public static class StrictBindingsEndpoints
+{
+    public const string Bindings = BenchPages.ExecutionStrictBindings + "/bindings";
+
+    public const string Binding = BenchPages.ExecutionStrictBindings + "/binding";
+}
+
+public static class StrictBindingsButtons
+{
+    public static readonly AppEvent ListTheStrictNames = AppEvent.Declare();
+
+    public static readonly AppEvent ListTheSealedNames = AppEvent.Declare();
+
+    public static readonly AppEvent ListThePolymorphicNames = AppEvent.Declare();
+
+    public static readonly AppEvent ShowTheShapedNumber = AppEvent.Declare();
+
+    public static readonly AppEvent ShowTheBindingsCount = AppEvent.Declare();
+
+    public static readonly AppEvent ShowAlphasStrictName = AppEvent.Declare();
 }

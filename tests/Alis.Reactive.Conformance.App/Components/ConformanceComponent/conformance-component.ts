@@ -24,6 +24,7 @@ export class ConformanceComponent extends ComponentEvents {
     private heldRatio = 0;
     private heldNullableCount: number | null = null;
     private heldRecords: RecordData[];
+    private heldBinding: BindingData = {};
     private readonly view: ComponentView;
     private readonly heading: HTMLHeadingElement;
     private readonly recordsList: HTMLUListElement;
@@ -42,7 +43,6 @@ export class ConformanceComponent extends ComponentEvents {
     record: RecordData;
     nullableRecords: RecordData[] | null = null;
     bindings: BindingStart[];
-    binding: BindingData = {};
     starts: StartsStart;
     outer: Outer;
     nullableOuter: Outer | null = null;
@@ -113,6 +113,8 @@ export class ConformanceComponent extends ComponentEvents {
     set ratio(value: number) { this.heldRatio = value; this.view.status("Ratio", String(value)); }
     get nullableCount(): number | null { return this.heldNullableCount; }
     set nullableCount(value: number | null) { this.heldNullableCount = value; this.view.status("Nullable count", value === null ? "none" : String(value)); }
+    get binding(): BindingData { return this.heldBinding; }
+    set binding(value: BindingData) { this.heldBinding = this.start.bindingCountPending ? withPendingCount(value) : value; }
     get records(): RecordData[] { return this.heldRecords; }
     set records(value: RecordData[]) { this.heldRecords = value; this.drawRecords(); }
     get readOnlyCount(): number { return this.count; }
@@ -339,7 +341,7 @@ export class ConformanceComponent extends ComponentEvents {
         this.view.button("High", () => { this.choice = "high"; });
         this.view.button("Hold medium", () => { Object.defineProperty(this, "choice", { value: "medium", writable: true, configurable: true }); });
         this.view.button("Hold 129", () => { this.days = 129; });
-        this.view.button("Sort", () => { this.records = [...this.records].sort((a, b) => String(a.name).localeCompare(String(b.name))); });
+        this.view.button("Sort", () => { this.records.sort((a, b) => String(a.name).localeCompare(String(b.name))); this.drawRecords(); });
         this.view.button("Edit first", () => { const first = this.records[0]; if (first !== undefined)
             first.count++; this.drawRecords(); });
         this.view.button("Deactivate last", () => this.items.at(-1)?.deactivate());
@@ -433,3 +435,7 @@ mountComponents("data-conformance-component", (element, value) => {
     }
     return () => { lifetime.abort(); component?.destroy(); };
 });
+function withPendingCount(binding: BindingData): BindingData {
+    const count: unknown = Reflect.get(binding, "count");
+    return Object.assign({}, binding, { count: Promise.resolve(count) });
+}

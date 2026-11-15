@@ -1,4 +1,3 @@
-using Alis.Reactive.Conformance.App.Components;
 using Alis.Reactive.Conformance.World;
 using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +13,15 @@ public sealed class DeclarationNamesController : Controller
         => View("/Bench/Declarations/NamesUnderTheAppsNaming.cshtml", new NamesBoard(DeclarationNameEndpoints.Record, DeclarationNameEndpoints.CamelRecord));
 
     [HttpGet(BenchPages.DeclarationsRecordsSortedByAField)]
-    public IActionResult RecordsSortedByAField() => View(
-        "/Bench/Declarations/RecordsSortedByAField.cshtml",
-        new SortedRecordsBoard([new RecordStart { Name = "Ada", MultiWord = 2 }, new RecordStart { Name = "Ben", MultiWord = 1 }, new RecordStart { Name = "Cy", MultiWord = 3 }]));
+    public IActionResult RecordsSortedByAField() => View("/Bench/Declarations/RecordsSortedByAField.cshtml", new SortedRecordsBoard(DeclarationNameEndpoints.SortedRecords));
+
+    [HttpGet(DeclarationNameEndpoints.SortedRecords)]
+    public IActionResult SortedRecords() => Json(new[]
+    {
+        new { Name = "Ada", MultiWord = 2 },
+        new { Name = "Ben", MultiWord = 1 },
+        new { Name = "Cy", MultiWord = 3 },
+    });
 
     [HttpGet(DeclarationNameEndpoints.Record)]
     public IActionResult Record() => Json(new MultiWordRecord(40));
@@ -27,7 +32,7 @@ public sealed class DeclarationNamesController : Controller
 
 public sealed record NamesBoard(string Record, string CamelRecord);
 
-public sealed record SortedRecordsBoard(IReadOnlyList<RecordStart> Records);
+public sealed record SortedRecordsBoard(string Records);
 
 public sealed record MultiWordRecord(int MultiWord);
 
@@ -36,6 +41,7 @@ public static class DeclarationNameEndpoints
     private const string Root = BenchPages.DeclarationsNamesUnderTheAppsNaming + "/";
     public const string Record = Root + "record";
     public const string CamelRecord = Root + "camel-record";
+    public const string SortedRecords = BenchPages.DeclarationsRecordsSortedByAField + "/records";
 }
 
 public static class NameButtons

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Alis.Reactive.Execution;
 using Alis.Reactive.Schema;
+using Alis.Reactive.TypeKnowledge;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Declarations;
@@ -27,6 +28,8 @@ public abstract class JsObject
 
     internal virtual Schema.Expression WriteTarget => Bound.WriteTarget;
 
+    internal string DeclaredName(string declaredBy) => ClassNames.AsCSharpWritesIt(GetType()) + "." + declaredBy;
+
     /// <summary>Declares a property the browser only reads.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="optional">True when the API marks the property optional: an absent one reads nothing.</param>
@@ -41,7 +44,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>The property, a source of its value that a step also sets.</returns>
     protected Property<TValue> Property<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => new(this, JavaScriptName(name, declaredBy), optional);
+        => new(this, JavaScriptName(name, declaredBy), optional, declaredBy);
 
     /// <summary>Declares a property the browser only sets.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -49,7 +52,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>The property, which a step sets.</returns>
     protected WriteOnly<TValue> WriteOnly<TValue>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => new(this, JavaScriptName(name, declaredBy), optional);
+        => new(this, JavaScriptName(name, declaredBy), optional, declaredBy);
 
     /// <summary>Declares a property that holds another object.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>

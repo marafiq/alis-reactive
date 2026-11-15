@@ -1155,22 +1155,21 @@ reached its object, a callback's answer, ALIS032, ALIS034 and ALIS009's reach to
 the contract's table written before the compiler reads it, the conformance library's six components in TypeScript
 beside their declarations, boot's plugin queue and `alis:mount`, the plugin script of every page that links one, and
 the contract's reader with ALIS014 and ALIS015, the core and the conformance app opting in to the table; the contract's
-rules ALIS016 to ALIS022 and ALIS037 are open, and of the 48 browser tests U13 lands, 47 pass, each run alone, and
-X4.9's is not written; the 50 more the page table moved in with U20's triggers are not run yet.
+rules ALIS016 to ALIS022 and ALIS037 wait until after 1.0 with the analyzers that repeat a refusal where the view
+renders (the owner, 2026-11-15), and the 98 browser tests the spec lands in U13 pass in one run.
 U14 is landed: `Plugin` and its name's check, `pipeline.Plugin<TPlugin>()` with one locator a name,
 `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`, with their module tests. A host is ready once MVC has
 rendered a view with a plan (section 2.5).
 U15 is landed: every door of `Element`, `ClassList`, `ElementChildren` and `ChildElement`, `JsObject`'s iterators, the
 runtime's `list` node, and a world whose browser runs in the zone a promise names (`NewWorldInZone`, section 2.5);
 M5.X2's test and the zone's harness test pass, X17.3's, X17.12's and X17.17's, U13's, pass on the conformance
-library's TypeScript, and a run through U13 or later waits on X4.9's test. The 29 browser tests U15 lands pass, each
-failing on its plant.
+library's TypeScript. The 29 browser tests U15 lands pass, each failing on its plant.
 U16 is landed: `IdGenerator.For`, `Html.InputField` with its options on both hosts, `ComponentInput.Of`,
 `AddReactiveClassNames`, `Html.PartialFor`, the request form and container blocks, `pipeline.Input`,
 `pipeline.Container` and `container.Read`, with their refusals where the view renders; the runtime's page tables of
 inputs and containers, R14.6 where the page composes its plans, and `alis.model`'s `sent`. U16 holds no browser test:
-every test of its features lands in U23, whose Native inputs its pages render, and X7.13 lands in U9, where it waits on
-the owner's yes to its Type.Name read. U17's first piece is landed: the validator grammar as the server runs it, every
+every test of its features lands in U23, whose Native inputs its pages render, and X7.13 lands in U9, where it passes,
+the class it names written by `ClassNames` from the declaration's own type. U17's first piece is landed: the validator grammar as the server runs it, every
 check and option FluentValidation 12.1.1 defines, with its messages. Its second piece is landed: a container checked
 in the browser by the rules its validator's set carries, over the body its request sends, each member read as the
 endpoint binds it; M8.F3's browser tests land with M8.F4's showing of failures.

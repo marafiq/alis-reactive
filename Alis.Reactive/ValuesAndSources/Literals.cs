@@ -26,11 +26,16 @@ internal static class Literals
         return JsonSerializer.Serialize(value, json.LiveForm);
     }
 
+    internal static Expression IntoLive<TValue>(TValue value, AppJson json, string member)
+    {
+        RefuseWhereJavaScriptReadsAnother(value, member);
+        return Live(value, json);
+    }
+
     internal static Expression IntoLive<TValue>(TValue value, AppJson json)
     {
         if (JavaScriptReadsAnother(value, out _)) throw new NotImplementedException();
-        var literal = Of(value, json);
-        return LiveShapes.Converts(json.LiveForm.GetTypeInfo(typeof(TValue)), out var shape) ? new AsExpression(literal, shape) : literal;
+        return Live(value, json);
     }
 
     internal static void RefuseWhereJavaScriptReadsAnother<TValue>(TValue value, string member)
@@ -52,6 +57,12 @@ internal static class Literals
             _ => string.Empty,
         };
         return reason.Length > 0;
+    }
+
+    private static Expression Live<TValue>(TValue value, AppJson json)
+    {
+        var literal = Of(value, json);
+        return LiveShapes.Converts(json.LiveForm.GetTypeInfo(typeof(TValue)), out var shape) ? new AsExpression(literal, shape) : literal;
     }
 
     private static bool IsWhole(decimal number) => decimal.Truncate(number) == number;

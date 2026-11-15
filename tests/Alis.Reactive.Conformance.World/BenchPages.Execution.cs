@@ -10,4 +10,5 @@ public static partial class BenchPages
     public const string ExecutionNameFilter = Execution + "name-filter";
     public const string ExecutionBindingDefaults = Execution + "binding-defaults";
     public const string ExecutionRequiredBindings = Execution + "required-bindings";
+    public const string ExecutionStrictBindings = Execution + "strict-bindings";
 }

@@ -21,14 +21,16 @@ public sealed class WhenALiteralIsWrittenIntoALiveNumber
         => Assert.That(SetValueOf(Rendered(panel => panel.Amount.Set(9007199254740991m))), Is.EqualTo(TheLastWholeNumberJavaScriptHolds));
 
     [Test]
-    public void a_property_set_to_a_whole_number_past_it_waits_for_the_name_its_refusal_gives_the_member()
+    public void a_property_set_to_a_whole_number_past_it_is_refused_naming_its_declarations_member()
         => Assert.That(() => Rendered(panel => panel.Amount.Set(9007199254740993m)),
-            Throws.TypeOf<NotImplementedException>().With.Message.EqualTo(NotBuilt));
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'LedgerPanel.Amount' holds a JavaScript number, and 9007199254740993 is a whole number past 9007199254740991, which JavaScript reads as another value; write a finite number of at most 15 significant digits."));
 
     [Test]
-    public void a_write_only_property_set_to_a_whole_number_past_it_waits_for_the_name_its_refusal_gives_the_member()
+    public void a_write_only_property_set_to_a_whole_number_past_it_is_refused_naming_its_declarations_member()
         => Assert.That(() => Rendered(panel => panel.Ticket.Set(9007199254740992L)),
-            Throws.TypeOf<NotImplementedException>().With.Message.EqualTo(NotBuilt));
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'LedgerPanel.Ticket' holds a JavaScript number, and 9007199254740992 is a whole number past 9007199254740991, which JavaScript reads as another value; write a finite number of at most 15 significant digits."));
 
     [Test]
     public void a_methods_argument_of_the_last_whole_number_javascript_holds_is_written()
