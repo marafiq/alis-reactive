@@ -1,6 +1,6 @@
 import { operated } from "../Conditions/index";
 import { assertNever, notBuilt, type Expression } from "../Schema/index";
-import { converted, got, heldOrNull, value, type Read } from "../ValuesAndSources/index";
+import { called, converted, got, heldOrNull, value, type Read } from "../ValuesAndSources/index";
 import type { Context } from "./context";
 import { read } from "./data";
 import { located } from "./objects";
@@ -26,6 +26,7 @@ export function evaluate(expression: Expression, context: Context): Read {
     case "op":
       return operated(expression.op, expression.args.map((arg) => () => evaluate(arg, context)));
     case "call":
+      return called(evaluate(expression.target, context), expression.path, expression.members, () => expression.args.map((arg) => heldOrNull(evaluate(arg, context))));
     case "answer":
     case "record":
     case "list":

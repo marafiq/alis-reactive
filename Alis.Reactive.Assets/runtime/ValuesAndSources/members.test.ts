@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { got, nothing, Stop, value } from "./index";
+import { called, got, nothing, Stop, value } from "./index";
 
 class Pump {
   readonly #rate = 40;
@@ -7,6 +7,37 @@ class Pump {
   get rate(): number {
     return this.#rate;
   }
+}
+
+class Bell {
+  readonly rang: unknown[][] = [];
+
+  readonly room: string;
+
+  constructor(room: string) {
+    this.room = room;
+  }
+
+  ring(...said: unknown[]): string {
+    this.rang.push(said);
+    return "rang " + this.room;
+  }
+
+  hush(): undefined {
+    return undefined;
+  }
+
+  later(): Promise<string> {
+    return Promise.reject(new Error("the bell is out of order"));
+  }
+}
+
+const unread = (): readonly unknown[] => {
+  throw new Error("arguments no call should read");
+};
+
+function holderOfItsThis(this: unknown): boolean {
+  return this === undefined;
 }
 
 describe("when a get reads a declared member, it reads as the member's mark says", () => {
@@ -72,5 +103,82 @@ describe("when a get reads a declared member, it reads as the member's mark says
 
   test("an index step reads the item of a list", () => {
     expect(got(value({ beds: ["B-1", "B-2"] }), ["beds", 1], "required")).toStrictEqual(value("B-2"));
+  });
+});
+
+describe("when a call runs a declared method, it calls it on its holder as the method's mark says", () => {
+  test("a required method the holder holds is called on the holder with its arguments, and reads what it returns", () => {
+    const bell = new Bell("Room 4");
+
+    expect(called(value(bell), ["ring"], "required", () => ["now", null])).toStrictEqual(value("rang Room 4"));
+    expect(bell.rang).toStrictEqual([["now", null]]);
+  });
+
+  test("a method that returns nothing reads nothing", () => {
+    expect(called(value(new Bell("Room 4")), ["hush"], "required", () => [])).toStrictEqual(nothing);
+  });
+
+  test("each step before the method reads the member of the value the step before it read, and the last is the method's holder", () => {
+    const bell = new Bell("Room 9");
+
+    expect(called(value({ ward: { bell } }), ["ward", "bell", "ring"], "required", () => [])).toStrictEqual(value("rang Room 9"));
+  });
+
+  test("a method of a text runs on the text", () => {
+    expect(called(value("North"), ["toLowerCase"], "required", () => [])).toStrictEqual(value("north"));
+  });
+
+  test("RequiredAbsentStops: a required method the holder lacks stops the pipeline, its arguments unread", () => {
+    expect(() => called(value(new Bell("Room 4")), ["silence"], "required", unread)).toThrow(new Stop("The member 'silence' is not on the object that should hold it."));
+  });
+
+  test("a required method the holder holds as undefined stops the pipeline", () => {
+    expect(() => called(value({ ring: undefined }), ["ring"], "required", unread)).toThrow(new Stop("The member 'ring' is no method."));
+  });
+
+  test("a required member that holds no function stops the pipeline", () => {
+    expect(() => called(value({ ring: "loud" }), ["ring"], "required", unread)).toThrow(new Stop("The member 'ring' is no method."));
+  });
+
+  test("a required method of a holder that reads nothing or holds null stops the pipeline", () => {
+    expect(() => called(nothing, ["ring"], "required", unread)).toThrow(new Stop("Nothing holds the member 'ring'."));
+    expect(() => called(value(null), ["ring"], "required", unread)).toThrow(new Stop("Nothing holds the member 'ring'."));
+  });
+
+  test("a method required if held reads nothing on a holder that reads nothing, its arguments unread", () => {
+    expect(called(nothing, ["filter"], "requiredIfHeld", unread)).toStrictEqual(nothing);
+  });
+
+  test("a method required if held stops on a holder that lacks it, as a paged result lacks a list's filter", () => {
+    expect(() => called(value({ result: [], count: 0 }), ["filter"], "requiredIfHeld", unread)).toThrow(new Stop("The member 'filter' is not on the object that should hold it."));
+  });
+
+  test("an optional method the holder lacks, or holds as undefined, runs nothing and reads nothing, its arguments unread", () => {
+    expect(called(value(new Bell("Room 4")), ["silence"], "optional", unread)).toStrictEqual(nothing);
+    expect(called(value({ ring: undefined }), ["ring"], "optional", unread)).toStrictEqual(nothing);
+  });
+
+  test("an optional method of a holder that reads nothing runs nothing", () => {
+    expect(called(nothing, ["ring"], "optional", unread)).toStrictEqual(nothing);
+  });
+
+  test("an optional method of a required holder runs nothing on a holder that lacks it and stops on a holder that reads nothing", () => {
+    expect(called(value(new Bell("Room 4")), ["silence"], "optionalMember", unread)).toStrictEqual(nothing);
+    expect(() => called(nothing, ["ring"], "optionalMember", unread)).toThrow(new Stop("Nothing holds the member 'ring'."));
+  });
+
+  test("PromiseWhereValueStops: a method that returns a promise where a value is declared stops the pipeline, and the promise's own failure is held", () => {
+    expect(() => called(value(new Bell("Room 4")), ["later"], "required", () => [])).toThrow(
+      new Stop("The method 'later' returned a promise where its declaration reads a value; a method that returns one is declared with MethodAsync."),
+    );
+  });
+
+  test("an empty path calls the target itself, with no holder as its this", () => {
+    expect(called(value(holderOfItsThis), [], "required", () => [])).toStrictEqual(value(true));
+  });
+
+  test("an empty path stops the pipeline on a target that is no function or reads nothing", () => {
+    expect(() => called(value({ ring: "loud" }), [], "required", unread)).toThrow(new Stop("The object called as a function is no function."));
+    expect(() => called(nothing, [], "required", unread)).toThrow(new Stop("The object called as a function is no function."));
   });
 });
