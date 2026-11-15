@@ -85,29 +85,31 @@ public abstract class JsObject
     protected void Method(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
         => Bound.Writer.Write(new DoStatement(false, Call(arguments, name, optional, declaredBy)));
 
-    /// <summary>Declares a method that takes no argument and returns a value, and calls it where the pipeline reaches the line.</summary>
+    /// <summary>Declares a method that takes no argument and returns a value.</summary>
+    /// <remarks>The call runs at its line, or, read once by the next step under a later term, where that term is reached.</remarks>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="optional">True when the API marks the method optional: a call of an absent one runs nothing, and its result reads nothing.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
-    /// <returns>What the call returned at that line, a source every later read reads as it was then.</returns>
+    /// <returns>What the call returned, a source that keeps that value for every read.</returns>
     protected MethodResult<TResult> Method<TResult>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => ResultOf<TResult>([], name, optional, declaredBy);
+        => ResultOf<TResult>([], false, name, optional, declaredBy);
 
-    /// <summary>Declares a method that returns a value, and calls it with its arguments where the pipeline reaches the line.</summary>
-    /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
+    /// <summary>Declares a method that returns a value and calls it with its arguments.</summary>
+    /// <remarks>The call runs at its line, or, read once by the next step under a later term, where that term is reached.</remarks>
+    /// <param name="arguments">The call's arguments in order, each read when the call runs.</param>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="optional">True when the API marks the method optional: a call of an absent one runs nothing, and its result reads nothing.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
-    /// <returns>What the call returned at that line, a source every later read reads as it was then.</returns>
+    /// <returns>What the call returned, a source that keeps that value for every read.</returns>
     protected MethodResult<TResult> Method<TResult>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => ResultOf<TResult>(arguments, name, optional, declaredBy);
+        => ResultOf<TResult>(arguments, false, name, optional, declaredBy);
 
     /// <summary>Declares a method that takes no argument and returns a promise of nothing; the pipeline waits for it before its next step.</summary>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="optional">True when the API marks the method optional: a call of an absent one runs nothing.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     protected void MethodAsync(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => Bound.Writer.Write(new DoStatement(true, Call([], name, optional, declaredBy)));
 
     /// <summary>Declares a method that returns a promise of nothing; the pipeline calls it with its arguments and waits for it before its next step.</summary>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
@@ -115,7 +117,7 @@ public abstract class JsObject
     /// <param name="optional">True when the API marks the method optional: a call of an absent one runs nothing.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     protected void MethodAsync(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => Bound.Writer.Write(new DoStatement(true, Call(arguments, name, optional, declaredBy)));
 
     /// <summary>Declares a method that takes no argument and returns a promise of a value; the pipeline waits for the value before its next step.</summary>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -123,7 +125,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>The value the promise gave, a source every later read reads as it was then.</returns>
     protected MethodResult<TResult> MethodAsync<TResult>(string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => ResultOf<TResult>([], true, name, optional, declaredBy);
 
     /// <summary>Declares a method that returns a promise of a value; the pipeline calls it with its arguments and waits for the value before its next step.</summary>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
@@ -132,7 +134,7 @@ public abstract class JsObject
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>The value the promise gave, a source every later read reads as it was then.</returns>
     protected MethodResult<TResult> MethodAsync<TResult>(IReadOnlyList<Arg> arguments, string? name = null, bool optional = false, [CallerMemberName] string declaredBy = "")
-        => throw new NotImplementedException();
+        => ResultOf<TResult>(arguments, true, name, optional, declaredBy);
 
     /// <summary>Declares a method that takes no argument and returns another object, and calls it where the pipeline reaches the line.</summary>
     /// <param name="name">The method's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -305,13 +307,11 @@ public abstract class JsObject
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
 
-    private MethodResult<TResult> ResultOf<TResult>(IReadOnlyList<Arg> arguments, string? name, bool optional, string declaredBy)
+    private MethodResult<TResult> ResultOf<TResult>(IReadOnlyList<Arg> arguments, bool awaits, string? name, bool optional, string declaredBy)
     {
         var writer = Bound.Writer;
         var call = Call(arguments, name, optional, declaredBy);
-        var result = writer.NextResult();
-        writer.Write(new LetStatement(result, false, LetBinds.Line, call));
-        return new MethodResult<TResult>(result, writer);
+        return new MethodResult<TResult>(writer.Result(call, awaits), writer);
     }
 
     private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, bool optional, string declaredBy)

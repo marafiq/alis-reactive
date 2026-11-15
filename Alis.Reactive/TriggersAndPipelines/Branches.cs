@@ -14,12 +14,14 @@ public sealed class Guard<TModel>
     private readonly BlockWriter _writer;
     private readonly Expression _condition;
     private readonly Func<Arm, IfChain> _taken;
+    private readonly IfChain? _chain;
 
-    internal Guard(BlockWriter writer, Expression condition, Func<Arm, IfChain> taken)
+    internal Guard(BlockWriter writer, Expression condition, Func<Arm, IfChain> taken, IfChain? chain = null)
     {
         _writer = writer;
         _condition = condition;
         _taken = taken;
+        _chain = chain;
     }
 
     /// <summary>Runs a branch when the condition is true.</summary>
@@ -27,7 +29,10 @@ public sealed class Guard<TModel>
     /// <param name="branch">The steps to run.</param>
     /// <returns>The branches written so far, which take an <c>ElseIf</c> or an <c>Else</c>.</returns>
     public Branches<TModel> Then(Action<Pipeline<TModel>> branch)
-        => new(_writer, _taken(new Arm(_condition, _writer.Block(() => branch(new Pipeline<TModel>(_writer))))));
+    {
+        var results = _chain?.TakeResults(_condition) ?? [];
+        return new Branches<TModel>(_writer, _taken(new Arm(_condition, _writer.Block(() => branch(new Pipeline<TModel>(_writer))), results)));
+    }
 }
 
 /// <summary>
@@ -51,7 +56,7 @@ public sealed class Branches<TModel>
     public Guard<TModel> ElseIf(TypedSource<bool> condition)
     {
         _chain.RefuseAfterItsElse();
-        return new Guard<TModel>(_writer, condition.Expression, _chain.Continued);
+        return new Guard<TModel>(_writer, condition.Expression, _chain.Continued, _chain);
     }
 
     /// <summary>Runs a branch when no branch before it ran, and ends the condition.</summary>

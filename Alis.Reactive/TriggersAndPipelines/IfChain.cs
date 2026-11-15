@@ -5,7 +5,7 @@ using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.TriggersAndPipelines;
 
-internal sealed record Arm(Expression When, IReadOnlyList<Statement> Then);
+internal sealed record Arm(Expression When, IReadOnlyList<Statement> Then, IReadOnlyList<Statement> Results);
 
 internal sealed class IfChain
 {
@@ -23,6 +23,12 @@ internal sealed class IfChain
     }
 
     internal static IfChain Opened(BlockWriter writer, Arm first) => new(writer, first);
+
+    internal IReadOnlyList<Statement> TakeResults(Expression condition)
+    {
+        RefuseAfterItsElse();
+        return _writer.TakeResults(_place, condition);
+    }
 
     internal IfChain Continued(Arm arm)
     {
@@ -48,14 +54,14 @@ internal sealed class IfChain
     private void Rewrite()
     {
         if (_writer.Replaced(_place, Folded())) return;
-        throw new InvalidOperationException("An ElseIf or an Else continues the When it follows, before any other step of its block: write it in the same sentence.");
+        throw BlockWriter.BrokenSentence();
     }
 
     private IfStatement Folded()
     {
         var otherwise = _otherwise;
         for (var arm = _arms.Count - 1; arm > 0; arm--)
-            otherwise = [new IfStatement(_arms[arm].When, _arms[arm].Then, otherwise)];
+            otherwise = [.. _arms[arm].Results, new IfStatement(_arms[arm].When, _arms[arm].Then, otherwise)];
         return new IfStatement(_arms[0].When, _arms[0].Then, otherwise);
     }
 }

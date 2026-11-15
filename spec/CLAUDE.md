@@ -1653,6 +1653,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `In` over literal values compares a source in its own form by `Eq` (M3.D1); and a text test, an emptiness test or a
   list operation over a value its own converter writes whole throws `NotImplementedException` until a line states
   it. The owner can overrule it.
+- The lead, 2026-11-15, landing U12's results (D4.7, D5.11, D8.7), from Codex's consult and build read at the source:
+  a result read once, by the call of a result that binds `read` just after it, binds `read` too, so
+  `Echo(Total())` under an `Or` calls neither unless the term is reached; a result's binding is decided once its
+  handler closes, every chain folded; a result's scope is read from the handler's final statements by its one `ref`,
+  so another plan's `result1` is refused where it is read. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

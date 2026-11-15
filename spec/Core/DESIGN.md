@@ -416,8 +416,10 @@ Terms used throughout:
   before it ran. C# writes a method's result as a `let` at its line (D5.11). A result called after the block's
   previous step and read once by the next step, under a term reached later (the right term of `and`, `or` or
   `coalesce`, or a branch of `cond`), is that term's own call: its
-  `let` binds with `binds: "read"`, and the call runs where its read is reached. An `ElseIf` is the `else` block of
-  the `if` before it, holding its condition's results at their lines and an `if` of its own, so its calls, awaited
+  `let` binds with `binds: "read"`, and the call runs where its read is reached; a result read once, by the call of
+  such a result called just after it, is that call's own and binds `read` too (`Echo(Total())` under an `Or`). An
+  `ElseIf` is the `else` block of the `if` before it, holding its condition's results at their lines and an `if` of
+  its own, so its calls, awaited
   ones included, run when it is reached (D8.6). An async method's result binds only at its line, so one called under
   a term reached later is refused where the view renders (X8.16).
 - D4.9 A value JavaScript holds as `undefined` reads as nothing wherever it is read: a member that holds it, a

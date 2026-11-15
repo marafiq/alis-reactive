@@ -27,7 +27,7 @@ public sealed class Trigger<TModel>
     public Trigger<TModel> DomReady(Action<Pipeline<TModel>> pipeline)
     {
         var document = DocumentPlugin.DeclaredIn(_writer.Content);
-        var steps = _writer.Block(() => pipeline(new Pipeline<TModel>(_writer)));
+        var steps = _writer.Handler(() => pipeline(new Pipeline<TModel>(_writer)));
         _writer.Content.Handles(new Handler(document, [], DocumentPlugin.Ready, [], PathMembers.Required, Policy.Overlap, steps));
         return this;
     }

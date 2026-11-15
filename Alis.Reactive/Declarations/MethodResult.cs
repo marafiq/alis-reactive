@@ -1,30 +1,30 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.Execution;
-using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Declarations;
 
 /// <summary>
-/// What a declared method returned at the line that called it: a source of that value.
+/// What a declared method returned: a source of that value.
 /// </summary>
 /// <remarks>
-/// The call runs once, where the pipeline reaches its line, and every read of the result reads what it returned
-/// then, so a later step that changes the object leaves the result as it was.
+/// The call runs at its line, or, read once by the next step under a later term, where that term is reached.
+/// Every read keeps what the call returned, so a later step that changes the object leaves the result as it was.
 /// </remarks>
 /// <typeparam name="TResult">The type the object's API gives the method's result.</typeparam>
 public sealed class MethodResult<TResult> : TypedSource<TResult>
 {
     private readonly BlockWriter _writer;
+    private readonly ResultBinding _binding;
 
-    internal MethodResult(string name, BlockWriter writer)
+    internal MethodResult(ResultBinding binding, BlockWriter writer)
     {
-        Expression = new RefExpression(name);
+        _binding = binding;
         _writer = writer;
     }
 
-    internal override Schema.Expression Expression { get; }
+    internal override Schema.Expression Expression => _binding.Read();
 
     internal override HeldForm Form => HeldForm.Live(_writer.Content.Json, _writer.Content.RendersUnder);
 

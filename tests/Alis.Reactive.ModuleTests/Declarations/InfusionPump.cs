@@ -74,6 +74,18 @@ public sealed class InfusionPump : Component
     public MethodResult<string?> LastAlarm() => Method<string?>(name: "last-alarm", optional: true);
 
     public MethodResult<DateTime> NextStart() => Method<DateTime>();
+
+    public MethodResult<int> Total() => Method<int>();
+
+    public MethodResult<int> Echo(Arg<int> value) => Method<int>([value]);
+
+    public void FlushAsync() => MethodAsync();
+
+    public void DeliverAsync(Arg<int> volume) => MethodAsync([volume], name: "deliver-async", optional: true);
+
+    public MethodResult<int> TotalAsync() => MethodAsync<int>();
+
+    public MethodResult<int> EstimateAsync(Arg<int> volume) => MethodAsync<int>([volume], name: "estimate-async", optional: true);
 }
 
 public sealed class Prescription
