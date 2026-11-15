@@ -75,9 +75,16 @@ internal sealed class Received(BlockWriter writer, string payload = "e", string 
     internal override Expression Target { get; } = new RefExpression(payload);
 
     internal override Expression WriteTarget
-        => Writer.ListenDepth > _listenDepth
-            ? throw new InvalidOperationException("A listen cannot write the payload of the event around it: the vendor read that payload when its listener returned. Write it before the listen step.")
-            : Target;
+    {
+        get
+        {
+            if (Writer.ListenDepth > _listenDepth)
+                throw new InvalidOperationException("A listen cannot write the payload of the event around it: the vendor read that payload when its listener returned. Write it before the listen step.");
+            if (Writer.PathAwaited)
+                throw new InvalidOperationException("A write to the event's payload after an awaited step reaches no vendor: write it before the first request, Confirm or async method.");
+            return Target;
+        }
+    }
 
     internal override Expression Arguments { get; } = new RefExpression(arguments);
 

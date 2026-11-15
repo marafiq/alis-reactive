@@ -20,6 +20,8 @@ internal sealed class BlockWriter
 
     internal int ListenDepth { get; private set; }
 
+    internal bool PathAwaited { get; private set; }
+
     internal BlockWriter(PlanContent content)
     {
         Content = content;
@@ -57,7 +59,7 @@ internal sealed class BlockWriter
         ListenDepth++;
         try
         {
-            return Block(body);
+            return Run(body);
         }
         finally
         {
@@ -106,7 +108,7 @@ internal sealed class BlockWriter
         _handlers.Push(handler);
         try
         {
-            return handler.Complete(Block(body));
+            return handler.Complete(Run(body));
         }
         finally
         {
@@ -154,7 +156,28 @@ internal sealed class BlockWriter
         if (_open.Count == 0)
             throw new InvalidOperationException("A step is written inside a pipeline, the callback its trigger runs: no pipeline is open here.");
         _open.Peek().Add(statement);
+        if (Awaits(statement)) PathAwaited = true;
     }
+
+    internal (IReadOnlyList<Statement> Block, bool Awaited) Branch(bool entered, Action body)
+    {
+        var around = PathAwaited;
+        PathAwaited = entered;
+        try
+        {
+            var block = Block(body);
+            return (block, PathAwaited);
+        }
+        finally
+        {
+            PathAwaited = around;
+        }
+    }
+
+    internal void BranchAwaited() => PathAwaited = true;
+
+    internal static bool Awaits(Statement statement)
+        => statement is DoStatement { Await: true } or LetStatement { Await: true } or RequestStatement or AllStatement;
 
     internal Place Placed(Statement statement)
     {
@@ -171,7 +194,7 @@ internal sealed class BlockWriter
         return true;
     }
 
-    internal IReadOnlyList<Statement> Block(Action body)
+    private IReadOnlyList<Statement> Block(Action body)
     {
         var block = new List<Statement>();
         _open.Push(block);
@@ -186,6 +209,8 @@ internal sealed class BlockWriter
 
         return block;
     }
+
+    private IReadOnlyList<Statement> Run(Action body) => Branch(false, body).Block;
 
     private static InvalidOperationException AsyncInAnswer()
         => new("A callback answers its vendor at once, so its answer cannot wait for an async method or a request.");

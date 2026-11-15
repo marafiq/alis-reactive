@@ -31,7 +31,11 @@ public sealed class Guard<TModel>
     public Branches<TModel> Then(Action<Pipeline<TModel>> branch)
     {
         var results = _chain?.TakeResults(_condition) ?? [];
-        return new Branches<TModel>(_writer, _taken(new Arm(_condition, _writer.Block(() => branch(new Pipeline<TModel>(_writer))), results)));
+        var entered = _chain?.Reaching(results) ?? _writer.PathAwaited;
+        var (then, awaited) = _writer.Branch(entered, () => branch(new Pipeline<TModel>(_writer)));
+        var chain = _taken(new Arm(_condition, then, results));
+        chain.Took(entered, awaited);
+        return new Branches<TModel>(_writer, chain);
     }
 }
 
@@ -64,6 +68,7 @@ public sealed class Branches<TModel>
     public void Else(Action<Pipeline<TModel>> branch)
     {
         _chain.RefuseAfterItsElse();
-        _chain.Ended(_writer.Block(() => branch(new Pipeline<TModel>(_writer))));
+        var (otherwise, awaited) = _writer.Branch(_chain.TermsAwaited, () => branch(new Pipeline<TModel>(_writer)));
+        _chain.Ended(otherwise, awaited);
     }
 }

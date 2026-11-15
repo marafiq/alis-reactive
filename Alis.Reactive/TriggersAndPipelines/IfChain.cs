@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.Execution;
 using Alis.Reactive.Schema;
 
@@ -30,6 +31,16 @@ internal sealed class IfChain
         return _writer.TakeResults(_place, condition);
     }
 
+    internal bool TermsAwaited { get; private set; }
+
+    internal bool Reaching(IReadOnlyList<Statement> termResults) => TermsAwaited || termResults.Any(BlockWriter.Awaits);
+
+    internal void Took(bool entered, bool awaited)
+    {
+        TermsAwaited = entered;
+        if (awaited) _writer.BranchAwaited();
+    }
+
     internal IfChain Continued(Arm arm)
     {
         RefuseAfterItsElse();
@@ -38,11 +49,12 @@ internal sealed class IfChain
         return this;
     }
 
-    internal void Ended(IReadOnlyList<Statement> otherwise)
+    internal void Ended(IReadOnlyList<Statement> otherwise, bool awaited)
     {
         _otherwise = otherwise;
         _ended = true;
         Rewrite();
+        if (awaited) _writer.BranchAwaited();
     }
 
     internal void RefuseAfterItsElse()
