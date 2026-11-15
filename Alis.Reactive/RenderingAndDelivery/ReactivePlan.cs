@@ -28,7 +28,7 @@ public sealed partial class ReactivePlan<TModel>
     /// <returns>The plugin, whose events a view handles with <c>Reactive</c>.</returns>
     public ReactivePlugin<TPlugin, TModel> Plugin<TPlugin>()
         where TPlugin : Plugin, new()
-        => throw new NotImplementedException();
+        => new(new Pipeline<TModel>(Writer).Plugin<TPlugin>(), Writer);
 
     /// <summary>Reaches an app-level object on the element its declaration fixes, to handle its events.</summary>
     /// <remarks>A handler leaves with the view that wrote it: a partial's handler of the drawer leaves when the partial leaves, and the drawer stays the page's.</remarks>
@@ -97,15 +97,7 @@ public sealed partial class Rendered<TComponent, TModel>
     private Rendered<TComponent, TModel> Handles<TArgs>(Event<TArgs> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
     {
-        var target = raised.Owner.Bound.Target;
-        var path = new List<PathStep>();
-        while (target is GetExpression member)
-        {
-            path.InsertRange(0, member.Path);
-            target = member.Target;
-        }
-
-        var on = ((ObjExpression)target).Id;
+        var (on, path) = Raiser.Of(raised);
         var steps = _writer.Handler(() => pipeline(JsObject.Reaching<TArgs>(new Received(_writer)), new Pipeline<TModel>(_writer)));
         _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps));
         return this;
@@ -120,15 +112,21 @@ public sealed partial class Rendered<TComponent, TModel>
 public sealed class ReactivePlugin<TPlugin, TModel>
     where TPlugin : Plugin, new()
 {
-    internal ReactivePlugin()
+    private readonly TPlugin _plugin;
+    private readonly BlockWriter _writer;
+
+    internal ReactivePlugin(TPlugin plugin, BlockWriter writer)
     {
+        _plugin = plugin;
+        _writer = writer;
     }
 
     /// <summary>Runs a pipeline each time the plugin raises an event that has no payload.</summary>
     /// <param name="raised">The event, as a member of the plugin's declaration.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
     /// <returns>The plugin.</returns>
-    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, Action<Pipeline<TModel>> pipeline)
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline);
 
     /// <summary>Runs a pipeline each time the plugin raises an event, with the event's payload.</summary>
     /// <param name="raised">The event, as a member of the plugin's declaration.</param>
@@ -136,14 +134,15 @@ public sealed class ReactivePlugin<TPlugin, TModel>
     /// <returns>The plugin.</returns>
     public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline);
 
     /// <summary>Runs a pipeline each time the plugin raises an event that has no payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the plugin's declaration.</param>
     /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
     /// <returns>The plugin.</returns>
-    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline)
+        => Handles(raised(_plugin), policy, (_, steps) => pipeline(steps));
 
     /// <summary>Runs a pipeline each time the plugin raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the plugin's declaration.</param>
@@ -152,7 +151,34 @@ public sealed class ReactivePlugin<TPlugin, TModel>
     /// <returns>The plugin.</returns>
     public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => Handles(raised(_plugin), policy, pipeline);
+
+    private ReactivePlugin<TPlugin, TModel> Handles<TArgs>(Event<TArgs> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+        where TArgs : JsObject, new()
+    {
+        var (on, path) = Raiser.Of(raised);
+        _writer.Content.HearsPlugin(_plugin.Heard(), raised.Name, _plugin.HeardBy);
+        var steps = _writer.Handler(() => pipeline(JsObject.Reaching<TArgs>(new Received(_writer)), new Pipeline<TModel>(_writer)));
+        _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps));
+        return this;
+    }
+}
+
+internal static class Raiser
+{
+    internal static (string On, List<PathStep> Path) Of<TArgs>(Event<TArgs> raised)
+        where TArgs : JsObject, new()
+    {
+        var target = raised.Owner.Bound.Target;
+        var path = new List<PathStep>();
+        while (target is GetExpression member)
+        {
+            path.InsertRange(0, member.Path);
+            target = member.Target;
+        }
+
+        return (((ObjExpression)target).Id, path);
+    }
 }
 
 /// <summary>

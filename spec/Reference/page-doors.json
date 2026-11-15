@@ -380,8 +380,7 @@
   "M12.F1 X12.9 0": {
     "modules": [
       "Elements",
-      "InputsAndIds",
-      "TriggersAndPipelines"
+      "InputsAndIds"
     ],
     "views": [
       "/Bench/Vendors/PeerChanges.cshtml",
@@ -581,7 +580,6 @@
   },
   "M13.F2 X17.24 0": {
     "modules": [
-      "Declarations",
       "Elements",
       "InputsAndIds",
       "RenderingAndDelivery",

@@ -1,2 +1,2 @@
 .
-Schema PathsAndWire OwnershipAndState ValuesAndSources Conditions ArrayLambdas Declarations PartialsAndSlots Vendors
+Schema PathsAndWire OwnershipAndState ValuesAndSources Conditions ArrayLambdas Declarations PartialsAndSlots Vendors Plugins

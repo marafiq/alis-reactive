@@ -1673,6 +1673,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   imports nothing and provides its plugins on the page's queue (D17.14). Two declarations follow their promises: the
   page plugin of source.PluginArgument is named pageLog, as its cell's promise names it, and the night clock's event
   is its onStruck property (M13.X2, X17.24). The owner can overrule each.
+- The lead, 2026-11-15, landing U14 from a fork's work read at the source: which declaration of a plugin declares an
+  event is no fact the core reads without reflection, so a plugin's locator carries the listening a handler or a
+  listen step hears it by, EventTarget where nothing hears it, and a plan that hears one name by two listenings is
+  refused where the view renders, naming each declaration by its event and its listening, since its class's name is
+  type information off the owner's list (M13.D1, D17.14). The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

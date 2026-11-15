@@ -648,6 +648,7 @@ abstract Alis.Reactive.Declarations.EventedObject.Listening.get -> Alis.Reactive
 abstract Alis.Reactive.Vendors.Component.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
 override Alis.Reactive.Elements.Element.Vendor.get -> Alis.Reactive.Vendors.ComponentVendor!
 override Alis.Reactive.Vendors.ComponentVendor.ToString() -> string!
+override sealed Alis.Reactive.Plugins.Plugin.Listening.get -> Alis.Reactive.Declarations.EventListening!
 override sealed Alis.Reactive.Vendors.Component.Listening.get -> Alis.Reactive.Declarations.EventListening!
 static Alis.Reactive.ArrayLambdas.DataLists.All<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list, System.Linq.Expressions.Expression<System.Func<TItem, bool>!>! predicate) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!
 static Alis.Reactive.ArrayLambdas.DataLists.Any<TItem>(this Alis.Reactive.ValuesAndSources.ITypedSource<System.Collections.Generic.IEnumerable<TItem>!>! list) -> Alis.Reactive.ValuesAndSources.TypedSource<bool>!

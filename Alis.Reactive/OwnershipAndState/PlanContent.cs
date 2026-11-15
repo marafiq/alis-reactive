@@ -10,6 +10,8 @@ namespace Alis.Reactive.OwnershipAndState;
 
 internal sealed class PlanContent
 {
+    private const string PluginObjectId = "$plugin:";
+
     private readonly string _planId;
     private readonly Culture _culture;
     private readonly TimeZone _timeZone;
@@ -18,6 +20,7 @@ internal sealed class PlanContent
     private readonly List<Handler> _handlers = [];
     private readonly Dictionary<string, string> _vendorDefinitions = new(StringComparer.Ordinal);
     private readonly HashSet<string> _renderedElements = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, (string Listening, string Event, string HeardBy)> _heardPlugins = new(StringComparer.Ordinal);
     private bool _rendered;
 
     internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json)
@@ -41,7 +44,33 @@ internal sealed class PlanContent
             throw new InvalidOperationException($"Two different vendors are named '{vendorName}'. Give each vendor its own name.");
         _vendorDefinitions[vendorName] = identity;
         _vendors[vendorName] = definition.Vendor;
-        if (definition.Lookup is { } lookup) Declares("$plugin:" + lookup.Name, lookup);
+        if (definition.Lookup is { } lookup) ReachesPlugin(lookup);
+    }
+
+    internal string ReachesPlugin(PluginLocator reached)
+    {
+        RefuseOnceRendered();
+        var objectId = PluginObjectId + reached.Name;
+        if (!_objects.ContainsKey(objectId)) _objects[objectId] = reached;
+        return objectId;
+    }
+
+    internal void HearsPlugin(PluginLocator heard, string raised, string heardBy)
+    {
+        RefuseOnceRendered();
+        var objectId = PluginObjectId + heard.Name;
+        var listening = JsonSerializer.Serialize(heard.Listen, PlanJson.Options);
+        var heardBefore = _heardPlugins.TryGetValue(objectId, out var first);
+        if (heardBefore && first.Listening != listening)
+        {
+            throw new InvalidOperationException(
+                $"Two declarations of the plugin '{heard.Name}' are heard two ways in one plan: the one whose event is '{first.Event}' by {first.HeardBy}, " +
+                $"and the one whose event is '{raised}' by {heardBy}. A plugin is one object: give every declaration of '{heard.Name}' that declares an event one EventListening.");
+        }
+
+        if (heardBefore) return;
+        _heardPlugins[objectId] = (listening, raised, heardBy);
+        _objects[objectId] = heard;
     }
 
     internal void Declares(string objectId, Locator locator, bool rendered = false)

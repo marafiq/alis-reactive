@@ -1133,7 +1133,16 @@ U12's C# half is built: a declared method called at its line, its result bound t
 its typed arguments, a `Field` and the run's abort signal among them, the objects and lists a member holds or a method
 returns, and the lambdas over live items; `Event`, `Data<T>`, callbacks and answers, `Argument`, `MethodAt`,
 `CallItself`, `EventListening` and the iterators are built with their first consumer, U13 to U20, and U12's browser
-tests land by the doors their pages call. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
+tests land by the doors their pages call.
+U13's pieces are landed: a vendor defined by `ComponentVendor`'s kinds, a component rendered with its handlers and
+their policy, a handler started and released as its row states, a pipeline's listen released by how the step
+reached its object, a callback's answer, ALIS032, ALIS034 and ALIS009's reach to a declaration and a render helper,
+the contract's table written before the compiler reads it, the conformance library's six components in TypeScript
+beside their declarations, boot's plugin queue and `alis:mount`, and the plugin script of every page that links one;
+the contract's rules, ALIS014 to ALIS022 and ALIS037, and X4.9's test, the one browser test U13 lands, are open.
+U14 is landed: `Plugin` and its name's check, `pipeline.Plugin<TPlugin>()` with one locator a name,
+`plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`, with their module tests. A host is ready once MVC has
+rendered a view with a plan (section 2.5). The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
 pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). The commit that lands
 a piece rewrites this paragraph.
 

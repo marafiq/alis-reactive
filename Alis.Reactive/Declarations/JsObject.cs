@@ -207,18 +207,22 @@ public abstract class JsObject
 
     /// <summary>Calls the object itself, a function, with no argument, where the pipeline reaches the line.</summary>
     /// <remarks>An object that is no function stops the pipeline.</remarks>
-    protected void CallItself() => throw new NotImplementedException();
+    protected void CallItself() => Bound.Writer.Write(new DoStatement(false, CallOfItself([])));
 
     /// <summary>Calls the object itself, a function, with its arguments, where the pipeline reaches the line.</summary>
     /// <remarks>An object that is no function stops the pipeline.</remarks>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
-    protected void CallItself(IReadOnlyList<Arg> arguments) => throw new NotImplementedException();
+    protected void CallItself(IReadOnlyList<Arg> arguments) => Bound.Writer.Write(new DoStatement(false, CallOfItself(arguments)));
 
     /// <summary>Calls the object itself, a function that returns a value, with its arguments, where the pipeline reaches the line.</summary>
     /// <remarks>An object that is no function stops the pipeline.</remarks>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
     /// <returns>What the call returned at that line, a source every later read reads as it was then.</returns>
-    protected MethodResult<TResult> CallItself<TResult>(IReadOnlyList<Arg> arguments) => throw new NotImplementedException();
+    protected MethodResult<TResult> CallItself<TResult>(IReadOnlyList<Arg> arguments)
+    {
+        var writer = Bound.Writer;
+        return new MethodResult<TResult>(writer.Result(CallOfItself(arguments), false), writer);
+    }
 
     /// <summary>Declares the argument a listener or a callback receives at a position.</summary>
     /// <remarks>
@@ -369,7 +373,12 @@ public abstract class JsObject
     }
 
     private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, bool optional, string declaredBy)
-        => new([new MemberStep(JavaScriptName(name, declaredBy))], Bound.Reads(optional), Bound.Target,
+        => CallAt([new MemberStep(JavaScriptName(name, declaredBy))], arguments, optional);
+
+    private CallExpression CallOfItself(IReadOnlyList<Arg> arguments) => CallAt([], arguments, false);
+
+    private CallExpression CallAt(IReadOnlyList<PathStep> path, IReadOnlyList<Arg> arguments, bool optional)
+        => new(path, Bound.Reads(optional), Bound.Target,
             arguments.Select(argument => argument?.Written(Bound.Writer) ?? Literals.Text(null)).ToArray());
 
     private static string JavaScriptName(string? name, string declaredBy) => name ?? JsonNamingPolicy.CamelCase.ConvertName(declaredBy);

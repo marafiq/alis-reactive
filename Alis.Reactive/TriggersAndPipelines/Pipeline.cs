@@ -55,7 +55,12 @@ public sealed class Pipeline<TModel>
     /// <returns>The plugin.</returns>
     public TPlugin Plugin<TPlugin>()
         where TPlugin : Plugin, new()
-        => throw new NotImplementedException();
+    {
+        var plugin = new TPlugin();
+        var id = _writer.Content.ReachesPlugin(plugin.Reached());
+        plugin.Reach(new Reached(new ObjExpression(id), _writer));
+        return plugin;
+    }
 
     /// <summary>Names the input a member of the view's model binds, for a request to send or a step to reach its component.</summary>
     /// <param name="member">The member the input binds, as a member path.</param>
@@ -224,6 +229,7 @@ public sealed class Pipeline<TModel>
             throw new InvalidOperationException("A listen needs its object when the step runs: an object declared optional or nullable cannot be listened to.");
         var selected = raised(source);
         var target = source.Bound.Target;
+        if (source is Plugin plugin && target is ObjExpression) _writer.Content.HearsPlugin(plugin.Heard(), selected.Name, plugin.HeardBy);
         var release = ReleaseOf(source, target);
         var names = _writer.NextListen();
         var body = _writer.Listening(() => pipeline(
