@@ -1554,10 +1554,10 @@
     },
     "native_behaviors": {
       "counts": {
-        "behaviors": 33,
+        "behaviors": 37,
         "problems": 0
       },
-      "detail": "33 behaviors on 9 declarations of native.json, each naming tests of the spec",
+      "detail": "37 behaviors on 9 declarations of native.json, each naming tests of the spec",
       "pass": true
     },
     "no_comments": {
@@ -1596,7 +1596,7 @@
         "unrefused": 0
       },
       "detail": "247 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "c0fe99fb93d9dd678488a7e35888786acd752f04059fd8765ae2b635692b6f1b",
+      "digest": "0869ee73f83c224baf35297eb8e557571c860b17f1f45713d08b75664c319b9f",
       "pass": true
     },
     "probes": {
@@ -1648,7 +1648,7 @@
         "tests": 586,
         "units": 27
       },
-      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 0, U5 0, U6 0, U7 0, U8 0, U9 0, U10 0, U11 0, U12 0, U13 1, U14 0, U15 6, U16 51, U17 0, U18 25, U19 18, U20 24, U21 24, U22 161, U23 140, U24 31, U25 32, U26 69, U27 3",
+      "detail": "27 units hold 112 features once; the browser tests land U1 0, U2 0, U3 1, U4 0, U5 0, U6 0, U7 0, U8 0, U9 0, U10 0, U11 0, U12 0, U13 4, U14 0, U15 2, U16 53, U17 0, U18 25, U19 18, U20 23, U21 24, U22 161, U23 140, U24 31, U25 32, U26 69, U27 3",
       "pass": true
     },
     "slice_tests": {
@@ -4168,7 +4168,7 @@
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 52m 3h, U4 18m 3a, U5 20m 2a, U6 9m, U7 10m 1a, U8 16m, U9 16m 2a, U10 16m 10a, U11 22m 24a 2h, U12 15m 2a, U13 1b 17m 23a, U14 15m 2a, U15 6b 12m 1a, U16 51b 13m 4a, U17 21m 9a, U18 25b 17m 9a, U19 18b 15m, U20 24b 20m 3a, U21 24b 14m 1a, U22 161b 4m, U23 140b, U24 31b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 52m 3h, U4 18m 3a, U5 20m 2a, U6 9m, U7 10m 1a, U8 16m, U9 16m 2a, U10 16m 10a, U11 22m 24a 2h, U12 15m 2a, U13 4b 17m 23a, U14 15m 2a, U15 2b 12m 1a, U16 53b 13m 4a, U17 21m 9a, U18 25b 17m 9a, U19 18b 15m, U20 23b 20m 3a, U21 24b 14m 1a, U22 161b 4m, U23 140b, U24 31b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -4186,7 +4186,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "4c94bb130b9de0da065438d82e6e2944a54f2e6b",
+  "read_at_head": "f604ee405119a00893281d3da0ab820b8d0e3404",
   "step": {
     "failing": [],
     "name": "End of session",
