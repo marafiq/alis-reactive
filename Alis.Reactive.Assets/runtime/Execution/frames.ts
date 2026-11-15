@@ -1,5 +1,6 @@
-import { notBuilt, type RequestStatement, type Statement } from "../Schema/index";
-import type { Read } from "../ValuesAndSources/index";
+import { attempt, prepare, routeFor } from "../RequestsAndResponses/index";
+import type { HttpResponse, HttpSend, RequestStatement, Statement } from "../Schema/index";
+import { heldOrNull, value, type Read } from "../ValuesAndSources/index";
 import { bind, under, type Context } from "./context";
 import { evaluate } from "./expressions";
 import { execute } from "./statements";
@@ -18,7 +19,15 @@ export interface LayerSignals {
   ofALayer(): AbortSignal;
 }
 
-type RequestState = "check" | "loading" | "guard" | "finally" | "after";
+type AfterRequest = { readonly kind: "chained"; readonly context: Context } | { readonly kind: "after" };
+
+type RequestState =
+  | { readonly kind: "check" }
+  | { readonly kind: "loading" | "guard"; readonly send: HttpSend }
+  | { readonly kind: "attempt"; readonly request: ReturnType<typeof prepare> }
+  | { readonly kind: "route"; readonly request: ReturnType<typeof prepare>; readonly reply: HttpResponse }
+  | { readonly kind: "finally"; readonly after: AfterRequest }
+  | AfterRequest;
 
 const completed: Outcome = { kind: "completed" };
 const ends: Outcome = { kind: "ends" };
@@ -82,7 +91,7 @@ export class RequestFrame {
   readonly kind = "request";
   readonly #statement: RequestStatement;
   #context: Context;
-  #state: RequestState = "check";
+  #state: RequestState = { kind: "check" };
   #loaded = 0;
   #owed = 0;
   #abrupt = false;
@@ -97,15 +106,19 @@ export class RequestFrame {
   }
 
   step(signals: LayerSignals): Outcome {
-    switch (this.#state) {
-      case "check":
-        this.#context = bind(this.#context, this.#statement.argument, evaluate(this.#statement.send, this.#context));
-        this.#state = "loading";
+    const state = this.#state;
+    switch (state.kind) {
+      case "check": {
+        const read = evaluate(this.#statement.send, this.#context);
+        const send = heldOrNull(read) as HttpSend;
+        this.#context = bind(this.#context, this.#statement.argument, read);
+        this.#state = { kind: "loading", send };
         return { kind: "opens", frame: BlockFrame.of(this.#statement.check, this.#context) };
+      }
       case "loading": {
         const layer = this.#statement.layers[this.#loaded];
         if (layer === undefined) {
-          this.#state = "guard";
+          this.#state = { kind: "guard", send: state.send };
           return completed;
         }
         return {
@@ -116,16 +129,38 @@ export class RequestFrame {
         };
       }
       case "guard":
-        throw notBuilt("a request past its WhileLoading: its guard, its send, its routes and its Chained");
+        this.#state = { kind: "attempt", request: prepare(state.send, this.#context.plan.timeZone) };
+        return completed;
+      case "attempt":
+        return {
+          kind: "waits",
+          on: attempt(state.request, this.#statement, this.#context.signal, location.href),
+          settled: read => {
+            this.#state = { kind: "route", request: state.request, reply: heldOrNull(read) as HttpResponse };
+          },
+        };
+      case "route": {
+        const reply = state.reply;
+        if (reply.outcome !== "ok" && reply.outcome !== "status") {
+          console.error("Request '" + state.request.method + " " + state.request.url + "' ended with " + reply.outcome + ".");
+        }
+        const context = bind(this.#context, this.#statement.reply, value(reply));
+        this.#owed = this.#loaded;
+        this.#state = { kind: "finally", after: reply.outcome === "ok" ? { kind: "chained", context } : { kind: "after" } };
+        return { kind: "opens", frame: BlockFrame.of(routeFor(reply, this.#statement).do, context) };
+      }
       case "finally": {
         const layer = this.#statement.layers[this.#owed - 1];
         if (layer === undefined) {
-          this.#state = "after";
+          this.#state = this.#abrupt ? { kind: "after" } : state.after;
           return completed;
         }
         this.#owed -= 1;
         return { kind: "opens", frame: new BlockFrame(layer.finally, under(this.#context, signals.ofALayer()), true, completesNothing) };
       }
+      case "chained":
+        this.#state = { kind: "after" };
+        return { kind: "opens", frame: BlockFrame.of(this.#statement.chained, state.context) };
       case "after":
         return ends;
     }
@@ -137,8 +172,8 @@ export class RequestFrame {
 
   unwinds(): void {
     this.#abrupt = true;
-    if (this.#state === "finally" || this.#state === "after") return;
+    if (this.#state.kind === "finally" || this.#state.kind === "after") return;
     this.#owed = this.#loaded;
-    this.#state = "finally";
+    this.#state = { kind: "finally", after: { kind: "after" } };
   }
 }
