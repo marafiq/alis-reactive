@@ -37,7 +37,7 @@ export class ConformanceComponent extends ComponentEvents {
     moment = new Date("2026-11-09T14:00:00Z");
     choice: "low" | "high" = "low";
     days = 0;
-    optionalText?: string;
+    optionalText?: string | null;
     record: RecordData;
     nullableRecords: RecordData[] | null = null;
     bindings: BindingStart[];

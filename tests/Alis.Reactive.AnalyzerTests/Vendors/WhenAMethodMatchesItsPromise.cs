@@ -162,6 +162,42 @@ public sealed class WhenAMethodMatchesItsPromise
         await InGauge("public void Read() => MethodAsync();", string.Join("\n", table));
     }
 
+    [RefusedCase]
+    public Task returnedobject_cannot_return_a_promise()
+        => InGauge("public Gauge Read() => {|#0:ReturnedObject|}<Gauge>(name: \"read\");", Async, "Declaration member 'Gauge.Read' uses ReturnedObject for 'read', whose vendor signatures return a promise; this live-object door requires a synchronous return");
+
+    [AcceptedCase]
+    public Task returnedobject_can_return_synchronously()
+        => InGauge("public Gauge Read() => ReturnedObject<Gauge>(name: \"read\");", Sync);
+
+    [RefusedCase]
+    public Task returnedobject_with_arguments_cannot_return_a_promise()
+        => InGauge("public Gauge Read() => {|#0:ReturnedObject|}<Gauge>([], name: \"read\");", Async, "Declaration member 'Gauge.Read' uses ReturnedObject for 'read', whose vendor signatures return a promise; this live-object door requires a synchronous return");
+
+    [AcceptedCase]
+    public Task returnedobject_with_arguments_can_return_synchronously()
+        => InGauge("public Gauge Read() => ReturnedObject<Gauge>([], name: \"read\");", Sync);
+
+    [RefusedCase]
+    public Task returnedobjects_cannot_return_a_promise()
+        => InGauge("public LiveObjects<Gauge> Read() => {|#0:ReturnedObjects|}<Gauge>(name: \"read\");", Async, "Declaration member 'Gauge.Read' uses ReturnedObjects for 'read', whose vendor signatures return a promise; this live-object door requires a synchronous return");
+
+    [AcceptedCase]
+    public Task returnedobjects_can_return_synchronously()
+        => InGauge("public LiveObjects<Gauge> Read() => ReturnedObjects<Gauge>(name: \"read\");", Sync);
+
+    [RefusedCase]
+    public Task returnedobjects_with_arguments_cannot_return_a_promise()
+        => InGauge("public LiveObjects<Gauge> Read() => {|#0:ReturnedObjects|}<Gauge>([], name: \"read\");", Async, "Declaration member 'Gauge.Read' uses ReturnedObjects for 'read', whose vendor signatures return a promise; this live-object door requires a synchronous return");
+
+    [AcceptedCase]
+    public Task returnedobjects_with_arguments_can_return_synchronously()
+        => InGauge("public LiveObjects<Gauge> Read() => ReturnedObjects<Gauge>([], name: \"read\");", Sync);
+
+    [AcceptedCase]
+    public Task a_callback_is_not_a_call_of_its_stored_function()
+        => InGauge("public Callback<Gauge, int> Read => Callback<Gauge, int>();", Async.Replace("\tmethod\t", "\tproperty\t"));
+
     private static Task InGauge(string members, string? table, string? message = null)
         => Source("[Mirrors(\"api\", \"Gauge\")] public sealed class Gauge : JsObject { " + members + " }", table, message);
 

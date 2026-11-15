@@ -32,18 +32,30 @@ internal sealed class VendorContract
 
     internal sealed class Member
     {
-        internal Member(string kind, bool callable, bool hasSignatures, bool returnsPromise)
+        internal Member(string kind, bool callable, bool hasSignatures, bool returnsPromise, bool optional, bool readsNull, bool writesNull, bool resultReadsNull, bool? callbackTakesNull, (string Module, string Location)? documentedNull)
         {
             Kind = kind;
             Callable = callable;
             HasSignatures = hasSignatures;
             ReturnsPromise = returnsPromise;
+            Optional = optional;
+            ReadsNull = readsNull;
+            WritesNull = writesNull;
+            ResultReadsNull = resultReadsNull;
+            CallbackTakesNull = callbackTakesNull;
+            DocumentedNull = documentedNull;
         }
 
         internal string Kind { get; }
         internal bool Callable { get; }
         internal bool HasSignatures { get; }
         internal bool ReturnsPromise { get; }
+        internal bool Optional { get; }
+        internal bool ReadsNull { get; }
+        internal bool WritesNull { get; }
+        internal bool ResultReadsNull { get; }
+        internal bool? CallbackTakesNull { get; }
+        internal (string Module, string Location)? DocumentedNull { get; }
     }
 
     private sealed class Table
@@ -95,7 +107,9 @@ internal sealed class VendorContract
             var declarations = new List<(string Module, string Name, string Id)>();
             var members = new List<string[]>();
             var bases = new Dictionary<string, SortedDictionary<int, string>>(StringComparer.Ordinal);
-            var signatures = new Dictionary<string, bool>(StringComparer.Ordinal);
+            var signatures = new Dictionary<string, List<(string Id, string PromiseMode, bool ReadsNull)>>(StringComparer.Ordinal);
+            var resultNulls = new Dictionary<string, bool>(StringComparer.Ordinal);
+            var defaultNulls = new Dictionary<string, (string Module, string Location)>(StringComparer.Ordinal);
             foreach (var line in text.Lines)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -119,8 +133,16 @@ internal sealed class VendorContract
                         break;
                     case "signature" when columns.Length == 8 && columns[2] == "member" && columns[5] is "none" or "promise" or "mixed":
                         var id = Unescape(columns[3]);
-                        signatures.TryGetValue(id, out var returnsPromise);
-                        signatures[id] = returnsPromise || columns[5] is "promise" or "mixed";
+                        if (!signatures.TryGetValue(id, out var overloads)) signatures[id] = overloads = [];
+                        overloads.Add((Unescape(columns[1]), columns[5], columns[6] == "true"));
+                        break;
+                    case "holds" when columns.Length == 9 && columns[2] == "signature" && columns[4] == "returns":
+                        var signature = Unescape(columns[3]);
+                        resultNulls.TryGetValue(signature, out var takesNull);
+                        resultNulls[signature] = takesNull || columns[6] == "null" || columns[6] == "other" && columns[8] is "any" or "unknown";
+                        break;
+                    case "default-null" when columns.Length == 7 && columns[5] == "true":
+                        defaultNulls[Unescape(columns[1])] = (Unescape(columns[2]), Unescape(columns[3]) + ":" + columns[4]);
                         break;
                 }
             }
@@ -129,8 +151,17 @@ internal sealed class VendorContract
             foreach (var member in members)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var hasSignatures = signatures.TryGetValue(Unescape(member[1]), out var returnsPromise);
-                publicMembers[(Unescape(member[2]), Unescape(member[3]))] = new Member(member[4], member[8] == "true", hasSignatures, returnsPromise);
+                var id = Unescape(member[1]);
+                signatures.TryGetValue(id, out var overloads);
+                var hasSignatures = overloads is { Count: > 0 };
+                var returnsPromise = overloads?.Any(signature => signature.PromiseMode is "promise" or "mixed") == true;
+                var resultReadsNull = overloads?.Any(signature => signature.ReadsNull) == true;
+                bool? callbackTakesNull = !hasSignatures ? null
+                    : overloads!.Any(signature => signature.PromiseMode == "promise" || resultNulls.TryGetValue(signature.Id, out var takesNull) && !takesNull) ? false
+                    : overloads.All(signature => signature.PromiseMode == "none" && resultNulls.ContainsKey(signature.Id)) ? true : null;
+                var documentedNull = defaultNulls.TryGetValue(id, out var tag) ? tag : ((string Module, string Location)?)null;
+                publicMembers[(Unescape(member[2]), Unescape(member[3]))] = new Member(member[4], member[8] == "true", hasSignatures, returnsPromise,
+                    member[5] == "true", member[6] == "true", member[7] == "true", resultReadsNull, callbackTakesNull, documentedNull);
             }
 
             var table = new Table(publicMembers.ToImmutable(), bases.ToImmutableDictionary(pair => pair.Key, pair => pair.Value.Values.ToImmutableArray()));

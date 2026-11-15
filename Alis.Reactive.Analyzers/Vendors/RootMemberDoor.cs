@@ -10,7 +10,12 @@ namespace Alis.Reactive.Analyzers.Vendors;
 
 internal sealed class RootMemberDoor
 {
-    private RootMemberDoor(string member, string name, string module, string type, string door, Location nameLocation, Location doorLocation, VendorContract.Member? vendor)
+    private readonly IInvocationOperation _call;
+    private readonly Location _memberLocation;
+    private readonly GenericNameSyntax? _genericName;
+    private readonly bool _partial;
+
+    private RootMemberDoor(string member, string name, string module, string type, string door, Location nameLocation, Location doorLocation, VendorContract.Member? vendor, IInvocationOperation call, Location memberLocation, GenericNameSyntax? genericName, bool partial)
     {
         Member = member;
         Name = name;
@@ -20,6 +25,10 @@ internal sealed class RootMemberDoor
         NameLocation = nameLocation;
         DoorLocation = doorLocation;
         Vendor = vendor;
+        _call = call;
+        _memberLocation = memberLocation;
+        _genericName = genericName;
+        _partial = partial;
     }
 
     internal string Member { get; }
@@ -30,7 +39,17 @@ internal sealed class RootMemberDoor
     internal Location NameLocation { get; }
     internal Location DoorLocation { get; }
     internal VendorContract.Member? Vendor { get; }
-    internal bool IsMethod => Door is "Method" or "MethodAsync";
+    internal bool IsMethod => Door is "Method" or "MethodAsync" or "ReturnedObject" or "ReturnedObjects";
+    internal ITypeSymbol? ValueType => _call.TargetMethod.TypeArguments.LastOrDefault();
+    internal Location ValueLocation => !_partial && _genericName is not null ? _genericName.TypeArgumentList.Arguments.Last().GetLocation() : _memberLocation;
+
+    internal (bool? Value, Location Location) Flag(string name)
+    {
+        var argument = _call.Arguments.FirstOrDefault(candidate => candidate.Parameter?.Name == name);
+        var value = argument?.Value.ConstantValue is { HasValue: true, Value: bool flag } ? flag : (bool?)null;
+        var location = !_partial && argument is { IsImplicit: false } ? argument.Value.Syntax.GetLocation() : _memberLocation;
+        return (value, location);
+    }
 
     internal static void Register(CompilationStartAnalysisContext start, Action<OperationAnalysisContext, RootMemberDoor> read)
     {
@@ -48,11 +67,15 @@ internal sealed class RootMemberDoor
     private static RootMemberDoor? Read(OperationAnalysisContext context, INamedTypeSymbol declarations, INamedTypeSymbol mirrors, VendorContract table)
     {
         var call = (IInvocationOperation)context.Operation;
-        if (!DeclarationDoor.Is(call.TargetMethod, declarations) || call.TargetMethod.Name is not ("Property" or "ReadOnly" or "WriteOnly" or "Method" or "MethodAsync")) return null;
+        if (!DeclarationDoor.Is(call.TargetMethod, declarations) || call.TargetMethod.Name is not ("Property" or "ReadOnly" or "WriteOnly" or "Method" or "MethodAsync" or "LiveObject" or "LiveObjects" or "ReturnedObject" or "ReturnedObjects" or "Callback")) return null;
         if (call.Instance is not IInstanceReferenceOperation { ReferenceKind: InstanceReferenceKind.ContainingTypeInstance }) return null;
         if (context.ContainingSymbol is not IMethodSymbol { MethodKind: MethodKind.Ordinary or MethodKind.PropertyGet } author || author.AssociatedSymbol is IPropertySymbol { IsIndexer: true }) return null;
         IOperation body = call;
-        while (body.Parent is IConversionOperation conversion) body = conversion;
+        while (body.Parent is IConversionOperation conversion)
+        {
+            if (!conversion.Conversion.Exists) return null;
+            body = conversion;
+        }
         if (body.Parent is not (IReturnOperation or IExpressionStatementOperation) || body.Parent.Parent is not IBlockOperation { Operations.Length: 1, Parent: null or IMethodBodyOperation }) return null;
         if (call.DescendantsAndSelf().Any(operation => operation is IInvalidOperation || operation.Type?.TypeKind == TypeKind.Error)) return null;
         var attribute = author.ContainingType.GetAttributes().FirstOrDefault(candidate => SymbolEqualityComparer.Default.Equals(candidate.AttributeClass, mirrors));
@@ -86,7 +109,7 @@ internal sealed class RootMemberDoor
         if (calledName is null) return null;
         var nameLocation = definition is not null || constant.Value is null ? identifier.GetLocation() : nameArgument.Value.Syntax.GetLocation();
         var doorLocation = definition is not null ? identifier.GetLocation() : calledName.Identifier.GetLocation();
-        return new RootMemberDoor(DeclarationDoor.Named(member), name, module, type, call.TargetMethod.Name, nameLocation, doorLocation, vendor);
+        return new RootMemberDoor(DeclarationDoor.Named(member), name, module, type, call.TargetMethod.Name, nameLocation, doorLocation, vendor, call, identifier.GetLocation(), calledName as GenericNameSyntax, definition is not null);
     }
 
     private static string CamelCase(string name)

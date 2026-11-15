@@ -41,7 +41,15 @@ public sealed class ALIS018DoorMatchesMemberKind : DiagnosticAnalyzer
         DiagnosticSeverity.Error,
         isEnabledByDefault: true);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(PropertyOnMethod, NotCallable, CannotWrite, CannotRead);
+    private static readonly DiagnosticDescriptor CallbackProperty = new(
+        Id,
+        "A callback names a writable callable property",
+        "Declaration member '{0}' uses Callback for vendor member '{2}', which is not a writable callable property; name a writable callable property",
+        "Alis.Reactive.Analyzers",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true);
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(PropertyOnMethod, NotCallable, CannotWrite, CannotRead, CallbackProperty);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -53,13 +61,15 @@ public sealed class ALIS018DoorMatchesMemberKind : DiagnosticAnalyzer
     private static void Read(OperationAnalysisContext context, RootMemberDoor door)
     {
         if (door.Vendor is not { } member) return;
-        var rule = door.IsMethod
+        var rule = door.Door == "Callback"
+            ? member.Kind != "property" || !member.Callable ? CallbackProperty : null
+            : door.IsMethod
             ? !member.Callable || member.Kind == "writeonly" ? NotCallable : null
             : member.Kind switch
             {
                 "method" => PropertyOnMethod,
                 "readonly" when door.Door is "Property" or "WriteOnly" => CannotWrite,
-                "writeonly" when door.Door is "Property" or "ReadOnly" => CannotRead,
+                "writeonly" when door.Door is "Property" or "ReadOnly" or "LiveObject" or "LiveObjects" => CannotRead,
                 _ => null,
             };
         if (rule is not null)

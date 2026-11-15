@@ -147,6 +147,98 @@ public sealed class WhenADoorMatchesItsMemberKind
     public Task readonly_can_read_a_readable_member()
         => InGauge("public ReadOnly<int> Value => ReadOnly<int>();", Property);
 
+    [RefusedCase]
+    public Task liveobject_cannot_read_a_vendor_method()
+        => InGauge("public Gauge Value => {|#0:LiveObject|}<Gauge>();", Method, "Declaration member 'Gauge.Value' uses LiveObject for vendor method 'value'; use Method or MethodAsync");
+
+    [AcceptedCase]
+    public Task liveobject_can_read_a_vendor_property()
+        => InGauge("public Gauge Value => LiveObject<Gauge>();", Method.Replace("\tmethod\t", "\tproperty\t"));
+
+    [RefusedCase]
+    public Task liveobject_cannot_read_a_writeonly_member()
+        => InGauge("public Gauge Value => {|#0:LiveObject|}<Gauge>();", WriteOnly, "Declaration member 'Gauge.Value' uses LiveObject for write-only vendor member 'value'; use WriteOnly");
+
+    [AcceptedCase]
+    public Task liveobject_can_read_a_readonly_member()
+        => InGauge("public Gauge Value => LiveObject<Gauge>();", ReadOnly);
+
+    [RefusedCase]
+    public Task liveobjects_cannot_read_a_vendor_method()
+        => InGauge("public LiveObjects<Gauge> Value => {|#0:LiveObjects|}<Gauge>();", Method, "Declaration member 'Gauge.Value' uses LiveObjects for vendor method 'value'; use Method or MethodAsync");
+
+    [AcceptedCase]
+    public Task liveobjects_can_read_a_vendor_property()
+        => InGauge("public LiveObjects<Gauge> Value => LiveObjects<Gauge>();", Method.Replace("\tmethod\t", "\tproperty\t"));
+
+    [RefusedCase]
+    public Task liveobjects_cannot_read_a_writeonly_member()
+        => InGauge("public LiveObjects<Gauge> Value => {|#0:LiveObjects|}<Gauge>();", WriteOnly, "Declaration member 'Gauge.Value' uses LiveObjects for write-only vendor member 'value'; use WriteOnly");
+
+    [AcceptedCase]
+    public Task liveobjects_can_read_a_readonly_member()
+        => InGauge("public LiveObjects<Gauge> Value => LiveObjects<Gauge>();", ReadOnly);
+
+    [RefusedCase]
+    public Task returnedobject_cannot_call_a_noncallable_member()
+        => InGauge("public Gauge Value() => {|#0:ReturnedObject|}<Gauge>();", Property, "Declaration member 'Gauge.Value' uses ReturnedObject for vendor member 'value', which cannot be called; use a property door that matches its access");
+
+    [AcceptedCase]
+    public Task returnedobject_can_call_a_callable_property()
+        => InGauge("public Gauge Value() => ReturnedObject<Gauge>();", Property.Replace("\tfalse\n", "\ttrue\n"));
+
+    [AcceptedCase]
+    public Task returnedobject_can_call_a_vendor_method()
+        => InGauge("public Gauge Value() => ReturnedObject<Gauge>();", Method);
+
+    [RefusedCase]
+    public Task returnedobject_cannot_call_a_writeonly_member()
+        => InGauge("public Gauge Value() => {|#0:ReturnedObject|}<Gauge>();", WriteOnly.Replace("\tfalse\n", "\ttrue\n"), "Declaration member 'Gauge.Value' uses ReturnedObject for vendor member 'value', which cannot be called; use a property door that matches its access");
+
+    [AcceptedCase]
+    public Task returnedobject_can_call_a_readonly_callable_property()
+        => InGauge("public Gauge Value() => ReturnedObject<Gauge>();", ReadOnly.Replace("\tfalse\n", "\ttrue\n"));
+
+    [RefusedCase]
+    public Task returnedobjects_cannot_call_a_noncallable_member()
+        => InGauge("public LiveObjects<Gauge> Value() => {|#0:ReturnedObjects|}<Gauge>();", Property, "Declaration member 'Gauge.Value' uses ReturnedObjects for vendor member 'value', which cannot be called; use a property door that matches its access");
+
+    [AcceptedCase]
+    public Task returnedobjects_can_call_a_callable_property()
+        => InGauge("public LiveObjects<Gauge> Value() => ReturnedObjects<Gauge>();", Property.Replace("\tfalse\n", "\ttrue\n"));
+
+    [AcceptedCase]
+    public Task returnedobjects_can_call_a_vendor_method()
+        => InGauge("public LiveObjects<Gauge> Value() => ReturnedObjects<Gauge>();", Method);
+
+    [RefusedCase]
+    public Task returnedobjects_cannot_call_a_writeonly_member()
+        => InGauge("public LiveObjects<Gauge> Value() => {|#0:ReturnedObjects|}<Gauge>();", WriteOnly.Replace("\tfalse\n", "\ttrue\n"), "Declaration member 'Gauge.Value' uses ReturnedObjects for vendor member 'value', which cannot be called; use a property door that matches its access");
+
+    [AcceptedCase]
+    public Task returnedobjects_can_call_a_readonly_callable_property()
+        => InGauge("public LiveObjects<Gauge> Value() => ReturnedObjects<Gauge>();", ReadOnly.Replace("\tfalse\n", "\ttrue\n"));
+
+    [RefusedCase]
+    public Task callback_cannot_name_a_noncallable_member()
+        => InGauge("public Callback<Gauge, int> Value => {|#0:Callback|}<Gauge, int>();", Property, "Declaration member 'Gauge.Value' uses Callback for vendor member 'value', which is not a writable callable property; name a writable callable property");
+
+    [RefusedCase]
+    public Task callback_cannot_name_a_readonly_member()
+        => InGauge("public Callback<Gauge, int> Value => {|#0:Callback|}<Gauge, int>();", ReadOnly.Replace("\tfalse\n", "\ttrue\n"), "Declaration member 'Gauge.Value' uses Callback for vendor member 'value', which is not a writable callable property; name a writable callable property");
+
+    [RefusedCase]
+    public Task callback_cannot_name_a_writeonly_member()
+        => InGauge("public Callback<Gauge, int> Value => {|#0:Callback|}<Gauge, int>();", WriteOnly.Replace("\tfalse\n", "\ttrue\n"), "Declaration member 'Gauge.Value' uses Callback for vendor member 'value', which is not a writable callable property; name a writable callable property");
+
+    [RefusedCase]
+    public Task callback_cannot_name_a_method_member()
+        => InGauge("public Callback<Gauge, int> Value => {|#0:Callback|}<Gauge, int>();", Method, "Declaration member 'Gauge.Value' uses Callback for vendor member 'value', which is not a writable callable property; name a writable callable property");
+
+    [AcceptedCase]
+    public Task callback_can_name_a_writable_callable_property()
+        => InGauge("public Callback<Gauge, int> Value => Callback<Gauge, int>();", Property.Replace("\tfalse\n", "\ttrue\n"));
+
     private static Task InGauge(string members, string? table, string? message = null)
         => Source("[Mirrors(\"api\", \"Gauge\")] public sealed class Gauge : JsObject { " + members + " }", table, message);
 

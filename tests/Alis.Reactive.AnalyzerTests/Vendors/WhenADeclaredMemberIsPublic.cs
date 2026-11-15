@@ -194,12 +194,92 @@ public sealed class WhenADeclaredMemberIsPublic
         => InGauge("public Property<int> Value => Property<int>(name: \"a\\tb\\nc\\r\\\\d\");", Value.Replace("\tvalue\t", "\ta\\tb\\nc\\r\\\\d\t"));
 
     [AcceptedCase]
-    public Task non_b2_doors_are_left_to_their_own_rules()
-        => InGauge("public Gauge Other => LiveObject<Gauge>(); public Event Raised => Event(); public Callback<Gauge, int> Answer => Callback<Gauge, int>();", Type);
+    public Task events_are_left_to_their_own_rule()
+        => InGauge("public Event Raised => Event();", Type);
 
     [AcceptedCase]
     public Task a_partial_property_can_name_a_public_member()
         => Source("""[Mirrors("api", "Gauge")] public sealed partial class Gauge : JsObject { public partial Property<int> Value { get; } } public sealed partial class Gauge { public partial Property<int> Value => Property<int>(); }""", Value);
+
+    [RefusedCase]
+    public Task liveobject_requires_a_public_member()
+        => InGauge("public Gauge {|#0:Value|} => LiveObject<Gauge>();", Type, "Declaration member 'Gauge.Value' names 'value', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task liveobject_names_a_public_member()
+        => InGauge("public Gauge Value => LiveObject<Gauge>();", Value);
+
+    [RefusedCase]
+    public Task liveobject_checks_its_explicit_name()
+        => InGauge("public Gauge Value => LiveObject<Gauge>(name: {|#0:\"missing\"|});", Value, "Declaration member 'Gauge.Value' names 'missing', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task liveobject_resolves_its_explicit_name()
+        => InGauge("public Gauge Other => LiveObject<Gauge>(name: \"value\");", Value);
+
+    [RefusedCase]
+    public Task liveobjects_requires_a_public_member()
+        => InGauge("public LiveObjects<Gauge> {|#0:Value|} => LiveObjects<Gauge>();", Type, "Declaration member 'Gauge.Value' names 'value', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task liveobjects_names_a_public_member()
+        => InGauge("public LiveObjects<Gauge> Value => LiveObjects<Gauge>();", Value);
+
+    [RefusedCase]
+    public Task liveobjects_checks_its_explicit_name()
+        => InGauge("public LiveObjects<Gauge> Value => LiveObjects<Gauge>(name: {|#0:\"missing\"|});", Value, "Declaration member 'Gauge.Value' names 'missing', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task liveobjects_resolves_its_explicit_name()
+        => InGauge("public LiveObjects<Gauge> Other => LiveObjects<Gauge>(name: \"value\");", Value);
+
+    [RefusedCase]
+    public Task returnedobject_requires_a_public_member()
+        => InGauge("public Gauge {|#0:Value|}() => ReturnedObject<Gauge>();", Type, "Declaration member 'Gauge.Value' names 'value', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task returnedobject_names_a_public_member()
+        => InGauge("public Gauge Value() => ReturnedObject<Gauge>();", Value);
+
+    [RefusedCase]
+    public Task returnedobject_checks_its_explicit_name()
+        => InGauge("public Gauge Value() => ReturnedObject<Gauge>(name: {|#0:\"missing\"|});", Value, "Declaration member 'Gauge.Value' names 'missing', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task returnedobject_resolves_its_explicit_name()
+        => InGauge("public Gauge Other() => ReturnedObject<Gauge>(name: \"value\");", Value);
+
+    [RefusedCase]
+    public Task returnedobjects_requires_a_public_member()
+        => InGauge("public LiveObjects<Gauge> {|#0:Value|}() => ReturnedObjects<Gauge>();", Type, "Declaration member 'Gauge.Value' names 'value', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task returnedobjects_names_a_public_member()
+        => InGauge("public LiveObjects<Gauge> Value() => ReturnedObjects<Gauge>();", Value);
+
+    [RefusedCase]
+    public Task returnedobjects_checks_its_explicit_name()
+        => InGauge("public LiveObjects<Gauge> Value() => ReturnedObjects<Gauge>(name: {|#0:\"missing\"|});", Value, "Declaration member 'Gauge.Value' names 'missing', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task returnedobjects_resolves_its_explicit_name()
+        => InGauge("public LiveObjects<Gauge> Other() => ReturnedObjects<Gauge>(name: \"value\");", Value);
+
+    [RefusedCase]
+    public Task callback_requires_a_public_member()
+        => InGauge("public Callback<Gauge, int> {|#0:Value|} => Callback<Gauge, int>();", Type, "Declaration member 'Gauge.Value' names 'value', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task callback_names_a_public_member()
+        => InGauge("public Callback<Gauge, int> Value => Callback<Gauge, int>();", Value);
+
+    [RefusedCase]
+    public Task callback_checks_its_explicit_name()
+        => InGauge("public Callback<Gauge, int> Value => Callback<Gauge, int>(name: {|#0:\"missing\"|});", Value, "Declaration member 'Gauge.Value' names 'missing', which type 'Gauge' in module 'api' and its bases do not make public; name a public member of that type");
+
+    [AcceptedCase]
+    public Task callback_resolves_its_explicit_name()
+        => InGauge("public Callback<Gauge, int> Other => Callback<Gauge, int>(name: \"value\");", Value);
 
     private static Task InGauge(string members, string? table, string? message = null)
         => Source("[Mirrors(\"api\", \"Gauge\")] public sealed class Gauge : JsObject { " + members + " }", table, message);
