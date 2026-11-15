@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.Validation;
 
@@ -67,28 +68,36 @@ internal sealed class ValidationContext<T>(T model, string prefix, ValidationRun
     }
 }
 
-internal sealed class RuleCondition<T>(Func<T, ValidationRun, Task<bool>> evaluate, bool shared)
+internal sealed class RuleCondition<T>(Func<T, ValidationRun, Task<bool>> evaluate, bool shared, Expression<Func<T, bool>>? browser)
 {
     internal bool Shared { get; } = shared;
+    internal Expression<Func<T, bool>>? Browser { get; } = browser;
     internal Task<bool> Evaluate(T model, ValidationRun run) => evaluate(model, run);
 
-    internal static RuleCondition<T> Of(Expression<Func<T, bool>> expression, bool shared)
-    {
-        var predicate = ServerExpressions.Read(expression);
-        return new RuleCondition<T>((model, _) => Task.FromResult(predicate(model)), shared);
-    }
+    internal static RuleCondition<T> Of(Expression<Func<T, bool>> expression, bool shared) => Read(expression, shared, expression);
+
+    internal static RuleCondition<T> OnServer(Expression<Func<T, bool>> expression, bool shared) => Read(expression, shared, null);
 
     internal static RuleCondition<T> Awaited(Func<T, CancellationToken, Task<bool>> predicate)
         => new((model, run) =>
         {
             run.RequireAsync();
             return predicate(model, run.Cancellation);
-        }, true);
+        }, true, null);
+
+    private static RuleCondition<T> Read(Expression<Func<T, bool>> expression, bool shared, Expression<Func<T, bool>>? browser)
+    {
+        var predicate = ServerExpressions.Read(expression);
+        return new RuleCondition<T>((model, _) => Task.FromResult(predicate(model)), shared, browser);
+    }
 }
 
 internal sealed class RuleGuard<T>(RuleCondition<T> condition, bool negated)
 {
-    internal async Task<bool> Holds(ValidationContext<T> context) => await context.Holds(condition).ConfigureAwait(false) != negated;
+    internal RuleCondition<T> Condition { get; } = condition;
+    internal bool Negated { get; } = negated;
+    internal bool DecidedOnTheServer => Condition.Browser is null;
+    internal async Task<bool> Holds(ValidationContext<T> context) => await context.Holds(Condition).ConfigureAwait(false) != Negated;
 }
 
 internal abstract class ValidationRule<T>(IReadOnlyList<string> sets)
@@ -105,18 +114,38 @@ internal abstract class ValidationRule<T>(IReadOnlyList<string> sets)
         await Check(context).ConfigureAwait(false);
     }
 
+    internal IReadOnlyList<RuleGroup> BrowserGroups(BrowserScope<T> scope)
+    {
+        NameScalars(scope);
+        var decidedOnTheServer = Guards.Any(guard => guard.DecidedOnTheServer);
+        if (!scope.Selects(Sets, this is IncludeRule<T>) || decidedOnTheServer) return [];
+        var rules = BrowserRules(scope);
+        if (rules.Count == 0 || Guards.Count == 0) return rules;
+        return [new RuleGroup([], scope.When(Guards), [], rules)];
+    }
+
     protected virtual bool Refused(ValidationContext<T> context) => false;
     protected abstract Task Check(ValidationContext<T> context);
+
+    private protected virtual void NameScalars(BrowserScope<T> scope)
+    {
+    }
+
+    private protected abstract IReadOnlyList<RuleGroup> BrowserRules(BrowserScope<T> scope);
 }
 
 internal sealed class IncludeRule<T>(IValidator<T> validator, IReadOnlyList<string> sets) : ValidationRule<T>(sets)
 {
     protected override Task Check(ValidationContext<T> context) => context.Run.Child(validator, context.Model, context.Prefix);
+
+    private protected override IReadOnlyList<RuleGroup> BrowserRules(BrowserScope<T> scope)
+        => validator is ReactiveValidator<T> reactive ? reactive.BrowserGroups(scope) : [];
 }
 
 internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOptions<T, TValue>
 {
     private readonly ReactiveValidator<T> _owner;
+    private readonly LambdaExpression _member;
     private readonly Func<T, IEnumerable<TValue>> _values;
     private readonly bool _each;
     private readonly string _path;
@@ -124,10 +153,12 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
     private readonly List<ValidationRule<T>> _dependents = [];
     private Func<CascadeMode> _cascade;
     private string _displayName;
+    private bool _serverOnly;
 
-    internal MemberRule(ReactiveValidator<T> owner, string path, Func<T, IEnumerable<TValue>> values, bool each, IReadOnlyList<string> sets, Func<CascadeMode> cascade) : base(sets)
+    internal MemberRule(ReactiveValidator<T> owner, LambdaExpression member, string path, Func<T, IEnumerable<TValue>> values, bool each, IReadOnlyList<string> sets, Func<CascadeMode> cascade) : base(sets)
     {
         _owner = owner;
+        _member = member;
         _path = path;
         _displayName = DisplayName.Of(path);
         _values = values;
@@ -162,12 +193,13 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
     public IRuleBuilderOptions<T, TValue> WithMessage(string message)
     {
         if (message.Length == 0) throw new ArgumentException("The value cannot be an empty string", "errorMessage");
-        return WithMessage(_ => message);
+        _parts[_parts.Count - 1].Written(message);
+        return this;
     }
 
     public IRuleBuilderOptions<T, TValue> WithMessage(Func<T, string> message)
     {
-        _parts[_parts.Count - 1].Message = message;
+        _parts[_parts.Count - 1].BuiltFromTheModel(message);
         return this;
     }
 
@@ -177,21 +209,56 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
         return this;
     }
 
-    public IRuleBuilderOptions<T, TValue> When(Expression<Func<T, bool>> predicate) => Conditioned(predicate, false);
-    public IRuleBuilderOptions<T, TValue> Unless(Expression<Func<T, bool>> predicate) => Conditioned(predicate, true);
-    public IRuleBuilderOptions<T, TValue> WhenOnServer(Expression<Func<T, bool>> predicate) => Conditioned(predicate, false);
-    public IRuleBuilderOptions<T, TValue> UnlessOnServer(Expression<Func<T, bool>> predicate) => Conditioned(predicate, true);
-    public IRuleBuilderOptions<T, TValue> ServerOnly() => this;
+    public IRuleBuilderOptions<T, TValue> When(Expression<Func<T, bool>> predicate) => Conditioned(RuleCondition<T>.Of(predicate, false), false);
+    public IRuleBuilderOptions<T, TValue> Unless(Expression<Func<T, bool>> predicate) => Conditioned(RuleCondition<T>.Of(predicate, false), true);
+    public IRuleBuilderOptions<T, TValue> WhenOnServer(Expression<Func<T, bool>> predicate) => Conditioned(RuleCondition<T>.OnServer(predicate, false), false);
+    public IRuleBuilderOptions<T, TValue> UnlessOnServer(Expression<Func<T, bool>> predicate) => Conditioned(RuleCondition<T>.OnServer(predicate, false), true);
 
-    private IRuleBuilderOptions<T, TValue> Conditioned(Expression<Func<T, bool>> predicate, bool negated)
+    public IRuleBuilderOptions<T, TValue> ServerOnly()
     {
-        var guard = new RuleGuard<T>(RuleCondition<T>.Of(predicate, false), negated);
+        _serverOnly = true;
+        return this;
+    }
+
+    private IRuleBuilderOptions<T, TValue> Conditioned(RuleCondition<T> condition, bool negated)
+    {
+        var guard = new RuleGuard<T>(condition, negated);
         foreach (var part in _parts) part.Guards.Insert(0, guard);
         foreach (var dependent in _dependents) dependent.Guards.Insert(0, guard);
         return this;
     }
 
     protected override bool Refused(ValidationContext<T> context) => context.Run.Refused(context.Prefix + _path);
+
+    private protected override void NameScalars(BrowserScope<T> scope)
+    {
+        if (!_each) scope.NameScalar<TValue>(_member, _path);
+    }
+
+    private protected override IReadOnlyList<RuleGroup> BrowserRules(BrowserScope<T> scope)
+    {
+        if (_serverOnly) return [];
+        var member = scope.Member<TValue>(_member, _path, _each, _displayName, () => _values(scope.Start()).First());
+        var segments = new List<RuleGroup>();
+        var tests = new List<RuleTest>();
+        foreach (var part in _parts)
+        {
+            if (part.Guards.Any(guard => guard.DecidedOnTheServer)) continue;
+            if (part.Test(member) is { } test)
+            {
+                tests.Add(test);
+                continue;
+            }
+
+            if (part.Group(member) is not { } group) continue;
+            member.CloseField(segments, tests);
+            segments.Add(part.Guards.Count == 0 ? group : new RuleGroup([], scope.When(part.Guards), [], [group]));
+        }
+
+        member.CloseField(segments, tests);
+        member.RequireTheServersOrder(_cascade(), _dependents.Count);
+        return segments;
+    }
 
     protected override async Task Check(ValidationContext<T> context)
     {
@@ -250,7 +317,26 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
 internal abstract class RulePart<T, TValue>
 {
     internal List<RuleGuard<T>> Guards { get; } = [];
-    internal Func<T, string> Message { get; set; } = _ => "";
+    internal Func<T, string> Message { get; private set; } = _ => "";
+    private protected string Text { get; private set; } = "";
+    private protected bool FromTheModel { get; private set; }
+
+    internal void Written(string message)
+    {
+        Message = _ => message;
+        Text = message;
+        FromTheModel = false;
+    }
+
+    internal void BuiltFromTheModel(Func<T, string> message)
+    {
+        Message = message;
+        FromTheModel = true;
+    }
+
+    internal virtual RuleTest? Test(BrowserMember<T, TValue> member) => null;
+
+    internal virtual RuleGroup? Group(BrowserMember<T, TValue> member) => null;
 
     internal async Task<bool> Applies(ValidationContext<T> context)
     {
@@ -269,7 +355,13 @@ internal sealed class CheckPart<T, TValue> : RulePart<T, TValue>
     internal CheckPart(Check<T, TValue> check)
     {
         _check = check;
-        Message = _ => check.Template;
+        Written(check.Template);
+    }
+
+    internal override RuleTest? Test(BrowserMember<T, TValue> member)
+    {
+        if (FromTheModel) return null;
+        return _check.Browser(member) is { } test ? new RuleTest(test.Check, member.When(Guards), member.Message(Text, test)) : null;
     }
 
     internal override async Task Validate(ValidationContext<T> context, TValue value, string fieldPath, MessageArguments arguments)
@@ -281,6 +373,9 @@ internal sealed class CheckPart<T, TValue> : RulePart<T, TValue>
 
 internal sealed class ChildPart<T, TValue>(IValidator<TValue> validator) : RulePart<T, TValue>
 {
+    internal override RuleGroup? Group(BrowserMember<T, TValue> member)
+        => validator is ReactiveValidator<TValue> reactive ? member.Child(reactive) : null;
+
     internal override Task Validate(ValidationContext<T> context, TValue value, string fieldPath, MessageArguments arguments)
         => value is null ? Task.CompletedTask : context.Run.Child(validator, value, context.Prefix + fieldPath + ".");
 }

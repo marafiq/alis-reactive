@@ -1,11 +1,12 @@
 import { pageInputs } from "../InputsAndIds/index";
 import { holdSlots, placeOf, slotsNamedBy, type Owner } from "../OwnershipAndState/index";
-import { assertNever, type Handler, type Locator, type PlanDocument, type Trace } from "../Schema/index";
+import { assertNever, type Expression, type FnExpression, type Handler, type Locator, type PlanDocument, type Trace } from "../Schema/index";
 import type { Traced } from "../Tracing/index";
+import { pageForms } from "../Validation/index";
 import { got, heldOrNull, Stop, value } from "../ValuesAndSources/index";
 import { subscribe } from "../Vendors/index";
 import { bind, isAnObject, within, type Context } from "./context";
-import { evaluate } from "./expressions";
+import { applied, evaluate } from "./expressions";
 import { Lane } from "./lane";
 import { heldBy, located, locatorOf, type ElementFor, type Located, type PluginFor } from "./objects";
 
@@ -19,7 +20,8 @@ export function start(plan: PlanDocument, owner: Owner, elementFor: ElementFor, 
   const boot = traced.span("alis.boot", { "alis.plan_id": plan.planId });
   const context: Context = { plan, owner, scope: new Map(), signal: new AbortController().signal, trace: traced };
   try {
-    pageInputs.join(plan, owner, placeOf(owner), expression => heldOrNull(evaluate(expression, context)));
+    pageInputs.join(plan, owner, placeOf(owner), (expression: Expression): unknown => heldOrNull(evaluate(expression, context)));
+    pageForms.join(plan, owner, (fn: FnExpression, args: readonly unknown[]): unknown => applied(fn, args, context));
   } catch (stopped) {
     if (!(stopped instanceof Stop)) throw stopped;
     console.error(stopped.reason);

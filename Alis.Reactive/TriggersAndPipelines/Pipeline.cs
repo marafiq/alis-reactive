@@ -29,6 +29,8 @@ public sealed class Pipeline<TModel>
         _writer = writer;
     }
 
+    internal BlockWriter Writer => _writer;
+
     /// <summary>Reaches the component an element holds, to read, set, call and listen to its declared members.</summary>
     /// <param name="id">The id the view gave the component's element.</param>
     /// <typeparam name="TComponent">The component's declaration.</typeparam>

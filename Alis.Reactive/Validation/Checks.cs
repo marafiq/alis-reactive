@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,12 +15,14 @@ internal abstract class Check<T, TValue>
 {
     internal abstract string Template { get; }
     internal abstract Task<bool> Passes(T model, TValue value, MessageArguments arguments, ValidationRun run);
+    internal abstract BrowserTest? Browser(BrowserMember<T, TValue> member);
 }
 
-internal sealed class ValueCheck<T, TValue>(Func<TValue, bool> passes, string template) : Check<T, TValue>
+internal sealed class ValueCheck<T, TValue>(Func<TValue, bool> passes, string template, Func<BrowserMember<T, TValue>, BrowserTest?> browser) : Check<T, TValue>
 {
     internal override string Template => template;
     internal override Task<bool> Passes(T model, TValue value, MessageArguments arguments, ValidationRun run) => Task.FromResult(passes(value));
+    internal override BrowserTest? Browser(BrowserMember<T, TValue> member) => browser(member);
 }
 
 internal static class Emptiness
@@ -56,6 +59,16 @@ internal sealed class LengthCheck<T> : Check<T, string?>
         arguments.With("MinLength", _minimum).With("MaxLength", _maximum).With("TotalLength", value?.Length ?? 0);
         return Task.FromResult(value is null || value.Length >= _minimum && (_maximum == -1 || value.Length <= _maximum));
     }
+
+    internal override BrowserTest Browser(BrowserMember<T, string?> member)
+    {
+        var minimum = _minimum;
+        var maximum = _maximum;
+        Expression<Func<string?, bool>> passes = maximum == -1
+            ? value => value == null || value.Length >= minimum
+            : value => value == null || value.Length >= minimum && value.Length <= maximum;
+        return member.Tests(passes, arguments => arguments.With("MinLength", minimum).With("MaxLength", maximum));
+    }
 }
 
 internal sealed class PatternCheck<T>(string pattern, RegexOptions options) : Check<T, string?>
@@ -67,6 +80,17 @@ internal sealed class PatternCheck<T>(string pattern, RegexOptions options) : Ch
     {
         arguments.With("RegularExpression", pattern);
         return Task.FromResult(_matches(value));
+    }
+
+    internal override BrowserTest Browser(BrowserMember<T, string?> member)
+    {
+        if ((options & RegexOptions.IgnoreCase) != 0)
+            throw new InvalidOperationException($"The pattern '{pattern}' ignores case, which no browser flag folds as .NET does; spell both cases, as [Aa]spirin, or mark the rule .ServerOnly().");
+        if (options != RegexOptions.None)
+            throw new NotImplementedException($"The pattern '{pattern}' is read with RegexOptions.{options}, and the plan carries a pattern with no options: a rule whose pattern needs an option has no browser form yet; mark the rule .ServerOnly().");
+        var copy = BrowserPattern.CopyOf(pattern, reason => new InvalidOperationException("The pattern '" + pattern + "' " + reason.TrimEnd('.') + ", or mark the rule .ServerOnly()."));
+        return member.TestsTheValue(value => BrowserTerms.NullOr(value, BrowserTerms.Matches(value, copy)),
+            arguments => arguments.With("RegularExpression", pattern));
     }
 }
 
@@ -103,28 +127,33 @@ internal static class TextChecks
 internal sealed class Comparison
 {
     private readonly Func<object?, object?, bool> _passes;
-    private Comparison(string template, Func<object?, object?, bool> passes)
+    private Comparison(string template, ExpressionType node, bool orders, Func<object?, object?, bool> passes)
     {
         Template = template;
+        Node = node;
+        Orders = orders;
         _passes = passes;
     }
 
     internal string Template { get; }
+    internal ExpressionType Node { get; }
+    internal bool Orders { get; }
     internal bool Passes(object? value, object? other) => _passes(value, other);
-    internal static Comparison Equal { get; } = new(Templates.Equal, Equals);
-    internal static Comparison NotEqual { get; } = new(Templates.NotEqual, (value, other) => !Equals(value, other));
-    internal static Comparison GreaterThan { get; } = Ordered(Templates.GreaterThan, order => order > 0);
-    internal static Comparison GreaterThanOrEqual { get; } = Ordered(Templates.GreaterThanOrEqual, order => order >= 0);
-    internal static Comparison LessThan { get; } = Ordered(Templates.LessThan, order => order < 0);
-    internal static Comparison LessThanOrEqual { get; } = Ordered(Templates.LessThanOrEqual, order => order <= 0);
+    internal static Comparison Equal { get; } = new(Templates.Equal, ExpressionType.Equal, false, Equals);
+    internal static Comparison NotEqual { get; } = new(Templates.NotEqual, ExpressionType.NotEqual, false, (value, other) => !Equals(value, other));
+    internal static Comparison GreaterThan { get; } = Ordered(Templates.GreaterThan, ExpressionType.GreaterThan, order => order > 0);
+    internal static Comparison GreaterThanOrEqual { get; } = Ordered(Templates.GreaterThanOrEqual, ExpressionType.GreaterThanOrEqual, order => order >= 0);
+    internal static Comparison LessThan { get; } = Ordered(Templates.LessThan, ExpressionType.LessThan, order => order < 0);
+    internal static Comparison LessThanOrEqual { get; } = Ordered(Templates.LessThanOrEqual, ExpressionType.LessThanOrEqual, order => order <= 0);
 
-    private static Comparison Ordered(string template, Func<int, bool> accepts)
-        => new(template, (value, other) => value is null || other is not null && accepts(Comparer.Default.Compare(value, other)));
+    private static Comparison Ordered(string template, ExpressionType node, Func<int, bool> accepts)
+        => new(template, node, true, (value, other) => value is null || other is not null && accepts(Comparer.Default.Compare(value, other)));
 }
 
-internal sealed class CompareCheck<T, TValue, TPeer>(Comparison comparison, Func<T, TPeer> read, string displayName) : Check<T, TValue>
+internal sealed class CompareCheck<T, TValue, TPeer>(Comparison comparison, Func<T, TPeer> read, string displayName, Func<BrowserMember<T, TValue>, BrowserTest> browser) : Check<T, TValue>
 {
     internal override string Template => comparison.Template;
+    internal override BrowserTest Browser(BrowserMember<T, TValue> member) => browser(member);
     internal override Task<bool> Passes(T model, TValue value, MessageArguments arguments, ValidationRun run)
     {
         var other = read(model);
@@ -158,6 +187,9 @@ internal sealed class BetweenCheck<T, TValue, TBound> : Check<T, TValue>
         var to = Comparer.Default.Compare(value, _to);
         return Task.FromResult(_inclusive ? from >= 0 && to <= 0 : from > 0 && to < 0);
     }
+
+    internal override BrowserTest Browser(BrowserMember<T, TValue> member)
+        => member.Between(_from, _to, _inclusive, arguments => arguments.With("From", _from).With("To", _to));
 }
 
 internal sealed class PrecisionScaleCheck<T, TValue> : Check<T, TValue>
@@ -201,12 +233,16 @@ internal sealed class PrecisionScaleCheck<T, TValue> : Check<T, TValue>
             .With("Digits", Math.Max(integerDigits, 1) + printedScale).With("ActualScale", printedScale);
         return Task.FromResult(scale <= _scale && integerDigits <= _precision - _scale);
     }
+
+    internal override BrowserTest Browser(BrowserMember<T, TValue> member)
+        => throw new NotImplementedException("PrecisionScale counts a decimal's digits, and the plan's operators count none: a PrecisionScale rule has no browser form yet; mark the rule .ServerOnly().");
 }
 
 internal sealed class PredicateCheck<T, TValue>(Func<T, TValue, bool> predicate) : Check<T, TValue>
 {
     internal override string Template => Templates.Predicate;
     internal override Task<bool> Passes(T model, TValue value, MessageArguments arguments, ValidationRun run) => Task.FromResult(predicate(model, value));
+    internal override BrowserTest? Browser(BrowserMember<T, TValue> member) => null;
 }
 
 internal sealed class AsyncPredicateCheck<T, TValue>(Func<T, TValue, CancellationToken, Task<bool>> predicate) : Check<T, TValue>
@@ -217,6 +253,8 @@ internal sealed class AsyncPredicateCheck<T, TValue>(Func<T, TValue, Cancellatio
         run.RequireAsync();
         return predicate(model, value, run.Cancellation);
     }
+
+    internal override BrowserTest? Browser(BrowserMember<T, TValue> member) => null;
 }
 
 internal sealed class EnumCheck<T, TValue, TEnum>(Func<TValue, TEnum?> read) : Check<T, TValue> where TEnum : struct, Enum
@@ -228,5 +266,12 @@ internal sealed class EnumCheck<T, TValue, TEnum>(Func<TValue, TEnum?> read) : C
         if (read(value) is not { } enumeration) return Task.FromResult(true);
         if (!run.Flags.Contains(typeof(TEnum))) return Task.FromResult(Enum.IsDefined(typeof(TEnum), enumeration));
         return Task.FromResult(EnumNames.NamesFlags(enumeration));
+    }
+
+    internal override BrowserTest Browser(BrowserMember<T, TValue> member)
+    {
+        if (member.Flags.Contains(typeof(TEnum)))
+            throw new NotImplementedException($"{ClassNames.AsCSharpWritesIt(typeof(TEnum))} is named as flags, and the plan's operators test no bit of a combination: IsInEnum over a flags enum has no browser form yet; mark the rule .ServerOnly().");
+        return member.InEnum(Enum.GetValues(typeof(TEnum)).Cast<object>());
     }
 }

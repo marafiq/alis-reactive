@@ -1,5 +1,5 @@
 import type { Owner } from "../OwnershipAndState/index";
-import type { Container, Expression, InputBinding, ModelPluginData, PathStep, PlanDocument } from "../Schema/index";
+import { assertNever, notBuilt, type AsExpression, type Container, type Expression, type InputBinding, type ModelPluginData, type OpExpression, type PathStep, type PlanDocument, type SentInput } from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
 
 type ReadValue = (expression: Expression) => unknown;
@@ -15,6 +15,13 @@ interface Contribution {
 interface Input {
   readonly binding: InputBinding;
   readonly contribution: Contribution;
+}
+
+export interface CapturedContainer {
+  readonly kind: "captured";
+  readonly id: string;
+  readonly body: object;
+  readonly inputs: readonly SentInput[];
 }
 
 export class PageInputs {
@@ -54,6 +61,10 @@ export class PageInputs {
   }
 
   sent(containerId: string, modelKey: string): object {
+    return this.captured(containerId, modelKey).body;
+  }
+
+  captured(containerId: string, modelKey: string): CapturedContainer {
     const inside = this.#inside(containerId);
     if (inside === null) throw new Stop("No element has the id '" + containerId + "'.");
     const renderings = this.#containers.get(containerId);
@@ -70,7 +81,16 @@ export class PageInputs {
     const [first] = inputs;
     const body = first !== undefined && typeof first[1].binding.path[0] === "number" ? [] : {};
     for (const [, input] of inputs) write(body, input.binding.path, input.contribution.read(input.binding.value));
-    return body;
+    return { kind: "captured", id: containerId, body, inputs: inputs.map(([id, input]) => ({ name: input.binding.name, entry: { id, binding: input.binding } })) };
+  }
+
+  typedText(sent: SentInput): string | null {
+    const input = this.#inputs.get(sent.entry.id);
+    if (input === undefined) throw new Stop("Input '" + sent.entry.id + "' left the page before its check read it.");
+    const converted = convertedRead(input.binding.value);
+    const typed = input.contribution.read(converted.expr);
+    if (typeof typed !== "string" || typed.trim() === "") return null;
+    return input.contribution.read(converted) === null ? typed : null;
   }
 
   #drop(contribution: Contribution): void {
@@ -80,6 +100,54 @@ export class PageInputs {
       renderings?.delete(contribution);
       if (renderings?.size === 0) this.#containers.delete(id);
     }
+  }
+}
+
+const notCoalesced = "a typed text read through a binding whose value is not coalesce(as(read, shape), blank): the contract types InputBinding.value as any expression, though C# writes that form (N3.3)";
+
+function convertedRead(value: Expression): AsExpression {
+  switch (value.kind) {
+    case "op":
+      return coalescedRead(value);
+    case "lit":
+    case "obj":
+    case "ref":
+    case "get":
+    case "data":
+    case "as":
+    case "call":
+    case "fn":
+    case "answer":
+    case "record":
+    case "list":
+    case "signal":
+      throw notBuilt(notCoalesced);
+    default:
+      return assertNever(value);
+  }
+}
+
+function coalescedRead(value: OpExpression): AsExpression {
+  const [converted] = value.args;
+  if (value.op !== "coalesce" || converted === undefined) throw notBuilt(notCoalesced);
+  switch (converted.kind) {
+    case "as":
+      return converted;
+    case "lit":
+    case "obj":
+    case "ref":
+    case "get":
+    case "data":
+    case "call":
+    case "fn":
+    case "answer":
+    case "record":
+    case "list":
+    case "op":
+    case "signal":
+      throw notBuilt(notCoalesced);
+    default:
+      return assertNever(converted);
   }
 }
 

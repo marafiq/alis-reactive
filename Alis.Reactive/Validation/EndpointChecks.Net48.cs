@@ -98,10 +98,5 @@ public static class EndpointChecks
         => controller.ModelState.SelectMany(entry => entry.Value!.Errors.Select(error => new ValidationFailure(entry.Key,
             error.ErrorMessage.Length > 0 ? error.ErrorMessage : string.Format(CultureInfo.CurrentCulture,
                 "The value '{0}' is not valid for {1}.", entry.Value.Value?.AttemptedValue, entry.Key.Substring(entry.Key.LastIndexOf('.') + 1))))).ToArray();
-
-    private sealed class ResolverServices : IServiceProvider
-    {
-        public object? GetService(Type serviceType) => DependencyResolver.Current.GetService(serviceType);
-    }
 }
 #endif

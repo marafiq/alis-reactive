@@ -1,6 +1,6 @@
 import { operated } from "../Conditions/index";
 import { plugin } from "../Plugins/index";
-import { assertNever, type CallExpression, type Expression } from "../Schema/index";
+import { assertNever, type CallExpression, type Expression, type FnExpression } from "../Schema/index";
 import { called, converted, got, heldOrNull, value, type Read, type Returns } from "../ValuesAndSources/index";
 import type { Context } from "./context";
 import { read } from "./data";
@@ -15,7 +15,7 @@ export function evaluate(expression: Expression, context: Context): Read {
     case "ref":
       return bound(expression.name, context);
     case "fn":
-      return value(callable(expression.params, expression.body, context));
+      return value((...args: unknown[]): unknown => applied(expression, args, context));
     case "signal":
       return value(context.signal);
     case "as":
@@ -49,12 +49,10 @@ function bound(name: string, context: Context): Read {
   return typeof held === "function" ? held() : held;
 }
 
-function callable(params: readonly string[], body: Expression, context: Context): (...args: unknown[]) => unknown {
-  return (...args: unknown[]): unknown => {
-    const scope = new Map(context.scope);
-    params.forEach((name, position) => scope.set(name, value(args[position])));
-    return heldOrNull(evaluate(body, { ...context, scope }));
-  };
+export function applied(fn: FnExpression, args: readonly unknown[], context: Context): unknown {
+  const scope = new Map(context.scope);
+  fn.params.forEach((name, position) => scope.set(name, value(args[position])));
+  return heldOrNull(evaluate(fn.body, { ...context, scope }));
 }
 
 export function awaited(expression: Expression, context: Context): Read {

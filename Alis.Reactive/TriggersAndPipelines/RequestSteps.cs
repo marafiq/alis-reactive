@@ -1,6 +1,7 @@
 using System;
 using Alis.Reactive.Elements;
 using Alis.Reactive.RequestsAndResponses;
+using Alis.Reactive.Validation;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.TriggersAndPipelines;
@@ -17,10 +18,16 @@ public static class RequestSteps
     public static void Parallel<TModel>(this Pipeline<TModel> pipeline, params Action<Pipeline<TModel>>[] branches) => throw new NotImplementedException();
 
     /// <summary>Checks a container's inputs, as it sends them, by the validator registered for its model, with no request.</summary>
-    /// <remarks>A check that fails shows its failures at the container and stops the pipeline.</remarks>
+    /// <remarks>
+    /// The check runs the validator's default rule set in the browser, over the model the endpoint would bind from the
+    /// container's inputs, and a text a member's type cannot hold fails that member as the endpoint's binder does. A
+    /// rule only the server decides is left to the server. A check that fails stops the pipeline. A model with no
+    /// registered validator is refused where the view renders.
+    /// </remarks>
     /// <param name="pipeline">The pipeline the step is written in.</param>
     /// <param name="container">The container whose inputs are checked.</param>
-    public static void Validate<TModel, TContainer>(this Pipeline<TModel> pipeline, RequestContainer<TContainer> container) => throw new NotImplementedException();
+    public static void Validate<TModel, TContainer>(this Pipeline<TModel> pipeline, RequestContainer<TContainer> container)
+        => FormChecks.WithNoRequest<TContainer>(pipeline.Writer, container.ElementId);
 
     /// <summary>Shows a server's validation errors as the request's failures: every message in its summary, and each at the input the request sent under its key.</summary>
     /// <param name="pipeline">The pipeline of a request's route.</param>

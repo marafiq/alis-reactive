@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.Validation;
 
@@ -85,7 +86,7 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
     public IRuleBuilder<T, TProperty> RuleFor<TProperty>(Expression<Func<T, TProperty>> member)
     {
         var named = new ModelMember<T, TProperty>(member);
-        var rule = new MemberRule<T, TProperty>(this, named.Name, model => [named.Read(model)], false, _sets, () => RuleLevelCascadeMode);
+        var rule = new MemberRule<T, TProperty>(this, member, named.Name, model => [named.Read(model)], false, _sets, () => RuleLevelCascadeMode);
         _rules.Add(rule);
         return rule;
     }
@@ -96,7 +97,7 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
     public IRuleBuilder<T, TElement> RuleForEach<TElement>(Expression<Func<T, IEnumerable<TElement>>> collection)
     {
         var named = new ModelMember<T, IEnumerable<TElement>>(collection);
-        var rule = new MemberRule<T, TElement>(this, named.Name, model => named.Read(model) ?? Enumerable.Empty<TElement>(), true, _sets, () => RuleLevelCascadeMode);
+        var rule = new MemberRule<T, TElement>(this, collection, named.Name, model => named.Read(model) ?? Enumerable.Empty<TElement>(), true, _sets, () => RuleLevelCascadeMode);
         _rules.Add(rule);
         return rule;
     }
@@ -146,14 +147,14 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
     /// <param name="predicate">The condition over the model.</param>
     /// <param name="rules">Declares the rules.</param>
     /// <returns>The block, whose <c>Otherwise</c> declares the rules of the other case.</returns>
-    public IConditionBuilder WhenOnServer(Expression<Func<T, bool>> predicate, Action rules) => Branch(RuleCondition<T>.Of(predicate, true), false, rules);
+    public IConditionBuilder WhenOnServer(Expression<Func<T, bool>> predicate, Action rules) => Branch(RuleCondition<T>.OnServer(predicate, true), false, rules);
 
     /// <summary>Applies the rules written inside only when the condition does not hold, decided by the server alone.</summary>
     /// <remarks>The rules under it stay whole on the server.</remarks>
     /// <param name="predicate">The condition over the model.</param>
     /// <param name="rules">Declares the rules.</param>
     /// <returns>The block, whose <c>Otherwise</c> declares the rules of the other case.</returns>
-    public IConditionBuilder UnlessOnServer(Expression<Func<T, bool>> predicate, Action rules) => Branch(RuleCondition<T>.Of(predicate, true), true, rules);
+    public IConditionBuilder UnlessOnServer(Expression<Func<T, bool>> predicate, Action rules) => Branch(RuleCondition<T>.OnServer(predicate, true), true, rules);
 
     /// <summary>Applies the rules written inside only when an awaited condition holds, decided by the server alone.</summary>
     /// <param name="predicate">The condition over the model, answered by a task.</param>
@@ -202,6 +203,8 @@ public abstract class ReactiveValidator<T> : ReactiveValidator, IValidator<T>
     }
 
     internal void TakeHolderSets(IReadOnlyList<string> sets) => _sets = sets;
+
+    internal IReadOnlyList<RuleGroup> BrowserGroups(BrowserScope<T> scope) => [.. _rules.SelectMany(rule => rule.BrowserGroups(scope))];
 
     internal List<ValidationRule<T>> Capture(Action rules, IReadOnlyList<string> sets)
     {

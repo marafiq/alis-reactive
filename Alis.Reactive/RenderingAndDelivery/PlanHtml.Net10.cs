@@ -30,7 +30,8 @@ public static class PlanHtml
             text => html.ViewData.TemplateInfo.GetFullHtmlFieldName(text),
             html.GenerateIdFromName,
             () => ViewPaths.Of(html),
-            type => html.ViewContext.HttpContext.RequestServices.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true);
+            type => html.ViewContext.HttpContext.RequestServices.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true,
+            () => html.ViewContext.HttpContext.RequestServices);
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>

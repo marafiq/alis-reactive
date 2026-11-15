@@ -18,15 +18,15 @@ public static class RuleBuilderExtensions
 {
     /// <summary>Requires the member to hold a value that is not null.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, TProperty> NotNull<T, TProperty>(this IRuleBuilder<T, TProperty> rule) => Add(rule, new ValueCheck<T, TProperty>(value => value is not null, Templates.NotNull));
+    public static IRuleBuilderOptions<T, TProperty> NotNull<T, TProperty>(this IRuleBuilder<T, TProperty> rule) => Add(rule, new ValueCheck<T, TProperty>(value => value is not null, Templates.NotNull, member => member.NotNull()));
 
     /// <summary>Requires the member to hold a value that is not empty.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, TProperty> NotEmpty<T, TProperty>(this IRuleBuilder<T, TProperty> rule) => Add(rule, new ValueCheck<T, TProperty>(value => !Emptiness.IsEmpty(value), Templates.NotEmpty));
+    public static IRuleBuilderOptions<T, TProperty> NotEmpty<T, TProperty>(this IRuleBuilder<T, TProperty> rule) => Add(rule, new ValueCheck<T, TProperty>(value => !Emptiness.IsEmpty(value), Templates.NotEmpty, member => member.Emptiness(false)));
 
     /// <summary>Requires the member to be empty.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, TProperty> Empty<T, TProperty>(this IRuleBuilder<T, TProperty> rule) => Add(rule, new ValueCheck<T, TProperty>(Emptiness.IsEmpty, Templates.Empty));
+    public static IRuleBuilderOptions<T, TProperty> Empty<T, TProperty>(this IRuleBuilder<T, TProperty> rule) => Add(rule, new ValueCheck<T, TProperty>(Emptiness.IsEmpty, Templates.Empty, member => member.Emptiness(true)));
 
     /// <summary>Requires a text of at least a number of characters.</summary>
     /// <param name="rule">The rule.</param>
@@ -77,21 +77,21 @@ public static class RuleBuilderExtensions
 
     /// <summary>Requires a text with one <c>@</c> that is neither its first nor its last character.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> EmailAddress<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.Email, Templates.Email));
+    public static IRuleBuilderOptions<T, string?> EmailAddress<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.Email, Templates.Email, _ => throw BrowserTerms.NoOperatorFor("EmailAddress")));
 
     /// <summary>Requires an <c>http</c> or <c>https</c> URL.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> Url<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.Url, Templates.Url));
+    public static IRuleBuilderOptions<T, string?> Url<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.Url, Templates.Url, _ => throw BrowserTerms.NoOperatorFor("Url")));
 
     /// <summary>Requires a text whose digits, once its spaces and dashes are taken out, hold the Luhn checksum.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> CreditCard<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.CreditCard, Templates.CreditCard));
+    public static IRuleBuilderOptions<T, string?> CreditCard<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.CreditCard, Templates.CreditCard, _ => throw BrowserTerms.NoOperatorFor("CreditCard")));
 
     /// <summary>Requires the member to equal a value.</summary>
     /// <param name="rule">The rule.</param>
     /// <param name="value">The value the member is compared with.</param>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, TProperty> Equal<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value) => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.Equal, _ => value, ""));
+    public static IRuleBuilderOptions<T, TProperty> Equal<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value) => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.Equal, _ => value, "", member => member.Compared(Comparison.Equal, value)));
 
     /// <summary>Requires the member to equal another member of the model.</summary>
     /// <param name="rule">The rule.</param>
@@ -103,7 +103,7 @@ public static class RuleBuilderExtensions
     /// <param name="rule">The rule.</param>
     /// <param name="value">The value the member is compared with.</param>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, TProperty> NotEqual<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value) => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.NotEqual, _ => value, ""));
+    public static IRuleBuilderOptions<T, TProperty> NotEqual<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value) => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.NotEqual, _ => value, "", member => member.Compared(Comparison.NotEqual, value)));
 
     /// <summary>Requires the member to differ from another member of the model.</summary>
     /// <param name="rule">The rule.</param>
@@ -117,7 +117,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TProperty> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)
         where TProperty : IComparable<TProperty>, IComparable
-        => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.GreaterThan, _ => value, ""));
+        => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.GreaterThan, _ => value, "", member => member.Compared(Comparison.GreaterThan, value)));
 
     /// <summary>Requires the member to be greater than a value.</summary>
     /// <param name="rule">The rule.</param>
@@ -125,7 +125,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TProperty?> GreaterThan<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, TProperty value)
         where TProperty : struct, IComparable<TProperty>, IComparable
-        => Add(rule, new CompareCheck<T, TProperty?, TProperty>(Comparison.GreaterThan, _ => value, ""));
+        => Add(rule, new CompareCheck<T, TProperty?, TProperty>(Comparison.GreaterThan, _ => value, "", member => member.Compared(Comparison.GreaterThan, value)));
 
     /// <summary>Requires the member to be greater than another member of the model.</summary>
     /// <param name="rule">The rule.</param>
@@ -165,7 +165,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TProperty> GreaterThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)
         where TProperty : IComparable<TProperty>, IComparable
-        => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.GreaterThanOrEqual, _ => value, ""));
+        => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.GreaterThanOrEqual, _ => value, "", member => member.Compared(Comparison.GreaterThanOrEqual, value)));
 
     /// <summary>Requires the member to be at least a value.</summary>
     /// <param name="rule">The rule.</param>
@@ -173,7 +173,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TProperty?> GreaterThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, TProperty value)
         where TProperty : struct, IComparable<TProperty>, IComparable
-        => Add(rule, new CompareCheck<T, TProperty?, TProperty>(Comparison.GreaterThanOrEqual, _ => value, ""));
+        => Add(rule, new CompareCheck<T, TProperty?, TProperty>(Comparison.GreaterThanOrEqual, _ => value, "", member => member.Compared(Comparison.GreaterThanOrEqual, value)));
 
     /// <summary>Requires the member to be at least another member of the model.</summary>
     /// <param name="rule">The rule.</param>
@@ -213,7 +213,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TProperty> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)
         where TProperty : IComparable<TProperty>, IComparable
-        => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.LessThan, _ => value, ""));
+        => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.LessThan, _ => value, "", member => member.Compared(Comparison.LessThan, value)));
 
     /// <summary>Requires the member to be less than a value.</summary>
     /// <param name="rule">The rule.</param>
@@ -221,7 +221,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TProperty?> LessThan<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, TProperty value)
         where TProperty : struct, IComparable<TProperty>, IComparable
-        => Add(rule, new CompareCheck<T, TProperty?, TProperty>(Comparison.LessThan, _ => value, ""));
+        => Add(rule, new CompareCheck<T, TProperty?, TProperty>(Comparison.LessThan, _ => value, "", member => member.Compared(Comparison.LessThan, value)));
 
     /// <summary>Requires the member to be less than another member of the model.</summary>
     /// <param name="rule">The rule.</param>
@@ -261,7 +261,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TProperty> LessThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty> rule, TProperty value)
         where TProperty : IComparable<TProperty>, IComparable
-        => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.LessThanOrEqual, _ => value, ""));
+        => Add(rule, new CompareCheck<T, TProperty, TProperty>(Comparison.LessThanOrEqual, _ => value, "", member => member.Compared(Comparison.LessThanOrEqual, value)));
 
     /// <summary>Requires the member to be at most a value.</summary>
     /// <param name="rule">The rule.</param>
@@ -269,7 +269,7 @@ public static class RuleBuilderExtensions
     /// <returns>The rule, which takes its options.</returns>
     public static IRuleBuilderOptions<T, TProperty?> LessThanOrEqualTo<T, TProperty>(this IRuleBuilder<T, TProperty?> rule, TProperty value)
         where TProperty : struct, IComparable<TProperty>, IComparable
-        => Add(rule, new CompareCheck<T, TProperty?, TProperty>(Comparison.LessThanOrEqual, _ => value, ""));
+        => Add(rule, new CompareCheck<T, TProperty?, TProperty>(Comparison.LessThanOrEqual, _ => value, "", member => member.Compared(Comparison.LessThanOrEqual, value)));
 
     /// <summary>Requires the member to be at most another member of the model.</summary>
     /// <param name="rule">The rule.</param>
@@ -450,6 +450,7 @@ public static class RuleBuilderExtensions
     private static IRuleBuilderOptions<T, TValue> ComparedWithMember<T, TValue, TPeer>(IRuleBuilder<T, TValue> rule, Comparison comparison, Expression<Func<T, TPeer>> member)
     {
         var named = new ModelMember<T, TPeer>(member);
-        return Add(rule, new CompareCheck<T, TValue, TPeer>(comparison, named.Read, DisplayName.Of(named.Name)));
+        var peerName = DisplayName.Of(named.Name);
+        return Add(rule, new CompareCheck<T, TValue, TPeer>(comparison, named.Read, peerName, browser => browser.ComparedWithMember(comparison, member, peerName)));
     }
 }

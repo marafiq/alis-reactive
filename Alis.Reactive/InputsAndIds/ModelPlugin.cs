@@ -21,10 +21,14 @@ internal static class ModelPlugin
         DeclaredIn(plan);
     }
 
-    internal static Expression Sent(PlanContent plan, string containerId, string model)
+    internal static Expression Sent(PlanContent plan, string containerId, string model) => Called(plan, "sent", containerId, model);
+
+    internal static Expression Captured(PlanContent plan, string containerId, string model) => Called(plan, "captured", containerId, model);
+
+    private static CallExpression Called(PlanContent plan, string method, string containerId, string model)
     {
         DeclaredIn(plan);
-        return new CallExpression([new MemberStep("sent")], PathMembers.Required, new ObjExpression(ObjectId),
+        return new CallExpression([new MemberStep(method)], PathMembers.Required, new ObjExpression(ObjectId),
             [ValuesAndSources.Literals.Text(containerId), ValuesAndSources.Literals.Text(model)]);
     }
 
