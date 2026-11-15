@@ -3,6 +3,7 @@ using Alis.Reactive.Plugins;
 
 namespace Alis.Reactive.Conformance.App.Care;
 
+[Mirrors("Care/Record/card-radio", "CardRadio")]
 public sealed class CardRadio : Plugin
 {
     public CardRadio()

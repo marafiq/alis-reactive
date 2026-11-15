@@ -3,6 +3,7 @@ using Alis.Reactive.Plugins;
 
 namespace Alis.Reactive.Conformance.App.Bench;
 
+[Mirrors("Bench/Plugins/visitor-desk", "VisitorBook")]
 public sealed class VisitorBook : Plugin
 {
     public VisitorBook()

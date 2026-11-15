@@ -12,7 +12,12 @@ function listenersOf(event: string): Set<Listener> {
 
 let offThrows = false;
 
-const benchClock = {
+interface BenchClock {
+  on(event: string, listener: Listener): void;
+  off(event: string, listener: Listener): void;
+}
+
+const benchClock: BenchClock = {
   on(event: string, listener: Listener): void {
     listenersOf(event).add(listener);
   },

@@ -29,7 +29,11 @@ const clock: NightClock = { onStruck: null };
 
 const freedListeners = new Set<FreedListener>();
 
-const bedStore = {
+interface BedStore {
+  subscribe(event: string, listener: FreedListener): () => void;
+}
+
+const bedStore: BedStore = {
   subscribe(event: string, listener: FreedListener): () => void {
     if (event !== "freed") throw new Error("The bed store raises no event '" + event + "'.");
     freedListeners.add(listener);

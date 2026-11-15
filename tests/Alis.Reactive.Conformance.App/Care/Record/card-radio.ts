@@ -10,7 +10,13 @@ function listenersOf(event: string): Set<Listener> {
   return added;
 }
 
-const cardRadio = {
+interface CardRadio {
+  on(event: string, listener: Listener): void;
+  off(event: string, listener: Listener): void;
+  transmit(): void;
+}
+
+const cardRadio: CardRadio = {
   on(event: string, listener: Listener): void {
     listenersOf(event).add(listener);
   },

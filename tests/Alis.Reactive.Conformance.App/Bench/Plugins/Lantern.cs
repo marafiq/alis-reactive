@@ -3,6 +3,7 @@ using Alis.Reactive.Plugins;
 
 namespace Alis.Reactive.Conformance.App.Bench;
 
+[Mirrors("Bench/Plugins/lantern-of-amber", "Lantern")]
 public sealed class Lantern : Plugin
 {
     public Lantern()

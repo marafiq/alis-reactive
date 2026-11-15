@@ -5,6 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
         <AlisSliceTree>true</AlisSliceTree>
+        <VendorContractTsConfig>$(MSBuildThisFileDirectory)tsconfig.json</VendorContractTsConfig>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,5 +15,7 @@
         <ProjectReference Include="..\..\Alis.Reactive.Fusion\Alis.Reactive.Fusion.csproj" />
         <ProjectReference Include="..\Alis.Reactive.Conformance.World\Alis.Reactive.Conformance.World.csproj" />
     </ItemGroup>
+
+    <Import Project="../../Alis.Reactive.Analyzers/Vendors/VendorContract.targets" />
 
 </Project>

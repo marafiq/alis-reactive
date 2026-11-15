@@ -1,6 +1,10 @@
 let rings = 0;
 
-const bell = {
+interface MoveInBell {
+  ring(): number;
+}
+
+const bell: MoveInBell = {
   ring(): number {
     rings += 1;
     return rings;

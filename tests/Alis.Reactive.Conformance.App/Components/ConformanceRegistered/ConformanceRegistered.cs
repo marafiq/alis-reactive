@@ -3,6 +3,7 @@ using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.Conformance.App.Components;
 
+[Mirrors("Components/ConformanceRegistered/conformance-registered", "ConformanceRegistered")]
 public sealed class ConformanceRegistered : Component
 {
     public static ComponentVendor Declared { get; } = ComponentVendor.Define("conformance-registered", VendorLookup.ByPlugin("conformance-registry"), subscribe: "on", unsubscribe: "off");

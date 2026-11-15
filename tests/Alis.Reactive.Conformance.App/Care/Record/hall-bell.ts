@@ -1,6 +1,10 @@
 let rings = 0;
 
-const bell = {
+interface HallBell {
+  ring(): number;
+}
+
+const bell: HallBell = {
   ring(): number {
     rings += 1;
     return rings;

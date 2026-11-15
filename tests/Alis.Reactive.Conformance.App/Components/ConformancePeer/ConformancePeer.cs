@@ -3,6 +3,7 @@ using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.Conformance.App.Components;
 
+[Mirrors("Components/ConformancePeer/conformance-peer", "ConformancePeer")]
 public sealed class ConformancePeer : Component
 {
     public static ComponentVendor Declared { get; } = ComponentVendor.Define("conformance-peer", objectPath: "conformancePeer", subscribe: "addEventListener", unsubscribe: "removeEventListener", elementPath: "element");

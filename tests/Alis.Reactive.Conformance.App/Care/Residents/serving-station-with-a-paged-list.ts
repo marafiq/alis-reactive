@@ -1,4 +1,8 @@
-const servingStation = {
+interface ServingStation {
+  plates: { result: string[]; count: number };
+}
+
+const servingStation: ServingStation = {
   plates: { result: ["Soup", "Fish pie", "Rice pudding"], count: 3 },
 };
 

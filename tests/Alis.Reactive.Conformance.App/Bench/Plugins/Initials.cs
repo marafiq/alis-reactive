@@ -4,6 +4,7 @@ using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Conformance.App.Bench;
 
+[Mirrors("Bench/Plugins/shift-log-desk", "initials")]
 public sealed class Initials : Plugin
 {
     public Initials()

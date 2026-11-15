@@ -1,6 +1,11 @@
 let added = 0;
 
-const tally = {
+interface CardTally {
+  addOne(): number;
+  readonly count: number;
+}
+
+const tally: CardTally = {
   addOne(): number {
     added += 1;
     return added;

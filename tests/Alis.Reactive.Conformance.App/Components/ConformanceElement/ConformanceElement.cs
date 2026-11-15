@@ -3,6 +3,7 @@ using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.Conformance.App.Components;
 
+[Mirrors("Components/ConformanceElement/conformance-element", "ConformanceElement")]
 public sealed class ConformanceElement : Component
 {
     public override ComponentVendor Vendor => ComponentVendor.Native;

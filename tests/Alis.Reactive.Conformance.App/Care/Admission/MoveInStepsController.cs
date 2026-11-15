@@ -29,6 +29,7 @@ public sealed class MoveInRing
     public int Count { get; init; }
 }
 
+[Mirrors("Care/Admission/move-in-bell", "MoveInBell")]
 public sealed class MoveInBell : Plugin
 {
     public MoveInBell()

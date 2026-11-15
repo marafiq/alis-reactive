@@ -4,6 +4,7 @@ using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Conformance.App.Care;
 
+[Mirrors("Care/Residents/serving-station-with-a-paged-list", "ServingStation")]
 public sealed class ServingStation : Plugin
 {
     public ServingStation()

@@ -3,6 +3,7 @@ using Alis.Reactive.Plugins;
 
 namespace Alis.Reactive.Conformance.App.Care;
 
+[Mirrors("Care/Record/card-tally", "CardTally")]
 public sealed class CardTally : Plugin
 {
     public CardTally()

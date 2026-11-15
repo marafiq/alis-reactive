@@ -3,6 +3,7 @@ using Alis.Reactive.Plugins;
 
 namespace Alis.Reactive.Conformance.App.Bench;
 
+[Mirrors("Bench/Plugins/shift-log-desk", "BedStore")]
 public sealed class BedStore : Plugin
 {
     public BedStore()

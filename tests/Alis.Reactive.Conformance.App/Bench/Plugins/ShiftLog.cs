@@ -4,6 +4,7 @@ using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.Conformance.App.Bench;
 
+[Mirrors("Bench/Plugins/shift-log-desk", "ShiftLog")]
 public sealed class ShiftLog : Plugin
 {
     public ShiftLog()

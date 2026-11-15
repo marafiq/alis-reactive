@@ -1,4 +1,8 @@
-const pageLog = {
+interface PageLog {
+  log(text: string | null): void;
+}
+
+const pageLog: PageLog = {
   log(text: string | null): void {
     const line = document.createElement("li");
     line.textContent = text;

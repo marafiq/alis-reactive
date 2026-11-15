@@ -3,6 +3,7 @@ using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.Conformance.App.Components;
 
+[Mirrors("Components/ConformanceCallbacks/conformance-callbacks", "ConformanceCallbacks")]
 public sealed class ConformanceCallbacks : Component
 {
     public static ComponentVendor Declared { get; } = ComponentVendor.DefineCallbackProperties("conformance-callbacks", objectPath: "conformanceCallbacks");

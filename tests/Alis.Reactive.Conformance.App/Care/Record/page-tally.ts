@@ -1,6 +1,10 @@
 let added = 0;
 
-const tally = {
+interface PageTally {
+  addOne(): number;
+}
+
+const tally: PageTally = {
   addOne(): number {
     added += 1;
     return added;
