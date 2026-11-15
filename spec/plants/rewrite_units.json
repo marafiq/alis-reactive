@@ -174,7 +174,7 @@
   "edits": [
    {
     "file": "spec/Reference/page-doors.json",
-    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"ArrayLambdas\",\n",
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n",
     "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Ledgers\",\n"
    }
   ],
@@ -185,8 +185,8 @@
   "edits": [
    {
     "file": "spec/Reference/page-doors.json",
-    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"ArrayLambdas\",\n",
-    "new": "  \"M16.F1 X18.8 9\": {\n    \"modules\": [\n      \"ArrayLambdas\",\n"
+    "old": "  \"M16.F1 X18.8 0\": {\n",
+    "new": "  \"M16.F1 X18.8 9\": {\n"
    }
   ],
   "expect": "spec/Reference/page-doors.json lands M16.F1 X18.8 9, which no placement or cell of app.json promises"
@@ -196,7 +196,7 @@
   "edits": [
    {
     "file": "spec/Reference/page-doors.json",
-    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"ArrayLambdas\",\n",
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n",
     "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Conditions\",\n"
    }
   ],
