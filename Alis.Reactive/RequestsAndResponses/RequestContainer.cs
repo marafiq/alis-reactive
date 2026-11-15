@@ -10,9 +10,12 @@ namespace Alis.Reactive.RequestsAndResponses;
 /// <typeparam name="TModel">The model the container's block was rendered for.</typeparam>
 public class RequestContainer<TModel>
 {
-    private protected RequestContainer()
+    internal RequestContainer(string elementId)
     {
+        ElementId = elementId;
     }
+
+    internal string ElementId { get; }
 
     /// <summary>Reads a member of the container's model as the container sends it: the value of the input inside the container that binds the member.</summary>
     /// <remarks>
@@ -34,7 +37,7 @@ public class RequestContainer<TModel>
 /// <typeparam name="TModel">The model the form's block was rendered for.</typeparam>
 public sealed class RequestForm<TModel> : RequestContainer<TModel>
 {
-    private RequestForm()
+    internal RequestForm(string elementId) : base(elementId)
     {
     }
 }

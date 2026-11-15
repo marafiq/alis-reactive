@@ -22,20 +22,45 @@ internal sealed class PlanContent
     private readonly HashSet<string> _renderedElements = new(StringComparer.Ordinal);
     private readonly Dictionary<string, (string Listening, string Event, string HeardBy)> _heardPlugins = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, InputBinding> _inputs = new(StringComparer.Ordinal);
+    private readonly SortedDictionary<string, Container> _containers = new(StringComparer.Ordinal);
+    private readonly Func<string, (string Prefix, string Name, string Id)> _nameInput;
     private bool _rendered;
 
-    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json)
+    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json, Func<string, (string Prefix, string Name, string Id)> nameInput)
     {
         _planId = planId;
         _culture = ViewCulture.Of(rendersUnder);
         RendersUnder = rendersUnder;
         _timeZone = timeZone;
         Json = json;
+        _nameInput = nameInput;
     }
 
     internal AppJson Json { get; }
 
     internal CultureInfo RendersUnder { get; }
+
+    internal string Model => _planId;
+
+    internal (string Prefix, string Name, string Id) NameInput(string text) => _nameInput(text);
+
+    internal ModelPluginData ModelData => new(_inputs, _containers);
+
+    internal void RendersContainer(string id, Container container)
+    {
+        RefuseOnceRendered();
+        RendersInputElement(id, id);
+        RendersInputElement(container.Summary, id);
+        _containers.Add(id, container);
+    }
+
+    internal void RendersInputElement(string id, string name)
+    {
+        RefuseOnceRendered();
+        if (_renderedElements.Add(id)) return;
+        throw new InvalidOperationException(
+            $"Input '{name}' renders element id '{id}' a second time in this plan: render the field once, or each copy for its own member with Html.PartialFor.");
+    }
 
     internal void Uses(string vendorName, (Vendor Vendor, IReadOnlyList<PathStep>? ElementPath, PluginLocator? Lookup) definition)
     {
@@ -86,11 +111,11 @@ internal sealed class PlanContent
 
     internal bool HasRendered(string elementId) => _renderedElements.Contains(elementId);
 
-    internal IReadOnlyDictionary<string, InputBinding> BindsInput(string inputId, InputBinding binding)
+    internal void BindsInput(string inputId, InputBinding binding)
     {
         RefuseOnceRendered();
+        if (binding.Message.Length > 0) RendersInputElement(binding.Message, binding.Name);
         _inputs[inputId] = binding;
-        return _inputs;
     }
 
     internal void Handles(Handler handler)

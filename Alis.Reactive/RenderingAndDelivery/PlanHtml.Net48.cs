@@ -20,7 +20,11 @@ public static class PlanHtml
     /// </remarks>
     /// <returns>The plan.</returns>
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this HtmlHelper<TModel> html)
-        => ViewPlans.Open<TModel>(new AppJson(TheOptionsTheAppRegisters), html.ViewData.TemplateInfo.HtmlFieldPrefix);
+        => ViewPlans.Open<TModel>(new AppJson(TheOptionsTheAppRegisters),
+            () => html.ViewData.TemplateInfo.HtmlFieldPrefix,
+            text => html.ViewData.TemplateInfo.GetFullHtmlFieldName(text),
+            HtmlHelper.GenerateIdFromName,
+            () => ViewPaths.Of(html));
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>

@@ -597,7 +597,6 @@
   "M15.F1 X3.5 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines"
     ],
@@ -609,7 +608,6 @@
   "M15.F1 X3.6 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3184,9 +3182,7 @@
   },
   "M7.F3 M7.X6 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/KinCards.cshtml",
@@ -3289,7 +3285,6 @@
   "M8.F1 X16.10 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3302,7 +3297,6 @@
   "M8.F1 X16.22 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3316,7 +3310,6 @@
   "M8.F1 X16.9 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3329,7 +3322,6 @@
   "M8.F3 X16.2 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3342,7 +3334,6 @@
   "M8.F3 X16.3 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3356,7 +3347,6 @@
   "M8.F3 X16.4 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3369,7 +3359,6 @@
   "M8.F3 X16.6 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3408,7 +3397,6 @@
   "M8.F4 X13.3 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3474,7 +3462,6 @@
   "M8.F4 X16.18 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines"
     ],
@@ -3499,8 +3486,7 @@
   },
   "M8.F4 X16.20 0": {
     "modules": [
-      "NativeComponents",
-      "RenderingAndDelivery"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/ResidentAdmission.cshtml",
@@ -3525,7 +3511,6 @@
   "M8.F4 X16.7 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -3538,7 +3523,6 @@
   "M8.F4 X8.3 0": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -4498,7 +4482,6 @@
   "cell validation.condition": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -4511,7 +4494,6 @@
   "cell validation.listItem": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -4524,7 +4506,6 @@
   "cell validation.live": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -4537,7 +4518,6 @@
   "cell validation.prefix": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -4551,7 +4531,6 @@
   "cell validation.rule": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"
@@ -4564,7 +4543,6 @@
   "cell validation.summary": {
     "modules": [
       "NativeComponents",
-      "RenderingAndDelivery",
       "RequestsAndResponses",
       "TriggersAndPipelines",
       "Validation"

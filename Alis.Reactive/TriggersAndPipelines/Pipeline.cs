@@ -1,7 +1,9 @@
 using System;
 using System.Linq.Expressions;
+using System.Text.Json;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Execution;
+using Alis.Reactive.InputsAndIds;
 using Alis.Reactive.Plugins;
 using Alis.Reactive.RequestsAndResponses;
 using Alis.Reactive.Schema;
@@ -65,7 +67,16 @@ public sealed class Pipeline<TModel>
     /// <summary>Names the input a member of the view's model binds, for a request to send or a step to reach its component.</summary>
     /// <param name="member">The member the input binds, as a member path.</param>
     /// <returns>The input, typed by the member's value.</returns>
-    public BoundInput<TValue> Input<TValue>(Expression<Func<TModel, TValue>> member) => throw new NotImplementedException();
+    public BoundInput<TValue> Input<TValue>(Expression<Func<TModel, TValue>> member)
+    {
+        var text = MvcText.Of(member);
+        var names = _writer.Content.NameInput(text);
+        var lambda = MemberLambda.Of(member, text, names.Name, typeof(TModel));
+        var app = _writer.Content.Json.App;
+        var input = InputsAndIds.BoundInput.Of(lambda, new MvcNames(names.Prefix, names.Name, names.Id), app,
+            () => JsonSerializer.SerializeToElement(default(TValue), app.GetTypeInfo(typeof(TValue))));
+        return new BoundInput<TValue>(input.Id, _writer);
+    }
 
     /// <summary>Raises an app event that carries no payload.</summary>
     /// <remarks>Each handler of the event runs up to its first awaited step before the step after this one runs.</remarks>
@@ -193,7 +204,7 @@ public sealed class Pipeline<TModel>
     /// <param name="containerId">The id of the container's element.</param>
     /// <typeparam name="TContainer">The model the container's block was rendered for.</typeparam>
     /// <returns>The container, which a request sends and a step validates.</returns>
-    public RequestContainer<TContainer> Container<TContainer>(string containerId) => throw new NotImplementedException();
+    public RequestContainer<TContainer> Container<TContainer>(string containerId) => new(containerId);
 
     /// <summary>Unloads what a request loaded into an element: its plans stop, its components leave and the element empties.</summary>
     /// <param name="elementId">The id of the element a request loaded HTML into.</param>
@@ -257,8 +268,13 @@ public sealed class Pipeline<TModel>
 /// <typeparam name="TValue">The type of the member the input binds.</typeparam>
 public sealed class BoundInput<TValue>
 {
-    internal BoundInput()
+    private readonly string _id;
+    private readonly BlockWriter _writer;
+
+    internal BoundInput(string id, BlockWriter writer)
     {
+        _id = id;
+        _writer = writer;
     }
 
     /// <summary>Reaches the component that renders the input, by the id the framework gave it.</summary>
@@ -266,7 +282,7 @@ public sealed class BoundInput<TValue>
     /// <returns>The component.</returns>
     public TComponent Component<TComponent>()
         where TComponent : Component, new()
-        => throw new NotImplementedException();
+        => new Pipeline<NoModel>(_writer).Component<TComponent>(_id);
 }
 
 /// <summary>

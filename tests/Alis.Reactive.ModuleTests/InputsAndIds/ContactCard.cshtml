@@ -1,0 +1,10 @@
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.ModuleTests.InputsAndIds
+@model NextOfKin
+@{
+    var plan = Html.ReactivePlan<NextOfKin>();
+    var field = Html.InputField(plan, m => m.Name);
+}
+<h2>Contact</h2>
+@(field.Render<IntakeBox>(Html.TextBoxFor(m => m.Name, new { id = field.Id })))
+@Html.RenderPlan(plan)

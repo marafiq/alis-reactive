@@ -16,8 +16,18 @@ internal static class ViewPlans
     private const string ScriptOpen = "<script type=\"application/json\" data-reactive-plan>";
     private const string ScriptClose = "</script>";
 
-    internal static ReactivePlan<TModel> Open<TModel>(AppJson json, string startPrefix)
-        => new(new BlockWriter(new PlanContent(IdOf<TModel>(), CultureInfo.CurrentCulture, ClockTimeZone.Instance, json)), startPrefix);
+    internal static ReactivePlan<TModel> Open<TModel>(AppJson json, Func<string> prefix, Func<string, string> fullName, Func<string, string> id, Func<string> view)
+    {
+        var startPrefix = prefix();
+        var content = new PlanContent(IdOf<TModel>(), CultureInfo.CurrentCulture, ClockTimeZone.Instance, json, text =>
+        {
+            var now = prefix();
+            var name = fullName(text);
+            FieldPrefixes.RefuseAMoveAfterThePlanStarted(startPrefix, now, view, name);
+            return (now, name, id(name));
+        });
+        return new(new BlockWriter(content), startPrefix);
+    }
 
     internal static void On<TModel>(ReactivePlan<TModel> plan, Action<Trigger<TModel>> trigger) => trigger(new Trigger<TModel>(plan.Writer));
 

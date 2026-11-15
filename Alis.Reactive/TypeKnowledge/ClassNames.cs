@@ -47,6 +47,13 @@ internal static class ClassNames
         return name.Substring(0, arity) + "<" + string.Join(", ", type.GetGenericArguments().Select(AsCSharpWritesIt)) + ">";
     }
 
+    internal static string PartialViewOf(Type type)
+    {
+        if (type.GetGenericArguments().Length != 0)
+            throw new InvalidOperationException($"The member's type {AsCSharpWritesIt(type)} is generic and names no partial view: pass the view name to Html.PartialFor.");
+        return NameOf(type);
+    }
+
     internal static bool IsInterface(Type type) => type.IsInterface;
 
     [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "A type's name is its identity (D18.1), and D14.3 names a generic declaring class's type arguments by it.")]

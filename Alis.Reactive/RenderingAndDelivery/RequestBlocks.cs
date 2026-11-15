@@ -1,5 +1,8 @@
 using System;
+using System.IO;
+using Alis.Reactive.InputsAndIds;
 using Alis.Reactive.RequestsAndResponses;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.RenderingAndDelivery;
 
@@ -13,15 +16,19 @@ namespace Alis.Reactive.RenderingAndDelivery;
 /// <typeparam name="TModel">The model of the view that renders the form.</typeparam>
 public sealed class RequestFormBlock<TModel> : IDisposable
 {
-    internal RequestFormBlock()
+    private readonly RequestBlock _block;
+
+    internal RequestFormBlock(TextWriter writer, ReactivePlan<TModel> plan, string id, Action checkPrefix)
     {
+        _block = new RequestBlock(writer, plan.Writer.Content, id, ContainerKind.Form, checkPrefix);
+        Form = new RequestForm<TModel>(id);
     }
 
     /// <summary>Gets the form's handle, which a request sends and a step validates.</summary>
-    public RequestForm<TModel> Form => throw new NotImplementedException();
+    public RequestForm<TModel> Form { get; }
 
     /// <summary>Ends the block: closes the form's element.</summary>
-    public void Dispose() => throw new NotImplementedException();
+    public void Dispose() => _block.Close();
 }
 
 /// <summary>
@@ -34,13 +41,17 @@ public sealed class RequestFormBlock<TModel> : IDisposable
 /// <typeparam name="TModel">The model of the view that renders the container.</typeparam>
 public sealed class RequestContainerBlock<TModel> : IDisposable
 {
-    internal RequestContainerBlock()
+    private readonly RequestBlock _block;
+
+    internal RequestContainerBlock(TextWriter writer, ReactivePlan<TModel> plan, string id, Action checkPrefix)
     {
+        _block = new RequestBlock(writer, plan.Writer.Content, id, ContainerKind.Element, checkPrefix);
+        Container = new RequestContainer<TModel>(id);
     }
 
     /// <summary>Gets the container's handle, which a request sends and a step validates.</summary>
-    public RequestContainer<TModel> Container => throw new NotImplementedException();
+    public RequestContainer<TModel> Container { get; }
 
     /// <summary>Ends the block: closes the container's element.</summary>
-    public void Dispose() => throw new NotImplementedException();
+    public void Dispose() => _block.Close();
 }
