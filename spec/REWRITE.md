@@ -1053,14 +1053,14 @@ of the fusion-refusals screen's six stand on the Fusion layout, in `Refusals/Fus
 `Refusals/FusionTemplates/`, each beside its rendering twin and each test red (M21.X805, M22.X1, M22.X4); M21.X203's
 three wait on the grid's validation door, as M21.X205's do. A promise placed on a care screen is a page of its own in
 `Care/<Screen>/`, as a
-refusal's is, and two hundred and forty-six care pages stand, each test red: sixty-four of the record screen's (thirteen
+refusal's is, and two hundred and fifty care pages stand, each test red: sixty-five of the record screen's (thirteen
 of module 5's, nine each of modules 2 and 9, eight of module 3's, seven of module 1's, four of module 17's, three each
-of modules 7 and 24, two each of modules 6, 8 and 12 and one each of modules 15 and 19), forty-six of the admission
-screen's (fifteen of module 8's, ten of module 7's, five of module 6's, four each of modules 3 and 24, two each of
-modules 1, 15 and 17 and one each of modules 9 and 18), forty-two of the residents screen's (twenty-five of module 4's,
-nine of module 6's, two each of modules 2 and 5 and one each of modules 3, 17, 24 and 25), nineteen of the round
+of modules 7 and 24, two each of modules 6, 8, 12 and 15 and one of module 19's), forty-eight of the admission
+screen's (fifteen of module 8's, ten of module 7's, five of module 6's, four each of modules 3, 15 and 24, two each of
+modules 1 and 17 and one each of modules 9 and 18), forty-two of the residents screen's (twenty-five of module 4's,
+nine of module 6's, two each of modules 2 and 5 and one each of modules 3, 17, 24 and 25), twenty of the round
 screen's (five of module 2's, four of module 6's, three each of modules 3 and 8, two of module 1's and one each of
-modules 4 and 16), eighteen of the admission-clinical screen's (eighteen of module 21's), seventeen of the
+modules 4, 16 and 18), eighteen of the admission-clinical screen's (eighteen of module 21's), seventeen of the
 record-contacts screen's (seventeen of module 21's), sixteen of the bed-board screen's (eight each of modules 21 and
 22), thirteen of the handover screen's (thirteen of module 21's) and eleven of the shell screen's (nine of module 25's
 and one each of modules 14 and 17). Forty feature tests stand on the bench, sixteen of module 11's, fifteen of module
@@ -1077,7 +1077,8 @@ form N18.4 sends to gate 2; one needs a record whose code holds null, which nati
 three need an export held while it runs, which their placement does not name and no harness verb holds; two need a grid
 column's rules from the app's validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need the
 clipboard, which the harness grants no page, and the first of them the antiforgery startup call besides. Five more
-read a request culture, which section 2.5 now serves: X6.27, X3.5, X3.6, X3.8 and M18.X1's second, pages to write next.
+read a request culture, which section 2.5 now serves: X3.5, X3.6, X3.8 and M18.X1's second stand among the care pages,
+each test red, and X6.27 waits on a host whose globalization is invariant, which the harness does not hold yet.
 Three more attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test
 typed where the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the
 harness; X11.20 waits on the defaultHooks host and M21.X803's second on the net48 host. Of the bench's feature tests
