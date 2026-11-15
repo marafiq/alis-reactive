@@ -45,19 +45,19 @@ public sealed class TestWorld
         if (message.Type == "error") _consoleErrors.Enqueue(message.Text);
     }
 
-    internal static async Task<TestWorld> Open(ConformanceHost host)
+    internal static async Task<TestWorld> Open(ConformanceHost host, string zone)
     {
         var key = Guid.NewGuid().ToString("N");
         var harness = new HttpClient { BaseAddress = host.Address };
         harness.DefaultRequestHeaders.Add("Cookie", $"{WorldKey.Cookie}={key}");
-        var context = await NewContext(host);
+        var context = await NewContext(host, zone);
         await context.AddCookiesAsync([new Cookie { Name = WorldKey.Cookie, Value = key, Url = host.Address.ToString() }]);
         return new TestWorld(harness, context, await context.NewPageAsync());
     }
 
-    internal static async Task<IBrowserContext> NewContext(ConformanceHost host)
+    internal static async Task<IBrowserContext> NewContext(ConformanceHost host, string zone)
     {
-        var context = await Run.Browser.NewContextAsync(new BrowserNewContextOptions { BaseURL = host.Address.ToString(), Locale = "en-US", TimezoneId = "America/Los_Angeles" });
+        var context = await Run.Browser.NewContextAsync(new BrowserNewContextOptions { BaseURL = host.Address.ToString(), Locale = "en-US", TimezoneId = zone });
         await Waits.Open(context);
         return context;
     }

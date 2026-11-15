@@ -7,6 +7,9 @@ public static partial class CarePages
     public const string CensusDaysWithADayNoMonthHolds = Residents + "census/days/a-day-no-month-holds";
     public const string CensusRaisedTime = Residents + "census/raised-time";
     public const string CensusItemPositions = Residents + "census/item-positions";
+    public const string VisitTimes = Residents + "visit-times";
+    public const string VisitTimesWithTheEarlyVisitAtHalfPastThree = VisitTimes + "/the-early-visit-at-half-past-three";
+    public const string VisitTimesWithTheUtcVisitAtEightThirtyOne = VisitTimes + "/the-utc-visit-at-eight-thirty-one";
     public const string CensusFirstActiveItems = Residents + "census/first-active-items";
     public const string CensusActiveCounts = Residents + "census/active-counts";
     public const string CensusScoresWithAHeadCountOnEveryItem = Residents + "census/scores/a-head-count-on-every-item";

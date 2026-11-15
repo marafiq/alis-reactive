@@ -1,0 +1,33 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model VisitTimes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Visit times";
+    var plan = Html.ReactivePlan<VisitTimes>();
+    var seen = new[] { new DateTimeOffset(2026, 11, 9, 18, 0, 0, TimeSpan.Zero) };
+}
+<h1>Visit times</h1>
+<dl>
+    <dt>Visits before three on the night the clocks went forward</dt>
+    <dd id="before-three-count">-</dd>
+    <dt>Visits at half past eight on the ninth of November</dt>
+    <dd id="half-past-eight-count">-</dd>
+    <dt>Visits after half past eight on the ninth of November</dt>
+    <dd id="after-half-past-eight-count">-</dd>
+    <dt>Visits seen at the hour on the rota</dt>
+    <dd id="seen-count">-</dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.VisitsAt)
+        .OnSuccess<List<Visit>>((visits, pipeline) =>
+        {
+            pipeline.Element("before-three-count").Text.Set(visits.Body.Count(v => v.At < new DateTime(2026, 3, 8, 3, 0, 0)));
+            pipeline.Element("half-past-eight-count").Text.Set(visits.Body.Count(v => v.At == new DateTime(2026, 11, 9, 8, 30, 0)));
+            pipeline.Element("after-half-past-eight-count").Text.Set(visits.Body.Count(v => v.At > new DateTime(2026, 11, 9, 8, 30, 0)));
+            pipeline.Element("seen-count").Text.Set(visits.Body.Count(v => seen.Contains(v.Seen)));
+        })));
+}
+@Html.RenderPlan(plan)

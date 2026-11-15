@@ -2367,6 +2367,16 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M4.F1 X6.11 0": {
+    "modules": [
+      "RequestsAndResponses",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Residents/VisitTimes.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M4.F1 X6.12 0": {
     "modules": [
       "RequestsAndResponses",

@@ -12,13 +12,15 @@ public abstract class ConformanceFixture(string host)
     private readonly ConcurrentDictionary<string, ConcurrentBag<IBrowserContext>> _people = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, ConcurrentQueue<string>> _asked = new(StringComparer.Ordinal);
 
-    protected Task<TestWorld> NewWorld() => OpenWorld(host);
+    protected Task<TestWorld> NewWorld() => OpenWorld(host, Zones.LosAngeles);
 
-    protected Task<TestWorld> NewWorldUnder(string otherHost) => OpenWorld(otherHost);
+    protected Task<TestWorld> NewWorldUnder(string otherHost) => OpenWorld(otherHost, Zones.LosAngeles);
 
-    private async Task<TestWorld> OpenWorld(string under)
+    protected Task<TestWorld> NewWorldInZone(string zone) => OpenWorld(host, zone);
+
+    private async Task<TestWorld> OpenWorld(string under, string zone)
     {
-        var world = await TestWorld.Open(await ConformanceHost.Of(under));
+        var world = await TestWorld.Open(await ConformanceHost.Of(under), zone);
         _worlds.GetOrAdd(TestContext.CurrentContext.Test.ID, _ => []).Add(world);
         Watch(world.Page);
         return world;
@@ -26,7 +28,7 @@ public abstract class ConformanceFixture(string host)
 
     protected async Task<IPage> NewPerson()
     {
-        var context = await TestWorld.NewContext(await ConformanceHost.Of(host));
+        var context = await TestWorld.NewContext(await ConformanceHost.Of(host), Zones.LosAngeles);
         _people.GetOrAdd(TestContext.CurrentContext.Test.ID, _ => []).Add(context);
         var page = await context.NewPageAsync();
         Watch(page);

@@ -10978,6 +10978,20 @@
       ]
     },
     {
+      "fixture": "WhenAWorldOpensInAnotherZone",
+      "test": "its_browser_reads_an_instant_on_the_clock_of_the_zone_the_test_names",
+      "unit": "U15",
+      "page": "The world's zone slip, a page of the app's World area with no framework part on it: a paragraph its own script fills with the hour and minute the browser's clock reads for the instant 2026-01-15T12:00:00Z.",
+      "gesture": "Open a world whose browser runs in Asia/Kolkata, a zone the fixture does not name, and open the zone slip.",
+      "outcome": "The slip reads 17:30: the world's browser runs in the zone the test named.",
+      "opposite": "A world of the fixture's own, whose browser runs in America/Los_Angeles, reads 04:00.",
+      "defect": "The world opens its browser in America/Los_Angeles whatever zone the test names, so the Kolkata world's slip reads 04:00; or in the host's zone, America/New_York, so it reads 07:00.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": []
+    },
+    {
       "fixture": "WhenAPageNamesItsCulture",
       "test": "the_page_renders_under_the_culture_its_address_names",
       "unit": "U11",

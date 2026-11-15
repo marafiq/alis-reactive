@@ -24,7 +24,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   contract's typed builders and keeps the errors its page's console holds, which a test reads with `Assert.That`.
   Teardown ends the world and fails a gate still parked. An opposite case that holds under another host's options
   opens its world by `NewWorldUnder` with that host's name of `Hosts`, its variable named in the promise's words, and
-  the fixture keeps the hosts its placement lists (`Harness/WhenAWorldOpensUnderAnotherHost.cs`).
+  the fixture keeps the hosts its placement lists (`Harness/WhenAWorldOpensUnderAnotherHost.cs`). A world whose
+  browser runs in the zone a promise names opens by `NewWorldInZone`, the zone a constant of `Zones`; every other
+  world's browser runs in America/Los_Angeles (`Harness/WhenAWorldOpensInAnotherZone.cs`).
 - A test names the server's culture in its page's address, a constant of the world contract, and the browser's
   locale stays "en-US"; a culture's opposite case opens a second world at the other culture's address
   (`ArrayLambdas/Refusals/WhenATextKeyIsOrderedUnderAnAlternateSort.cs`).

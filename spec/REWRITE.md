@@ -349,7 +349,8 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   fixture's own is started, and the test's teardown ends that world with the rest; the fixture still runs under the
   hosts its placement lists, so no placement, case of a run or category names the opposite case's host. The net10
   clock is America/New_York, the twin's UTC; the browser context is en-US in
-  America/Los_Angeles, so a date read in the wrong zone shows. The hosts consumerNet10 and consumerNet48 are the fresh
+  America/Los_Angeles, so a date read in the wrong zone shows, and a promise that names the browser's zone opens
+  that world by `NewWorldInZone`, its zone a constant of `Zones`, as `NewWorldUnder` opens another host's. The hosts consumerNet10 and consumerNet48 are the fresh
   apps' own servers, which hold no World area: a test under one runs on app.json's `fresh` screen, sets no world and
   uses no harness verb.
 - **Request culture.** A request names the culture its page binds and renders under in its address's query

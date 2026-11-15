@@ -4,7 +4,7 @@ import { build } from "esbuild";
 
 const app = "tests/Alis.Reactive.Conformance.App";
 
-const screens = ["Bench", "Care", "Refusals"];
+const screens = ["Bench", "Care", "Refusals", "World"];
 
 function pageScriptsOf(screen) {
   return readdirSync(posix.join(app, screen), { recursive: true })
