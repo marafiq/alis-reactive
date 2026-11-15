@@ -22,6 +22,7 @@ public sealed class Program
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();
 
         var app = builder.Build();
+        app.UseRequestCultures();
         if (app.Environment.IsDevelopment())
         {
             app.UseWorld();

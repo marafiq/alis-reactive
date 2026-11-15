@@ -6,6 +6,8 @@ public sealed class Seed
 {
     public IList<string> Residents { get; set; } = new List<string>();
 
+    public IList<string> Carers { get; set; } = new List<string>();
+
     public string? Word { get; set; }
 
     public int? CachedRoundsPlanVersion { get; set; }
@@ -68,6 +70,8 @@ public sealed class Seed
 
     public static Seed Resident(string name) => new Seed().AndResident(name);
 
+    public static Seed Carer(string name) => new Seed().AndCarer(name);
+
     public static Seed TheWord(string word) => new() { Word = word };
 
     public static Seed CachedRoundsOfPlanVersion(int version) => new() { CachedRoundsPlanVersion = version };
@@ -127,6 +131,12 @@ public sealed class Seed
     public static Seed TheRecordEndpointsCount(int count) => new() { RecordCount = count };
 
     public static Seed TheCheckEndpointsAnswer(bool answer) => new() { CheckAnswer = answer };
+
+    public Seed AndCarer(string name)
+    {
+        Carers.Add(name);
+        return this;
+    }
 
     public Seed AndResident(string name)
     {

@@ -25,6 +25,9 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   Teardown ends the world and fails a gate still parked. An opposite case that holds under another host's options
   opens its world by `NewWorldUnder` with that host's name of `Hosts`, its variable named in the promise's words, and
   the fixture keeps the hosts its placement lists (`Harness/WhenAWorldOpensUnderAnotherHost.cs`).
+- A test names the server's culture in its page's address, a constant of the world contract, and the browser's
+  locale stays "en-US"; a culture's opposite case opens a second world at the other culture's address
+  (`ArrayLambdas/Refusals/WhenATextKeyIsOrderedUnderAnAlternateSort.cs`).
 - A refusal where the view renders is read as its developer reads it: the heading of the page ASP.NET shows for
   an exception, the exception's name, a colon and the whole message, found by its role and its exact name.
   `ValuesAndSources/Refusals/WhenALiteralIsPastTheNumbersJavaScriptHolds.cs` is the pattern, the page that renders

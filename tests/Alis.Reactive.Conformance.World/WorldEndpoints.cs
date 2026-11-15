@@ -2,6 +2,7 @@ namespace Alis.Reactive.Conformance.World;
 
 public static class WorldEndpoints
 {
+    public const string Ready = "/world/ready";
     public const string Seed = "/world/seed";
     public const string End = "/world/end";
     public const string ArmGate = "/world/gates/arm";

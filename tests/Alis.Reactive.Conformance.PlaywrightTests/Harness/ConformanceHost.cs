@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
+using Alis.Reactive.Conformance.World;
 using NUnit.Framework;
 
 namespace Alis.Reactive.Conformance.PlaywrightTests.Harness;
@@ -50,7 +51,7 @@ internal sealed class ConformanceHost
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                Environment = { ["ASPNETCORE_ENVIRONMENT"] = "Development", ["TZ"] = "America/New_York" },
+                Environment = { ["ASPNETCORE_ENVIRONMENT"] = "Development", ["TZ"] = "America/New_York", ["LC_ALL"] = "fr_FR.UTF-8" },
             },
         };
         foreach (var argument in new[] { AppAssembly(folder), "--urls", "http://127.0.0.1:0", "--host", host, "--test-host", Environment.ProcessId.ToString(CultureInfo.InvariantCulture) })
@@ -61,7 +62,10 @@ internal sealed class ConformanceHost
         server.Start();
         server.BeginOutputReadLine();
         server.BeginErrorReadLine();
-        return new ConformanceHost(server, await listening.Task);
+        var address = await listening.Task;
+        using var ready = new HttpClient { BaseAddress = address };
+        (await ready.GetAsync(WorldEndpoints.Ready)).EnsureSuccessStatusCode();
+        return new ConformanceHost(server, address);
     }
 
     private static void Heard(string? line, ConcurrentQueue<string> said, TaskCompletionSource<Uri> listening, string host)

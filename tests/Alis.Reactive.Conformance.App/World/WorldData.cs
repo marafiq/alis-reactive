@@ -8,6 +8,7 @@ internal sealed class WorldData
     private const string Anywhere = "";
 
     private readonly ConcurrentQueue<string> _residents = new();
+    private readonly ConcurrentQueue<string> _carers = new();
     private readonly ConcurrentDictionary<(string Gate, string At), WorldGate> _gates = new();
     private volatile string _word = "";
     private volatile string _componentText = "Alpha";
@@ -38,6 +39,8 @@ internal sealed class WorldData
     private volatile bool _checkAnswer = true;
 
     internal IReadOnlyCollection<string> Residents => _residents;
+
+    internal IReadOnlyCollection<string> Carers => _carers;
 
     internal string Word => _word;
 
@@ -96,6 +99,7 @@ internal sealed class WorldData
     internal void Take(Seed seed)
     {
         foreach (var resident in seed.Residents) _residents.Enqueue(resident);
+        foreach (var carer in seed.Carers) _carers.Enqueue(carer);
         if (seed.Word is { } word) _word = word;
         if (seed.ComponentText is { } text) _componentText = text;
         if (seed.ComponentOuterText is { } outerText) _componentOuterText = outerText;

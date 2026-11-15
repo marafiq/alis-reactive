@@ -1634,6 +1634,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   the wall fields of the value as the server wrote it, as its key reads it (D6.12): never the browser's clock, so no
   `as date`, whose `Date` moves a wall time daylight saving skips or repeats. A question the specs already answer goes
   to no one (the lead's mistake, 2026-11-14).
+- The lead, 2026-11-14, landing the request culture, designed by Codex at max from a scoped brief and decided from its
+  answer read at the source: a request names its culture in its address's query "culture", from a closed list, none
+  meaning "en-US" and any other value, or two, answering 400, set by one middleware of the conformance app before MVC
+  reads the request, since ASP.NET Core's request localization picks a culture by its name and the phonebook sort's
+  name is "de-DE" (`spec/REWRITE.md` section 2.5). A host's process culture is fr-FR, which no request names, and a host
+  is ready once it answers the world's ready endpoint. X6.36's page stands on it, its test red until its doors land.
+  The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

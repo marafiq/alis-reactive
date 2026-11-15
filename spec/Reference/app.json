@@ -10976,6 +10976,34 @@
       "harness": [
         "seed"
       ]
+    },
+    {
+      "fixture": "WhenAPageNamesItsCulture",
+      "test": "the_page_renders_under_the_culture_its_address_names",
+      "unit": "U11",
+      "page": "The world's culture slip, a page of the app's World area with no framework part on it: an action of an MVC controller of the app writes the name of the sort its request's culture compares text by and the number 1234.5 as that culture writes it with one decimal, as text the server writes.",
+      "gesture": "Open the culture slip at its address under the German phonebook sort, culture=de-DE_phoneb.",
+      "outcome": "The slip reads de-DE_phoneb 1.234,5: the request bound and rendered under the culture its address named, the phonebook sort kept.",
+      "opposite": "The culture slip opened at its address with no culture reads en-US 1,234.5, whatever culture the machine runs under.",
+      "defect": "The app ignores the query, so the slip reads en-US 1,234.5 under the phonebook's address; or it resolves the culture by its name, which drops the alternate sort, so the slip reads de-DE 1.234,5; or a request with no culture reads the machine's.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": []
+    },
+    {
+      "fixture": "WhenAPageNamesItsCulture",
+      "test": "an_address_that_names_a_culture_the_app_does_not_serve_is_answered_with_the_cultures_it_serves",
+      "unit": "U11",
+      "page": "The world's culture slip, at its address under fr-FR, a culture the app does not serve.",
+      "gesture": "Open the culture slip at its address under culture=fr-FR.",
+      "outcome": "The page reads The culture query names one of en-US, de-DE, tr-TR, haw-US, de-DE_phoneb and invariant, once.",
+      "opposite": "The culture slip opened under culture=de-DE reads de-DE 1.234,5.",
+      "defect": "An unserved culture is served as en-US or as the machine's, so the page shows a slip, en-US 1,234.5, and a test that names a culture by mistake runs under another.",
+      "hosts": [
+        "net10"
+      ],
+      "harness": []
     }
   ]
 }

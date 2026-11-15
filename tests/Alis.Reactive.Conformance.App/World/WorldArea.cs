@@ -32,6 +32,7 @@ internal static class WorldArea
 
     internal static void MapWorld(this WebApplication app)
     {
+        app.MapGet(WorldEndpoints.Ready, () => Results.NoContent());
         app.MapPost(WorldEndpoints.Seed, async (Seed seed, CurrentWorld world, IDistributedCache cache) =>
         {
             world.Data.Take(seed);

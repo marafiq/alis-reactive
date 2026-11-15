@@ -340,7 +340,9 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   calls fails its unit's run, and its placement then lists the part that needs it.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
   host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
-  "Now listening on:" line; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
+  "Now listening on:" line and ready once `WorldEndpoints.Ready` answers, so a test's first wait never meets a cold
+  server; its process culture is fr-FR, which no request names, so a page that reads the process's culture in place of
+  its request's shows it; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
   server alive fails. A promise whose opposite case holds under another net10 host's options opens that case's
   world under it: `NewWorldUnder` takes the other host by its name of `Hosts`, starts its server on first use as a
   fixture's own is started, and the test's teardown ends that world with the rest; the fixture still runs under the
@@ -349,6 +351,14 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   America/Los_Angeles, so a date read in the wrong zone shows. The hosts consumerNet10 and consumerNet48 are the fresh
   apps' own servers, which hold no World area: a test under one runs on app.json's `fresh` screen, sets no world and
   uses no harness verb.
+- **Request culture.** A request names the culture its page binds and renders under in its address's query
+  "culture", on the host it runs under, apart from its world and the browser's locale: "en-US", "de-DE", "tr-TR",
+  "haw-US", "de-DE_phoneb" and "invariant", the invariant culture; none means "en-US", and any other value, or two,
+  answers 400. The conformance app sets both current cultures from that closed list before MVC reads the request
+  (`tests/Alis.Reactive.Conformance.App/RequestCultures.cs`), since ASP.NET Core's request localization picks a culture
+  by its name and the phonebook sort's is "de-DE", the invariant culture's ""; the MVC 5 twin sets the same at the
+  start of each request. Invariant globalization mode is a process setting, so X6.27's case under it needs a host of
+  its own, which app.json does not hold.
 - **A run proves it ran.** Each run ends with
   `[playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>`,
   its selection the selector's own words (`U8`, `through U8`, `all`, a pool's name), its shard `1/1` when whole, and
@@ -1034,7 +1044,7 @@ test red, six forks' work read at the source and landed, and one the lead's: fif
 list a refusal page reads is a response body of the page's own endpoint. Six of them open their opposite case's world
 under another host through `NewWorldUnder`, on one page at one address: X6.12's first, placed under net10, under
 enumsAsNumbers, and X6.43's and X8.22's first, placed under numbersAsText, and X6.57's first two, placed under
-dateConverter, under net10. Of the refusal promises placed under net10, one waits: X6.36, a request culture. X7.11's
+dateConverter, under net10. X6.36 stands on the request culture (section 2.5), its test red. X7.11's
 two and X1.4 read a value a person chooses or types through its container (N13.1), their tests red.
 Seven more are placed under other hosts: X6.57's third under dateConverter, whose visit form needs a date picker bound
 to a DateTime, which no door renders, since the text box's Type is N18.4's form and the owner's, and six under hosts
@@ -1060,15 +1070,15 @@ other conformance declarations. The app starts under the host its argument `--ho
 app.json gives that host: net10's camel-case members and enum names, or those options with the one change each of five
 other hosts names; X7.14 stands under numbersAsText, M11.X1 and M11.X2 under snakeCase, and X15.5 under pascalCase, its
 opposite case opened under net10 through `NewWorldUnder`, as X6.16's is opened under enumsAsNumbers. Of the care
-families attempted, fifty-one promises placed under net10 alone wait: twenty-five need a call of the app's startup that
-throws until its unit (request defaults, antiforgery, flags enums, a registered validator, the busy indicator); five
-need a request culture; three need a console error's words, which no line states; six need a browser zone or the view's
+families attempted, forty-six promises placed under net10 alone wait: twenty-five need a call of the app's startup that
+throws until its unit (request defaults, antiforgery, flags enums, a registered validator, the busy indicator); three need a console error's words, which no line states; six need a browser zone or the view's
 time zone; two need the harness's clock verb; one needs the harness's restart verb; one needs the text box's Type, whose
 form N18.4 sends to gate 2; one needs a record whose code holds null, which native.json's type of it does not hold;
 three need an export held while it runs, which their placement does not name and no harness verb holds; two need a grid
 column's rules from the app's validator, whose door waits on the core door U17 names (M21.N23, N16.2); and two need the
-clipboard, which the harness grants no page, and the first of them the antiforgery startup call besides. Three more
-attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test
+clipboard, which the harness grants no page, and the first of them the antiforgery startup call besides. Five more
+read a request culture, which section 2.5 now serves: X6.27, X3.5, X3.6, X3.8 and M18.X1's second, pages to write next.
+Three more attempted promises are placed beyond net10 alone: M24.X10 waits on TEST009, which refuses an expected value the test
 typed where the promise's outcome is the value the server renders back, a rule the owner decides, and on net48 in the
 harness; X11.20 waits on the defaultHooks host and M21.X803's second on the net48 host. Of the bench's feature tests
 attempted, ten wait: six need an append to the callbacks object's log line, which neither native.json nor a core door

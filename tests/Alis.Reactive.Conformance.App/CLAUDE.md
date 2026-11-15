@@ -14,6 +14,14 @@ its views.
   definition names. An app started under no host, or under one it does not serve, stops and names the hosts it serves.
   The harness passes the host a fixture runs under, `scripts/run.sh` passes net10, and the page sweep sets it. What
   else a host's definition names lands with the door or the page that needs it.
+- A request names the culture the app binds and renders it under in its query "culture": "en-US", "de-DE",
+  "tr-TR", "haw-US", "de-DE_phoneb" or "invariant", the invariant culture, whose plan collation is "en" (D3.11). A
+  request with none takes "en-US", so no page reads the machine's culture, and one that names another, or two,
+  answers 400. `RequestCultures.cs` sets both current cultures from that closed list before MVC reads the request:
+  ASP.NET Core's request localization picks a culture by its name, and the German phonebook sort is named "de-DE" and
+  the invariant culture "". Each request names its own, a slot's load and a form's send among them; the world's seed
+  and the browser's locale choose none. Invariant globalization mode is a process setting the query cannot reach, and
+  no host of `spec/Reference/app.json` runs it.
 - The World area (`World/`) scopes data, gates and caches to a test's world by the cookie `"world"`, in Development
   alone. A document's request that carries no world gets a new one, so a person runs the app as a test does; any
   other request with no world gets none.

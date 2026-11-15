@@ -1,0 +1,18 @@
+@using Alis.Reactive.ArrayLambdas
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.Refusals
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CarerDirectory
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Carers";
+    var plan = Html.ReactivePlan<CarerDirectory>();
+}
+<h1>Carers</h1>
+@(plan.ConformanceComponent("carers", new ConformanceStart { Text = "Directory", Version = Model.Version }))
+@{
+    Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(CarerDirectoryEndpoints.Carers)
+        .OnSuccess<List<Record>>((carers, pipeline) => pipeline.Component<ConformanceComponent>("carers").Records.Set(carers.Body.OrderBy(c => c.Name)))));
+}
+@Html.RenderPlan(plan)

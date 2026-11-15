@@ -1092,5 +1092,7 @@ public static class Promises
         [Holds(CompositionGate.Answer)]
         public const string WhenAnActionWaitsAtTheGate_the_actions_held_answer_reads_the_word_seeded_while_it_was_held = "harness WhenAnActionWaitsAtTheGate.the_actions_held_answer_reads_the_word_seeded_while_it_was_held";
         public const string WhenAWorldOpensUnderAnotherHost_the_world_is_seeded_and_served_by_the_host_the_test_names = "harness WhenAWorldOpensUnderAnotherHost.the_world_is_seeded_and_served_by_the_host_the_test_names";
+        public const string WhenAPageNamesItsCulture_the_page_renders_under_the_culture_its_address_names = "harness WhenAPageNamesItsCulture.the_page_renders_under_the_culture_its_address_names";
+        public const string WhenAPageNamesItsCulture_an_address_that_names_a_culture_the_app_does_not_serve_is_answered_with_the_cultures_it_serves = "harness WhenAPageNamesItsCulture.an_address_that_names_a_culture_the_app_does_not_serve_is_answered_with_the_cultures_it_serves";
     }
 }
