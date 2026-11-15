@@ -4,6 +4,11 @@ using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.ValuesAndSources;
 
+internal interface IArgumentValue
+{
+    Expression Written(AppJson json);
+}
+
 /// <summary>
 /// One argument of a call the browser makes: a literal or a source.
 /// </summary>
@@ -43,7 +48,8 @@ public sealed class Arg<T> : Arg
 
     /// <summary>Passes a literal, written into the plan where the view renders.</summary>
     /// <param name="value">The value the call receives.</param>
-    public static implicit operator Arg<T>(T value) => new(json => Literals.IntoLive(value, json));
+    public static implicit operator Arg<T>(T value)
+        => new(json => value is IArgumentValue argument ? argument.Written(json) : Literals.IntoLive(value, json));
 
     /// <summary>Passes what a source reads when the call runs.</summary>
     /// <param name="source">The source the call's argument is read from.</param>

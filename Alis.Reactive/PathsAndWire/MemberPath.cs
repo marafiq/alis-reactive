@@ -37,6 +37,16 @@ internal sealed partial class MemberPath
             $"read '{converted.Text}' itself, or read past it on the server.");
     }
 
+    internal static string NameOfField(LambdaExpression field, JsonSerializerOptions options)
+    {
+        if (!TryOf(field, options, out var members)) throw NoMemberPath(field);
+        members.RefuseAReadPastItsOwnConverter(field.Body.ToString());
+        return string.Join(".", members._links.Select(link => link.Written.Name));
+    }
+
+    internal static InvalidOperationException NoMemberPath(LambdaExpression path)
+        => new($"'{path}' names no member path, so the browser has no member to read; read a member and the members past it, such as record => record.Detail.Name.");
+
     internal static bool TryOf(LambdaExpression path, JsonSerializerOptions options, [NotNullWhen(true)] out MemberPath? members)
         => TryOf(path.Body, path.Parameters[0], path, options, out members);
 
