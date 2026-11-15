@@ -1,5 +1,7 @@
 using System;
 using System.Linq.Expressions;
+using Alis.Reactive.InputsAndIds;
+using Alis.Reactive.Vendors;
 
 namespace Alis.Reactive.RenderingAndDelivery;
 
@@ -11,25 +13,44 @@ namespace Alis.Reactive.RenderingAndDelivery;
 /// <typeparam name="TValue">The type of the member the input binds.</typeparam>
 public sealed partial class InputField<TModel, TValue>
 {
-    internal InputField()
-    {
-    }
+    private readonly ReactivePlan<TModel> _plan;
+    private readonly InputFieldOptions _options;
+    private readonly BoundInput _bound;
+    private readonly ReactiveClassNames _classNames;
 
     /// <summary>Gets the id the framework gives the input's element: the class that declares the member, then the member's path.</summary>
-    public string Id => throw new NotImplementedException();
+    public string Id => _bound.Id;
 
     /// <summary>Gets the name the input binds under: the member's full field name in its view.</summary>
-    public string Name => throw new NotImplementedException();
+    public string Name => _bound.Name;
 
     /// <summary>Gets the member the input binds.</summary>
-    public Expression<Func<TModel, TValue>> Member => throw new NotImplementedException();
+    public Expression<Func<TModel, TValue>> Member { get; }
 
     /// <summary>Gets the member's value as the plan writes a literal: the state the component starts in.</summary>
     /// <remarks>It is <c>null</c> when an object on the way to the member holds nothing.</remarks>
-    public string ValueJson => throw new NotImplementedException();
+    public string ValueJson { get; }
 
     /// <summary>Writes the options a render helper starts its component with, as the plan writes a literal.</summary>
     /// <param name="options">The options to write.</param>
     /// <returns>The options' JSON.</returns>
-    public string Json<TOptions>(TOptions options) => throw new NotImplementedException();
+    public string Json<TOptions>(TOptions options) => _plan.Json(options);
+
+    private Rendered<TComponent, TModel> Registers<TComponent>(Func<Rendered<TComponent, TModel>> render)
+        where TComponent : Component, IInputComponent, new()
+    {
+        if (_plan.Writer.Content.HasRendered(Id))
+        {
+            throw new InvalidOperationException(
+                $"Input '{Name}' renders element id '{Id}' a second time in this plan: render the field once, or each copy for its own member with Html.PartialFor.");
+        }
+
+        var rendered = render();
+        ModelPlugin.Binds(_plan.Writer.Content, Id, _bound.Binding(rendered.Component.Input, _classNames.InvalidInput, _options.IsHidden));
+        return rendered;
+    }
+
+    private string Wrapper => FieldMarkup.Open(_classNames, _options, Id);
+
+    private string WrapperEnd => FieldMarkup.Close(_classNames, _bound.MessageId);
 }

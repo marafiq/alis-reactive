@@ -11,6 +11,8 @@ internal static class DataStarts
     internal static IReadOnlyList<DataStep> Steps(IReadOnlyList<WrittenMember> path)
         => [.. path.Select((member, position) => new DataStep(member.Name, member.Holder.RequiredNames(), AbsentAt(path, position)))];
 
+    internal static Absence StartOf(IReadOnlyList<WrittenMember> path) => AbsentAt(path, path.Count - 1);
+
     private static Absence AbsentAt(IReadOnlyList<WrittenMember> path, int position)
     {
         var startHangsOnTheData = path.Take(position + 1).Any(member => member.Holder.StartHangsOnTheData());

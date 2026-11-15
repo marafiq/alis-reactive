@@ -21,6 +21,7 @@ internal sealed class PlanContent
     private readonly Dictionary<string, string> _vendorDefinitions = new(StringComparer.Ordinal);
     private readonly HashSet<string> _renderedElements = new(StringComparer.Ordinal);
     private readonly Dictionary<string, (string Listening, string Event, string HeardBy)> _heardPlugins = new(StringComparer.Ordinal);
+    private readonly SortedDictionary<string, InputBinding> _inputs = new(StringComparer.Ordinal);
     private bool _rendered;
 
     internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json)
@@ -81,6 +82,15 @@ internal sealed class PlanContent
         if (rendered && !_renderedElements.Add(objectId))
             throw new InvalidOperationException($"Element '{objectId}' renders a second time in this plan: render each component once.");
         _objects[objectId] = locator;
+    }
+
+    internal bool HasRendered(string elementId) => _renderedElements.Contains(elementId);
+
+    internal IReadOnlyDictionary<string, InputBinding> BindsInput(string inputId, InputBinding binding)
+    {
+        RefuseOnceRendered();
+        _inputs[inputId] = binding;
+        return _inputs;
     }
 
     internal void Handles(Handler handler)

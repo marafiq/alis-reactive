@@ -22,7 +22,7 @@ public static class PlanHtml
     /// </remarks>
     /// <returns>The plan.</returns>
     public static ReactivePlan<TModel> ReactivePlan<TModel>(this IHtmlHelper<TModel> html)
-        => ViewPlans.Open<TModel>(new AppJson(() => html.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions));
+        => ViewPlans.Open<TModel>(new AppJson(() => html.ViewContext.HttpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value.JsonSerializerOptions), html.ViewData.TemplateInfo.HtmlFieldPrefix);
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>
@@ -71,6 +71,6 @@ public static class PlanHtml
     /// <param name="plan">The plan the view opened.</param>
     /// <returns>The plan's script.</returns>
     public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper html, ReactivePlan<TModel> plan)
-        => new HtmlString(ViewPlans.ScriptOf(plan));
+        => new HtmlString(ViewPlans.ScriptOf(plan, html.ViewData.TemplateInfo.HtmlFieldPrefix, () => ViewPaths.Of(html)));
 }
 #endif

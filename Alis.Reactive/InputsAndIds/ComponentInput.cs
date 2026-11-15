@@ -1,4 +1,3 @@
-using System;
 using Alis.Reactive.Declarations;
 
 namespace Alis.Reactive.InputsAndIds;
@@ -25,9 +24,15 @@ public interface IInputComponent
 /// </remarks>
 public sealed class ComponentInput
 {
-    private ComponentInput()
+    private ComponentInput(Schema.Expression read, string committed)
     {
+        Read = read;
+        Committed = committed;
     }
+
+    internal Schema.Expression Read { get; }
+
+    internal string Committed { get; }
 
     /// <summary>Declares the input's value property and the event that commits it.</summary>
     /// <param name="value">The property that holds the value, declared on the component.</param>
@@ -37,5 +42,5 @@ public sealed class ComponentInput
     /// <returns>The input's declaration.</returns>
     public static ComponentInput Of<TValue, TArgs>(ReadOnly<TValue> value, Event<TArgs> committedBy)
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => new(value.Expression, committedBy.Name);
 }

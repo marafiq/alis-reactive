@@ -16,12 +16,15 @@ namespace Alis.Reactive.RenderingAndDelivery;
 /// <typeparam name="TModel">The model of the view that writes the plan.</typeparam>
 public sealed partial class ReactivePlan<TModel>
 {
-    internal ReactivePlan(BlockWriter writer)
+    internal ReactivePlan(BlockWriter writer, string startPrefix)
     {
         Writer = writer;
+        StartPrefix = startPrefix;
     }
 
     internal BlockWriter Writer { get; }
+
+    internal string StartPrefix { get; }
 
     /// <summary>Reaches a plugin the page registers, to handle its events.</summary>
     /// <typeparam name="TPlugin">The plugin's declaration.</typeparam>
@@ -61,6 +64,8 @@ public sealed partial class Rendered<TComponent, TModel>
 {
     private readonly TComponent _component;
     private readonly BlockWriter _writer;
+
+    internal TComponent Component => _component;
 
     /// <summary>Runs a pipeline each time the component raises an event that has no payload.</summary>
     /// <param name="raised">The event, as a member of the component's declaration.</param>

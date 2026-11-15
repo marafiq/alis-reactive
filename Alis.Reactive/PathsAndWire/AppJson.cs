@@ -14,6 +14,8 @@ internal sealed class AppJson
         _options = new Lazy<JsonSerializerOptions>(read);
     }
 
+    internal JsonSerializerOptions App => _options.Value;
+
     internal JsonSerializerOptions LiveForm => LiveForms.GetValue(_options.Value, LiveFormOf);
 
     private static JsonSerializerOptions LiveFormOf(JsonSerializerOptions app) => new()

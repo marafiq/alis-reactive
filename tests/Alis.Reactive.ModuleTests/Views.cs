@@ -16,9 +16,11 @@ internal static class Views
 {
     internal static IHtmlHelper<TModel> Of<TModel>(TModel model) => Of(model, _ => { });
 
-    internal static IHtmlHelper<TModel> Of<TModel>(TModel model, Action<JsonSerializerOptions> appJson)
+    internal static IHtmlHelper<TModel> Of<TModel>(TModel model, Action<JsonSerializerOptions> appJson) => Of(model, appJson, _ => { });
+
+    internal static IHtmlHelper<TModel> Of<TModel>(TModel model, Action<JsonSerializerOptions> appJson, Action<IServiceCollection> app)
     {
-        var services = MvcOfAnApp(appJson).CreateScope().ServiceProvider;
+        var services = MvcOfAnApp(appJson, app).CreateScope().ServiceProvider;
         var html = services.GetRequiredService<IHtmlHelper<TModel>>();
         var view = new ViewContext
         {
@@ -37,7 +39,7 @@ internal static class Views
         return written.ToString();
     }
 
-    private static ServiceProvider MvcOfAnApp(Action<JsonSerializerOptions> appJson)
+    private static ServiceProvider MvcOfAnApp(Action<JsonSerializerOptions> appJson, Action<IServiceCollection> app)
     {
         var services = new ServiceCollection();
         var diagnostics = new DiagnosticListener("Alis.Reactive.ModuleTests");
@@ -45,6 +47,7 @@ internal static class Views
         services.AddSingleton(diagnostics);
         services.AddSingleton<DiagnosticSource>(diagnostics);
         services.AddControllersWithViews().AddJsonOptions(json => appJson(json.JsonSerializerOptions));
+        app(services);
         return services.BuildServiceProvider();
     }
 }

@@ -94,7 +94,7 @@ internal sealed class WrittenMember
     }
 
     [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's exception, 2026-11-06: the class that declares a lambda's member is a type's identity, not a discovery of members (D18.1, D18.3).")]
-    private static Type? DeclaringClass(MemberExpression access) => access.Member.DeclaringType;
+    internal static Type? DeclaringClass(MemberExpression access) => access.Member.DeclaringType;
 
     [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "A type's name is its identity (D18.1), and X18.8's refusal names the class a read starts from by it.")]
     private static string NameOf(JsonTypeInfo holder) => holder.Type.Name;

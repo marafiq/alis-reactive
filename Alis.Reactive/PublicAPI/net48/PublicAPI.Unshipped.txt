@@ -113,14 +113,27 @@ Alis.Reactive.Elements.ElementContent.Set<TValue>(Alis.Reactive.ValuesAndSources
 Alis.Reactive.InputsAndIds.ComponentInput
 Alis.Reactive.InputsAndIds.IInputComponent
 Alis.Reactive.InputsAndIds.IInputComponent.Input.get -> Alis.Reactive.InputsAndIds.ComponentInput!
+Alis.Reactive.InputsAndIds.IdGenerator
 Alis.Reactive.InputsAndIds.InputFieldOptions
 Alis.Reactive.InputsAndIds.InputFieldOptions.Hidden() -> Alis.Reactive.InputsAndIds.InputFieldOptions!
 Alis.Reactive.InputsAndIds.InputFieldOptions.Label(string! text) -> Alis.Reactive.InputsAndIds.InputFieldOptions!
 Alis.Reactive.InputsAndIds.InputFieldOptions.Required() -> Alis.Reactive.InputsAndIds.InputFieldOptions!
+Alis.Reactive.InputsAndIds.ReactiveClassNames
+Alis.Reactive.InputsAndIds.ReactiveClassNames.Field.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.Field.set -> void
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldLabel.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldLabel.set -> void
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldMessage.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldMessage.set -> void
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldRequired.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.FieldRequired.set -> void
+Alis.Reactive.InputsAndIds.ReactiveClassNames.InvalidInput.get -> string!
+Alis.Reactive.InputsAndIds.ReactiveClassNames.InvalidInput.set -> void
 Alis.Reactive.Plugins.Plugin
 Alis.Reactive.Plugins.Plugin.Name.get -> string!
 Alis.Reactive.Plugins.Plugin.Plugin(string! name) -> void
 Alis.Reactive.Plugins.Plugin.Plugin(string! name, Alis.Reactive.Declarations.EventListening! events) -> void
+Alis.Reactive.RenderingAndDelivery.ClassNameServices
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Html.get -> System.Web.Mvc.HtmlHelper<TModel>!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Id.get -> string!
@@ -763,6 +776,8 @@ static Alis.Reactive.Declarations.JsObject.Pass<TDeclared, TSource>(Alis.Reactiv
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.Property<TValue?>! property, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.Declarations.NullableWrites.Set<TValue>(this Alis.Reactive.Declarations.WriteOnly<TValue?>! member, Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 static Alis.Reactive.InputsAndIds.ComponentInput.Of<TValue, TArgs>(Alis.Reactive.Declarations.ReadOnly<TValue>! value, Alis.Reactive.Declarations.Event<TArgs!>! committedBy) -> Alis.Reactive.InputsAndIds.ComponentInput!
+static Alis.Reactive.InputsAndIds.IdGenerator.For<TModel, TProp>(System.Linq.Expressions.Expression<System.Func<TModel, TProp>!>! member) -> string!
+static Alis.Reactive.RenderingAndDelivery.ClassNameServices.AddReactiveClassNames(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.InputsAndIds.ReactiveClassNames!>! names) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
 static Alis.Reactive.RenderingAndDelivery.InputFields.InputField<TModel, TValue>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, System.Linq.Expressions.Expression<System.Func<TModel, TValue>!>! member, System.Action<Alis.Reactive.InputsAndIds.InputFieldOptions!>! options) -> Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>!
 static Alis.Reactive.RenderingAndDelivery.MemberPartials.PartialFor<TModel, TMember>(this System.Web.Mvc.HtmlHelper<TModel>! html, System.Linq.Expressions.Expression<System.Func<TModel, TMember>!>! member, string! viewName) -> System.Web.Mvc.MvcHtmlString!

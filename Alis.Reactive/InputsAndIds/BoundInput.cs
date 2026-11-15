@@ -1,0 +1,120 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq.Expressions;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+using Alis.Reactive.Schema;
+using Alis.Reactive.TypeKnowledge;
+
+namespace Alis.Reactive.InputsAndIds;
+
+internal sealed partial class BoundInput
+{
+    private const string MessageOf = "_message";
+
+    private readonly IReadOnlyList<PathStep> _path;
+    private readonly Shape _shape;
+    private readonly Schema.Expression _blank;
+
+    private BoundInput(string id, string name, IReadOnlyList<PathStep> path, Shape shape, Schema.Expression blank)
+    {
+        Id = id;
+        Name = name;
+        _path = path;
+        _shape = shape;
+        _blank = blank;
+    }
+
+    internal string Id { get; }
+
+    internal string Name { get; }
+
+    internal string MessageId => Id + MessageOf;
+
+    internal static BoundInput Of(MemberLambda lambda, MvcNames names, JsonSerializerOptions app, Func<JsonElement> positionStart)
+    {
+        var path = new List<PathStep>(PrefixSteps(names.Prefix, app));
+        var sinceTheItem = new List<WrittenMember>();
+        foreach (var step in lambda.Steps)
+        {
+            var holder = app.GetTypeInfo(HolderOf(step.Node).Type);
+            if (step.IsPosition)
+            {
+                path.Add(PositionIn(lambda, step, holder));
+                sinceTheItem.Clear();
+                continue;
+            }
+
+            var access = (MemberExpression)step.Node;
+            if (holder.Kind != JsonTypeInfoKind.Object) throw NoBodyPath(lambda, step.Text, WrittenMember.DeclaringClass(access), holder);
+            var member = WrittenMember.Of(access, holder, lambda.Lambda);
+            sinceTheItem.Add(member);
+            path.Add(new MemberStep(NameOf(member, step.Text)));
+        }
+
+        var blank = lambda.EndsAtAPosition ? positionStart() : StartOf(lambda, sinceTheItem);
+        return new BoundInput(lambda.Scope + "__" + names.IdOfTheName, names.Name, path, InputShapes.Of(app.GetTypeInfo(lambda.Lambda.Body.Type), blank), new LitExpression(blank));
+    }
+
+    internal InputBinding Binding(ComponentInput input, string invalidClass, bool hidden)
+        => new(
+            Name,
+            _path,
+            new OpExpression(Operator.Coalesce, [new AsExpression(input.Read, new NullableShape(_shape)), _blank]),
+            input.Committed,
+            invalidClass,
+            hidden ? "" : MessageId);
+
+    private static partial string NameOf(WrittenMember member, string clrName);
+
+    private static partial string PrefixMemberName(string clrName, JsonSerializerOptions app);
+
+    private static IEnumerable<PathStep> PrefixSteps(string prefix, JsonSerializerOptions app)
+    {
+        foreach (var (text, isPosition) in MemberLambda.Named(prefix))
+        {
+            var isListPosition = isPosition && int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out _);
+            if (isListPosition) yield return new IndexStep(int.Parse(text, NumberStyles.None, CultureInfo.InvariantCulture));
+            else yield return new MemberStep(isPosition ? text : PrefixMemberName(text, app));
+        }
+    }
+
+    private static PathStep PositionIn(MemberLambda lambda, MemberLambda.Step step, JsonTypeInfo holder) => holder.Kind switch
+    {
+        JsonTypeInfoKind.Enumerable => new IndexStep(int.Parse(step.Text, NumberStyles.None, CultureInfo.InvariantCulture)),
+        JsonTypeInfoKind.Dictionary => new MemberStep(step.Text),
+        _ => throw NoBodyPath(lambda, "[" + step.Text + "]", holder.Type, holder),
+    };
+
+    private static System.Linq.Expressions.Expression HolderOf(System.Linq.Expressions.Expression step) => step switch
+    {
+        MemberExpression { Expression: { } holder } => holder,
+        MethodCallExpression { Object: { } holder } => holder,
+        BinaryExpression position => position.Left,
+        _ => throw new InvalidOperationException($"'{step}' is no step MVC names."),
+    };
+
+    private static JsonElement StartOf(MemberLambda lambda, IReadOnlyList<WrittenMember> sinceTheItem)
+    {
+        if (DataStarts.StartOf(sinceTheItem) is StartAbsence start) return start.Value;
+        throw new InvalidOperationException(
+            $"Input '{lambda.Lambda}' binds a member the app's JSON options make only from the data the endpoint is sent: an abstract class, or a class they bind by the type the data names. A blank input has no start its plan can carry: bind a member of a class they make from an empty object.");
+    }
+
+    private static InvalidOperationException NoBodyPath(MemberLambda lambda, string member, Type? declaring, JsonTypeInfo holder)
+    {
+        var holderName = ClassNames.AsCSharpWritesIt(holder.Type);
+        var declarer = declaring is null ? holderName : ClassNames.AsCSharpWritesIt(declaring);
+        return new InvalidOperationException(
+            $"Input '{lambda.Lambda}' binds {member}, which {declarer} declares, and the app's JSON options write {holderName} as {WrittenAs(holder)}, so the input has no body path: bind a member of a class they write as an object.");
+    }
+
+    private static string WrittenAs(JsonTypeInfo holder) => holder.Kind switch
+    {
+        JsonTypeInfoKind.Enumerable => "a list",
+        JsonTypeInfoKind.Dictionary => "a dictionary",
+        JsonTypeInfoKind.Object => "an object",
+        _ => "one value",
+    };
+}
