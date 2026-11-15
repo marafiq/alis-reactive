@@ -605,7 +605,10 @@ Terms used throughout:
   (`Alis.Reactive/Components/JsObject.cs:74-260`).
 - `N5.6` new: `Read(..)` on a property's read and on `Data<T>`, replacing `Get(..)`
   (`Alis.Reactive/Components/JsMembers.cs:37`, `Alis.Reactive/PlanAuthoring/Events/Data.cs:40`), since `Get` is
-  the HTTP verb in the same views (D5.10).
+  the HTTP verb in the same views (D5.10). A lambda that names no member path is refused where the view renders, as
+  the redesign's `Get` refused it (`Alis.Reactive/Members/ExpressionPathHelper.cs:129` at 65fdf118d): "'{lambda}' names
+  no member path, so the browser has no member to read; read a member and the members past it, such as record =>
+  record.Detail.Name."
 - `N5.5` new: `LiveObject<T>()` and `LiveObjects<T>()`, the live object and the list a property holds, replacing
   `Object<T>()` and `Objects<T>()` (the owner, 2026-11-06: "Object which collide with the built-in C# object"). A
   member named `Object` on `JsObject` shadows `System.Object` in every declaration, and the build refuses it

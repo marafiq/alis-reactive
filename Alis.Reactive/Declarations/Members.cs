@@ -35,7 +35,8 @@ public class ReadOnly<TValue> : TypedSource<TValue>
     /// </remarks>
     /// <param name="path">The field to read, as a member path from the property's value.</param>
     /// <returns>A source of the field's value.</returns>
-    public TypedSource<TResult> Read<TResult>(Expression<Func<TValue, TResult>> path) => throw new NotImplementedException();
+    public TypedSource<TResult> Read<TResult>(Expression<Func<TValue, TResult>> path)
+        => DataReads.Past<TResult>(Expression, Form, path, Owner.Bound.Writer.Content.Json.LiveForm);
 }
 
 /// <summary>

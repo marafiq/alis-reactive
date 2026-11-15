@@ -36,6 +36,10 @@ internal sealed class WrittenMember
 
     internal JsonTypeInfo Contract => Holder.Options.GetTypeInfo(_property.PropertyType);
 
+    internal bool HasItsOwnConverter => _property.CustomConverter is not null;
+
+    internal bool HoldsItsOwnForm => !ReferenceEquals(OwnForm(), Holder.Options);
+
     internal object? ReadFrom(object holder) => _get(holder);
 
     internal JsonElement Written(object? value) => JsonSerializer.SerializeToElement(value, OwnForm().GetTypeInfo(_property.PropertyType));

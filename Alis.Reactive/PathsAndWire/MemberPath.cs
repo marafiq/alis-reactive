@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -25,6 +26,17 @@ internal sealed partial class MemberPath
 
     internal IReadOnlyList<DataStep> DataSteps() => DataStarts.Steps([.. _links.Select(link => link.Written)]);
 
+    internal bool EndsInItsOwnForm => _links[_links.Count - 1].Written.HoldsItsOwnForm;
+
+    internal void RefuseAReadPastItsOwnConverter(LambdaExpression path)
+    {
+        var converted = _links.Take(_links.Count - 1).FirstOrDefault(link => link.Written.HasItsOwnConverter);
+        if (converted is null) return;
+        throw new InvalidOperationException(
+            $"'{path.Body}' reads past '{converted.Text}', which its own JSON converter writes, so the browser holds what the converter writes, not its members; " +
+            $"read '{converted.Text}' itself, or read past it on the server.");
+    }
+
     internal static bool TryOf(LambdaExpression path, JsonSerializerOptions options, [NotNullWhen(true)] out MemberPath? members)
     {
         var accesses = new List<MemberLink.Access>();
@@ -43,18 +55,21 @@ internal sealed partial class MemberPath
 
     private sealed class MemberLink
     {
-        private MemberLink(string clrName, WrittenMember written)
+        private MemberLink(string clrName, string text, WrittenMember written)
         {
             ClrName = clrName;
+            Text = text;
             Written = written;
         }
 
         internal string ClrName { get; }
 
+        internal string Text { get; }
+
         internal WrittenMember Written { get; }
 
         internal static MemberLink Of(Access access, LambdaExpression path)
-            => new(access.Member.ToString().Substring(access.HolderText.Length + 1), WrittenMember.Of(access.Member, access.Holder, path));
+            => new(access.Member.ToString().Substring(access.HolderText.Length + 1), access.Member.ToString(), WrittenMember.Of(access.Member, access.Holder, path));
 
         internal sealed record Access(MemberExpression Member, string HolderText, System.Text.Json.Serialization.Metadata.JsonTypeInfo Holder);
     }
