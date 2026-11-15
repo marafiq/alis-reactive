@@ -28,8 +28,10 @@ A test rule, TEST001 to TEST013 of `spec/REWRITE.md` section 2.10, is an analyze
 2. **The title states the rule as a fact; the message names the member and the cure.** One sentence, the developer's
    own names as its arguments, no final period. A rule of the spec is an error and is on by default; the one
    other severity is the one its line in `spec/Analyzers/module.md` names. A message its spec line quotes is written
-   word for word; every other message is its author's, written to this rule. No rule carries a help link: the message
-   holds the cure.
+   word for word, save the final period of a quote of one sentence, which the compiler's rule for an analyzer's
+   message refuses (RS1032), as ALIS042's drops it; a quote of several sentences keeps its periods, as RS1032 asks
+   (the lead, 2026-11-15). Every other message is its author's, written to this rule. No rule carries a help link:
+   the message holds the cure.
 3. **Semantic, never textual.** The framework types a rule reads are resolved once for each compilation, by
    `GetTypeByMetadataName` inside `RegisterCompilationStartAction`, and a compilation that lacks one registers
    nothing. The rule reads symbols and `IOperation` nodes and compares symbols with `SymbolEqualityComparer`. It

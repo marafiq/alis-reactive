@@ -1,2 +1,2 @@
 .
-Analyzers TypeKnowledge PartialsAndSlots ValuesAndSources ArrayLambdas
+Analyzers TypeKnowledge PartialsAndSlots ValuesAndSources ArrayLambdas Vendors

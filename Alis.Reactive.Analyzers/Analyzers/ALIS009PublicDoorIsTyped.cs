@@ -96,7 +96,10 @@ public sealed class ALIS009PublicDoorIsTyped : DiagnosticAnalyzer
 
     private static void Start(CompilationStartAnalysisContext start)
     {
-        if (SliceTable.Read(start.Options, start.CancellationToken) is null) return;
+        var hasTable = SliceTable.Read(start.Options, start.CancellationToken) is not null;
+        var declaration = start.Compilation.GetTypeByMetadataName("Alis.Reactive.Declarations.JsObject");
+        var rendered = start.Compilation.GetTypeByMetadataName("Alis.Reactive.RenderingAndDelivery.Rendered`2");
+        if (!hasTable && declaration is null && rendered is null) return;
 
         var surface = new Surface(
             start.Compilation.Assembly,
@@ -104,13 +107,31 @@ public sealed class ALIS009PublicDoorIsTyped : DiagnosticAnalyzer
             start.Compilation.GetTypeByMetadataName(ExemptionName),
             CallerInformation.Select(start.Compilation.GetTypeByMetadataName).OfType<INamedTypeSymbol>().ToImmutableArray());
         start.RegisterSymbolAction(
-            context => Read(context, surface),
+            context =>
+            {
+                if (hasTable || IsDeclaration(context.Symbol, declaration) || IsRenderHelper(context.Symbol, rendered)) Read(context, surface);
+            },
             SymbolKind.NamedType,
             SymbolKind.Method,
             SymbolKind.Property,
             SymbolKind.Field,
             SymbolKind.Event);
     }
+
+    private static bool IsDeclaration(ISymbol symbol, INamedTypeSymbol? declaration)
+    {
+        if (declaration is null) return false;
+        for (var type = symbol as INamedTypeSymbol ?? symbol.ContainingType; type is not null; type = type.BaseType)
+        {
+            if (SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, declaration)) return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsRenderHelper(ISymbol symbol, INamedTypeSymbol? rendered)
+        => rendered is not null && symbol is IMethodSymbol { ReturnType: INamedTypeSymbol result }
+            && SymbolEqualityComparer.Default.Equals(result.OriginalDefinition, rendered);
 
     private static void Read(SymbolAnalysisContext context, Surface surface)
     {

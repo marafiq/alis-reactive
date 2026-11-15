@@ -144,42 +144,48 @@ public sealed class WhenAVendorIsDefined
     [Test]
     public void method_path_refuses_an_empty_element_path_segment()
     {
-        Assert.That(() => ComponentVendor.Define("bell", "", "on", "off", elementPath: "host."),
+        var path = "host.";
+        Assert.That(() => ComponentVendor.Define("bell", "", "on", "off", elementPath: path),
             Throws.InvalidOperationException.With.Message.EqualTo("Path 'host.' contains an empty segment at index 1. Use dot-separated property names without consecutive, leading, or trailing dots."));
     }
 
     [Test]
     public void callback_path_refuses_an_empty_element_path_segment()
     {
-        Assert.That(() => ComponentVendor.DefineCallbackProperties("bell", "", elementPath: "host."),
+        var path = "host.";
+        Assert.That(() => ComponentVendor.DefineCallbackProperties("bell", "", elementPath: path),
             Throws.InvalidOperationException.With.Message.EqualTo("Path 'host.' contains an empty segment at index 1. Use dot-separated property names without consecutive, leading, or trailing dots."));
     }
 
     [Test]
     public void returned_path_refuses_an_empty_element_path_segment()
     {
-        Assert.That(() => ComponentVendor.DefineReturnedUnsubscriber("bell", "", "watch", elementPath: "host."),
+        var path = "host.";
+        Assert.That(() => ComponentVendor.DefineReturnedUnsubscriber("bell", "", "watch", elementPath: path),
             Throws.InvalidOperationException.With.Message.EqualTo("Path 'host.' contains an empty segment at index 1. Use dot-separated property names without consecutive, leading, or trailing dots."));
     }
 
     [Test]
     public void method_lookup_refuses_an_empty_element_path_segment()
     {
-        Assert.That(() => ComponentVendor.Define("bell", VendorLookup.ByPlugin("ward-bells"), "on", "off", elementPath: "host."),
+        var path = "host.";
+        Assert.That(() => ComponentVendor.Define("bell", VendorLookup.ByPlugin("ward-bells"), "on", "off", elementPath: path),
             Throws.InvalidOperationException.With.Message.EqualTo("Path 'host.' contains an empty segment at index 1. Use dot-separated property names without consecutive, leading, or trailing dots."));
     }
 
     [Test]
     public void callback_lookup_refuses_an_empty_element_path_segment()
     {
-        Assert.That(() => ComponentVendor.DefineCallbackProperties("bell", VendorLookup.ByPlugin("ward-bells"), elementPath: "host."),
+        var path = "host.";
+        Assert.That(() => ComponentVendor.DefineCallbackProperties("bell", VendorLookup.ByPlugin("ward-bells"), elementPath: path),
             Throws.InvalidOperationException.With.Message.EqualTo("Path 'host.' contains an empty segment at index 1. Use dot-separated property names without consecutive, leading, or trailing dots."));
     }
 
     [Test]
     public void returned_lookup_refuses_an_empty_element_path_segment()
     {
-        Assert.That(() => ComponentVendor.DefineReturnedUnsubscriber("bell", VendorLookup.ByPlugin("ward-bells"), "watch", elementPath: "host."),
+        var path = "host.";
+        Assert.That(() => ComponentVendor.DefineReturnedUnsubscriber("bell", VendorLookup.ByPlugin("ward-bells"), "watch", elementPath: path),
             Throws.InvalidOperationException.With.Message.EqualTo("Path 'host.' contains an empty segment at index 1. Use dot-separated property names without consecutive, leading, or trailing dots."));
     }
 }
