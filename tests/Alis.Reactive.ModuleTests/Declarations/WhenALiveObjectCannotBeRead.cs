@@ -32,7 +32,7 @@ public sealed class WhenALiveObjectCannotBeRead
             html.RenderPlan(plan);
         };
         Assert.That(() => theView(), Throws.InvalidOperationException.With.Message.EqualTo(
-            "A live list's position must be a non-negative integer; the first item is at position 0."));
+            "An item's position is zero or more."));
     }
 
     [Test]

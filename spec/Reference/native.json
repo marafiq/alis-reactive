@@ -686,7 +686,7 @@
           ]
         },
         {
-          "behavior": "Raise's payload has Count 14 where the box holds no number, a day of 2026-11-12T10:00:00 and its box text as Time. Raise is flagged, Raise plain is not. Their outer's middle is named M-14 and M-12. Before listeners return, the flagged payload's Total() is 3, its Current() is One, two of its three Items are named Missed and Matching() holds two items; the plain payload's Total() is 1, its Current() is Two and no item matches or is named Missed. After listeners return, Total() is 2, Current() is Two and the first item is named Done, leaving one Missed in the flagged payload. Held.ItemAt uses positions starting at 1 and Held.Item is One.",
+          "behavior": "Raise's payload has Count 14 where the box holds no number, a day of 2026-11-12T10:00:00 and its box text as Time. Raise is flagged, Raise plain is not. Their outer's middle is named M-12 and M-14. Before listeners return, the flagged payload's Total() is 3, its Current() is One, two of its three Items are named Missed and Matching() holds two items; the plain payload's Total() is 1, its Current() is Two and no item matches or is named Missed. After listeners return, Total() is 2, Current() is Two and the first item is named Done, leaving one Missed in the flagged payload. Held.ItemAt uses positions starting at 1 and Held.Item is One.",
           "tests": [
             "event.poc15.methodValue.payload.before",
             "event.poc15.methodValue.payload.after",
@@ -1168,7 +1168,7 @@
       ],
       "behaviors": [
         {
-          "behavior": "The component shows its outer's text as Outer: and the text in a status named Outer, its outer's count as Outer count: and the count in a status named Outer count, and Outer acted once the outer's Act() is called.",
+          "behavior": "The component shows its outer's text as Outer: and the text in a status named Outer, its outer's count as Outer count: and the count in a status named Outer count, and Outer acted in a status named Outer action once the outer's Act() is called.",
           "tests": [
             "X5.10"
           ]

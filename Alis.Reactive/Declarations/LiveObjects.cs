@@ -32,7 +32,7 @@ public sealed class LiveObjects<TItem>
     /// <returns>The item, whose members are read, set and called through its declaration.</returns>
     public TItem At(int position)
     {
-        if (position < 0) throw new InvalidOperationException("A live list's position must be a non-negative integer; the first item is at position 0.");
+        if (position < 0) throw new InvalidOperationException("An item's position is zero or more.");
         return JsObject.Reaching<TItem>(new Reached(() => new GetExpression([new IndexStep(position)], PathMembers.RequiredIfHeld, _bound.Target), _bound.Writer, false));
     }
 

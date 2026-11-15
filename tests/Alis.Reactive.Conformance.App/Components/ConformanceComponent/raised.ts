@@ -10,6 +10,7 @@ export class Held {
     private readonly request: RequestValue;
     readonly items: Item[];
     readonly item: Item;
+    private readonly matches: Item[];
     answer: ((item: Item) => string) | null = null;
     constructor(start: ConformanceStart, view: ComponentView, request: RequestValue) {
         this.start = start;
@@ -17,6 +18,7 @@ export class Held {
         this.request = request;
         this.items = start.held.items.map((item) => new Item(item, view, request, start.itemEndpoint, () => undefined));
         this.item = new Item(itemStart("One"), view, request, start.itemEndpoint, () => undefined);
+        this.matches = Array.from({ length: start.held.matchingItems }, (_, position) => new Item(itemStart("Match " + String(position + 1)), view, request, start.itemEndpoint, () => undefined));
     }
     set writeOnlyText(value: string) { this.view.status("Held", "Held: " + value); }
     total(): number { return this.start.held.total; }
@@ -32,7 +34,7 @@ export class Held {
             throw new Error("There is no held item at " + String(position) + ".");
         return item;
     }
-    matching(): Item[] { return this.items.slice(0, this.start.held.matchingItems); }
+    matching(): Item[] { return this.matches; }
     act(): void { this.view.status("Held", "Held: acted for " + (this.answer === null ? this.item.name : this.answer(this.item))); }
 }
 export class Raised {
@@ -72,7 +74,7 @@ export class Raised {
         if (option.text === null)
             Reflect.deleteProperty(this, "text");
         this.record = option.emptyRecord ? {} : option.record;
-        this.outer = new Outer(start.outer, view, request, start.textEndpoint, option.flag ? "M-14" : "M-12");
+        this.outer = new Outer(start.outer, view, request, start.textEndpoint, option.flag ? "M-12" : "M-14");
         this.items = [makeItem(itemStart(option.flag ? "Missed" : "Done")), makeItem(itemStart(option.flag ? "Missed" : "Done")), makeItem(itemStart("Done"))];
         this.quantity = option.flag ? 3 : 1;
         this.currentItem = makeItem(itemStart(option.flag ? "One" : "Two"));

@@ -87,5 +87,5 @@ export class Outer {
     set text(value: string) { this.heldText = value; this.view.status("Outer", "Outer: " + value); }
     get count(): number { return this.heldCount; }
     set count(value: number) { this.heldCount = value; this.view.status("Outer count", "Outer count: " + String(value)); }
-    act(): void { this.view.status("Outer", "Outer acted"); }
+    act(): void { this.view.status("Outer action", "Outer acted"); }
 }
