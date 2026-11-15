@@ -19,9 +19,15 @@ public class WhenThePlanContractIsGenerated
     private static readonly WrittenType[] ABedIsWrittenAsItsNumber =
         [new(typeof(Bed), "export type Bed = number;", new JsonObject { ["type"] = "integer" }, kinds: [], uses: [])];
 
+    private static readonly IReadOnlyDictionary<Type, IReadOnlyList<Type>> Contracts = new Dictionary<Type, IReadOnlyList<Type>>
+    {
+        [typeof(DayVisit)] = [typeof(VisitReport)],
+        [typeof(Breakfast)] = [typeof(OpenRound)],
+    };
+
     [AcceptedCase]
     public void a_closed_grammar_is_written_as_its_typescript()
-        => Assert.That(PlanContract.Read(Options, typeof(Round), ABedIsWrittenAsItsNumber).TypeScript(), Is.EqualTo(
+        => Assert.That(PlanContract.Read(Options, typeof(Round), ABedIsWrittenAsItsNumber, Contracts).TypeScript(), Is.EqualTo(
             """
             export type JsonValue = string | number | boolean | null | readonly JsonValue[] | { readonly [key: string]: JsonValue };
 
@@ -51,11 +57,28 @@ public class WhenThePlanContractIsGenerated
 
             export type Bed = number;
 
+            export interface VisitReport {
+              readonly result: Result;
+              readonly bytes: number;
+              readonly shift: Shift;
+            }
+
+            export type Result = DayResult | NightResult;
+
+            export interface DayResult {
+              readonly kind: "day";
+              readonly nurse: string;
+            }
+
+            export interface NightResult {
+              readonly kind: "night";
+            }
+
             """));
 
     [AcceptedCase]
     public void a_closed_grammar_is_written_as_its_schema()
-        => Assert.That(PlanContract.Read(Options, typeof(Round), ABedIsWrittenAsItsNumber).Schema(), Is.EqualTo(
+        => Assert.That(PlanContract.Read(Options, typeof(Round), ABedIsWrittenAsItsNumber, Contracts).Schema(), Is.EqualTo(
             """
             {
               "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -154,11 +177,229 @@ public class WhenThePlanContractIsGenerated
                 },
                 "Bed": {
                   "type": "integer"
+                },
+                "VisitReport": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "$ref": "#/$defs/Result"
+                    },
+                    "bytes": {
+                      "type": "integer"
+                    },
+                    "shift": {
+                      "$ref": "#/$defs/Shift"
+                    }
+                  },
+                  "required": [
+                    "result",
+                    "bytes",
+                    "shift"
+                  ],
+                  "additionalProperties": false
+                },
+                "Result": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/DayResult"
+                    },
+                    {
+                      "$ref": "#/$defs/NightResult"
+                    }
+                  ]
+                },
+                "DayResult": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "day"
+                    },
+                    "nurse": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "nurse"
+                  ],
+                  "additionalProperties": false
+                },
+                "NightResult": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "const": "night"
+                    }
+                  },
+                  "required": [
+                    "kind"
+                  ],
+                  "additionalProperties": false
                 }
               }
             }
 
             """));
+
+    [AcceptedCase]
+    public void the_grammar_reaches_every_request_contract_and_part()
+    {
+        var definitions = JsonNode.Parse(PlanContract.ReadCore().Schema())!["$defs"]!.AsObject();
+        var contracts = definitions.SkipWhile(row => row.Key is not ("HttpSend" or "FormCheck"))
+            .OrderBy(row => row.Key, StringComparer.Ordinal)
+            .Select(row => row.Key + "=" + row.Value!.ToJsonString());
+        Assert.That(string.Join("\n", contracts), Is.EqualTo(
+            """
+            Antiforgery={"oneOf":[{"$ref":"#/$defs/NoneAntiforgery"},{"$ref":"#/$defs/TokenAntiforgery"}]}
+            BodyFormat={"enum":["none","json","urlEncoded","multipart","text","file"]}
+            BooleanScalarWireForm={"type":"object","properties":{"kind":{"const":"boolean"}},"required":["kind"],"additionalProperties":false}
+            BrowserHeaders={}
+            Busy={"oneOf":[{"$ref":"#/$defs/NoneBusy"},{"$ref":"#/$defs/PageBusy"},{"$ref":"#/$defs/TargetsBusy"}]}
+            BusyTarget={"oneOf":[{"$ref":"#/$defs/MissingBusyTarget"},{"$ref":"#/$defs/ElementBusyTarget"},{"$ref":"#/$defs/ComponentBusyTarget"}]}
+            CapturedContainerCapture={"type":"object","properties":{"kind":{"const":"captured"},"id":{"type":"string"},"body":{"$ref":"#/$defs/EvaluatedValue"},"inputs":{"type":"array","items":{"$ref":"#/$defs/SentInput"}}},"required":["kind","id","body","inputs"],"additionalProperties":false}
+            CapturedInputCapture={"type":"object","properties":{"kind":{"const":"captured"},"input":{"$ref":"#/$defs/SentInput"}},"required":["kind","input"],"additionalProperties":false}
+            CheckedBody={"type":"object","properties":{"format":{"$ref":"#/$defs/BodyFormat"},"value":{"$ref":"#/$defs/EvaluatedValue"}},"required":["format","value"],"additionalProperties":false}
+            ComponentBusyTarget={"type":"object","properties":{"kind":{"const":"component"},"value":{"$ref":"#/$defs/ValueRead"}},"required":["kind","value"],"additionalProperties":false}
+            ContainerCapture={"oneOf":[{"$ref":"#/$defs/NoneContainerCapture"},{"$ref":"#/$defs/MissingContainerCapture"},{"$ref":"#/$defs/CapturedContainerCapture"}]}
+            DateScalarWireForm={"type":"object","properties":{"kind":{"const":"date"}},"required":["kind"],"additionalProperties":false}
+            ElementBusyTarget={"type":"object","properties":{"kind":{"const":"element"},"id":{"type":"string"}},"required":["kind","id"],"additionalProperties":false}
+            EnumScalarWireForm={"type":"object","properties":{"kind":{"const":"enum"},"values":{"type":"array","items":{"$ref":"#/$defs/EnumValue"}}},"required":["kind","values"],"additionalProperties":false}
+            EnumValue={"type":"object","properties":{"held":{},"name":{"type":"string"}},"required":["held","name"],"additionalProperties":false}
+            EvaluatedValue={}
+            FieldMultipartPart={"type":"object","properties":{"kind":{"const":"field"},"field":{"$ref":"#/$defs/SentField"}},"required":["kind","field"],"additionalProperties":false}
+            FieldTokenPlace={"type":"object","properties":{"kind":{"const":"field"},"name":{"type":"string"}},"required":["kind","name"],"additionalProperties":false}
+            FileMultipartPart={"type":"object","properties":{"kind":{"const":"file"},"name":{"type":"string"},"value":{"$ref":"#/$defs/ValueRead"}},"required":["kind","name","value"],"additionalProperties":false}
+            FileResponseBody={"type":"object","properties":{"kind":{"const":"file"},"value":{"$ref":"#/$defs/ResponseFile"}},"required":["kind","value"],"additionalProperties":false}
+            FileSentBody={"type":"object","properties":{"kind":{"const":"file"},"value":{"$ref":"#/$defs/ValueRead"},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","value","inputs"],"additionalProperties":false}
+            FlagValue={"type":"object","properties":{"held":{},"name":{"type":"string"},"number":{"type":"integer"}},"required":["held","name","number"],"additionalProperties":false}
+            FlagsScalarWireForm={"type":"object","properties":{"kind":{"const":"flags"},"values":{"type":"array","items":{"$ref":"#/$defs/FlagValue"}}},"required":["kind","values"],"additionalProperties":false}
+            FormCheck={"type":"object","properties":{"registration":{"type":"string"},"body":{"$ref":"#/$defs/CheckedBody"},"inputs":{"type":"array","items":{"$ref":"#/$defs/SentInput"}},"place":{"$ref":"#/$defs/FormPlace"}},"required":["registration","body","inputs","place"],"additionalProperties":false}
+            FormDestination={"oneOf":[{"$ref":"#/$defs/SummaryFormDestination"},{"$ref":"#/$defs/NoticeFormDestination"}]}
+            FormPlace={"type":"object","properties":{"destination":{"$ref":"#/$defs/FormDestination"}},"required":["destination"],"additionalProperties":false}
+            HeaderTokenPlace={"type":"object","properties":{"kind":{"const":"header"},"name":{"type":"string"}},"required":["kind","name"],"additionalProperties":false}
+            HeldValueRead={"type":"object","properties":{"kind":{"const":"held"},"value":{"$ref":"#/$defs/EvaluatedValue"}},"required":["kind","value"],"additionalProperties":false}
+            HtmlResponseBody={"type":"object","properties":{"kind":{"const":"html"},"value":{"type":"string"}},"required":["kind","value"],"additionalProperties":false}
+            HttpOutcome={"enum":["ok","status","network","redirect","content"]}
+            HttpResponse={"type":"object","properties":{"status":{"type":"integer"},"outcome":{"$ref":"#/$defs/HttpOutcome"},"headers":{"$ref":"#/$defs/BrowserHeaders"},"request":{"$ref":"#/$defs/EvaluatedValue"},"inputs":{"type":"array","items":{"$ref":"#/$defs/SentInput"}},"body":{"$ref":"#/$defs/ResponseBody"}},"required":["status","outcome","headers","request","inputs","body"],"additionalProperties":false}
+            HttpSend={"type":"object","properties":{"method":{"$ref":"#/$defs/RequestMethod"},"url":{"$ref":"#/$defs/RequestUrl"},"query":{"$ref":"#/$defs/SentQuery"},"body":{"$ref":"#/$defs/SentBody"},"headers":{"type":"array","items":{"$ref":"#/$defs/SentHeader"}},"antiforgery":{"$ref":"#/$defs/Antiforgery"},"retry":{"$ref":"#/$defs/RetryPolicy"},"busy":{"$ref":"#/$defs/Busy"},"respondedJson":{"type":"boolean"},"contracts":{"type":"array","items":{"$ref":"#/$defs/RequestContract"}}},"required":["method","url","query","body","headers","antiforgery","retry","busy","respondedJson","contracts"],"additionalProperties":false}
+            InputCapture={"oneOf":[{"$ref":"#/$defs/MissingInputCapture"},{"$ref":"#/$defs/CapturedInputCapture"}]}
+            InputEntry={"type":"object","properties":{"id":{"type":"string"},"binding":{"$ref":"#/$defs/InputBinding"}},"required":["id","binding"],"additionalProperties":false}
+            InstantScalarWireForm={"type":"object","properties":{"kind":{"const":"instant"}},"required":["kind"],"additionalProperties":false}
+            ItemWhenNothing={"enum":["empty","stop"]}
+            JsonResponseBody={"type":"object","properties":{"kind":{"const":"json"},"value":{"$ref":"#/$defs/EvaluatedValue"}},"required":["kind","value"],"additionalProperties":false}
+            JsonSentBody={"type":"object","properties":{"kind":{"const":"json"},"value":{"$ref":"#/$defs/EvaluatedValue"},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","value","inputs"],"additionalProperties":false}
+            ListWireForm={"type":"object","properties":{"kind":{"const":"list"},"item":{"$ref":"#/$defs/ScalarWireForm"},"itemWhenNothing":{"$ref":"#/$defs/ItemWhenNothing"}},"required":["kind","item","itemWhenNothing"],"additionalProperties":false}
+            MemberPathPart={"type":"object","properties":{"kind":{"const":"member"},"name":{"type":"string"},"value":{"$ref":"#/$defs/ValueRead"},"form":{"$ref":"#/$defs/ScalarWireForm"}},"required":["kind","name","value","form"],"additionalProperties":false}
+            MissingBusyTarget={"type":"object","properties":{"kind":{"const":"missing"},"id":{"type":"string"}},"required":["kind","id"],"additionalProperties":false}
+            MissingContainerCapture={"type":"object","properties":{"kind":{"const":"missing"},"id":{"type":"string"}},"required":["kind","id"],"additionalProperties":false}
+            MissingInputCapture={"type":"object","properties":{"kind":{"const":"missing"},"id":{"type":"string"},"name":{"type":"string"}},"required":["kind","id","name"],"additionalProperties":false}
+            MultipartPart={"oneOf":[{"$ref":"#/$defs/FieldMultipartPart"},{"$ref":"#/$defs/FileMultipartPart"}]}
+            MultipartSentBody={"type":"object","properties":{"kind":{"const":"multipart"},"parts":{"type":"array","items":{"$ref":"#/$defs/MultipartPart"}},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","parts","inputs"],"additionalProperties":false}
+            NoneAntiforgery={"type":"object","properties":{"kind":{"const":"none"}},"required":["kind"],"additionalProperties":false}
+            NoneBusy={"type":"object","properties":{"kind":{"const":"none"}},"required":["kind"],"additionalProperties":false}
+            NoneContainerCapture={"type":"object","properties":{"kind":{"const":"none"}},"required":["kind"],"additionalProperties":false}
+            NoneResponseBody={"type":"object","properties":{"kind":{"const":"none"}},"required":["kind"],"additionalProperties":false}
+            NoneRetryPolicy={"type":"object","properties":{"kind":{"const":"none"}},"required":["kind"],"additionalProperties":false}
+            NoneSentBody={"type":"object","properties":{"kind":{"const":"none"}},"required":["kind"],"additionalProperties":false}
+            NothingValueRead={"type":"object","properties":{"kind":{"const":"nothing"}},"required":["kind"],"additionalProperties":false}
+            NoticeFormDestination={"type":"object","properties":{"kind":{"const":"notice"},"separator":{"type":"string"}},"required":["kind","separator"],"additionalProperties":false}
+            NumberScalarWireForm={"type":"object","properties":{"kind":{"const":"number"}},"required":["kind"],"additionalProperties":false}
+            PageBusy={"type":"object","properties":{"kind":{"const":"page"}},"required":["kind"],"additionalProperties":false}
+            PathPart={"oneOf":[{"$ref":"#/$defs/TextPathPart"},{"$ref":"#/$defs/MemberPathPart"}]}
+            RequestContract={"enum":["busy","notice"]}
+            RequestMethod={"enum":["GET","HEAD","OPTIONS","POST","PUT","DELETE"]}
+            RequestUrl={"type":"object","properties":{"parts":{"type":"array","items":{"$ref":"#/$defs/PathPart"}},"query":{"type":"string"}},"required":["parts","query"],"additionalProperties":false}
+            ResponseBody={"oneOf":[{"$ref":"#/$defs/NoneResponseBody"},{"$ref":"#/$defs/JsonResponseBody"},{"$ref":"#/$defs/TextResponseBody"},{"$ref":"#/$defs/HtmlResponseBody"},{"$ref":"#/$defs/FileResponseBody"}]}
+            ResponseFile={"type":"object","properties":{"name":{"type":"string"},"size":{"type":"integer"},"type":{"type":"string"}},"required":["name","size","type"],"additionalProperties":false}
+            RetryPolicy={"oneOf":[{"$ref":"#/$defs/NoneRetryPolicy"},{"$ref":"#/$defs/StandardRetryPolicy"}]}
+            ScalarWireForm={"oneOf":[{"$ref":"#/$defs/TextScalarWireForm"},{"$ref":"#/$defs/NumberScalarWireForm"},{"$ref":"#/$defs/BooleanScalarWireForm"},{"$ref":"#/$defs/DateScalarWireForm"},{"$ref":"#/$defs/InstantScalarWireForm"},{"$ref":"#/$defs/WrittenScalarWireForm"},{"$ref":"#/$defs/EnumScalarWireForm"},{"$ref":"#/$defs/FlagsScalarWireForm"}]}
+            SentBody={"oneOf":[{"$ref":"#/$defs/NoneSentBody"},{"$ref":"#/$defs/JsonSentBody"},{"$ref":"#/$defs/UrlEncodedSentBody"},{"$ref":"#/$defs/MultipartSentBody"},{"$ref":"#/$defs/TextSentBody"},{"$ref":"#/$defs/FileSentBody"}]}
+            SentField={"type":"object","properties":{"name":{"type":"string"},"path":{"type":"array","items":{"$ref":"#/$defs/PathStep"}},"value":{"$ref":"#/$defs/ValueRead"},"form":{"$ref":"#/$defs/WireForm"},"whenNothing":{"$ref":"#/$defs/WhenNothing"}},"required":["name","path","value","form","whenNothing"],"additionalProperties":false}
+            SentHeader={"type":"object","properties":{"name":{"type":"string"},"value":{"$ref":"#/$defs/ValueRead"},"form":{"$ref":"#/$defs/ScalarWireForm"}},"required":["name","value","form"],"additionalProperties":false}
+            SentInput={"type":"object","properties":{"name":{"type":"string"},"entry":{"$ref":"#/$defs/InputEntry"}},"required":["name","entry"],"additionalProperties":false}
+            SentInputs={"type":"object","properties":{"container":{"$ref":"#/$defs/ContainerCapture"},"individual":{"type":"array","items":{"$ref":"#/$defs/InputCapture"}}},"required":["container","individual"],"additionalProperties":false}
+            SentQuery={"type":"object","properties":{"fields":{"type":"array","items":{"$ref":"#/$defs/SentField"}},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["fields","inputs"],"additionalProperties":false}
+            StandardRetryPolicy={"type":"object","properties":{"kind":{"const":"standard"},"attempts":{"type":"integer"},"firstWaitMilliseconds":{"type":"integer"}},"required":["kind","attempts","firstWaitMilliseconds"],"additionalProperties":false}
+            SummaryFormDestination={"type":"object","properties":{"kind":{"const":"summary"},"containerId":{"type":"string"}},"required":["kind","containerId"],"additionalProperties":false}
+            TargetsBusy={"type":"object","properties":{"kind":{"const":"targets"},"values":{"type":"array","items":{"$ref":"#/$defs/BusyTarget"}}},"required":["kind","values"],"additionalProperties":false}
+            TextPathPart={"type":"object","properties":{"kind":{"const":"text"},"text":{"type":"string"}},"required":["kind","text"],"additionalProperties":false}
+            TextResponseBody={"type":"object","properties":{"kind":{"const":"text"},"value":{"type":"string"}},"required":["kind","value"],"additionalProperties":false}
+            TextScalarWireForm={"type":"object","properties":{"kind":{"const":"text"}},"required":["kind"],"additionalProperties":false}
+            TextSentBody={"type":"object","properties":{"kind":{"const":"text"},"value":{"$ref":"#/$defs/ValueRead"},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","value","inputs"],"additionalProperties":false}
+            TokenAntiforgery={"type":"object","properties":{"kind":{"const":"token"},"value":{"type":"string"},"place":{"$ref":"#/$defs/TokenPlace"}},"required":["kind","value","place"],"additionalProperties":false}
+            TokenPlace={"oneOf":[{"$ref":"#/$defs/HeaderTokenPlace"},{"$ref":"#/$defs/FieldTokenPlace"}]}
+            UrlEncodedSentBody={"type":"object","properties":{"kind":{"const":"urlEncoded"},"fields":{"type":"array","items":{"$ref":"#/$defs/SentField"}},"inputs":{"$ref":"#/$defs/SentInputs"}},"required":["kind","fields","inputs"],"additionalProperties":false}
+            ValueRead={"oneOf":[{"$ref":"#/$defs/NothingValueRead"},{"$ref":"#/$defs/HeldValueRead"}]}
+            WhenNothing={"enum":["leave","empty"]}
+            WireForm={"oneOf":[{"$ref":"#/$defs/TextScalarWireForm"},{"$ref":"#/$defs/NumberScalarWireForm"},{"$ref":"#/$defs/BooleanScalarWireForm"},{"$ref":"#/$defs/DateScalarWireForm"},{"$ref":"#/$defs/InstantScalarWireForm"},{"$ref":"#/$defs/WrittenScalarWireForm"},{"$ref":"#/$defs/EnumScalarWireForm"},{"$ref":"#/$defs/FlagsScalarWireForm"},{"$ref":"#/$defs/ListWireForm"}]}
+            WrittenScalarWireForm={"type":"object","properties":{"kind":{"const":"written"}},"required":["kind"],"additionalProperties":false}
+            """));
+    }
+
+    [AcceptedCase]
+    public void evaluated_values_and_browser_headers_keep_their_runtime_types()
+    {
+        var declarations = PlanContract.ReadCore().TypeScript().Split("\n\n");
+        Assert.That(declarations.Where(declaration => declaration.StartsWith("export type EvaluatedValue", StringComparison.Ordinal)
+                || declaration.StartsWith("export type BrowserHeaders", StringComparison.Ordinal)),
+            Is.EqualTo(new[] { "export type EvaluatedValue = unknown;", "export type BrowserHeaders = Headers;" }));
+    }
+
+    [AcceptedCase]
+    public void a_contract_kind_uses_its_written_property_name_once()
+    {
+        var contract = PlanContract.Read(Options, typeof(Round), ABedIsWrittenAsItsNumber,
+            new Dictionary<Type, IReadOnlyList<Type>> { [typeof(DayVisit)] = [typeof(NamedResult)] });
+        Assert.That(contract.TypeScript().Split("\n\n")[^1], Is.EqualTo(
+            """
+            export interface DayNamedResult {
+              readonly caseKind: "day";
+            }
+
+            """));
+        Assert.That(JsonSerializer.Serialize<NamedResult>(new DayNamedResult(), Options), Is.EqualTo("{\"caseKind\":\"day\"}"));
+    }
+
+    [RefusedCase]
+    public void a_contract_kind_with_an_unreadable_property_is_refused()
+    {
+        var resolver = new DefaultJsonTypeInfoResolver();
+        resolver.Modifiers.Add(info =>
+        {
+            if (info.Type == typeof(DayNamedResult)) info.Properties[0].Get = null;
+        });
+        var options = new JsonSerializerOptions(Options) { TypeInfoResolver = resolver };
+        Assert.That(Assert.Throws<GrammarRefusedException>(() => PlanContract.Read(options, typeof(Round), ABedIsWrittenAsItsNumber,
+            new Dictionary<Type, IReadOnlyList<Type>> { [typeof(DayVisit)] = [typeof(NamedResult)] }))!.Message,
+            Is.EqualTo("DayNamedResult is a kind of NamedResult with no text for its kind."));
+    }
+
+    [RefusedCase]
+    public void two_cases_of_one_contract_union_cannot_write_one_kind()
+        => Assert.That(ContractRefusal<RepeatedResult>(),
+            Is.EqualTo("DayRepeatedResult and DayRepeatedResult both write the kind 'day'; a kind is one name across RepeatedResult."));
+
+    [AcceptedCase]
+    public void one_case_of_a_contract_union_writes_its_kind()
+    {
+        var resolver = new DefaultJsonTypeInfoResolver();
+        resolver.Modifiers.Add(info =>
+        {
+            if (info.Type == typeof(RepeatedResult)) info.PolymorphismOptions!.DerivedTypes.RemoveAt(1);
+        });
+        var options = new JsonSerializerOptions(Options) { TypeInfoResolver = resolver };
+        var contract = PlanContract.Read(options, typeof(Round), ABedIsWrittenAsItsNumber,
+            new Dictionary<Type, IReadOnlyList<Type>> { [typeof(DayVisit)] = [typeof(RepeatedResult)] });
+        Assert.That(string.Join("\n\n", contract.TypeScript().Split("\n\n").TakeLast(2)), Is.EqualTo(
+            """
+            export type RepeatedResult = DayRepeatedResult;
+
+            export interface DayRepeatedResult {
+              readonly kind: "day";
+            }
+
+            """));
+    }
 
     [RefusedCase]
     public void a_node_that_is_not_sealed_is_refused()
@@ -220,8 +461,133 @@ public class WhenThePlanContractIsGenerated
             Refusal<RoundOfTwoWings>(),
             Is.EqualTo("Alis.Reactive.ArchitectureTests.WhenThePlanContractIsGenerated+South+Wing is the second type of the plan named Wing; a name of the contract is one type."));
 
+    [RefusedCase]
+    public void a_contract_node_that_is_not_sealed_is_refused()
+        => Assert.That(ContractRefusal<OpenRound>(), Is.EqualTo("OpenRound is a node of the plan and is not sealed."));
+
+    [RefusedCase]
+    public void a_contract_nullable_field_is_refused()
+        => Assert.That(ContractRefusal<RoundWithNoWard>(), Is.EqualTo("RoundWithNoWard.ward is nullable; every field of a node is required and none holds null as a state."));
+
+    [RefusedCase]
+    public void a_contract_list_of_nullable_items_is_refused()
+        => Assert.That(ContractRefusal<RoundWithGaps>(), Is.EqualTo("RoundWithGaps.nurses is nullable; every field of a node is required and none holds null as a state."));
+
+    [RefusedCase]
+    public void a_contract_kind_whose_class_is_not_named_for_it_is_refused()
+        => Assert.That(ContractRefusal<RoundWithAMeal>(), Is.EqualTo("Breakfast writes the kind 'breakfast' of Meal; the class of that kind is named BreakfastMeal."));
+
+    [RefusedCase]
+    public void a_contract_kind_with_no_text_is_refused()
+        => Assert.That(ContractRefusal<RoundWithARota>(), Is.EqualTo("WeekRota is a kind of Rota with no text for its kind."));
+
+    [RefusedCase]
+    public void a_contract_field_typed_as_a_kinds_class_is_refused()
+        => Assert.That(
+            ContractRefusal<RoundOfOneVisit>(),
+            Is.EqualTo("RoundOfOneVisit.first is typed as DayVisit, a kind of Visit, so the plan would write it without its kind; type the member as Visit."));
+
+    [RefusedCase]
+    public void a_contract_field_of_a_type_with_no_row_is_refused()
+        => Assert.That(ContractRefusal<RoundWithADose>(), Is.EqualTo("RoundWithADose.dose is a System.Decimal; the plan's contract has no row for it."));
+
+    [RefusedCase]
+    public void a_contract_choice_that_can_be_made_outside_it_is_refused()
+        => Assert.That(
+            ContractRefusal<RoundWithAnOpenWing>(),
+            Is.EqualTo("OpenWing is a closed choice and a case of it can be made outside it; seal it and make its constructor private."));
+
+    [RefusedCase]
+    public void a_contract_choice_that_is_not_sealed_is_refused()
+        => Assert.That(
+            ContractRefusal<RoundWithALooseWing>(),
+            Is.EqualTo("LooseWing is a closed choice and a case of it can be made outside it; seal it and make its constructor private."));
+
+    [RefusedCase]
+    public void a_contract_choice_whose_case_is_not_written_as_text_is_refused()
+        => Assert.That(ContractRefusal<RoundWithAFloor>(), Is.EqualTo("Floor.Ground is written as 0; a case of a closed choice is written as its text."));
+
+    [RefusedCase]
+    public void a_contract_choice_with_two_cases_of_one_text_is_refused()
+        => Assert.That(ContractRefusal<RoundWithATwin>(), Is.EqualTo("Twin.Second is written as \"twin\", the text of another case of Twin."));
+
+    [RefusedCase]
+    public void two_contract_types_of_one_name_are_refused()
+        => Assert.That(
+            ContractRefusal<RoundOfTwoWings>(),
+            Is.EqualTo("Alis.Reactive.ArchitectureTests.WhenThePlanContractIsGenerated+South+Wing is the second type of the plan named Wing; a name of the contract is one type."));
+
     private static string Refusal<TRoot>()
         => Assert.Throws<GrammarRefusedException>(() => PlanContract.Read(Options, typeof(TRoot), []))!.Message;
+
+    private static string ContractRefusal<TContract>()
+        => Assert.Throws<GrammarRefusedException>(() => PlanContract.Read(Options, typeof(Round), ABedIsWrittenAsItsNumber,
+            new Dictionary<Type, IReadOnlyList<Type>> { [typeof(DayVisit)] = [typeof(TContract)] }))!.Message;
+
+    private sealed class VisitReport
+    {
+        public required Result Result { get; init; }
+
+        public required long Bytes { get; init; }
+
+        public required Shift Shift { get; init; }
+    }
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Kind))]
+    [JsonDerivedType(typeof(DayResult))]
+    [JsonDerivedType(typeof(NightResult))]
+    private abstract class Result
+    {
+        public abstract string Kind { get; }
+    }
+
+    private sealed class DayResult : Result
+    {
+        public override string Kind => "day";
+
+        public required string Nurse { get; init; }
+    }
+
+    private sealed class NightResult : Result
+    {
+        public override string Kind => "night";
+    }
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(CaseKind))]
+    [JsonDerivedType(typeof(DayNamedResult))]
+    private abstract class NamedResult
+    {
+        public abstract string CaseKind { get; }
+    }
+
+    private sealed class DayNamedResult : NamedResult
+    {
+        public override string CaseKind => "day";
+    }
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Kind))]
+    [JsonDerivedType(typeof(First.DayRepeatedResult))]
+    [JsonDerivedType(typeof(Second.DayRepeatedResult))]
+    private abstract class RepeatedResult
+    {
+        public abstract string Kind { get; }
+    }
+
+    private static class First
+    {
+        internal sealed class DayRepeatedResult : RepeatedResult
+        {
+            public override string Kind => "day";
+        }
+    }
+
+    private static class Second
+    {
+        internal sealed class DayRepeatedResult : RepeatedResult
+        {
+            public override string Kind => "day";
+        }
+    }
 
     private interface IWritten
     {

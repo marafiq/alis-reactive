@@ -488,3 +488,368 @@ export interface StopStatement {
   readonly kind: "stop";
   readonly reason: string;
 }
+
+export interface FormCheck {
+  readonly registration: string;
+  readonly body: CheckedBody;
+  readonly inputs: readonly SentInput[];
+  readonly place: FormPlace;
+}
+
+export interface CheckedBody {
+  readonly format: BodyFormat;
+  readonly value: EvaluatedValue;
+}
+
+export type BodyFormat = "none" | "json" | "urlEncoded" | "multipart" | "text" | "file";
+
+export type EvaluatedValue = unknown;
+
+export interface SentInput {
+  readonly name: string;
+  readonly entry: InputEntry;
+}
+
+export interface InputEntry {
+  readonly id: string;
+  readonly binding: InputBinding;
+}
+
+export interface FormPlace {
+  readonly destination: FormDestination;
+}
+
+export type FormDestination = SummaryFormDestination | NoticeFormDestination;
+
+export interface SummaryFormDestination {
+  readonly kind: "summary";
+  readonly containerId: string;
+}
+
+export interface NoticeFormDestination {
+  readonly kind: "notice";
+  readonly separator: string;
+}
+
+export interface HttpSend {
+  readonly method: RequestMethod;
+  readonly url: RequestUrl;
+  readonly query: SentQuery;
+  readonly body: SentBody;
+  readonly headers: readonly SentHeader[];
+  readonly antiforgery: Antiforgery;
+  readonly retry: RetryPolicy;
+  readonly busy: Busy;
+  readonly respondedJson: boolean;
+  readonly contracts: readonly RequestContract[];
+}
+
+export type RequestMethod = "GET" | "HEAD" | "OPTIONS" | "POST" | "PUT" | "DELETE";
+
+export interface RequestUrl {
+  readonly parts: readonly PathPart[];
+  readonly query: string;
+}
+
+export type PathPart = TextPathPart | MemberPathPart;
+
+export interface TextPathPart {
+  readonly kind: "text";
+  readonly text: string;
+}
+
+export interface MemberPathPart {
+  readonly kind: "member";
+  readonly name: string;
+  readonly value: ValueRead;
+  readonly form: ScalarWireForm;
+}
+
+export type ValueRead = NothingValueRead | HeldValueRead;
+
+export interface NothingValueRead {
+  readonly kind: "nothing";
+}
+
+export interface HeldValueRead {
+  readonly kind: "held";
+  readonly value: EvaluatedValue;
+}
+
+export type ScalarWireForm = TextScalarWireForm | NumberScalarWireForm | BooleanScalarWireForm | DateScalarWireForm | InstantScalarWireForm | WrittenScalarWireForm | EnumScalarWireForm | FlagsScalarWireForm;
+
+export interface TextScalarWireForm {
+  readonly kind: "text";
+}
+
+export interface NumberScalarWireForm {
+  readonly kind: "number";
+}
+
+export interface BooleanScalarWireForm {
+  readonly kind: "boolean";
+}
+
+export interface DateScalarWireForm {
+  readonly kind: "date";
+}
+
+export interface InstantScalarWireForm {
+  readonly kind: "instant";
+}
+
+export interface WrittenScalarWireForm {
+  readonly kind: "written";
+}
+
+export interface EnumScalarWireForm {
+  readonly kind: "enum";
+  readonly values: readonly EnumValue[];
+}
+
+export interface EnumValue {
+  readonly held: JsonValue;
+  readonly name: string;
+}
+
+export interface FlagsScalarWireForm {
+  readonly kind: "flags";
+  readonly values: readonly FlagValue[];
+}
+
+export interface FlagValue {
+  readonly held: JsonValue;
+  readonly name: string;
+  readonly number: number;
+}
+
+export interface SentQuery {
+  readonly fields: readonly SentField[];
+  readonly inputs: SentInputs;
+}
+
+export interface SentField {
+  readonly name: string;
+  readonly path: readonly PathStep[];
+  readonly value: ValueRead;
+  readonly form: WireForm;
+  readonly whenNothing: WhenNothing;
+}
+
+export type WireForm = TextScalarWireForm | NumberScalarWireForm | BooleanScalarWireForm | DateScalarWireForm | InstantScalarWireForm | WrittenScalarWireForm | EnumScalarWireForm | FlagsScalarWireForm | ListWireForm;
+
+export interface ListWireForm {
+  readonly kind: "list";
+  readonly item: ScalarWireForm;
+  readonly itemWhenNothing: ItemWhenNothing;
+}
+
+export type ItemWhenNothing = "empty" | "stop";
+
+export type WhenNothing = "leave" | "empty";
+
+export interface SentInputs {
+  readonly container: ContainerCapture;
+  readonly individual: readonly InputCapture[];
+}
+
+export type ContainerCapture = NoneContainerCapture | MissingContainerCapture | CapturedContainerCapture;
+
+export interface NoneContainerCapture {
+  readonly kind: "none";
+}
+
+export interface MissingContainerCapture {
+  readonly kind: "missing";
+  readonly id: string;
+}
+
+export interface CapturedContainerCapture {
+  readonly kind: "captured";
+  readonly id: string;
+  readonly body: EvaluatedValue;
+  readonly inputs: readonly SentInput[];
+}
+
+export type InputCapture = MissingInputCapture | CapturedInputCapture;
+
+export interface MissingInputCapture {
+  readonly kind: "missing";
+  readonly id: string;
+  readonly name: string;
+}
+
+export interface CapturedInputCapture {
+  readonly kind: "captured";
+  readonly input: SentInput;
+}
+
+export type SentBody = NoneSentBody | JsonSentBody | UrlEncodedSentBody | MultipartSentBody | TextSentBody | FileSentBody;
+
+export interface NoneSentBody {
+  readonly kind: "none";
+}
+
+export interface JsonSentBody {
+  readonly kind: "json";
+  readonly value: EvaluatedValue;
+  readonly inputs: SentInputs;
+}
+
+export interface UrlEncodedSentBody {
+  readonly kind: "urlEncoded";
+  readonly fields: readonly SentField[];
+  readonly inputs: SentInputs;
+}
+
+export interface MultipartSentBody {
+  readonly kind: "multipart";
+  readonly parts: readonly MultipartPart[];
+  readonly inputs: SentInputs;
+}
+
+export type MultipartPart = FieldMultipartPart | FileMultipartPart;
+
+export interface FieldMultipartPart {
+  readonly kind: "field";
+  readonly field: SentField;
+}
+
+export interface FileMultipartPart {
+  readonly kind: "file";
+  readonly name: string;
+  readonly value: ValueRead;
+}
+
+export interface TextSentBody {
+  readonly kind: "text";
+  readonly value: ValueRead;
+  readonly inputs: SentInputs;
+}
+
+export interface FileSentBody {
+  readonly kind: "file";
+  readonly value: ValueRead;
+  readonly inputs: SentInputs;
+}
+
+export interface SentHeader {
+  readonly name: string;
+  readonly value: ValueRead;
+  readonly form: ScalarWireForm;
+}
+
+export type Antiforgery = NoneAntiforgery | TokenAntiforgery;
+
+export interface NoneAntiforgery {
+  readonly kind: "none";
+}
+
+export interface TokenAntiforgery {
+  readonly kind: "token";
+  readonly value: string;
+  readonly place: TokenPlace;
+}
+
+export type TokenPlace = HeaderTokenPlace | FieldTokenPlace;
+
+export interface HeaderTokenPlace {
+  readonly kind: "header";
+  readonly name: string;
+}
+
+export interface FieldTokenPlace {
+  readonly kind: "field";
+  readonly name: string;
+}
+
+export type RetryPolicy = NoneRetryPolicy | StandardRetryPolicy;
+
+export interface NoneRetryPolicy {
+  readonly kind: "none";
+}
+
+export interface StandardRetryPolicy {
+  readonly kind: "standard";
+  readonly attempts: number;
+  readonly firstWaitMilliseconds: number;
+}
+
+export type Busy = NoneBusy | PageBusy | TargetsBusy;
+
+export interface NoneBusy {
+  readonly kind: "none";
+}
+
+export interface PageBusy {
+  readonly kind: "page";
+}
+
+export interface TargetsBusy {
+  readonly kind: "targets";
+  readonly values: readonly BusyTarget[];
+}
+
+export type BusyTarget = MissingBusyTarget | ElementBusyTarget | ComponentBusyTarget;
+
+export interface MissingBusyTarget {
+  readonly kind: "missing";
+  readonly id: string;
+}
+
+export interface ElementBusyTarget {
+  readonly kind: "element";
+  readonly id: string;
+}
+
+export interface ComponentBusyTarget {
+  readonly kind: "component";
+  readonly value: ValueRead;
+}
+
+export type RequestContract = "busy" | "notice";
+
+export interface HttpResponse {
+  readonly status: number;
+  readonly outcome: HttpOutcome;
+  readonly headers: BrowserHeaders;
+  readonly request: EvaluatedValue;
+  readonly inputs: readonly SentInput[];
+  readonly body: ResponseBody;
+}
+
+export type HttpOutcome = "ok" | "status" | "network" | "redirect" | "content";
+
+export type BrowserHeaders = Headers;
+
+export type ResponseBody = NoneResponseBody | JsonResponseBody | TextResponseBody | HtmlResponseBody | FileResponseBody;
+
+export interface NoneResponseBody {
+  readonly kind: "none";
+}
+
+export interface JsonResponseBody {
+  readonly kind: "json";
+  readonly value: EvaluatedValue;
+}
+
+export interface TextResponseBody {
+  readonly kind: "text";
+  readonly value: string;
+}
+
+export interface HtmlResponseBody {
+  readonly kind: "html";
+  readonly value: string;
+}
+
+export interface FileResponseBody {
+  readonly kind: "file";
+  readonly value: ResponseFile;
+}
+
+export interface ResponseFile {
+  readonly name: string;
+  readonly size: number;
+  readonly type: string;
+}

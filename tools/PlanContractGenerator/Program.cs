@@ -1,15 +1,10 @@
 using System;
 using System.IO;
-using System.Reflection;
-using System.Text.Json;
-using Alis.Reactive.Declarations;
 
 namespace Alis.Reactive.PlanContractGenerator;
 
 internal static class Program
 {
-    private const string Schema = "Alis.Reactive.Schema.";
-
     private static int Main(string[] args)
     {
         if (args.Length != 1)
@@ -18,11 +13,7 @@ internal static class Program
             return 2;
         }
 
-        var core = typeof(TypedDslExemptionAttribute).Assembly;
-        var options = (JsonSerializerOptions)core.GetType(Schema + "PlanJson", throwOnError: true)!
-            .GetField("Options", BindingFlags.Static | BindingFlags.NonPublic)!
-            .GetValue(null)!;
-        var contract = PlanContract.Read(options, core.GetType(Schema + "PlanDocument", throwOnError: true)!, PathSteps.Rows(core, options));
+        var contract = PlanContract.ReadCore();
 
         var folder = Path.GetFullPath(args[0]);
         Directory.CreateDirectory(folder);

@@ -1697,6 +1697,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   status keeps Waiting when the guard refuses, while D10.23's table and Request.tla run `loading` before `guard`
   (Request.tla's `Loading` moves to "guard", a failed `Guard` to "finally"); each outcome now reads the status its
   WhileLoading wrote, and completed loading is no defect. Their tests are U18's to write.
+- The owner, 2026-11-15: "Date - server is truth - I told u", "It will send timezone info", then "Date has eatn days
+  worth of tokens". A date in the browser means what the server states: C# writes whether the value is a `DateTime`
+  or a `DateTimeOffset` wherever the browser converts it, and the plan carries the view's time zone, so the browser
+  chooses nothing. The runtime's conversions that stop because the shape does not say which (a `Date`'s text, a
+  `Date`'s instant under a zone) take that statement from the plan, and no date question goes to the owner again.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -156,9 +156,12 @@ loop until then. Drift is stopped where it starts: one meaning changes in one co
   and what of the unit in work is left, each by its count, and a TLA+ run by its spec, what it reads and its count.
   What is open is a piece of a unit; the lead's own checking is no handoff's next and holds no finished piece (the
   owner, 2026-11-14: "you keep saying that it's open when your behavior must be finishing the rewrite", then "you can
-  keep reporting [TLA+], but you gotta be specific what you're saying and how many units are left"). Work is pushed
-  when a unit lands and when a session ends, each push behind the full check; a commit between pushes is behind the
-  gate. A long run is wrapped in `caffeinate`.
+  keep reporting [TLA+], but you gotta be specific what you're saying and how many units are left"). Progress is
+  units closed: the open units close before another opens, a fork's build takes what is left of a unit's half, and a
+  consult runs only where no line decides (the owner, 2026-11-15: "Wow we were saying same thing 24 hours ago 3 units
+  done", after 112 commits spread over eight open units had closed three). Work is pushed when a unit lands and when
+  a session ends, each push behind the full check; a commit between pushes is behind the gate. A long run is wrapped
+  in `caffeinate`.
 - A handoff is written after every push, since the harness compacts without warning. It holds the head, what landed
   with its proof line, what is next, and no time but one `date` printed then (the lead's mistake, 2026-11-11);
   the lead's memory names its folder, and a session ends with it and the next prompt in the clipboard, read back.
@@ -186,15 +189,17 @@ slip is about you invented so you can avoid accountability about mistakes").
 ## Forks, agents and reviews
 
 - A fork or an agent takes one bounded task that has a spec line, a landed exemplar and a command that proves it: one
-  test rule to a landed rule's pattern, one module's half against the schema. Three at a time at most. None words a
-  rule, and each decides the forms its own task meets, as the line below on quality states. Its brief names the
+  test rule to a landed rule's pattern, one module's half against the schema. Six at a time at most, three of Codex
+  and three Opus agents at xhigh, each in a worktree of its own (the owner, 2026-11-15: "Spin more agents ver clear
+  scope and outcome of opus xhigh as well"). None words a rule, and each decides the forms its own task meets, as the line below on quality states. Its brief names the
   base SHA and carries the full bar, finished before anything reads it, and every spec file, D line and TLA+ action
   it cites is found at that SHA by a command before it goes out (the lead's mistake, 2026-11-14); it reads no secret
   or file that holds a credential, runs no git command beyond its own worktree and branch, and runs no command its
   brief does not name (the lead's correction of a fork, 2026-11-13).
 - An agent starts from a definition of `.claude/agents/`, which carries the harness its kind of task meets and the
   reply it returns: `.claude/agents/designer.md` for a complex task or a critical decision, on the latest Fable model
-  at xhigh, and `.claude/agents/page-writer.md` for pages and their tests. It reads this file, `spec/CLAUDE.md`'s
+  at xhigh, `.claude/agents/page-writer.md` for pages and their tests, and `.claude/agents/builder.md` for a piece
+  to build, on Opus at xhigh. It reads this file, `spec/CLAUDE.md`'s
   owner decisions, the kinds of `spec/MISTAKES.md`, and the rule file and the project's own `CLAUDE.md` of each kind
   of file it reads, writes or proposes, and its reply opens with the rule lines it applied, by file and line at the
   base SHA, which the lead reads at the source before a word of it lands. A brief adds the task alone, and a task no

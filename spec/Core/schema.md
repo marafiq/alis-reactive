@@ -400,6 +400,39 @@ no argument type of its own (D9.1).
   notice with the separator that joins the messages, a space. `alis.form`'s `showErrors` takes a `ValidationProblem`,
   the response's `inputs` and the `FormPlace`.
 
+Their classes, each sealed with every field required, a union's cases named for their kind and their union, and
+each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `HttpResponse.cs`,
+`Alis.Reactive/Validation/FormCheck.cs`, `FormPlace.cs`, `Alis.Reactive/InputsAndIds/SentInputs.cs`,
+`Alis.Reactive/PathsAndWire/WireForms.cs`, `Alis.Reactive/ValuesAndSources/EvaluatedValue.cs`,
+`Alis.Reactive/Schema/RequestChoices.cs`):
+- `HttpSend`: `method` (a `RequestMethod`), `url` (`parts`, a list of `PathPart`, `text` with its `text` or `member`
+  with its `name`, `value` and scalar `form`; and `query`, the URL's own), `query` (`fields`, a list of `SentField`,
+  and `inputs`), `body` (a `SentBody`: `none`; `json` with its `value` and `inputs`; `urlEncoded` with its `fields`
+  and `inputs`; `multipart` with its `parts`, each a `field` with its `SentField` or a `file` with its `name` and
+  `value`, and `inputs`; `text` and `file`, each with its `value` and `inputs`), `headers` (a list of `SentHeader`:
+  `name`, `value`, scalar `form`), `antiforgery` (`none`, or `token` with its `value` and `place`, `header` or `field`,
+  each with its `name`), `retry` (`none`, or `standard` with its `attempts` and `firstWaitMilliseconds`), `busy`
+  (`none`, `page`, or `targets` with its `values`, each `missing` or `element` with its `id`, or `component` with its
+  `value`), `respondedJson` and `contracts` (a list of `RequestContract`, `busy` or `notice`).
+- `SentField`: `name`, its `path`, `value`, `form` (a wire form) and `whenNothing` (`leave` or `empty`). A `value` is a
+  `ValueRead`, `nothing` or `held` with its `value`, so a value that reads nothing is apart from a held null; an
+  evaluated value is a leaf the contract writes as `unknown`, since it holds the user's data, a `Date` or a `File`.
+- `SentInputs`: `container` (`none`; `missing` with its `id`; or `captured` with its `id`, the `body` it sends and its
+  `inputs`) and `individual`, a list of `missing` (with its `id` and `name`) or `captured` (with its `input`). A
+  `SentInput` is its binding `name` and its `entry`, the inputs table's `InputEntry`, its `id` and `binding`.
+- The wire forms are the table's above: the scalar forms `text`, `number`, `boolean`, `date`, `instant`, `written`,
+  `enum` and `flags`, each `enum` and `flags` with its `values`, and `list` with its scalar `item` and
+  `itemWhenNothing` (`empty` or `stop`). An `EnumValue` is its `held` and `name`, a `FlagValue` those and its `number`.
+- `HttpResponse`: `status`, `outcome` (an `HttpOutcome`), `headers` (lib.dom's `Headers`), `request`, `inputs` (a list of
+  `SentInput`) and `body` (`none`; `json` with its `value`; `text` and `html`, each with its text `value`; `file` with its
+  `ResponseFile`).
+- `FormCheck`: `registration`, `body` (its `format`, a `BodyFormat`, and its `value`), `inputs` and `place`; `FormPlace`
+  is its `destination`, `summary` with its `containerId` or `notice` with its `separator`.
+
+The generator reaches each from the node that holds it (`tools/PlanContractGenerator/CLAUDE.md`), and a contract's
+kinds are its own, never the grammar's. The part a condition guards (N10.4's `PartsGuard`) and a container's
+conditional inputs (D10.16) are the owner's, and no class holds them yet.
+
 ## Kinds
 
 The kinds at the State SHA, 65fdf118d, and the proposed set. The today column cites each case line at

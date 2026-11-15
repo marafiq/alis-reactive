@@ -8,6 +8,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization.Metadata;
+using Alis.Reactive.Declarations;
 
 namespace Alis.Reactive.PlanContractGenerator;
 
@@ -32,21 +33,40 @@ public sealed class PlanContract
     private readonly List<string> _order = [];
     private readonly Dictionary<string, Declaration> _declarations = new(StringComparer.Ordinal);
     private readonly Dictionary<Type, string> _named = [];
-    private readonly Dictionary<string, string> _kinds = new(StringComparer.Ordinal);
+    private readonly Dictionary<(Type? Union, string Text), string> _kinds = [];
+    private readonly IReadOnlyDictionary<Type, IReadOnlyList<Type>> _contractUses;
+    private readonly Queue<Type> _pendingContracts = [];
+    private bool _isContract;
     private readonly NullabilityInfoContext _nullability = new();
     private bool _holdsJson;
 
-    private PlanContract(JsonSerializerOptions options, Type root, IReadOnlyList<WrittenType> written)
+    private PlanContract(JsonSerializerOptions options, Type root, IReadOnlyList<WrittenType> written, IReadOnlyDictionary<Type, IReadOnlyList<Type>> contractUses)
     {
         _options = options;
         _root = root;
         _written = written.ToDictionary(row => row.Type);
+        _contractUses = contractUses;
+    }
+
+    public static PlanContract ReadCore()
+    {
+        var core = typeof(TypedDslExemptionAttribute).Assembly;
+        var options = (JsonSerializerOptions)core.GetType("Alis.Reactive.Schema.PlanJson", throwOnError: true)!
+            .GetField("Options", BindingFlags.Static | BindingFlags.NonPublic)!
+            .GetValue(null)!;
+        return Read(options, core.GetType("Alis.Reactive.Schema.PlanDocument", throwOnError: true)!,
+            [.. PathSteps.Rows(core, options), .. ContractUses.Leaves(core)], ContractUses.Edges(core));
     }
 
     public static PlanContract Read(JsonSerializerOptions options, Type root, IReadOnlyList<WrittenType> written)
+        => Read(options, root, written, new Dictionary<Type, IReadOnlyList<Type>>());
+
+    public static PlanContract Read(JsonSerializerOptions options, Type root, IReadOnlyList<WrittenType> written, IReadOnlyDictionary<Type, IReadOnlyList<Type>> contractUses)
     {
-        var contract = new PlanContract(options, root, written);
+        var contract = new PlanContract(options, root, written, contractUses);
         contract.Visit(root, root.Name);
+        contract._isContract = true;
+        while (contract._pendingContracts.TryDequeue(out var used)) contract.Visit(used, used.Name);
         return contract;
     }
 
@@ -73,7 +93,7 @@ public sealed class PlanContract
     private Reference Visit(Type type, string holder)
     {
         if (type == typeof(string)) return new Reference("string", Typed("string"));
-        if (type == typeof(int)) return new Reference("number", Typed("integer"));
+        if (type == typeof(int) || type == typeof(long)) return new Reference("number", Typed("integer"));
         if (type == typeof(bool)) return new Reference("boolean", Typed("boolean"));
         if (type == typeof(JsonElement)) return AnyJson();
         if (_written.TryGetValue(type, out var row)) return Named(Written(row));
@@ -125,18 +145,39 @@ public sealed class PlanContract
         var kinds = new List<string>();
         foreach (var derived in polymorphism.DerivedTypes)
         {
-            var kind = derived.TypeDiscriminator as string
-                ?? throw new GrammarRefusedException($"{derived.DerivedType.Name} is a kind of {name} with no text for its kind.");
-            var expected = char.ToUpperInvariant(kind[0]) + kind.Substring(1) + name;
+            var info = _options.GetTypeInfo(derived.DerivedType);
+            var isProperty = _isContract && derived.TypeDiscriminator == null;
+            var property = isProperty
+                ? info.Properties.SingleOrDefault(candidate => candidate.AttributeProvider is MemberInfo member && member.Name == polymorphism.TypeDiscriminatorPropertyName)
+                : null;
+            var kind = isProperty
+                ? property?.PropertyType == typeof(string) ? property.Get?.Invoke(RuntimeHelpers.GetUninitializedObject(derived.DerivedType)) as string : null
+                : derived.TypeDiscriminator as string;
+            if (string.IsNullOrEmpty(kind))
+                throw new GrammarRefusedException($"{derived.DerivedType.Name} is a kind of {name} with no text for its kind.");
+            var owner = _isContract ? DeclaringUnion(derived.DerivedType, type) : type;
+            var expected = char.ToUpperInvariant(kind[0]) + kind.Substring(1) + owner.Name;
             if (derived.DerivedType.Name != expected)
                 throw new GrammarRefusedException($"{derived.DerivedType.Name} writes the kind '{kind}' of {name}; the class of that kind is named {expected}.");
-            kinds.Add(Node(derived.DerivedType, _options.GetTypeInfo(derived.DerivedType), new Kind(polymorphism.TypeDiscriminatorPropertyName, kind)));
+            Claim(kind, derived.DerivedType.Name, _isContract ? type : null);
+            kinds.Add(Node(derived.DerivedType, info, new Kind(isProperty ? property!.Name : polymorphism.TypeDiscriminatorPropertyName, kind, isProperty)));
         }
 
         _declarations[name] = new Declaration(
             "export type " + name + " = " + string.Join(" | ", kinds) + ";",
             new JsonObject { ["oneOf"] = new JsonArray(kinds.Select(kind => (JsonNode)new JsonObject { ["$ref"] = "#/$defs/" + kind }).ToArray()) });
         return name;
+    }
+
+    private Type DeclaringUnion(Type type, Type visited)
+    {
+        for (var union = type.BaseType; union != null && union != visited; union = union.BaseType)
+        {
+            if (_options.GetTypeInfo(union).PolymorphismOptions?.DerivedTypes.Any(derived => derived.DerivedType == type) == true)
+                return union;
+        }
+
+        return visited;
     }
 
     private Type WrittenWithItsKind(Type type, string holder)
@@ -160,11 +201,7 @@ public sealed class PlanContract
         var typeScript = new StringBuilder("export interface ").Append(name).Append(" {\n");
         var properties = new JsonObject();
         var required = new JsonArray();
-        if (kind != null)
-        {
-            Claim(kind.Text, name);
-            Member(kind.Member, Constant(kind.Text));
-        }
+        if (kind is { IsProperty: false }) Member(kind.Member, Constant(kind.Text));
 
         foreach (var property in info.Properties)
         {
@@ -172,7 +209,9 @@ public sealed class PlanContract
             if (HoldsNull(NullabilityOf(property)))
                 throw new GrammarRefusedException($"{member} is nullable; every field of a node is required and none holds null as a state.");
             var isThePlansVersion = type == _root && property.Name == VersionMember;
-            Member(property.Name, isThePlansVersion ? Constant(property.Get!(RuntimeHelpers.GetUninitializedObject(type))!) : Visit(property.PropertyType, member));
+            var isTheContractsKind = kind is { IsProperty: true } && property.Name == kind.Member;
+            Member(property.Name, isTheContractsKind ? Constant(kind!.Text)
+                : isThePlansVersion ? Constant(property.Get!(RuntimeHelpers.GetUninitializedObject(type))!) : Visit(property.PropertyType, member));
         }
 
         typeScript.Append('}');
@@ -240,17 +279,19 @@ public sealed class PlanContract
             throw new GrammarRefusedException($"{type.FullName} is the second type of the plan named {name}; a name of the contract is one type.");
         _named[type] = name;
         _order.Add(name);
+        if (_contractUses.TryGetValue(type, out var uses))
+            foreach (var used in uses) _pendingContracts.Enqueue(used);
         return name;
     }
 
-    private void Claim(string kind, string name)
+    private void Claim(string kind, string name, Type? union = null)
     {
-        if (_kinds.TryGetValue(kind, out var first))
-            throw new GrammarRefusedException($"{name} and {first} both write the kind '{kind}'; a kind is one name across the plan.");
-        _kinds[kind] = name;
+        if (_kinds.TryGetValue((union, kind), out var first))
+            throw new GrammarRefusedException($"{name} and {first} both write the kind '{kind}'; a kind is one name across {union?.Name ?? "the plan"}.");
+        _kinds[(union, kind)] = name;
     }
 
-    private sealed record Kind(string Member, string Text);
+    private sealed record Kind(string Member, string Text, bool IsProperty);
 
     private sealed record Reference(string TypeScript, JsonNode Schema);
 

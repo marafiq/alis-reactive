@@ -63,8 +63,15 @@ public sealed class ErrorContent<TBody> : SuccessContent<TBody>
 /// <summary>
 /// The file a route saved as the browser's download.
 /// </summary>
-public sealed class ResponseFile
+public sealed class ResponseFile()
 {
+    internal ResponseFile(string name, long size, string type) : this()
+    {
+        Name = name;
+        Size = size;
+        Type = type;
+    }
+
     /// <summary>Gets the name the download was saved under: the answer's <c>Content-Disposition</c> name, else the last segment of the request's path.</summary>
     public string Name { get; init; } = "";
 

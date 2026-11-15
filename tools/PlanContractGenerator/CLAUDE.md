@@ -10,9 +10,13 @@ core itself never does.
 - The contract is what System.Text.Json writes. `PlanContract.cs` reads each node from the type information of the
   options the plan is written with (`Alis.Reactive/Schema/PlanJson.cs`): a union's kinds from its polymorphism, a
   node's fields from its properties, a closed choice from each of its instances as written. It states no shape of
-  its own but the path steps', which `PathSteps.cs` writes as rows and proves by writing one step of each kind.
+  its own but the path steps', which `PathSteps.cs` writes as rows and proves by writing one step of each kind, and
+  two leaves `ContractUses.cs` writes: an evaluated value, `unknown`, and the browser's headers, lib.dom's `Headers`.
 - It walks from the plan's root, so a definition is in the contract because the plan reaches it, in the order the
-  walk meets it; a field is `readonly`, and every field is required.
+  walk meets it; a field is `readonly`, and every field is required. A typed contract, the value a node evaluates to,
+  is reached by an edge of `ContractUses.cs` from the node that holds it: a `request`'s `HttpSend` and
+  `HttpResponse`, the form plugin's `FormCheck` and `FormPlace`. Each refusal below holds for a contract's class,
+  and a contract's kinds are claimed apart from the grammar's, so a contract's `none` adds no kind to the grammar.
 - A grammar the contract cannot state is refused with a `GrammarRefusedException` that names the type and the cure:
   a node that is not sealed, a nullable field, a field typed as a kind's class, a kind with no text, a kind's class
   not named for its kind and its union, a kind two classes write, a choice a case of which can be made outside it
