@@ -97,7 +97,8 @@ D6.13, D16.16): text of fixed width whose code units order as .NET orders the va
 `probe:js-span-key-order`). No key builds a JavaScript `Date`, so neither a wall time daylight saving skips or repeats
 nor a `Date`'s milliseconds move a comparison (`probe:js-date-wall-gap`, `probe:js-date-wall-overlap`,
 `probe:js-date-milliseconds`). C# writes a key only as an argument of those operators, the two arguments of one
-comparison keys of one type.
+comparison keys of one type, or as the one argument of a date part, which reads a field of the key text
+(`spec/Core/schema.md`).
 
 The forms, each as System.Text.Json writes it (`probe:core-stj-date-time-forms`) and MVC 10's binding reads it as its
 fields, in a query and in form data under every culture whose calendar is Gregorian (`probe:core-query-date-forms`,

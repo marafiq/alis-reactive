@@ -265,7 +265,8 @@ A listen release says when release removes the listener the step added (D12.8):
 The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `not`, `add`, `sub`, `mul`, `mod`,
 `neg`, `coalesce`, `cond`, `nullableValue`, `nonNull`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
-`sumDouble`, `sumDecimal`, `eqDecimal`, `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey` and `spanKey`.
+`sumDouble`, `sumDecimal`, `eqDecimal`, `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey`, `spanKey`, `year`,
+`month`, `day`, `hour`, `minute`, `second` and `dayOfWeek`.
 `toNumber`,
 `toDate`, `toBoolean` and `toText` leave: `as` converts (D3.2, N3.1). The pattern of `matches` is a `lit` (D7.5,
 D16.11). The text operators carry .NET's meaning (`spec/Core/translated-members.md`) where JavaScript's own methods
@@ -290,7 +291,13 @@ Keys read it, to the tick: nothing reads nothing, null is null, a value in the k
 other value stops the pipeline unless C# wrote a second argument, a `lit` of the member's start, which the key reads
 in its place; C# writes that argument for a page URL member and an input (N10.7, N3.3). C# writes a key only as an
 argument of `eq`, `neq`, `lt`, `lte`, `gt`, `gte` or `compareOrdinal` whose arguments are keys of one type (D6.12,
-D6.13, D16.16), so no value position takes one.
+D6.13, D16.16), or as the one argument of a date part, so no value position takes one.
+`year`, `month`, `day`, `hour`, `minute`, `second` and `dayOfWeek` read one field of a date or a time from its key
+(D6.5, `spec/Core/translated-members.md`), as the server wrote it: the number the key text holds at the field's place,
+the clock's fields from the text's start for a `timeKey` and after its `T` for the others, and for `dayOfWeek` the
+day's number by the civil calendar, Sunday 0. A key that reads nothing or holds null makes it read nothing. C# writes
+its one argument a key that holds the value's wall, `dateKey`, `wallKey`, `dayKey` or `timeKey`, never `instantKey` or
+`spanKey` (`Schema.tla:PartsReadAKey`, `Schema.tla:PartsReadAWall`).
 `toArray` is the array of the items its argument's `[Symbol.iterator]` yields, as `Array.from` reads them, where C#
 reads a list an object's iterator yields (D6.17): an argument that reads nothing or holds null reads nothing, and one
 with no iterator stops the pipeline; C# writes it over no other list.
@@ -477,7 +484,8 @@ The diff beyond the kinds, each with the decision that makes it:
   `compareOrdinal`, `compareBooleans` and `compareCulture` (D6.13), the text operators `trim`, `trimStart`, `trimEnd`,
   `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`,
   `endsWith` and `nullOrEmpty` (D6.5), `includes` (D6.6), `sumInt`, `sumDouble` and `sumDecimal` (D6.11), `eqDecimal`
-  (D6.12) and the six date keys `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey` and `spanKey` (D6.12);
+  (D6.12), the six date keys `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey` and `spanKey` (D6.12) and the
+  seven date parts `year`, `month`, `day`, `hour`, `minute`, `second` and `dayOfWeek` (D6.5);
 - `let` gains `binds`, `line` or `read`, so a term's own method call runs where its read is reached (D4.7);
 - `if` holds one `when` and its `then` in place of `arms`, and an `ElseIf` nests in `else` with its condition's results
   (D8.7), so `Arm` leaves;

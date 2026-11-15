@@ -2,7 +2,7 @@ import { assertNever, notBuilt, type Operator } from "../Schema/index";
 import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
 import { arrayOf, comparedBooleans, comparedCulture, comparedNumbers, comparedOrdinal, lower, nonNull, nullableValue, summedDecimals, summedDoubles, summedInts, trimmed, upper } from "../ArrayLambdas/index";
 import { decimalsEqual } from "./decimals";
-import { keyOf } from "./keys";
+import { keyOf, partOf } from "./keys";
 import { empty, included } from "./lists";
 import { matched, nullOrEmpty, textTested } from "./texts";
 
@@ -101,6 +101,14 @@ export function operated(op: Operator, terms: readonly Term[], collation: string
     case "timeKey":
     case "spanKey":
       return keyOf(op, termOf(op, terms, 0)(), terms[1]);
+    case "year":
+    case "month":
+    case "day":
+    case "hour":
+    case "minute":
+    case "second":
+    case "dayOfWeek":
+      return partOf(op, termOf(op, terms, 0)());
     default:
       return assertNever(op);
   }

@@ -1628,6 +1628,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   JSON value. No type stages it apart, so that form refuses a value that is a source where the view renders, naming the
   type argument that binds the form for sources (`test.Choose<string?>(first, second)`). An analyzer refusing it at build
   and its X line wait for the owner.
+- The owner, 2026-11-14 (verbatim in `spec/NOTES.md`), on a date's members in a list's lambda: "keep server as truth
+  for DLS, as instructured to you its designed specifically for time zone communities have, TLA+ had proved it so -
+  again action it". A date's `Year`, `Month`, `Day`, `Hour`, `Minute` and `Second`, and a `DayOfWeek` compared, read
+  the wall fields of the value as the server wrote it, as its key reads it (D6.12): never the browser's clock, so no
+  `as date`, whose `Date` moves a wall time daylight saving skips or repeats. A question the specs already answer goes
+  to no one (the lead's mistake, 2026-11-14).
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

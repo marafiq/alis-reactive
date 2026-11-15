@@ -56,6 +56,13 @@ internal sealed class Operator : IChoice
     internal static readonly Operator DayKey = new("dayKey");
     internal static readonly Operator TimeKey = new("timeKey");
     internal static readonly Operator SpanKey = new("spanKey");
+    internal static readonly Operator Year = new("year");
+    internal static readonly Operator Month = new("month");
+    internal static readonly Operator Day = new("day");
+    internal static readonly Operator Hour = new("hour");
+    internal static readonly Operator Minute = new("minute");
+    internal static readonly Operator Second = new("second");
+    internal static readonly Operator DayOfWeek = new("dayOfWeek");
 
     private Operator(string text)
     {

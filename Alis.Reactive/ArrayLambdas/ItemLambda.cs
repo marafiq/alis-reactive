@@ -151,7 +151,7 @@ internal sealed class ItemLambda
         var held = leftReadsAnItem ? right : left;
         var compilerFoldedTheValueToANumber = !ComparedTypes.IsNumber(member.Type) && ComparedTypes.IsNumber(held.Type);
         var writtenAs = compilerFoldedTheValueToANumber ? member.Type : held.Type;
-        var written = _form.Beside(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
+        var written = TranslatedMembers.ReadsADayOfTheWeek(member) ? DayNumber(ViewValues.Of(held)) : _form.Beside(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
         RequireComparableValue(comparison, written.Value, member.Type, orders);
         var memberRead = Keys.Of(member.Type, Read(member));
         var value = Keys.Of(member.Type, written);
@@ -187,6 +187,8 @@ internal sealed class ItemLambda
         if (value is int code && ComparedTypes.IsChar(writtenAs)) return Convert.ToChar(code, CultureInfo.InvariantCulture);
         return JsonSerializer.SerializeToElement(value, heldAs, _form.DataOptions).Deserialize(writtenAs, _form.DataOptions);
     }
+
+    private static LitExpression DayNumber(object? day) => new(JsonSerializer.SerializeToElement(day is null ? (int?)null : Convert.ToInt32(day, CultureInfo.InvariantCulture)));
 
     private LinqExpression Unconverted(LinqExpression node)
     {

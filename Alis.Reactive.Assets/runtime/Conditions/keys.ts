@@ -3,6 +3,8 @@ import { described, nothing, Stop, value, type Read } from "../ValuesAndSources/
 
 export type KeyOperator = Extract<Operator, "dateKey" | "wallKey" | "instantKey" | "dayKey" | "timeKey" | "spanKey">;
 
+export type PartOperator = Extract<Operator, "year" | "month" | "day" | "hour" | "minute" | "second" | "dayOfWeek">;
+
 type Keyed = { readonly kind: "key"; readonly text: string } | { readonly kind: "noValue" } | { readonly kind: "outside" };
 
 interface Day {
@@ -30,6 +32,10 @@ const latestTicks = 2n ** 63n - 1n;
 
 const latestOffsetMinutes = 14 * 60;
 
+const timeKeyLength = 16;
+
+const dateKeyClock = 11;
+
 export function keyOf(key: KeyOperator, held: Read, start: (() => Read) | undefined): Read {
   if (held.kind === "nothing") return nothing;
   if (held.value === null) return value(null);
@@ -45,6 +51,44 @@ export function keyOf(key: KeyOperator, held: Read, start: (() => Read) | undefi
     default:
       return assertNever(keyed);
   }
+}
+
+export function partOf(part: PartOperator, keyed: Read): Read {
+  if (keyed.kind === "nothing" || typeof keyed.value !== "string") return nothing;
+  const key = keyed.value;
+  const clock = key.length === timeKeyLength ? 0 : dateKeyClock;
+  switch (part) {
+    case "year":
+      return value(fieldAt(key, 0, 4));
+    case "month":
+      return value(fieldAt(key, 5, 2));
+    case "day":
+      return value(fieldAt(key, 8, 2));
+    case "hour":
+      return value(fieldAt(key, clock, 2));
+    case "minute":
+      return value(fieldAt(key, clock + 3, 2));
+    case "second":
+      return value(fieldAt(key, clock + 6, 2));
+    case "dayOfWeek":
+      return value(weekdayOf(fieldAt(key, 0, 4), fieldAt(key, 5, 2), fieldAt(key, 8, 2)));
+    default:
+      return assertNever(part);
+  }
+}
+
+function fieldAt(key: string, at: number, count: number): number {
+  return Number(key.slice(at, at + count));
+}
+
+function weekdayOf(year: number, month: number, day: number): number {
+  const shifted = month <= 2 ? year - 1 : year;
+  const era = Math.floor(shifted / 400);
+  const yearOfEra = shifted - era * 400;
+  const dayOfYear = Math.floor((153 * ((month + 9) % 12) + 2) / 5) + day - 1;
+  const dayOfEra = yearOfEra * 365 + Math.floor(yearOfEra / 4) - Math.floor(yearOfEra / 100) + dayOfYear;
+  const daysSinceThursday = era * 146_097 + dayOfEra - 719_468 + 4;
+  return ((daysSinceThursday % 7) + 7) % 7;
 }
 
 function keyedAs(key: KeyOperator, held: unknown): Keyed {

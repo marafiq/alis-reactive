@@ -158,3 +158,54 @@ describe("when a DateOnly, a TimeOnly or a TimeSpan is compared, it reads as its
     expect(operated("spanKey", [held("10675199.02:48:05.4775807")])).toStrictEqual(value("18446744073709551615"));
   });
 });
+
+describe("when a list's lambda reads a date's member, it reads the field of the value as the server wrote it", () => {
+  const keyed = (key: Parameters<typeof operatedUnder>[0], read: unknown): Term => () => operated(key, [held(read)]);
+
+  test("year, month and day read the day of a DateTime's key", () => {
+    expect([
+      operated("year", [keyed("dateKey", "2026-11-09T08:30:15")]),
+      operated("month", [keyed("dateKey", "2026-11-09T08:30:15")]),
+      operated("day", [keyed("dateKey", "2026-11-09T08:30:15")]),
+    ]).toStrictEqual([value(2026), value(11), value(9)]);
+  });
+
+  test("hour, minute and second read the time of a DateTime's key", () => {
+    expect([
+      operated("hour", [keyed("dateKey", "2026-11-09T08:30:15")]),
+      operated("minute", [keyed("dateKey", "2026-11-09T08:30:15")]),
+      operated("second", [keyed("dateKey", "2026-11-09T08:30:15")]),
+    ]).toStrictEqual([value(8), value(30), value(15)]);
+  });
+
+  test("a wall time daylight saving skips in New York reads its hour as the server wrote it", () => {
+    expect(operated("hour", [keyed("dateKey", "2026-03-08T02:30:00")])).toStrictEqual(value(2));
+  });
+
+  test("a DateTimeOffset's day is its day at its own offset, not the day of its instant", () => {
+    expect(operated("day", [keyed("wallKey", "2026-11-09T23:30:00-05:00")])).toStrictEqual(value(9));
+  });
+
+  test("the day of the week counts from Sunday at 0", () => {
+    expect([
+      operated("dayOfWeek", [keyed("dateKey", "2026-11-15T09:00:00")]),
+      operated("dayOfWeek", [keyed("dateKey", "2026-11-09T09:00:00")]),
+    ]).toStrictEqual([value(0), value(1)]);
+  });
+
+  test("the first day of year 1 is a Monday, as .NET's calendar counts it", () => {
+    expect(operated("dayOfWeek", [keyed("dayKey", "0001-01-01")])).toStrictEqual(value(1));
+  });
+
+  test("a DateOnly's key holds its day and a TimeOnly's key its time", () => {
+    expect([operated("year", [keyed("dayKey", "2026-11-09")]), operated("minute", [keyed("timeKey", "08:45:00")])]).toStrictEqual([value(2026), value(45)]);
+  });
+
+  test("a date that reads nothing reads no member", () => {
+    expect(operated("year", [() => operated("dateKey", [readsNothing])])).toStrictEqual(nothing);
+  });
+
+  test("a date that holds null reads no member", () => {
+    expect(operated("month", [keyed("dateKey", null)])).toStrictEqual(nothing);
+  });
+});

@@ -93,6 +93,10 @@ public sealed class CartDose
     public IReadOnlyList<int> Rounds { get; set; } = [];
 
     public int[] Slots { get; set; } = [];
+
+    public DateOnly Round { get; set; }
+
+    public TimeOnly Shift { get; set; }
 }
 
 public sealed class Carer

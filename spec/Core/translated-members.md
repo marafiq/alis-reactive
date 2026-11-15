@@ -60,15 +60,19 @@ and the outer item side by side (D6.8).
 
 ## Dates
 
-For `DateTime` and `DateTimeOffset`, read on the browser's clock.
+A date's member reads the field of the value as the server wrote it, from the key its type's comparison reads (D6.12):
+never from a `Date` on the browser's clock, which moves a wall time daylight saving skips or repeats
+(`probe:js-date-wall-gap`, `probe:js-date-wall-overlap`). A `DateTime` reads its `dateKey`; a `DateTimeOffset` its
+wall at its own offset, `wallKey`, as its `DateTime` holds it, never its UTC instant; a `DateOnly` its `dayKey` and a
+`TimeOnly` its `timeKey`, net10's alone. A value that reads nothing or holds null makes the member read nothing, and a
+value outside the key's forms stops the pipeline as the key does: a `Date` held for a `DateTimeOffset` carries no
+offset of its own.
 
 | .NET member | Browser meaning |
 |-------------|-----------------|
-| `Year` | `getFullYear()` |
-| `Month` | `getMonth() + 1` |
-| `Day` | `getDate()` |
-| `Hour`, `Minute`, `Second` | `getHours()`, `getMinutes()`, `getSeconds()` |
-| `DayOfWeek` compared with a `DayOfWeek` | `getDay()` compared with the day's number, Sunday 0 |
+| `Year`, `Month`, `Day` of a `DateTime`, `DateTimeOffset` or `DateOnly` | `year`, `month`, `day` of its key |
+| `Hour`, `Minute`, `Second` of a `DateTime`, `DateTimeOffset` or `TimeOnly` | `hour`, `minute`, `second` of its key |
+| `DayOfWeek` compared with a `DayOfWeek` | `dayOfWeek` of its key, the day's number by the civil calendar, Sunday 0, compared with the `DayOfWeek`'s number |
 
 ## Elements
 

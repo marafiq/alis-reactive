@@ -46,6 +46,8 @@ internal static partial class TranslatedMembers
 
     internal static bool IsAnExactDecimalConversion(UnaryExpression conversion) => ExactDecimalConversions.Contains(Key(conversion.Method!));
 
+    internal static bool ReadsADayOfTheWeek(LinqExpression term) => term is MemberExpression { Expression: not null } part && part.Type == typeof(DayOfWeek) && Table.ContainsKey(Key(part.Member));
+
     internal static bool TryTranslating(LinqExpression term, ItemLambda read, [NotNullWhen(true)] out PlanExpression? translated)
     {
         translated = term switch
@@ -92,6 +94,20 @@ internal static partial class TranslatedMembers
             [Method((IEnumerable<int> values) => values.Contains(0, null))] = Lookup(inAnyCollection: false),
             [Method((List<int> values) => values.Contains(0))] = Lookup(inAnyCollection: true),
             [Method((HashSet<int> values) => values.Contains(0))] = Lookup(inAnyCollection: false),
+            [Property((DateTime date) => date.Year)] = DatePart(Operator.Year),
+            [Property((DateTime date) => date.Month)] = DatePart(Operator.Month),
+            [Property((DateTime date) => date.Day)] = DatePart(Operator.Day),
+            [Property((DateTime date) => date.Hour)] = DatePart(Operator.Hour),
+            [Property((DateTime date) => date.Minute)] = DatePart(Operator.Minute),
+            [Property((DateTime date) => date.Second)] = DatePart(Operator.Second),
+            [Property((DateTime date) => date.DayOfWeek)] = DatePart(Operator.DayOfWeek),
+            [Property((DateTimeOffset date) => date.Year)] = OffsetPart(Operator.Year),
+            [Property((DateTimeOffset date) => date.Month)] = OffsetPart(Operator.Month),
+            [Property((DateTimeOffset date) => date.Day)] = OffsetPart(Operator.Day),
+            [Property((DateTimeOffset date) => date.Hour)] = OffsetPart(Operator.Hour),
+            [Property((DateTimeOffset date) => date.Minute)] = OffsetPart(Operator.Minute),
+            [Property((DateTimeOffset date) => date.Second)] = OffsetPart(Operator.Second),
+            [Property((DateTimeOffset date) => date.DayOfWeek)] = OffsetPart(Operator.DayOfWeek),
         };
         AddTheHostsOwn(table, SpanConversions);
         return table;
@@ -105,6 +121,10 @@ internal static partial class TranslatedMembers
         if (!passesNoCharacters) throw ItemLambda.NoBrowserForm(term);
         return new OpExpression(op, [read.Term(operands[0])]);
     };
+
+    private static Translation DatePart(Operator part) => (_, operands, read) => new OpExpression(part, [Keys.Of(operands[0].Type, read.Term(operands[0]))]);
+
+    private static Translation OffsetPart(Operator part) => (_, operands, read) => new OpExpression(part, [new OpExpression(Operator.WallKey, [read.Term(operands[0])])]);
 
     private static Translation Binary(Operator op) => (_, operands, read) => new OpExpression(op, [read.Term(operands[0]), read.Term(operands[1])]);
 

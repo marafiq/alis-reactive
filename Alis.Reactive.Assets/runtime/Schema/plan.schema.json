@@ -869,7 +869,14 @@
         "instantKey",
         "dayKey",
         "timeKey",
-        "spanKey"
+        "spanKey",
+        "year",
+        "month",
+        "day",
+        "hour",
+        "minute",
+        "second",
+        "dayOfWeek"
       ]
     },
     "SignalExpression": {

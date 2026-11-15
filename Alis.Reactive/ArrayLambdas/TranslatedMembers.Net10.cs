@@ -15,6 +15,13 @@ internal static partial class TranslatedMembers
         table.Add(Method((string text) => text.Contains('a')), Binary(Operator.Contains));
         table.Add(Method((int[] values) => values.Contains(0)), Lookup(inAnyCollection: true));
         table.Add(Method((DayOfWeek[] values) => values.Contains(DayOfWeek.Monday)), Lookup(inAnyCollection: true));
+        table.Add(Property((DateOnly day) => day.Year), DatePart(Operator.Year));
+        table.Add(Property((DateOnly day) => day.Month), DatePart(Operator.Month));
+        table.Add(Property((DateOnly day) => day.Day), DatePart(Operator.Day));
+        table.Add(Property((DateOnly day) => day.DayOfWeek), DatePart(Operator.DayOfWeek));
+        table.Add(Property((TimeOnly time) => time.Hour), DatePart(Operator.Hour));
+        table.Add(Property((TimeOnly time) => time.Minute), DatePart(Operator.Minute));
+        table.Add(Property((TimeOnly time) => time.Second), DatePart(Operator.Second));
         spanConversions.Add(SpanConversionOf((int[] values) => values.Contains(0)));
     }
 

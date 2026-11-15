@@ -5,7 +5,8 @@ CONSTANT Mutant
 
 Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARead", "AsOfAny", "PatternReadInBrowser",
             "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock", "DecimalTextComparedAsText", "SelectFieldUnchecked",
-            "DateComparedBare", "KeyAsAValue", "KeyFallbackComputed", "PartJoinedUnconverted"}
+            "DateComparedBare", "KeyAsAValue", "KeyFallbackComputed", "PartJoinedUnconverted", "PartOfAValue",
+            "PartOfTheInstant"}
 
 ASSUME Mutant \in Mutants
 
@@ -44,9 +45,13 @@ Operators == {"eq", "neq", "lt", "lte", "gt", "gte", "and", "or", "not", "add", 
               "compareBooleans", "compareCulture", "merge", "trim", "trimStart", "trimEnd", "upperInvariant", "lowerInvariant",
               "upper", "lower", "upperTurkic", "lowerTurkic", "contains", "startsWith", "endsWith", "nullOrEmpty", "includes",
               "sumInt", "sumDouble", "sumDecimal", "eqDecimal", "nonNull", "dateKey", "wallKey", "instantKey", "dayKey",
-              "timeKey", "spanKey"}
+              "timeKey", "spanKey", "year", "month", "day", "hour", "minute", "second", "dayOfWeek"}
 
 DateKeys == {"dateKey", "wallKey", "instantKey", "dayKey", "timeKey", "spanKey"}
+
+WallKeys == DateKeys \ {"instantKey", "spanKey"}
+
+DateParts == {"year", "month", "day", "hour", "minute", "second", "dayOfWeek"}
 
 Comparisons == {"eq", "neq", "lt", "lte", "gt", "gte", "compareOrdinal"}
 
@@ -97,8 +102,9 @@ ExprsTo(d) ==
         \cup {[k |-> "op", c |-> <<e, x>>, p |-> <<>>, s |-> "string", o |-> op, h |-> "value"] : e \in below, x \in below, op \in WrittenOps}
         \cup {[k |-> "op", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "nonNull", h |-> "value"] : e \in below}
         \cup {[k |-> "fn", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "eq", h |-> "value"] : e \in below}
-        \cup {[k |-> "op", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> "dateKey", h |-> "value"] : e \in below}
+        \cup {[k |-> "op", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> key, h |-> "value"] : e \in below, key \in DateKeys}
         \cup {[k |-> "op", c |-> <<e, x>>, p |-> <<>>, s |-> "string", o |-> "dateKey", h |-> "value"] : e \in below, x \in Leaves}
+        \cup {[k |-> "op", c |-> <<e>>, p |-> <<>>, s |-> "string", o |-> part, h |-> "value"] : e \in below, part \in DateParts}
 
 PartReads == Leaves \cup {[k |-> "get", c |-> <<e>>, p |-> <<"member">>, s |-> "string", o |-> "eq", h |-> "value"] : e \in Leaves}
 
@@ -126,8 +132,11 @@ WriterAccepts(e) ==
     /\ IsKey(e) => e.c[1].h = "dateHeld"
     /\ (IsKey(e) /\ Len(e.c) = 2) => (e.c[2].k = "lit" \/ Mutant = "KeyFallbackComputed")
     /\ IsJoin(e) => ((\A part \in JoinedParts(e) : IsTextPart(part)) \/ Mutant = "PartJoinedUnconverted")
+    /\ (e.k = "op" /\ e.o \in DateParts) => (IsKey(e.c[1]) \/ Mutant = "PartOfAValue")
+    /\ (e.k = "op" /\ e.o \in DateParts /\ IsKey(e.c[1])) => (e.c[1].o \in WallKeys \/ Mutant = "PartOfTheInstant")
     /\ \A i \in DOMAIN e.c : IsKey(e.c[i]) =>
-           ((e.k = "op" /\ e.o \in Comparisons /\ \A j \in DOMAIN e.c : IsKey(e.c[j])) \/ Mutant = "KeyAsAValue")
+           ((e.k = "op" /\ e.o \in Comparisons /\ \A j \in DOMAIN e.c : IsKey(e.c[j])) \/ (e.k = "op" /\ e.o \in DateParts)
+            \/ Mutant = "KeyAsAValue")
 
 RootAccepts(e) == ~IsKey(e) \/ Mutant = "KeyAsAValue"
 
@@ -250,7 +259,11 @@ DatesComparedByKey == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in Comparisons)
 KeysOnlyCompared ==
     /\ ~IsKey(expr)
     /\ \A n \in Nodes(expr) : \A i \in DOMAIN n.c : IsKey(n.c[i]) =>
-           (n.k = "op" /\ n.o \in Comparisons /\ \A j \in DOMAIN n.c : IsKey(n.c[j]))
+           (n.k = "op" /\ ((n.o \in Comparisons /\ \A j \in DOMAIN n.c : IsKey(n.c[j])) \/ n.o \in DateParts))
+
+PartsReadAKey == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in DateParts) => IsKey(n.c[1])
+
+PartsReadAWall == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in DateParts /\ IsKey(n.c[1])) => n.c[1].o \in WallKeys
 
 KeyFallbackIsALiteral == \A n \in Nodes(expr) : (IsKey(n) /\ Len(n.c) = 2) => n.c[2].k = "lit"
 
@@ -279,6 +292,8 @@ ReachDecimalTextEquality == ~(plane = "expr" /\ expr.k = "op" /\ expr.o = "eqDec
 ReachDateKeyCompared == ~(plane = "expr" /\ expr.k = "op" /\ expr.o \in Comparisons
                           /\ (\A i \in DOMAIN expr.c : IsKey(expr.c[i]))
                           /\ (\E j \in DOMAIN expr.c : Len(expr.c[j].c) = 2))
+
+ReachDatePart == ~(plane = "expr" /\ expr.k = "op" /\ expr.o \in DateParts /\ IsKey(expr.c[1]) /\ expr.c[1].c[1].h = "dateHeld")
 
 ReachJoinedSourcePart == ~(plane = "expr" /\ IsJoin(expr) /\ \E part \in JoinedParts(expr) : part.k = "op" /\ part.o = "coalesce" /\ part.c[1].c[1].k = "data")
 

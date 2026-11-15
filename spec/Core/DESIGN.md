@@ -169,7 +169,8 @@ Terms used throughout:
 - D3.2 There is one conversion node, `as(expr, shape)`. The operators `toNumber`, `toDate`, `toBoolean` and
   `toText` leave the grammar, and a validation rule converts with `as` like every read. A comparison or a sort of a
   date or a time reads each operand through its key (D6.12), an operator C# writes only as an argument of a
-  comparison or a sort's comparison, so a key is no conversion: no value position takes it (`Schema.tla:KeysOnlyCompared`).
+  comparison, a sort's comparison or a date part (D6.5), so a key is no conversion: no value position takes it
+  (`Schema.tla:KeysOnlyCompared`).
 - D3.3 A conversion of a present value the shape cannot hold yields nothing. No conversion passes the
   unconverted value on (`Absence.tla:FailedConversionReadsNothing`).
 - D3.4 The conversions are the table of `spec/Core/conversions.md`, one row per source kind and shape; the
@@ -921,7 +922,7 @@ Terms used throughout:
   text or a number as a list of one (`Alis.Reactive.Assets/runtime/grammar/operators.ts:86-93`), so its count over a
   list that reads nothing is 0, where D6.3 reads nothing.
 
-**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`, `nonNull`, `toArray`, `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey`, `spanKey`).
+**Schema nodes.** `call` with `fn`; `get` of `length`; `op` (`coalesce`, `cond`, `nullableValue`, `eqDecimal`, `nonNull`, `toArray`, `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey`, `spanKey`, `year`, `month`, `day`, `hour`, `minute`, `second`, `dayOfWeek`).
 
 **Checker.**
 - `Absence.tla:MissingListReadsNothing`
@@ -929,7 +930,9 @@ Terms used throughout:
 - `Schema.tla:SelectFieldHoldsItsType`: no `Select` field of a type that holds no null is written bare
 - `Schema.tla:DatesComparedByKey`: no comparison or sort's comparison the C# writes takes a date or a time bare
 - `Schema.tla:KeysOnlyCompared`: a key is written only as an argument of a comparison or a sort's comparison whose
-  arguments are keys
+  arguments are keys, or as the one argument of a date part
+- `Schema.tla:PartsReadAKey`: a date part reads a key, never the date bare
+- `Schema.tla:PartsReadAWall`: a date part's key holds the value's wall, never a `DateTimeOffset`'s UTC instant
 - `Schema.tla:KeyFallbackIsALiteral`: a key's second argument, where C# writes one, is a literal of the member's start
 - `probe:core-date-compares-ticks`
 - `probe:net48-datetime-compares-ticks`
