@@ -174,8 +174,8 @@
   "edits": [
    {
     "file": "spec/Reference/page-doors.json",
-    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n",
-    "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Ledgers\",\n"
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [],\n",
+    "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Ledgers\"\n    ],\n"
    }
   ],
   "expect": "M16.F1 X18.8 0's pages call a door of 'Ledgers', the module of no unit"
@@ -196,8 +196,8 @@
   "edits": [
    {
     "file": "spec/Reference/page-doors.json",
-    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n",
-    "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Conditions\",\n"
+    "old": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [],\n",
+    "new": "  \"M16.F1 X18.8 0\": {\n    \"modules\": [\n      \"Conditions\"\n    ],\n"
    }
   ],
   "expect": null
