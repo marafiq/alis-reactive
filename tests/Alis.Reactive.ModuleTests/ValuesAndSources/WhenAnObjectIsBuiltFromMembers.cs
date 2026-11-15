@@ -228,6 +228,12 @@ public sealed class WhenAnObjectIsBuiltFromMembers
     }
 
     [Test]
+    public void an_object_members_nested_whole_number_past_javascripts_safe_integer_is_refused_naming_its_path()
+        => Assert.That(() => Rendered((pipeline, panel) => panel.Order.Set(pipeline.Object<TransferOrder>(order => order.Set(x => x.Charge, new TransferCharge { Ticket = 9007199254740992L })))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'x.Charge.ticket' holds a JavaScript number, and 9007199254740992 is a whole number past 9007199254740991, which JavaScript reads as another value; write a finite number of at most 15 significant digits."));
+
+    [Test]
     public void a_whole_decimal_of_sixteen_digits_within_javascripts_safe_integer_is_written()
     {
         var rendered = Rendered((pipeline, panel) => panel.Order.Set(pipeline.Object<TransferOrder>(order => order.Set(x => x.Amount, 9007199254740991m))));
@@ -348,6 +354,13 @@ public sealed class TransferOrder
 
     [JsonConverter(typeof(DestinationConverter))]
     public TransferDestination Converted { get; init; } = new();
+
+    public TransferCharge Charge { get; init; } = new();
+}
+
+public sealed class TransferCharge
+{
+    public long Ticket { get; init; }
 }
 
 public sealed class TransferDestination

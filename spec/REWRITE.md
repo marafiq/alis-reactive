@@ -1142,7 +1142,10 @@ U4, U5 and U10 are closed: their modules build every door they declare, the brow
 pass in one run (1, 1 and 5), their analyzers wait until after 1.0 (the owner, 2026-11-15), and each promise of
 theirs whose page calls a later unit's door is proven in that unit. U8 is closed: Execution builds every part it
 declares, the walk of a parallel's results among them, whose proof lands with U18's `Parallel`, the one door that
-writes it, and its 2 browser tests pass in one run. U11's lambdas are built: a list's lambda translated where the view renders, its orderings by the key's type and the
+writes it, and its 2 browser tests pass in one run. U9 is closed: Values and sources builds every door it
+declares, `Concat` and its parts among them, and refuses where the view renders a literal JavaScript reads as another
+value at any depth of a start, an argument, a property's value and an object's member, named by its path; its 2
+browser tests, X7.10's and X7.13's, pass in one run. U11's lambdas are built: a list's lambda translated where the view renders, its orderings by the key's type and the
 view's culture, a page under the culture its address names, a member read in its own form, and the refusals where
 the view renders, each naming its term or its read and the app's options, X6.57's date the app's own JSON converter
 writes among them; its 18 browser tests pass, and each fails on its planted defect. ALIS033's conditions (N18.10), ALIS028 (X6.52), the step a list's lambda refuses (X6.8, X5.13) and D6.14's

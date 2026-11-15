@@ -1,4 +1,4 @@
-using System;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.ValuesAndSources;
 
@@ -12,11 +12,16 @@ namespace Alis.Reactive.ValuesAndSources;
 /// </remarks>
 public sealed class TextPart
 {
-    private TextPart()
+    private TextPart(Expression written)
     {
+        Written = written;
     }
+
+    internal Expression Written { get; }
 
     /// <summary>Joins a text, written into the plan where the view renders.</summary>
     /// <param name="text">The text; null adds nothing.</param>
-    public static implicit operator TextPart(string? text) => throw new NotImplementedException();
+    public static implicit operator TextPart(string? text) => new(TextForms.Part(text));
+
+    internal static TextPart Of<T>(ITypedSource<T> source) => new(TextForms.Part(source));
 }

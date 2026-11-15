@@ -1,4 +1,3 @@
-using System;
 using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.ValuesAndSources;
@@ -38,5 +37,5 @@ public abstract class TypedSource<T> : ITypedSource<T>, IPlanSource
 
     /// <summary>Joins what the source reads when the step runs, shown as an element's text shows it.</summary>
     /// <param name="source">The source of the part; one that cannot be read or holds null adds nothing.</param>
-    public static implicit operator TextPart(TypedSource<T> source) => throw new NotImplementedException();
+    public static implicit operator TextPart(TypedSource<T> source) => TextPart.Of(source);
 }

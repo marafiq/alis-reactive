@@ -1723,6 +1723,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   1.0: "I am okay for analyzers to wait. It was to drive quality." The analyzers no unit has built wait until after
   1.0, U11's and U13's among them; each meaning they would guard at build stays held by its refusal where the view
   renders and its browser test, and a unit whose open pieces are such analyzers closes on its browser tests.
+- The lead, 2026-11-15, building `Concat` (N7.7): a null list of parts throws `ArgumentNullException`, as the core
+  throws for a null argument in four files, `Alis.Reactive/Validation/Checks.cs` among them; an
+  `InvalidOperationException` stays the refusal of a meaning where the view renders (2026-11-14), and a null list
+  states no meaning. A literal is judged at every depth against the contract it was written by, a member a derived
+  type adds by the discriminator it is written under; an `object` member's number is written unjudged, since its
+  JSON names no .NET type to judge it by. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

@@ -205,7 +205,12 @@ public sealed class Pipeline<TModel>
     /// </remarks>
     /// <param name="parts">The parts, each a text or a source.</param>
     /// <returns>A source of the joined text, which never holds null.</returns>
-    public TypedSource<string> Concat(params TextPart[] parts) => throw new NotImplementedException();
+    public TypedSource<string> Concat(params TextPart[] parts)
+    {
+        if (parts is null) throw new ArgumentNullException(nameof(parts));
+        var written = Array.ConvertAll(parts, part => part?.Written ?? TextForms.Part(null));
+        return new Computed<string>(TextForms.Joined(written), HeldForm.Live(_writer.Content.Json, _writer.Content.RendersUnder));
+    }
 
     /// <summary>Reaches the page's own URL, read as the action that rendered the page bound it.</summary>
     /// <typeparam name="TPage">The type the page's action binds its URL to.</typeparam>

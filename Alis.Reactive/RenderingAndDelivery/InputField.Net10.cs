@@ -55,7 +55,7 @@ public sealed partial class InputField<TModel, TValue>
         _bound = BoundInput.Of(lambda, new MvcNames(prefix, name, html.GenerateIdFromName(name)), plan.Writer.Content.Json, () => JsonSerializer.SerializeToElement(default(TValue), live.GetTypeInfo(typeof(TValue))));
         var services = html.ViewContext.HttpContext.RequestServices;
         _classNames = services.GetService<ReactiveClassNames>() ?? new ReactiveClassNames();
-        ValueJson = services.GetRequiredService<ModelExpressionProvider>().CreateModelExpression(html.ViewData, member).Model is TValue held ? plan.Json(held) : "null";
+        ValueJson = services.GetRequiredService<ModelExpressionProvider>().CreateModelExpression(html.ViewData, member).Model is TValue held ? plan.StartOf(held, _bound.Name) : "null";
     }
 
     /// <summary>Gets the view's HTML helper.</summary>

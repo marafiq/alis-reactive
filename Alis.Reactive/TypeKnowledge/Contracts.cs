@@ -30,6 +30,13 @@ internal static class Contracts
 
     internal static bool StartHangsOnTheData(this JsonTypeInfo holder) => holder.PolymorphismOptions is not null;
 
+    internal static JsonTypeInfo ContractItWasWrittenBy(this JsonTypeInfo declared, JsonElement written)
+    {
+        if (declared.PolymorphismOptions is not { } polymorphism || !written.TryGetProperty(polymorphism.TypeDiscriminatorPropertyName, out var named)) return declared;
+        var derived = polymorphism.DerivedTypes.FirstOrDefault(type => Discriminates(type.TypeDiscriminator, named));
+        return derived.DerivedType is null ? declared : declared.Options.GetTypeInfo(derived.DerivedType);
+    }
+
     internal static JsonElement StartOf(this JsonTypeInfo type)
     {
         var start = JsonSerializer.Deserialize("{}", Binding(type.Options).GetTypeInfo(type.Type));
@@ -47,6 +54,13 @@ internal static class Contracts
         binding.MakeReadOnly();
         return binding;
     }
+
+    private static bool Discriminates(object? discriminator, JsonElement named) => discriminator switch
+    {
+        string text => named.ValueKind == JsonValueKind.String && named.GetString() == text,
+        int number => named.ValueKind == JsonValueKind.Number && named.TryGetInt32(out var held) && held == number,
+        _ => false,
+    };
 
     private static void MembersOptional(JsonTypeInfo type)
     {

@@ -6,6 +6,7 @@ using Alis.Reactive.Execution;
 using Alis.Reactive.Plugins;
 using Alis.Reactive.Schema;
 using Alis.Reactive.TriggersAndPipelines;
+using Alis.Reactive.TypeKnowledge;
 using Alis.Reactive.ValuesAndSources;
 using Alis.Reactive.Vendors;
 
@@ -46,7 +47,9 @@ public sealed partial class ReactivePlan<TModel>
     /// <remarks>A date, an enum and a number reach the component's code in the forms the plan's own values take.</remarks>
     /// <param name="value">The value to write.</param>
     /// <returns>The value's JSON.</returns>
-    public string Json<TValue>(TValue value) => Literals.Written(value, Writer.Content.Json);
+    public string Json<TValue>(TValue value) => StartOf(value, ClassNames.AsCSharpWritesIt(typeof(TModel)));
+
+    internal string StartOf<TValue>(TValue value, string holder) => Literals.Written(value, Writer.Content.Json, holder + " start");
 
     /// <summary>Names the rows of a grid-like list, for a render helper to declare each row action once and render it in every row.</summary>
     /// <param name="rowsId">The id the list's row controls are numbered under.</param>

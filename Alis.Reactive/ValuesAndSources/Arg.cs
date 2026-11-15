@@ -19,14 +19,14 @@ internal interface IArgumentValue
 /// </remarks>
 public abstract class Arg
 {
-    private readonly Func<BlockWriter, Expression> _write;
+    private readonly Func<BlockWriter, string, Expression> _write;
 
-    private protected Arg(Func<BlockWriter, Expression> write)
+    private protected Arg(Func<BlockWriter, string, Expression> write)
     {
         _write = write;
     }
 
-    internal Expression Written(BlockWriter writer) => _write(writer);
+    internal Expression Written(BlockWriter writer, string argument) => _write(writer, argument);
 }
 
 /// <summary>
@@ -39,18 +39,18 @@ public abstract class Arg
 /// <typeparam name="T">The type of the parameter the argument fills.</typeparam>
 public sealed class Arg<T> : Arg
 {
-    private Arg(Func<AppJson, Expression> write) : base(writer => write(writer.Content.Json))
+    private Arg(Func<AppJson, string, Expression> write) : base((writer, argument) => write(writer.Content.Json, argument))
     {
     }
 
     internal static Arg<T> FromSource<TSource>(TypedSource<TSource> source)
         where TSource : T
-        => new(_ => Sources.FormOf(source).IntoLive<T>(Sources.Of(source)));
+        => new((_, _) => Sources.FormOf(source).IntoLive<T>(Sources.Of(source)));
 
     /// <summary>Passes a literal, written into the plan where the view renders.</summary>
     /// <param name="value">The value the call receives.</param>
     public static implicit operator Arg<T>(T value)
-        => new(json => value is IArgumentValue argument ? argument.Written(json) : Literals.IntoLive(value, json));
+        => new((json, argument) => value is IArgumentValue held ? held.Written(json) : Literals.IntoLive(value, json, argument));
 
     /// <summary>Passes what a source reads when the call runs.</summary>
     /// <param name="source">The source the call's argument is read from.</param>
@@ -62,7 +62,7 @@ internal sealed class TheRunsAbortSignal : Arg
     internal static readonly TheRunsAbortSignal Instance = new();
 
     private TheRunsAbortSignal()
-        : base(_ => SignalExpression.Instance)
+        : base((_, _) => SignalExpression.Instance)
     {
     }
 }

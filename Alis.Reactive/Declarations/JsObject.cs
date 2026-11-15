@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -337,7 +338,7 @@ public abstract class JsObject
     {
         var received = Bound.Arguments;
         var call = new CallExpression([ArgumentPosition(position)], PathMembers.Required, received,
-            arguments.Select(argument => argument?.Written(Bound.Writer) ?? Literals.Text(null)).ToArray());
+            WrittenArguments(ClassNames.AsCSharpWritesIt(GetType()) + " at position " + position.ToString(CultureInfo.InvariantCulture), arguments));
         Bound.Writer.Write(new DoStatement(false, call));
     }
 
@@ -379,17 +380,19 @@ public abstract class JsObject
     }
 
     private CallExpression Call(IReadOnlyList<Arg> arguments, string? name, bool optional, string declaredBy)
-        => CallAt([new MemberStep(JavaScriptName(name, declaredBy))], arguments, optional);
+        => CallAt([new MemberStep(JavaScriptName(name, declaredBy))], DeclaredName(declaredBy), arguments, optional);
 
-    private CallExpression CallOfItself(IReadOnlyList<Arg> arguments) => CallAt([], arguments, false);
+    private CallExpression CallOfItself(IReadOnlyList<Arg> arguments) => CallAt([], ClassNames.AsCSharpWritesIt(GetType()), arguments, false);
 
-    private CallExpression CallAt(IReadOnlyList<PathStep> path, IReadOnlyList<Arg> arguments, bool optional)
-        => new(path, Bound.Reads(optional), Bound.Target,
-            arguments.Select(argument => argument?.Written(Bound.Writer) ?? Literals.Text(null)).ToArray());
+    private CallExpression CallAt(IReadOnlyList<PathStep> path, string called, IReadOnlyList<Arg> arguments, bool optional)
+        => new(path, Bound.Reads(optional), Bound.Target, WrittenArguments(called, arguments));
+
+    private Schema.Expression[] WrittenArguments(string called, IReadOnlyList<Arg> arguments)
+        => arguments.Select((argument, index) => argument?.Written(Bound.Writer, called + " argument " + (index + 1).ToString(CultureInfo.InvariantCulture)) ?? Literals.Text(null)).ToArray();
 
     private static string JavaScriptName(string? name, string declaredBy) => name ?? JsonNamingPolicy.CamelCase.ConvertName(declaredBy);
 
     private sealed class AnswerArgument<TArgs, TResult>(Func<TArgs, TypedSource<TResult>> answer)
-        : Arg(writer => WrittenAnswer(writer, answer))
+        : Arg((writer, _) => WrittenAnswer(writer, answer))
         where TArgs : JsObject, new();
 }

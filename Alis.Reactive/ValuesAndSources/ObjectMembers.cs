@@ -48,7 +48,7 @@ public sealed class ObjectMembers<T>
     {
         var path = Path(member);
         var hasOwnForm = path.Member.HoldsItsOwnForm;
-        if (!hasOwnForm) Literals.RefuseWhereJavaScriptReadsAnother(value, member.Body.ToString());
+        if (!hasOwnForm) Literals.RefuseAtAnyDepth(value, _form.DataOptions, member.Body.ToString());
         var written = path.Member.Written(value, typeof(TValue));
         if (hasOwnForm && written.ValueKind == JsonValueKind.Number) Literals.RefuseWhereJavaScriptReadsAnother(value, member.Body.ToString());
         return Add(path.WireNames, new LitExpression(written), member);
