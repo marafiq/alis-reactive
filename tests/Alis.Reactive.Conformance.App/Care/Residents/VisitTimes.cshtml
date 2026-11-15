@@ -8,6 +8,8 @@
     ViewData["Title"] = "Visit times";
     var plan = Html.ReactivePlan<VisitTimes>();
     var seen = new[] { new DateTimeOffset(2026, 11, 9, 18, 0, 0, TimeSpan.Zero) };
+    var threeOnTheNight = new DateTime(2026, 3, 8, 3, 0, 0);
+    var halfPastEight = new DateTime(2026, 11, 9, 8, 30, 0);
 }
 <h1>Visit times</h1>
 <dl>
@@ -24,9 +26,9 @@
     Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.VisitsAt)
         .OnSuccess<List<Visit>>((visits, pipeline) =>
         {
-            pipeline.Element("before-three-count").Text.Set(visits.Body.Count(v => v.At < new DateTime(2026, 3, 8, 3, 0, 0)));
-            pipeline.Element("half-past-eight-count").Text.Set(visits.Body.Count(v => v.At == new DateTime(2026, 11, 9, 8, 30, 0)));
-            pipeline.Element("after-half-past-eight-count").Text.Set(visits.Body.Count(v => v.At > new DateTime(2026, 11, 9, 8, 30, 0)));
+            pipeline.Element("before-three-count").Text.Set(visits.Body.Count(v => v.At < threeOnTheNight));
+            pipeline.Element("half-past-eight-count").Text.Set(visits.Body.Count(v => v.At == halfPastEight));
+            pipeline.Element("after-half-past-eight-count").Text.Set(visits.Body.Count(v => v.At > halfPastEight));
             pipeline.Element("seen-count").Text.Set(visits.Body.Count(v => seen.Contains(v.Seen)));
         })));
 }

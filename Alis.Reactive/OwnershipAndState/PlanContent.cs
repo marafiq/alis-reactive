@@ -13,6 +13,7 @@ internal sealed class PlanContent
     private const string PluginObjectId = "$plugin:";
 
     private readonly string _planId;
+    private readonly Func<Type, bool> _namesFlags;
     private readonly Culture _culture;
     private readonly TimeZone _timeZone;
     private readonly SortedDictionary<string, Vendor> _vendors = new(StringComparer.Ordinal);
@@ -26,7 +27,7 @@ internal sealed class PlanContent
     private readonly Func<string, (string Prefix, string Name, string Id)> _nameInput;
     private bool _rendered;
 
-    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json, Func<string, (string Prefix, string Name, string Id)> nameInput)
+    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json, Func<string, (string Prefix, string Name, string Id)> nameInput, Func<Type, bool> namesFlags)
     {
         _planId = planId;
         _culture = ViewCulture.Of(rendersUnder);
@@ -34,9 +35,12 @@ internal sealed class PlanContent
         _timeZone = timeZone;
         Json = json;
         _nameInput = nameInput;
+        _namesFlags = namesFlags;
     }
 
     internal AppJson Json { get; }
+
+    internal bool NamesFlags(Type type) => _namesFlags(type);
 
     internal CultureInfo RendersUnder { get; }
 

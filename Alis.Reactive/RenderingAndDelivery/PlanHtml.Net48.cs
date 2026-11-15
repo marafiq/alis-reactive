@@ -1,10 +1,12 @@
 #if NET48
 using System;
+using System.Linq;
 using System.Text.Json;
 using System.Web;
 using System.Web.Mvc;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.TriggersAndPipelines;
+using Alis.Reactive.Validation;
 
 namespace Alis.Reactive.RenderingAndDelivery;
 
@@ -24,7 +26,8 @@ public static class PlanHtml
             () => html.ViewData.TemplateInfo.HtmlFieldPrefix,
             text => html.ViewData.TemplateInfo.GetFullHtmlFieldName(text),
             HtmlHelper.GenerateIdFromName,
-            () => ViewPaths.Of(html));
+            () => ViewPaths.Of(html),
+            type => DependencyResolver.Current.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true);
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>

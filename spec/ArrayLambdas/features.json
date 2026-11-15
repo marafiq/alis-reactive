@@ -767,7 +767,7 @@
         },
         {
           "for": "X6.11",
-          "page": "A visit list whose server, in New York, writes six visits with the app's options: 02:30 and 03:15 on 2026-03-08, a Utc visit at 2026-11-09T08:30:00Z, a Local one at 2026-11-09T08:30:00-05:00 seen at 2026-11-09T13:00:00-05:00, an Unspecified one at 2026-11-09T08:30:00 and one at 2026-11-09T08:30:00.0000001. Four counts: v.At < new DateTime(2026, 3, 8, 3, 0, 0), v.At == new DateTime(2026, 11, 9, 8, 30, 0), v.At > new DateTime(2026, 11, 9, 8, 30, 0), and seen.Contains(v.Seen) over a view's DateTimeOffset array that holds 2026-11-09T18:00:00Z.",
+          "page": "A visit list whose server, in New York, writes six visits with the app's options: 02:30 and 03:15 on 2026-03-08, a Utc visit at 2026-11-09T08:30:00Z, a Local one at 2026-11-09T08:30:00-05:00 seen at 2026-11-09T13:00:00-05:00, an Unspecified one at 2026-11-09T08:30:00 and one at 2026-11-09T08:30:00.0000001. Four counts over the view's locals threeOnTheNight, new DateTime(2026, 3, 8, 3, 0, 0), and halfPastEight, new DateTime(2026, 11, 9, 8, 30, 0): v.At < threeOnTheNight, v.At == halfPastEight, v.At > halfPastEight, and seen.Contains(v.Seen) over a view's DateTimeOffset array that holds 2026-11-09T18:00:00Z.",
           "gesture": "Open the visits in a browser whose zone is New York, then in one whose zone is Kolkata.",
           "outcome": "Both times the counts show 1, 3, 1 and 1.",
           "opposite": "With the 02:30 visit written at 03:30, the first count shows 0; with the Utc visit written at 08:31, the second shows 2.",

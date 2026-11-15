@@ -1,4 +1,4 @@
-using System;
+using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.RequestsAndResponses;
 
@@ -11,21 +11,21 @@ namespace Alis.Reactive.RequestsAndResponses;
 public static class Content
 {
     /// <summary>Gets the kind of a route with no data: the body is not read.</summary>
-    public static NoContent None => throw new NotImplementedException();
+    public static NoContent None => NoContent.Instance;
 
     /// <summary>Gets the kind of a body of any <c>text/*</c> type, read as text.</summary>
-    public static ErrorContent<string> Text => throw new NotImplementedException();
+    public static ErrorContent<string> Text => new(SuccessBody.PlainText, ErrorBody.PlainText);
 
     /// <summary>Gets the kind of a body of <c>text/html</c> or <c>application/xhtml+xml</c>, which <c>Into</c> loads into an element.</summary>
-    public static ErrorContent<Markup> Html => throw new NotImplementedException();
+    public static ErrorContent<Markup> Html => new(SuccessBody.Html, ErrorBody.Html);
 
     /// <summary>Gets the kind of a body of any media type that the browser saves as a download.</summary>
-    public static SuccessContent<ResponseFile> File => throw new NotImplementedException();
+    public static SuccessContent<ResponseFile> File => new FileContent();
 
     /// <summary>Makes the kind of a body of <c>application/json</c>, or of a type ending in <c>+json</c>, read as <typeparamref name="TBody"/>.</summary>
     /// <typeparam name="TBody">The type the body is read as.</typeparam>
     /// <returns>The kind, which a success route and an error route take.</returns>
-    public static ErrorContent<TBody> Json<TBody>() => throw new NotImplementedException();
+    public static ErrorContent<TBody> Json<TBody>() => new(SuccessBody.Json, ErrorBody.Json);
 }
 
 /// <summary>
@@ -33,6 +33,8 @@ public static class Content
 /// </summary>
 public sealed class NoContent
 {
+    internal static readonly NoContent Instance = new();
+
     private NoContent()
     {
     }
@@ -44,9 +46,12 @@ public sealed class NoContent
 /// <typeparam name="TBody">The type the body is read as.</typeparam>
 public abstract class SuccessContent<TBody>
 {
-    private protected SuccessContent()
+    private protected SuccessContent(SuccessBody kind)
     {
+        Kind = kind;
     }
+
+    internal SuccessBody Kind { get; }
 }
 
 /// <summary>
@@ -55,9 +60,12 @@ public abstract class SuccessContent<TBody>
 /// <typeparam name="TBody">The type the body is read as.</typeparam>
 public sealed class ErrorContent<TBody> : SuccessContent<TBody>
 {
-    private ErrorContent()
+    internal ErrorContent(SuccessBody success, ErrorBody error) : base(success)
     {
+        ErrorKind = error;
     }
+
+    internal ErrorBody ErrorKind { get; }
 }
 
 /// <summary>
@@ -81,3 +89,5 @@ public sealed class ResponseFile()
     /// <summary>Gets the file's media type.</summary>
     public string Type { get; init; } = "";
 }
+
+internal sealed class FileContent() : SuccessContent<ResponseFile>(SuccessBody.File);

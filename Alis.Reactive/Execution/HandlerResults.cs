@@ -1,17 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Alis.Reactive.Schema;
 
 namespace Alis.Reactive.Execution;
 
 internal sealed class HandlerResults
 {
+    private readonly Dictionary<string, RefExpression> _replies = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ResultBinding> _results = new(StringComparer.Ordinal);
     private readonly Dictionary<string, Site> _sites = new(StringComparer.Ordinal);
     private readonly Dictionary<Statement, Site> _calls = new();
     private readonly List<Site> _ordered = [];
 
     internal bool Closed { get; set; }
+
+    internal void BindReply(RefExpression reply) => _replies.Add(reply.Name, reply);
 
     internal ResultBinding Add(string name)
     {
@@ -87,6 +91,16 @@ internal sealed class HandlerResults
                     Read(statement, branch.When, visible);
                     written.Add(new IfStatement(branch.When, Walk(branch.Then, visible), Walk(branch.Else, visible)));
                     break;
+                case RequestStatement request:
+                    Read(statement, request.Send, visible);
+                    var replied = new HashSet<RefExpression>(visible) { _replies[request.Reply] };
+                    written.Add(new RequestStatement(request.Argument, request.Reply, request.Send, Walk(request.Check, visible),
+                        request.Layers.Select(layer => new Layer(Walk(layer.WhileLoading, visible), Walk(layer.Finally, visible))).ToArray(),
+                        new Route(request.Success.Kind, Walk(request.Success.Do, replied)),
+                        request.Statuses.Select(route => new StatusRoute(route.Status, route.Kind, Walk(route.Do, replied))).ToArray(),
+                        new OtherwiseRoute(request.Otherwise.Kind, Walk(request.Otherwise.Do, replied)),
+                        Walk(request.Chained, replied)));
+                    break;
                 case ListenStatement listen:
                     Read(statement, listen.Object, visible);
                     written.Add(new ListenStatement(listen.Event, listen.Listen, listen.Release, listen.Payload, listen.Members,
@@ -108,6 +122,13 @@ internal sealed class HandlerResults
         foreach (var read in ExpressionReads.In(expression))
         {
             var reference = read.Reference;
+            if (reference.Name.StartsWith("reply", StringComparison.Ordinal))
+            {
+                if (!_replies.TryGetValue(reference.Name, out var reply) || !ReferenceEquals(reference, reply) || !visible.Contains(reply))
+                    throw new InvalidOperationException("A request's reply is read outside its route or Chained block; read it in that block or a block inside it.");
+                continue;
+            }
+
             if (!_results.TryGetValue(reference.Name, out var result))
             {
                 if (reference.Name.StartsWith(ResultBinding.NameStem, StringComparison.Ordinal)) throw ResultBinding.OutsideBlock();

@@ -46,7 +46,10 @@ public class ReadOnly<TValue> : TypedSource<TValue>
     /// <param name="path">The field to read, as a member path from the property's value.</param>
     /// <returns>A source of the field's value.</returns>
     public TypedSource<TResult> Read<TResult>(Expression<Func<TValue, TResult>> path)
-        => DataReads.Past<TResult>(Expression, Form, path, Owner.Bound.Writer.Content.Json.LiveForm);
+        => ReadPast<TResult>(path);
+
+    internal virtual TypedSource<TResult> ReadPast<TResult>(LambdaExpression path)
+        => DataReads.Past<TResult>(Expression, Form, path, Form.DataOptions);
 }
 
 /// <summary>

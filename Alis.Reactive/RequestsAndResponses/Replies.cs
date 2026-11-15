@@ -1,5 +1,7 @@
-using System;
+using System.Text.Json.Serialization;
 using Alis.Reactive.Declarations;
+using Alis.Reactive.Schema;
+using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.RequestsAndResponses;
 
@@ -14,14 +16,14 @@ public class Response<TRequest> : JsObject
     }
 
     /// <summary>Gets the status of the server's answer.</summary>
-    public ReadOnly<int> Status => throw new NotImplementedException();
+    public ReadOnly<int> Status => ReplyValues.Status(this);
 
     /// <summary>Gets the headers of the server's answer, as the browser hands them to the page.</summary>
-    public ResponseHeaders Headers => throw new NotImplementedException();
+    public ResponseHeaders Headers => ReplyValues.Headers(this);
 
     /// <summary>Gets the request's members as it sent them; <c>Read</c> reads one.</summary>
     /// <remarks>A read of an input cannot give what was sent once the user edits the input during the send.</remarks>
-    public ReadOnly<TRequest> Request => throw new NotImplementedException();
+    public ReadOnly<TRequest> Request => new SentRequestValue<TRequest>(this);
 }
 
 /// <summary>
@@ -31,12 +33,15 @@ public class Response<TRequest> : JsObject
 /// <typeparam name="TBody">The type the route reads the body as.</typeparam>
 public sealed class Response<TRequest, TBody> : Response<TRequest>
 {
-    internal Response()
+    private readonly SuccessBody _kind;
+
+    internal Response(SuccessBody kind)
     {
+        _kind = kind;
     }
 
     /// <summary>Gets the body of the server's answer; <c>Read</c> reads a field of it.</summary>
-    public ReadOnly<TBody> Body => throw new NotImplementedException();
+    public ReadOnly<TBody> Body => new ReplyBody<TBody>(this, _kind);
 }
 
 /// <summary>
@@ -51,7 +56,7 @@ public sealed class ResponseHeaders : JsObject
     /// <summary>Reads a header by its name.</summary>
     /// <param name="name">The header's name, compared ignoring case.</param>
     /// <returns>A source of the header's text, which cannot be read when the answer lacks the header.</returns>
-    public MethodResult<string?> Get(string name) => throw new NotImplementedException();
+    public MethodResult<string?> Get(string name) => Method<string?>([(Arg<string>)HeaderNames.Response(name)], "get");
 }
 
 /// <summary>
@@ -67,23 +72,27 @@ public sealed class Markup
 /// <summary>
 /// Why a request ran its catch-all route: one of four outcomes that are not a success.
 /// </summary>
+[JsonConverter(typeof(FailureOutcomeConverter))]
 public sealed class FailureOutcome
 {
     /// <summary>The server answered with a status that is not 2xx, and the request names no route for that status.</summary>
-    public static readonly FailureOutcome Status = new();
+    public static readonly FailureOutcome Status = new(HttpOutcome.Status);
 
     /// <summary>The network failed, or the answer's body broke off while it was read.</summary>
-    public static readonly FailureOutcome Network = new();
+    public static readonly FailureOutcome Network = new(HttpOutcome.Network);
 
     /// <summary>A redirect ended on another origin than the page's.</summary>
-    public static readonly FailureOutcome Redirect = new();
+    public static readonly FailureOutcome Redirect = new(HttpOutcome.Redirect);
 
     /// <summary>The server answered 2xx with a body that is not of the kind the success route declares.</summary>
-    public static readonly FailureOutcome Content = new();
+    public static readonly FailureOutcome Content = new(HttpOutcome.Content);
 
-    private FailureOutcome()
+    private FailureOutcome(HttpOutcome outcome)
     {
+        Text = outcome.Text;
     }
+
+    internal string Text { get; }
 }
 
 /// <summary>
@@ -96,13 +105,13 @@ public sealed class Failure : JsObject
     }
 
     /// <summary>Gets why the request did not succeed.</summary>
-    public ReadOnly<FailureOutcome> Outcome => throw new NotImplementedException();
+    public ReadOnly<FailureOutcome> Outcome => ReplyValues.Outcome(this);
 
     /// <summary>Gets the status of the server's answer.</summary>
-    public ReadOnly<int> Status => throw new NotImplementedException();
+    public ReadOnly<int> Status => ReplyValues.Status(this);
 
     /// <summary>Gets the headers of the server's answer, as the browser hands them to the page.</summary>
-    public ResponseHeaders Headers => throw new NotImplementedException();
+    public ResponseHeaders Headers => ReplyValues.Headers(this);
 }
 
 /// <summary>
@@ -117,14 +126,14 @@ public sealed class Failure<TError> : JsObject
     }
 
     /// <summary>Gets why the request did not succeed.</summary>
-    public ReadOnly<FailureOutcome> Outcome => throw new NotImplementedException();
+    public ReadOnly<FailureOutcome> Outcome => ReplyValues.Outcome(this);
 
     /// <summary>Gets the status of the server's answer.</summary>
-    public ReadOnly<int> Status => throw new NotImplementedException();
+    public ReadOnly<int> Status => ReplyValues.Status(this);
 
     /// <summary>Gets the headers of the server's answer, as the browser hands them to the page.</summary>
-    public ResponseHeaders Headers => throw new NotImplementedException();
+    public ResponseHeaders Headers => ReplyValues.Headers(this);
 
     /// <summary>Gets the body of an answer whose status is not 2xx; <c>Read</c> reads a field of it.</summary>
-    public ReadOnly<TError> Body => throw new NotImplementedException();
+    public ReadOnly<TError> Body => new ReplyBody<TError>(this, SuccessBody.Json);
 }

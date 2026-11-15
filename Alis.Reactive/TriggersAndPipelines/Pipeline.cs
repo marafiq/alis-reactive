@@ -103,38 +103,41 @@ public sealed class Pipeline<TModel>
     /// <summary>Sends a GET request with no member.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI.</param>
     /// <returns>The request, which takes its routes.</returns>
-    public GetRequest<TModel, NoModel> Get(string url) => throw new NotImplementedException();
+    public GetRequest<TModel, NoModel> Get(string url) => Get<NoModel>(url, request => { });
 
     /// <summary>Sends a GET request whose members fill the URL's placeholders and its query.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
     /// <returns>The request, which takes its routes.</returns>
-    public GetRequest<TModel, TRequest> Get<TRequest>(string url, Action<QueryParts<TRequest>> request) => throw new NotImplementedException();
+    public GetRequest<TModel, TRequest> Get<TRequest>(string url, Action<QueryParts<TRequest>> request)
+        => new(RequestWriter<TModel>.Open(_writer, url, RequestMethod.Get, request), 0);
 
     /// <summary>Sends a HEAD request with no member.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI.</param>
     /// <returns>The request, which takes its routes.</returns>
-    public HeadRequest<TModel, NoModel> Head(string url) => throw new NotImplementedException();
+    public HeadRequest<TModel, NoModel> Head(string url) => Head<NoModel>(url, request => { });
 
     /// <summary>Sends a HEAD request whose members fill the URL's placeholders and its query.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
     /// <returns>The request, which takes its routes.</returns>
-    public HeadRequest<TModel, TRequest> Head<TRequest>(string url, Action<QueryParts<TRequest>> request) => throw new NotImplementedException();
+    public HeadRequest<TModel, TRequest> Head<TRequest>(string url, Action<QueryParts<TRequest>> request)
+        => new(RequestWriter<TModel>.Open(_writer, url, RequestMethod.Head, request), 0);
 
     /// <summary>Sends an OPTIONS request with no member.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI.</param>
     /// <returns>The request, which takes its routes.</returns>
-    public OptionsRequest<TModel, NoModel> Options(string url) => throw new NotImplementedException();
+    public OptionsRequest<TModel, NoModel> Options(string url) => Options<NoModel>(url, request => { });
 
     /// <summary>Sends an OPTIONS request whose members fill the URL's placeholders and its query.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI, with a placeholder in braces for each member its path takes.</param>
     /// <param name="request">The request's parts.</param>
     /// <typeparam name="TRequest">The type the endpoint binds the request to.</typeparam>
     /// <returns>The request, which takes its routes.</returns>
-    public OptionsRequest<TModel, TRequest> Options<TRequest>(string url, Action<QueryParts<TRequest>> request) => throw new NotImplementedException();
+    public OptionsRequest<TModel, TRequest> Options<TRequest>(string url, Action<QueryParts<TRequest>> request)
+        => new(RequestWriter<TModel>.Open(_writer, url, RequestMethod.Options, request), 0);
 
     /// <summary>Sends a POST request with no member.</summary>
     /// <param name="url">The URL: a path on the page's origin, or an absolute http or https URI.</param>

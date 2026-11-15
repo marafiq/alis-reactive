@@ -1044,12 +1044,12 @@ Terms used throughout:
   inside a list's lambda; compute it into a local before the lambda, such as var ward = Model.Ward.ToUpper();." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
 - `X6.10` analyzer (D6.12): a comparison of objects: "'{term}' compares objects, and the browser compares objects by
   reference; compare a member of each, such as d => d.Carer.Name == lead." At build by ALIS033, and where the view renders on code it does not follow (D18.6): new:N18.10.
-- `X6.11` behavior (D6.12): over visits the app's JSON writes, in New York,
-  `Count(v => v.At < new DateTime(2026, 3, 8, 3, 0, 0))` counts the visit at 02:30 on 2026-03-08, a wall time daylight
-  saving skips, and not the one at 03:15; `Count(v => v.At == new DateTime(2026, 11, 9, 8, 30, 0))` counts a Utc visit
-  written 2026-11-09T08:30:00Z, a Local one written 2026-11-09T08:30:00-05:00 and an Unspecified one written
-  2026-11-09T08:30:00, and not one at 08:30:00.0000001, which `Count(v => v.At > new DateTime(2026, 11, 9, 8, 30, 0))`
-  counts; `Count(v => seen.Contains(v.Seen))`, over a view's `DateTimeOffset` array that holds 2026-11-09T18:00:00Z,
+- `X6.11` behavior (D6.12): over visits the app's JSON writes, in New York, with the view's locals
+  `threeOnTheNight`, `new DateTime(2026, 3, 8, 3, 0, 0)`, and `halfPastEight`, `new DateTime(2026, 11, 9, 8, 30, 0)`
+  (D6.7: a value the lambda captures, never one it computes), `Count(v => v.At < threeOnTheNight)` counts the visit at
+  02:30 on 2026-03-08, a wall time daylight saving skips, and not the one at 03:15; `Count(v => v.At == halfPastEight)`
+  counts a Utc visit written 2026-11-09T08:30:00Z, a Local one written 2026-11-09T08:30:00-05:00 and an Unspecified one
+  written 2026-11-09T08:30:00, and not one at 08:30:00.0000001, which `Count(v => v.At > halfPastEight)` counts; `Count(v => seen.Contains(v.Seen))`, over a view's `DateTimeOffset` array that holds 2026-11-09T18:00:00Z,
   counts a visit seen at 2026-11-09T13:00:00-05:00, one instant at another offset; each count is the same in Kolkata.
 - `X6.12` refusal (D6.12): an ordering against a value the app's JSON writes as text: "'{term}' orders a value the
   app's JSON writes as text, which does not order as the value does in .NET; {compare it with == or !=, or order on

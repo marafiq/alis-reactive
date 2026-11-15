@@ -10,8 +10,13 @@ namespace Alis.Reactive.TriggersAndPipelines;
 /// </summary>
 public sealed class QueryParts<TRequest>
 {
-    internal QueryParts()
+    private readonly RequestPartsWriter _parts;
+    private readonly int _stage;
+
+    internal QueryParts(RequestPartsWriter parts, int stage)
     {
+        _parts = parts;
+        _stage = stage;
     }
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
@@ -19,14 +24,16 @@ public sealed class QueryParts<TRequest>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotImplementedException();
+    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
+    => new(_parts, _parts.Source(_stage, member, value, true));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with a literal.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotImplementedException();
+    public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value)
+    => new(_parts, _parts.Literal(_stage, member, value, true));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
@@ -35,41 +42,45 @@ public sealed class QueryParts<TRequest>
     /// <returns>The request's parts.</returns>
     public QueryParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => throw new NotImplementedException();
+    => new(_parts, _parts.Source(_stage, member, value, true));
 
-    /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a source reads it when the request is sent.</summary>
+    /// <summary>Sends a member in the URL's query, under the member's C# path, as a source reads it when the request is sent.</summary>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotImplementedException();
+    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
+    => new(_parts, _parts.Source(_stage, member, value, false));
 
-    /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a literal.</summary>
+    /// <summary>Sends a member in the URL's query, under the member's C# path, as a literal.</summary>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotImplementedException();
+    public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value)
+    => new(_parts, _parts.Literal(_stage, member, value, false));
 
-    /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a source reads it when the request is sent.</summary>
+    /// <summary>Sends a member in the URL's query, under the member's C# path, as a source reads it when the request is sent.</summary>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public QueryParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => throw new NotImplementedException();
+    => new(_parts, _parts.Source(_stage, member, value, false));
 
     /// <summary>Sends a header with a fixed text.</summary>
     /// <remarks><c>Content-Type</c>, <c>Accept</c> and the headers the framework or the browser writes are refused where the view renders.</remarks>
     /// <param name="name">The header's name.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueryParts<TRequest> Header(string name, string value) => throw new NotImplementedException();
+    public QueryParts<TRequest> Header(string name, string value)
+    => new(_parts, _parts.Header(_stage, name, value));
 
     /// <summary>Sends a header whose text a source reads when the request is sent; one that cannot be read is not sent.</summary>
     /// <remarks><c>Content-Type</c>, <c>Accept</c> and the headers the framework or the browser writes are refused where the view renders.</remarks>
     /// <param name="name">The header's name.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueryParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value) => throw new NotImplementedException();
+    public QueryParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value)
+    => new(_parts, _parts.Header(_stage, name, value));
 
     /// <summary>Starts a condition on the parts its branch sends, read once when the request is sent.</summary>
     /// <remarks>When the condition is not true, each part the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start. The URL, the method and the body's format take no condition, so a branch takes no body and no container: the request names them before its first condition.</remarks>

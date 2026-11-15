@@ -1,7 +1,9 @@
 #if NET10_0_OR_GREATER
 using System;
+using System.Linq;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.TriggersAndPipelines;
+using Alis.Reactive.Validation;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -26,7 +28,8 @@ public static class PlanHtml
             () => html.ViewData.TemplateInfo.HtmlFieldPrefix,
             text => html.ViewData.TemplateInfo.GetFullHtmlFieldName(text),
             html.GenerateIdFromName,
-            () => ViewPaths.Of(html));
+            () => ViewPaths.Of(html),
+            type => html.ViewContext.HttpContext.RequestServices.GetService<ValidatorCatalog>()?.Flags.Contains(type) == true);
 
     /// <summary>Handles a trigger in the view's plan.</summary>
     /// <remarks>A view calls it once for each trigger it handles, before it renders the plan.</remarks>

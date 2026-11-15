@@ -39,6 +39,13 @@ internal sealed class BlockWriter
         return _handlers.Peek().Add(name);
     }
 
+    internal RefExpression RequestReply()
+    {
+        var reply = NextBinding("reply");
+        _handlers.Peek().BindReply(reply);
+        return reply;
+    }
+
     internal string NextLiveItem() => "liveItem" + (++_liveItems).ToString(CultureInfo.InvariantCulture);
 
     internal RefExpression NextBinding(string stem)
