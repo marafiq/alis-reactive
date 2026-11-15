@@ -24,6 +24,9 @@ public sealed class ConformanceStart
     [JsonPropertyName("record")]
     public RecordStart Record { get; init; } = new();
 
+    [JsonPropertyName("days")]
+    public CareDays Days { get; init; }
+
     [JsonPropertyName("amount")]
     public decimal Amount { get; init; }
 

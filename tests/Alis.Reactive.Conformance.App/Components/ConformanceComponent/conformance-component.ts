@@ -38,7 +38,7 @@ export class ConformanceComponent extends ComponentEvents {
     nullableDay: Date | null = null;
     moment = new Date("2026-11-09T14:00:00Z");
     choice: "low" | "high" = "low";
-    days = 0;
+    days: number;
     optionalText?: string | null;
     record: RecordData;
     nullableRecords: RecordData[] | null = null;
@@ -69,6 +69,7 @@ export class ConformanceComponent extends ComponentEvents {
         this.heldCount = start.count;
         this.heldAmount = start.amount;
         this.enabled = start.enabled;
+        this.days = start.days;
         this.readOnlyText = start.readOnlyText;
         this.record = start.record;
         this.heldRecords = start.records;

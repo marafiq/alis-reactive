@@ -566,6 +566,15 @@
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },
+  "M17.F1 X11.4 0": {
+    "modules": [
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Round/OrderStart.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M17.F1 X11.8 0": {
     "modules": [],
     "views": [
@@ -2373,6 +2382,42 @@
     ],
     "views": [
       "/Care/Round/StaffRoster.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.24 0": {
+    "modules": [
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Record/CareWeek.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.24 1": {
+    "modules": [
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Record/CareWeek.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.24 2": {
+    "modules": [
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Record/PanelDays.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.25 0": {
+    "modules": [
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Record/PanelDaysHold.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

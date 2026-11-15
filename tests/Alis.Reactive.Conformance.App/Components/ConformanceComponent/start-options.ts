@@ -4,6 +4,7 @@ export interface ConformanceStart {
     value: string | null;
     options: string[];
     count: number;
+    days: number;
     record: RecordStart;
     amount: number;
     outer: OuterStart;
