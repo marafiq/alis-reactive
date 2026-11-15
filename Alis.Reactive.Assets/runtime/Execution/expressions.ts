@@ -1,16 +1,17 @@
 import { operated } from "../Conditions/index";
+import { plugin } from "../Plugins/index";
 import { assertNever, notBuilt, type Expression } from "../Schema/index";
 import { called, converted, got, heldOrNull, value, type Read } from "../ValuesAndSources/index";
 import type { Context } from "./context";
 import { read } from "./data";
-import { located } from "./objects";
+import { elementById, located } from "./objects";
 
 export function evaluate(expression: Expression, context: Context): Read {
   switch (expression.kind) {
     case "lit":
       return value(expression.value);
     case "obj":
-      return value(located(context, expression.id).object);
+      return value(located(context, expression.id, elementById, plugin).object);
     case "ref":
       return bound(expression.name, context);
     case "fn":

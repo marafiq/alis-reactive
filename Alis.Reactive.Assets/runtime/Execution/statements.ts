@@ -12,7 +12,7 @@ import { got, heldOrNull, Stop, type Read } from "../ValuesAndSources/index";
 import { bind, isAnObject, type Context } from "./context";
 import { evaluate } from "./expressions";
 import { listenTo } from "./listen";
-import { elementOf } from "./objects";
+import { elementById } from "./objects";
 
 export type Step =
   | { readonly kind: "completed"; readonly context: Context }
@@ -40,7 +40,7 @@ export function execute(statement: Statement, context: Context): Step {
     case "stop":
       return { kind: "stop", reason: statement.reason };
     case "listen":
-      listenTo(statement, context, elementOf);
+      listenTo(statement, context, elementById);
       return { kind: "completed", context };
     default:
       return assertNever(statement);

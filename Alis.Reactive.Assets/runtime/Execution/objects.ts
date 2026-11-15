@@ -1,44 +1,75 @@
-import { plugin } from "../Plugins/index";
-import { assertNever, type Listening, type Vendor } from "../Schema/index";
-import { Stop, type Read } from "../ValuesAndSources/index";
+import { assertNever, type ElementLocator, type Listening, type Locator, type Vendor } from "../Schema/index";
+import { Stop } from "../ValuesAndSources/index";
 import { isAnObject, type Context } from "./context";
 import { evaluate } from "./expressions";
 
-export interface Located {
-  readonly object: unknown;
-  readonly listen: Listening;
-}
+export type ElementFor = (id: string) => object | null;
+export type PluginFor = (name: string, key: string) => unknown;
+export type StillHeld = (object: object) => boolean;
 
-export function located(context: Context, id: string): Located {
-  const locator = context.plan.objects[id];
-  if (locator === undefined) throw new Error("The plan names the object '" + id + "', which it does not declare.");
+type Locate = (element: object) => unknown;
+
+export type Located =
+  | { readonly kind: "element"; readonly object: object; readonly listen: Listening; readonly element: object; readonly vendor: string }
+  | { readonly kind: "plugin"; readonly object: unknown; readonly listen: Listening };
+
+export function located(context: Context, id: string, elementFor: ElementFor, pluginFor: PluginFor): Located {
+  const locator = locatorOf(context, id);
   switch (locator.kind) {
     case "element": {
-      const vendor = vendorOf(context, locator.vendor);
-      return { object: heldOn(elementOf(locator.id), locator.vendor, evaluate(vendor.locate, context)), listen: vendor.listen };
+      const element = elementOf(locator.id, elementFor);
+      return { kind: "element", object: heldOn(element, locator, locateOf(context, locator.vendor)), listen: vendorOf(context, locator.vendor).listen, element, vendor: locator.vendor };
     }
     case "plugin":
-      return { object: plugin(locator.name, locator.key), listen: locator.listen };
+      return { kind: "plugin", object: pluginFor(locator.name, locator.key), listen: locator.listen };
     default:
       return assertNever(locator);
   }
 }
 
-export function vendorOf(context: Context, name: string): Vendor {
+export function locatorOf(context: Context, id: string): Locator {
+  const locator = context.plan.objects[id];
+  if (locator === undefined) throw new Error("The plan names the object '" + id + "', which it does not declare.");
+  return locator;
+}
+
+export function elementById(id: string): HTMLElement | null {
+  return document.getElementById(id);
+}
+
+export function elementOf(id: string, elementFor: ElementFor): object {
+  const element = elementFor(id);
+  if (element === null) throw new Stop("No element has the id '" + id + "'.");
+  return element;
+}
+
+export function heldBy(element: object, vendor: string, context: Context): StillHeld {
+  const locate = locateOf(context, vendor);
+  const weak = new WeakRef(element);
+  return (object) => {
+    const held = weak.deref();
+    return held !== undefined && locate(held) === object;
+  };
+}
+
+function vendorOf(context: Context, name: string): Vendor {
   const vendor = context.plan.vendors[name];
   if (vendor === undefined) throw new Error("The plan names the vendor '" + name + "', which it does not declare.");
   return vendor;
 }
 
-export function elementOf(id: string): HTMLElement {
-  const element = document.getElementById(id);
-  if (element === null) throw new Stop("No element has the id '" + id + "'.");
-  return element;
+function locateOf(context: Context, vendor: string): Locate {
+  const find = evaluate(vendorOf(context, vendor).locate, { ...context, scope: new Map() });
+  if (find.kind === "nothing" || typeof find.value !== "function") throw new Error("The vendor '" + vendor + "' locates its object by no function.");
+  const locate = find.value;
+  return (element) => {
+    const found: unknown = Reflect.apply(locate, undefined, [element]);
+    return found;
+  };
 }
 
-function heldOn(element: HTMLElement, vendor: string, find: Read): object {
-  if (find.kind === "nothing" || typeof find.value !== "function") throw new Error("The vendor '" + vendor + "' locates its object by no function.");
-  const found: unknown = Reflect.apply(find.value, undefined, [element]);
-  if (!isAnObject(found)) throw new Stop("The element '" + element.id + "' holds no object of the vendor '" + vendor + "'.");
+function heldOn(element: object, locator: ElementLocator, locate: Locate): object {
+  const found = locate(element);
+  if (!isAnObject(found)) throw new Stop("The element '" + locator.id + "' holds no object of the vendor '" + locator.vendor + "'.");
   return found;
 }

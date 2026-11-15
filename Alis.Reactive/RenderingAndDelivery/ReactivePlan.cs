@@ -67,7 +67,7 @@ public sealed partial class Rendered<TComponent, TModel>
     /// <param name="pipeline">The steps to run on each raise.</param>
     /// <returns>The rendered component.</returns>
     public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline)
-        => Handles(raised(_component), (_, steps) => pipeline(steps));
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline);
 
     /// <summary>Runs a pipeline each time the component raises an event, with the event's payload.</summary>
     /// <param name="raised">The event, as a member of the component's declaration.</param>
@@ -75,14 +75,15 @@ public sealed partial class Rendered<TComponent, TModel>
     /// <returns>The rendered component.</returns>
     public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
-        => Handles(raised(_component), pipeline);
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline);
 
     /// <summary>Runs a pipeline each time the component raises an event that has no payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the component's declaration.</param>
     /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
     /// <returns>The rendered component.</returns>
-    public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+    public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline)
+        => Handles(raised(_component), policy, (_, steps) => pipeline(steps));
 
     /// <summary>Runs a pipeline each time the component raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the component's declaration.</param>
@@ -91,9 +92,9 @@ public sealed partial class Rendered<TComponent, TModel>
     /// <returns>The rendered component.</returns>
     public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => Handles(raised(_component), policy, pipeline);
 
-    private Rendered<TComponent, TModel> Handles<TArgs>(Event<TArgs> raised, Action<TArgs, Pipeline<TModel>> pipeline)
+    private Rendered<TComponent, TModel> Handles<TArgs>(Event<TArgs> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
         where TArgs : JsObject, new()
     {
         var target = raised.Owner.Bound.Target;
@@ -106,7 +107,7 @@ public sealed partial class Rendered<TComponent, TModel>
 
         var on = ((ObjExpression)target).Id;
         var steps = _writer.Handler(() => pipeline(JsObject.Reaching<TArgs>(new Received(_writer)), new Pipeline<TModel>(_writer)));
-        _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, Policy.Overlap, steps));
+        _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps));
         return this;
     }
 }
