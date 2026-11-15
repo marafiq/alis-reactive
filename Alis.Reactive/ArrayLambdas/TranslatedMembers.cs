@@ -50,6 +50,8 @@ internal static partial class TranslatedMembers
 
     internal static bool ReadsADayOfTheWeek(LinqExpression term) => term is MemberExpression { Expression: not null } part && part.Type == typeof(DayOfWeek) && Table.ContainsKey(Key(part.Member));
 
+    internal static bool Translates(MemberExpression member) => Table.ContainsKey(Key(member.Member));
+
     internal static bool TryTranslating(LinqExpression term, ItemLambda read, [NotNullWhen(true)] out PlanExpression? translated)
     {
         translated = term switch

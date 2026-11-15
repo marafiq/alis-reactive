@@ -31,6 +31,8 @@ internal sealed class HeldForm
 
     internal LitExpression Beside(object? value, Type type) => _ownForm ? throw new NotImplementedException() : Literals.Of(value, type, _json);
 
+    internal string BaseFormName => _ownForm ? throw new NotImplementedException() : "JavaScript's value";
+
     internal JsonSerializerOptions DataOptions => _ownForm ? throw new NotImplementedException() : _json.LiveForm;
 
     internal Expression IntoLive(Expression held) => held;

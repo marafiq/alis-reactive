@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Text.Json;
 using Alis.Reactive.Conditions;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
+using Alis.Reactive.TypeKnowledge;
 using Alis.Reactive.ValuesAndSources;
 using LinqExpression = System.Linq.Expressions.Expression;
 using PlanExpression = Alis.Reactive.Schema.Expression;
@@ -42,7 +44,10 @@ internal sealed class ItemLambda
     internal static FnExpression Of(LambdaExpression lambda, HeldForm form) => Outermost(lambda, form).Fn(lambda, body => body);
 
     internal static FnExpression Selecting(LambdaExpression field, HeldForm form, bool fieldHoldsNull)
-        => Outermost(field, form).Fn(field, body => fieldHoldsNull ? body : new OpExpression(Operator.NonNull, [body]));
+        => Outermost(field, form).Fn(field, body => fieldHoldsNull ? body : new OpExpression(Operator.NonNull, [body]), takenAsHeld: _ => true);
+
+    internal static FnExpression Totalling(LambdaExpression term, HeldForm form)
+        => Outermost(term, form).Fn(term, body => body, takenAsHeld: member => !member.HasItsOwnConverter && ComparedTypes.IsDecimal(member.Contract.Type));
 
     internal static FnExpression EveryItem() => new([Item + "1"], new LitExpression(JsonSerializer.SerializeToElement(true)));
 
@@ -62,11 +67,15 @@ internal sealed class ItemLambda
 
     private string NextItem => Item + (_items.Count + 1).ToString(CultureInfo.InvariantCulture);
 
-    private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped)
+    private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped) => Fn(lambda, shaped, takenAsHeld: _ => false);
+
+    private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped, Func<WrittenMember, bool> takenAsHeld)
     {
         var name = NextItem;
         var items = new Dictionary<ParameterExpression, string>(_items) { [lambda.Parameters[0]] = name };
-        return new FnExpression([name], shaped(new ItemLambda(_lambda, items, _form).Term(lambda.Body)));
+        var body = new ItemLambda(_lambda, items, _form);
+        if (body.ReadsItsOwnForm(lambda.Body, out var read) && takenAsHeld(read.Path.Member)) throw new NotImplementedException();
+        return new FnExpression([name], shaped(body.Term(lambda.Body)));
     }
 
     private FnExpression Sort(LambdaExpression key, Operator comparison, bool descending)
@@ -111,20 +120,53 @@ internal sealed class ItemLambda
         };
     }
 
-    private PlanExpression DataRead(MemberExpression member)
+    private DataExpression DataRead(MemberExpression member)
+    {
+        if (!ReadsAPath(member, out var root)) throw NoBrowserForm(member);
+        var path = PathOf(member, root);
+        if (path.Member.HoldsItsOwnForm)
+        {
+            throw new InvalidOperationException(
+                $"'{Printed.Of(member)}' is written by {path.Member.WhatWritesItsOwnForm}, unlike {_form.BaseFormName}, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server.");
+        }
+
+        return Data(path, root);
+    }
+
+    private DataExpression Data(MemberPath path, ParameterExpression root) => new(path.DataSteps(), new RefExpression(_items[root]));
+
+    private bool ReadsAPath(MemberExpression member, [NotNullWhen(true)] out ParameterExpression? root)
     {
         LinqExpression node = member;
         while (node is MemberExpression { Expression: { } holder })
         {
-            if (_form.WritesAsAScalar(holder.Type)) throw NoBrowserForm(member);
+            if (_form.WritesAsAScalar(holder.Type))
+            {
+                root = null;
+                return false;
+            }
+
             node = holder;
         }
 
-        var readsAnItem = node is ParameterExpression root && _items.ContainsKey(root);
-        if (!readsAnItem || !MemberPath.TryOf(member, (ParameterExpression)node, _lambda, _form.DataOptions, out var path)) throw NoBrowserForm(member);
+        root = node as ParameterExpression;
+        return root is not null && _items.ContainsKey(root);
+    }
+
+    private MemberPath PathOf(MemberExpression member, ParameterExpression root)
+    {
+        if (!MemberPath.TryOf(member, root, _lambda, _form.DataOptions, out var path)) throw NoBrowserForm(member);
         path.RefuseAReadPastItsOwnConverter(Printed.Of(member));
-        if (path.EndsInItsOwnForm) throw new NotImplementedException();
-        return new DataExpression(path.DataSteps(), new RefExpression(_items[(ParameterExpression)node]));
+        return path;
+    }
+
+    private bool ReadsItsOwnForm(LinqExpression node, [NotNullWhen(true)] out OwnFormRead? read)
+    {
+        read = null;
+        if (node is not MemberExpression member || TranslatedMembers.Translates(member) || !ReadsAPath(member, out var root)) return false;
+        var path = PathOf(member, root);
+        read = path.Member.HoldsItsOwnForm ? new OwnFormRead(member, path, root) : null;
+        return read is not null;
     }
 
     private OpExpression Coalesced(BinaryExpression coalesce)
@@ -143,19 +185,55 @@ internal sealed class ItemLambda
         if (!leftReadsAnItem && !rightReadsAnItem) throw ViewValues.Computed(comparison);
         if (leftReadsAnItem && rightReadsAnItem)
         {
+            RefuseAMemberInItsOwnFormBesideAnother(comparison, left, right);
             RequireComparableMembers(comparison, left.Type, right.Type, orders);
             return new OpExpression(op, [Keys.Of(left.Type, Read(left)), Keys.Of(right.Type, Read(right))]);
         }
 
         var member = leftReadsAnItem ? left : right;
         var held = leftReadsAnItem ? right : left;
-        var compilerFoldedTheValueToANumber = !ComparedTypes.IsNumber(member.Type) && ComparedTypes.IsNumber(held.Type);
-        var writtenAs = compilerFoldedTheValueToANumber ? member.Type : held.Type;
+        if (ReadsItsOwnForm(member, out var inItsOwnForm)) return ComparedInItsOwnForm(comparison, op, orders, inItsOwnForm, held, leftReadsAnItem);
+        var writtenAs = WrittenAs(member, held);
         var written = TranslatedMembers.ReadsADayOfTheWeek(member) ? DayNumber(ViewValues.Of(held)) : _form.Beside(Held(ViewValues.Of(held), held.Type, writtenAs), writtenAs);
         RequireComparableValue(comparison, written.Value, member.Type, orders);
         var memberRead = Keys.Of(member.Type, Read(member));
         var value = Keys.Of(member.Type, written);
         return new OpExpression(op, leftReadsAnItem ? [memberRead, value] : [value, memberRead]);
+    }
+
+    private static Type WrittenAs(LinqExpression member, LinqExpression held)
+    {
+        var compilerFoldedTheValueToANumber = !ComparedTypes.IsNumber(member.Type) && ComparedTypes.IsNumber(held.Type);
+        return compilerFoldedTheValueToANumber ? member.Type : held.Type;
+    }
+
+    private OpExpression ComparedInItsOwnForm(BinaryExpression comparison, Operator op, bool orders, OwnFormRead read, LinqExpression held, bool memberOnTheLeft)
+    {
+        var member = read.Member;
+        var written = read.Path.Member;
+        var unlikeTheBase = $"'{Printed.Of(member)}', which {written.WhatWritesItsOwnForm} writes unlike {_form.BaseFormName}";
+        if (orders) throw Refused(comparison, $"orders {unlikeTheBase}, so the browser does not order it as .NET does; order it on the server.");
+        if (!_form.WritesAsAScalar(member.Type)) throw Refused(comparison, $"compares {unlikeTheBase}, and .NET compares the object it holds; compare it on the server.");
+        if (Keys.IsDateOrTime(member.Type)) throw Refused(comparison, "compares a date or a time its own converter writes, whose text the converter decides; compare it on the server.");
+        var value = written.Written(Held(ViewValues.Of(held), held.Type, WrittenAs(member, held)));
+        var writtenAsText = value.ValueKind == JsonValueKind.String;
+        if (writtenAsText && ComparedTypes.IsBinaryFraction(member.Type))
+            throw Refused(comparison, "compares a float or double the JSON writes as text, whose text does not equal as the number does, as -0 and 0 or NaN and NaN; compare it on the server.");
+        if (writtenAsText && ComparedTypes.IsDecimal(member.Type) && written.HasItsOwnConverter)
+            throw Refused(comparison, "compares a decimal its own converter writes as text, whose text the converter decides; compare it on the server.");
+        var data = Data(read.Path, read.Root);
+        var literal = new LitExpression(value);
+        PlanExpression[] operands = memberOnTheLeft ? [data, literal] : [literal, data];
+        var comparedAsDecimals = ComparedTypes.IsDecimal(member.Type) && !written.HasItsOwnConverter;
+        if (!comparedAsDecimals) return new OpExpression(op, operands);
+        var equal = new OpExpression(Operator.EqDecimal, operands);
+        return op == Operator.Eq ? equal : new OpExpression(Operator.Not, [equal]);
+    }
+
+    private void RefuseAMemberInItsOwnFormBesideAnother(BinaryExpression comparison, LinqExpression left, LinqExpression right)
+    {
+        if (!ReadsItsOwnForm(left, out var read) && !ReadsItsOwnForm(right, out read)) return;
+        throw Refused(comparison, $"compares two members, and {read.Path.Member.WhatWritesItsOwnForm} writes '{Printed.Of(read.Member)}' unlike {_form.BaseFormName}, so the browser does not compare them as .NET does; compare them on the server.");
     }
 
     private void RequireComparableMembers(BinaryExpression comparison, Type left, Type right, bool orders)
@@ -230,6 +308,8 @@ internal sealed class ItemLambda
         => Refused(comparison, "compares objects, and the browser compares objects by reference; compare a member of each, such as d => d.Carer.Name == lead.");
 
     private static InvalidOperationException Refused(LinqExpression term, string reason) => new($"'{Printed.Of(term)}' {reason}");
+
+    private sealed record OwnFormRead(MemberExpression Member, MemberPath Path, ParameterExpression Root);
 
     private sealed class ItemFinder(Dictionary<ParameterExpression, string> items) : ExpressionVisitor
     {

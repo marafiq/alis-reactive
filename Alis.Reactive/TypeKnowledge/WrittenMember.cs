@@ -40,6 +40,10 @@ internal sealed class WrittenMember
 
     internal bool HoldsItsOwnForm => !ReferenceEquals(OwnForm(), Holder.Options);
 
+    internal string WhatWritesItsOwnForm => HasItsOwnConverter
+        ? "its own JSON converter"
+        : _property.NumberHandling is null ? "its class's JSON number handling" : "its own JSON number handling";
+
     internal object? ReadFrom(object holder) => _get(holder);
 
     internal JsonElement Written(object? value) => JsonSerializer.SerializeToElement(value, OwnForm().GetTypeInfo(_property.PropertyType));

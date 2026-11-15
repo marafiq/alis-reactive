@@ -13,7 +13,7 @@ internal static class DataReads
     {
         if (!MemberPath.TryOf(path, options, out var members)) throw NoMemberPath(path);
         members.RefuseAReadPastItsOwnConverter(path.Body.ToString());
-        var form = members.EndsInItsOwnForm ? holdersForm.OwnForm : holdersForm;
+        var form = members.Member.HoldsItsOwnForm ? holdersForm.OwnForm : holdersForm;
         return new Computed<TResult>(new DataExpression(members.DataSteps(), holder), form);
     }
 

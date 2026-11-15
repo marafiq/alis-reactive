@@ -26,7 +26,7 @@ internal sealed partial class MemberPath
 
     internal IReadOnlyList<DataStep> DataSteps() => DataStarts.Steps([.. _links.Select(link => link.Written)]);
 
-    internal bool EndsInItsOwnForm => _links[_links.Count - 1].Written.HoldsItsOwnForm;
+    internal WrittenMember Member => _links[_links.Count - 1].Written;
 
     internal void RefuseAReadPastItsOwnConverter(string read)
     {

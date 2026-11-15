@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -100,6 +101,30 @@ public sealed class CartDose
     public DateOnly Round { get; set; }
 
     public TimeOnly Shift { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public DoseStatus Charted { get; set; } = DoseStatus.Due;
+
+    public Supply Supply { get; set; } = new();
+
+    [JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
+    public decimal Rebate { get; set; }
+
+    [JsonConverter(typeof(DecimalText))]
+    public decimal Tariff { get; set; }
+
+    [JsonConverter(typeof(DayText))]
+    public DateTime Stamped { get; set; }
+}
+
+[JsonNumberHandling(JsonNumberHandling.WriteAsString | JsonNumberHandling.AllowReadingFromString)]
+public sealed class Supply
+{
+    public int Vials { get; set; }
+
+    public double Fill { get; set; }
+
+    public string Lot { get; set; } = "none";
 }
 
 public sealed class Carer
@@ -119,4 +144,18 @@ public sealed class SealText : JsonConverter<Seal>
     public override Seal Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => new() { Tag = reader.GetString() ?? "" };
 
     public override void Write(Utf8JsonWriter writer, Seal value, JsonSerializerOptions options) => writer.WriteStringValue(value.Tag);
+}
+
+public sealed class DecimalText : JsonConverter<decimal>
+{
+    public override decimal Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => decimal.Parse(reader.GetString() ?? "0", CultureInfo.InvariantCulture);
+
+    public override void Write(Utf8JsonWriter writer, decimal value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToString(CultureInfo.InvariantCulture));
+}
+
+public sealed class DayText : JsonConverter<DateTime>
+{
+    public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) => DateTime.ParseExact(reader.GetString() ?? "00010101", "yyyyMMdd", CultureInfo.InvariantCulture);
+
+    public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options) => writer.WriteStringValue(value.ToString("yyyyMMdd", CultureInfo.InvariantCulture));
 }

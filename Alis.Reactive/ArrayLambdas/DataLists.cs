@@ -169,5 +169,5 @@ public static class DataLists
         => new(ListForms.ToSorted(Sources.Of(list), ItemLambda.Comparing(key, Sources.FormOf(list), comparison, descending)), Sources.FormOf(list));
 
     private static Computed<TTotal> Summed<TItem, TTotal>(Operator sum, ITypedSource<IEnumerable<TItem>> list, LambdaExpression term)
-        => new(new OpExpression(sum, [ListForms.Map(Sources.Of(list), ItemLambda.Of(term, Sources.FormOf(list)))]), Sources.FormOf(list).Computed);
+        => new(new OpExpression(sum, [ListForms.Map(Sources.Of(list), ItemLambda.Totalling(term, Sources.FormOf(list)))]), Sources.FormOf(list).Computed);
 }
