@@ -96,8 +96,7 @@
       "Declarations",
       "NativeComponents",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/WardTransfer.cshtml",
@@ -245,8 +244,7 @@
   "M11.F1 X5.4 0": {
     "modules": [
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Declarations/RecordFields.cshtml",
@@ -3522,8 +3520,7 @@
     "modules": [
       "Declarations",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/StandingNote.cshtml",
@@ -3547,8 +3544,7 @@
     "modules": [
       "Declarations",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/PinBoard.cshtml",
@@ -3561,8 +3557,7 @@
     "modules": [
       "Declarations",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Record/HallNotices.cshtml",
@@ -3634,8 +3629,7 @@
       "Declarations",
       "NativeComponents",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Care/Admission/MoveInResidentStep.cshtml",
@@ -4342,8 +4336,7 @@
     "modules": [
       "Declarations",
       "RenderingAndDelivery",
-      "TriggersAndPipelines",
-      "ValuesAndSources"
+      "TriggersAndPipelines"
     ],
     "views": [
       "/Bench/Sources/SourceDispatchPayloadMember.cshtml",

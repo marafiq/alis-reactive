@@ -240,3 +240,61 @@ describe("when a list is built from its items, each item is read when the step r
     expect(appended(textPart(member(ref("round"), "bed", "optional")))).toStrictEqual([]);
   });
 });
+
+describe("when a step builds an object from fields", () => {
+  test("each field is evaluated once in order and a source that reads nothing becomes null", () => {
+    const remaining = ["Ada Hart", "North", "fall"];
+    const next: Source = { kind: "call", path: ["shift"], members: "required", target: ref("remaining"), args: [] };
+    const record: Source = {
+      kind: "record",
+      fields: [
+        { name: "residentName", value: next },
+        { name: "destination", value: { kind: "record", fields: [{ name: "ward", value: next }] } },
+        { name: "bed", value: member(ref("round"), "bed", "optional") },
+        { name: "reason", value: next },
+        { name: "cleared", value: lit(null) },
+      ],
+    };
+
+    expect(charted({ remaining, round: rounds[0] }, record)).toStrictEqual([{ residentName: "Ada Hart", destination: { ward: "North" }, bed: null, reason: "fall", cleared: null }]);
+    expect(remaining).toStrictEqual([]);
+  });
+
+  test("a stopped field prevents the later fields and the following step from running", () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const remaining = ["Ada Hart", "North", "fall"];
+    const next: Source = { kind: "call", path: ["shift"], members: "required", target: ref("remaining"), args: [] };
+    const chart = new Chart();
+    const block: Block = [
+      { kind: "do", await: false, expr: { kind: "call", path: ["note"], members: "required", target: ref("chart"), args: [lit("before")] } },
+      {
+        kind: "do",
+        await: false,
+        expr: { kind: "record", fields: [{ name: "first", value: next }, { name: "bed", value: member(ref("round"), "bed") }, { name: "last", value: next }] },
+      },
+      { kind: "do", await: false, expr: { kind: "call", path: ["note"], members: "required", target: ref("chart"), args: [lit("after")] } },
+    ];
+    new Lane("overlap", block, aRoundsOwner).raise(raisedWith({ chart, remaining, round: rounds[0] }));
+
+    expect(chart.lines).toStrictEqual([["before"]]);
+    expect(remaining).toStrictEqual(["North", "fall"]);
+  });
+
+  test("every evaluation builds a new object including when no fields are supplied", () => {
+    const chart = new Chart();
+    const empty: Source = { kind: "record", fields: [] };
+    const record: Source = { kind: "record", fields: [{ name: "destination", value: empty }] };
+    const write: Step = { kind: "set", path: ["line"], members: "required", content: false, target: ref("chart"), value: record };
+    new Lane("overlap", [write, write], aRoundsOwner).raise(raisedWith({ chart }));
+
+    expect(chart.lines).toStrictEqual([{ destination: {} }, { destination: {} }]);
+    expect(chart.lines[0]).not.toBe(chart.lines[1]);
+    expect(charted({}, empty)).toStrictEqual([{}]);
+  });
+
+  test("wire names are own members even when a name is inherited or contains a dot", () => {
+    const record: Source = { kind: "record", fields: [{ name: "__proto__", value: { kind: "record", fields: [{ name: "ward", value: lit("North") }] } }, { name: "constructor", value: lit("Ada Hart") }, { name: "why.now", value: lit("fall") }] };
+
+    expect(charted({}, record)).toStrictEqual([{ ["__proto__"]: { ward: "North" }, constructor: "Ada Hart", "why.now": "fall" }]);
+  });
+});

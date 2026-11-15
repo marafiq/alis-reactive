@@ -177,7 +177,13 @@ public sealed class Pipeline<TModel>
     /// <param name="members">The members the object holds, each a literal or a source.</param>
     /// <typeparam name="T">The class of the object built.</typeparam>
     /// <returns>A source of the object.</returns>
-    public TypedSource<T> Object<T>(Action<ObjectMembers<T>> members) => throw new NotImplementedException();
+    public TypedSource<T> Object<T>(Action<ObjectMembers<T>> members)
+    {
+        var form = HeldForm.Live(_writer.Content.Json, _writer.Content.RendersUnder);
+        var building = new ObjectMembers<T>(form);
+        members(building);
+        return new Computed<T>(building.Written(), form);
+    }
 
     /// <summary>Joins a text from its parts when the step runs, in their order: texts the view holds and sources of any type.</summary>
     /// <remarks>

@@ -1,6 +1,6 @@
 import { operated } from "../Conditions/index";
 import { plugin } from "../Plugins/index";
-import { assertNever, notBuilt, type CallExpression, type Expression } from "../Schema/index";
+import { assertNever, type CallExpression, type Expression } from "../Schema/index";
 import { called, converted, got, heldOrNull, value, type Read, type Returns } from "../ValuesAndSources/index";
 import type { Context } from "./context";
 import { read } from "./data";
@@ -35,7 +35,7 @@ export function evaluate(expression: Expression, context: Context): Read {
         return heldOrNull(evaluate(expression.body, { ...context, scope }));
       });
     case "record":
-      throw notBuilt("the expression '" + expression.kind + "'");
+      return value(Object.fromEntries(expression.fields.map((field): [string, unknown] => [field.name, heldOrNull(evaluate(field.value, context))])));
     case "list":
       return value(expression.items.map((item) => heldOrNull(evaluate(item, context))));
     default:

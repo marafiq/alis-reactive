@@ -48,7 +48,9 @@ internal sealed class WrittenMember
 
     internal bool WritesAlike(WrittenMember other)
     {
-        if (ReferenceEquals(_property, other._property)) return true;
+        var sameMember = ReferenceEquals(Holder.Options, other.Holder.Options) && Holder.Type == other.Holder.Type
+            && Name == other.Name && Equals(_property.AttributeProvider, other._property.AttributeProvider);
+        if (sameMember) return true;
         var bothByNumberHandling = !HasItsOwnConverter && !other.HasItsOwnConverter;
         return bothByNumberHandling && (Handling & WritingBits) == (other.Handling & WritingBits);
     }
