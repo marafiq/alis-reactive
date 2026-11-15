@@ -1290,7 +1290,9 @@ Terms used throughout:
     joined from parts (N7.7), a JavaScript string; and a member as its container sends it (N13.1), read from the input
     that holds it and converted by the member's key, as an input's value is (N3.3).
   The live form is System.Text.Json's writing of the type with the app's naming policies and its contract (its
-  resolver, a source-generated context's included) and nothing else the options set: every number a JSON number,
+  resolver, a source-generated context's included, and its `RespectRequiredConstructorParameters`, so a constructor
+  parameter the data lacks stops a read through its holder, D4.2, the owner, 2026-11-15) and nothing else the
+  options set: every number a JSON number,
   every null member written, and no converter but the plan's own `DateTime` converter (D3.9)
   (`probe:core-stj-live-writer`, `probe:core-stj-live-keeps-naming`, `probe:core-stj-live-source-generated`). The
   names stay the app's, by the owner's line on JSON naming (`spec/CLAUDE.md`, 2026-11-06), so an app's own rows set into

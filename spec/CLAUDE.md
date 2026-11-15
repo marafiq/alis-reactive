@@ -135,7 +135,8 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   it (a condition's literal, `IfNull`'s fallback, `Choose`'s literal arm) is written in that form (D7.7, D8.10, POC
   13f-iii). Chosen within the owner's yes, 2026-11-09, gate 1's P8: who wrote a value decides its base form, the
   app's for what the server's JSON wrote and the live form for what a live object holds or hands, a payload declared
-  as data included; the live form keeps the app's naming and nothing else its options set (every number a JSON
+  as data included; the live form keeps the app's naming and its `RespectRequiredConstructorParameters` (the owner,
+  2026-11-15) and nothing else its options set (every number a JSON
   number, every null written, no converter of the app's), so a live object takes a source in the app's form as held
   where the forms agree, a number held as text converted, an enum mapped by D9.13's rows, whose reads gate 1 granted
   (C37), and refuses anything else (X7.10); a literal JavaScript would read as another value is refused (X7.13); and
@@ -1729,6 +1730,11 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   states no meaning. A literal is judged at every depth against the contract it was written by, a member a derived
   type adds by the discriminator it is written under; an `object` member's number is written unjudged, since its
   JSON names no .NET type to judge it by. The owner can overrule it.
+- The owner, 2026-11-15, on P8's live form, given the lead's two options and its recommendation: "I'll go with your
+  recommendation, though I don't fully understand the context yet. But let's go with your recommendation." The live
+  form keeps the app's `RespectRequiredConstructorParameters` (`Alis.Reactive/PathsAndWire/AppJson.cs`), since the
+  setting says what the data must hold, not how a value is written: a constructor parameter live data lacks stops a
+  read through its holder, as the server's binding refuses it (D4.2, X4.10).
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

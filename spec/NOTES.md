@@ -1561,3 +1561,5 @@
   C# writes whether a converted value is a DateTime or a DateTimeOffset, and the plan carries the view's time zone; the browser chooses nothing, and no date question goes to the owner again (spec/CLAUDE.md).
 - 2026-11-15 owner, asking when the framework is done: "Spin more agents ver clear scope and outcome of opus xhigh as well", "Let's get framework done - same quality".
   Six builders at a time, three of Codex and three Opus agents at xhigh from `.claude/agents/builder.md`, each in its own worktree (root CLAUDE.md); progress is units closed.
+- 2026-11-15 the owner's yes to the lead's recommendation on P8: the live form keeps the app's RespectRequiredConstructorParameters, as D4.2 and schema.md's `requires` already state; P8's line in spec/CLAUDE.md and D7.7 now say so.
+  Evidence: X4.10's browser test passes with the setting carried, its opposite with the option off writing the count; the owner's words, verbatim, in spec/CLAUDE.md's line of 2026-11-15.
