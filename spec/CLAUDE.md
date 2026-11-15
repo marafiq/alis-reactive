@@ -1665,6 +1665,14 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   while it still holds the object where its vendor's `locate` finds it (D12.5, D12.8), so its vendor needs no element
   path and the runtime infers nothing from the step's object. D19.2 closes the set at 52, and `spec/Schema/Schema.tla`
   holds `located` among its release kinds, one handler each.
+- The lead, 2026-11-15, landing U13's page plugin scripts, a fork's work read at the source. Each folder under
+  `tests/Alis.Reactive.Conformance.App/Bench/` and `tests/Alis.Reactive.Conformance.App/Care/` is a slice of its own,
+  which ALIS010 holds, so a scripted page takes the scripted layout of its own folder and the 2026-11-12 line's one
+  bench layout, Bench/Plugins', serves that folder's pages alone. A page's script is a TypeScript file beside the page,
+  at the address its folder's constants give it, bundled by `build.mjs` into the app's wwwroot, which git ignores; it
+  imports nothing and provides its plugins on the page's queue (D17.14). Two declarations follow their promises: the
+  page plugin of source.PluginArgument is named pageLog, as its cell's promise names it, and the night clock's event
+  is its onStruck property (M13.X2, X17.24). The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

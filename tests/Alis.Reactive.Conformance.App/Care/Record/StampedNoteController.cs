@@ -7,7 +7,7 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class StampedNoteController : Controller
 {
     [HttpGet(CarePages.StampedNote)]
-    public IActionResult OfTheHall() => View("/Care/Record/StampedNote.cshtml", new StampedNote("Main hall"));
+    public IActionResult OfTheHall() => View("/Care/Record/StampedNote.cshtml", new StampedNote("Main hall", [RecordScripts.CardTally]));
 
     [HttpGet(StampedNoteEndpoints.Board)]
     public IActionResult Board() => PartialView("/Care/Record/StampedNoteBoard.cshtml", new StampedNoteBoard("Noticeboard"));
@@ -16,7 +16,7 @@ public sealed class StampedNoteController : Controller
     public IActionResult Note() => PartialView("/Care/Record/StampedNoteCard.cshtml", new StampedNoteCard("The hall closes at nine."));
 }
 
-public sealed record StampedNote(string Hall);
+public sealed record StampedNote(string Hall, IReadOnlyList<string> Scripts) : IScriptedRecordPage;
 
 public sealed record StampedNoteBoard(string Title);
 

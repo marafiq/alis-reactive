@@ -13,7 +13,7 @@ public sealed class VendorKindsController : Controller
     public IActionResult RegisteredGauges() => View("/Bench/Vendors/RegisteredGauges.cshtml", new GaugesBoard(97, 88));
 
     [HttpGet(BenchPages.VendorsStoreUpdates)]
-    public IActionResult StoreUpdates() => View("/Bench/Vendors/StoreUpdates.cshtml", new StoreUpdatesBoard("Ward updates"));
+    public IActionResult StoreUpdates() => View("/Bench/Vendors/StoreUpdates.cshtml", new StoreUpdatesBoard("Ward updates", [VendorsScripts.PageTally]));
 
     [HttpGet(VendorCards.StoreCard)]
     public IActionResult StoreCard() => PartialView("/Bench/Vendors/StoreCard.cshtml", new StoreListeningCard("The card listens to the store."));
@@ -28,10 +28,10 @@ public sealed class VendorKindsController : Controller
     public IActionResult CallbackAndStore() => View("/Bench/Vendors/CallbackAndStore.cshtml", new CallbackAndStoreBoard("Room calls and ward updates"));
 
     [HttpGet(BenchPages.VendorsPeerChanges)]
-    public IActionResult PeerChanges() => View("/Bench/Vendors/PeerChanges.cshtml", new PeerChangesBoard("Peer changes heard"));
+    public IActionResult PeerChanges() => View("/Bench/Vendors/PeerChanges.cshtml", new PeerChangesBoard("Peer changes heard", [VendorsScripts.PageTally]));
 
     [HttpGet(BenchPages.VendorsClockTicks)]
-    public IActionResult ClockTicks() => View("/Bench/Vendors/ClockTicks.cshtml", new ClockTicksBoard("Ticks heard"));
+    public IActionResult ClockTicks() => View("/Bench/Vendors/ClockTicks.cshtml", new ClockTicksBoard("Ticks heard", [VendorsScripts.BenchClock, VendorsScripts.PageTally]));
 
     [HttpGet(VendorCards.ClockCard)]
     public IActionResult ClockCard() => PartialView("/Bench/Vendors/ClockCard.cshtml", new ClockListeningCard("The card listens to the clock."));
@@ -50,7 +50,7 @@ public sealed record ElementSignalsBoard(string Room);
 
 public sealed record GaugesBoard(int FirstReading, int SecondReading);
 
-public sealed record StoreUpdatesBoard(string Caption);
+public sealed record StoreUpdatesBoard(string Caption, IReadOnlyList<string> Scripts) : IScriptedVendorsPage;
 
 public sealed record StoreListeningCard(string Note);
 
@@ -60,9 +60,9 @@ public sealed record EmptyPayloadsBoard(int Reading);
 
 public sealed record CallbackAndStoreBoard(string Caption);
 
-public sealed record PeerChangesBoard(string Caption);
+public sealed record PeerChangesBoard(string Caption, IReadOnlyList<string> Scripts) : IScriptedVendorsPage;
 
-public sealed record ClockTicksBoard(string Caption);
+public sealed record ClockTicksBoard(string Caption, IReadOnlyList<string> Scripts) : IScriptedVendorsPage;
 
 public sealed record ClockListeningCard(string Note);
 

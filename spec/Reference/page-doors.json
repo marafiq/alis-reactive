@@ -286,7 +286,7 @@
     ],
     "views": [
       "/Bench/Declarations/RecordFields.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Bench/Declarations/_ScriptedLayout.cshtml"
     ]
   },
   "M11.F1 X7.9 0": {
@@ -362,7 +362,7 @@
     "views": [
       "/Care/Record/PanelHandover.cshtml",
       "/Care/Record/PanelHandoverCard.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Care/Record/_ScriptedLayout.cshtml"
     ]
   },
   "M12.F1 X12.16 0": {
@@ -374,7 +374,7 @@
     "views": [
       "/Bench/Vendors/ClockCard.cshtml",
       "/Bench/Vendors/ClockTicks.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Bench/Vendors/_ScriptedLayout.cshtml"
     ]
   },
   "M12.F1 X12.9 0": {
@@ -385,7 +385,7 @@
     ],
     "views": [
       "/Bench/Vendors/PeerChanges.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Bench/Vendors/_ScriptedLayout.cshtml"
     ]
   },
   "M12.F1 X17.10 0": {
@@ -408,7 +408,7 @@
     "views": [
       "/Bench/Vendors/StoreCard.cshtml",
       "/Bench/Vendors/StoreUpdates.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Bench/Vendors/_ScriptedLayout.cshtml"
     ]
   },
   "M12.F1 X17.12 0": {
@@ -3970,7 +3970,7 @@
       "/Care/Record/StampedNote.cshtml",
       "/Care/Record/StampedNoteBoard.cshtml",
       "/Care/Record/StampedNoteCard.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Care/Record/_ScriptedLayout.cshtml"
     ]
   },
   "M9.F2 M9.X3 0": {
@@ -3985,7 +3985,7 @@
       "/Care/Record/StandingNote.cshtml",
       "/Care/Record/StandingNoteBoard.cshtml",
       "/Care/Record/StandingNoteCard.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Care/Record/_ScriptedLayout.cshtml"
     ]
   },
   "M9.F2 M9.X4 0": {
@@ -4011,7 +4011,7 @@
       "/Care/Record/PinBoard.cshtml",
       "/Care/Record/PinBoardBoard.cshtml",
       "/Care/Record/PinBoardNote.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Care/Record/_ScriptedLayout.cshtml"
     ]
   },
   "M9.F2 X12.1 0": {
@@ -4026,7 +4026,7 @@
       "/Care/Record/HallNotices.cshtml",
       "/Care/Record/HallNoticesBoard.cshtml",
       "/Care/Record/HallNoticesNote.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Care/Record/_ScriptedLayout.cshtml"
     ]
   },
   "M9.F2 X12.11 0": {
@@ -4106,7 +4106,7 @@
       "/Care/Admission/MoveInResidentStep.cshtml",
       "/Care/Admission/MoveInRoomStep.cshtml",
       "/Care/Admission/MoveInSteps.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Care/Admission/_ScriptedLayout.cshtml"
     ]
   },
   "cell absence.member": {
@@ -5047,7 +5047,7 @@
     ],
     "views": [
       "/Bench/Sources/SourcePluginArgument.cshtml",
-      "/Shared/_Layout.cshtml"
+      "/Bench/Sources/_ScriptedLayout.cshtml"
     ]
   },
   "cell source.PropertySet": {

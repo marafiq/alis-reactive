@@ -7,7 +7,7 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class HallNoticesController : Controller
 {
     [HttpGet(CarePages.HallNotices)]
-    public IActionResult OfTheHall() => View("/Care/Record/HallNotices.cshtml", new HallNotices("Main hall"));
+    public IActionResult OfTheHall() => View("/Care/Record/HallNotices.cshtml", new HallNotices("Main hall", [RecordScripts.HallBell]));
 
     [HttpGet(HallNoticesEndpoints.Board)]
     public IActionResult Board() => PartialView("/Care/Record/HallNoticesBoard.cshtml", new HallNoticesBoard("Noticeboard"));
@@ -16,7 +16,7 @@ public sealed class HallNoticesController : Controller
     public IActionResult Note() => PartialView("/Care/Record/HallNoticesNote.cshtml", new HallNoticesNote("The hall closes at nine."));
 }
 
-public sealed record HallNotices(string Hall);
+public sealed record HallNotices(string Hall, IReadOnlyList<string> Scripts) : IScriptedRecordPage;
 
 public sealed record HallNoticesBoard(string Title);
 

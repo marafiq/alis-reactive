@@ -2,14 +2,14 @@
 @using Alis.Reactive.Conformance.App.Components
 @using Alis.Reactive.RenderingAndDelivery
 @using Alis.Reactive.TriggersAndPipelines
-@model SourceBoard
+@model ScriptedBoard
 @{
-    Layout = "/Shared/_Layout.cshtml";
+    Layout = "/Bench/Sources/_ScriptedLayout.cshtml";
     ViewData["Title"] = "The bench";
-    var plan = Html.ReactivePlan<SourceBoard>();
+    var plan = Html.ReactivePlan<ScriptedBoard>();
 }
 <h1>The bench</h1>
-@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Text, Value = Model.Value, Options = Model.Codes }))
+@(plan.ConformanceComponent("conformance", new ConformanceStart { Text = Model.Board.Text, Value = Model.Board.Value, Options = Model.Board.Codes }))
 <p id="shown"></p>
 <section role="log" aria-label="Page log">
     <ol id="page-log"></ol>

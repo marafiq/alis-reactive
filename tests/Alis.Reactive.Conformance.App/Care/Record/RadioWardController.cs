@@ -7,10 +7,10 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class RadioWardController : Controller
 {
     [HttpGet(CarePages.RadioWard)]
-    public IActionResult WithItsRadio() => View("/Care/Record/RadioWard.cshtml", new RadioWard("East ward", [RecordScripts.CardRadio]));
+    public IActionResult WithItsRadio() => View("/Care/Record/RadioWard.cshtml", new RadioWard("East ward", [RecordScripts.CardRadio, RecordScripts.CardTally]));
 
     [HttpGet(CarePages.RadioWardWithAStuckRadio)]
-    public IActionResult WithAStuckRadio() => View("/Care/Record/RadioWard.cshtml", new RadioWard("East ward", [RecordScripts.CardRadioWithAStuckUnsubscribe]));
+    public IActionResult WithAStuckRadio() => View("/Care/Record/RadioWard.cshtml", new RadioWard("East ward", [RecordScripts.CardRadioWithAStuckUnsubscribe, RecordScripts.CardTally]));
 
     [HttpGet(RadioWardEndpoints.AdasCard)]
     public IActionResult AdasCard() => PartialView("/Care/Record/RadioWardAdaCard.cshtml", new RadioWardAdaCard("Ada Byron", new RadioWardAdaNotes("Turn Ada every two hours.")));

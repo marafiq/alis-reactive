@@ -22,7 +22,7 @@ public sealed class SourceCellsController : Controller
     public IActionResult SourceMethodArgument() => View("/Bench/Sources/SourceMethodArgument.cshtml", TheWorldsBoard());
 
     [HttpGet(BenchPages.SourcePluginArgument)]
-    public IActionResult SourcePluginArgument() => View("/Bench/Sources/SourcePluginArgument.cshtml", TheWorldsBoard());
+    public IActionResult SourcePluginArgument() => View("/Bench/Sources/SourcePluginArgument.cshtml", new ScriptedBoard(TheWorldsBoard(), [SourcesScripts.PageLog]));
 
     [HttpGet(BenchPages.SourceElementText)]
     public IActionResult SourceElementText() => View("/Bench/Sources/SourceElementText.cshtml", TheWorldsBoard());
@@ -62,6 +62,8 @@ public sealed record SourceBoard(string Text, string Value, IReadOnlyList<string
 public sealed record TypedBoard(SourceBoard Board, string Typed);
 
 public sealed record NotedBoard(SourceBoard Board, string Note);
+
+public sealed record ScriptedBoard(SourceBoard Board, IReadOnlyList<string> Scripts) : IScriptedSourcesPage;
 
 public sealed class EchoRequest
 {

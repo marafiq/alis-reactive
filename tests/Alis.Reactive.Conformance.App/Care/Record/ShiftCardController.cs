@@ -7,10 +7,10 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class ShiftCardController : Controller
 {
     [HttpGet(CarePages.ShiftCard)]
-    public IActionResult WithItsRadio() => View("/Care/Record/ShiftCard.cshtml", new ShiftCard("Night shift", [RecordScripts.CardRadio]));
+    public IActionResult WithItsRadio() => View("/Care/Record/ShiftCard.cshtml", new ShiftCard("Night shift", [RecordScripts.CardRadio, RecordScripts.CardTally]));
 
     [HttpGet(CarePages.ShiftCardWithAStuckRadio)]
-    public IActionResult WithAStuckRadio() => View("/Care/Record/ShiftCard.cshtml", new ShiftCard("Night shift", [RecordScripts.CardRadioWithAStuckUnsubscribe]));
+    public IActionResult WithAStuckRadio() => View("/Care/Record/ShiftCard.cshtml", new ShiftCard("Night shift", [RecordScripts.CardRadioWithAStuckUnsubscribe, RecordScripts.CardTally]));
 
     [HttpGet(ShiftCardEndpoints.Card)]
     public IActionResult Card() => PartialView("/Care/Record/ShiftCardSheet.cshtml", new ShiftCardSheet("Handover card"));

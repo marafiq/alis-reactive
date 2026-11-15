@@ -21,7 +21,7 @@ public sealed class DeclarationMembersController : Controller
     public IActionResult ItemWithoutAct() => View("/Bench/Declarations/ItemWithoutAct.cshtml", new ItemActsBoard("Alpha", "One"));
 
     [HttpGet(BenchPages.DeclarationsRecordFields)]
-    public IActionResult RecordFields() => View("/Bench/Declarations/RecordFields.cshtml", new RecordFieldsBoard("Morning"));
+    public IActionResult RecordFields() => View("/Bench/Declarations/RecordFields.cshtml", new RecordFieldsBoard("Morning", [DeclarationsScripts.PageTally]));
 
     [HttpGet(BenchPages.DeclarationsBoundTotals)]
     public IActionResult BoundTotals() => View(
@@ -52,7 +52,7 @@ public sealed record PromisedPingBoard(string Text, bool PromisedIsEnabled);
 
 public sealed record ItemActsBoard(string Text, string CurrentItem);
 
-public sealed record RecordFieldsBoard(string RecordName);
+public sealed record RecordFieldsBoard(string RecordName, IReadOnlyList<string> Scripts) : IScriptedDeclarationsPage;
 
 public sealed record BoundTotalsBoard(int Count, IReadOnlyList<ItemStart> Items);
 

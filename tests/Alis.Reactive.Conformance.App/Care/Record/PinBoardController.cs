@@ -7,7 +7,7 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class PinBoardController : Controller
 {
     [HttpGet(CarePages.PinBoard)]
-    public IActionResult OfTheHall() => View("/Care/Record/PinBoard.cshtml", new PinBoard("Main hall"));
+    public IActionResult OfTheHall() => View("/Care/Record/PinBoard.cshtml", new PinBoard("Main hall", [RecordScripts.HallBell, RecordScripts.CardTally]));
 
     [HttpGet(PinBoardEndpoints.Board)]
     public IActionResult Board() => PartialView("/Care/Record/PinBoardBoard.cshtml", new PinBoardBoard("Noticeboard"));
@@ -16,7 +16,7 @@ public sealed class PinBoardController : Controller
     public IActionResult Note() => PartialView("/Care/Record/PinBoardNote.cshtml", new PinBoardNote("Choir practice moves to Friday."));
 }
 
-public sealed record PinBoard(string Hall);
+public sealed record PinBoard(string Hall, IReadOnlyList<string> Scripts) : IScriptedRecordPage;
 
 public sealed record PinBoardBoard(string Title);
 

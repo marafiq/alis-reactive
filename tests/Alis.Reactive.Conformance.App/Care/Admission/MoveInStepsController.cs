@@ -9,13 +9,13 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class MoveInStepsController : Controller
 {
     [HttpGet(CarePages.MoveInSteps)]
-    public IActionResult OfTheHome() => View("/Care/Admission/MoveInSteps.cshtml", new MoveInSteps("Rose House", new MoveInResidentStep()));
+    public IActionResult OfTheHome() => View("/Care/Admission/MoveInSteps.cshtml", new MoveInSteps("Rose House", new MoveInResidentStep(), [AdmissionScripts.MoveInBell]));
 
     [HttpGet(MoveInStepsEndpoints.RoomStep)]
     public IActionResult RoomStep() => PartialView("/Care/Admission/MoveInRoomStep.cshtml", new MoveInRoomStep("Room 12 is ready."));
 }
 
-public sealed record MoveInSteps(string Home, MoveInResidentStep ResidentStep);
+public sealed record MoveInSteps(string Home, MoveInResidentStep ResidentStep, IReadOnlyList<string> Scripts) : IScriptedAdmissionPage;
 
 public sealed class MoveInResidentStep
 {

@@ -7,13 +7,13 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class StandingNoteController : Controller
 {
     [HttpGet(CarePages.StandingNote)]
-    public IActionResult OfTheHall() => View("/Care/Record/StandingNote.cshtml", new StandingNote("Main hall"));
+    public IActionResult OfTheHall() => View("/Care/Record/StandingNote.cshtml", new StandingNote("Main hall", [RecordScripts.HallBell]));
 
     [HttpGet(StandingNoteEndpoints.Board)]
     public IActionResult Board() => PartialView("/Care/Record/StandingNoteBoard.cshtml", new StandingNoteBoard("Noticeboard", new StandingNoteCard("Lunch is served at noon.")));
 }
 
-public sealed record StandingNote(string Hall);
+public sealed record StandingNote(string Hall, IReadOnlyList<string> Scripts) : IScriptedRecordPage;
 
 public sealed record StandingNoteBoard(string Title, StandingNoteCard Note);
 

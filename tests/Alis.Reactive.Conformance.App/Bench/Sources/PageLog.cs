@@ -6,7 +6,7 @@ namespace Alis.Reactive.Conformance.App.Bench;
 public sealed class PageLog : Plugin
 {
     public PageLog()
-        : base("page-log")
+        : base("pageLog")
     {
     }
 

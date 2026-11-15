@@ -7,13 +7,13 @@ namespace Alis.Reactive.Conformance.App.Care;
 public sealed class PanelHandoverController : Controller
 {
     [HttpGet(CarePages.PanelHandover)]
-    public IActionResult OfAResident() => View("/Care/Record/PanelHandover.cshtml", new PanelHandover("Ada Hart"));
+    public IActionResult OfAResident() => View("/Care/Record/PanelHandover.cshtml", new PanelHandover("Ada Hart", [RecordScripts.PageTally]));
 
     [HttpGet(PanelHandoverEndpoints.Card)]
     public IActionResult Card() => PartialView("/Care/Record/PanelHandoverCard.cshtml", new PanelHandoverCard("The card counts the changes of the peer the panel hands."));
 }
 
-public sealed record PanelHandover(string Resident);
+public sealed record PanelHandover(string Resident, IReadOnlyList<string> Scripts) : IScriptedRecordPage;
 
 public sealed record PanelHandoverCard(string Note);
 

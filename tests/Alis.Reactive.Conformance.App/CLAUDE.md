@@ -61,9 +61,13 @@ its views.
   holds the pages of module 12's feature tests, each on the conformance declaration that holds its vendor kind;
   each of those declarations has its render helper beside it (`Components/ConformanceStore/ConformanceStoreHtml.cs`).
   `Bench/Declarations/`, `Bench/Plugins/` and `Bench/Execution/` hold the pages of the bench's other feature
-  tests, a folder a module; a page whose plugins are scripts takes `Bench/Plugins/_ScriptedLayout.cshtml`, which
-  links the scripts the page names before the framework's. `Bench/Schema/` holds the bench's page of module 14,
-  two plans that handle one element's events. `Care/Shell/` holds the shell screen's pages, which take
+  tests, a folder a module; a page whose plugins are scripts takes its own folder's scripted layout,
+  `Bench/Plugins/_ScriptedLayout.cshtml` the first, since each folder under `Bench/` and `Care/` is a slice of its own
+  (ALIS010), and the layout links the conformance script, then the scripts the page names, then the framework's. A
+  page's plugin script sits beside the page, a TypeScript file named as its address names it
+  (`Bench/Plugins/visitor-desk.ts`, at the address `DeskScripts` gives it), imports nothing, and provides its plugins
+  on `window.__alisPlugins`; `build.mjs` bundles each into the app's wwwroot, at its path in lower case, where git
+  ignores it. `Bench/Schema/` holds the bench's page of module 14, two plans that handle one element's events. `Care/Shell/` holds the shell screen's pages, which take
   `Care/Shell/_ShellLayout.cshtml`: it renders the drawer and the confirm beside the body, as an app's layout
   renders its app-level objects. A page whose request sends no container renders the notice region,
   `Html.NativeToast`, itself, since the core shows that request's failed check there (D16.13), and it needs no

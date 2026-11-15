@@ -104,7 +104,8 @@ nuget.config                          nuget.org alone, every other source cleare
 package.json  package-lock.json  eslint.config.js   npm workspaces, locked; the lint, its import order generated from
                                       each SliceTree.txt
 vitest.config.js                      the runtime's pure tests: node, the files that end in .test.ts under the runtime
-build.mjs                             esbuild: one bundle a package, written into its project's static web assets
+build.mjs                             esbuild: one bundle a package, written into its project's static web assets, and the
+                                      conformance app's library and page scripts, written into the app's wwwroot
 tools/PlanContractGenerator/          writes Alis.Reactive.Assets/runtime/Schema/plan.ts and plan.schema.json
 .editorconfig .gitignore AGENTS.md CLAUDE.md
 README.md                             every package's readme (Directory.Build.props packs it): the docs, beside the XML docs
@@ -434,7 +435,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | MSBuild SDK | Microsoft.Build.NoTargets 3.7.134 | the Assets project |
 | Node | 26.13.0 (`.node-version`) | esbuild, tsc, eslint, node probes |
 | TypeScript | 6.0.3 | `tsc -b`, no emit, every strictness option on: strict, exactOptionalPropertyTypes, noUncheckedIndexedAccess, noImplicitOverride, noPropertyAccessFromIndexSignature, noImplicitReturns, noFallthroughCasesInSwitch, noUnusedLocals, noUnusedParameters, noUncheckedSideEffectImports, verbatimModuleSyntax, isolatedModules and erasableSyntaxOnly, which refuses an enum (S8), with allowUnreachableCode and allowUnusedLabels off; held by typescript-eslint 8.72.2, whose peer range ends below 6.1.0 (the latest is 7.0.2) |
-| esbuild | 0.28.2 | one root `build.mjs`, one bundle per package; `package.json` denies its install script, since its platform package holds the binary |
+| esbuild | 0.28.2 | one root `build.mjs`, one bundle per package and the conformance app's, its library and each page's plugin script; `package.json` denies its install script, since its platform package holds the binary |
 | ESLint | eslint 10.14.0, @eslint/js 10.0.1, typescript-eslint 8.72.2, with minimatch 11.0.7 by an override of the 10.2.6 they bring, which npm's audit reports (GHSA-g3hv-75wg-m249) | `strictTypeChecked` and `stylisticTypeChecked` on the runtime and every package's TypeScript, each of their rules an error, `--max-warnings 0`, no rule turned off or down and no inline configuration (`noInlineConfig`); the rules beyond the presets are listed below the table |
 | Vitest | vitest 5.1.0, with vite 8.3.8, the peer it requires; node environment, no jsdom | a runtime module's pure tests of what its index exports (1.2): the files that end in .test.ts under the runtime, which the root's `vitest.config.js` names |
 | @microsoft/signalr | 10.0.11 | the hub's own asset; held on the 10.0 line, the line of the hub it talks to (the latest is 11.0.0) |

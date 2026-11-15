@@ -10,5 +10,5 @@ public sealed class NightClock : Plugin
     {
     }
 
-    public Event Struck => Event();
+    public Event Struck => Event("onStruck");
 }
