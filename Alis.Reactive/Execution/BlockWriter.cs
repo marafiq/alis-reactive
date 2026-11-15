@@ -11,6 +11,7 @@ internal sealed class BlockWriter
     private readonly Stack<List<Statement>> _open = new();
     private readonly Stack<HandlerResults> _handlers = new();
     private readonly Stack<LambdaResults> _lambdas = new();
+    private readonly Dictionary<string, int> _bindings = new(StringComparer.Ordinal);
     private int _results;
     private int _liveItems;
     private int _answers;
@@ -37,6 +38,13 @@ internal sealed class BlockWriter
     }
 
     internal string NextLiveItem() => "liveItem" + (++_liveItems).ToString(CultureInfo.InvariantCulture);
+
+    internal RefExpression NextBinding(string stem)
+    {
+        var number = _bindings.TryGetValue(stem, out var last) ? last + 1 : 1;
+        _bindings[stem] = number;
+        return new RefExpression(stem + number.ToString(CultureInfo.InvariantCulture));
+    }
 
     internal (string Payload, string Arguments) NextListen()
     {

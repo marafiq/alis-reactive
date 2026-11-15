@@ -194,7 +194,7 @@ public abstract class JsObject
     /// <returns>The items the iterator yields.</returns>
     protected LiveObjects<TItem> LiveIterator<TItem>()
         where TItem : JsObject, new()
-        => throw new NotImplementedException();
+        => new(new Reached(IteratedItems, Bound.Writer, false));
 
     /// <summary>Declares the object's iterator, which yields data: texts, numbers or records.</summary>
     /// <remarks>
@@ -203,7 +203,8 @@ public abstract class JsObject
     /// </remarks>
     /// <typeparam name="TItem">The type of each item the iterator yields.</typeparam>
     /// <returns>A source of the items the iterator yields.</returns>
-    protected TypedSource<IReadOnlyList<TItem>> DataIterator<TItem>() => throw new NotImplementedException();
+    protected TypedSource<IReadOnlyList<TItem>> DataIterator<TItem>()
+        => new Computed<IReadOnlyList<TItem>>(IteratedItems(), HeldForm.Live(Bound.Writer.Content.Json, Bound.Writer.Content.RendersUnder));
 
     /// <summary>Calls the object itself, a function, with no argument, where the pipeline reaches the line.</summary>
     /// <remarks>An object that is no function stops the pipeline.</remarks>
@@ -343,6 +344,8 @@ public abstract class JsObject
             throw new InvalidOperationException("An argument's position must be a non-negative integer; the first argument is at position 0.");
         return new IndexStep(position);
     }
+
+    private OpExpression IteratedItems() => new(Operator.ToArray, [Bound.Target]);
 
     private Binding Member(string? name, bool optional, bool nullable, string declaredBy)
     {

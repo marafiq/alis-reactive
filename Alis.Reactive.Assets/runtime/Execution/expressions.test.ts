@@ -203,3 +203,40 @@ describe("when a list's operation reads an operator over its items, the plan's o
     expect(charted({ doses: [...doses, { medicine: "warfarin" }] }, units)).toStrictEqual([]);
   });
 });
+
+const textPart = (read: Source): Source => ({ kind: "op", op: "coalesce", args: [{ kind: "as", expr: read, shape: { kind: "string" } }, lit("")] });
+const joined = (...parts: Source[]): Source => ({ kind: "call", path: ["join"], members: "requiredIfHeld", target: { kind: "list", items: parts }, args: [lit("")] });
+
+describe("when a list is built from its items, each item is read when the step runs", () => {
+  test("a list holds each item's value in order, and null for an item that reads nothing", () => {
+    expect(charted({ round: rounds[0] }, { kind: "list", items: [lit("Ada Hart"), member(ref("round"), "bed", "optional"), member(ref("round"), "ward")] })).toStrictEqual([
+      ["Ada Hart", null, "North"],
+    ]);
+  });
+
+  test("a joined text is the join of its parts, a source part shown as text and one that reads nothing adding nothing", () => {
+    expect(charted({ round: rounds[2] }, joined(lit("Bed "), textPart(member(ref("round"), "bed", "optional"))))).toStrictEqual(["Bed 3"]);
+    expect(charted({ round: rounds[0] }, joined(lit("Bed "), textPart(member(ref("round"), "bed", "optional"))))).toStrictEqual(["Bed "]);
+  });
+
+  test("an append calls its element's method with the joined text at the end only where that text is not empty", () => {
+    const appended = (part: Source): unknown[] => {
+      const chart = new Chart();
+      const block: Block = [
+        { kind: "let", name: "element1", await: false, binds: "line", expr: ref("chart") },
+        { kind: "let", name: "text1", await: false, binds: "line", expr: joined(part) },
+        {
+          kind: "if",
+          when: { kind: "op", op: "neq", args: [ref("text1"), lit("")] },
+          then: [{ kind: "do", await: false, expr: { kind: "call", path: ["note"], members: "required", target: ref("element1"), args: [lit("beforeend"), ref("text1")] } }],
+          else: [],
+        },
+      ];
+      new Lane("overlap", block, aRoundsOwner).raise(raisedWith({ chart, round: rounds[0] }));
+      return chart.lines;
+    };
+
+    expect(appended(lit("Noted at 02:00"))).toStrictEqual([["beforeend", "Noted at 02:00"]]);
+    expect(appended(textPart(member(ref("round"), "bed", "optional")))).toStrictEqual([]);
+  });
+});

@@ -35,8 +35,9 @@ export function evaluate(expression: Expression, context: Context): Read {
         return heldOrNull(evaluate(expression.body, { ...context, scope }));
       });
     case "record":
-    case "list":
       throw notBuilt("the expression '" + expression.kind + "'");
+    case "list":
+      return value(expression.items.map((item) => heldOrNull(evaluate(item, context))));
     default:
       return assertNever(expression);
   }

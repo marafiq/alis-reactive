@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Schema;
@@ -25,7 +24,7 @@ public sealed class Element : Component
     /// plan still holds is refused where the view renders when the same plan loads that slot, and stops its
     /// pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
     /// </remarks>
-    public ElementContent Text => new(this, "textContent");
+    public ElementContent Text => new(this, "textContent", "insertAdjacentText");
 
     /// <summary>Gets the element's HTML, <c>innerHTML</c>: a source of it that a step also sets.</summary>
     /// <remarks>
@@ -33,24 +32,24 @@ public sealed class Element : Component
     /// plan still holds is refused where the view renders when the same plan loads that slot, and stops its
     /// pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
     /// </remarks>
-    public ElementContent Html => throw new NotImplementedException();
+    public ElementContent Html => new(this, "innerHTML", "insertAdjacentHTML");
 
     /// <summary>Gets the element's classes, <c>classList</c>.</summary>
-    public ClassList Classes => throw new NotImplementedException();
+    public ClassList Classes => LiveObject<ClassList>(name: "classList");
 
     /// <summary>Gets the element's child elements, <c>children</c>, which the list operations take as a list.</summary>
-    public ElementChildren Children => throw new NotImplementedException();
+    public ElementChildren Children => LiveObject<ElementChildren>();
 
     /// <summary>Gets whether the element is hidden, <c>hidden</c>: a source of it that a step also sets.</summary>
-    public Property<bool> Hidden => throw new NotImplementedException();
+    public Property<bool> Hidden => Property<bool>();
 
     /// <summary>Shows the element when the step runs, as setting <see cref="Hidden"/> to false does.</summary>
     /// <remarks>An element that already shows keeps showing.</remarks>
-    public void Show() => throw new NotImplementedException();
+    public void Show() => Hidden.Set(false);
 
     /// <summary>Hides the element when the step runs, as setting <see cref="Hidden"/> to true does.</summary>
     /// <remarks>An element that is already hidden stays hidden.</remarks>
-    public void Hide() => throw new NotImplementedException();
+    public void Hide() => Hidden.Set(true);
 }
 
 /// <summary>
@@ -59,15 +58,19 @@ public sealed class Element : Component
 /// </summary>
 public sealed class ElementContent : ReadOnly<string?>
 {
-    internal ElementContent(Element element, string member)
+    private const string AtTheEnd = "beforeend";
+
+    private readonly string _addsBy;
+
+    internal ElementContent(Element element, string member, string addsBy)
         : base(element, member, optional: false)
     {
+        _addsBy = addsBy;
     }
 
     /// <summary>Sets the content to a text when the step runs.</summary>
     /// <param name="text">The text, written into the plan where the view renders; null shows nothing.</param>
-    public void Set(string? text)
-        => Owner.Bound.Writer.Write(new SetStatement([Member], SetMembers.Required, true, Owner.Bound.Target, Literals.Text(text)));
+    public void Set(string? text) => Written(Literals.Text(text));
 
     /// <summary>Sets the content to what a source reads when the step runs, shown as text.</summary>
     /// <remarks>
@@ -76,7 +79,7 @@ public sealed class ElementContent : ReadOnly<string?>
     /// </remarks>
     /// <param name="source">The source of the value to show.</param>
     /// <typeparam name="TValue">The type of the value the source reads.</typeparam>
-    public void Set<TValue>(ITypedSource<TValue> source) => throw new NotImplementedException();
+    public void Set<TValue>(ITypedSource<TValue> source) => Written(TextForms.Shown(source));
 
     /// <summary>Adds a text after the content when the step runs.</summary>
     /// <remarks>
@@ -85,7 +88,7 @@ public sealed class ElementContent : ReadOnly<string?>
     /// it stay. A slot a plan holds takes it too, and what it adds there leaves at that slot's next load or unload.
     /// </remarks>
     /// <param name="text">The text, written into the plan where the view renders; null or an empty text adds nothing.</param>
-    public void Append(string? text) => throw new NotImplementedException();
+    public void Append(string? text) => Added(TextForms.Part(text));
 
     /// <summary>Adds what a source reads after the content when the step runs, shown as text.</summary>
     /// <remarks>
@@ -95,7 +98,22 @@ public sealed class ElementContent : ReadOnly<string?>
     /// </remarks>
     /// <param name="source">The source of the value to add.</param>
     /// <typeparam name="TValue">The type of the value the source reads.</typeparam>
-    public void Append<TValue>(ITypedSource<TValue> source) => throw new NotImplementedException();
+    public void Append<TValue>(ITypedSource<TValue> source) => Added(TextForms.Part(source));
+
+    private void Written(Expression value)
+        => Owner.Bound.Writer.Write(new SetStatement([Member], SetMembers.Required, true, Owner.Bound.Target, value));
+
+    private void Added(Expression part)
+    {
+        var writer = Owner.Bound.Writer;
+        var element = writer.NextBinding("element");
+        var text = writer.NextBinding("text");
+        writer.Write(new LetStatement(element.Name, false, LetBinds.Line, Owner.Bound.Target));
+        writer.Write(new LetStatement(text.Name, false, LetBinds.Line, TextForms.Joined([part])));
+        var adds = new DoStatement(false, new CallExpression([new MemberStep(_addsBy)], Owner.Bound.Reads(false), element, [Literals.Text(AtTheEnd), text]));
+        var textHoldsSomething = new OpExpression(Operator.Neq, [text, Literals.Text(string.Empty)]);
+        writer.Write(new IfStatement(textHoldsSomething, [adds], []));
+    }
 }
 
 /// <summary>
@@ -107,27 +125,37 @@ public sealed class ClassList : JsObject, IDataIterable<string>
 
     /// <summary>Adds a class to the element.</summary>
     /// <param name="name">The class's name; null changes no class.</param>
-    public void Add(string? name) => throw new NotImplementedException();
+    public void Add(string? name) => Changed("add", Literals.Text(name));
 
     /// <summary>Adds the class a source names when the step runs.</summary>
     /// <param name="name">The source of the class's name; one that holds null or cannot be read changes no class.</param>
-    public void Add(ITypedSource<string?> name) => throw new NotImplementedException();
+    public void Add(ITypedSource<string?> name) => Changed("add", Sources.Of(name));
 
     /// <summary>Removes a class from the element.</summary>
     /// <param name="name">The class's name; null changes no class.</param>
-    public void Remove(string? name) => throw new NotImplementedException();
+    public void Remove(string? name) => Changed("remove", Literals.Text(name));
 
     /// <summary>Removes the class a source names when the step runs.</summary>
     /// <param name="name">The source of the class's name; one that holds null or cannot be read changes no class.</param>
-    public void Remove(ITypedSource<string?> name) => throw new NotImplementedException();
+    public void Remove(ITypedSource<string?> name) => Changed("remove", Sources.Of(name));
 
     /// <summary>Adds a class the element lacks, or removes one it has.</summary>
     /// <param name="name">The class's name; null changes no class.</param>
-    public void Toggle(string? name) => throw new NotImplementedException();
+    public void Toggle(string? name) => Changed("toggle", Literals.Text(name));
 
     /// <summary>Adds or removes the class a source names when the step runs.</summary>
     /// <param name="name">The source of the class's name; one that holds null or cannot be read changes no class.</param>
-    public void Toggle(ITypedSource<string?> name) => throw new NotImplementedException();
+    public void Toggle(ITypedSource<string?> name) => Changed("toggle", Sources.Of(name));
+
+    private void Changed(string method, Expression name)
+    {
+        var writer = Bound.Writer;
+        var className = writer.NextBinding("className");
+        writer.Write(new LetStatement(className.Name, false, LetBinds.Line, name));
+        var change = new DoStatement(false, new CallExpression([new MemberStep(method)], Bound.Reads(false), Bound.Target, [className]));
+        var nameHoldsAValue = new OpExpression(Operator.Neq, [className, Literals.Text(null)]);
+        writer.Write(new IfStatement(nameHoldsAValue, [change], []));
+    }
 }
 
 /// <summary>
