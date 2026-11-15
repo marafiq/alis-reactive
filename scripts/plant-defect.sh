@@ -9,13 +9,15 @@ usage() {
   cat >&2 <<'USAGE'
 usage: scripts/plant-defect.sh --test <constant> --in <file> --replace <text> --with <text>
 
-Plants one defect in <file>, the text to replace found once, runs the one test through scripts/playwright.sh, says
-whether the test failed, and restores <file> on every exit, an interrupt included.
+Runs the one test through scripts/playwright.sh, which must pass, then plants one defect in <file>, the text to
+replace found once, runs the test again, says whether it failed, and restores <file> on every exit, an interrupt
+included.
   --test <constant>   the test's promise constant as the test writes it after Promises. (M3_F1.X8_27_2)
 
   [plant] caught: ...    the test failed with the defect in place; its failure follows
   [plant] ESCAPED: ...   the test passed with the defect in place
-Anything else is no verdict: a defect the build refuses is held by the compiler and needs no test.
+Anything else is no verdict: a test that does not pass without the defect proves nothing of it, and a defect the
+build refuses is held by the compiler and needs no test.
 USAGE
   exit 2
 }
@@ -88,6 +90,32 @@ on_signal() {
 trap restore EXIT
 trap on_signal INT TERM HUP
 
+run_the_test() {
+  scripts/playwright.sh --test "$constant" >"$log" 2>&1 &
+  child=$!
+  run_status=0
+  wait "$child" || run_status=$?
+  child=""
+}
+
+read_the_result() {
+  result="$(grep -E '^\[playwright:result\] .*: [0-9]+ selected, [0-9]+ ran, [0-9]+ passed, [0-9]+ failed, ' "$log" | tail -1 || true)"
+  [[ "$result" =~ :\ ([0-9]+)\ selected,\ ([0-9]+)\ ran,\ ([0-9]+)\ passed,\ ([0-9]+)\ failed, ]] \
+    || refuse "the run printed no result line (scripts/playwright.sh exit $run_status); its output is $log"
+  selected="${BASH_REMATCH[1]}"
+  ran="${BASH_REMATCH[2]}"
+  passed="${BASH_REMATCH[3]}"
+  failed="${BASH_REMATCH[4]}"
+  [ "$selected" -gt 0 ] && [ "$ran" -eq "$selected" ] || refuse "the run selected $selected and ran $ran; its output is $log"
+}
+
+echo "[plant] running the test $constant without the defect"
+run_the_test
+read_the_result
+[ "$failed" -eq 0 ] && [ "$passed" -eq "$ran" ] \
+  || refuse "$constant does not pass without the defect ($result), so a plant proves nothing of it; its output is $log"
+echo "[plant] $result"
+
 if ! python3 -I - "$file" "$anchor" "$replacement" <<'PY'
 import pathlib
 import sys
@@ -105,23 +133,12 @@ then
 fi
 
 echo "[plant] planted in $file; running the test $constant"
-scripts/playwright.sh --test "$constant" >"$log" 2>&1 &
-child=$!
-run_status=0
-wait "$child" || run_status=$?
-child=""
+run_the_test
 
 if [ "$run_status" -eq 4 ]; then
   refuse "the build refuses the defect, so the compiler holds it and no test is needed for it. The run's output is $log"
 fi
-result="$(grep -E '^\[playwright:result\] .*: [0-9]+ selected, [0-9]+ ran, [0-9]+ passed, [0-9]+ failed, ' "$log" | tail -1 || true)"
-[[ "$result" =~ :\ ([0-9]+)\ selected,\ ([0-9]+)\ ran,\ ([0-9]+)\ passed,\ ([0-9]+)\ failed, ]] \
-  || refuse "the run printed no result line (scripts/playwright.sh exit $run_status); its output is $log"
-selected="${BASH_REMATCH[1]}"
-ran="${BASH_REMATCH[2]}"
-passed="${BASH_REMATCH[3]}"
-failed="${BASH_REMATCH[4]}"
-[ "$selected" -gt 0 ] && [ "$ran" -eq "$selected" ] || refuse "the run selected $selected and ran $ran; its output is $log"
+read_the_result
 
 echo "[plant] $result"
 if [ "$passed" -gt 0 ]; then

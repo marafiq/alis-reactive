@@ -6,9 +6,10 @@ description: Prove that a Playwright test fails for the defect it names, by choo
 # Prove a behavior
 
 A test keeps the rules in `.claude/rules/tests.md`. This skill is how to show it keeps rule 5 (it fails for the
-defect it names) and rule 6 (both sides of the promise). `scripts/plant-defect.sh` does the mechanics: it replaces
-one text found once, runs the one test through `scripts/playwright.sh`, which builds first, says whether the test
-failed, and restores the file on every exit, an interrupt included. The test is named by its promise constant, as
+defect it names) and rule 6 (both sides of the promise). `scripts/plant-defect.sh` does the mechanics: it runs the
+one test through `scripts/playwright.sh`, which builds first, and gives no verdict unless the test passes; then it
+replaces one text found once, runs the test again, says whether it failed, and restores the file on every exit, an
+interrupt included. The test is named by its promise constant, as
 the test writes it after `Promises`.
 
 ```bash

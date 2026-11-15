@@ -342,7 +342,9 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
 - **Hosts.** A fixture takes its hosts from its placement (`TestFixtureSource`), each host an NUnit category. Each net10
   host is one server process, started on first use with `--urls http://127.0.0.1:0`, its address read from the
   "Now listening on:" line and ready once `WorldEndpoints.Ready` answers, a view MVC renders through the shared
-  layout with a plan, as a page does, so a test's first wait never meets a cold server, MVC's first request among it; its process culture is fr-FR, which no request names, so a page that reads the process's culture in place of
+  layout with a plan, as a page does, whose request counts its answer's list by a lambda, so the request writer, a
+  list's lambda, the conditions and the JSON contracts run before a test does and a test's first wait never meets a
+  cold server, MVC's first request among it; its process culture is fr-FR, which no request names, so a page that reads the process's culture in place of
   its request's shows it; it exits when its test host dies, teardown kills its process tree, and a run that leaves a
   server alive fails. A promise whose opposite case holds under another net10 host's options opens that case's
   world under it: `NewWorldUnder` takes the other host by its name of `Hosts`, starts its server on first use as a
@@ -516,7 +518,8 @@ and `scripts/playwright-result.mjs`, which list the built tests, select a run's 
 `scripts/test.sh` (both, its browser leg every test or, with `--through`, the tests landed through a unit); `scripts/build.sh`,
 `scripts/run.sh`, `scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,
 Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
-`scripts/plant-defect.sh`, which plants one defect and reads the runner's result line for its one test,
+`scripts/plant-defect.sh`, which runs its one test, refuses a verdict unless it passes, then plants one defect and
+reads the runner's result line for that test again,
 `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`.
 MSBuild never runs npm, and runs node only for the vendor contract a project opts into, whose target writes the
 table before the compiler reads it (D17.5, `Alis.Reactive.Analyzers/Vendors/VendorContract.targets`): `build.mjs` writes each bundle, the core's to
