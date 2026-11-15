@@ -104,7 +104,11 @@ outcome, on a page a developer would write. A test finds an element as a user do
 `page.evaluate()`, no read of a component's object, no DOM poking (`.claude/rules/tests.md`). A build, a typecheck and
 a module's pure tests are no proof of behavior. A non-browser project runs when it is named first
 (`dotnet test tests/Alis.Reactive.ArchitectureTests`). A unit runs the tests the spec lands in it (`--unit`) and, before
-its commit, every test landed through it (`--through`). `poc/playwright.sh` runs the POC's suites, and `poc/` leaves last.
+its commit, every test landed through it (`--through`). Since `--through` refuses while a unit before it holds an
+unwritten test, every commit waits on `--all` at its tree, every written test in about two minutes, and a test that
+passed at the run before and fails stops the commit (the owner, 2026-11-15: "Did you clearly throw the conformist
+browser testing out of the window?", after the branch's one full run found four landed tests that had never run
+against the component they read). `poc/playwright.sh` runs the POC's suites, and `poc/` leaves last.
 
 ## What is forbidden, and what refuses it
 
