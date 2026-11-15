@@ -20,6 +20,14 @@ public class WhenTheCoreIsCompiled
 
     private static readonly string[] TypeReadsTheOwnerLists =
     [
+        "ArrayLambdas/TranslatedMembers.cs System.Reflection.MemberInfo",
+        "ArrayLambdas/TranslatedMembers.cs System.Reflection.MemberInfo.MetadataToken",
+        "ArrayLambdas/TranslatedMembers.cs System.Reflection.MemberInfo.Module",
+        "ArrayLambdas/TranslatedMembers.cs System.Reflection.Module",
+        "ArrayLambdas/ViewValues.cs System.Reflection.FieldInfo",
+        "ArrayLambdas/ViewValues.cs System.Reflection.FieldInfo.GetValue",
+        "ArrayLambdas/ViewValues.cs System.Reflection.PropertyInfo",
+        "ArrayLambdas/ViewValues.cs System.Reflection.PropertyInfo.GetValue",
         "RenderingAndDelivery/ViewPlans.cs System.Type.FullName",
         "TriggersAndPipelines/Pipeline.cs System.Activator.CreateInstance",
         "TypeKnowledge/WrittenMember.cs System.Reflection.MemberInfo.DeclaringType",

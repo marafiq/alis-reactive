@@ -28,28 +28,31 @@ internal sealed partial class MemberPath
 
     internal bool EndsInItsOwnForm => _links[_links.Count - 1].Written.HoldsItsOwnForm;
 
-    internal void RefuseAReadPastItsOwnConverter(LambdaExpression path)
+    internal void RefuseAReadPastItsOwnConverter(string read)
     {
         var converted = _links.Take(_links.Count - 1).FirstOrDefault(link => link.Written.HasItsOwnConverter);
         if (converted is null) return;
         throw new InvalidOperationException(
-            $"'{path.Body}' reads past '{converted.Text}', which its own JSON converter writes, so the browser holds what the converter writes, not its members; " +
+            $"'{read}' reads past '{converted.Text}', which its own JSON converter writes, so the browser holds what the converter writes, not its members; " +
             $"read '{converted.Text}' itself, or read past it on the server.");
     }
 
     internal static bool TryOf(LambdaExpression path, JsonSerializerOptions options, [NotNullWhen(true)] out MemberPath? members)
+        => TryOf(path.Body, path.Parameters[0], path, options, out members);
+
+    internal static bool TryOf(System.Linq.Expressions.Expression read, ParameterExpression root, LambdaExpression lambda, JsonSerializerOptions options, [NotNullWhen(true)] out MemberPath? members)
     {
         var accesses = new List<MemberLink.Access>();
-        var node = path.Body;
+        var node = read;
         while (node is MemberExpression { Expression: { } holder } access)
         {
             accesses.Add(new MemberLink.Access(access, holder.ToString(), options.GetTypeInfo(holder.Type)));
             node = holder;
         }
 
-        var readsItsValue = accesses.Count > 0 && node == path.Parameters[0];
+        var readsItsValue = accesses.Count > 0 && node == root;
         accesses.Reverse();
-        members = readsItsValue ? new MemberPath([.. accesses.Select(access => MemberLink.Of(access, path))]) : null;
+        members = readsItsValue ? new MemberPath([.. accesses.Select(access => MemberLink.Of(access, lambda))]) : null;
         return members is not null;
     }
 

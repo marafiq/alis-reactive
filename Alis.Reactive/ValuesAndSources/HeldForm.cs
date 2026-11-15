@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
@@ -24,7 +25,13 @@ internal sealed class HeldForm
 
     internal LitExpression Beside<TValue>(TValue value) => _ownForm ? throw new NotImplementedException() : Literals.Of(value, _json);
 
+    internal LitExpression Beside(object? value, Type type) => _ownForm ? throw new NotImplementedException() : Literals.Of(value, type, _json);
+
+    internal JsonSerializerOptions DataOptions => _ownForm ? throw new NotImplementedException() : _json.LiveForm;
+
     internal Expression IntoLive(Expression held) => held;
 
-    internal bool WritesAsAScalar<TValue>() => _ownForm ? throw new NotImplementedException() : _json.LiveForm.GetTypeInfo(typeof(TValue)).Kind == JsonTypeInfoKind.None;
+    internal bool WritesAsAScalar<TValue>() => WritesAsAScalar(typeof(TValue));
+
+    internal bool WritesAsAScalar(Type type) => _ownForm ? throw new NotImplementedException() : _json.LiveForm.GetTypeInfo(type).Kind == JsonTypeInfoKind.None;
 }

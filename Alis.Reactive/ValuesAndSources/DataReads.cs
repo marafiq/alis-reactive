@@ -12,7 +12,7 @@ internal static class DataReads
     internal static TypedSource<TResult> Past<TResult>(Expression holder, HeldForm holdersForm, LambdaExpression path, JsonSerializerOptions options)
     {
         if (!MemberPath.TryOf(path, options, out var members)) throw NoMemberPath(path);
-        members.RefuseAReadPastItsOwnConverter(path);
+        members.RefuseAReadPastItsOwnConverter(path.Body.ToString());
         var form = members.EndsInItsOwnForm ? holdersForm.OwnForm : holdersForm;
         return new Computed<TResult>(new DataExpression(members.DataSteps(), holder), form);
     }
