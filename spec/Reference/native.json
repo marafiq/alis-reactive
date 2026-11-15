@@ -675,7 +675,7 @@
           ]
         },
         {
-          "behavior": "Its Items list reads each item's name and value separated by a space. An item's status is named Item and its name, One, not acted before Act() and One, acted after; its Checks status starts at 0 and shows each check. The Answer status holds the list its Ask button draws, and Error holds the thrown message. Its Raise status starts at Waiting and reads Acted after the payload's Act(), beside the Payload action status that reads Payload acted. Payload starts at Payload text: none and reads Payload text: and the written text after WriteOnlyText.",
+          "behavior": "Its Items list reads each item's name and value separated by a space. An item's status is named Item and its name, One, not acted before Act() and One, acted after; its Checks status starts at 0 and shows each check. The Answer status holds the list its Ask button draws, and Error holds the thrown message. Its Raise status starts at Waiting and reads Acted after the payload's Act(), beside the Payload action status that reads Payload acted. Payload starts at Payload text: none and, once a raise's listeners return, reads Payload text: and the text its payload's WriteOnlyText was written, or none where no listener wrote it.",
           "tests": [
             "X5.3",
             "X5.11",

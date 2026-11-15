@@ -58,6 +58,7 @@ export class Raised {
     private quantity: number;
     private currentItem: Item;
     private readonly matches: Item[];
+    private writtenText = "none";
     constructor(option: RaiseStart, start: ConformanceStart, peer: ConformancePeer, view: ComponentView, request: RequestValue, endpoint: string, makeItem: (start: ReturnType<typeof itemStart>) => Item) {
         this.peer = peer;
         this.view = view;
@@ -83,7 +84,7 @@ export class Raised {
         if (start.version === 2)
             Object.defineProperty(this, "count", { value: Promise.resolve(option.count) });
     }
-    set writeOnlyText(value: string) { this.view.status("Payload", "Payload text: " + value); this.view.status("Note", value); }
+    set writeOnlyText(value: string) { this.writtenText = value; this.view.status("Note", value); }
     act(): void { this.view.status("Raise", "Acted"); this.view.status("Payload action", "Payload acted"); }
     total(): number { return this.quantity; }
     settle(): Promise<string> { return textAnswer(this.request, this.endpoint); }
@@ -91,6 +92,7 @@ export class Raised {
     matching(): Item[] { return this.matches; }
     fill(names: string[]): void { this.view.list("Names", names, this.view.status("Names", "")); }
     returned(): void {
+        this.view.status("Payload", "Payload text: " + this.writtenText);
         this.view.status("Answer", this.answer === null ? this.currentItem.name + " unanswered" : this.answer(this.currentItem));
         this.quantity = 2;
         this.currentItem = this.makeItem(itemStart("Two"));
