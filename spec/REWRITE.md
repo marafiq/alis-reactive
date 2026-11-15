@@ -1140,14 +1140,20 @@ their policy, a handler started and released as its row states, a pipeline's lis
 reached its object, a callback's answer, ALIS032, ALIS034 and ALIS009's reach to a declaration and a render helper,
 the contract's table written before the compiler reads it, the conformance library's six components in TypeScript
 beside their declarations, boot's plugin queue and `alis:mount`, and the plugin script of every page that links one;
-the contract's rules, ALIS014 to ALIS022 and ALIS037, and X4.9's test, the one browser test U13 lands, are open.
+the contract's rules, ALIS014 to ALIS022 and ALIS037, are open, and of the 48 browser tests U13 lands, 47 pass, each
+run alone, and X4.9's is not written.
 U14 is landed: `Plugin` and its name's check, `pipeline.Plugin<TPlugin>()` with one locator a name,
 `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`, with their module tests. A host is ready once MVC has
 rendered a view with a plan (section 2.5).
 U15 is landed: every door of `Element`, `ClassList`, `ElementChildren` and `ChildElement`, `JsObject`'s iterators, the
 runtime's `list` node, and a world whose browser runs in the zone a promise names (`NewWorldInZone`, section 2.5);
 M5.X2's test and the zone's harness test pass, X17.3's, X17.12's and X17.17's, U13's, pass on the conformance
-library's TypeScript, and a run through U13 or later waits on X4.9's test. A date shown as an element's text waits
+library's TypeScript, and a run through U13 or later waits on X4.9's test.
+U16's first piece is landed: `IdGenerator.For`, `Html.InputField` with its options on both hosts, `ComponentInput.Of`,
+`AddReactiveClassNames` and the plan's `alis.model` inputs, with their refusals where the view renders. With the
+field's component input built, U16 holds no browser test: every test of its features lands in U23, whose Native inputs
+its pages render, and X7.13 lands in U9, where it waits on the owner's yes to its Type.Name read. `Html.PartialFor`, the
+request container's blocks, `pipeline.Input` and `container.Read` are open. A date shown as an element's text waits
 on a date kind for the `string` shape, the owner's to decide. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
 pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). The commit that lands
 a piece rewrites this paragraph.
