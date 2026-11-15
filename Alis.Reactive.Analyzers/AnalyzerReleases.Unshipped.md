@@ -11,4 +11,5 @@ ALIS023 | Alis.Reactive.Analyzers | Error | A declaration door is the body of th
 ALIS024 | Alis.Reactive.Analyzers | Error | A declaration door's arguments are constants the build reads
 ALIS025 | Alis.Reactive.Analyzers | Error | An override keeps the JSON name and the ignore of the member it overrides
 ALIS041 | Alis.Reactive.Analyzers | Error | A view renders the plan it opens once, after every door that takes it
+ALIS042 | Alis.Reactive.Analyzers | Error | A list's operation runs over a list
 ALIS043 | Alis.Reactive.Analyzers | Error | A text is joined with a source by pipeline.Concat
