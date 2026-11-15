@@ -1882,6 +1882,9 @@
         },
         {
           "$ref": "#/$defs/HeldRelease"
+        },
+        {
+          "$ref": "#/$defs/LocatedRelease"
         }
       ]
     },
@@ -1917,6 +1920,22 @@
         "kind",
         "vendor",
         "element"
+      ],
+      "additionalProperties": false
+    },
+    "LocatedRelease": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "located"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
       ],
       "additionalProperties": false
     },

@@ -6,7 +6,7 @@ The plan grammar: its closed node set, how C# writes it and the TypeScript contr
 
 ## Core questions
 
-- Q19: one C# model writes the grammar, with no lowering pass (D19.1); the set is closed at 51 kinds, `try` leaving
+- Q19: one C# model writes the grammar, with no lowering pass (D19.1); the set is closed at 52 kinds, `try` leaving
   for a `request`'s layers (D19.2); every field is required and none holds null as a state (D19.3); a closed choice
   with no data is a sealed class, never an enum, so `Operator` and `PathMembers` become such classes (D19.4, N19.1);
   each kind has one handler (D19.5); a handler carries its payload's place, so the vendors map is shared by name

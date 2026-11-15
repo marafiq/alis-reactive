@@ -103,11 +103,11 @@
   "edits": [
    {
     "file": "spec/Core/DESIGN.md",
-    "old": "- D19.2 The set is closed at 51 kinds:",
-    "new": "- D19.2 The set is closed at 52 kinds:"
+    "old": "- D19.2 The set is closed at 52 kinds:",
+    "new": "- D19.2 The set is closed at 53 kinds:"
    }
   ],
-  "expect": "D19.2 closes the set at 52 kinds, and schema.md proposes 51"
+  "expect": "D19.2 closes the set at 53 kinds, and schema.md proposes 52"
  },
  {
   "name": "a proposed column outside its closed set",

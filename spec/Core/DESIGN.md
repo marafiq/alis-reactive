@@ -3035,7 +3035,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   - on a component reached by its element's id is the door a slot's plan has to a component the page rendered (gate 1's
     P5): the step holds that element weakly beside the object and the listener, and the release removes the listener
     only while the element still holds the object where the vendor's `locate` finds it, D12.5's rule, so its vendor
-    needs no element path. A plan hears a component it renders with `.Reactive` from the plan's start; a `listen` on it
+    needs no element path. The plan carries it as the release `located`, which names the object id the step reaches
+    the element by, so the runtime reads that element from the plan and infers nothing from the step's object (the
+    owner, 2026-11-15). A plan hears a component it renders with `.Reactive` from the plan's start; a `listen` on it
     starts when its step runs and leaves at its owner's release, the page's included (X12.14);
   - is refused where the view renders on a component a payload or a returned object hands over whose vendor names no
     element path, since its release could not tell a destroyed component from a living one;
@@ -4951,11 +4953,12 @@ shapes, starts and the payload's path of each event.
   and nothing else, so the runtime and the builders proceed in parallel from that file. The builders and the JSON they
   write are one track: one C# model writes the grammar, with no lowering pass (the owner, 2026-11-06, and the answer in
   `spec/NOTES.md`) (`check:kinds`, `Schema.tla:KindsHandledOnce`).
-- D19.2 The set is closed at 51 kinds: today's 33 but `try`, and `request`, `stop`, `listen`, `data`, `start`,
-  `nothing`, `unbound`, `signal`, `answer`, `file`, `each`, `returned`, `living`, `held`, `stream`, `clock`, `zone`,
-  `off` and `on`, the 19 `spec/Core/schema.md` marks added and `spec/Schema/Schema.tla` checks. `try` leaves, its
+- D19.2 The set is closed at 52 kinds: today's 33 but `try`, and `request`, `stop`, `listen`, `data`, `start`,
+  `nothing`, `unbound`, `signal`, `answer`, `file`, `each`, `returned`, `living`, `held`, `located`, `stream`, `clock`,
+  `zone`, `off` and `on`, the 20 `spec/Core/schema.md` marks added and `spec/Schema/Schema.tla` checks. `try` leaves, its
   `finally` carried by a `request`'s layers, since nothing but a request's `Finally` wrote it (the owner's amendment of
-  G2, 2026-11-08, D10.23); no other kind leaves. After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
+  G2, 2026-11-08, D10.23); no other kind leaves. `located` joined it by the owner's yes of 2026-11-15, the release of a
+  `listen` on a component reached by its element's id (D12.8). After gate 1 a unit never changes the set: a behavior the nodes cannot express stops the unit and goes
   to the owner with its use case (`check:kinds`).
 - D19.3 Every field is required, and none holds null as a state; a value that can be absent is a closed union with a kind per case. Null
   is only a value data holds: a `lit` of null and the JSON of a start (the owner, 2026-11-06).

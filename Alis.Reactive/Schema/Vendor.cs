@@ -62,6 +62,7 @@ internal sealed class ReturnedListening : Listening
 [JsonPolymorphic(TypeDiscriminatorPropertyName = "kind")]
 [JsonDerivedType(typeof(LivingRelease), "living")]
 [JsonDerivedType(typeof(HeldRelease), "held")]
+[JsonDerivedType(typeof(LocatedRelease), "located")]
 internal abstract class Release
 {
     private protected Release()
@@ -89,4 +90,14 @@ internal sealed class HeldRelease : Release
     public string Vendor { get; }
 
     public IReadOnlyList<PathStep> Element { get; }
+}
+
+internal sealed class LocatedRelease : Release
+{
+    internal LocatedRelease(string id)
+    {
+        Id = id;
+    }
+
+    public string Id { get; }
 }

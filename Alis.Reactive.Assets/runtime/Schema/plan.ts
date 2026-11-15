@@ -467,7 +467,7 @@ export interface ListenStatement {
   readonly do: readonly Statement[];
 }
 
-export type Release = LivingRelease | HeldRelease;
+export type Release = LivingRelease | HeldRelease | LocatedRelease;
 
 export interface LivingRelease {
   readonly kind: "living";
@@ -477,6 +477,11 @@ export interface HeldRelease {
   readonly kind: "held";
   readonly vendor: string;
   readonly element: readonly PathStep[];
+}
+
+export interface LocatedRelease {
+  readonly kind: "located";
+  readonly id: string;
 }
 
 export interface StopStatement {

@@ -231,6 +231,7 @@ A listen release says when release removes the listener the step added (D12.8):
 |------|---------|---------|
 | `living` | nothing | remove it while the object and the listener live |
 | `held` | `vendor`: a vendor's name in `vendors`; `element`: a path from the object to its element | read the element when the step listens; remove the listener while the object and the listener live and that element still holds the object at the vendor's object path (D12.5) |
+| `located` | `id`: the object id of `objects` whose element the step reaches the object by | read that object's element when the step listens; remove the listener while the object and the listener live and that element still holds the object where its vendor's `locate` finds it (D12.5, D12.8) |
 
 ## Expressions
 
@@ -443,6 +444,7 @@ proposed column says `added`.
 | vendor listening | returned | absent | added | the listening switch of `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts` | D17.3 |
 | listen release | living | absent | added | the release switch of `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts` | D12.8 |
 | listen release | held | absent | added | the release switch of `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts` | D12.8 |
+| listen release | located | absent | added | the release switch of `Alis.Reactive.Assets/runtime/objects/vendor-driver.ts` | D12.8 |
 | plugin data | none | `Alis.Reactive.Assets/runtime/plans/start.ts:38` | kept | none | S4 |
 | plugin data | hub | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.hub` | D12.6 |
 | plugin data | model | `Alis.Reactive.Assets/runtime/plans/start.ts:39` | kept | the plugin the plan names, `alis.model` | D13.2 |

@@ -1658,6 +1658,13 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `Echo(Total())` under an `Or` calls neither unless the term is reached; a result's binding is decided once its
   handler closes, every chain folded; a result's scope is read from the handler's final statements by its one `ref`,
   so another plan's `result1` is refused where it is read. The owner can overrule it.
+- The owner, 2026-11-15, asked for the grammar's 52nd kind with its example (a slot's plan listening to the page's
+  pump by its id, whose host restarts it before the slot unloads): "approved", then "TLA+ must be updated". A `listen`
+  on a component reached by its element's id carries the release `located`, which names the object id whose element
+  the step reaches the object by: the release reads that element when the step listens and removes the listener only
+  while it still holds the object where its vendor's `locate` finds it (D12.5, D12.8), so its vendor needs no element
+  path and the runtime infers nothing from the step's object. D19.2 closes the set at 52, and `spec/Schema/Schema.tla`
+  holds `located` among its release kinds, one handler each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

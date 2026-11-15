@@ -17,7 +17,7 @@ ShapeKinds == {"string", "number", "boolean", "date", "instant", "file", "any", 
 PathStepKinds == {"each"}
 LocatorKinds == {"element", "plugin"}
 ListeningKinds == {"method", "assignment", "returned"}
-ReleaseKinds == {"living", "held"}
+ReleaseKinds == {"living", "held", "located"}
 PluginDataKinds == {"none", "hub", "model", "form", "stream"}
 TimeZoneKinds == {"clock", "zone"}
 TraceKinds == {"off", "on"}
