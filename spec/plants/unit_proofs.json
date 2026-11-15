@@ -15,11 +15,11 @@
   "edits": [
    {
     "file": "spec/REWRITE.md",
-    "old": "### U15. Elements\nFeatures: M5.F1\n",
-    "new": "### U15. Elements\nFeatures: none\n"
+    "old": "### U14. Plugins\nFeatures: M13.F1, M13.F2\n",
+    "new": "### U14. Plugins\nFeatures: none\n"
    }
   ],
-  "expect": "U15 proves nothing"
+  "expect": "U14 proves nothing"
  },
  {
   "name": "a harness test on a care screen",
