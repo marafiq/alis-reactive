@@ -1687,6 +1687,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   its key, which reads nothing when the body lacks it, since a new instance's dictionary holds no entry. `Live.body`
   and a request's `Inputs(container)` read the same method, so a container's send has one reader. No node kind and
   no field is added. The owner can overrule it.
+- The lead, 2026-11-15, before U16's third piece, deciding two forms the lines left apart: a blank input's literal
+  is written in the live form, since an input's value is (D7.7) and the two meet in one `coalesce`; written in the
+  app's form, a cleared number read "0" as text under an app's number handling while a typed one sent a number. A
+  number shape's blank is a JSON number, which System.Text.Json reads under every number handling (D3.6). And R14.6's
+  error names each plan by its id and its place, the page or its slot, since a plan carries no view outside a trace
+  (D20.7) and a slot's partial of the page's model shares the page plan's id (X14.7). The owner can overrule each.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

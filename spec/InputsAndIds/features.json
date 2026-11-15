@@ -539,7 +539,7 @@
           "for": "X14.7",
           "page": "A reception page whose plan renders an input of Name; a Load button loads into a slot a partial whose own plan renders an input of Name of the page's model class, which takes the same id, and whose handler on that input's change writes its value into the slot's note.",
           "gesture": "Click Load, then type Ada in the slot's input and press Tab.",
-          "outcome": "The slot's note stays empty, and the console's one error names the id and both views.",
+          "outcome": "The slot's note stays empty, and the console's one error names the id and both plans with their places.",
           "opposite": "A slot partial whose input binds Phone loads, and typing 0101 there and pressing Tab shows 0101 in its note.",
           "defect": "The slot's plan starts beside the page's, so its handler runs and the note shows Ada while two live inputs hold one id."
         },

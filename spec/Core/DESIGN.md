@@ -177,8 +177,9 @@ Terms used throughout:
   browser implements exactly that table.
 - D3.5 Blank is nothing, or text that is empty or white space as .NET's `string.IsNullOrWhiteSpace` defines it.
 - D3.6 What a blank input binds as is a literal C# writes into the input's binding: the member's value in a
-  new instance of the item or model that holds it, encoded as the endpoint encodes it (Q18). The browser
-  chooses no default by shape.
+  new instance of the item or model that holds it, written in the live form (D7.7), the form the input's value
+  takes beside it, and a number shape's blank a JSON number, as the input's number is one and System.Text.Json reads a
+  JSON number under every number handling. The browser chooses no default by shape.
 - D3.7 A number goes into JSON as a JSON number. Into form data it goes as its text with the decimal
   separator of the culture the view renders under, which C# writes into the request argument, because both
   hosts bind form values under the request's culture (`probe:core-form-decimal-culture`,
@@ -3422,8 +3423,9 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     - R14.4 a step that sets the text or HTML of an element the same plan loads or unloads as a slot;
     - R14.5 a JSON request over a number-keyed dictionary entry (D14.5).
   - At composition, in the browser:
-    - R14.6 a plan holding an input id a live plan already holds is not started. One error names the id and
-      both plans' views. A slot's content that renders an id the page holds is the same case.
+    - R14.6 a plan holding an input id a live plan already holds is not started. One error names the id, and
+      each plan by its id and its place, the page or the slot that holds its script, since a plan carries no view
+      and two plans of one model share an id. A slot's content that renders an id the page holds is the same case.
     - R14.7 a step that sets the text or HTML of an element that is or holds a held slot, one a live plan names or
       whose content has a live owner (D12.9), stops, with one error naming the first held slot at or inside the
       element in document order (X12.12).
@@ -3558,7 +3560,7 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   '{prefix}', a dictionary entry keyed by a number, which JSON reads as a list position: send this request
   with AsFormData()." At build by ALIS030, and where the view renders on code it does not follow (D18.6): new:N18.7.
 - `X14.7` behavior: a slot's content that renders an input id the page holds runs none of its handlers, and the
-  console names the id and both views.
+  console names the id and both plans with their places.
 - `X14.8` behavior: an `EditorFor` template's input of `NextOfKin.Name` shows the page's server message for
   `NextOfKin.Name` beside it, and the page's rule checks it.
 - `X14.9` behavior (D13.2, D14.1, D14.2): one partial rendered by `PartialFor` for two members posts each card's own values.
