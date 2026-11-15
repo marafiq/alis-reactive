@@ -1143,7 +1143,12 @@ beside their declarations, boot's plugin queue and `alis:mount`, and the plugin 
 the contract's rules, ALIS014 to ALIS022 and ALIS037, and X4.9's test, the one browser test U13 lands, are open.
 U14 is landed: `Plugin` and its name's check, `pipeline.Plugin<TPlugin>()` with one locator a name,
 `plan.Plugin<TPlugin>().Reactive(..)` and `CallItself`, with their module tests. A host is ready once MVC has
-rendered a view with a plan (section 2.5). The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
+rendered a view with a plan (section 2.5).
+U15 is landed: every door of `Element`, `ClassList`, `ElementChildren` and `ChildElement`, `JsObject`'s iterators, the
+runtime's `list` node, and a world whose browser runs in the zone a promise names (`NewWorldInZone`, section 2.5);
+M5.X2's test and the zone's harness test pass, X17.3's, X17.12's and X17.17's, U13's, pass on the conformance
+library's TypeScript, and a run through U13 or later waits on X4.9's test. A date shown as an element's text waits
+on a date kind for the `string` shape, the owner's to decide. The bindings check takes no view clause (section 2.5). Each written browser test lands by the doors its built
 pages call that are not built, read by `scripts/page-doors.cs` (the owner's yes of 2026-11-14). The commit that lands
 a piece rewrites this paragraph.
 
