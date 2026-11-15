@@ -1693,6 +1693,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   number shape's blank is a JSON number, which System.Text.Json reads under every number handling (D3.6). And R14.6's
   error names each plan by its id and its place, the page or its slot, since a plan carries no view outside a trace
   (D20.7) and a slot's partial of the page's model shares the page plan's id (X14.7). The owner can overrule each.
+- The lead, 2026-11-15, from a consult of Codex read at the source: three promises (X9.13, X10.17, X10.20) said the
+  status keeps Waiting when the guard refuses, while D10.23's table and Request.tla run `loading` before `guard`
+  (Request.tla's `Loading` moves to "guard", a failed `Guard` to "finally"); each outcome now reads the status its
+  WhileLoading wrote, and completed loading is no defect. Their tests are U18's to write.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

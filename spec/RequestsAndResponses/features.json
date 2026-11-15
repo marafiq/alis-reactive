@@ -463,9 +463,9 @@
           "for": "X9.13",
           "page": "An applicant form whose POST sends Header(\"X-Applicant\", name box's value) and a WhileLoading that writes Sending into the status.",
           "gesture": "Type Zoë into the name and click Apply.",
-          "outcome": "No request reaches the network log, the status keeps Waiting, and the console holds one error naming X-Applicant.",
+          "outcome": "No request reaches the network log, the status reads Sending, and the console holds one error naming X-Applicant.",
           "opposite": "With the name Zoe, the endpoint echoes X-Applicant Zoe.",
-          "defect": "The value handed to fetch, which throws or sends a mangled byte, so the status reads Sending or the endpoint echoes a name; or the request stops with no console line naming the header."
+          "defect": "The value handed to fetch, which throws or sends a mangled byte, so the endpoint echoes a name; or the request stops with no console line naming the header."
         },
         {
           "for": "X9.15",
@@ -1463,9 +1463,9 @@
           "for": "X10.17",
           "page": "A GET whose Busy names the element summary-panel, rendered by a partial the page has not loaded yet; its WhileLoading writes Loading.",
           "gesture": "Click Load summary before loading the partial.",
-          "outcome": "The network log holds no request and the status keeps Waiting.",
+          "outcome": "The network log holds no request and the status reads Loading.",
           "opposite": "After the partial loads, the GET is sent and the panel shows the indicator.",
-          "defect": "The request sent with no target, so the network log holds it; or WhileLoading run, so the status reads Loading.",
+          "defect": "The request sent with no target, so the network log holds it.",
           "observes": "Composition.tla:Stop"
         },
         {
@@ -1481,7 +1481,7 @@
           "for": "X10.20",
           "page": "A page under ShowBusy() that loads no script providing busy, and a GET whose WhileLoading writes Loading.",
           "gesture": "Click Load.",
-          "outcome": "The network log holds no request, the status keeps Waiting, and the console holds one error naming busy.",
+          "outcome": "The network log holds no request, the status reads Loading, and the console holds one error naming busy.",
           "opposite": "With NativeLoader's script loaded, the GET is sent.",
           "defect": "The request sent with no indicator, so the network log holds it; or the missing contract found only at the first failure.",
           "observes": "Request.tla:DefaultLoading"
