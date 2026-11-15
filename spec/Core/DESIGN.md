@@ -2940,7 +2940,14 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     (`Ownership.tla:RulesLeaveWithTheirOwner`);
   - its runs (Q11).
 - D12.3 What HTML carries belongs to the owner of the innermost slot around it, else the page:
-  - the components mounted in it, which construct on `alis:mount` and destroy themselves on `alis:unmount`;
+  - the components mounted in it, which construct on `alis:mount` and destroy themselves on `alis:unmount`. Each is a
+    `CustomEvent` the runtime dispatches on the content's document, at once and with no bubbling, whose detail is
+    `{ root }`: the element that holds the content it announces, `document.body` at boot and a slot's container at
+    its load and its unload. The root holds the content and is none of it, since a slot's container is its outer
+    owner's (D12.1), so a component's code builds and destroys each element below the root that its selector
+    matches, and never the root itself. The redesign's `forEachWithin` also takes the root when it matches
+    (`Alis.Reactive.Assets/components/hooks.ts:37-41` at 65fdf118d), which builds a component a second time on a
+    container that is one: the rewrite keeps its target and its detail and drops that match;
   - the slots whose containers it holds;
   - the plans whose scripts it holds, content the server rendered inside a slot's container included. Such
     content belongs to that slot from boot, so the slot's first load or unload releases it.
@@ -4360,7 +4367,10 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   `field.ValueJson` is the member's value, read through MVC with no compile and written by the plan's one literal
   writer in the live form (D7.7), `"null"` when a holder on the way holds nothing; `field.Json(options)` writes
   the helper's starting options the same way, so a date, an enum and a number reach the component's code in the
-  forms the plan's own values take. After a failed post the value is the model's, as the action leaves it, on both
+  forms the plan's own values take. The live form keeps the app's naming (D7.7), so each member of the options that
+  the component's code reads by name carries `[JsonPropertyName]` with that name, as a data member checked against a
+  vendor's name does (X17.48), and the component starts the same under a camel-case, a snake-case or a Pascal-case
+  app. After a failed post the value is the model's, as the action leaves it, on both
   hosts: net10 keeps no typed form of an attempted value (its converter is internal, and a value provider's result
   converts nothing), and MVC 5 converts one only by a `System.Type` (`ValueProviderResult.ConvertTo(Type)`), a type
   read the owner's list lacks. A typed component shows what the server decided; a text box keeps MVC's attempted text. A
