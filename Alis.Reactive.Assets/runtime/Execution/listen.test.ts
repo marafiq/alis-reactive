@@ -6,6 +6,15 @@ type Context = Parameters<typeof listenTo>[1];
 type Statement = ConstructorParameters<typeof Lane>[1][number];
 type Listener = (...args: unknown[]) => void;
 
+const untraced: Context["trace"] = {
+  handler: () => untraced,
+  run: () => untraced,
+  span: () => untraced,
+  send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),
+  event: () => undefined,
+  end: () => undefined,
+};
+
 class Card {
   readonly endings: (() => void)[] = [];
   readonly removals: (() => void)[] = [];
@@ -97,6 +106,7 @@ function context(owner: Card, bindings: Readonly<Record<string, unknown>>): Cont
     },
     scope: new Map(Object.entries(bindings).map(([name, value]) => [name, { kind: "value", value }])),
     signal: new AbortController().signal,
+    trace: untraced,
   };
 }
 

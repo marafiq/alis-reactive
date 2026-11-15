@@ -1,5 +1,6 @@
 import type { Owner } from "../OwnershipAndState/index";
 import type { PlanDocument } from "../Schema/index";
+import type { Traced } from "../Tracing/index";
 import type { Read } from "../ValuesAndSources/index";
 
 export type Binding = Read | (() => Read);
@@ -9,6 +10,7 @@ export interface Context {
   readonly plan: PlanDocument;
   readonly scope: ReadonlyMap<string, Binding>;
   readonly signal: AbortSignal;
+  readonly trace: Traced;
 }
 
 export function bind(context: Context, name: string, binding: Binding): Context {
@@ -19,6 +21,10 @@ export function bind(context: Context, name: string, binding: Binding): Context 
 
 export function under(context: Context, signal: AbortSignal): Context {
   return { ...context, signal };
+}
+
+export function within(context: Context, trace: Traced): Context {
+  return { ...context, trace };
 }
 
 export function isAnObject(held: unknown): held is object {

@@ -16,6 +16,15 @@ type Layer = Extract<Step, { kind: "request" }>["layers"][number];
 type Raised = Parameters<Lane["raise"]>[0];
 type Held = Raised["scope"] extends ReadonlyMap<string, infer Read> ? Read : never;
 
+const untraced: Raised["trace"] = {
+  handler: () => untraced,
+  run: () => untraced,
+  span: () => untraced,
+  send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),
+  event: () => undefined,
+  end: () => undefined,
+};
+
 const ward: Raised["plan"] = {
   version: 7,
   planId: "ward",
@@ -88,7 +97,40 @@ function gate(): Gate {
 function raisedWith(bound: Readonly<Record<string, unknown>>): Raised {
   const scope = new Map<string, Held>();
   for (const [name, value] of Object.entries(bound)) scope.set(name, { kind: "value", value });
-  return { plan: ward, scope, signal: new AbortController().signal };
+  return { plan: ward, scope, signal: new AbortController().signal, trace: untraced };
+}
+
+class Spans {
+  readonly recorded: string[] = [];
+  #started = 0;
+
+  readonly root: Raised["trace"] = this.#traced("handler");
+
+  #traced(name: string): Raised["trace"] {
+    return {
+      handler: () => this.root,
+      run: () => this.#starts("alis.run", {}),
+      span: (child, attributes) => this.#starts(child, attributes),
+      send: () => untraced.send(),
+      event: (event, attributes) => {
+        this.recorded.push(name + " " + event + " " + JSON.stringify(attributes));
+      },
+      end: (outcome) => {
+        this.recorded.push(name + " " + outcome);
+      },
+    };
+  }
+
+  #starts(name: string, attributes: Readonly<Record<string, unknown>>): Raised["trace"] {
+    this.#started += 1;
+    const numbered = name + "#" + String(this.#started);
+    this.recorded.push(numbered + " starts " + JSON.stringify(attributes));
+    return this.#traced(numbered);
+  }
+}
+
+function tracedWith(spans: Spans, bound: Readonly<Record<string, unknown>>): Raised {
+  return { ...raisedWith(bound), trace: spans.root };
 }
 
 function everyPromiseJobRan(): Promise<void> {
@@ -416,6 +458,123 @@ describe("when a step is one C# marked awaited (D11.2, D11.3, D4.3)", () => {
 
     expect(chart.lines).toStrictEqual(["Testing"]);
     expect(logged.mock.calls.length).toBe(1);
+  });
+});
+
+describe("when a run is traced, each span it starts ends once with how it ended (Tracing.tla, D20.4, D20.6)", () => {
+  test("EveryStartedSpanEnds: a run with no awaited step ends its span completed in its trigger's turn", () => {
+    const spans = new Spans();
+    const lane = new Lane("overlap", [charts(text("admitted"))], aRoundsOwner);
+
+    lane.raise(tracedWith(spans, { chart: new Chart() }));
+
+    expect(spans.recorded).toStrictEqual(["alis.run#1 starts {}", "alis.run#1 completed"]);
+  });
+
+  test("EveryStartedSpanEnds: a run its next raise replaces ends its span replaced, and the new run's span stays open while it waits", () => {
+    const spans = new Spans();
+    const lane = new Lane("replace", [{ kind: "do", await: true, expr: calls("pharmacy", "refresh") }], aRoundsOwner);
+    const pharmacy = { refresh: () => gate().held };
+
+    lane.raise(tracedWith(spans, { pharmacy }));
+    lane.raise(tracedWith(spans, { pharmacy }));
+
+    expect(spans.recorded).toStrictEqual([
+      "alis.run#1 starts {}",
+      "alis.method#2 starts {\"alis.method\":\"refresh\"}",
+      "alis.run#1 replaced",
+      "alis.run#3 starts {}",
+      "alis.method#4 starts {\"alis.method\":\"refresh\"}",
+    ]);
+  });
+
+  test("EveryStartedSpanEnds: a run disposed while it waits ends its span disposed", () => {
+    const spans = new Spans();
+    const lane = new Lane("overlap", [awaits("settle"), charts(text("after"))], aRoundsOwner);
+    lane.raise(tracedWith(spans, { chart: new Chart(), settle: gate().held }));
+
+    lane.dispose();
+
+    expect(spans.recorded).toStrictEqual(["alis.run#1 starts {}", "alis.method#2 starts {}", "alis.run#1 disposed"]);
+  });
+
+  test("a stop statement records its reason, which C# wrote, on the run's span, and the run ends stopped", () => {
+    stopsLogged();
+    const spans = new Spans();
+    const lane = new Lane("overlap", [stops("The bed is taken."), charts(text("after"))], aRoundsOwner);
+
+    lane.raise(tracedWith(spans, { chart: new Chart() }));
+
+    expect(spans.recorded).toStrictEqual([
+      "alis.run#1 starts {}",
+      "alis.run#1 alis.stop {\"alis.reason\":\"The bed is taken.\"}",
+      "alis.run#1 stopped",
+    ]);
+  });
+
+  test("a stop the page's values cause records no reason, since a value may be in it (D20.5), and the console keeps it", () => {
+    const logged = stopsLogged();
+    const spans = new Spans();
+    const lane = new Lane("overlap", [{ kind: "do", await: false, expr: calls("resident", "name") }], aRoundsOwner);
+
+    lane.raise(tracedWith(spans, { resident: { name: "Ruth" } }));
+
+    expect([spans.recorded, logged.mock.calls]).toStrictEqual([
+      ["alis.run#1 starts {}", "alis.run#1 alis.stop {}", "alis.run#1 stopped"],
+      [["The member 'name' is no method."]],
+    ]);
+  });
+
+  test("a rejected method ends its span stopped and records an error with no message on the run's span, which ends stopped", async () => {
+    stopsLogged();
+    const spans = new Spans();
+    const settle = gate();
+    const lane = new Lane("overlap", [{ kind: "do", await: true, expr: calls("pharmacy", "refresh") }], aRoundsOwner);
+    lane.raise(tracedWith(spans, { pharmacy: { refresh: () => settle.held } }));
+
+    settle.refuses(new Error("Ruth's dose is held."));
+    await everyPromiseJobRan();
+
+    expect(spans.recorded).toStrictEqual([
+      "alis.run#1 starts {}",
+      "alis.method#2 starts {\"alis.method\":\"refresh\"}",
+      "alis.method#2 stopped",
+      "alis.run#1 alis.error {}",
+      "alis.run#1 stopped",
+    ]);
+  });
+
+  test("a resolved method ends its span completed before the run goes on", async () => {
+    const spans = new Spans();
+    const settle = gate();
+    const lane = new Lane("overlap", [{ kind: "let", name: "stock", await: true, binds: "line", expr: calls("pharmacy", "refresh") }], aRoundsOwner);
+    lane.raise(tracedWith(spans, { pharmacy: { refresh: () => settle.held } }));
+
+    settle.opens(12);
+    await everyPromiseJobRan();
+
+    expect(spans.recorded).toStrictEqual([
+      "alis.run#1 starts {}",
+      "alis.method#2 starts {\"alis.method\":\"refresh\"}",
+      "alis.method#2 completed",
+      "alis.run#1 completed",
+    ]);
+  });
+
+  test("each block of an all is a span under the run, and each ends before the run", () => {
+    const spans = new Spans();
+    const lane = new Lane("overlap", [{ kind: "all", blocks: [[charts(text("north"))], [charts(text("south"))]] }], aRoundsOwner);
+
+    lane.raise(tracedWith(spans, { chart: new Chart() }));
+
+    expect(spans.recorded).toStrictEqual([
+      "alis.run#1 starts {}",
+      "alis.all#2 starts {}",
+      "alis.all#2 completed",
+      "alis.all#3 starts {}",
+      "alis.all#3 completed",
+      "alis.run#1 completed",
+    ]);
   });
 });
 

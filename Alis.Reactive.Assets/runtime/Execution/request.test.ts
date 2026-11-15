@@ -11,6 +11,15 @@ type Held = Raised["scope"] extends ReadonlyMap<string, infer Read> ? Read : nev
 const owner: ConstructorParameters<typeof Lane>[2] = {
   runs: () => undefined, mounts: () => undefined, listens: () => undefined, holds: () => undefined, registers: () => undefined,
 };
+const untraced: Raised["trace"] = {
+  handler: () => untraced,
+  run: () => untraced,
+  span: () => untraced,
+  send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),
+  event: () => undefined,
+  end: () => undefined,
+};
+
 const plan: Raised["plan"] = {
   version: 7, planId: "ward",
   culture: { name: "en-US", collation: "en-US", decimal: ".", group: ",", integer: { group: false, exponent: false }, fraction: { group: true, exponent: true } },
@@ -48,7 +57,7 @@ function raised(chart: Chart, bindings: Readonly<Record<string, unknown>> = {}):
   const scope = new Map<string, Held>();
   scope.set("chart", { kind: "value", value: chart });
   for (const [name, value] of Object.entries(bindings)) scope.set(name, { kind: "value", value });
-  return { plan, scope, signal: new AbortController().signal };
+  return { plan, scope, signal: new AbortController().signal, trace: untraced };
 }
 
 function gate<T>() {

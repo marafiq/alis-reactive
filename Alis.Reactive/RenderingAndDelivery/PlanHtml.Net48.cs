@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Web;
 using System.Web.Mvc;
 using Alis.Reactive.PathsAndWire;
+using Alis.Reactive.Tracing;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.Validation;
 
@@ -77,7 +78,8 @@ public static class PlanHtml
     /// <param name="plan">The plan the view opened.</param>
     /// <returns>The plan's script.</returns>
     public static IHtmlString RenderPlan<TModel>(this HtmlHelper html, ReactivePlan<TModel> plan)
-        => new HtmlString(ViewPlans.ScriptOf(plan, html.ViewData.TemplateInfo.HtmlFieldPrefix, () => ViewPaths.Of(html)));
+        => new HtmlString(ViewPlans.ScriptOf(plan, html.ViewData.TemplateInfo.HtmlFieldPrefix, () => ViewPaths.Of(html),
+            () => (DependencyResolver.Current.GetService<ReactiveTracing>() ?? new ReactiveTracing()).Console));
 
     private static JsonSerializerOptions TheOptionsTheAppRegisters() => throw new NotImplementedException();
 }

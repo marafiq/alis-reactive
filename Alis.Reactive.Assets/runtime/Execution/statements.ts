@@ -1,6 +1,7 @@
 import {
   assertNever,
   type DoStatement,
+  type Expression,
   type LetStatement,
   type PathStep,
   type RequestStatement,
@@ -8,6 +9,7 @@ import {
   type SetStatement,
   type Statement,
 } from "../Schema/index";
+import type { Attributes, Traced } from "../Tracing/index";
 import { got, heldOrNull, Stop, type Read } from "../ValuesAndSources/index";
 import { bind, isAnObject, type Context } from "./context";
 import { awaited, evaluate } from "./expressions";
@@ -52,20 +54,44 @@ function done(statement: DoStatement, context: Context): Step {
     evaluate(statement.expr, context);
     return { kind: "completed", context };
   }
-  return { kind: "wait", on: Promise.resolve(heldOrNull(awaited(statement.expr, context))), settled: () => context };
+  const method = context.trace.span("alis.method", methodOf(statement.expr));
+  return { kind: "wait", on: endsOnSettle(Promise.resolve(heldOrNull(awaited(statement.expr, context))), method), settled: () => context };
 }
 
 function bound(statement: LetStatement, context: Context): Step {
   switch (statement.binds) {
     case "line": {
       if (!statement.await) return { kind: "completed", context: bind(context, statement.name, evaluate(statement.expr, context)) };
-      return { kind: "wait", on: Promise.resolve(heldOrNull(awaited(statement.expr, context))), settled: (settled) => bind(context, statement.name, settled) };
+      const method = context.trace.span("alis.method", methodOf(statement.expr));
+      return {
+        kind: "wait",
+        on: endsOnSettle(Promise.resolve(heldOrNull(awaited(statement.expr, context))), method),
+        settled: (settled) => bind(context, statement.name, settled),
+      };
     }
     case "read":
       return { kind: "completed", context: bind(context, statement.name, () => evaluate(statement.expr, context)) };
     default:
       return assertNever(statement.binds);
   }
+}
+
+function methodOf(expr: Expression): Attributes {
+  if (expr.kind !== "call") return {};
+  const name = expr.path.at(-1);
+  return typeof name === "string" ? { "alis.method": name } : {};
+}
+
+function endsOnSettle(on: Promise<unknown>, method: Traced): Promise<unknown> {
+  void on.then(
+    () => {
+      method.end("completed");
+    },
+    () => {
+      method.end("stopped");
+    },
+  );
+  return on;
 }
 
 function holds(when: Read): boolean {

@@ -1,6 +1,7 @@
 import type { Statement } from "../Schema/index";
+import type { Attributes, EventName, SpanOutcome, Traced } from "../Tracing/index";
 import { Stop, value, type Read } from "../ValuesAndSources/index";
-import { under, type Context } from "./context";
+import { under, within, type Context } from "./context";
 import { BlockFrame, type Frame, type Outcome } from "./frames";
 
 export type Status = "idle" | "running" | "waiting" | "ended";
@@ -8,6 +9,19 @@ export type Status = "idle" | "running" | "waiting" | "ended";
 export type Cut = "replace" | "dispose";
 
 type Block = readonly Statement[];
+
+interface Halted {
+  readonly kind: "halts";
+  readonly reason: string;
+}
+
+interface Recorded {
+  readonly name: EventName;
+  readonly attributes: Attributes;
+}
+
+const aPageMismatch: Recorded = { name: "alis.stop", attributes: {} };
+const aRejection: Recorded = { name: "alis.error", attributes: {} };
 
 function runsNothing(): void {
   return undefined;
@@ -17,9 +31,18 @@ function rejected(error: unknown): string {
   return "An awaited step rejected, so its pipeline stops: " + (error instanceof Error ? error.message : String(error));
 }
 
+function aStopStatement(reason: string): Recorded {
+  return { name: "alis.stop", attributes: { "alis.reason": reason } };
+}
+
+function outcomeOf(cause: Cut): SpanOutcome {
+  return cause === "replace" ? "replaced" : "disposed";
+}
+
 export class Run {
   readonly #block: Block;
   readonly #context: Context;
+  readonly #trace: Traced;
   readonly #ownSignals: readonly AbortController[];
   readonly #layerSignals: AbortController[] = [];
   readonly #frames: Frame[] = [];
@@ -31,17 +54,19 @@ export class Run {
   #branches: Run[] = [];
   #unwindsAtItsJoin = false;
   #waited = 0;
+  #outcome: SpanOutcome = "completed";
 
-  private constructor(block: Block, context: Context, ownSignals: readonly AbortController[], cut: Cut | "none") {
+  private constructor(block: Block, context: Context, trace: Traced, ownSignals: readonly AbortController[], cut: Cut | "none") {
     this.#block = block;
-    this.#context = context;
+    this.#context = within(context, trace);
+    this.#trace = trace;
     this.#ownSignals = ownSignals;
     this.#cut = cut;
   }
 
   static ofAHandler(block: Block, context: Context): Run {
     const own = new AbortController();
-    return new Run(block, under(context, own.signal), [own], "none");
+    return new Run(block, under(context, own.signal), context.trace.run(), [own], "none");
   }
 
   get status(): Status {
@@ -108,7 +133,10 @@ export class Run {
         this.#waits(outcome.on, outcome.settled);
         return;
       case "stops":
-        this.#stops(outcome.reason);
+        this.#stops(outcome.reason, aStopStatement(outcome.reason));
+        return;
+      case "halts":
+        this.#stops(outcome.reason, aPageMismatch);
         return;
       case "ends":
         this.#frames.pop();
@@ -117,19 +145,19 @@ export class Run {
     }
   }
 
-  #outcomeOf(frame: Frame): Outcome {
+  #outcomeOf(frame: Frame): Outcome | Halted {
     try {
       return frame.kind === "request" ? frame.step(this) : frame.step();
     } catch (stopped) {
       if (!(stopped instanceof Stop)) throw stopped;
-      return { kind: "stops", reason: stopped.reason };
+      return { kind: "halts", reason: stopped.reason };
     }
   }
 
   #forks(blocks: readonly Block[], context: Context): void {
     const branches: Run[] = [];
     for (const block of blocks) {
-      const branch = new Run(block, context, [], this.#cut === "dispose" ? "dispose" : "none");
+      const branch = new Run(block, context, context.trace.span("alis.all", {}), [], this.#cut === "dispose" ? "dispose" : "none");
       branches.push(branch);
       branch.begin();
     }
@@ -161,7 +189,7 @@ export class Run {
       },
       (error: unknown) => {
         this.#settles(wait, () => {
-          this.#stops(rejected(error));
+          this.#stops(rejected(error), aRejection);
         });
       },
     );
@@ -177,8 +205,10 @@ export class Run {
     this.#drive();
   }
 
-  #stops(reason: string): void {
+  #stops(reason: string, recorded: Recorded): void {
     console.error(reason);
+    this.#trace.event(recorded.name, recorded.attributes);
+    if (this.#outcome === "completed") this.#outcome = "stopped";
     this.#unwinds();
   }
 
@@ -193,6 +223,7 @@ export class Run {
   }
 
   #lands(cause: Cut): void {
+    if (this.#outcome === "completed") this.#outcome = outcomeOf(cause);
     for (const own of this.#ownSignals) own.abort();
     if (cause === "dispose") for (const layer of this.#layerSignals) layer.abort();
     const outermostFinally = this.#frames.findIndex((frame) => frame.kind === "block" && frame.isAFinally);
@@ -215,6 +246,7 @@ export class Run {
 
   #ends(): void {
     this.#status = "ended";
+    this.#trace.end(this.#outcome);
     for (const ended of this.#afterItEnds.splice(0)) ended();
   }
 }

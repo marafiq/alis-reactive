@@ -1,1 +1,3 @@
 #nullable enable
+Alis.Reactive.OpenTelemetry.Tracing.OpenTelemetryHtml
+static Alis.Reactive.OpenTelemetry.Tracing.OpenTelemetryHtml.OpenTelemetryExporter(this System.Web.Mvc.HtmlHelper! html, string! tracesUrl, string! serviceName) -> System.Web.IHtmlString!

@@ -1,6 +1,7 @@
 import { pageInputs } from "../InputsAndIds/index";
 import { ownerAround, slotsNamedBy } from "../OwnershipAndState/index";
 import { plugin, provide, readQueue, type PluginRegistration } from "../Plugins/index";
+import { tracing } from "../Tracing/index";
 import { DocumentPlugin, raisesOnClick } from "../TriggersAndPipelines/index";
 import { elementById } from "./objects";
 import { plansWithin } from "./plans";
@@ -21,6 +22,6 @@ export function boot(): void {
   document.dispatchEvent(new CustomEvent("alis:mount", { detail: { root: document.body } }));
   const found = plansWithin(document);
   const named = new Set(found.flatMap(({ plan }) => slotsNamedBy(plan)));
-  for (const { plan, script } of found) start(plan, ownerAround(script, named), elementById, plugin);
+  for (const { plan, script } of found) start(plan, ownerAround(script, named), elementById, plugin, (trace) => tracing.planTrace(trace));
   documentPlugin.started();
 }

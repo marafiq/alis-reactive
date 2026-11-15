@@ -53,13 +53,13 @@ npm audit
 step "the Syncfusion pin"
 node scripts/pin-syncfusion.mjs --check
 
-step "tsc -b over the runtime and conformance app"
-node node_modules/typescript/bin/tsc -b Alis.Reactive.Assets tests/Alis.Reactive.Conformance.App
+step "tsc -b over the runtime, the OpenTelemetry adapter and conformance app"
+node node_modules/typescript/bin/tsc -b Alis.Reactive.Assets Alis.Reactive.OpenTelemetry tests/Alis.Reactive.Conformance.App
 
-step "eslint over the runtime and conformance app"
-node node_modules/eslint/bin/eslint.js Alis.Reactive.Assets tests/Alis.Reactive.Conformance.App --max-warnings 0
+step "eslint over the runtime, the OpenTelemetry adapter and conformance app"
+node node_modules/eslint/bin/eslint.js Alis.Reactive.Assets Alis.Reactive.OpenTelemetry tests/Alis.Reactive.Conformance.App --max-warnings 0
 
-step "vitest over the runtime's pure tests"
+step "vitest over the runtime's and the adapter's pure tests"
 node node_modules/vitest/vitest.mjs run
 
 step "the browser bundle"

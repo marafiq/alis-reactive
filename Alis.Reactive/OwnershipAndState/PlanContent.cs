@@ -19,6 +19,7 @@ internal sealed class PlanContent
     private readonly SortedDictionary<string, Vendor> _vendors = new(StringComparer.Ordinal);
     private readonly SortedDictionary<string, Locator> _objects = new(StringComparer.Ordinal);
     private readonly List<Handler> _handlers = [];
+    private readonly List<(string File, int Line)> _calls = [];
     private readonly Dictionary<string, string> _vendorDefinitions = new(StringComparer.Ordinal);
     private readonly HashSet<string> _renderedElements = new(StringComparer.Ordinal);
     private readonly Dictionary<string, (string Listening, string Event, string HeardBy)> _heardPlugins = new(StringComparer.Ordinal);
@@ -122,13 +123,14 @@ internal sealed class PlanContent
         _inputs[inputId] = binding;
     }
 
-    internal void Handles(Handler handler)
+    internal void Handles(Handler handler, string callerFile, int callerLine)
     {
         RefuseOnceRendered();
         _handlers.Add(handler);
+        _calls.Add((callerFile, callerLine));
     }
 
-    internal PlanDocument Document(Trace trace)
+    internal PlanDocument Document(Func<IReadOnlyList<(string File, int Line)>, Trace> traceOf)
     {
         if (_rendered)
         {
@@ -137,7 +139,7 @@ internal sealed class PlanContent
         }
 
         _rendered = true;
-        return new(_planId, _culture, _timeZone, trace, _vendors, _objects, _handlers);
+        return new(_planId, _culture, _timeZone, traceOf(_calls), _vendors, _objects, _handlers);
     }
 
     private void RefuseOnceRendered()

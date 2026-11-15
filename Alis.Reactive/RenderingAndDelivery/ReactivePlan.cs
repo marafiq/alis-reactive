@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Execution;
 using Alis.Reactive.Plugins;
@@ -70,41 +71,49 @@ public sealed partial class Rendered<TComponent, TModel>
     /// <summary>Runs a pipeline each time the component raises an event that has no payload.</summary>
     /// <param name="raised">The event, as a member of the component's declaration.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The rendered component.</returns>
-    public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline)
-        => Reactive(raised, HandlerPolicy.Overlap, pipeline);
+    public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline, callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the component raises an event, with the event's payload.</summary>
     /// <param name="raised">The event, as a member of the component's declaration.</param>
     /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The rendered component.</returns>
-    public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
+    public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
         where TArgs : JsObject, new()
-        => Reactive(raised, HandlerPolicy.Overlap, pipeline);
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline, callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the component raises an event that has no payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the component's declaration.</param>
     /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The rendered component.</returns>
-    public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline)
-        => Handles(raised(_component), policy, (_, steps) => pipeline(steps));
+    public Rendered<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
+        => Handles(raised(_component), policy, (_, steps) => pipeline(steps), callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the component raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the component's declaration.</param>
     /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
     /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The rendered component.</returns>
-    public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+    public Rendered<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
         where TArgs : JsObject, new()
-        => Handles(raised(_component), policy, pipeline);
+        => Handles(raised(_component), policy, pipeline, callerFile, callerLine);
 
-    private Rendered<TComponent, TModel> Handles<TArgs>(Event<TArgs> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+    private Rendered<TComponent, TModel> Handles<TArgs>(Event<TArgs> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline, string callerFile, int callerLine)
         where TArgs : JsObject, new()
     {
         var (on, path) = Raiser.Of(raised);
         var steps = _writer.Handler(() => pipeline(JsObject.Reaching<TArgs>(new Received(_writer)), new Pipeline<TModel>(_writer)));
-        _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps));
+        _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps), callerFile, callerLine);
         return this;
     }
 }
@@ -129,42 +138,50 @@ public sealed class ReactivePlugin<TPlugin, TModel>
     /// <summary>Runs a pipeline each time the plugin raises an event that has no payload.</summary>
     /// <param name="raised">The event, as a member of the plugin's declaration.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The plugin.</returns>
-    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, Action<Pipeline<TModel>> pipeline)
-        => Reactive(raised, HandlerPolicy.Overlap, pipeline);
+    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline, callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the plugin raises an event, with the event's payload.</summary>
     /// <param name="raised">The event, as a member of the plugin's declaration.</param>
     /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The plugin.</returns>
-    public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
+    public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
         where TArgs : JsObject, new()
-        => Reactive(raised, HandlerPolicy.Overlap, pipeline);
+        => Reactive(raised, HandlerPolicy.Overlap, pipeline, callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the plugin raises an event that has no payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the plugin's declaration.</param>
     /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The plugin.</returns>
-    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline)
-        => Handles(raised(_plugin), policy, (_, steps) => pipeline(steps));
+    public ReactivePlugin<TPlugin, TModel> Reactive(Func<TPlugin, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
+        => Handles(raised(_plugin), policy, (_, steps) => pipeline(steps), callerFile, callerLine);
 
     /// <summary>Runs a pipeline each time the plugin raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the plugin's declaration.</param>
     /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
     /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The plugin.</returns>
-    public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+    public ReactivePlugin<TPlugin, TModel> Reactive<TArgs>(Func<TPlugin, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
         where TArgs : JsObject, new()
-        => Handles(raised(_plugin), policy, pipeline);
+        => Handles(raised(_plugin), policy, pipeline, callerFile, callerLine);
 
-    private ReactivePlugin<TPlugin, TModel> Handles<TArgs>(Event<TArgs> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+    private ReactivePlugin<TPlugin, TModel> Handles<TArgs>(Event<TArgs> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline, string callerFile, int callerLine)
         where TArgs : JsObject, new()
     {
         var (on, path) = Raiser.Of(raised);
         _writer.Content.HearsPlugin(_plugin.Heard(), raised.Name, _plugin.HeardBy);
         var steps = _writer.Handler(() => pipeline(JsObject.Reaching<TArgs>(new Received(_writer)), new Pipeline<TModel>(_writer)));
-        _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps));
+        _writer.Content.Handles(new Handler(on, path, raised.Name, raised.Payload, PathMembers.Required, policy.Grammar, steps), callerFile, callerLine);
         return this;
     }
 }
@@ -201,14 +218,18 @@ public sealed class ReactiveComponent<TComponent, TModel>
     /// <summary>Runs a pipeline each time the object raises an event that has no payload.</summary>
     /// <param name="raised">The event, as a member of the object's declaration.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The object.</returns>
-    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0) => throw new NotImplementedException();
 
     /// <summary>Runs a pipeline each time the object raises an event, with the event's payload.</summary>
     /// <param name="raised">The event, as a member of the object's declaration.</param>
     /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The object.</returns>
-    public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline)
+    public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, Action<TArgs, Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
 
@@ -216,15 +237,19 @@ public sealed class ReactiveComponent<TComponent, TModel>
     /// <param name="raised">The event, as a member of the object's declaration.</param>
     /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
     /// <param name="pipeline">The steps to run on each raise.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The object.</returns>
-    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline) => throw new NotImplementedException();
+    public ReactiveComponent<TComponent, TModel> Reactive(Func<TComponent, Event> raised, HandlerPolicy policy, Action<Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0) => throw new NotImplementedException();
 
     /// <summary>Runs a pipeline each time the object raises an event, with the event's payload, under a policy for a raise that comes while its last run is in flight.</summary>
     /// <param name="raised">The event, as a member of the object's declaration.</param>
     /// <param name="policy">What a raise does while the run the last raise started is in flight.</param>
     /// <param name="pipeline">The steps to run on each raise, with what the event's listener receives.</param>
+    /// <param name="callerFile">The file of the call, which the compiler supplies.</param>
+    /// <param name="callerLine">The line of the call, which the compiler supplies.</param>
     /// <returns>The object.</returns>
-    public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline)
+    public ReactiveComponent<TComponent, TModel> Reactive<TArgs>(Func<TComponent, Event<TArgs>> raised, HandlerPolicy policy, Action<TArgs, Pipeline<TModel>> pipeline, [CallerFilePath] string callerFile = "", [CallerLineNumber] int callerLine = 0)
         where TArgs : JsObject, new()
         => throw new NotImplementedException();
 }

@@ -23,6 +23,15 @@ await build({
 });
 
 await build({
+  entryPoints: ["Alis.Reactive.OpenTelemetry/opentelemetry.ts"],
+  outfile: "Alis.Reactive.OpenTelemetry/wwwroot/js/alis-reactive-opentelemetry.js",
+  bundle: true,
+  format: "iife",
+  target: "es2022",
+  logLevel: "info",
+});
+
+await build({
   entryPoints: ["tests/Alis.Reactive.Conformance.App/conformance.ts"],
   outfile: "tests/Alis.Reactive.Conformance.App/wwwroot/js/alis-reactive-conformance.js",
   bundle: true,

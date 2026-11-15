@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Alis.Reactive.Tracing;
+using Alis.Reactive.TypeKnowledge;
 using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -62,7 +64,10 @@ public static class EndpointChecks
         var services = controller.HttpContext.RequestServices;
         var catalog = services.GetService<ValidatorCatalog>() ?? throw ValidatorCatalog.Missing<TRequest, TValidator>();
         var validator = catalog.Resolve<TRequest, TValidator>(services);
-        return validator.CheckBound(request, ruleSet, BindingFailures(controller), catalog.Flags);
+        using var check = ServerActivities.Check(ClassNames.AsCSharpWritesIt(typeof(TValidator)), ruleSet);
+        var result = validator.CheckBound(request, ruleSet, BindingFailures(controller), catalog.Flags);
+        ServerActivities.Checked(check, result.Errors.Count);
+        return result;
     }
 
     /// <summary>Checks the model the action bound by the validator and the rule set named, with its asynchronous rules, and adds each value the binder refused under the name it was sent under.</summary>
@@ -77,13 +82,16 @@ public static class EndpointChecks
     /// <typeparam name="TRequest">The type of the model.</typeparam>
     /// <typeparam name="TValidator">The validator that checks it.</typeparam>
     /// <returns>The check's result.</returns>
-    public static Task<ValidationResult> ValidateAsync<TRequest, TValidator>(this ControllerBase controller, TRequest request, string ruleSet, CancellationToken cancellation = default)
+    public static async Task<ValidationResult> ValidateAsync<TRequest, TValidator>(this ControllerBase controller, TRequest request, string ruleSet, CancellationToken cancellation = default)
         where TValidator : ReactiveValidator<TRequest>
     {
         var services = controller.HttpContext.RequestServices;
         var catalog = services.GetService<ValidatorCatalog>() ?? throw ValidatorCatalog.Missing<TRequest, TValidator>();
         var validator = catalog.Resolve<TRequest, TValidator>(services);
-        return validator.CheckBoundAsync(request, ruleSet, BindingFailures(controller), catalog.Flags, cancellation);
+        using var check = ServerActivities.Check(ClassNames.AsCSharpWritesIt(typeof(TValidator)), ruleSet);
+        var result = await validator.CheckBoundAsync(request, ruleSet, BindingFailures(controller), catalog.Flags, cancellation).ConfigureAwait(false);
+        ServerActivities.Checked(check, result.Errors.Count);
+        return result;
     }
 
     private static IReadOnlyList<ValidationFailure> BindingFailures(ControllerBase controller)

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json;
 using Alis.Reactive.Execution;
@@ -32,14 +33,14 @@ internal static class ViewPlans
 
     internal static void On<TModel>(ReactivePlan<TModel> plan, Action<Trigger<TModel>> trigger) => trigger(new Trigger<TModel>(plan.Writer));
 
-    internal static string ScriptOf<TModel>(ReactivePlan<TModel> plan, string prefix, Func<string> view)
+    internal static string ScriptOf<TModel>(ReactivePlan<TModel> plan, string prefix, Func<string> view, Func<bool> console)
     {
         FieldPrefixes.RefuseAMoveInsideThePlan(plan.StartPrefix, prefix, view);
-        return ScriptOf(plan);
+        var request = Activity.Current;
+        using var render = ServerActivities.Render(plan.Writer.Content.Model);
+        var document = plan.Writer.Content.Document(calls => RenderTrace.Of(request, render, calls, view, console));
+        return ScriptOpen + JsonSerializer.Serialize(document, PlanJson.Options) + ScriptClose;
     }
-
-    private static string ScriptOf<TModel>(ReactivePlan<TModel> plan)
-        => ScriptOpen + JsonSerializer.Serialize(plan.Writer.Content.Document(RenderTrace.OfTheRender()), PlanJson.Options) + ScriptClose;
 
     private static string IdOf<TModel>()
         => ClassNames.ModelKey(typeof(TModel));

@@ -4,6 +4,7 @@ ArrayLambdas
 Conditions
 OwnershipAndState
 Plugins
+Tracing
 Vendors
 TriggersAndPipelines
 InputsAndIds

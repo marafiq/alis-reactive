@@ -91,6 +91,47 @@ function deskOf(desk: unknown) {
   return (name: string, key: string) => name === "ward.desk" && key === "north" ? desk : undefined;
 }
 
+type TraceOf = Parameters<typeof start>[4];
+type Traced = ReturnType<TraceOf>;
+
+const quiet: Traced = {
+  handler: () => quiet,
+  run: () => quiet,
+  span: () => quiet,
+  send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),
+  event: () => undefined,
+  end: () => undefined,
+};
+
+const untraced: TraceOf = () => quiet;
+
+class Spans {
+  readonly recorded: string[] = [];
+
+  readonly traceOf: TraceOf = () => this.#traced("plan");
+
+  #traced(name: string): Traced {
+    return {
+      handler: (index, event) => {
+        this.recorded.push("handler " + String(index) + " " + event);
+        return quiet;
+      },
+      run: () => quiet,
+      span: (child, attributes) => {
+        this.recorded.push(child + " starts " + JSON.stringify(attributes));
+        return this.#traced(child);
+      },
+      send: () => quiet.send(),
+      event: (event, attributes) => {
+        this.recorded.push(name + " " + event + " " + JSON.stringify(attributes));
+      },
+      end: (outcome) => {
+        this.recorded.push(name + " " + outcome);
+      },
+    };
+  }
+}
+
 function nextTask(): Promise<void> {
   return new Promise((resolve) => { setTimeout(resolve, 0); });
 }
@@ -116,7 +157,7 @@ describe("when a plan starts, a handler subscribes to the object its row names",
     const monitor = new Monitor();
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
-    start(planOf(handler("bell", "sounded", ["alarm"])), ward, elementsOf(new Map([["bell-element", { current: monitor }]])), deskOf(undefined));
+    start(planOf(handler("bell", "sounded", ["alarm"])), ward, elementsOf(new Map([["bell-element", { current: monitor }]])), deskOf(undefined), untraced);
 
     monitor.raise("sounded", { text: "the monitor" }, note);
     monitor.alarm.raise("sounded", { text: "Ada" }, note);
@@ -130,7 +171,7 @@ describe("when a plan starts, a handler subscribes to the object its row names",
     const monitor = new Monitor();
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
-    start(planOf(handler("bell", "sounded", ["alarm"])), ward, elementsOf(new Map([["bell-element", { current: monitor }]])), deskOf(undefined));
+    start(planOf(handler("bell", "sounded", ["alarm"])), ward, elementsOf(new Map([["bell-element", { current: monitor }]])), deskOf(undefined), untraced);
 
     ward.release();
     monitor.alarm.raise("sounded", { text: "after" }, note);
@@ -145,7 +186,7 @@ describe("when a plan starts, a handler subscribes to the object its row names",
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    start(planOf(handler("bell", "sounded", ["siren"]), handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", { current: monitor }]])), deskOf(undefined));
+    start(planOf(handler("bell", "sounded", ["siren"]), handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", { current: monitor }]])), deskOf(undefined), untraced);
 
     monitor.raise("rang", { text: "Ada" }, note);
 
@@ -163,7 +204,7 @@ describe("when a plan starts, a handler subscribes to the object its row names",
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    start(planOf(handler("bell", "rang"), handler("desk", "called")), ward, elementsOf(page), deskOf(desk));
+    start(planOf(handler("bell", "rang"), handler("desk", "called")), ward, elementsOf(page), deskOf(desk), untraced);
 
     page.set("bell-element", { current: bell });
     bell.raise("rang", { text: "the bell" }, note);
@@ -179,7 +220,7 @@ describe("when a plan starts, a handler subscribes to the object its row names",
     const desk = new Bell();
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
-    start(planOf(handler("desk", "called")), ward, elementsOf(new Map()), deskOf(desk));
+    start(planOf(handler("desk", "called")), ward, elementsOf(new Map()), deskOf(desk), untraced);
 
     desk.raise("called", { text: "before" }, note);
     ward.release();
@@ -195,7 +236,7 @@ describe("when a plan starts, a handler subscribes to the object its row names",
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    start(planOf(handler("desk", "called"), handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined));
+    start(planOf(handler("desk", "called"), handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined), untraced);
 
     bell.raise("rang", { text: "Ada" }, note);
 
@@ -210,7 +251,7 @@ describe("when a handler's object raises, each raise reads its own payload", () 
     const bell = new Bell();
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
-    start(planOf(handler("bell", "rang", [], [2, "detail"])), ward, elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined));
+    start(planOf(handler("bell", "rang", [], [2, "detail"])), ward, elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined), untraced);
 
     bell.raise("rang", { detail: { text: "the first argument" } }, note, { detail: { text: "Ada" } });
 
@@ -223,7 +264,7 @@ describe("when a handler's object raises, each raise reads its own payload", () 
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    start(planOf(handler("bell", "rang", [], [0, "detail"])), ward, elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined));
+    start(planOf(handler("bell", "rang", [], [0, "detail"])), ward, elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined), untraced);
 
     bell.raise("rang", {}, note);
     bell.raise("rang", { detail: { text: "Ben" } }, note);
@@ -239,7 +280,7 @@ describe("when a handler's owner releases it, Ownership.tla's release holds", ()
     const bell = new Bell();
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
-    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined));
+    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined), untraced);
 
     ward.release();
     bell.raise("rang", { text: "after" }, note);
@@ -252,7 +293,7 @@ describe("when a handler's owner releases it, Ownership.tla's release holds", ()
     const ward = new Ward();
     const bell = new Bell();
     const element: Host = { current: bell };
-    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined));
+    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined), untraced);
     element.current = null;
     Object.defineProperty(bell, "off", { value: () => { throw new Error("The destroyed bell was called."); } });
 
@@ -268,7 +309,7 @@ describe("when a handler's owner releases it, Ownership.tla's release holds", ()
     const element: Host = { current: bell };
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
-    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined));
+    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined), untraced);
     element.current = restarted;
     restarted.on("rang", () => { lines.push("the restarted bell's own listener"); });
 
@@ -287,7 +328,7 @@ describe("when a handler's owner releases it, Ownership.tla's release holds", ()
     const element: Host = { current: bell };
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
-    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined));
+    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined), untraced);
     const [release] = ward.removals;
     if (release === undefined) throw new Error("The handler has no release.");
     Object.defineProperty(element, "current", {
@@ -309,7 +350,7 @@ describe("when a handler's owner releases it, Ownership.tla's release holds", ()
     const element: Host = { current: bell };
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
-    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined));
+    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined), untraced);
     const [release] = ward.removals;
     if (release === undefined) throw new Error("The handler has no release.");
     Object.defineProperty(element, "current", { get: () => { throw new Error("The lookup failed."); } });
@@ -338,7 +379,7 @@ describe("when a handler's owner releases it, Ownership.tla's release holds", ()
 
 function startedOn(ward: Ward, bell: Bell): WeakRef<Host> {
   const element: Host = { current: bell };
-  start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined));
+  start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined), untraced);
   return new WeakRef(element);
 }
 
@@ -350,8 +391,8 @@ describe("when a plan contributes an input already held on the page", () => {
     const lines: unknown[] = [];
     const note = (line: unknown) => { lines.push(line); };
     const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    start(withInput("first", "first"), first, elementsOf(new Map()), deskOf(desk));
-    start(withInput("second", "second"), second, elementsOf(new Map()), deskOf(desk));
+    start(withInput("first", "first"), first, elementsOf(new Map()), deskOf(desk), untraced);
+    start(withInput("second", "second"), second, elementsOf(new Map()), deskOf(desk), untraced);
     desk.raise("first", { text: "first heard" }, note);
     desk.raise("second", { text: "second heard" }, note);
     second.release();
@@ -359,7 +400,7 @@ describe("when a plan contributes an input already held on the page", () => {
     expect(lines).toStrictEqual(["first heard"]);
     expect(logged.mock.calls).toStrictEqual([["Input 'repeated' is already held by plan 'first' on the page; plan 'second' on the page did not start."]]);
     first.release();
-    start(withInput("third", "third"), second, elementsOf(new Map()), deskOf(desk));
+    start(withInput("third", "third"), second, elementsOf(new Map()), deskOf(desk), untraced);
     desk.raise("third", { text: "after release" }, note);
     expect(lines).toStrictEqual(["first heard", "after release"]);
     second.release();
@@ -409,7 +450,7 @@ describe("when an app event's handler hears the event on the document, its polic
     const events = new EventTarget();
     const chart = new Chart();
     const first = settled();
-    start(anAppEventsPlan("skip"), new Ward(), elementsOf(new Map()), theDocument(events));
+    start(anAppEventsPlan("skip"), new Ward(), elementsOf(new Map()), theDocument(events), untraced);
 
     events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => first.held, starts: "saving 1", ends: "saved 1" } }));
     events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => settled().held, starts: "saving 2", ends: "saved 2" } }));
@@ -425,7 +466,7 @@ describe("when an app event's handler hears the event on the document, its polic
     const chart = new Chart();
     const first = settled();
     const second = settled();
-    start(anAppEventsPlan("replace"), new Ward(), elementsOf(new Map()), theDocument(events));
+    start(anAppEventsPlan("replace"), new Ward(), elementsOf(new Map()), theDocument(events), untraced);
 
     events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => first.held, starts: "saving 1", ends: "saved 1" } }));
     events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => second.held, starts: "saving 2", ends: "saved 2" } }));
@@ -442,7 +483,7 @@ describe("when an app event's handler hears the event on the document, its polic
     const chart = new Chart();
     const first = settled();
     const second = settled();
-    start(anAppEventsPlan("overlap"), new Ward(), elementsOf(new Map()), theDocument(events));
+    start(anAppEventsPlan("overlap"), new Ward(), elementsOf(new Map()), theDocument(events), untraced);
 
     events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => first.held, starts: "saving 1", ends: "saved 1" } }));
     events.dispatchEvent(new CustomEvent("chartSaveRequested", { detail: { chart, settle: () => second.held, starts: "saving 2", ends: "saved 2" } }));
@@ -452,5 +493,43 @@ describe("when an app event's handler hears the event on the document, its polic
     await nextTask();
 
     expect(chart.lines).toStrictEqual(["saving 1", "saving 2", "saved 2", "saved 1"]);
+  });
+});
+
+describe("when a traced plan boots, its boot is a span that records no value (D20.4, D20.5)", () => {
+  test("a boot that starts every handler ends completed, each handler traced by its position and its event", () => {
+    const spans = new Spans();
+    const bell = new Bell();
+
+    start(planOf(handler("bell", "rang"), handler("bell", "sounded")), new Ward(), elementsOf(new Map([["bell-element", { current: bell }]])), deskOf(undefined), spans.traceOf);
+
+    expect(spans.recorded).toStrictEqual(["alis.boot starts {\"alis.plan_id\":\"round\"}", "handler 0 rang", "handler 1 sounded", "alis.boot completed"]);
+  });
+
+  test("a handler that does not start records an error with no reason on the boot, which goes on, and the console keeps the reason", () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const spans = new Spans();
+
+    start(planOf(handler("desk", "called"), handler("bell", "rang")), new Ward(), elementsOf(new Map([["bell-element", { current: new Bell() }]])), deskOf(undefined), spans.traceOf);
+
+    expect([spans.recorded, logged.mock.calls.length]).toStrictEqual([
+      ["alis.boot starts {\"alis.plan_id\":\"round\"}", "handler 0 called", "alis.boot alis.error {}", "handler 1 rang", "alis.boot completed"],
+      1,
+    ]);
+  });
+
+  test("a plan whose inputs cannot join the page ends its boot stopped with no reason, and the console keeps the reason", () => {
+    const logged = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const spans = new Spans();
+    const first = new Ward();
+    start(withInput("first", "first"), first, elementsOf(new Map()), deskOf(new Bell()), untraced);
+
+    start(withInput("second", "second"), new Ward(), elementsOf(new Map()), deskOf(new Bell()), spans.traceOf);
+
+    expect([spans.recorded, logged.mock.calls]).toStrictEqual([
+      ["alis.boot starts {\"alis.plan_id\":\"second\"}", "alis.boot alis.stop {}", "alis.boot stopped"],
+      [["Input 'repeated' is already held by plan 'first' on the page; plan 'second' on the page did not start."]],
+    ]);
+    first.release();
   });
 });

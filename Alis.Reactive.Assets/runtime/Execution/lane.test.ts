@@ -8,6 +8,15 @@ type Layer = Extract<Step, { kind: "request" }>["layers"][number];
 type Raised = Parameters<Lane["raise"]>[0];
 type Held = Raised["scope"] extends ReadonlyMap<string, infer Read> ? Read : never;
 
+const untraced: Raised["trace"] = {
+  handler: () => untraced,
+  run: () => untraced,
+  span: () => untraced,
+  send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),
+  event: () => undefined,
+  end: () => undefined,
+};
+
 const ward: Raised["plan"] = {
   version: 7,
   planId: "ward",
@@ -63,7 +72,7 @@ const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
 function raisedWith(bound: Readonly<Record<string, unknown>>): Raised {
   const scope = new Map<string, Held>();
   for (const [name, value] of Object.entries(bound)) scope.set(name, { kind: "value", value });
-  return { plan: ward, scope, signal: new AbortController().signal };
+  return { plan: ward, scope, signal: new AbortController().signal, trace: untraced };
 }
 
 function everyPromiseJobRan(): Promise<void> {

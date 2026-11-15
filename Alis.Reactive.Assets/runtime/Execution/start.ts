@@ -1,9 +1,10 @@
 import { pageInputs } from "../InputsAndIds/index";
 import { holdSlots, placeOf, slotsNamedBy, type Owner } from "../OwnershipAndState/index";
-import { assertNever, type Handler, type Locator, type PlanDocument } from "../Schema/index";
+import { assertNever, type Handler, type Locator, type PlanDocument, type Trace } from "../Schema/index";
+import type { Traced } from "../Tracing/index";
 import { got, heldOrNull, Stop, value } from "../ValuesAndSources/index";
 import { subscribe } from "../Vendors/index";
-import { bind, isAnObject, type Context } from "./context";
+import { bind, isAnObject, within, type Context } from "./context";
 import { evaluate } from "./expressions";
 import { Lane } from "./lane";
 import { heldBy, located, locatorOf, type ElementFor, type Located, type PluginFor } from "./objects";
@@ -11,24 +12,32 @@ import { heldBy, located, locatorOf, type ElementFor, type Located, type PluginF
 const payloadName = "e";
 const argumentsName = "arguments";
 
-export function start(plan: PlanDocument, owner: Owner, elementFor: ElementFor, pluginFor: PluginFor): void {
-  const context: Context = { plan, owner, scope: new Map(), signal: new AbortController().signal };
+export type TraceOf = (trace: Trace) => Traced;
+
+export function start(plan: PlanDocument, owner: Owner, elementFor: ElementFor, pluginFor: PluginFor, traceOf: TraceOf): void {
+  const traced = traceOf(plan.trace);
+  const boot = traced.span("alis.boot", { "alis.plan_id": plan.planId });
+  const context: Context = { plan, owner, scope: new Map(), signal: new AbortController().signal, trace: traced };
   try {
     pageInputs.join(plan, owner, placeOf(owner), expression => heldOrNull(evaluate(expression, context)));
   } catch (stopped) {
     if (!(stopped instanceof Stop)) throw stopped;
     console.error(stopped.reason);
+    boot.event("alis.stop", {});
+    boot.end("stopped");
     return;
   }
   holdSlots(slotsNamedBy(plan), owner);
-  for (const handler of plan.handlers) {
+  for (const [index, handler] of plan.handlers.entries()) {
     try {
-      listen(handler, context, elementFor, pluginFor);
+      listen(handler, within(context, traced.handler(index, handler.event)), elementFor, pluginFor);
     } catch (stopped) {
       if (!(stopped instanceof Stop)) throw stopped;
       console.error("The handler of '" + handler.event + "' on " + named(locatorOf(context, handler.on)) + " did not start: " + stopped.reason);
+      boot.event("alis.error", {});
     }
   }
+  boot.end("completed");
 }
 
 function listen(handler: Handler, context: Context, elementFor: ElementFor, pluginFor: PluginFor): void {

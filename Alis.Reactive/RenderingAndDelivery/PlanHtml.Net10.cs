@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using Alis.Reactive.PathsAndWire;
+using Alis.Reactive.Tracing;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.Validation;
 using Microsoft.AspNetCore.Html;
@@ -79,6 +80,7 @@ public static class PlanHtml
     /// <param name="plan">The plan the view opened.</param>
     /// <returns>The plan's script.</returns>
     public static IHtmlContent RenderPlan<TModel>(this IHtmlHelper html, ReactivePlan<TModel> plan)
-        => new HtmlString(ViewPlans.ScriptOf(plan, html.ViewData.TemplateInfo.HtmlFieldPrefix, () => ViewPaths.Of(html)));
+        => new HtmlString(ViewPlans.ScriptOf(plan, html.ViewData.TemplateInfo.HtmlFieldPrefix, () => ViewPaths.Of(html),
+            () => (html.ViewContext.HttpContext.RequestServices.GetService<ReactiveTracing>() ?? new ReactiveTracing()).Console));
 }
 #endif

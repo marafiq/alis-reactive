@@ -7,6 +7,15 @@ type Source = Extract<Step, { kind: "do" }>["expr"];
 type Raised = Parameters<Lane["raise"]>[0];
 type Held = Raised["scope"] extends ReadonlyMap<string, infer Read> ? Read : never;
 
+const untraced: Raised["trace"] = {
+  handler: () => untraced,
+  run: () => untraced,
+  span: () => untraced,
+  send: () => ({ attempt: () => ({ headers: {}, answered: () => undefined, end: () => undefined }), end: () => undefined }),
+  event: () => undefined,
+  end: () => undefined,
+};
+
 const ward: Raised["plan"] = {
   version: 7,
   planId: "ward",
@@ -55,7 +64,7 @@ const aRoundsOwner: ConstructorParameters<typeof Lane>[2] = {
 function raisedWith(bound: Readonly<Record<string, unknown>>, plan: Raised["plan"] = ward): Raised {
   const scope = new Map<string, Held>();
   for (const [name, value] of Object.entries(bound)) scope.set(name, { kind: "value", value });
-  return { plan, scope, signal: new AbortController().signal };
+  return { plan, scope, signal: new AbortController().signal, trace: untraced };
 }
 
 function charted(bound: Readonly<Record<string, unknown>>, read: Source, plan: Raised["plan"] = ward): unknown[] {

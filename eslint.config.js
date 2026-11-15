@@ -72,7 +72,12 @@ function rowsRule(table) {
 
 export default defineConfig(
   {
-    files: ["tests/Alis.Reactive.Conformance.App/**/*.ts", "Alis.Reactive.Assets/runtime/**/*.ts", "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.ts"],
+    files: [
+      "tests/Alis.Reactive.Conformance.App/**/*.ts",
+      "Alis.Reactive.Assets/runtime/**/*.ts",
+      "Alis.Reactive.OpenTelemetry/**/*.ts",
+      "tests/Alis.Reactive.ArchitectureTests/LintCases/**/*.ts",
+    ],
     extends: [eslint.configs.recommended, tseslint.configs.strictTypeChecked, tseslint.configs.stylisticTypeChecked],
     linterOptions: { noInlineConfig: true },
     languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname } },

@@ -208,13 +208,16 @@ internal sealed class Pages
             modules.UnionWith(walked.Modules);
             foreach (var text in walked.Unaddressed.Where(named.Contains))
                 Problems.Add($"{promise}: its test names the link '{text}' of {view}, whose address is written by no route before it, so the page it opens is not read");
-            foreach (var next in walked.Strings.Where(text => text.EndsWith(ViewSuffix, StringComparison.Ordinal))) waiting.Enqueue(next);
+            foreach (var next in walked.Strings.Where(text => text.EndsWith(ViewSuffix, StringComparison.Ordinal) && !IsItsOwnSource(view, text))) waiting.Enqueue(next);
             var slotted = walked.Strings.SelectMany(Answering).Where(action => action.Partial);
             var linked = walked.Links.Where(link => named.Contains(link.Text)).SelectMany(link => Answering(link.Route)).Where(action => action.Get);
             foreach (var next in slotted.Concat(linked).SelectMany(action => action.Views)) waiting.Enqueue(next);
         }
         return new Landing([.. modules], [.. views]);
     }
+
+    private bool IsItsOwnSource(string view, string text)
+        => !_views.ContainsKey(text) && text.Length > view.Length && text.EndsWith(view, StringComparison.Ordinal);
 
     private IEnumerable<Action> Answering(string url)
     {

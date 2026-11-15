@@ -261,8 +261,8 @@ Native's table is `NativeComponents` over `NativeAppLevelObjects/* NativeCompone
 `FusionComponents FusionTemplates` over `FusionAppLevelObjects/* FusionComponents/*`; OpenTelemetry's is `Tracing`
 alone. The runtime has its own table,
 `Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top, and its last row is the dot, the bundle's entry beside
-the table: `Schema`, `ValuesAndSources`, `ArrayLambdas`, `Conditions`, `OwnershipAndState`, `Plugins`, `Vendors`,
-`TriggersAndPipelines`, `Execution` and the dot today, a row entering with its first file. `ArrayLambdas` stands above
+the table: `Schema`, `ValuesAndSources`, `ArrayLambdas`, `Conditions`, `OwnershipAndState`, `Plugins`, `Tracing`,
+`Vendors`, `TriggersAndPipelines`, `InputsAndIds`, `RequestsAndResponses`, `Execution` and the dot today, a row entering with its first file. `ArrayLambdas` stands above
 `Conditions` there, the reverse of the core's rows, since the one switch over the operators is `Conditions`' and runs
 a list's operators too; the decimal reader both share is `ArrayLambdas`' (D6.11). The test app
 holds `Components`, what its components share, over `Components/ConformancePeer`, which ConformanceComponent's
@@ -441,7 +441,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | Vitest | vitest 5.1.0, with vite 8.3.8, the peer it requires; node environment, no jsdom | a runtime module's pure tests of what its index exports (1.2): the files that end in .test.ts under the runtime, which the root's `vitest.config.js` names |
 | @microsoft/signalr | 10.0.11 | the hub's own asset; held on the 10.0 line, the line of the hub it talks to (the latest is 11.0.0) |
 | Probe packages | jsdom 31.0.0, parse5 8.1.1, ws 8.22.2 | what the node probes load beside the pins they read: a DOM for EJ2's code, HTML's parser and a WebSocket server; no test loads them |
-| OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.1 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
+| OpenTelemetry | @opentelemetry/api 1.10.0, @opentelemetry/sdk-trace 3.1.1, @opentelemetry/resources 3.1.1, @opentelemetry/exporter-trace-otlp-http 0.301.2 | the adapter's bundle (N20.2); sdk-trace replaces sdk-trace-web, which its registry entry retires in its favor; the three move together, each peering on the API's 1.10 |
 | Roslyn | Microsoft.CodeAnalysis.CSharp 4.14.0 for the analyzer projects; 5.9.0 for the projects that host the compiler | 4.14.0 is the floor, the lowest compiler the packed analyzers load in: a compiler below an analyzer's Roslyn refuses to load it (CS9057), and 4.14.0 is Visual Studio 2022's last, so an MVC 5 app built there runs every rule; the analyzer cases, the test-rule cases and the architecture tests host 5.9.0, the latest, which parses C# 14 (`LanguageVersion.CSharp14`) |
 | Analyzer authoring | Microsoft.CodeAnalysis.Analyzers 5.9.0, private | the compiler's own rules for an analyzer project, release tracking among them (`.claude/rules/analyzers.md`) |
 | Analyzer cases | Microsoft.CodeAnalysis.CSharp.Analyzer.Testing 1.1.4, with Microsoft.CodeAnalysis.CSharp.Workspaces 5.9.0 and System.Security.Cryptography.Pkcs 10.0.15 | every analyzer's, suppressor's and test rule's cases; the library takes the workspaces package at any version, and without its pin the restore brings 1.0.1 and fails (NU1701); the Pkcs pin replaces the 9.0.6 that the library's NuGet.Packaging 7.0.3 brings, which NuGet's audit refuses (NU1903) |
