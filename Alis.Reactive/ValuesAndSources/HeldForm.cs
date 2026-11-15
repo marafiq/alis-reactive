@@ -32,7 +32,9 @@ internal sealed class HeldForm
 
     internal HeldForm Base => Own is null ? this : new(_json, RendersUnder, _baseOptions, _fromApp, null);
 
-    internal string BaseFormName => _fromApp ? "the app's JSON" : "JavaScript's value";
+    internal string BaseFormName => _fromApp ? "the app's options" : "JavaScript's value";
+
+    internal Operator KeyOfADateTime => _fromApp ? Operator.WallKey : Operator.DateKey;
 
     internal JsonSerializerOptions DataOptions => Own is { } own ? own.Member.OwnForm() : _baseOptions;
 

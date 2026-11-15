@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using Alis.Reactive.TypeKnowledge;
 
@@ -86,9 +87,42 @@ internal static class Printed
     private static string Binary(BinaryExpression binary, string op, int binds)
     {
         var groupsToTheRight = binary.NodeType == ExpressionType.Coalesce;
-        var left = Printing(binary.Left, groupsToTheRight ? binds + 1 : binds);
-        var right = Printing(binary.Right, groupsToTheRight ? binds : binds + 1);
+        var left = Operand(binary.Left, binary.Right, groupsToTheRight ? binds + 1 : binds);
+        var right = Operand(binary.Right, binary.Left, groupsToTheRight ? binds : binds + 1);
         return left + " " + op + " " + right;
+    }
+
+    private static string Operand(Expression operand, Expression partner, int outer)
+    {
+        var number = FoldedNumber(operand);
+        var held = ComparedAsItsNumber(partner);
+        return number is not null && held is not null ? AsWritten(number, held) : Printing(operand, outer);
+    }
+
+    private static object? FoldedNumber(Expression operand)
+    {
+        while (operand is UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked, Method: null } conversion) operand = conversion.Operand;
+        return operand is ConstantExpression { Value: { } value } constant && ComparedTypes.IsNumber(constant.Type) ? value : null;
+    }
+
+    private static Type? ComparedAsItsNumber(Expression partner)
+    {
+        if (partner is not UnaryExpression { NodeType: ExpressionType.Convert or ExpressionType.ConvertChecked, Method: null } conversion) return null;
+        var held = Nullable.GetUnderlyingType(conversion.Operand.Type) ?? conversion.Operand.Type;
+        var heldAsANumber = ComparedTypes.IsNumber(conversion.Type) && !ComparedTypes.IsNumber(held);
+        return heldAsANumber ? held : null;
+    }
+
+    private static string AsWritten(object number, Type held)
+    {
+        if (ComparedTypes.IsChar(held)) return "'" + Convert.ToChar(number, CultureInfo.InvariantCulture) + "'";
+        var type = ClassNames.AsCSharpWritesIt(held);
+        var named = Enum.Format(held, Enum.ToObject(held, number), "G");
+        var namesNoMember = named.Length == 0 || named[0] == '-' || char.IsDigit(named[0]);
+        if (namesNoMember) return "(" + type + ")" + ((IFormattable)number).ToString(null, CultureInfo.InvariantCulture);
+        var members = named.Split([", "], StringSplitOptions.None);
+        var written = string.Join(" | ", members.Select(member => type + "." + member));
+        return members.Length == 1 ? written : "(" + written + ")";
     }
 
     private static (string Text, int Binds) Converted(UnaryExpression conversion)
@@ -106,9 +140,17 @@ internal static class Printed
         bool truth => truth ? "true" : "false",
         string text => "\"" + text + "\"",
         char letter => "'" + letter + "'",
-        sbyte or byte or short or ushort or int or uint or long or ulong or float or double or decimal => ((IFormattable)constant.Value).ToString(null, CultureInfo.InvariantCulture),
+        float or double => Fraction((IFormattable)constant.Value),
+        sbyte or byte or short or ushort or int or uint or long or ulong or decimal => ((IFormattable)constant.Value).ToString(null, CultureInfo.InvariantCulture),
         _ => WithoutClosures(constant.ToString()),
     };
+
+    private static string Fraction(IFormattable value)
+    {
+        var text = value.ToString(null, CultureInfo.InvariantCulture);
+        var readsAsAWholeNumber = text.All(character => char.IsDigit(character) || character == '-');
+        return readsAsAWholeNumber ? text + ".0" : text;
+    }
 
     private static string WithoutClosures(string text)
     {

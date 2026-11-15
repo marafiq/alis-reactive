@@ -129,7 +129,7 @@ internal static partial class TranslatedMembers
         return new OpExpression(op, [read.Term(operands[0])]);
     };
 
-    private static Translation DatePart(Operator part) => (_, operands, read) => new OpExpression(part, [Keys.Of(operands[0].Type, read.Term(operands[0]))]);
+    private static Translation DatePart(Operator part) => (_, operands, read) => new OpExpression(part, [Keys.Of(operands[0].Type, read.Term(operands[0]), read.Form)]);
 
     private static Translation OffsetPart(Operator part) => (_, operands, read) => new OpExpression(part, [new OpExpression(Operator.WallKey, [read.Term(operands[0])])]);
 
@@ -165,7 +165,7 @@ internal static partial class TranslatedMembers
     private static OpExpression HasAValue(LinqExpression nullable, ItemLambda read)
     {
         var noValue = read.Form.Beside(null, nullable.Type);
-        return new OpExpression(Operator.Neq, [Keys.Of(nullable.Type, read.Term(nullable)), Keys.Of(nullable.Type, noValue)]);
+        return new OpExpression(Operator.Neq, [Keys.Of(nullable.Type, read.Term(nullable), read.Form), Keys.Of(nullable.Type, noValue, read.Form)]);
     }
 
     private static Translation Lookup(bool inAnyCollection) => (term, operands, read) =>
@@ -183,7 +183,9 @@ internal static partial class TranslatedMembers
         var comparesByItsOwnRules = !inAnyCollection && held is not Array;
         if (comparesByItsOwnRules)
             throw Refused(printed, "looks in a collection that can compare by its own rules, as a HashSet's comparer does; copy it into an array before the lambda, such as var wards = Model.Wards.ToArray();.");
-        var list = read.Form.Beside(held, values.Type);
+        var itemsForm = read.FormOf(item);
+        if (itemsForm.Own is { Member.HasItsOwnConverter: true }) itemsForm.RefuseAComputation();
+        var list = itemsForm.Beside(held, values.Type);
         var written = list.Value.EnumerateArray().ToList();
         var holdsAnObject = written.Any(value => value.ValueKind is JsonValueKind.Object or JsonValueKind.Array);
         if (holdsAnObject) throw Refused(printed, "looks for an object, and the browser compares objects by reference; look for a member, such as names.Contains(d.Carer.Name).");
@@ -196,10 +198,10 @@ internal static partial class TranslatedMembers
 
         var looked = read.Term(item);
         if (!Keys.IsDateOrTime(item.Type)) return new OpExpression(Operator.Includes, [list, looked]);
-        var key = Keys.Of(item.Type, looked);
+        var key = Keys.Of(item.Type, looked, itemsForm);
         if (written.Count == 0) return new OpExpression(Operator.Neq, [key, key]);
         return written
-            .Select(value => (PlanExpression)new OpExpression(Operator.Eq, [key, Keys.Of(item.Type, new LitExpression(value.Clone()))]))
+            .Select(value => (PlanExpression)new OpExpression(Operator.Eq, [key, Keys.Of(item.Type, new LitExpression(value.Clone()), itemsForm)]))
             .Aggregate((either, or) => new OpExpression(Operator.Or, [either, or]));
     };
 

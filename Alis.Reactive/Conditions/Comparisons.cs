@@ -208,7 +208,7 @@ public static class Comparisons
         var written = left.Form.Beside(right);
         var writtenAsAnObject = written.Value.ValueKind is JsonValueKind.Object or JsonValueKind.Array;
         if (writtenAsAnObject) throw ComparesObjects();
-        return Compared<TValue>(op, left, written);
+        return Compared<TValue>(op, left, written, left.Form);
     }
 
     private static TypedSource<bool> Equal<TValue>(Operator op, TypedSource<TValue> left, TypedSource<TValue> right)
@@ -216,7 +216,7 @@ public static class Comparisons
         RefuseTwoValuesWhereOneIsInItsOwnForm(left.Form);
         RefuseTwoValuesWhereOneIsInItsOwnForm(right.Form);
         if (!left.Form.WritesAsAScalar<TValue>()) throw ComparesObjects();
-        return Compared<TValue>(op, left, right.Expression);
+        return Compared<TValue>(op, left, right.Expression, right.Form);
     }
 
     private static TypedSource<bool> EqualInItsOwnForm<TValue>(Operator op, TypedSource<TValue> left, TValue right, HeldForm.OwnWriting own)
@@ -251,22 +251,19 @@ public static class Comparisons
             $"A condition orders '{own.Read}', which {own.Cause} writes unlike {form.BaseFormName}, so the browser does not order it as .NET does; order it on the server.");
     }
 
-    private static TypedSource<bool> Compared<TValue>(Operator op, TypedSource<TValue> left, Expression right)
-        => new Computed<bool>(new OpExpression(op, [Keys.Of<TValue>(left.Expression), Keys.Of<TValue>(right)]), left.Form.Computed);
+    private static TypedSource<bool> Compared<TValue>(Operator op, TypedSource<TValue> left, Expression right, HeldForm rightsForm)
+        => new Computed<bool>(new OpExpression(op, [Keys.Of<TValue>(left.Expression, left.Form), Keys.Of<TValue>(right, rightsForm)]), left.Form.Computed);
+
+    private static TypedSource<bool> Ordered<TOrdered>(Operator op, Expression left, Expression right, HeldForm form) => Ordered<TOrdered>(op, left, right, form, form);
 
     private static TypedSource<bool> Ordered<TOrdered>(Operator op, Expression left, Expression right, HeldForm form, HeldForm partnersForm)
     {
         RefuseAnOrderingInItsOwnForm(partnersForm);
-        return Ordered<TOrdered>(op, left, right, form);
-    }
-
-    private static TypedSource<bool> Ordered<TOrdered>(Operator op, Expression left, Expression right, HeldForm form)
-    {
         RefuseAnOrderingInItsOwnForm(form);
         var browserOrdersAsDotNet = Orderable.Contains(typeof(TOrdered)) || Keys.IsDateOrTime<TOrdered>();
         if (!browserOrdersAsDotNet)
             throw new InvalidOperationException("A condition orders values the browser cannot order as .NET does; order numbers, a char, or a date or a time, or order on the server.");
-        return new Computed<bool>(new OpExpression(op, [Keys.Of<TOrdered>(left), Keys.Of<TOrdered>(right)]), form.Computed);
+        return new Computed<bool>(new OpExpression(op, [Keys.Of<TOrdered>(left, form), Keys.Of<TOrdered>(right, partnersForm)]), form.Computed);
     }
 
     private static TypedSource<bool> Joined(Operator op, TypedSource<bool> left, TypedSource<bool> right)

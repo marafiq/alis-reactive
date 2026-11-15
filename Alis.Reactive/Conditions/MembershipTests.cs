@@ -93,8 +93,8 @@ public static class MembershipTests
         Comparisons.RefuseTwoValuesWhereOneIsInItsOwnForm(source.Form);
         Comparisons.RefuseTwoValuesWhereOneIsInItsOwnForm(Sources.FormOf(values));
         if (!source.Form.WritesAsAScalar<TValue>()) throw Comparisons.ComparesObjects();
-        var value = Keys.Of<TValue>(source.Expression);
-        var itemEqualsTheValue = new FnExpression([Item], new OpExpression(Operator.Eq, [Keys.Of<TValue>(new RefExpression(Item)), value]));
+        var value = Keys.Of<TValue>(source.Expression, source.Form);
+        var itemEqualsTheValue = new FnExpression([Item], new OpExpression(Operator.Eq, [Keys.Of<TValue>(new RefExpression(Item), Sources.FormOf(values)), value]));
         var anyItem = new CallExpression([new MemberStep("some")], PathMembers.RequiredIfHeld, Sources.Of(values), [itemEqualsTheValue]);
         var valueIsRead = new OpExpression(Operator.Eq, [value, value]);
         return new Computed<bool>(new OpExpression(Operator.Cond, [valueIsRead, anyItem, valueIsRead]), source.Form.Computed);

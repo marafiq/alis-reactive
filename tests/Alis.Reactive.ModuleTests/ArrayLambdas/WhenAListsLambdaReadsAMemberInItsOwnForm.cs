@@ -152,14 +152,14 @@ public sealed class WhenAListsLambdaReadsAMemberInItsOwnForm
         => Assert.That(
             () => Rendered(cart => cart.Counted.Set(cart.Doses.Select(d => d.Supply.Vials).Sum(v => v))),
             Throws.InvalidOperationException.With.Message.EqualTo(
-                "'v' is written by its class's JSON number handling, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+                "'d.Supply.Vials' is written by its class's JSON number handling, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
 
     [Test]
     public void a_selected_decimal_written_by_its_converter_is_not_a_sum_term()
         => Assert.That(
             () => Rendered(cart => cart.Charged.Set(cart.Doses.Select(d => d.Tariff).Sum(tariff => tariff))),
             Throws.InvalidOperationException.With.Message.EqualTo(
-                "'tariff' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+                "'d.Tariff' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
 
     [Test]
     public void a_selected_object_written_by_its_converter_is_not_compared()
@@ -169,7 +169,7 @@ public sealed class WhenAListsLambdaReadsAMemberInItsOwnForm
         Assert.That(
             () => Rendered(cart => cart.Flagged.Set(cart.Doses.Select(d => d.Tagged).Any(s => s == seal))),
             Throws.InvalidOperationException.With.Message.EqualTo(
-                "'s == seal' compares 's', which its own JSON converter writes unlike JavaScript's value, and .NET compares the object it holds; compare it on the server."));
+                "'s == seal' compares 'd.Tagged', which its own JSON converter writes unlike JavaScript's value, and .NET compares the object it holds; compare it on the server."));
     }
 
     [Test]
@@ -372,6 +372,29 @@ public sealed class WhenAListsLambdaReadsAMemberInItsOwnForm
 
         Assert.That(
             () => Refused(cart => cart.Flagged.Set(AnyOf(cart.Doses, d => charted.Contains(d.Charted)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'d.Charted' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
+    }
+
+    [Test]
+    public void a_decimal_its_own_number_handling_writes_as_text_is_not_looked_up_in_a_list_the_view_holds()
+    {
+        var rebates = new[] { 0.10m, 0.25m };
+
+        Assert.That(
+            () => Refused(cart => cart.Flagged.Set(AnyOf(cart.Doses, d => rebates.Contains(d.Rebate)))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'rebates.Contains(d.Rebate)' looks for a fraction the JSON writes as text, and the browser's lookup compares its text, which does not equal as the number does, as 0.10 and 0.1 or -0 and 0; "
+                + "compare a decimal with == for each value, such as d => d.Copay == 0.10m || d.Copay == 0.25m, or look it up on the server."));
+    }
+
+    [Test]
+    public void a_selected_chart_its_converter_writes_is_not_looked_up_in_a_list_the_view_holds()
+    {
+        var charted = new[] { DoseStatus.Given };
+
+        Assert.That(
+            () => Refused(cart => cart.Counted.Set(cart.Doses.Select(d => d.Charted).Count(s => charted.Contains(s)))),
             Throws.InvalidOperationException.With.Message.EqualTo(
                 "'d.Charted' is written by its own JSON converter, unlike JavaScript's value, so the browser does not hold the value .NET computes with; take it whole in a Select, or compute on the server."));
     }
