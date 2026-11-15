@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Alis.Reactive.Schema;
 using Alis.Reactive.ValuesAndSources;
@@ -11,11 +12,19 @@ namespace Alis.Reactive.Declarations;
 /// <typeparam name="TValue">The type the object's API gives the property, nullable where the API's is.</typeparam>
 public class ReadOnly<TValue> : TypedSource<TValue>
 {
+    private readonly bool _fromArguments;
+
     internal ReadOnly(JsObject owner, string member, bool optional)
+        : this(owner, new MemberStep(member), optional, false)
+    {
+    }
+
+    internal ReadOnly(JsObject owner, PathStep member, bool optional, bool fromArguments)
     {
         Owner = owner;
-        Member = new MemberStep(member);
+        Member = member;
         Optional = optional;
+        _fromArguments = fromArguments;
     }
 
     private protected JsObject Owner { get; }
@@ -24,7 +33,8 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 
     private protected bool Optional { get; }
 
-    internal override Schema.Expression Expression => new GetExpression([Member], Owner.Bound.Reads(Optional), Owner.Bound.Target);
+    internal override Schema.Expression Expression
+        => new GetExpression([Member], _fromArguments ? PathMembers.Required : Owner.Bound.Reads(Optional), _fromArguments ? Owner.Bound.Arguments : Owner.Bound.Target);
 
     internal override HeldForm Form => HeldForm.Live(Owner.Bound.Writer.Content.Json, Owner.Bound.Writer.Content.RendersUnder);
 
@@ -136,9 +146,18 @@ public sealed class Callback<TArgs, TResult>
 public class Event<TArgs>
     where TArgs : JsObject, new()
 {
-    private protected Event()
+    internal Event(JsObject owner, string name, IReadOnlyList<PathStep> payload)
     {
+        Owner = owner;
+        Name = name;
+        Payload = payload;
     }
+
+    internal JsObject Owner { get; }
+
+    internal string Name { get; }
+
+    internal IReadOnlyList<PathStep> Payload { get; }
 }
 
 /// <summary>
@@ -146,7 +165,8 @@ public class Event<TArgs>
 /// </summary>
 public sealed class Event : Event<NoPayload>
 {
-    internal Event()
+    internal Event(JsObject owner, string name)
+        : base(owner, name, [])
     {
     }
 }

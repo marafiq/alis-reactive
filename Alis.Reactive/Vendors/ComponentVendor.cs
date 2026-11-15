@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Schema;
 
@@ -17,19 +20,31 @@ public sealed class ComponentVendor
 
     private const string TheElement = "element";
 
-    private ComponentVendor(string name, Vendor grammar)
+    private ComponentVendor(string name, FnExpression locate, EventListening listening, string? elementPath, VendorLookup? lookup = null)
     {
+        if (name.Length == 0 || !IsLetter(name[0]) || name.Any(character => !IsLetter(character) && character is not (>= '0' and <= '9') and not '_' and not '-'))
+            throw new InvalidOperationException($"Vendor name '{name}' must start with a letter and contain only ASCII letters, digits, underscore, or hyphen.");
         Name = name;
-        Grammar = grammar;
+        Listening = listening;
+        Grammar = (
+            new Vendor(locate, listening.Grammar),
+            elementPath is null ? null : PathOf(elementPath),
+            lookup is null ? null : new PluginLocator(lookup.Name, "", EventListening.EventTarget.Grammar, NonePluginData.Instance));
     }
 
     /// <summary>Gets the vendor of an element that is its own object, such as a custom element, listened to as the DOM listens.</summary>
-    public static ComponentVendor Native { get; } = new("native", new Vendor(new FnExpression([TheElement], new RefExpression(TheElement)), VendorListening.OfAnEventTarget));
+    public static ComponentVendor Native { get; } = new("native", new FnExpression([TheElement], new RefExpression(TheElement)), EventListening.EventTarget, "");
 
     /// <summary>Gets the vendor's name, by which every plan of a page names it.</summary>
     public string Name { get; }
 
-    internal Vendor Grammar { get; }
+    /// <summary>Returns the vendor's name.</summary>
+    /// <returns>The name by which every plan of a page names the vendor.</returns>
+    public override string ToString() => Name;
+
+    internal (Vendor Vendor, IReadOnlyList<PathStep>? ElementPath, PluginLocator? Lookup) Grammar { get; }
+
+    internal EventListening Listening { get; }
 
     /// <summary>Defines a vendor whose object is at a path from its element, with one method that adds a listener and one that removes it.</summary>
     /// <param name="name">The vendor's name, one for each library.</param>
@@ -40,7 +55,7 @@ public sealed class ComponentVendor
     /// <returns>The vendor.</returns>
     [TypedDslExemption(NamesTheVendorsOwnApi)]
     public static ComponentVendor Define(string name, string objectPath, string subscribe, string unsubscribe, string? elementPath = null)
-        => throw new NotImplementedException();
+        => new(name, LocateAt(objectPath), EventListening.Methods(subscribe, unsubscribe), elementPath);
 
     /// <summary>Defines a vendor whose object is at a path from its element and raises an event by calling the property the event names.</summary>
     /// <param name="name">The vendor's name, one for each library.</param>
@@ -49,7 +64,7 @@ public sealed class ComponentVendor
     /// <returns>The vendor.</returns>
     [TypedDslExemption(NamesTheVendorsOwnApi)]
     public static ComponentVendor DefineCallbackProperties(string name, string objectPath, string? elementPath = null)
-        => throw new NotImplementedException();
+        => new(name, LocateAt(objectPath), EventListening.CallbackProperties, elementPath);
 
     /// <summary>Defines a vendor whose object is at a path from its element, with one method that adds a listener and returns the function that removes it.</summary>
     /// <param name="name">The vendor's name, one for each library.</param>
@@ -59,7 +74,7 @@ public sealed class ComponentVendor
     /// <returns>The vendor.</returns>
     [TypedDslExemption(NamesTheVendorsOwnApi)]
     public static ComponentVendor DefineReturnedUnsubscriber(string name, string objectPath, string subscribe, string? elementPath = null)
-        => throw new NotImplementedException();
+        => new(name, LocateAt(objectPath), EventListening.ReturnedUnsubscriber(subscribe), elementPath);
 
     /// <summary>Defines a vendor whose object a lookup finds, with one method that adds a listener and one that removes it.</summary>
     /// <param name="name">The vendor's name, one for each library.</param>
@@ -70,7 +85,7 @@ public sealed class ComponentVendor
     /// <returns>The vendor.</returns>
     [TypedDslExemption(NamesTheVendorsOwnApi)]
     public static ComponentVendor Define(string name, VendorLookup lookup, string subscribe, string unsubscribe, string? elementPath = null)
-        => throw new NotImplementedException();
+        => new(name, LocateBy(lookup), EventListening.Methods(subscribe, unsubscribe), elementPath, lookup);
 
     /// <summary>Defines a vendor whose object a lookup finds and which raises an event by calling the property the event names.</summary>
     /// <param name="name">The vendor's name, one for each library.</param>
@@ -79,7 +94,7 @@ public sealed class ComponentVendor
     /// <returns>The vendor.</returns>
     [TypedDslExemption(NamesTheVendorsOwnApi)]
     public static ComponentVendor DefineCallbackProperties(string name, VendorLookup lookup, string? elementPath = null)
-        => throw new NotImplementedException();
+        => new(name, LocateBy(lookup), EventListening.CallbackProperties, elementPath, lookup);
 
     /// <summary>Defines a vendor whose object a lookup finds, with one method that adds a listener and returns the function that removes it.</summary>
     /// <param name="name">The vendor's name, one for each library.</param>
@@ -89,7 +104,37 @@ public sealed class ComponentVendor
     /// <returns>The vendor.</returns>
     [TypedDslExemption(NamesTheVendorsOwnApi)]
     public static ComponentVendor DefineReturnedUnsubscriber(string name, VendorLookup lookup, string subscribe, string? elementPath = null)
-        => throw new NotImplementedException();
+        => new(name, LocateBy(lookup), EventListening.ReturnedUnsubscriber(subscribe), elementPath, lookup);
+
+    private static bool IsLetter(char character) => character is >= 'A' and <= 'Z' or >= 'a' and <= 'z';
+
+    private static FnExpression LocateAt(string text)
+    {
+        var path = PathOf(text);
+        var element = new RefExpression(TheElement);
+        return new FnExpression([TheElement], path.Count == 0 ? element : new GetExpression(path, PathMembers.Required, element));
+    }
+
+    private static FnExpression LocateBy(VendorLookup lookup)
+        => new([TheElement], new CallExpression([], PathMembers.Required, new ObjExpression(lookup.ObjectId), [new RefExpression(TheElement)]));
+
+    private static IReadOnlyList<PathStep> PathOf(string text)
+    {
+        if (text.Length == 0) return [];
+        var segments = text.Split('.');
+        var path = new List<PathStep>();
+        for (var index = 0; index < segments.Length; index++)
+        {
+            var segment = segments[index];
+            if (segment.Length == 0)
+                throw new InvalidOperationException($"Path '{text}' contains an empty segment at index {index}. Use dot-separated property names without consecutive, leading, or trailing dots.");
+            path.Add(int.TryParse(segment, NumberStyles.None, CultureInfo.InvariantCulture, out var position)
+                ? new IndexStep(position)
+                : new MemberStep(segment));
+        }
+
+        return path;
+    }
 }
 
 /// <summary>
@@ -101,12 +146,17 @@ public sealed class ComponentVendor
 /// </remarks>
 public sealed class VendorLookup
 {
-    private VendorLookup()
+    private VendorLookup(string name)
     {
+        Name = name;
     }
+
+    internal string Name { get; }
+
+    internal string ObjectId => "$plugin:" + Name;
 
     /// <summary>Names the plugin a library's browser code registers as its lookup.</summary>
     /// <param name="name">The name the lookup is registered under.</param>
     /// <returns>The lookup, given to a vendor in place of its object's path.</returns>
-    public static VendorLookup ByPlugin(string name) => throw new NotImplementedException();
+    public static VendorLookup ByPlugin(string name) => new(name);
 }

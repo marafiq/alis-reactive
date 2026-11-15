@@ -13,6 +13,9 @@ internal abstract class Binding
 
     internal abstract Expression Target { get; }
 
+    internal virtual Expression Arguments
+        => throw new InvalidOperationException("An argument at a position is what a listener or a callback receives: declare it on an event's payload or a callback's arguments.");
+
     internal abstract BlockWriter Writer { get; }
 
     internal abstract PathMembers Reads(bool optional);
@@ -61,4 +64,15 @@ internal sealed class Reached : Binding
         => _mayBeAbsent
             ? optional ? PathMembers.Optional : PathMembers.RequiredIfHeld
             : optional ? PathMembers.OptionalMember : PathMembers.Required;
+}
+
+internal sealed class Received(BlockWriter writer) : Binding
+{
+    internal override Expression Target { get; } = new RefExpression("e");
+
+    internal override Expression Arguments { get; } = new RefExpression("arguments");
+
+    internal override BlockWriter Writer { get; } = writer;
+
+    internal override PathMembers Reads(bool optional) => optional ? PathMembers.OptionalMember : PathMembers.Required;
 }

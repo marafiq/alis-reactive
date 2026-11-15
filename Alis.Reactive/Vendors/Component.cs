@@ -1,4 +1,3 @@
-using System;
 using Alis.Reactive.Declarations;
 
 namespace Alis.Reactive.Vendors;
@@ -17,5 +16,5 @@ public abstract class Component : EventedObject
     public abstract ComponentVendor Vendor { get; }
 
     /// <inheritdoc />
-    protected internal sealed override EventListening Listening => throw new NotImplementedException();
+    protected internal sealed override EventListening Listening => Vendor.Listening;
 }

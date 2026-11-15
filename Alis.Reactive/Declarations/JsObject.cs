@@ -224,7 +224,11 @@ public abstract class JsObject
     /// </remarks>
     /// <param name="position">The argument's position, the first at zero.</param>
     /// <returns>The argument, a source of its value.</returns>
-    protected ReadOnly<TValue> Argument<TValue>(int position) => throw new NotImplementedException();
+    protected ReadOnly<TValue> Argument<TValue>(int position)
+    {
+        _ = Bound.Arguments;
+        return new ReadOnly<TValue>(this, ArgumentPosition(position), false, true);
+    }
 
     /// <summary>Calls, with no argument, the function a listener or a callback receives at a position.</summary>
     /// <remarks>
@@ -232,7 +236,7 @@ public abstract class JsObject
     /// on any other declaration the call is refused where the view renders.
     /// </remarks>
     /// <param name="position">The function's position among the arguments, the first at zero.</param>
-    protected void MethodAt(int position) => throw new NotImplementedException();
+    protected void MethodAt(int position) => CallArgument(position, []);
 
     /// <summary>Calls, with its arguments, the function a listener or a callback receives at a position.</summary>
     /// <remarks>
@@ -241,7 +245,7 @@ public abstract class JsObject
     /// </remarks>
     /// <param name="position">The function's position among the arguments, the first at zero.</param>
     /// <param name="arguments">The call's arguments in order, each read when the line runs.</param>
-    protected void MethodAt(int position, IReadOnlyList<Arg> arguments) => throw new NotImplementedException();
+    protected void MethodAt(int position, IReadOnlyList<Arg> arguments) => CallArgument(position, arguments);
 
     /// <summary>Declares a property whose value is a function the object calls for an answer, such as a label's formatter.</summary>
     /// <param name="name">The property's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -296,7 +300,7 @@ public abstract class JsObject
     /// <param name="name">The event's JavaScript name, when it is not the C# member's name in camel case.</param>
     /// <param name="declaredBy">The name of the C# member that declares it, which the compiler supplies.</param>
     /// <returns>The event a view handles.</returns>
-    protected Event Event(string? name = null, [CallerMemberName] string declaredBy = "") => throw new NotImplementedException();
+    protected Event Event(string? name = null, [CallerMemberName] string declaredBy = "") => new(this, JavaScriptName(name, declaredBy));
 
     /// <summary>Declares an event the object raises with a payload.</summary>
     /// <param name="name">The event's JavaScript name, when it is not the C# member's name in camel case.</param>
@@ -305,7 +309,22 @@ public abstract class JsObject
     /// <returns>The event a view handles, with its payload.</returns>
     protected Event<TArgs> Event<TArgs>(string? name = null, [CallerMemberName] string declaredBy = "")
         where TArgs : JsObject, new()
-        => throw new NotImplementedException();
+        => new(this, JavaScriptName(name, declaredBy), [new IndexStep(0)]);
+
+    private void CallArgument(int position, IReadOnlyList<Arg> arguments)
+    {
+        var received = Bound.Arguments;
+        var call = new CallExpression([ArgumentPosition(position)], PathMembers.Required, received,
+            arguments.Select(argument => argument?.Written(Bound.Writer.Content.Json) ?? Literals.Text(null)).ToArray());
+        Bound.Writer.Write(new DoStatement(false, call));
+    }
+
+    private static IndexStep ArgumentPosition(int position)
+    {
+        if (position < 0)
+            throw new InvalidOperationException("An argument's position must be a non-negative integer; the first argument is at position 0.");
+        return new IndexStep(position);
+    }
 
     private Binding Member(string? name, bool optional, bool nullable, string declaredBy)
     {
