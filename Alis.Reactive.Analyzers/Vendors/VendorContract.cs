@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -10,7 +13,64 @@ internal sealed class VendorContract
 {
     private readonly ImmutableDictionary<(string Module, string Name), int> _types;
 
-    private VendorContract(ImmutableDictionary<(string Module, string Name), int> types) => _types = types;
+    private readonly ImmutableDictionary<(string Module, string Name), (Table Table, string Id)> _roots;
+
+    private VendorContract(ImmutableDictionary<(string Module, string Name), int> types, ImmutableDictionary<(string Module, string Name), (Table Table, string Id)> roots)
+    {
+        _types = types;
+        _roots = roots;
+    }
+
+    internal bool TryMember(string module, string type, string name, CancellationToken cancellationToken, out Member? member)
+    {
+        member = null;
+        if (Count(module, type) != 1) return false;
+        var root = _roots[(module, type)];
+        member = root.Table.Find(root.Id, name, new HashSet<string>(StringComparer.Ordinal), cancellationToken);
+        return true;
+    }
+
+    internal sealed class Member
+    {
+        internal Member(string kind, bool callable, bool hasSignatures, bool returnsPromise)
+        {
+            Kind = kind;
+            Callable = callable;
+            HasSignatures = hasSignatures;
+            ReturnsPromise = returnsPromise;
+        }
+
+        internal string Kind { get; }
+        internal bool Callable { get; }
+        internal bool HasSignatures { get; }
+        internal bool ReturnsPromise { get; }
+    }
+
+    private sealed class Table
+    {
+        private readonly ImmutableDictionary<(string Type, string Name), Member> _members;
+        private readonly ImmutableDictionary<string, ImmutableArray<string>> _bases;
+
+        internal Table(ImmutableDictionary<(string Type, string Name), Member> members, ImmutableDictionary<string, ImmutableArray<string>> bases)
+        {
+            _members = members;
+            _bases = bases;
+        }
+
+        internal Member? Find(string type, string name, HashSet<string> visited, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!visited.Add(type)) return null;
+            if (_members.TryGetValue((type, name), out var member)) return member;
+            if (!_bases.TryGetValue(type, out var bases)) return null;
+            foreach (var parent in bases)
+            {
+                if (Find(parent, name, visited, cancellationToken) is { } inherited) return inherited;
+            }
+
+            return null;
+        }
+    }
 
     internal int Count(string module, string name) => _types.TryGetValue((module, name), out var count) ? count : 0;
 
@@ -23,6 +83,7 @@ internal sealed class VendorContract
     internal static VendorContract? Read(AnalyzerOptions options, CancellationToken cancellationToken)
     {
         var types = ImmutableDictionary.CreateBuilder<(string Module, string Name), int>();
+        var roots = ImmutableDictionary.CreateBuilder<(string Module, string Name), (Table Table, string Id)>();
         var read = false;
         foreach (var file in options.AdditionalFiles)
         {
@@ -31,20 +92,52 @@ internal sealed class VendorContract
             var text = file.GetText(cancellationToken);
             if (text is null || text.Lines[0].ToString() != "format\t1") continue;
             read = true;
+            var declarations = new List<(string Module, string Name, string Id)>();
+            var members = new List<string[]>();
+            var bases = new Dictionary<string, SortedDictionary<int, string>>(StringComparer.Ordinal);
+            var signatures = new Dictionary<string, bool>(StringComparer.Ordinal);
             foreach (var line in text.Lines)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var written = line.ToString();
-                if (!written.StartsWith("type\t", StringComparison.Ordinal)) continue;
-                var columns = written.Split('\t');
-                if (columns.Length != 6 || columns[4] is not ("class" or "interface" or "alias" or "function" or "enum")) continue;
-                var key = (Unescape(columns[2]), Unescape(columns[3]));
-                types.TryGetValue(key, out var count);
-                types[key] = count + 1;
+                var columns = line.ToString().Split('\t');
+                switch (columns[0])
+                {
+                    case "type" when columns.Length == 6 && columns[4] is "class" or "interface" or "alias" or "function" or "enum":
+                        var module = Unescape(columns[2]);
+                        var name = Unescape(columns[3]);
+                        types.TryGetValue((module, name), out var count);
+                        types[(module, name)] = count + 1;
+                        declarations.Add((module, name, Unescape(columns[1])));
+                        break;
+                    case "member" when columns.Length == 9 && columns[4] is "method" or "property" or "readonly" or "writeonly":
+                        members.Add(columns);
+                        break;
+                    case "base" when columns.Length == 4 && int.TryParse(columns[2], NumberStyles.None, CultureInfo.InvariantCulture, out var ordinal):
+                        var owner = Unescape(columns[1]);
+                        if (!bases.TryGetValue(owner, out var parents)) bases[owner] = parents = new SortedDictionary<int, string>();
+                        parents[ordinal] = Unescape(columns[3]);
+                        break;
+                    case "signature" when columns.Length == 8 && columns[2] == "member" && columns[5] is "none" or "promise" or "mixed":
+                        var id = Unescape(columns[3]);
+                        signatures.TryGetValue(id, out var returnsPromise);
+                        signatures[id] = returnsPromise || columns[5] is "promise" or "mixed";
+                        break;
+                }
             }
+
+            var publicMembers = ImmutableDictionary.CreateBuilder<(string Type, string Name), Member>();
+            foreach (var member in members)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var hasSignatures = signatures.TryGetValue(Unescape(member[1]), out var returnsPromise);
+                publicMembers[(Unescape(member[2]), Unescape(member[3]))] = new Member(member[4], member[8] == "true", hasSignatures, returnsPromise);
+            }
+
+            var table = new Table(publicMembers.ToImmutable(), bases.ToImmutableDictionary(pair => pair.Key, pair => pair.Value.Values.ToImmutableArray()));
+            foreach (var declaration in declarations) roots[(declaration.Module, declaration.Name)] = (table, declaration.Id);
         }
 
-        return read ? new VendorContract(types.ToImmutable()) : null;
+        return read ? new VendorContract(types.ToImmutable(), roots.ToImmutable()) : null;
     }
 
     private static string Unescape(string text)

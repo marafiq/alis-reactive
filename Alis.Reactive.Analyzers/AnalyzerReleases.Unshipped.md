@@ -9,6 +9,9 @@ ALIS012 | Alis.Reactive.Analyzers | Error | A public class nothing derives from 
 ALIS013 | Alis.Reactive.Analyzers | Error | SliceTree.txt and its project agree
 ALIS014 | Alis.Reactive.Analyzers | Error | A component or plugin names the TypeScript type it mirrors
 ALIS015 | Alis.Reactive.Analyzers | Error | A mirrored type names one type in the vendor contract
+ALIS016 | Alis.Reactive.Analyzers | Error | A declared member is public on its vendor type and its bases
+ALIS017 | Alis.Reactive.Analyzers | Error | A method door follows its vendor promise
+ALIS018 | Alis.Reactive.Analyzers | Error | A declaration door follows its vendor member kind and access
 ALIS023 | Alis.Reactive.Analyzers | Error | A declaration door is the body of the member it declares, and its declaredBy: is the compiler's
 ALIS024 | Alis.Reactive.Analyzers | Error | A declaration door's arguments are constants the build reads
 ALIS025 | Alis.Reactive.Analyzers | Error | An override keeps the JSON name and the ignore of the member it overrides
