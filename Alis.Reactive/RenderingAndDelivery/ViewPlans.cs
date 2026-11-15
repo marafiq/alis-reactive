@@ -16,7 +16,7 @@ internal static class ViewPlans
     private const string ScriptClose = "</script>";
 
     internal static ReactivePlan<TModel> Open<TModel>(AppJson json)
-        => new(new BlockWriter(new PlanContent(IdOf<TModel>(), ViewCulture.Of(CultureInfo.CurrentCulture), ClockTimeZone.Instance, json)));
+        => new(new BlockWriter(new PlanContent(IdOf<TModel>(), CultureInfo.CurrentCulture, ClockTimeZone.Instance, json)));
 
     internal static void On<TModel>(ReactivePlan<TModel> plan, Action<Trigger<TModel>> trigger) => trigger(new Trigger<TModel>(plan.Writer));
 

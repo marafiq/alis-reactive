@@ -57,6 +57,10 @@ public sealed class CartDose
 
     public char Initial { get; set; } = 'A';
 
+    public bool Late { get; set; }
+
+    public Guid Batch { get; set; }
+
     public DateTime Due { get; set; }
 
     public DateTime Given { get; set; }

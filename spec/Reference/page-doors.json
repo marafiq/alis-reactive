@@ -2577,7 +2577,6 @@
   },
   "M4.F1 M4.X3 0": {
     "modules": [
-      "ArrayLambdas",
       "Declarations",
       "Elements",
       "InputsAndIds",
@@ -2669,7 +2668,6 @@
   },
   "M4.F1 X6.28 0": {
     "modules": [
-      "ArrayLambdas",
       "Elements",
       "RequestsAndResponses",
       "TriggersAndPipelines"
@@ -2694,7 +2692,6 @@
   },
   "M4.F1 X6.32 0": {
     "modules": [
-      "ArrayLambdas",
       "Elements",
       "RequestsAndResponses",
       "TriggersAndPipelines"

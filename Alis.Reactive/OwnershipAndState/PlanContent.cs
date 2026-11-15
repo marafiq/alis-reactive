@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Alis.Reactive.PathsAndWire;
 using Alis.Reactive.Schema;
 using TimeZone = Alis.Reactive.Schema.TimeZone;
@@ -16,15 +17,18 @@ internal sealed class PlanContent
     private readonly List<Handler> _handlers = [];
     private bool _rendered;
 
-    internal PlanContent(string planId, Culture culture, TimeZone timeZone, AppJson json)
+    internal PlanContent(string planId, CultureInfo rendersUnder, TimeZone timeZone, AppJson json)
     {
         _planId = planId;
-        _culture = culture;
+        _culture = ViewCulture.Of(rendersUnder);
+        RendersUnder = rendersUnder;
         _timeZone = timeZone;
         Json = json;
     }
 
     internal AppJson Json { get; }
+
+    internal CultureInfo RendersUnder { get; }
 
     internal void Uses(string vendorName, Vendor vendor)
     {

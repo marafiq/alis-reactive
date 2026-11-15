@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Alis.Reactive.PathsAndWire;
@@ -11,17 +12,20 @@ internal sealed class HeldForm
     private readonly AppJson _json;
     private readonly bool _ownForm;
 
-    private HeldForm(AppJson json, bool ownForm)
+    private HeldForm(AppJson json, CultureInfo rendersUnder, bool ownForm)
     {
         _json = json;
+        RendersUnder = rendersUnder;
         _ownForm = ownForm;
     }
 
-    internal HeldForm Computed => _ownForm ? throw new NotImplementedException() : Live(_json);
+    internal CultureInfo RendersUnder { get; }
 
-    internal HeldForm OwnForm => new(_json, ownForm: true);
+    internal HeldForm Computed => _ownForm ? throw new NotImplementedException() : Live(_json, RendersUnder);
 
-    internal static HeldForm Live(AppJson json) => new(json, ownForm: false);
+    internal HeldForm OwnForm => new(_json, RendersUnder, ownForm: true);
+
+    internal static HeldForm Live(AppJson json, CultureInfo rendersUnder) => new(json, rendersUnder, ownForm: false);
 
     internal LitExpression Beside<TValue>(TValue value) => _ownForm ? throw new NotImplementedException() : Literals.Of(value, _json);
 

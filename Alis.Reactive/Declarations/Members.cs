@@ -26,7 +26,7 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 
     internal override Schema.Expression Expression => new GetExpression([Member], Owner.Bound.Reads(Optional), Owner.Bound.Target);
 
-    internal override HeldForm Form => HeldForm.Live(Owner.Bound.Writer.Content.Json);
+    internal override HeldForm Form => HeldForm.Live(Owner.Bound.Writer.Content.Json, Owner.Bound.Writer.Content.RendersUnder);
 
     /// <summary>Reads data past the property: a field of the value it holds, at any depth.</summary>
     /// <remarks>

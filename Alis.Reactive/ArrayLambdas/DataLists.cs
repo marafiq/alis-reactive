@@ -89,7 +89,8 @@ public static class DataLists
     /// <param name="list">The list to order.</param>
     /// <param name="key">The key read from each item.</param>
     /// <returns>A source of a new list in the key's order.</returns>
-    public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey>> key) => throw new NotImplementedException();
+    public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey>> key)
+        => Sorted(list, key, ListOrder.ComparisonOf<TKey>(key, Sources.FormOf(list)), descending: false);
 
     /// <summary>Orders the list's items by a key that holds null, the smallest first and null before every value.</summary>
     /// <param name="list">The list to order.</param>
@@ -97,7 +98,7 @@ public static class DataLists
     /// <returns>A source of a new list in the key's order.</returns>
     public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey?>> key)
         where TKey : struct
-        => throw new NotImplementedException();
+        => Sorted(list, key, ListOrder.ComparisonOf<TKey>(key, Sources.FormOf(list)), descending: false);
 
     /// <summary>Orders the list's items by a text key, compared as the comparer compares.</summary>
     /// <remarks>
@@ -108,7 +109,8 @@ public static class DataLists
     /// <param name="key">The text read from each item.</param>
     /// <param name="comparer">How two texts are compared.</param>
     /// <returns>A source of a new list in the key's order.</returns>
-    public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, string?>> key, StringComparer comparer) => throw new NotImplementedException();
+    public static TypedSource<IReadOnlyList<TItem>> OrderBy<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, string?>> key, StringComparer comparer)
+        => Sorted(list, key, ListOrder.TextComparison(key, comparer, Sources.FormOf(list)), descending: false);
 
     /// <summary>Orders the list's items by a key, the greatest first and null after every value.</summary>
     /// <remarks>
@@ -118,7 +120,8 @@ public static class DataLists
     /// <param name="list">The list to order.</param>
     /// <param name="key">The key read from each item.</param>
     /// <returns>A source of a new list in the key's reverse order.</returns>
-    public static TypedSource<IReadOnlyList<TItem>> OrderByDescending<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey>> key) => throw new NotImplementedException();
+    public static TypedSource<IReadOnlyList<TItem>> OrderByDescending<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey>> key)
+        => Sorted(list, key, ListOrder.ComparisonOf<TKey>(key, Sources.FormOf(list)), descending: true);
 
     /// <summary>Orders the list's items by a key that holds null, the greatest first and null after every value.</summary>
     /// <param name="list">The list to order.</param>
@@ -126,7 +129,7 @@ public static class DataLists
     /// <returns>A source of a new list in the key's reverse order.</returns>
     public static TypedSource<IReadOnlyList<TItem>> OrderByDescending<TItem, TKey>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, TKey?>> key)
         where TKey : struct
-        => throw new NotImplementedException();
+        => Sorted(list, key, ListOrder.ComparisonOf<TKey>(key, Sources.FormOf(list)), descending: true);
 
     /// <summary>Orders the list's items by a text key, in the reverse of the comparer's order.</summary>
     /// <remarks>
@@ -137,7 +140,8 @@ public static class DataLists
     /// <param name="key">The text read from each item.</param>
     /// <param name="comparer">How two texts are compared.</param>
     /// <returns>A source of a new list in the key's reverse order.</returns>
-    public static TypedSource<IReadOnlyList<TItem>> OrderByDescending<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, string?>> key, StringComparer comparer) => throw new NotImplementedException();
+    public static TypedSource<IReadOnlyList<TItem>> OrderByDescending<TItem>(this ITypedSource<IEnumerable<TItem>> list, Expression<Func<TItem, string?>> key, StringComparer comparer)
+        => Sorted(list, key, ListOrder.TextComparison(key, comparer, Sources.FormOf(list)), descending: true);
 
     /// <summary>Adds a whole number read from every item.</summary>
     /// <remarks>A total past the range of <see cref="int"/> stops the pipeline, as .NET's checked sum refuses it.</remarks>
@@ -164,6 +168,7 @@ public static class DataLists
     private const string Every = "every";
     private const string FindItem = "find";
     private const string LengthOf = "length";
+    private const string ToSorted = "toSorted";
 
     private static GetExpression Length(PlanExpression list) => new([new MemberStep(LengthOf)], PathMembers.RequiredIfHeld, list);
 
@@ -172,6 +177,9 @@ public static class DataLists
 
     private static CallExpression Found<TItem>(ITypedSource<IEnumerable<TItem>> list, LambdaExpression predicate)
         => Called(FindItem, list, ItemLambda.Of(predicate, Sources.FormOf(list)));
+
+    private static Computed<IReadOnlyList<TItem>> Sorted<TItem>(ITypedSource<IEnumerable<TItem>> list, LambdaExpression key, Operator comparison, bool descending)
+        => new(Called(ToSorted, list, ItemLambda.Comparing(key, Sources.FormOf(list), comparison, descending)), Sources.FormOf(list));
 
     private static Computed<TTotal> Summed<TItem, TTotal>(Operator sum, ITypedSource<IEnumerable<TItem>> list, LambdaExpression term)
         => new(new OpExpression(sum, [Called(Map, list, ItemLambda.Of(term, Sources.FormOf(list)))]), Sources.FormOf(list).Computed);

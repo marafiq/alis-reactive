@@ -15,6 +15,8 @@ namespace Alis.Reactive.ArrayLambdas;
 internal sealed class ItemLambda
 {
     private const string Item = "item";
+    private const string Left = "left";
+    private const string Right = "right";
 
     private static readonly Dictionary<ExpressionType, (Operator Op, bool Orders)> Comparisons = new()
     {
@@ -44,6 +46,9 @@ internal sealed class ItemLambda
 
     internal static FnExpression EveryItem() => new([Item + "1"], new LitExpression(JsonSerializer.SerializeToElement(true)));
 
+    internal static FnExpression Comparing(LambdaExpression key, HeldForm form, Operator comparison, bool descending)
+        => Outermost(key, form).Sort(key, comparison, descending);
+
     private static ItemLambda Outermost(LambdaExpression lambda, HeldForm form) => new(lambda, [], form);
 
     private FnExpression Fn(LambdaExpression lambda, Func<PlanExpression, PlanExpression> shaped)
@@ -51,6 +56,22 @@ internal sealed class ItemLambda
         var name = Item + (_items.Count + 1).ToString(CultureInfo.InvariantCulture);
         var items = new Dictionary<ParameterExpression, string>(_items) { [lambda.Parameters[0]] = name };
         return new FnExpression([name], shaped(new ItemLambda(_lambda, items, _form).Term(lambda.Body)));
+    }
+
+    private FnExpression Sort(LambdaExpression key, Operator comparison, bool descending)
+    {
+        var depth = (_items.Count + 1).ToString(CultureInfo.InvariantCulture);
+        var left = Left + depth;
+        var right = Right + depth;
+        var leftKey = KeyOf(key, left);
+        var rightKey = KeyOf(key, right);
+        return new FnExpression([left, right], new OpExpression(comparison, descending ? [rightKey, leftKey] : [leftKey, rightKey]));
+    }
+
+    private PlanExpression KeyOf(LambdaExpression key, string item)
+    {
+        var items = new Dictionary<ParameterExpression, string>(_items) { [key.Parameters[0]] = item };
+        return Keys.Of(key.Body.Type, new ItemLambda(_lambda, items, _form).Term(key.Body));
     }
 
     private PlanExpression Term(LinqExpression node) => node switch
