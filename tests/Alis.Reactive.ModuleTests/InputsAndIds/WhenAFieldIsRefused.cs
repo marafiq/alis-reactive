@@ -66,8 +66,8 @@ public sealed class WhenAFieldIsRefused
     {
         var html = Views.Of(new MoveIn());
         var plan = html.ReactivePlan<MoveIn>();
-        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Items.Count), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Items.Count' binds Count, which List<String> declares, and the app's JSON options write List<String> as a list, so the input has no body path: bind a member of a class they write as an object."));
-        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Room.Length), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Room.Length' binds Length, which String declares, and the app's JSON options write String as one value, so the input has no body path: bind a member of a class they write as an object."));
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Items.Count), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Items.Count' binds Count, which List<string> declares, and the app's JSON options write List<string> as a list, so the input has no body path: bind a member of a class they write as an object."));
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Room.Length), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Room.Length' binds Length, which string declares, and the app's JSON options write string as one value, so the input has no body path: bind a member of a class they write as an object."));
         Assert.That(() => MoveInPlans.Box(html, plan, m => m.Kin.Name), Throws.Nothing);
         html.RenderPlan(plan);
     }
@@ -97,7 +97,7 @@ public sealed class WhenAFieldIsRefused
     {
         var html = Views.Of(new MoveIn());
         var plan = html.ReactivePlan<MoveIn>();
-        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Strength!.Value), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Strength.Value' binds Value, which Decimal? declares, not a member of MoveIn: bind 'm => m.Strength', which takes a Decimal?."));
+        Assert.That(() => MoveInPlans.Box(html, plan, m => m.Strength!.Value), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Strength.Value' binds Value, which decimal? declares, not a member of MoveIn: bind 'm => m.Strength', which takes a decimal?."));
         Assert.That(() => MoveInPlans.Box(html, plan, m => m.Strength), Throws.Nothing);
         html.RenderPlan(plan);
     }

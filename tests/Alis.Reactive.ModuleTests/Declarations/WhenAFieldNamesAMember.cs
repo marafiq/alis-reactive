@@ -162,7 +162,7 @@ public sealed class WhenAFieldNamesAMember
         Assert.That(
             () => theView(),
             Throws.InvalidOperationException.With.Message.EqualTo(
-                "'r => r.Name.Length' reads a member of 'String' that the app's JSON options do not write, so the browser never holds it."));
+                "'r => r.Name.Length' reads a member of 'string' that the app's JSON options do not write, so the browser never holds it."));
     }
 
     [Test]

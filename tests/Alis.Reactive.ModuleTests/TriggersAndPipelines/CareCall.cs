@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Plugins;
 using Alis.Reactive.TriggersAndPipelines;
@@ -38,6 +40,21 @@ public sealed class Escalation
     public string? Note { get; set; }
 }
 
+public sealed class RoundOfCarers
+{
+    public int Room { get; set; }
+
+    public List<RoundCarer> Carers { get; set; } = [];
+}
+
+public sealed record RoundCarer(string Name);
+
+public sealed class SignedRound
+{
+    [JsonPropertyName("SignedBy")]
+    public string Carer { get; set; } = "";
+}
+
 public static class CareEvents
 {
     public static readonly AppEvent RoundStarted = AppEvent.Declare();
@@ -47,6 +64,10 @@ public static class CareEvents
     public static readonly AppEvent<ResidentFlagged> Acknowledged = AppEvent.Declare<ResidentFlagged>();
 
     public static readonly AppEvent<Escalation> Escalated = AppEvent.Declare<Escalation>(name: "care-escalated");
+
+    public static readonly AppEvent<RoundOfCarers> RoundStaffed = AppEvent.Declare<RoundOfCarers>();
+
+    public static readonly AppEvent<SignedRound> RoundSigned = AppEvent.Declare<SignedRound>();
 }
 
 public sealed class CareDesk : Plugin

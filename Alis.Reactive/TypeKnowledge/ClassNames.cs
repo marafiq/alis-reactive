@@ -12,6 +12,27 @@ internal static class ClassNames
     private const char ArityMark = '`';
     private const char ArgumentsOpen = '[';
 
+    private static readonly Dictionary<Type, string> Keywords = new()
+    {
+        [typeof(bool)] = "bool",
+        [typeof(byte)] = "byte",
+        [typeof(sbyte)] = "sbyte",
+        [typeof(char)] = "char",
+        [typeof(decimal)] = "decimal",
+        [typeof(double)] = "double",
+        [typeof(float)] = "float",
+        [typeof(int)] = "int",
+        [typeof(uint)] = "uint",
+        [typeof(nint)] = "nint",
+        [typeof(nuint)] = "nuint",
+        [typeof(long)] = "long",
+        [typeof(ulong)] = "ulong",
+        [typeof(short)] = "short",
+        [typeof(ushort)] = "ushort",
+        [typeof(object)] = "object",
+        [typeof(string)] = "string",
+    };
+
     internal static string ModelKey(Type model)
         => model.FullName ?? throw new InvalidOperationException("A plan's model is a type with a full name.");
 
@@ -33,7 +54,7 @@ internal static class ClassNames
             var digits = at + 1;
             while (digits < written.Length && char.IsDigit(written[digits])) digits++;
             var arity = int.Parse(written.Substring(at + 1, digits - at - 1), CultureInfo.InvariantCulture);
-            named.Append('<').Append(string.Join(", ", Enumerable.Range(0, arity).Select(_ => AsCSharpWritesIt(arguments.Dequeue())))).Append('>');
+            named.Append('<').Append(string.Join(", ", Enumerable.Range(0, arity).Select(_ => ByTypeNames(arguments.Dequeue())))).Append('>');
             at = digits - 1;
         }
 
@@ -41,13 +62,18 @@ internal static class ClassNames
     }
 
     internal static string AsCSharpWritesIt(Type type)
+        => Keywords.TryGetValue(type, out var keyword) ? keyword : Composed(type, AsCSharpWritesIt);
+
+    private static string ByTypeNames(Type type) => Composed(type, ByTypeNames);
+
+    private static string Composed(Type type, Func<Type, string> named)
     {
-        if (Nullable.GetUnderlyingType(type) is { } underlying) return AsCSharpWritesIt(underlying) + "?";
+        if (Nullable.GetUnderlyingType(type) is { } underlying) return named(underlying) + "?";
         var name = NameOf(type);
         if (type.IsArray) return name;
         var arity = name.IndexOf(ArityMark);
         if (arity < 0) return name;
-        return name.Substring(0, arity) + "<" + string.Join(", ", type.GetGenericArguments().Select(AsCSharpWritesIt)) + ">";
+        return name.Substring(0, arity) + "<" + string.Join(", ", type.GetGenericArguments().Select(named)) + ">";
     }
 
     internal static string PartialViewOf(Type type)

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -98,9 +99,12 @@ internal sealed class WrittenMember
     [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's exception, 2026-11-06: the class that declares a lambda's member is a type's identity, not a discovery of members (D18.1, D18.3).")]
     internal static Type? DeclaringClass(MemberExpression access) => access.Member.DeclaringType;
 
-    [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "A type's name is its identity (D18.1), and X18.8's refusal names the class a read starts from by it.")]
-    private static string NameOf(JsonTypeInfo holder) => holder.Type.Name;
+    [SuppressMessage("ApiDesign", "RS0030:Do not use banned APIs", Justification = "The owner's exception, 2026-11-16: a contract's member names no C# member, so a refusal names it by the member behind it (D18.1, M1.X8, M1.X9).")]
+    internal static string AsCSharpDeclaresIt(JsonTypeInfo holder, JsonPropertyInfo member)
+        => member.AttributeProvider is MemberInfo declared
+            ? declared.Name
+            : throw new InvalidOperationException($"'{ClassNames.AsCSharpWritesIt(holder.Type)}' holds '{member.Name}', a member the app's JSON contract adds and no C# member declares, so the core cannot name it as C# declares it.");
 
     private static InvalidOperationException NotWritten(LambdaExpression read, JsonTypeInfo holder)
-        => new($"'{read}' reads a member of '{NameOf(holder)}' that the app's JSON options do not write, so the browser never holds it.");
+        => new($"'{read}' reads a member of '{ClassNames.AsCSharpWritesIt(holder.Type)}' that the app's JSON options do not write, so the browser never holds it.");
 }

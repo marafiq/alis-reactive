@@ -89,4 +89,44 @@ public sealed class WhenMarkupRaisesAnAppEvent
         html.RenderPlan(plan);
         Assert.That(marked, Is.EqualTo("data-alis-raise=\"flagged\""));
     }
+
+    [Test]
+    public void a_payload_of_null_whose_type_holds_a_list_is_refused_naming_the_member_and_dispatch()
+    {
+        var html = Views.Of(new CareCall("North"));
+        var plan = html.ReactivePlan<CareCall>();
+
+        Action theView = () =>
+        {
+            html.Raises(plan, CareEvents.RoundStaffed, null!);
+            html.RenderPlan(plan);
+        };
+
+        Assert.That(
+            () => theView(),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'RoundOfCarers.Carers' is a List<RoundCarer>, and markup carries each member of the payload it raises as the text of one attribute, "
+                + "so a member it carries is text, a number, a bool, a date, a Guid or an enum. "
+                + "Raise a payload that holds a record or a list from a pipeline, with p.Dispatch."));
+    }
+
+    [Test]
+    public void a_payload_of_null_whose_type_names_a_member_so_no_attribute_carries_it_back_is_refused_naming_the_member_its_name_and_dispatch()
+    {
+        var html = Views.Of(new CareCall("North"));
+        var plan = html.ReactivePlan<CareCall>();
+
+        Action theView = () =>
+        {
+            html.Raises(plan, CareEvents.RoundSigned, null!);
+            html.RenderPlan(plan);
+        };
+
+        Assert.That(
+            () => theView(),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "'SignedRound.Carer' is named 'SignedBy', and markup carries each member of the payload it raises as an attribute whose name the browser lowercases, "
+                + "so a name it carries is camel case: a lowercase first letter, then letters, digits or underscores. "
+                + "Rename it, or raise the payload from a pipeline, with p.Dispatch."));
+    }
 }

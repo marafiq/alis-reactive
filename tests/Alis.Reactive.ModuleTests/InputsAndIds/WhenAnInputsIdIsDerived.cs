@@ -28,6 +28,13 @@ public sealed class WhenAnInputsIdIsDerived
     }
 
     [Test]
+    public void a_type_argument_csharp_writes_as_a_keyword_is_named_by_its_type_name()
+    {
+        Assert.That(IdGenerator.For<ChartEntry<int>, string>(m => m.Initials), Is.EqualTo("Alis_Reactive_ModuleTests_InputsAndIds_ChartEntry_Int32___Initials"));
+        Assert.That(IdGenerator.For<ChartEntry<string>, string>(m => m.Initials), Is.EqualTo("Alis_Reactive_ModuleTests_InputsAndIds_ChartEntry_String___Initials"));
+    }
+
+    [Test]
     public void a_member_a_base_class_declares_takes_the_base_class_id_in_a_view_of_the_derived_class()
     {
         Assert.That(IdGenerator.For<Resident, string>(m => m.Name), Is.EqualTo("Alis_Reactive_ModuleTests_InputsAndIds_Person__Name"));

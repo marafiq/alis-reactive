@@ -3642,8 +3642,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   `tests/Alis.Reactive.Framework.PlaywrightTests/Partials/WhenAnInputsIdCannotFollowItsMember.cs` proves the message
   where the view renders at 65fdf118d.
 - `X14.14` analyzer (D14.3, R14.1): an input of `m => m.Dose.Value` over a `decimal?` is refused with "Input
-  'm => m.Dose.Value' binds Value, which Decimal? declares, not a member of {model}: bind 'm => m.Dose', which takes
-  a Decimal?." At build by ALIS033, and where the view renders on code it does not follow
+  'm => m.Dose.Value' binds Value, which decimal? declares, not a member of {model}: bind 'm => m.Dose', which takes
+  a decimal?." At build by ALIS033, and where the view renders on code it does not follow
   (D18.6): new:N18.10.
 - `X14.15` refusal (D14.3, R14.1, D18.2): an input of `m => m.Items.Count` is refused with "Input 'm => m.Items.Count' binds
   Count, which {List<Item>} declares, and the app's JSON options write {List<Item>} as {a list | one value}, so the
@@ -4900,6 +4900,10 @@ plans (Q19).
     factory on the declaration, which net48's runtime does not support;
   - `Expression.Compile` in validation, where the server runs a condition, a member read and a fixed operand, the tree
     the browser reads (Q16, C13).
+  The owner granted one more on 2026-11-16, (5) of `spec/CLAUDE.md`, which the rewrite's list holds:
+  - the C# member behind a member of the app's contract, `JsonPropertyInfo.AttributeProvider` read as a `MemberInfo`
+    for its `Name`, in `TypeKnowledge/WrittenMember.cs`, since System.Text.Json's member names no C# member: markup's
+    raise names the payload member it refuses as C# declares it (M1.X8, M1.X9).
   The POC stands until the rewrite's request, declarations, validation and inputs units: it sends an enum a source
   holds as it is held, its `Enum.ToString` of a literal and its `new T()` are on no list in `WhenTheCoreIsCompiled`,
   and it refuses a member a generic class declares.

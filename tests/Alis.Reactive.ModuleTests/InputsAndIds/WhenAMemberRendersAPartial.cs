@@ -144,7 +144,7 @@ public sealed class WhenAMemberRendersAPartial
     public async Task a_partial_refuses_a_member_a_nullable_declares()
     {
         var html = Views.Of(new Family());
-        Assert.That(async () => await Partial(html, m => m.Dose!.Value), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Dose.Value' binds Value, which Decimal? declares, not a member of Family: bind 'm => m.Dose', which takes a Decimal?."));
+        Assert.That(async () => await Partial(html, m => m.Dose!.Value), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Dose.Value' binds Value, which decimal? declares, not a member of Family: bind 'm => m.Dose', which takes a decimal?."));
         Assert.That(Views.TextOf(await html.PartialFor(m => m.Dose, "DoseCard")).Trim(), Is.EqualTo("<p>0.125</p>"));
     }
 

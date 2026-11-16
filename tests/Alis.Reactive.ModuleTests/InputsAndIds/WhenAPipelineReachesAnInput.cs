@@ -69,13 +69,13 @@ public sealed class WhenAPipelineReachesAnInput
 
     [Test]
     public void an_input_read_refuses_a_member_a_nullable_declares()
-        => Assert.That(() => Reach(m => m.Dose!.Value), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Dose.Value' binds Value, which Decimal? declares, not a member of Family: bind 'm => m.Dose', which takes a Decimal?."));
+        => Assert.That(() => Reach(m => m.Dose!.Value), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Dose.Value' binds Value, which decimal? declares, not a member of Family: bind 'm => m.Dose', which takes a decimal?."));
 
     [Test]
     public void an_input_read_refuses_a_member_of_a_list_or_one_value()
     {
         Assert.That(() => Reach(m => m.Members.Count), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Members.Count' binds Count, which List<NextOfKin> declares, and the app's JSON options write List<NextOfKin> as a list, so the input has no body path: bind a member of a class they write as an object."));
-        Assert.That(() => Reach(m => m.Room.Length), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Room.Length' binds Length, which String declares, and the app's JSON options write String as one value, so the input has no body path: bind a member of a class they write as an object."));
+        Assert.That(() => Reach(m => m.Room.Length), Throws.InvalidOperationException.With.Message.EqualTo("Input 'm => m.Room.Length' binds Length, which string declares, and the app's JSON options write string as one value, so the input has no body path: bind a member of a class they write as an object."));
     }
 
     private static void Reach<TValue>(Expression<Func<Family, TValue>> member)
