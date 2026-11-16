@@ -113,7 +113,7 @@ public sealed class WhenDataIsReadPastADeclaredMember
         html.On(plan, trigger => trigger.DomReady(pipeline =>
         {
             var pump = pipeline.Component<InfusionPump>("pump");
-            pump.Label.Set(pump.CurrentPrescription.Read(prescription => prescription.Prescriber!.Name));
+            pump.Label.Set(pump.CurrentPrescription.Read(prescription => prescription.Prescriber.Name));
         }));
 
         var rendered = Views.TextOf(html.RenderPlan(plan));

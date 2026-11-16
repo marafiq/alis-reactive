@@ -22,7 +22,7 @@
             .OnSuccess<ChartSearch>((found, pipeline) => pipeline.Element("chart-resident").Text.Set(found.Body.Read(search => search.Resident))))
         .CustomEvent(MedicationChecks.Check, pipeline => pipeline.Get(Model.Chart)
             .OnSuccess<ChartSearch>((found, pipeline) => pipeline
-                .When(pipeline.Input(m => m.Test).Component<NativeCheckBox>().Checked.Choose(DoseStatus.Given, found.Body.Read(search => search.Chart!.Status)).Eq(DoseStatus.Given))
+                .When(pipeline.Input(m => m.Test).Component<NativeCheckBox>().Checked.Choose(DoseStatus.Given, found.Body.Read(search => search.Chart.Status)).Eq(DoseStatus.Given))
                 .Then(pipeline => pipeline.Element("dose-badge").Text.Set("Given"))
                 .Else(pipeline => pipeline.Element("dose-badge").Text.Set("Not given")))));
 }

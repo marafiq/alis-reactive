@@ -19,7 +19,7 @@ public sealed class WhenAnElementsTextOrHtmlIsSet
             .Reactive(board => board.Seated, (seated, pipeline) =>
             {
                 pipeline.Element("seated-type").Text.Set(seated.Type);
-                pipeline.Element("seated-room").Text.Set(seated.Detail.Read(detail => detail!.Room));
+                pipeline.Element("seated-room").Text.Set(seated.Detail.Read(detail => detail.Room));
                 pipeline.Element("seated-portion").Text.Set(seated.Portion);
             });
         var expected = Seated(

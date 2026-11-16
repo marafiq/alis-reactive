@@ -20,7 +20,7 @@
     Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
         .OnSuccess<List<VialDose>>((doses, pipeline) =>
         {
-            pipeline.Element("unsupplied-count").Text.Set(doses.Body.Select(d => (int?)d.Supply!.Vials).Count(v => v == null));
+            pipeline.Element("unsupplied-count").Text.Set(doses.Body.Select(d => (int?)d.Supply.Vials).Count(v => v == null));
             pipeline.Element("supply-count").Text.Set(doses.Body.Select(d => d.Supply!.Vials).Count());
             pipeline.Element("vial-status").Text.Set("Counted");
         })));

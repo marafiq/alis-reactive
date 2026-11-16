@@ -28,11 +28,11 @@
         .OnSuccess<List<AssignedDose>>((doses, pipeline) =>
         {
             pipeline.Element("prioritised-count").Text.Set(doses.Body.Count(d => d.Priority.HasValue));
-            pipeline.Element("on-file-off-routine-count").Text.Set(doses.Body.Count(d => d.Priority!.Value != 2));
+            pipeline.Element("on-file-off-routine-count").Text.Set(doses.Body.Count(d => d.Priority.Value != 2));
             pipeline.Element("off-routine-count").Text.Set(doses.Body.Count(d => d.Priority != 2));
-            pipeline.Element("unassigned-count").Text.Set(doses.Body.Count(d => (d.Carer!.Name ?? "unassigned") == "unassigned"));
+            pipeline.Element("unassigned-count").Text.Set(doses.Body.Count(d => (d.Carer.Name ?? "unassigned") == "unassigned"));
             pipeline.Element("no-ward-count").Text.Set(doses.Body.Count(d => (d.Ward ?? "none") == "none"));
-            pipeline.Element("low-count").Text.Set(doses.Body.Count(d => (d.Priority > 2 ? d.Carer!.Name : "low") == "low"));
+            pipeline.Element("low-count").Text.Set(doses.Body.Count(d => (d.Priority > 2 ? d.Carer.Name : "low") == "low"));
         })));
 }
 @Html.RenderPlan(plan)

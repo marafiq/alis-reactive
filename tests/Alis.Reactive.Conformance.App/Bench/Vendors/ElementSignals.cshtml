@@ -13,7 +13,7 @@
     .Reactive(element => element.Opened, (signal, pipeline) =>
     {
         pipeline.Element("opened-type").Text.Set(signal.Type);
-        pipeline.Element("opened-room").Text.Set(signal.Detail.Read(detail => detail!.Room));
+        pipeline.Element("opened-room").Text.Set(signal.Detail.Read(detail => detail.Room));
     }))
 <dl>
     <dt>Signal</dt>

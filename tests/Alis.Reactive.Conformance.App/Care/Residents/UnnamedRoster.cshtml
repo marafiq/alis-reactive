@@ -16,7 +16,7 @@
     Html.On(plan, trigger => trigger.CustomEvent(UnnamedRosters.Count, pipeline => pipeline.Get(Model.Beds)
         .OnSuccess<List<RosterBed>>((roster, pipeline) =>
         {
-            pipeline.Element("unnamed-count").Text.Set(roster.Body.Count(r => r.Name!.Trim() == ""));
+            pipeline.Element("unnamed-count").Text.Set(roster.Body.Count(r => r.Name.Trim() == ""));
             pipeline.Element("roster-status").Text.Set("Counted");
         })));
 }

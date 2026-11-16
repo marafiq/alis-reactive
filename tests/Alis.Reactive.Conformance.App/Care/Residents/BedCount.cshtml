@@ -18,7 +18,7 @@
         .OnSuccess<WingCensus>((census, pipeline) => pipeline.Element("census-wing").Text.Set(census.Body.Read(c => c.Wing)))));
     Html.On(plan, trigger => trigger.CustomEvent(BedCounts.Send, pipeline => pipeline.Get(Model.Census)
         .OnSuccess<WingCensus>((census, pipeline) => pipeline
-            .Post<BedCount>(BedCountEndpoints.BedCounts, request => request.Json(body => body.Set(r => r.Beds, census.Body.Read(c => c.Ward!.Beds))))
+            .Post<BedCount>(BedCountEndpoints.BedCounts, request => request.Json(body => body.Set(r => r.Beds, census.Body.Read(c => c.Ward.Beds))))
             .OnSuccess(Content.Text, (recorded, pipeline) => pipeline.Element("recorded-beds").Text.Set(recorded.Body)))));
 }
 @Html.RenderPlan(plan)

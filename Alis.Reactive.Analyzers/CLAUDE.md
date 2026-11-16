@@ -4,7 +4,8 @@ The compiler's rules, packed inside AlisReactive: each analyzer is one line of t
 is named for the module whose lines its rules enforce; `Analyzers/` holds module 20's own, `ALIS009` to `ALIS013`,
 `TypeKnowledge/` holds `ALIS023` to `ALIS025`, a declaration door's body and constants and an override's JSON name
 and ignore, `PartialsAndSlots/` holds `ALIS041`, the plan a view opens and renders, `ValuesAndSources/` holds
-`ALIS043`, a source .NET makes a text of, and `ArrayLambdas/` holds `ALIS042`, a list's operation over a text.
+`ALIS043`, a source .NET makes a text of, and `ArrayLambdas/` holds `ALIS042`, a list's operation over a text, and
+the suppressors `ALIS026` and `ALIS027`, a data lambda's read past a holder that holds null and a nullable's value.
 
 ## The standard
 

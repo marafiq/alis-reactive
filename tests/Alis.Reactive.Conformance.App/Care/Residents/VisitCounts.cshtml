@@ -16,8 +16,8 @@
     Html.On(plan, trigger => trigger.CustomEvent(VisitCountEvents.Count, pipeline => pipeline.Get(Model.Visits)
         .OnSuccess<List<CountedVisit>>((visits, pipeline) =>
         {
-            pipeline.Element("ruth-or-north").Text.Set(visits.Body.Count(v => v.Carer!.Name == "Ruth" || v.Ward == "North"));
-            pipeline.Element("not-ruth-in-south").Text.Set(visits.Body.Count(v => !(v.Carer!.Name == "Ruth" && v.Ward == "South")));
+            pipeline.Element("ruth-or-north").Text.Set(visits.Body.Count(v => v.Carer.Name == "Ruth" || v.Ward == "North"));
+            pipeline.Element("not-ruth-in-south").Text.Set(visits.Body.Count(v => !(v.Carer.Name == "Ruth" && v.Ward == "South")));
         })));
 }
 @Html.RenderPlan(plan)

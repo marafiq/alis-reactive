@@ -29,12 +29,12 @@
     Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(CareNotesEndpoints.Notes)
         .OnSuccess<List<CareNote>>((notes, pipeline) =>
         {
-            pipeline.Element("one-character-count").Text.Set(notes.Body.Count(n => n.Detail!.Text.Trim().Length == 1));
-            pipeline.Element("capitals-count").Text.Set(notes.Body.Count(n => n.Detail!.Text.ToUpperInvariant() == "STRAßE"));
-            pipeline.Element("small-letters-count").Text.Set(notes.Body.Count(n => n.Detail!.Text.ToLowerInvariant() == "οδοσ"));
-            pipeline.Element("no-text-count").Text.Set(notes.Body.Count(n => string.IsNullOrEmpty(n.Detail!.Text)));
-            pipeline.Element("blank-count").Text.Set(notes.Body.Count(n => string.IsNullOrWhiteSpace(n.Detail!.Text)));
-            pipeline.Element("looked-for-count").Text.Set(notes.Body.Count(n => n.Detail!.Text.Contains(lookedFor!)));
+            pipeline.Element("one-character-count").Text.Set(notes.Body.Count(n => n.Detail.Text.Trim().Length == 1));
+            pipeline.Element("capitals-count").Text.Set(notes.Body.Count(n => n.Detail.Text.ToUpperInvariant() == "STRAßE"));
+            pipeline.Element("small-letters-count").Text.Set(notes.Body.Count(n => n.Detail.Text.ToLowerInvariant() == "οδοσ"));
+            pipeline.Element("no-text-count").Text.Set(notes.Body.Count(n => string.IsNullOrEmpty(n.Detail.Text)));
+            pipeline.Element("blank-count").Text.Set(notes.Body.Count(n => string.IsNullOrWhiteSpace(n.Detail.Text)));
+            pipeline.Element("looked-for-count").Text.Set(notes.Body.Count(n => n.Detail.Text.Contains(lookedFor!)));
             pipeline.Element("notes-status").Text.Set("Looked");
         })));
 }

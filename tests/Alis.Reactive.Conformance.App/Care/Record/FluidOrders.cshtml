@@ -23,9 +23,9 @@
 @{
     Html.On(plan, trigger => trigger.CustomEvent(FluidOrderEvents.SetTheRestrictedTarget, pipeline => pipeline.Get(FluidOrderEndpoints.RestrictedOrder)
         .OnSuccess<FluidOrder>((order, pipeline) => pipeline.Element("fluid-target").Text.Set(
-            order.Body.Read(ordered => ordered.Restriction!.Applies).Choose(1000, pipeline.Component<ConformanceComponent>("care-panel").Total())))));
+            order.Body.Read(ordered => ordered.Restriction.Applies).Choose(1000, pipeline.Component<ConformanceComponent>("care-panel").Total())))));
     Html.On(plan, trigger => trigger.CustomEvent(FluidOrderEvents.SetTheUnrestrictedTarget, pipeline => pipeline.Get(FluidOrderEndpoints.UnrestrictedOrder)
         .OnSuccess<FluidOrder>((order, pipeline) => pipeline.Element("fluid-target").Text.Set(
-            order.Body.Read(ordered => ordered.Restriction!.Applies).Choose(1000, pipeline.Component<ConformanceComponent>("care-panel").Total())))));
+            order.Body.Read(ordered => ordered.Restriction.Applies).Choose(1000, pipeline.Component<ConformanceComponent>("care-panel").Total())))));
 }
 @Html.RenderPlan(plan)

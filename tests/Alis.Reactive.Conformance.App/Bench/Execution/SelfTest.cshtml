@@ -42,7 +42,7 @@
         .CustomEvent(SelfTestButtons.TakeTheMissingRecord, pipeline =>
         {
             var conformance = pipeline.Component<ConformanceComponent>("conformance");
-            conformance.TakeText(conformance.SettleMaybe().Read(record => record!.Name).OrNull());
+            conformance.TakeText(conformance.SettleMaybe().Read(record => record.Name).OrNull());
         }));
 }
 @Html.RenderPlan(plan)

@@ -23,7 +23,7 @@
     Html.On(plan, trigger => trigger.DomReady(pipeline => pipeline.Get(Model.Doses)
         .OnSuccess<List<RoutineDose>>((doses, pipeline) =>
         {
-            pipeline.Element("off-routine-count").Text.Set(doses.Body.Count(d => (int)d.Priority! != 2));
+            pipeline.Element("off-routine-count").Text.Set(doses.Body.Count(d => (int)d.Priority != 2));
             pipeline.Element("routine-count").Text.Set(doses.Body.Count(d => d.Priority == (int)routine!));
             pipeline.Element("priority-total").Text.Set(doses.Body.Sum(d => (int)d.Priority!));
             pipeline.Element("doses-status").Text.Set("Summed");
