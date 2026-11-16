@@ -86,8 +86,8 @@ internal sealed class PatternCheck<T>(string pattern, RegexOptions options) : Ch
     {
         if ((options & RegexOptions.IgnoreCase) != 0)
             throw new InvalidOperationException($"The pattern '{pattern}' ignores case, which no browser flag folds as .NET does; spell both cases, as [Aa]spirin, or mark the rule .ServerOnly().");
-        if (options != RegexOptions.None)
-            throw new NotImplementedException($"The pattern '{pattern}' is read with RegexOptions.{options}, and the plan carries a pattern with no options: a rule whose pattern needs an option has no browser form yet; mark the rule .ServerOnly().");
+        if ((options & ~RegexOptions.CultureInvariant) != RegexOptions.None)
+            throw new InvalidOperationException($"The pattern '{pattern}' passes an option other than RegexOptions.CultureInvariant, which the browser does not read as .NET does; move the work to the server, or mark the rule .ServerOnly().");
         var copy = BrowserPattern.CopyOf(pattern, reason => new InvalidOperationException("The pattern '" + pattern + "' " + reason.TrimEnd('.') + ", or mark the rule .ServerOnly()."));
         return member.TestsTheValue(value => BrowserTerms.NullOr(value, BrowserTerms.Matches(value, copy)),
             arguments => arguments.With("RegularExpression", pattern));
@@ -235,7 +235,11 @@ internal sealed class PrecisionScaleCheck<T, TValue> : Check<T, TValue>
     }
 
     internal override BrowserTest Browser(BrowserMember<T, TValue> member)
-        => throw new NotImplementedException("PrecisionScale counts a decimal's digits, and the plan's operators count none: a PrecisionScale rule has no browser form yet; mark the rule .ServerOnly().");
+    {
+        if (!_ignoreTrailingZeros)
+            throw new InvalidOperationException($"The rule of '{member.Path}' counts the zeros its decimal ends in (PrecisionScale with ignoreTrailingZeros: false), and the browser holds a number, which ends in none; pass ignoreTrailingZeros: true, or mark the rule .ServerOnly().");
+        throw new NotImplementedException("PrecisionScale counts a decimal's digits, and the plan's operators count none: a PrecisionScale rule has no browser form yet; mark the rule .ServerOnly().");
+    }
 }
 
 internal sealed class PredicateCheck<T, TValue>(Func<T, TValue, bool> predicate) : Check<T, TValue>

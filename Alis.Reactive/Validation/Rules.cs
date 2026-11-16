@@ -241,22 +241,25 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
         var member = scope.Member<TValue>(_member, _path, _each, _displayName, () => _values(scope.Start()).First());
         var segments = new List<RuleGroup>();
         var tests = new List<RuleTest>();
+        var laterCheckWritten = false;
         foreach (var part in _parts)
         {
             if (part.Guards.Any(guard => guard.DecidedOnTheServer)) continue;
             if (part.Test(member) is { } test)
             {
                 tests.Add(test);
+                laterCheckWritten |= part != _parts[0];
                 continue;
             }
 
             if (part.Group(member) is not { } group) continue;
+            laterCheckWritten |= part != _parts[0];
             member.CloseField(segments, tests);
             segments.Add(part.Guards.Count == 0 ? group : new RuleGroup([], scope.When(part.Guards), [], [group]));
         }
 
         member.CloseField(segments, tests);
-        member.RequireTheServersOrder(_cascade(), _dependents.Count);
+        member.RequireTheServersOrder(_cascade(), _dependents.Count, laterCheckWritten);
         return segments;
     }
 

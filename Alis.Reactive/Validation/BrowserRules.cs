@@ -160,6 +160,8 @@ internal sealed class BrowserMember<T, TValue>
 
     internal IReadOnlyCollection<Type> Flags => _scope.Flags;
 
+    internal string Path => _path;
+
     internal FnExpression When(IReadOnlyList<RuleGuard<T>> guards) => _scope.When(guards);
 
     internal BrowserTest Tests(LambdaExpression passes, Action<MessageArguments> arguments)
@@ -183,7 +185,7 @@ internal sealed class BrowserMember<T, TValue>
         if (typeof(TValue) == typeof(string)) return Tests(empty ? Blank : NotBlank, NoArguments);
         var contract = _scope.Json.LiveForm.GetTypeInfo(typeof(TValue));
         if (contract.IsDictionary(out _, out _))
-            throw new NotImplementedException($"'{_path}' holds a dictionary, which the browser holds as an object whose entries the plan's operators do not count: NotEmpty and Empty over a dictionary have no browser form yet; mark the rule .ServerOnly().");
+            throw new InvalidOperationException($"The rule of '{_path}' checks whether a dictionary is empty, and the browser's rules count a list's items, not a dictionary's entries; mark the rule .ServerOnly().");
         if (contract.IsList(out _))
             return TestsTheValue(value => empty ? new OpExpression(Operator.Empty, [value]) : new OpExpression(Operator.Not, [new OpExpression(Operator.Empty, [value])]), NoArguments);
         var held = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
@@ -194,8 +196,7 @@ internal sealed class BrowserMember<T, TValue>
 
     internal BrowserTest Compared(Comparison comparison, object? other)
     {
-        if (comparison.Orders && typeof(TValue) == typeof(string))
-            throw new NotImplementedException($"'{_path}' is text, which .NET orders by the culture's comparer and the plan's ordering operators do not: an ordering of text has no browser form yet; mark the rule .ServerOnly().");
+        if (comparison.Orders && typeof(TValue) == typeof(string)) throw OrdersText();
         var value = LinqExpression.Parameter(typeof(TValue), BrowserTerms.Value);
         var test = Binary(comparison.Node, value, LinqExpression.Constant(other, typeof(TValue)));
         var passes = comparison.Orders && default(TValue) is null ? LinqExpression.OrElse(IsNull(value), test) : test;
@@ -243,11 +244,11 @@ internal sealed class BrowserMember<T, TValue>
         var unknown = test.Unknown.Concat(_each ? ["CollectionIndex", "PropertyPath"] : _scope.Each ? ["PropertyPath"] : []).ToList();
         var named = unknown.FirstOrDefault(name => text.Contains("{" + name));
         if (named is not null)
-            throw new NotImplementedException($"The message '{text}' names {{{named}}}, which only the server knows of '{_path}' when the check runs: a browser copy of it has no form yet; write the message without it, or mark the rule .ServerOnly().");
+            throw new InvalidOperationException($"The message '{text}' names {{{named}}}, which only the endpoint knows when the check runs, so the browser's copy cannot say it; write the message without it, or mark the rule .ServerOnly().");
         var dropped = test.FillsTheStart ? SentValues.Skip(1) : SentValues;
         var kept = Sentences(text).Where(sentence => !dropped.Any(name => sentence.Contains("{" + name))).ToList();
         if (kept.Count == 0)
-            throw new NotImplementedException($"Every sentence of the message '{text}' names a value the request sends, which the browser's copy leaves out: a browser copy of it has no form yet; write the message without it, or mark the rule .ServerOnly().");
+            throw new InvalidOperationException($"Every sentence of the message '{text}' names a value the request sends, which the browser's copy leaves out, so no text is left for the browser to show; write a sentence that names none, or mark the rule .ServerOnly().");
         var start = test.FillsTheStart ? _each ? default : _start() : default;
         var arguments = new MessageArguments(_displayName, _scope.Prefix + _path, start);
         test.Arguments(arguments);
@@ -270,13 +271,16 @@ internal sealed class BrowserMember<T, TValue>
         return new RuleGroup(path, BrowserTerms.HoldsAValue, [], reactive.BrowserGroups(scope));
     }
 
-    internal void RequireTheServersOrder(CascadeMode cascade, int dependents)
+    internal void RequireTheServersOrder(CascadeMode cascade, int dependents, bool laterCheckWritten)
     {
         if (_written == 0) return;
         if (dependents > 0)
-            throw new NotImplementedException($"The rule of '{_path}' declares DependentRules, which run only after the rule passes, and a plan's rules run side by side: DependentRules have no browser form yet; mark the rule .ServerOnly().");
-        if (cascade == CascadeMode.Stop && (_each || _written > 1))
-            throw new NotImplementedException($"The rule of '{_path}' stops at its first failure, and a plan's tests of a member run side by side: CascadeMode.Stop over more than one browser test has no browser form yet; mark the rule .ServerOnly().");
+            throw new InvalidOperationException($"The rule of '{_path}' declares DependentRules, which the endpoint checks only while the rule passes, a condition no browser rule reads; write them under When with the rule's test as the condition, or mark the rule .ServerOnly().");
+        if (cascade != CascadeMode.Stop) return;
+        if (_each)
+            throw new InvalidOperationException($"The rule of '{_path}' stops at its first failing item (CascadeMode.Stop), and the browser checks every item, so it would show failures the endpoint never gives; mark the rule .ServerOnly().");
+        if (laterCheckWritten)
+            throw new InvalidOperationException($"The rule of '{_path}' stops at its first failure (CascadeMode.Stop), and the browser runs a member's checks side by side, so a check after the rule's first would show a failure the endpoint never gives; write that check as a rule of its own, or mark the rule .ServerOnly().");
     }
 
     private static Expression<Func<string?, bool>> Blank => value => string.IsNullOrWhiteSpace(value);
@@ -298,7 +302,7 @@ internal sealed class BrowserMember<T, TValue>
         if (_fieldPath.Count > 0) return _fieldPath;
         var body = Unconverted(_member.Body);
         if (!MemberPath.TryOf(body, _member.Parameters[0], _member, _scope.Json.App, out var members))
-            throw new NotImplementedException($"The rule of '{_path}' reads no member path, and a plan's rule names the member it checks by its path: a rule over a list position or a computed value has no browser form yet; mark the rule .ServerOnly().");
+            throw new InvalidOperationException($"The rule of '{Printed.Of(_member)}' checks no member of the model, and the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member) or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly().");
         _fieldPath = _each ? [.. members.BodyPath, EachRegistrationStep.Instance] : [.. members.BodyPath];
         return _fieldPath;
     }
@@ -323,9 +327,13 @@ internal sealed class BrowserMember<T, TValue>
         }
         catch (InvalidOperationException)
         {
-            throw new NotImplementedException($"'{_path}' is compared by its type's own comparer, which declares no {node} operator the plan can write: the comparison has no browser form yet; mark the rule .ServerOnly().");
+            if (typeof(TValue) == typeof(string)) throw OrdersText();
+            throw new InvalidOperationException($"The rule of '{_path}' compares a value by its type's own comparer, which the browser does not have; mark the rule .ServerOnly().");
         }
     }
+
+    private InvalidOperationException OrdersText()
+        => new($"The rule of '{_path}' orders text, which .NET orders by the culture's comparer and the browser cannot order as .NET does; mark the rule .ServerOnly().");
 
     private static LinqExpression IsNull(LinqExpression read) => LinqExpression.Equal(read, LinqExpression.Constant(null, read.Type));
 

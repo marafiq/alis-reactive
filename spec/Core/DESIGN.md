@@ -3782,7 +3782,8 @@ and a request's state, which no node holds: it is its `request` statement's, in 
   - `EmailAddress`: one `@`, neither first nor last, as the server counts it today
     (`Alis.Reactive/Validation/Checks.cs:166-170`);
   - `CreditCard`: the Luhn sum over the digits once spaces and dashes are taken out (`Alis.Reactive/Validation/Checks.cs:180-193`);
-  - `PrecisionScale`: the digits and decimals of the number;
+  - `PrecisionScale`: the digits and decimals of the number, its trailing zeros dropped as `ignoreTrailingZeros: true`
+    drops them, since the browser's number ends in none; a rule that counts them is the server's (X16.28);
   - `IsInEnum`: membership in the enum's names and numbers, as `Enum.IsDefined` reads it. Over an enum the app names
     as flags (N16.4) it is FluentValidation's flags meaning, which FluentValidation keys on `FlagsAttribute`: a value
     is in the enum when it is the union of the enum's values whose bits it holds all, so zero is in it only when a
@@ -4028,7 +4029,10 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.11` analyzer: a pattern with `IgnoreCase` (D16.11): "The pattern '{pattern}' ignores case, which no browser flag
   folds as .NET does; spell both cases, as [Aa]spirin, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
 - `X16.12` analyzer: a pattern with a construct the engines read differently: "The pattern '{pattern}' uses
-  {construct}, which .NET and the browser read differently; write {same} instead, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+  {construct}, which .NET and the browser read differently; write {same} instead, or mark the rule .ServerOnly().",
+  and a pattern with an option other than `RegexOptions.CultureInvariant`, which writes the `matches` no option writes
+  (D16.11): "The pattern '{pattern}' passes an option other than RegexOptions.CultureInvariant, which the browser does
+  not read as .NET does; move the work to the server, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
 - `X16.13` analyzer: a condition with no browser form: "The condition '{condition}' has no browser form. Write it as
   tests of model members against fixed values or other members, or declare that the server alone decides it:
   WhenOnServer or UnlessOnServer." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
@@ -4076,6 +4080,37 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   `GreaterThanOrEqualTo(new TimeOnly(7, 0))`, and whose `Length`, a `TimeSpan` typed 1.02:00:00, fails
   `LessThanOrEqualTo(TimeSpan.FromHours(23))`, in the browser before sending, as the endpoint answers; with `Starts`
   left empty the ordering passes on both sides.
+- `X16.28` analyzer (D16.10): a `PrecisionScale` that counts trailing zeros: "The rule of '{member}' counts the zeros
+  its decimal ends in (PrecisionScale with ignoreTrailingZeros: false), and the browser holds a number, which ends in
+  none; pass ignoreTrailingZeros: true, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.29` analyzer: `NotEmpty` or `Empty` over a dictionary: "The rule of '{member}' checks whether a dictionary is
+  empty, and the browser's rules count a list's items, not a dictionary's entries; mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.30` analyzer (D16.14): an ordering of text, against a fixed value, another member or a range: "The rule of
+  '{member}' orders text, which .NET orders by the culture's comparer and the browser cannot order as .NET does; mark
+  the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.31` analyzer: a value compared by its type's own comparer, an ordering of `bool` or an ordering or an equality
+  of a struct that declares no operators: "The rule of '{member}' compares a value by its type's own comparer, which
+  the browser does not have; mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.32` analyzer (M8.D1): a message the browser cannot copy. One that names what only the endpoint knows when the
+  check runs, `{ComparisonValue}` of another member, `{CollectionIndex}` or `{PropertyPath}` under a list: "The message
+  '{message}' names {name}, which only the endpoint knows when the check runs, so the browser's copy cannot say it;
+  write the message without it, or mark the rule .ServerOnly().", `{name}` the placeholder as the message writes it;
+  and one whose every sentence names a value the request sends: "Every sentence of the message '{message}' names a
+  value the request sends, which the browser's copy leaves out, so no text is left for the browser to show; write a
+  sentence that names none, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.33` analyzer (D16.8): `DependentRules` behind a rule the browser checks: "The rule of '{member}' declares
+  DependentRules, which the endpoint checks only while the rule passes, a condition no browser rule reads; write them
+  under When with the rule's test as the condition, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.34` analyzer (D16.5): a rule under `CascadeMode.Stop` that writes for the browser a check other than its first,
+  test or child validator: "The rule of '{member}' stops at its first failure (CascadeMode.Stop), and the browser runs
+  a member's checks side by side, so a check after the rule's first would show a failure the endpoint never gives;
+  write that check as a rule of its own, or mark the rule .ServerOnly()."; and a rule of each item under it: "The
+  rule of '{member}' stops at its first failing item (CascadeMode.Stop), and the browser checks every item, so it
+  would show failures the endpoint never gives; mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.35` analyzer (D16.14): a rule over no member path: "The rule of '{read}' checks no member of the model, and
+  the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member)
+  or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly().", `{read}` the rule's lambda as the validator
+  writes it. At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
 
 ## Q17. Vendors and inversion
 
@@ -4845,7 +4880,7 @@ plans (Q19).
     X8.16, X8.17, X8.18, X8.25, X11.1, X17.13, X17.19; N18.9); ALIS033, lambdas, member lambdas and literals (X2.5,
     X3.11, X4.12, X6.2, X6.6, X6.10, X6.13, X6.14, X6.17, X6.18, X6.21, X6.22, X6.23, X6.25, X6.30,
     X6.31, X6.33, X6.38, X6.49, X6.50, X8.2, X8.10, X14.3, X14.13, X14.14; N18.10); ALIS006, the validator (X16.11, X16.12, X16.13,
-    X16.14; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
+    X16.14, X16.28 to X16.35; N18.11); ALIS034, declarations (X17.5, X17.18, X17.27; N18.12); ALIS035, a row action's link (X17.32;
     N18.13), and ALIS038, the flags door (X16.23 to X16.26; N16.5), new beside the moved ones.
   - Kept where the view renders, each by what only the render knows: the app's JSON options (X1.4, X3.12, X4.13,
     X6.12, X6.28, X6.39, X6.40, X6.41, X6.42, X6.43, X6.54, X6.57, X7.10, X7.11, X7.13, X8.19, X8.20, X8.21, X8.22, X14.15, X18.8), its culture
@@ -4919,7 +4954,11 @@ shapes, starts and the payload's path of each event.
   and N8.2 refuse by the types they read; a constant pattern outside D16.11's closed set (D6.15); in a pipeline condition, a constant `MinLength` below zero (M3.D1, M3.X4); a constant position below zero given to `At` (D1.1, M4.X10).
 - `N18.11` new: ALIS006 kept as an error, the validator analyzer: a condition with no browser form outside
   `WhenOnServer` and `UnlessOnServer`, a constant pattern outside D16.11's closed set or with an option other than
-  `CultureInvariant`, and on net48 a model type with no public parameterless constructor (D16.6, D16.11).
+  `CultureInvariant`, a `PrecisionScale` that counts trailing zeros, an emptiness check of a dictionary, an ordering of
+  text, a comparison by a type's own comparer, a message the browser cannot copy, `DependentRules` behind a browser
+  check, a rule under `CascadeMode.Stop` whose browser check is not its first or that checks each item, a rule over
+  no member path, and on net48 a model type with no public parameterless constructor (D16.5, D16.6, D16.8, D16.10,
+  D16.11, D16.14, M8.D1).
 - `N18.13` new: ALIS035, the row-action analyzer: a `NativeActionLink` whose block's one request at its own level is no
   GET, whose route or query value is neither a C# value nor `Row.Read(..)` of its payload, or that sends `Form`,
   `Inputs`, `Input` or a header (D17.15).

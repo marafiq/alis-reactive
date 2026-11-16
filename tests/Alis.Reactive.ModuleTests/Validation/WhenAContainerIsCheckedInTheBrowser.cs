@@ -105,6 +105,92 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
             Throws.InvalidOperationException.With.Message.EqualTo("The pattern '^a[0-9]$' ignores case, which no browser flag folds as .NET does; spell both cases, as [Aa]spirin, or mark the rule .ServerOnly()."));
 
     [Test]
+    public void a_decimal_rule_that_counts_its_trailing_zeros_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<DoseCard>(validation => validation.Add<CountedZerosRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Dose' counts the zeros its decimal ends in (PrecisionScale with ignoreTrailingZeros: false), and the browser holds a number, which ends in none; pass ignoreTrailingZeros: true, or mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_pattern_read_culture_invariant_writes_the_browser_test_a_pattern_with_no_option_writes()
+    {
+        Assert.That(RulesOf<RoundCard>(validation => validation.Add<InvariantWardRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["ward"],"tests":[{"check":{"kind":"fn","params":["value","instance"],"body":{"kind":"op","op":"or","args":[{"kind":"op","op":"eq","args":[{"kind":"ref","name":"value"},{"kind":"lit","value":null}]},{"kind":"op","op":"matches","args":[{"kind":"ref","name":"value"},{"kind":"lit","value":"^[0-9]\u002B(?=\\n?$)"}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"\u0027Ward\u0027 is not in the correct format."}]}],"groups":[]}]}"""));
+        Assert.That(RulesOf<RoundCard>(validation => validation.Add<PlainWardRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["ward"],"tests":[{"check":{"kind":"fn","params":["value","instance"],"body":{"kind":"op","op":"or","args":[{"kind":"op","op":"eq","args":[{"kind":"ref","name":"value"},{"kind":"lit","value":null}]},{"kind":"op","op":"matches","args":[{"kind":"ref","name":"value"},{"kind":"lit","value":"^[0-9]\u002B(?=\\n?$)"}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"\u0027Ward\u0027 is not in the correct format."}]}],"groups":[]}]}"""));
+    }
+
+    [Test]
+    public void a_pattern_with_an_option_other_than_culture_invariant_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<MultilineWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The pattern '^[0-9]+$' passes an option other than RegexOptions.CultureInvariant, which the browser does not read as .NET does; move the work to the server, or mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_checks_whether_a_dictionary_is_empty_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<DoseCard>(validation => validation.Add<EmptyRoundsRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Rounds' checks whether a dictionary is empty, and the browser's rules count a list's items, not a dictionary's entries; mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_orders_text_against_a_fixed_value_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<OrderedWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Ward' orders text, which .NET orders by the culture's comparer and the browser cannot order as .NET does; mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_orders_text_against_another_member_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<IntakeCard>(validation => validation.Add<OrderedStatusRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Status' orders text, which .NET orders by the culture's comparer and the browser cannot order as .NET does; mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_holds_text_between_two_bounds_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<BoundedWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Ward' orders text, which .NET orders by the culture's comparer and the browser cannot order as .NET does; mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_orders_a_value_by_its_types_own_comparer_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<IntakeCard>(validation => validation.Add<OrderedUrgencyRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Urgent' compares a value by its type's own comparer, which the browser does not have; mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_message_that_names_what_only_the_endpoint_knows_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<NamedStaffRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The message 'No more than {ComparisonValue} staff.' names {ComparisonValue}, which only the endpoint knows when the check runs, so the browser's copy cannot say it; write the message without it, or mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_message_whose_every_sentence_names_a_sent_value_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<CountedWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("Every sentence of the message 'You entered {TotalLength} letters.' names a value the request sends, which the browser's copy leaves out, so no text is left for the browser to show; write a sentence that names none, or mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_with_dependent_rules_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<DependentWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Ward' declares DependentRules, which the endpoint checks only while the rule passes, a condition no browser rule reads; write them under When with the rule's test as the condition, or mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_stops_and_writes_two_checks_for_the_browser_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<StoppedWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Ward' stops at its first failure (CascadeMode.Stop), and the browser runs a member's checks side by side, so a check after the rule's first would show a failure the endpoint never gives; write that check as a rule of its own, or mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_stops_after_a_check_only_the_server_decides_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<StoppedAfterTheServerWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Ward' stops at its first failure (CascadeMode.Stop), and the browser runs a member's checks side by side, so a check after the rule's first would show a failure the endpoint never gives; write that check as a rule of its own, or mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_stops_before_its_child_validator_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<DeputyCard>(validation => validation.Add<StoppedDeputyRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Deputy' stops at its first failure (CascadeMode.Stop), and the browser runs a member's checks side by side, so a check after the rule's first would show a failure the endpoint never gives; write that check as a rule of its own, or mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_that_stops_writes_its_first_check_alone_for_the_browser()
+        => Assert.That(RulesOf<RoundCard>(validation => validation.Add<StoppedBeforeTheServerWardRules>()), Is.EqualTo("""{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[],"groups":[{"path":[],"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"fields":[{"path":["ward"],"tests":[{"check":{"kind":"fn","params":["item1","instance"],"body":{"kind":"op","op":"not","args":[{"kind":"op","op":"nullOrEmpty","args":[{"kind":"op","op":"trim","args":[{"kind":"ref","name":"item1"}]}]}]}},"when":{"kind":"fn","params":["item1"],"body":{"kind":"lit","value":true}},"message":"\u0027Ward\u0027 must not be empty."}]}],"groups":[]}]}"""));
+
+    [Test]
+    public void a_rule_for_each_item_that_stops_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<IntakeCard>(validation => validation.Add<StoppedCarersRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'Carers' stops at its first failing item (CascadeMode.Stop), and the browser checks every item, so it would show failures the endpoint never gives; mark the rule .ServerOnly()."));
+
+    [Test]
+    public void a_rule_over_no_member_path_is_refused_where_the_view_renders()
+        => Assert.That(() => PlanOf<RoundCard>(validation => validation.Add<TrimmedWardRules>()),
+            Throws.InvalidOperationException.With.Message.EqualTo("The rule of 'card => card.Ward.Trim()' checks no member of the model, and the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member) or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly()."));
+
+    [Test]
     public void a_container_whose_model_has_no_registered_validator_is_refused_where_the_view_renders()
         => Assert.That(() => PlanOf<Supplies>(validation => validation.Add<DeputyCardRules>()),
             Throws.InvalidOperationException.With.Message.EqualTo("Validate(container) checks container 'intake' by the validator registered for Supplies, and none is registered: register one with services.AddReactiveFluentValidation(validation => validation.Add<TValidator>())."));
@@ -114,6 +200,12 @@ public sealed class WhenAContainerIsCheckedInTheBrowser
         using var plan = JsonDocument.Parse(PlanOf<TModel>(validators));
         return plan.RootElement.GetProperty("objects").EnumerateObject().Single(member => member.Name.StartsWith("$form:", StringComparison.Ordinal))
             .Value.GetProperty("data").GetProperty("registration").GetRawText();
+    }
+
+    private static string RulesOf<TModel>(Action<ReactiveFluentValidationBuilder> validators) where TModel : new()
+    {
+        using var plan = JsonDocument.Parse(RegistrationOf<TModel>(validators));
+        return plan.RootElement.GetProperty("rules").GetRawText();
     }
 
     private static string PlanOf<TModel>(Action<ReactiveFluentValidationBuilder> validators) where TModel : new()
