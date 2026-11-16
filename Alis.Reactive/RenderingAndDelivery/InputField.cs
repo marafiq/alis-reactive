@@ -31,6 +31,10 @@ public sealed partial class InputField<TModel, TValue>
     /// <remarks>It is <c>null</c> when an object on the way to the member holds nothing.</remarks>
     public string ValueJson { get; }
 
+    /// <summary>Gets whether the member binds a list: System.Text.Json's built-in handling writes its type as a JSON array, as it writes a list or an array.</summary>
+    /// <remarks>A converter the app's JSON options register does not change it; a type that names its own converter is no list.</remarks>
+    public bool BindsAList => _bound.BindsAList;
+
     /// <summary>Writes the options a render helper starts its component with, as the plan writes a literal.</summary>
     /// <param name="options">The options to write.</param>
     /// <returns>The options' JSON.</returns>

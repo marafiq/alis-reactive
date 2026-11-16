@@ -136,6 +136,7 @@ Alis.Reactive.Plugins.Plugin.Plugin(string! name) -> void
 Alis.Reactive.Plugins.Plugin.Plugin(string! name, Alis.Reactive.Declarations.EventListening! events) -> void
 Alis.Reactive.RenderingAndDelivery.ClassNameServices
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>
+Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.BindsAList.get -> bool
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Html.get -> System.Web.Mvc.HtmlHelper<TModel>!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Id.get -> string!
 Alis.Reactive.RenderingAndDelivery.InputField<TModel, TValue>.Json<TOptions>(TOptions options) -> string!

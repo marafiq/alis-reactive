@@ -33,6 +33,8 @@ internal sealed partial class BoundInput
 
     internal string MessageId => Id + MessageOf;
 
+    internal bool BindsAList => _shape is ArrayShape;
+
     internal static BoundInput Of(MemberLambda lambda, MvcNames names, AppJson json, Func<JsonElement> positionStart)
     {
         var app = json.App;

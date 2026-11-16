@@ -46,10 +46,10 @@ Each name is gate 2's; each door is the capability it carries.
 - `M7.N2` kept: `Html.InputField(plan, m => m.Member)` and `Html.InputField(plan, m => m.Member, options => ..)`, with
   `InputFieldOptions`'s `Label`, `Required` and `Hidden` (M7.D1). It returns the bound field a component's render
   helper builds on: the view's `Helper`, the member's `Expression`, its `ElementId` and `BindingPath`, N17.10's
-  starting value and options, and `Render<TComponent>(content)`, which registers the component at the id and takes
-  an input only (M7.X2). The base's `Plan` and `Options` getters leave as implementation details: the field registers
-  its component and renders its own label and marker, and no view, test or render helper of Fusion or Native reads
-  either at 65fdf118d.
+  starting value and options, N17.13's `BindsAList`, and `Render<TComponent>(content)`, which registers the component
+  at the id and takes an input only (M7.X2). The base's `Plan` and `Options` getters leave as implementation details:
+  the field registers its component and renders its own label and marker, and no view, test or render helper of Fusion
+  or Native reads either at 65fdf118d.
 - `M7.N3` kept: `IInputComponent.Input`, a `ComponentInput.Of(value, committedBy)` built from the declaration's typed
   value property and the event that commits it: the read an input's binding takes (N3.3) and the event its live check
   runs on (D16.15). It replaces main's `IInputComponent.ValueMember`, a string.

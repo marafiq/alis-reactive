@@ -4441,17 +4441,20 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   to by a method pair, an assignment or a returned unsubscriber (D17.3), and runs a pipeline as any handler does.
 - D17.13 A render helper starts its component in the state the model gives it, written as the plan writes a literal.
   `field.ValueJson` is the member's value, read through MVC with no compile and written by the plan's one literal
-  writer in the live form (D7.7), `"null"` when a holder on the way holds nothing; `field.Json(options)` writes
-  the helper's starting options the same way, so a date, an enum and a number reach the component's code in the
-  forms the plan's own values take. The live form keeps the app's naming (D7.7), so each member of the options that
-  the component's code reads by name carries `[JsonPropertyName]` with that name, as a data member checked against a
-  vendor's name does (X17.48), and the component starts the same under a camel-case, a snake-case or a Pascal-case
-  app. After a failed post the value is the model's, as the action leaves it, on both
-  hosts: net10 keeps no typed form of an attempted value (its converter is internal, and a value provider's result
-  converts nothing), and MVC 5 converts one only by a `System.Type` (`ValueProviderResult.ConvertTo(Type)`), a type
-  read the owner's list lacks. A typed component shows what the server decided; a text box keeps MVC's attempted text. A
-  component that posts through a hidden input writes a number in the view's culture, the decimal separator the
-  helper gives it and no grouping, since the server binds the body under the culture the view rendered under (D3.11).
+  writer in the live form (D7.7), `"null"` when a holder on the way holds nothing; `field.Json(options)` writes the
+  helper's starting options the same way, so a date, an enum and a number reach the component's code in the forms the
+  plan's own values take. `field.BindsAList` says whether the live form writes the member's type as a list (D7.7),
+  read from the shape the one finder gave the input (D18.2), so a helper renders a list member as a group of inputs
+  the browser submits under one name, and a text and a flags enum as one value. The live form keeps the app's naming
+  (D7.7), so each member of the options that the component's code reads by name carries `[JsonPropertyName]` with that
+  name, as a data member checked against a vendor's name does (X17.48), and the component starts the same under a
+  camel-case, a snake-case or a Pascal-case app. After a failed post the value is the model's, as the action leaves
+  it, on both hosts: net10 keeps no typed form of an attempted value (its converter is internal, and a value
+  provider's result converts nothing), and MVC 5 converts one only by a `System.Type`
+  (`ValueProviderResult.ConvertTo(Type)`), a type read the owner's list lacks. A typed component shows what the server
+  decided; a text box keeps MVC's attempted text. A component that posts through a hidden input writes a number in the
+  view's culture, the decimal separator the helper gives it and no grouping, since the server binds the body under the
+  culture the view rendered under (D3.11).
 - D17.14 A plugin is a live object the page's own code provides by name, with no element (D5.1).
   - Its declaration is a `Plugin`, named once with a vendor's characters (D17.7), so a dot is refused and the `alis.`
     names stay the framework's. The name is checked where the plan takes the plugin, outside the declaration's
@@ -4568,6 +4571,8 @@ plans (Q19).
 - `N17.5` new: the declaration's argument kind that carries its block's abort signal (D17.11).
 - `N17.10` new: an input field's `ValueJson` and `Json(options)`, the starting value and options a render helper
   writes (D17.13); their names go to gate 2.
+- `N17.13` new: an input field's `BindsAList`, whether the live form writes its member's type as a list
+  (D17.13).
 - kept: `Plugin`, `Plugin.Name` and `Plugin(string name)` (both lines).
 - `N17.12` new: `plan.Rows<TRow>(rowsId)` and `Rows<TModel, TRow>` in the core; `RowActivated<TRow>`, `RowAction<TModel,
   TRow>.Render(row, text)`, `NativeActionButton(action)` and `NativeActionLink(action)` in Alis.Reactive.Native, with

@@ -1791,6 +1791,12 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   `spec/Reference/native.json` types the record's code as text or null, the app's class still starting it at C0,
   and the conformance library's record start gives a code as text, leaves it out, or sends it as null, so the
   census panel holds a record its script sends with no code beside one that holds null. The owner can overrule it.
+- The lead, 2026-11-16, U23's gap G1: a render helper learns whether its member binds a list from the input field's
+  `BindsAList`, read from the shape the core's one finder gives the input, so NativeCheckList renders a list
+  member as boxes the browser submits under one name; a test of the member's C# type in the helper would send a
+  flags enum by the boxes. The shape is the live form's writing of the member's type, so a converter the member
+  names, which D7.7 keeps in the live form, does not reach it; no page binds such a member, and the first that does
+  decides it. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
