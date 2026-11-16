@@ -32,9 +32,7 @@
     ]
   },
   "M1.F1 X11.6 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/RoomChoice.cshtml",
       "/Care/Admission/RoomChoiceRooms.cshtml",
@@ -797,9 +795,7 @@
     ]
   },
   "M2.F1 X7.11 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/ValuesAndSources/BedsideDoseFallingBackToGiven.cshtml",
       "/Refusals/ValuesAndSources/BedsideDoseFallingBackToTheSelect.cshtml",
@@ -807,9 +803,7 @@
     ]
   },
   "M2.F1 X7.11 1": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/ValuesAndSources/BedsideDoseChosenAsGiven.cshtml",
       "/Refusals/ValuesAndSources/BedsideDoseChosenFromTheSelect.cshtml",
@@ -824,9 +818,7 @@
     ]
   },
   "M2.F1 X7.12 1": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/MedicationTestCheck.cshtml",
       "/Shared/_Layout.cshtml"
@@ -1562,9 +1554,7 @@
     ]
   },
   "M24.F3 M24.X7 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/RoomFreeRecord.cshtml",
       "/Shared/_Layout.cshtml"
@@ -1589,9 +1579,7 @@
     ]
   },
   "M24.F5 M24.X8 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/ResidentsByWing.cshtml",
       "/Shared/_Layout.cshtml"
@@ -1614,9 +1602,7 @@
     ]
   },
   "M24.F8 M24.X9 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/CareNoteRecord.cshtml",
       "/Shared/_Layout.cshtml"
@@ -1753,9 +1739,7 @@
     ]
   },
   "M3.F1 X8.11 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/RoomBooking.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2376,7 +2360,6 @@
   },
   "M6.F1 X10.10 0": {
     "modules": [
-      "NativeComponents",
       "TriggersAndPipelines"
     ],
     "views": [
@@ -2455,9 +2438,7 @@
     ]
   },
   "M6.F1 X9.20 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/RequestsAndResponses/WardBedsOfTwoWardsInOneForm.cshtml",
       "/Refusals/RequestsAndResponses/WardBedsOfWardsInTheirOwnForms.cshtml",
@@ -2578,9 +2559,7 @@
     ]
   },
   "M6.F2 X10.11 0": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Care/Admission/BadgeDesk.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3770,9 +3749,7 @@
     ]
   },
   "cell validation.condition": {
-    "modules": [
-      "NativeComponents"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Validation/StrictCodeForm.cshtml",
       "/Shared/_Layout.cshtml"
