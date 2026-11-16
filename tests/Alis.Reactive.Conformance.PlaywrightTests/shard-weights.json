@@ -1,3 +1,16 @@
 {
-  "Harness": 0.77
+  "ArrayLambdas": 5.01,
+  "Conditions": 3.01,
+  "Declarations": 3.61,
+  "Elements": 1.5,
+  "Execution": 4.14,
+  "Harness": 1.57,
+  "PathsAndWire": 1.59,
+  "Plugins": 1.5,
+  "RequestsAndResponses": 7.3,
+  "Schema": 0.21,
+  "TypeKnowledge": 0.56,
+  "ValuesAndSources": 3.07,
+  "Vendors": 20.05,
+  "hosts": 15.27
 }
