@@ -1,6 +1,6 @@
 first
 nested
 nested/left nested/right
-unread/*
+wings/*
 .
 second third

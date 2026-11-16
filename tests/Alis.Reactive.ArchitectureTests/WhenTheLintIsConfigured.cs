@@ -110,9 +110,21 @@ public class WhenTheLintIsConfigured
     public void a_nested_slice_that_imports_an_earlier_row_is_accepted()
         => AssertAccepted("rows/nested/left/reads-an-earlier-row.accepted.ts");
 
+    [AcceptedCase]
+    public void a_folder_under_an_entry_with_a_star_that_imports_its_own_file_is_accepted()
+        => AssertAccepted("rows/wings/east/reads-its-own-file.accepted.ts");
+
+    [AcceptedCase]
+    public void a_folder_under_an_entry_with_a_star_that_imports_an_earlier_row_is_accepted()
+        => AssertAccepted("rows/wings/east/reads-an-earlier-row.accepted.ts");
+
     [RefusedCase]
-    public void a_file_under_an_entry_with_a_star_stands_as_a_file_with_no_row()
-        => AssertRefused("rows/unread/under/reads-an-earlier-row.refused.ts", RestrictedImport, line: 1);
+    public void a_folder_under_an_entry_with_a_star_that_imports_a_folder_beside_its_own_is_refused()
+        => AssertRefused("rows/wings/east/reads-a-folder-beside-it.refused.ts", RestrictedImport, line: 1);
+
+    [RefusedCase]
+    public void a_folder_under_an_entry_with_a_star_that_imports_a_later_row_is_refused()
+        => AssertRefused("rows/wings/east/reads-a-later-row.refused.ts", RestrictedImport, line: 1);
 
     [RefusedCase]
     public void a_loose_equality_is_refused() => AssertRefused("equals.refused.ts", Equality, line: 2);
@@ -210,6 +222,14 @@ public class WhenTheLintIsConfigured
     [RefusedCase]
     public void a_file_beside_the_table_that_imports_a_later_row_by_its_folder_is_refused()
         => AssertRefused("rows/reads-a-later-row-by-its-folder.refused.ts", RestrictedImport, line: 1);
+
+    [AcceptedCase]
+    public void a_file_beside_a_table_with_no_dot_that_imports_its_last_row_is_accepted()
+        => AssertAccepted("package/reads-the-last-row.accepted.ts");
+
+    [RefusedCase]
+    public void a_slice_that_imports_the_file_beside_a_table_with_no_dot_is_refused()
+        => AssertRefused("package/rooms/reads-the-file-beside-the-table.refused.ts", RestrictedImport, line: 1);
 
     [RefusedCase]
     public void a_file_whose_folder_has_no_row_that_imports_a_row_is_refused() => AssertRefused("rows/unlisted/reads-a-row.refused.ts", RestrictedImport, line: 1);

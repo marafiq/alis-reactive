@@ -4,7 +4,12 @@ import eslint from "@eslint/js";
 import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-const sliceTables = ["tests/Alis.Reactive.Conformance.App", "Alis.Reactive.Assets/runtime", "tests/Alis.Reactive.ArchitectureTests/LintCases/rows"];
+const sliceTables = [
+  "tests/Alis.Reactive.Conformance.App",
+  "Alis.Reactive.Assets/runtime",
+  "tests/Alis.Reactive.ArchitectureTests/LintCases/rows",
+  "tests/Alis.Reactive.ArchitectureTests/LintCases/package",
+];
 
 const beyondItsModulesIndex = "^(\\.\\./|\\./(?!index(\\.ts)?$))";
 
@@ -17,26 +22,33 @@ const aWideQuery =
 
 const aFile = "[^/]+";
 
-const aStar = "/*";
+const eachFolder = "*";
 
 function rowsOf(table) {
-  return readFileSync(new URL(table + "/SliceTree.txt", import.meta.url), "utf8")
+  const rows = readFileSync(new URL(table + "/SliceTree.txt", import.meta.url), "utf8")
     .split("\n")
     .map((line) => line.split(/\s+/u).filter((entry) => entry !== ""))
-    .map((row) => row.filter((entry) => !entry.endsWith(aStar)))
     .filter((row) => row.length > 0);
+  return rows.flat().includes(besideTheTable) ? rows : [...rows, [besideTheTable]];
 }
 
 function literal(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }
 
+function folderPattern(relative) {
+  return relative
+    .split("/")
+    .map((segment) => (segment === eachFolder ? aFile : literal(segment)))
+    .join("/");
+}
+
 function filesOf(slice, from, slices) {
   const relative = posix.relative(from, slice) || ".";
-  const prefix = (relative.startsWith(".") ? relative : "./" + relative) + "/";
-  if (slice !== besideTheTable) return literal(prefix) + aFile;
+  const prefix = folderPattern(relative.startsWith(".") ? relative : "./" + relative) + "/";
+  if (slice !== besideTheTable) return prefix + aFile;
   const folders = slices.filter((other) => other !== besideTheTable).map(literal);
-  return literal(prefix) + "(?!(?:" + folders.join("|") + ")$)" + aFile;
+  return prefix + "(?!(?:" + folders.join("|") + ")$)" + aFile;
 }
 
 function ownFilesOf(slice, slices) {

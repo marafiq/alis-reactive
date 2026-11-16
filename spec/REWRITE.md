@@ -483,12 +483,13 @@ list only with its line, in the unit that brings that line's code:
 - `no-restricted-syntax` refuses a call of `querySelector`, `querySelectorAll`, `getElementsByClassName`,
   `getElementsByTagName`, `getElementsByName`, `closest` or `matches`: an element is found by its id (BRIEF.md,
   Principles 8; M5.N1). It is lifted in one file, the one of `runtime/Execution/` that finds a root's plans.
-- `no-restricted-imports`, which `eslint.config.js` writes from each `SliceTree.txt` of a TypeScript tree, the
-  runtime's today, refuses in a slice's file every relative import but one of a file of its own folder or of a
-  slice on a row before its own: a later row, a slice of its own row and a folder named in place of its file are
-  refused, and so is every relative import in a file whose folder has no row (section 2.3, M20.D3). It reads a
-  table's folder entries and its dot; an entry with a star is read from U23 on, with the first TypeScript tree that
-  writes one, and before that a file under one stands as a file with no row.
+- `no-restricted-imports`, which `eslint.config.js` writes from the `SliceTree.txt` of each TypeScript tree it lists,
+  refuses in a slice's file every relative import but one of a file of its own folder or of a slice on a row before
+  its own: a later row, a slice of its own row and a folder named in place of its file are refused, and so is every
+  relative import in a file whose folder has no row (section 2.3, M20.D3). It reads a table's folder entries, its
+  dot and its starred entries, each folder under a starred entry a slice of that entry's row; a file beside a table
+  that writes no dot takes the place after the table's last row, as a package's bundle entry does, and imports any
+  slice's file.
 - `no-restricted-imports`, over a module's pure tests, the files that end in .test.ts, refuses an import of the
   runtime other than the test's own module's index (`./index`), so a pure test reads a module's public surface and
   never its internals (1.2).
