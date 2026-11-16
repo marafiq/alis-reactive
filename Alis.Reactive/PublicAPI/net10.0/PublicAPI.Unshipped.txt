@@ -109,6 +109,9 @@ Alis.Reactive.Elements.ElementContent
 Alis.Reactive.Elements.ElementContent.Append(string? text) -> void
 Alis.Reactive.Elements.ElementContent.Append<TValue>(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 Alis.Reactive.Elements.ElementContent.Set(string? text) -> void
+Alis.Reactive.Elements.ElementContent.Set(System.DateTime value) -> void
+Alis.Reactive.Elements.ElementContent.Set(System.DateOnly day) -> void
+Alis.Reactive.Elements.ElementContent.Set(System.TimeOnly time) -> void
 Alis.Reactive.Elements.ElementContent.Set<TValue>(Alis.Reactive.ValuesAndSources.ITypedSource<TValue>! source) -> void
 Alis.Reactive.InputsAndIds.ComponentInput
 Alis.Reactive.InputsAndIds.IInputComponent

@@ -460,6 +460,20 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M15.F1 X3.13 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/ShiftClock.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M15.F1 X3.14 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/RoundLookup.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M15.F1 X3.5 0": {
     "modules": [
       "NativeComponents",
@@ -2043,6 +2057,17 @@
     "views": [
       "/Refusals/ArrayLambdas/WardHandoverCheck.cshtml",
       "/Refusals/ArrayLambdas/WardHandovers.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M4.F1 X6.57 2": {
+    "modules": [
+      "NativeComponents",
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Refusals/ArrayLambdas/BookedVisits.cshtml",
+      "/Refusals/ArrayLambdas/VisitBooking.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

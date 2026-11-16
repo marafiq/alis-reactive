@@ -20,8 +20,10 @@ its children read as a list. Module 5 of `spec/CLAUDE.md`.
 Each name is gate 2's; each door is the capability it carries.
 
 - `M5.N1` new: `Element`, a component declaration that mirrors lib.dom's `HTMLElement`: `Text` and `Html`, each an
-  `ElementContent` over `textContent` and `innerHTML`, a source of that text whose `Set` takes a text literal or a
-  source of D7.2 of any type, shown as the string table of `spec/Core/conversions.md` writes it (D7.3, D3.11, X3.8);
+  `ElementContent` over `textContent` and `innerHTML`, a source of that text whose `Set` takes a text literal, a
+  source of D7.2 of any type, shown as the string table of `spec/Core/conversions.md` writes it (D7.3, D3.11, X3.8),
+  or a date's literal, a `DateTime` on both hosts and a `DateOnly` or a `TimeOnly` on net10, written as the wall time
+  the view holds and shown as that date's text in every browser's zone (X3.13, X3.14);
   its `Append` takes the same two and adds the value after what the element holds, removing nothing: a `call` of
   lib.dom's `insertAdjacentText` on `Text` and of `insertAdjacentHTML` on `Html`, at "beforeend", with the value's
   joined text (N7.7), run only where that text is not empty (D7.6), so the element's children, a value a person typed

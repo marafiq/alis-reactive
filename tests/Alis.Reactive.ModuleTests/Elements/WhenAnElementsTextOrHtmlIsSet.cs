@@ -1,3 +1,4 @@
+using System;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.TriggersAndPipelines;
 using Microsoft.AspNetCore.Html;
@@ -30,6 +31,33 @@ public sealed class WhenAnElementsTextOrHtmlIsSet
             ShownAsText("""{"kind":"data","path":[{"name":"room","requires":[],"absent":{"kind":"start","value":""}}],"target":{"kind":"get","path":["detail"],"members":"required","target":""" + Payload + "}}") + "}," +
             """{"kind":"set","path":["textContent"],"members":"required","content":true,"target":""" + Obj("seated-portion") + ",\"value\":" +
             ShownAsText("""{"kind":"get","path":["portion"],"members":"required","target":""" + Payload + "}") + "}");
+
+        Assert.That(Views.TextOf(html.RenderPlan(plan)), Is.EqualTo(ScriptOpen + expected + ScriptClose));
+        Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);
+    }
+
+    [Test]
+    public void a_date_a_day_and_a_time_are_written_as_the_wall_time_the_view_holds_and_shown_as_text()
+    {
+        var html = Views.Of(new Seating("4"));
+        var plan = html.ReactivePlan<Seating>();
+        html.On(plan, trigger => trigger.DomReady(pipeline =>
+        {
+            pipeline.Element("logged-utc").Text.Set(new DateTime(2026, 11, 9, 14, 30, 5, DateTimeKind.Utc));
+            pipeline.Element("logged-local").Text.Set(new DateTime(2026, 11, 9, 9, 30, 5, DateTimeKind.Local));
+            pipeline.Element("round-day").Text.Set(new DateOnly(2026, 11, 9));
+            pipeline.Element("round-time").Html.Set(new TimeOnly(13, 30));
+        }));
+        var expected = Loaded(
+            Element("logged-local") + "," + Element("logged-utc") + "," + Element("round-day") + "," + Element("round-time"),
+            """{"kind":"set","path":["textContent"],"members":"required","content":true,"target":""" + Obj("logged-utc") + ",\"value\":" +
+            ShownAsADate(WallTime("2026-11-09T14:30:05")) + "}," +
+            """{"kind":"set","path":["textContent"],"members":"required","content":true,"target":""" + Obj("logged-local") + ",\"value\":" +
+            ShownAsADate(WallTime("2026-11-09T09:30:05")) + "}," +
+            """{"kind":"set","path":["textContent"],"members":"required","content":true,"target":""" + Obj("round-day") + ",\"value\":" +
+            ShownAsText(Text("2026-11-09")) + "}," +
+            """{"kind":"set","path":["innerHTML"],"members":"required","content":true,"target":""" + Obj("round-time") + ",\"value\":" +
+            ShownAsText(Text("13:30:00")) + "}");
 
         Assert.That(Views.TextOf(html.RenderPlan(plan)), Is.EqualTo(ScriptOpen + expected + ScriptClose));
         Assert.That(PlanSchema.ProblemsOf(expected), Is.Empty);

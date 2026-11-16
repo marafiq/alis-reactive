@@ -1565,3 +1565,5 @@
   Evidence: X4.10's browser test passes with the setting carried, its opposite with the option off writing the count; the owner's words, verbatim, in spec/CLAUDE.md's line of 2026-11-15.
 - 2026-11-15 lead, U9's M2.F2: the page's URL is read through `alis.document`'s `query` and `segment` (schema.md), and its numbers take the `invariant` number text, an integer's text read whole.
   So `?beds=2.0` and `?beds=1e3` read 2 and 1000 where both hosts bind an int with `NumberStyles.Integer` and keep its start, and net10's group separator in a fraction reads nothing; a number text of the binders' own is a grammar case, the owner's.
+- 2026-11-15 lead, U18's X3.13 and X3.14: `ElementContent.Set` takes a date's literal, `Set(DateTime)` on both hosts and `Set(DateOnly)` and `Set(TimeOnly)` on net10, written in the live form, so a DateTime is its wall time whatever its kind, and shown as the source's text (M5.N1, D7.3).
+  A generic `Set<TValue>(TValue)` was refused: a component's `Property<T>` passed to it binds by identity over `Set<T>(ITypedSource<T>)`'s conversion, so the property would be written as a literal.

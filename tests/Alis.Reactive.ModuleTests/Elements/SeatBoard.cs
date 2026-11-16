@@ -54,6 +54,10 @@ internal static class SeatPlans
 
     internal static string ShownAsText(string expression) => "{\"kind\":\"as\",\"expr\":" + expression + ",\"shape\":{\"kind\":\"string\",\"date\":\"none\",\"negativeZero\":\"0\"}}";
 
+    internal static string WallTime(string text) => "{\"kind\":\"as\",\"expr\":" + Text(text) + ",\"shape\":{\"kind\":\"date\"}}";
+
+    internal static string ShownAsADate(string expression) => "{\"kind\":\"as\",\"expr\":" + expression + ",\"shape\":{\"kind\":\"string\",\"date\":\"date\",\"negativeZero\":\"0\"}}";
+
     internal static string Loaded(string objects, string statements) => Head + Document + "," + objects + OnLoad + statements + Ends;
 
     internal static string Seated(string objects, string statements) => Head + objects + OnSeated + statements + Ends;

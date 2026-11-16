@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Alis.Reactive.Declarations;
 using Alis.Reactive.Schema;
@@ -24,7 +25,7 @@ public sealed class Element : Component
     /// plan still holds is refused where the view renders when the same plan loads that slot, and stops its
     /// pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
     /// </remarks>
-    public ElementContent Text => new(this, "textContent", "insertAdjacentText");
+    public ElementContent Text => new(this, "textContent", "insertAdjacentText", nameof(Text));
 
     /// <summary>Gets the element's HTML, <c>innerHTML</c>: a source of it that a step also sets.</summary>
     /// <remarks>
@@ -32,7 +33,7 @@ public sealed class Element : Component
     /// plan still holds is refused where the view renders when the same plan loads that slot, and stops its
     /// pipeline otherwise, since it would remove what the slot loaded while that content's plan runs.
     /// </remarks>
-    public ElementContent Html => new(this, "innerHTML", "insertAdjacentHTML");
+    public ElementContent Html => new(this, "innerHTML", "insertAdjacentHTML", nameof(Html));
 
     /// <summary>Gets the element's classes, <c>classList</c>.</summary>
     public ClassList Classes => LiveObject<ClassList>(name: "classList");
@@ -56,16 +57,18 @@ public sealed class Element : Component
 /// An element's text or its HTML: a source of it that a step also sets or adds to, with a text or a value shown as
 /// text.
 /// </summary>
-public sealed class ElementContent : ReadOnly<string?>
+public sealed partial class ElementContent : ReadOnly<string?>
 {
     private const string AtTheEnd = "beforeend";
 
     private readonly string _addsBy;
+    private readonly string _declaredBy;
 
-    internal ElementContent(Element element, string member, string addsBy)
+    internal ElementContent(Element element, string member, string addsBy, string declaredBy)
         : base(element, member, optional: false)
     {
         _addsBy = addsBy;
+        _declaredBy = declaredBy;
     }
 
     /// <summary>Sets the content to a text when the step runs.</summary>
@@ -80,6 +83,14 @@ public sealed class ElementContent : ReadOnly<string?>
     /// <param name="source">The source of the value to show.</param>
     /// <typeparam name="TValue">The type of the value the source reads.</typeparam>
     public void Set<TValue>(ITypedSource<TValue> source) => Written(TextForms.Shown(source));
+
+    /// <summary>Sets the content to a date and time when the step runs, shown as text.</summary>
+    /// <remarks>
+    /// It shows the wall time the view holds, whatever its kind, the same in every browser's zone: its day, with its
+    /// time when that is not midnight.
+    /// </remarks>
+    /// <param name="value">The date and time, written into the plan where the view renders.</param>
+    public void Set(DateTime value) => Written(Shown(value));
 
     /// <summary>Adds a text after the content when the step runs.</summary>
     /// <remarks>
@@ -99,6 +110,13 @@ public sealed class ElementContent : ReadOnly<string?>
     /// <param name="source">The source of the value to add.</param>
     /// <typeparam name="TValue">The type of the value the source reads.</typeparam>
     public void Append<TValue>(ITypedSource<TValue> source) => Added(TextForms.Part(source));
+
+    private AsExpression Shown<TValue>(TValue value)
+    {
+        var content = Owner.Bound.Writer.Content;
+        var literal = Literals.IntoLive(value, content.Json, Owner.DeclaredName(_declaredBy));
+        return TextForms.Shown(new Computed<TValue>(literal, HeldForm.Live(content.Json, content.RendersUnder)));
+    }
 
     private void Written(Expression value)
         => Owner.Bound.Writer.Write(new SetStatement([Member], SetMembers.Required, true, Owner.Bound.Target, value));

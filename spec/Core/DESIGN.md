@@ -1258,7 +1258,8 @@ Terms used throughout:
   the text it tests and its operand the same way (M3.N1). An element's text
   and HTML are the one position that takes a source of any type, `ElementContent`'s `Set` (M5.N1), and a joined
   text's part takes one the same way (N7.7): what the source reads is shown as the string table of
-  `spec/Core/conversions.md` writes it (D3.11, X3.8). C# converts a
+  `spec/Core/conversions.md` writes it (D3.11, X3.8). That `Set` takes a date's literal too, a `DateTime`,
+  `DateOnly` or `TimeOnly` and no literal of another type (X3.13, X3.14). C# converts a
   method's `Arg<T>` only from a `TypedSource<T>`: it refuses a conversion from the covariant interface (CS0552), warns
   where only nullability differs (CS8620), which ALIS040 refuses as an error in every app (N18.14, gate 2's G8), has
   no conversion from a struct's source to its nullable's (CS1503), takes no

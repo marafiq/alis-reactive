@@ -1,0 +1,32 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RoundLookup
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Round lookup";
+    var plan = Html.ReactivePlan<RoundLookup>();
+    var day = Model.Day;
+    var at = Model.At;
+}
+<h1>Round lookup</h1>
+<button type="button" @Html.Raises(plan, RoundLookupButtons.FindTheRound)>Find the round</button>
+<dl>
+    <dt>Round</dt>
+    <dd id="round-found"></dd>
+    <dt>Day</dt>
+    <dd id="day-text"></dd>
+    <dt>Time</dt>
+    <dd id="time-text"></dd>
+</dl>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RoundLookupButtons.FindTheRound, pipeline =>
+    {
+        pipeline.Get<RoundLookupQuery>(RoundLookupEndpoints.Find, request => request.Query(r => r.Day, day).Query(r => r.At, at))
+            .OnSuccess(Content.Text, (found, pipeline) => pipeline.Element("round-found").Text.Set(found.Body));
+        pipeline.Element("day-text").Text.Set(day);
+        pipeline.Element("time-text").Text.Set(at);
+    }));
+}
+@Html.RenderPlan(plan)
