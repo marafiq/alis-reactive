@@ -16,7 +16,8 @@ Runs every check that needs no browser, in order, and stops at the first that fa
   5. dotnet restore in locked mode, then dotnet build -c Release, then the doors each browser test's pages call,
      written by scripts/page-doors.cs and compared with the tracked spec/Reference/page-doors.json
   6. dotnet format --verify-no-changes over the solution
-  7. the architecture tests, the analyzer cases, the test rules' cases and the module tests
+  7. the architecture tests but WhenAConsumerAppIsBuilt, which scripts/delivery.sh runs on the packs,
+     the analyzer cases, the test rules' cases and the module tests
   8. python3 spec/tools/check.py --ci, which reads JAVA_HOME and TLA2TOOLS_JAR
 
 Options:
@@ -85,7 +86,10 @@ fi
 step "dotnet format --verify-no-changes"
 dotnet format Alis.Reactive.slnx --verify-no-changes --severity warn --no-restore
 
-for project in tests/Alis.Reactive.ArchitectureTests tests/Alis.Reactive.AnalyzerTests tests/Alis.Reactive.TestRules.AnalyzerTests tests/Alis.Reactive.ModuleTests; do
+step "dotnet test tests/Alis.Reactive.ArchitectureTests, but WhenAConsumerAppIsBuilt"
+dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --no-build --filter "FullyQualifiedName!~WhenAConsumerAppIsBuilt"
+
+for project in tests/Alis.Reactive.AnalyzerTests tests/Alis.Reactive.TestRules.AnalyzerTests tests/Alis.Reactive.ModuleTests; do
   step "dotnet test $project"
   dotnet test "$project" -c Release --no-build
 done

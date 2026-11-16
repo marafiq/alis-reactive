@@ -11,6 +11,7 @@
         <VendorContractTsConfig>$(MSBuildThisFileDirectory)tsconfig.json</VendorContractTsConfig>
         <PackageDescription>Core reactive framework for building plan-driven browser UIs with C# fluent builders and JSON-serialized Reactive Plans, with validation rules written once in FluentValidation's grammar for the server and the browser.</PackageDescription>
         <PackageTags>reactive;aspnetcore;mvc;fluent-api;plan-driven</PackageTags>
+        <BeforePack>$(BeforePack);PackTheAnalyzers</BeforePack>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
@@ -28,8 +29,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="../Alis.Reactive.Analyzers/Vendors/VendorContract.targets" Pack="true" PackagePath="build/Vendors/" />
-        <None Include="../Alis.Reactive.Analyzers/Vendors/vendor-contract.mjs" Pack="true" PackagePath="build/Vendors/" />
+        <None Include="../Alis.Reactive.Analyzers/Vendors/VendorContract.targets" Pack="true" PackagePath="Vendors/" />
+        <None Include="../Alis.Reactive.Analyzers/Vendors/vendor-contract.mjs" Pack="true" PackagePath="Vendors/" />
+        <None Include="../Alis.Reactive.Analyzers/RenderingAndDelivery/CopyBrowserFiles.targets" Pack="true" PackagePath="build/net48/$(PackageId).targets;buildTransitive/net48/$(PackageId).targets" />
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
         <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" />
@@ -37,6 +39,15 @@
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
+
+    <Target Name="PackTheAnalyzers">
+        <MSBuild Projects="../Alis.Reactive.Analyzers/Alis.Reactive.Analyzers.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration)">
+            <Output TaskParameter="TargetOutputs" ItemName="AlisReactiveAnalyzer" />
+        </MSBuild>
+        <ItemGroup>
+            <None Include="@(AlisReactiveAnalyzer)" Pack="true" PackagePath="analyzers/dotnet/cs/" />
+        </ItemGroup>
+    </Target>
 
     <Import Project="../Alis.Reactive.Analyzers/Vendors/VendorContract.targets" />
 

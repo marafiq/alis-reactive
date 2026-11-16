@@ -6,6 +6,9 @@ is named for the module whose lines its rules enforce; `Analyzers/` holds module
 and ignore, `PartialsAndSlots/` holds `ALIS041`, the plan a view opens and renders, `ValuesAndSources/` holds
 `ALIS043`, a source .NET makes a text of, and `ArrayLambdas/` holds `ALIS042`, a list's operation over a text, and
 the suppressors `ALIS026` and `ALIS027`, a data lambda's read past a holder that holds null and a nullable's value.
+Two folders hold build files the packages carry beside the analyzers: `Vendors/` the vendor contract (D17.5), which a
+project opts into, and `RenderingAndDelivery/` the target that copies a package's browser files into a net48 app's
+Content/<PackageId>/ when their content changes (M19.D2).
 
 ## The standard
 

@@ -22,11 +22,20 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" />
+        <ProjectReference Include="..\Alis.Reactive\Alis.Reactive.csproj" PrivateAssets="none" />
+        <None Include="../Alis.Reactive.Analyzers/RenderingAndDelivery/CopyBrowserFiles.targets" Pack="true" PackagePath="build/net48/$(PackageId).targets;buildTransitive/net48/$(PackageId).targets" />
         <ProjectReference Include="..\Alis.Reactive.Analyzers\Alis.Reactive.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="all" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Shipped.txt" />
         <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
     </ItemGroup>
+
+    <Target Name="DependOnAlisReactiveExactly" BeforeTargets="GenerateNuspec">
+        <ItemGroup>
+            <AlisReactiveExactReference Include="@(_ProjectReferencesWithVersions)" ProjectVersion="[%(ProjectVersion)]" />
+            <_ProjectReferencesWithVersions Remove="@(_ProjectReferencesWithVersions)" />
+            <_ProjectReferencesWithVersions Include="@(AlisReactiveExactReference)" />
+        </ItemGroup>
+    </Target>
 
 </Project>

@@ -132,7 +132,8 @@ Alis.Reactive.Fusion/                 net48;net10.0, PackageId AlisReactive.Fusi
 Alis.Reactive.OpenTelemetry/          net48;net10.0, PackageId AlisReactive.OpenTelemetry, on the core alone
   SliceTree.txt PublicAPI/ opentelemetry.ts
   Tracing/                            the layout helper and the trace sink it registers (N20.2)
-build/EmptyPackage.proj  build/EmptyPackage.md   packed once per empty id
+build/EmptyPackage.proj  build/EmptyPackage.md   packed once per empty id, restored in locked mode from its own lock:
+build/packages.AlisReactive.DesignSystem.lock.json  build/packages.AlisReactive.NativeTagHelpers.lock.json
 
 tests/
   Alis.Reactive.Conformance.World/            net48;net10.0, on no Alis.Reactive assembly: the world's records, its
@@ -512,13 +513,15 @@ Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `n
 agreement in NuGet, npm and the lock; `tsc -b`; eslint; vitest over the runtime's pure tests; the browser bundle, `node build.mjs`; a locked `dotnet restore`; `dotnet build -c Release`;
 the doors each browser test's pages call, written from that build by `scripts/page-doors.cs` and diffed with the
 tracked table;
-`dotnet format --verify-no-changes` over the solution; the architecture tests, the analyzer cases, the test
-rules' cases and the module tests; `check.py --ci`, which
+`dotnet format --verify-no-changes` over the solution; the architecture tests but WhenAConsumerAppIsBuilt, the
+analyzer cases, the test rules' cases and the module tests; `check.py --ci`, which
 its `--no-spec` leaves to CI's own job; its last line is "[check] every check passed."); `scripts/playwright.sh` (the bundle and the build, then run, with the selectors
 below, the result line and the leftover-server check), with `scripts/list-tests.cs`, `scripts/playwright-select.mjs`
 and `scripts/playwright-result.mjs`, which list the built tests, select a run's cases and read its result;
 `scripts/test.sh` (both, its browser leg every test or, with `--through`, the tests landed through a unit); `scripts/build.sh`,
-`scripts/run.sh`, `scripts/pack.sh`, `scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,
+`scripts/run.sh`, `scripts/pack.sh` (the six packages at one version, each read back from its nuspec),
+`scripts/delivery.sh` (`scripts/pack.sh` at a version of its own, then WhenAConsumerAppIsBuilt over the small apps its
+cases write on those packs), `scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,
 Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
 `scripts/plant-defect.sh`, which runs its one test, refuses a verdict unless it passes, then plants one defect and
 reads the runner's result line for that test again,
@@ -527,7 +530,8 @@ MSBuild never runs npm, and runs node only for the vendor contract a project opt
 table before the compiler reads it (D17.5, `Alis.Reactive.Analyzers/Vendors/VendorContract.targets`): `build.mjs` writes each bundle, the core's to
 `Alis.Reactive/wwwroot/js/alis-reactive.js`,
 which git ignores and the core's static web assets serve at `_content/AlisReactive/js/alis-reactive.js`, and each
-script that builds runs it first (`scripts/check.sh`, `scripts/playwright.sh`, `scripts/build.sh`, `scripts/run.sh`).
+script that builds runs it first (`scripts/check.sh`, `scripts/playwright.sh`, `scripts/build.sh`, `scripts/run.sh`,
+`scripts/pack.sh`).
 An app whose bundle is missing refuses to start.
 
 `check.py --ci`, which U1 adds, runs every check but survival, a spec session's own hook and branch, and probes,
@@ -589,10 +593,10 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
 
 | Package | lib | analyzers | build | browser files | dependencies |
 |---|---|---|---|---|---|
-| AlisReactive | net48, net10.0 | the ALIS analyzers and the validator generator, packed from the analyzer project's own output path | `build/net48` copies the browser files; the vendor contract target, opt-in | `alis-reactive.js`; `alis-reactive-hub.js` on net10 | net48: System.Text.Json 10.0.15, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.15, System.Diagnostics.DiagnosticSource 10.0.15 (D20.8), Microsoft.AspNet.Mvc 5.3.0; net10: the framework reference |
-| AlisReactive.Native | net48, net10.0 | none | `build/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |
-| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |
-| AlisReactive.OpenTelemetry | net48, net10.0 | none | `build/net48` copy | `alis-reactive-opentelemetry.js`, its bundle holding 2.7's OpenTelemetry pins | AlisReactive at the same version, exactly |
+| AlisReactive | net48, net10.0 | the ALIS analyzers and the validator generator, packed from the analyzer project's own output path | `build/net48` and `buildTransitive/net48` copy the browser files; `Vendors/` holds the vendor contract target, opt-in | `alis-reactive.js`; `alis-reactive-hub.js` on net10 | net48: System.Text.Json 10.0.15, Microsoft.Extensions.DependencyInjection.Abstractions 10.0.15, System.Diagnostics.DiagnosticSource 10.0.15 (D20.8), Microsoft.AspNet.Mvc 5.3.0; net10: the framework reference |
+| AlisReactive.Native | net48, net10.0 | none | `build/net48` and `buildTransitive/net48` copy | `alis-reactive-native.js` | AlisReactive at the same version, exactly |
+| AlisReactive.Fusion | net48, net10.0 | none | `build/net48` and `buildTransitive/net48` copy | `alis-reactive-fusion.js`, `alis-reactive-fusion-templates.js` | AlisReactive at the same version, exactly; Syncfusion.EJ2.AspNet.Core [33.1.47] on net10, Syncfusion.EJ2.MVC5 [33.1.47] on net48 |
+| AlisReactive.OpenTelemetry | net48, net10.0 | none | `build/net48` and `buildTransitive/net48` copy | `alis-reactive-opentelemetry.js`, its bundle holding 2.7's OpenTelemetry pins | AlisReactive at the same version, exactly |
 | AlisReactive.DesignSystem | `lib/net48/_._`, `lib/net10.0/_._` | none | none | none | none |
 | AlisReactive.NativeTagHelpers | `lib/net10.0/_._` | none | none | none | none |
 
@@ -610,15 +614,17 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
 - The delivery tests run on both fresh apps: app.json's placements on its `fresh` screen under the hosts consumerNet10
   and consumerNet48, apps that README.md's steps alone wire on the packed packages, each booting its plan (M19.X5); and
   WhenAConsumerAppIsBuilt, whose cases hold that git lists no file a build wrote into either app (M19.D2), that a file an
-  ALIS analyzer refuses fails a fresh app's build with that analyzer's id, so the analyzers packed inside AlisReactive
-  reach an app on both hosts, and that the fresh net10 app's static web assets serve each package's browser file under
+  ALIS analyzer refuses fails, with that analyzer's id, the build of an app on either host that names
+  AlisReactive.Native alone, so the analyzers packed inside AlisReactive reach an app through a consumer package, and
+  that the fresh net10 app's static web assets serve each package's browser file under
   `_content/<PackageId>/js/`, which only a fresh app reads, since the conformance app takes the shipped projects. Each other
   delivery behavior is proven once where its defect shows: a link's version is the content hash of the bytes served on
   the twin (M19.X1), which runs on the packs, a validator refuses in the browser and the server saves a valid post on
   the conformance app and the twin (M8.F1's X16.10), and each time zone shows its own day there (M15.F1's X3.7 and
   X3.9, M18.F1's M18.X1); on net10 the version is ASP.NET Core's own `asp-append-version` (M19.N1).
-- Native, Fusion and OpenTelemetry depend on AlisReactive at the exact version: pack writes `[x.y.z]`, and U22's
-  delivery job reads it back from each nuspec.
+- Native, Fusion and OpenTelemetry depend on AlisReactive at the exact version with every asset: each references the
+  core with `PrivateAssets="none"`, and `scripts/pack.sh` writes `[x.y.z]` and `include="All"` into each nuspec and
+  reads both back, exit 1 on a difference. The two empty ids restore in locked mode, each from its own lock.
 
 ### 2.10 The test rules
 
@@ -837,8 +843,8 @@ is never the reason.
   `poc/VendorContract.targets` and `poc/tools/vendor-contract.mjs` to `Alis.Reactive.Analyzers/Vendors/`,
   `spec/api/HttpSurface` retargeted to the core, and every cite of `poc/` pinned to a SHA.
 - The sources of `Alis.Reactive.DesignSystem` and `Alis.Reactive.NativeTagHelpers`, their workspaces and asset lines, since
-  their ids ship from `build/EmptyPackage.proj`; `examples/net48-mvc-smoke`, which becomes
-  `tests/Alis.Reactive.Consumer.Net48`; the build targets `build/AlisReactiveBrowserAssets.targets`,
+  their ids ship from build/EmptyPackage.proj; `examples/net48-mvc-smoke`, which becomes
+  tests/Alis.Reactive.Consumer.Net48; the build targets `build/AlisReactiveBrowserAssets.targets`,
   `build/AlisReactiveNetFrameworkContent.targets`, `build/AlisReactiveStaticWebAssets.targets` and main's
   `build/AlisReactiveAssets.targets`, which each package's own build target and static web assets replace (section 2.9,
   U22); `Alis.Reactive.Assets/components/`, whose code moves into its package; Tailwind, and jsdom as a test's

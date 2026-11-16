@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.Build.NoTargets/3.7.134">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition="'$(PackageId)' == 'AlisReactive.DesignSystem'">net48;net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(PackageId)' == 'AlisReactive.NativeTagHelpers'">net10.0</TargetFrameworks>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <IsPackable>true</IsPackable>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NuGetLockFilePath>$(MSBuildThisFileDirectory)packages.$(PackageId).lock.json</NuGetLockFilePath>
+    <PackageReadmeFile>EmptyPackage.md</PackageReadmeFile>
+    <PackageDescription>An id of the Alis.Reactive family that holds no code. It ships at every version of AlisReactive, so the id stays the family's.</PackageDescription>
+    <PackageTags>reactive;aspnetcore;mvc</PackageTags>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackTheEmptyFrameworkMark</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="@(None)" />
+    <None Include="EmptyPackage.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <Target Name="PackTheEmptyFrameworkMark">
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <Touch Files="$(IntermediateOutputPath)_._" AlwaysCreate="true" />
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(IntermediateOutputPath)_._" PackagePath="lib/$(TargetFramework)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

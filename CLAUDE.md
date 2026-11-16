@@ -258,9 +258,11 @@ slip is about you invented so you can avoid accountability about mistakes").
 - The rewrite runs on `feature/rewrite` and lands on `main` by pull request; other work branches from `origin/main` in
   a worktree (`feature/`, `fix/`, `chore/`): `git worktree add .worktrees/<name> -b feature/<name> origin/main`. A
   SessionStart hook installs the pre-commit guard. `git stash` is never run: `stash@{0}` holds work that stays put.
-- `scripts/check.sh` (every check that needs no browser), `scripts/test.sh` (that, then the browser tests),
-  `scripts/doctor.sh` (every pin against this machine), `scripts/build.sh`, `scripts/run.sh` (the conformance app at
-  http://localhost:5220), `scripts/pack.sh <version>`. A script joins this list with the commit that writes it.
+- `scripts/check.sh` (every check that needs no browser and no pack), `scripts/test.sh` (that, then the browser
+  tests), `scripts/doctor.sh` (every pin against this machine), `scripts/build.sh`, `scripts/run.sh` (the conformance
+  app at http://localhost:5220), `scripts/pack.sh <version>`, `scripts/delivery.sh` (the six packages at a version of
+  its own, then the apps `WhenAConsumerAppIsBuilt` builds on them). A script joins this list with the commit that
+  writes it.
 - Every tool and package is pinned to one exact version, the latest stable when its unit lands it; a hold names its
   reason in `spec/REWRITE.md` section 2.7, and Syncfusion's is the owner's (`node scripts/pin-syncfusion.mjs <version>`).
 - C# 14, compiled for `net48` and `net10.0`; `Alis.Reactive/CLAUDE.md` holds the one rule for a host's own code.

@@ -1,0 +1,26 @@
+<Project>
+  <ItemGroup>
+    <AlisReactiveBrowserFile Include="$(MSBuildThisFileDirectory)../../staticwebassets/**/*">
+      <PackageFolder>$(MSBuildProjectDirectory)/Content/$(MSBuildThisFileName)/</PackageFolder>
+      <Shipped>%(FullPath)</Shipped>
+      <Placed>$(MSBuildProjectDirectory)/Content/$(MSBuildThisFileName)/%(RecursiveDir)%(Filename)%(Extension)</Placed>
+    </AlisReactiveBrowserFile>
+  </ItemGroup>
+  <Target Name="CopyAlisReactiveBrowserFiles" AfterTargets="Build" Condition="'@(AlisReactiveBrowserFile)' != ''">
+    <WriteLinesToFile File="%(AlisReactiveBrowserFile.PackageFolder).gitignore" Lines="*" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <GetFileHash Files="@(AlisReactiveBrowserFile)" Algorithm="SHA256" MetadataName="ShippedHash">
+      <Output TaskParameter="Items" ItemName="_AlisReactiveShippedFile" />
+    </GetFileHash>
+    <ItemGroup>
+      <_AlisReactivePlacedFile Include="@(_AlisReactiveShippedFile->'%(Placed)')" Condition="Exists('%(Placed)')" />
+    </ItemGroup>
+    <GetFileHash Files="@(_AlisReactivePlacedFile)" Algorithm="SHA256" MetadataName="PlacedHash" Condition="'@(_AlisReactivePlacedFile)' != ''">
+      <Output TaskParameter="Items" ItemName="_AlisReactiveHashedPlacedFile" />
+    </GetFileHash>
+    <ItemGroup>
+      <_AlisReactiveCurrentFile Include="@(_AlisReactiveHashedPlacedFile)" Condition="'%(ShippedHash)' == '%(PlacedHash)'" />
+      <_AlisReactiveStaleFile Include="@(_AlisReactiveShippedFile->'%(Placed)')" Exclude="@(_AlisReactiveCurrentFile)" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_AlisReactiveStaleFile->'%(Shipped)')" DestinationFiles="@(_AlisReactiveStaleFile)" Condition="'@(_AlisReactiveStaleFile)' != ''" />
+  </Target>
+</Project>

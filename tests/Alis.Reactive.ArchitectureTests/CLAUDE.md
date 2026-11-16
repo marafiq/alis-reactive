@@ -49,6 +49,8 @@ expects none.
   result, over the tables and TRX files their cases write, and expect each refusal's own line. A case's tables
   hold what the real tools write: a fixture in the namespace of its first folder, as ALIS011 holds every test,
   beside the folder `scripts/list-tests.cs` reads from the assembly's portable PDB (the lead's mistake, 2026-11-13).
+- `WhenAConsumerAppIsBuilt` builds small apps its cases write on the packs in nupkgs/, each restored by its own
+  nuget.config into its own obj/; `scripts/check.sh` leaves it out and `scripts/delivery.sh` runs it.
 
 ```bash
 dotnet test tests/Alis.Reactive.ArchitectureTests
