@@ -1783,6 +1783,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   writes another step there or leaves the listen out. `RowEntry` keeps D17.15's word. A link's address writes the
   closed set of forms D17.15 names, since a date, an instant and a fraction need what the row alone does not hold. The
   busy target of a component a payload holds is U18's, so U24 changes no line of the core.
+- The lead, 2026-11-16, closing the gap of 2026-11-12 that M4.X2's promise needs a record whose code holds null:
+  `spec/Reference/native.json` types the record's code as text or null, the app's class still starting it at C0,
+  and the conformance library's record start gives a code as text, leaves it out, or sends it as null, so the
+  census panel holds a record its script sends with no code beside one that holds null. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or

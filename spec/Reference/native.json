@@ -1458,8 +1458,8 @@
         {
           "js": "code",
           "kind": "property",
-          "ts": "code: string",
-          "door": "string",
+          "ts": "code: string | null",
+          "door": "string?",
           "csharp": "Code"
         },
         {

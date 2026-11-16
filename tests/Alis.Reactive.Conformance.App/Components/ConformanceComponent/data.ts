@@ -3,7 +3,7 @@ export type RecordData = RecordStart;
 export type EmptyRecord = Readonly<Partial<RecordStart>>;
 export interface TakenRecord {
     readonly name: string | null;
-    readonly code: string;
+    readonly code: string | null;
     readonly day: unknown;
 }
 export interface Linked {

@@ -235,7 +235,7 @@ export class ConformanceComponent extends ComponentEvents {
         if (this.offCalls !== null)
             this.offCalls.textContent = String(removals.called);
     }
-    private inItsCode(record: TakenRecord): string { return String(record.name) + " in " + record.code; }
+    private inItsCode(record: TakenRecord): string { return String(record.name) + " in " + String(record.code); }
     private called(): void { this.view.status("Calls", String(++this.methodCalls)); }
     private makeItem(start: ItemStart): Item { return new Item(start, this.view, (endpoint) => this.request(endpoint), this.start.itemEndpoint, () => { this.drawItems(); }); }
     private recordAnswer(value: unknown): RecordData {

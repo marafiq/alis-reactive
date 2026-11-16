@@ -6,7 +6,7 @@ public sealed class Record
 {
     public string Name { get; set; } = null!;
 
-    public string Code { get; set; } = "C0";
+    public string? Code { get; set; } = "C0";
 
     public int Count { get; set; }
 

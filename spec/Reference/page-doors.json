@@ -1919,6 +1919,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M4.F1 M4.X2 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/CensusCodes.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M4.F1 M4.X3 0": {
     "modules": [],
     "views": [

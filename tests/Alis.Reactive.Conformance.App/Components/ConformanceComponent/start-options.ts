@@ -33,6 +33,7 @@ export interface ConformanceStart {
 }
 export interface RecordStart {
     name: string | null;
+    code?: string | null;
     count: number;
     day?: string;
     detail: DetailStart | null;
