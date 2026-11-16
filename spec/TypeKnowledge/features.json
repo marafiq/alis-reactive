@@ -291,7 +291,7 @@
           "page": "A net10 admission page in an app whose JSON options name members in snake case. Its Admission form holds a Given name input bound to GivenName; Admit posts the form as a JSON body to an endpoint that binds Admission from it and answers the member names the body held and the bound GivenName, which the success route writes into sent-names and admitted-name.",
           "gesture": "Type Rose in Given name and click Admit.",
           "outcome": "sent-names reads given_name and admitted-name reads Rose.",
-          "opposite": "The same page on net48, whose JSON body names each member by its CLR name (D2.4): the same typing and click write GivenName into sent-names and Rose into admitted-name.",
+          "opposite": "The same page on net10 under its own camel-case options, whose JSON body names each member by that policy (D2.4): the same typing and click write givenName into sent-names and Rose into admitted-name.",
           "defect": "The framework names the member by a camel case of its own, as both lines do (Alis.Reactive/PlanAuthoring/ExpressionPaths/JsonMemberName.cs:9 at 623dd4a27, Alis.Reactive/Members/JsonMemberName.cs:9 at 65fdf118d), so sent-names reads givenName, from which the endpoint binds nothing (probe:core-frombody-naming-policy), and admitted-name stays empty."
         },
         {

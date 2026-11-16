@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="AlisReactive" Version="$(PACKAGE_VERSION)" />
+    <PackageReference Include="AlisReactive.Native" Version="$(PACKAGE_VERSION)" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="4.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.15" />
@@ -32,11 +33,17 @@
     <Compile Include="$(ConformanceApp)World/ReadyPage.cs" Link="ConformanceApp/World/ReadyPage.cs" />
     <Compile Include="$(ConformanceApp)Refusals/RequestsAndResponses/RoundsBoard.cs" Link="ConformanceApp/Refusals/RequestsAndResponses/RoundsBoard.cs" />
     <Compile Include="$(ConformanceApp)Care/Record/VisitBoard.cs" Link="ConformanceApp/Care/Record/VisitBoard.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/AdmitResident.cs" Link="ConformanceApp/Care/Admission/AdmitResident.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/RoomIntake.cs" Link="ConformanceApp/Care/Admission/RoomIntake.cs" />
+    <Compile Include="$(ConformanceApp)Care/Admission/ContactMoveIn.cs" Link="ConformanceApp/Care/Admission/ContactMoveIn.cs" />
     <TwinView Include="$(ConformanceApp)**/*.Net48.cshtml" Exclude="$(ConformanceApp)bin/**;$(ConformanceApp)obj/**" />
     <TwinView Include="$(ConformanceApp)World/Ready.cshtml" />
     <TwinView Include="$(ConformanceApp)Refusals/RequestsAndResponses/RoundsBoard.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Record/VisitBoard.cshtml" />
     <TwinView Include="$(ConformanceApp)Care/Record/VisitBoardDesk.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/AdmitResident.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/RoomIntake.cshtml" />
+    <TwinView Include="$(ConformanceApp)Care/Admission/ContactMoveInKinCard.cshtml" />
   </ItemGroup>
 
   <Target Name="LayOutTheSite" AfterTargets="Build" DependsOnTargets="CopyAlisReactiveBrowserFiles">

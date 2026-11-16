@@ -1,0 +1,9 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model ContactMoveInKin
+@{
+    var plan = Html.ReactivePlan<ContactMoveInKin>();
+}
+@(Html.InputField(plan, m => m.Name, options => options.Label("Next of kin's name")).NativeTextBox())
+@Html.RenderPlan(plan)

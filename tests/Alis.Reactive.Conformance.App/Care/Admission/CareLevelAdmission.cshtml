@@ -1,0 +1,33 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model CareLevelAdmission
+@{
+    Layout = "/Care/Admission/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Admit with a care level";
+    var plan = Html.ReactivePlan<CareLevelAdmission>();
+}
+<h1>Admit @Model.Resident</h1>
+@(plan.ConformanceComponent("care-level", new ConformanceStart { Version = Model.Version, Text = "Care level", ReadOnlyText = "Residential" }))
+<button type="button" @Html.Raises(plan, CareLevelAdmissions.Admit)>Admit</button>
+<p>Care level: <output id="care-level-shown"></output></p>
+<p>Admission log: <output id="@DefaultHooks.RequestLog"></output></p>
+<p>Session: <output id="@DefaultHooks.FlushLine"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(CareLevelAdmissions.Admit, pipeline =>
+    {
+        pipeline.Post(CareLevelAdmissionEndpoints.Admissions)
+            .OnSuccess(pipeline =>
+            {
+                pipeline.Post(CareLevelAdmissionEndpoints.Beds)
+                    .OnSuccess(pipeline => pipeline.Element("care-level-shown").Text.Set(pipeline.Component<ConformanceComponent>("care-level").ReadOnlyText))
+                    .Finally(pipeline => pipeline.Element(DefaultHooks.RequestLog).Text.Append("inner finally "));
+                pipeline.Element(DefaultHooks.RequestLog).Text.Append("after beds ");
+            })
+            .Finally(pipeline => pipeline.Element(DefaultHooks.RequestLog).Text.Append("outer finally "));
+        pipeline.Element(DefaultHooks.RequestLog).Text.Append("after admission ");
+    }));
+}
+@Html.RenderPlan(plan)

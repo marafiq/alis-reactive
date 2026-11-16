@@ -574,6 +574,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M16.F1 X18.5 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/AdmitByGivenName.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M16.F1 X18.7 0": {
     "modules": [],
     "views": [
@@ -622,6 +629,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M17.F1 X11.15 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/RosterShifts.cshtml",
+      "/Care/Residents/_ScriptedLayout.cshtml"
+    ]
+  },
   "M17.F1 X11.16 0": {
     "modules": [],
     "views": [
@@ -637,6 +651,13 @@
       "/Care/Shell/CarePlanDrawer.cshtml",
       "/Care/Shell/CarePlanForm.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
+    ]
+  },
+  "M17.F1 X11.20 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/CareLevelAdmission.cshtml",
+      "/Care/Admission/_ScriptedLayout.cshtml"
     ]
   },
   "M17.F1 X11.21 0": {
@@ -1630,6 +1651,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M24.F9 M24.X10 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/RoomIntake.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M25.F1 M25.X1 0": {
     "modules": [
       "NativeAppLevelObjects"
@@ -1723,6 +1751,13 @@
     "views": [
       "/Care/Shell/DischargeIntake.cshtml",
       "/Care/Shell/_ShellLayout.cshtml"
+    ]
+  },
+  "M26.F1 X20.1 0": {
+    "modules": [],
+    "views": [
+      "/Care/Round/DoseSave.cshtml",
+      "/Care/Round/_TracedLayout.cshtml"
     ]
   },
   "M26.F2 X20.3 0": {
@@ -2696,6 +2731,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F2 X10.7 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/AdmitResident.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F2 X10.8 0": {
     "modules": [],
     "views": [
@@ -2723,6 +2765,14 @@
     "views": [
       "/Care/Admission/Circle.cshtml",
       "/Care/Admission/CircleMemberCard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M7.F1 X14.11 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/ContactMoveIn.cshtml",
+      "/Care/Admission/ContactMoveInKinCard.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
