@@ -1,7 +1,8 @@
 # Alis.Reactive.Conformance.PlaywrightTests
 
 The browser tests: each is one promise of the spec, proven by a gesture and its visible outcome in Chromium, on a
-screen of the conformance app. `.claude/rules/tests.md` holds the ten rules and loads with any file here. A test is
+screen of the conformance app, or for a delivery test on a fresh app's page (`tests/Alis.Reactive.Consumer.Net10`).
+`.claude/rules/tests.md` holds the ten rules and loads with any file here. A test is
 written once, at the full bar, from its promise and before its code: it fails until the code lands, proves the
 behavior when it turns green, and then fails on its planted defect (`scripts/plant-defect.sh`).
 
@@ -217,7 +218,9 @@ scripts/playwright.sh WhenTwoWorldsRun
 scripts/playwright.sh --measure-parallelism --all
 scripts/playwright.sh --measure --all
 scripts/playwright.sh --pool core --shard "1/1"
+scripts/playwright.sh --test M19_F1.M19_X5_0 --host consumerNet10
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
+scripts/plant-defect.sh --test M19_F1.M19_X5_0 --host consumerNet10 --in Alis.Reactive/Alis.Reactive.csproj --replace 'Sdk="Microsoft.NET.Sdk.Razor"' --with 'Sdk="Microsoft.NET.Sdk"'
 scripts/plant-defect.sh --test M14_F1.X19_3_0 --in Alis.Reactive.Assets/runtime/Schema/read-plan.ts --replace "plan.version === pageVersion" --with "plan.version > 0"
 scripts/plant-defect.sh --test Harness.WhenAGateIsHeldAtTwoEndpoints_each_endpoints_answer_waits_for_its_own_release --in tests/Alis.Reactive.Conformance.App/World/WorldData.cs --replace 'GetOrAdd((order.Gate, order.At)' --with 'GetOrAdd((order.Gate, Anywhere)'
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace '<title>{Text(title)}</title>' --with '<title>{Text(title)}</title><script src=\"/js/ej2.min.js\"></script>'

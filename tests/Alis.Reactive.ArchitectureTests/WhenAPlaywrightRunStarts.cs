@@ -16,6 +16,8 @@ public class WhenAPlaywrightRunStarts
     private const string RoundsFolder = "Rounds/Round";
     private const string Worlds = "Tests.Harness.WhenTwoWorldsRun";
     private const string WorldsFolder = "Harness";
+    private const string Fresh = "Tests.RenderingAndDelivery.WhenAFreshAppOpens";
+    private const string FreshFolder = "RenderingAndDelivery/Fresh";
 
     private static readonly string[] TheSpec =
     [
@@ -167,6 +169,25 @@ public class WhenAPlaywrightRunStarts
         Assert.That(selected.Units, Is.EqualTo(new[] { "twin" }));
         Assert.That(selected.Filter, Is.EqualTo($"(FullyQualifiedName~{Residents}&Name=the_resident_is_opened)&TestCategory=net48"));
         Assert.That(selected.Label, Is.EqualTo("U4@net48"));
+    }
+
+    [AcceptedCase]
+    public void a_fresh_hosts_selection_names_the_fresh_app_the_run_builds_and_a_selection_served_here_names_none()
+    {
+        using var written = new WrittenFolder();
+        string[] spec = [.. TheSpec, "M19.F1 M19.X5 0\tM19_F1.M19_X5_0\tU22\tfresh\tconsumerNet10\tfresh"];
+        string[] assembly = [.. TheAssembly, $"M19.F1 M19.X5 0\t{Fresh}\tthe_plan_boots\t{FreshFolder}"];
+
+        var fresh = Select(written, spec, assembly, "--test", "M19_F1.M19_X5_0", "--host", "consumerNet10");
+        var servedHere = Select(written, spec, assembly, "--all");
+
+        Assert.That(fresh.Cases, Is.EqualTo(new[] { $"{Fresh}(\"consumerNet10\").the_plan_boots" }));
+        Assert.That(fresh.Units, Is.EqualTo(new[] { "fresh" }));
+        Assert.That(fresh.Filter, Is.EqualTo($"FullyQualifiedName~{Fresh}&TestCategory=consumerNet10"));
+        Assert.That(fresh.Label, Is.EqualTo("M19_F1.M19_X5_0@consumerNet10"));
+        Assert.That(fresh.FreshApps, Is.EqualTo(new[] { "tests/Alis.Reactive.Consumer.Net10" }));
+        Assert.That(servedHere.Cases, Does.Not.Contain($"{Fresh}(\"consumerNet10\").the_plan_boots"));
+        Assert.That(servedHere.FreshApps, Is.Empty);
     }
 
     [AcceptedCase]
@@ -344,7 +365,7 @@ public class WhenAPlaywrightRunStarts
         Assert.That(Select(written, TheSpec, TheAssembly).Errors, Does.StartWith("[playwright:select] a run takes one selector, and 0 were given."));
     }
 
-    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, string Errors, int ExitCode);
+    private sealed record Selected(IReadOnlyList<string> Cases, IReadOnlyList<string> Units, string Filter, string Label, string Shard, IReadOnlyList<string> FreshApps, string Errors, int ExitCode);
 
     private static Selected Select(WrittenFolder written, string[] spec, string[] assembly, params string[] selector)
     {
@@ -357,7 +378,7 @@ public class WhenAPlaywrightRunStarts
             "--assembly", written.Write("tests.tsv", string.Join("\n", assembly) + "\n"), "--weights", weights, "--out", selection,
             .. selector.Skip(holdsWeights ? 1 : 0),
         ]);
-        if (run.ExitCode != 0) return new Selected([], [], "", "", "", run.Errors, run.ExitCode);
+        if (run.ExitCode != 0) return new Selected([], [], "", "", "", [], run.Errors, run.ExitCode);
 
         using var read = JsonDocument.Parse(File.ReadAllText(selection));
         var filter = read.RootElement.GetProperty("filter").GetString()!;
@@ -369,6 +390,7 @@ public class WhenAPlaywrightRunStarts
             filter,
             read.RootElement.GetProperty("label").GetString()!,
             read.RootElement.GetProperty("shard").GetString()!,
+            read.RootElement.GetProperty("freshApps").EnumerateArray().Select(one => one.GetString()!).ToList(),
             run.Errors,
             0);
     }

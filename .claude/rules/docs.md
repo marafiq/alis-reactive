@@ -31,8 +31,10 @@ Show small code (3-5 lines) that answers one question. Never dump big JSON blobs
 
 ## Code Examples
 
-A code example in the docs is copied from a view a Playwright test runs, never written for the page: the view, its
-controller and its model exist in the conformance app, and the test that opens it passes.
+A code example in the docs is copied whole from a view a Playwright test runs, never written for the page: the view,
+its controller and its model exist in the conformance app, and the test that opens it passes; or it is copied whole
+from a file of a fresh app (`tests/Alis.Reactive.Consumer.Net10`), which README's steps wire and M19.X5's test opens.
+`WhenADocShowsAnExample` refuses an example of README.md found whole in neither.
 
 "If you get anything wrong in terms of syntax or explanation, users will not use it. It will never come back."
 
@@ -65,7 +67,7 @@ lead's mistakes, 2026-11-11).
 ## Workflow
 
 1. Read the actual source code for the feature.
-2. Find the conformance app's screen that uses it, or write one with its test.
+2. Find the conformance app's screen that uses it, or the fresh app's file that holds it, or write one with its test.
 3. Run its Playwright test and read the result line.
 4. Copy the view's code to the docs.
 5. Frame with question followed by answer. Progressive disclosure.

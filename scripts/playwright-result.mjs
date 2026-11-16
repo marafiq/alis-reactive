@@ -2,7 +2,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { cpus, release, type } from "node:os";
 
-const usage = `usage: node scripts/playwright-result.mjs --selection <file> --trx <file> --budget <file> [--servers-left <n>]
+const usage = `usage: node scripts/playwright-result.mjs --selection <file> --trx <file> --budget <file> [--servers-left <n>] [--fresh-servers-left <n>]
        node scripts/playwright-result.mjs --measure --selection <file> --budget <file> --weights <file> <file.trx>...
        node scripts/playwright-result.mjs --measure-parallelism --selection <file> --budget <file> --at 1 <file.trx>... --at 2 <file.trx>... --at 4 <file.trx>... --at 8 <file.trx>...
        node scripts/playwright-result.mjs --at-once --budget <file>
@@ -11,7 +11,8 @@ const usage = `usage: node scripts/playwright-result.mjs --selection <file> --tr
 Reads what one run of the browser tests wrote and prints its result line:
   [playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>
 It exits 1 when the run wrote no TRX, selected no test, ran other than it selected, failed a test, ran a test over
-the budget, or left a server alive, each said on a line of its own before the result line.
+the budget, or left a server alive, of the conformance app or of a fresh app, each said on a line of its own before
+the result line.
 
 --measure reads the TRX of each of 20 green runs of one selection, and beside each TRX the steps the harness wrote
 (<name>.steps.tsv: a test, the holder and the method of one call of Playwright, its milliseconds), and writes the
@@ -42,7 +43,7 @@ function refuse(message) {
 }
 
 function parse(argv) {
-  const options = { "servers-left": "0", measure: false, parallelism: false, atOnce: false, proof: false, trxFiles: [], runsAt: new Map() };
+  const options = { "servers-left": "0", "fresh-servers-left": "0", measure: false, parallelism: false, atOnce: false, proof: false, trxFiles: [], runsAt: new Map() };
   let files = options.trxFiles;
   for (let index = 0; index < argv.length; index += 1) {
     const word = argv[index];
@@ -54,7 +55,7 @@ function parse(argv) {
       if (index + 1 >= argv.length) refuse(`${word} takes a value.\n${usage}`);
       files = [];
       options.runsAt.set(argv[(index += 1)], files);
-    } else if (["--selection", "--trx", "--budget", "--weights", "--full", "--servers-left"].includes(word)) {
+    } else if (["--selection", "--trx", "--budget", "--weights", "--full", "--servers-left", "--fresh-servers-left"].includes(word)) {
       if (index + 1 >= argv.length) refuse(`${word} takes a value.\n${usage}`);
       options[word.slice(2)] = argv[(index += 1)];
     } else if (word.startsWith("-")) refuse(`${word} is no option.\n${usage}`);
@@ -68,7 +69,9 @@ function parse(argv) {
   for (const name of needed) {
     if (options[name] === undefined) refuse(`--${name} is missing.\n${usage}`);
   }
-  if (!/^[0-9]+$/.test(options["servers-left"])) refuse(`--servers-left takes a count, and '${options["servers-left"]}' is not one.`);
+  for (const count of ["servers-left", "fresh-servers-left"]) {
+    if (!/^[0-9]+$/.test(options[count])) refuse(`--${count} takes a count, and '${options[count]}' is not one.`);
+  }
   return options;
 }
 
@@ -160,7 +163,7 @@ function stepsBeside(trxPath) {
   return { path, steps };
 }
 
-function read(selection, trxPath, budget, serversLeft) {
+function read(selection, trxPath, budget, serversLeft, freshServersLeft) {
   const said = [];
   if (!existsSync(trxPath)) return { said: [`no TRX at ${trxPath}; the test process wrote no result`], counts: undefined, ran: [] };
 
@@ -182,6 +185,7 @@ function read(selection, trxPath, budget, serversLeft) {
   for (const result of overBudget) said.push(`over budget, ${result.seconds.toFixed(2)}s of ${budget.seconds}s: ${result.id}`);
   if (budget.problem !== undefined) said.push(budget.problem);
   if (serversLeft > 0) said.push(`${serversLeft} server of the conformance app left alive after the run`);
+  if (freshServersLeft > 0) said.push(`${freshServersLeft} server of a fresh app left alive after the run`);
 
   const slowest = ran.reduce((slow, result) => (result.seconds > slow.seconds ? result : slow), { seconds: 0, id: "no test" });
   return { said, counts: { selected: selected.size, ran: ran.length, passed: ran.length - failed.length, failed: failed.length, overBudget: overBudget.length, slowest }, ran };
@@ -203,7 +207,7 @@ function measureParallelism(options, selection) {
     let hundredthsTaken = 0;
     let red;
     for (const trxPath of options.runsAt.get(String(count))) {
-      const { said } = read(selection, trxPath, {}, 0);
+      const { said } = read(selection, trxPath, {}, 0, 0);
       if (said.length > 0 && red === undefined) red = { trxPath, said };
       hundredthsTaken += hundredths(wallSecondsOf(trxPath));
     }
@@ -232,7 +236,7 @@ function measure(options, selection) {
   const slowestStep = Object.fromEntries(waits.map(kind => [kind, { milliseconds: 0, what: "no step" }]));
   const secondsOf = new Map();
   for (const trxPath of options.trxFiles) {
-    const { said, counts, ran } = read(selection, trxPath, {}, 0);
+    const { said, counts, ran } = read(selection, trxPath, {}, 0, 0);
     if (said.length > 0) {
       for (const line of said) console.log(`[playwright:result] ${trxPath}: ${line}`);
       console.log(`[playwright:measured] no budget is written: ${trxPath} is no green run of '${selection.label}'`);
@@ -341,7 +345,7 @@ if (options.measure) {
   process.exit(0);
 }
 
-const { said, counts } = read(selection, options.trx, budgetOf(options.budget), Number(options["servers-left"]));
+const { said, counts } = read(selection, options.trx, budgetOf(options.budget), Number(options["servers-left"]), Number(options["fresh-servers-left"]));
 for (const line of said) console.log(`[playwright:result] ${line}`);
 if (counts === undefined) {
   console.log(`[playwright:result] ${selection.label} ${selection.shard}: no result`);

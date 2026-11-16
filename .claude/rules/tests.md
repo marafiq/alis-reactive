@@ -91,8 +91,9 @@ plan proves nothing.
 
 ## Where a test lives
 
-Every browser test runs on one screen of the care home conformance app, in a world of its own:
-`spec/Reference/app.json` names each test's screen, hosts, parts and harness verbs. A test sits in the folder of the
+Every browser test runs on one screen of the care home conformance app, in a world of its own, save a delivery test,
+which runs on a fresh app's own page with no world: `spec/Reference/app.json` names each test's screen, hosts, parts
+and harness verbs. A test sits in the folder of the
 module whose test it is, under the screen it runs on, and no module's tests use another's helpers
 (`spec/REWRITE.md`, sections 2.3 and 2.4).
 

@@ -9,6 +9,7 @@ namespace Alis.Reactive.Conformance.PlaywrightTests.Harness;
 internal sealed class ConformanceHost
 {
     private const string App = "Alis.Reactive.Conformance.App";
+    private const string FreshNet10App = "Alis.Reactive.Consumer.Net10";
     private const string Listening = "Now listening on: ";
 
     private static readonly ConcurrentDictionary<string, Lazy<Task<ConformanceHost>>> Started = new(StringComparer.Ordinal);
@@ -38,9 +39,14 @@ internal sealed class ConformanceHost
         Started.Clear();
     }
 
-    private static async Task<ConformanceHost> Start(string host)
+    private static Task<ConformanceHost> Start(string host)
+        => host == HostNames.ConsumerNet10
+            ? Serve(FreshNet10App, [], FreshPages.Home, host)
+            : Serve(App, ["--host", host], WorldEndpoints.Ready, host);
+
+    private static async Task<ConformanceHost> Serve(string app, string[] hostArguments, string ready, string host)
     {
-        var folder = AppFolder();
+        var folder = AppFolder(app);
         var said = new ConcurrentQueue<string>();
         var listening = new TaskCompletionSource<Uri>(TaskCreationOptions.RunContinuationsAsynchronously);
         var server = new Process
@@ -54,8 +60,8 @@ internal sealed class ConformanceHost
                 Environment = { ["ASPNETCORE_ENVIRONMENT"] = "Development", ["TZ"] = "America/New_York", ["LC_ALL"] = "fr_FR.UTF-8" },
             },
         };
-        foreach (var argument in new[] { AppAssembly(folder), "--urls", "http://127.0.0.1:0", "--host", host, "--test-host", Environment.ProcessId.ToString(CultureInfo.InvariantCulture) })
-            server.StartInfo.ArgumentList.Add(argument);
+        string[] arguments = [AppAssembly(folder, app), "--urls", "http://127.0.0.1:0", .. hostArguments, "--test-host", Environment.ProcessId.ToString(CultureInfo.InvariantCulture)];
+        foreach (var argument in arguments) server.StartInfo.ArgumentList.Add(argument);
 
         server.OutputDataReceived += (_, line) => Heard(line.Data, said, listening, host);
         server.ErrorDataReceived += (_, line) => Heard(line.Data, said, listening, host);
@@ -63,8 +69,8 @@ internal sealed class ConformanceHost
         server.BeginOutputReadLine();
         server.BeginErrorReadLine();
         var address = await listening.Task;
-        using var ready = new HttpClient { BaseAddress = address };
-        (await ready.GetAsync(WorldEndpoints.Ready)).EnsureSuccessStatusCode();
+        using var answering = new HttpClient { BaseAddress = address };
+        (await answering.GetAsync(ready)).EnsureSuccessStatusCode();
         return new ConformanceHost(server, address);
     }
 
@@ -82,21 +88,21 @@ internal sealed class ConformanceHost
         if (at >= 0) listening.TrySetResult(new Uri(line[(at + Listening.Length)..].Trim()));
     }
 
-    private static string AppFolder()
+    private static string AppFolder(string app)
     {
         for (var folder = new DirectoryInfo(TestContext.CurrentContext.TestDirectory); folder is not null; folder = folder.Parent)
         {
-            var app = Path.Combine(folder.FullName, App);
-            if (File.Exists(Path.Combine(app, App + ".csproj"))) return app;
+            var project = Path.Combine(folder.FullName, app);
+            if (File.Exists(Path.Combine(project, app + ".csproj"))) return project;
         }
 
-        throw new DirectoryNotFoundException($"No {App}/{App}.csproj beside a folder above {TestContext.CurrentContext.TestDirectory}.");
+        throw new DirectoryNotFoundException($"No {app}/{app}.csproj beside a folder above {TestContext.CurrentContext.TestDirectory}.");
     }
 
-    private static string AppAssembly(string folder)
+    private static string AppAssembly(string folder, string app)
     {
         var built = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
-        var assembly = Path.Combine(folder, "bin", built.Parent!.Name, built.Name, App + ".dll");
-        return File.Exists(assembly) ? assembly : throw new FileNotFoundException($"The app is not built at {assembly}: the test project builds it first.");
+        var assembly = Path.Combine(folder, "bin", built.Parent!.Name, built.Name, app + ".dll");
+        return File.Exists(assembly) ? assembly : throw new FileNotFoundException($"{app} is not built at {assembly}: scripts/playwright.sh builds it before the tests that run on it.");
     }
 }

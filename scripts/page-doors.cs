@@ -9,7 +9,7 @@ using System.Text.Json;
 if (args.Length != 3)
 {
     Console.Error.WriteLine("usage: dotnet run scripts/page-doors.cs -- <the app's assembly> <its Playwright tests' assembly> <the table to write>");
-    Console.Error.WriteLine("Reads a Release build of an app and its Playwright tests, the framework's assemblies beside the app's, and writes to the table, for each test's promise, the views its pages render and the modules of the framework's members those views call that throw NotImplementedException, the doors not built.");
+    Console.Error.WriteLine("Reads a Release build of an app and its Playwright tests, the framework's assemblies beside the app's, and writes to the table, for each test's promise, the views its pages render and the modules of the framework's members those views call that throw NotImplementedException, the doors not built. A test whose fixture runs under a fresh app's host opens that app's own pages, which the app read here does not hold, and is not read.");
     return 2;
 }
 
@@ -424,10 +424,13 @@ internal static class Promised
     public const string Harness = "Alis.Reactive.Conformance.PlaywrightTests.Harness";
 
     private const string Mark = "Alis.Reactive.Conformance.World.FailsForAttribute";
+    private const string Category = "NUnit.Framework.CategoryAttribute";
+
+    private static readonly string[] HostsOfAFreshApp = ["consumerNet10", "consumerNet48"];
 
     public static IEnumerable<(string Promise, MethodDefinitionHandle Method)> Tests(Loaded tests)
     {
-        foreach (var typeHandle in tests.Reader.TypeDefinitions.Where(type => !Meta.NamespaceOf(tests.Reader, type).StartsWith(Harness, StringComparison.Ordinal)))
+        foreach (var typeHandle in tests.Reader.TypeDefinitions.Where(type => !Meta.NamespaceOf(tests.Reader, type).StartsWith(Harness, StringComparison.Ordinal) && !RunsOnAFreshApp(tests.Reader, type)))
         {
             foreach (var methodHandle in tests.Reader.GetTypeDefinition(typeHandle).GetMethods())
             {
@@ -442,6 +445,18 @@ internal static class Promised
             }
         }
     }
+
+    private static bool RunsOnAFreshApp(MetadataReader reader, TypeDefinitionHandle type)
+        => reader.GetTypeDefinition(type).GetCustomAttributes()
+            .Select(reader.GetCustomAttribute)
+            .Where(attribute => Meta.AttributeName(reader, attribute) == Category)
+            .Select(attribute =>
+            {
+                var value = reader.GetBlobReader(attribute.Value);
+                value.ReadUInt16();
+                return value.ReadSerializedString();
+            })
+            .Any(host => HostsOfAFreshApp.Contains(host));
 }
 
 internal static class Meta

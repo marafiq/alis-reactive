@@ -159,7 +159,8 @@ tests/
                                               address it answers to a GET and every link its pages hold, and
                                               SandboxStaticStateTests, renamed WhenTheAppHoldsNoStaticState, which
                                               refuses a static a request can change, over each fresh app's build
-                                              WhenAConsumerAppIsBuilt (section 2.9), and over the runner's selection
+                                              WhenAConsumerAppIsBuilt (section 2.9), over README's examples
+                                              WhenADocShowsAnExample (section 2.9), and over the runner's selection
                                               and result WhenAPlaywrightRunStarts and WhenAPlaywrightRunEnds (section
                                               2.5), over the reader of the doors a test's pages call
                                               WhenAPagesDoorsAreRead (section 4), over the net48 time zone table
@@ -357,7 +358,7 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
   America/Los_Angeles, so a date read in the wrong zone shows, and a promise that names the browser's zone opens
   that world by `NewWorldInZone`, its zone a constant of `Zones`, as `NewWorldUnder` opens another host's. The hosts consumerNet10 and consumerNet48 are the fresh
   apps' own servers, which hold no World area: a test under one runs on app.json's `fresh` screen, sets no world and
-  uses no harness verb.
+  uses no harness verb, and its server starts with no `--host` and is ready once the app's home page answers.
 - **Request culture.** A request names the culture its page binds and renders under in its address's query
   "culture", on the host it runs under, apart from its world and the browser's locale: "en-US", "de-DE", "tr-TR",
   "haw-US", "de-DE_phoneb" and "invariant", the invariant culture; none means "en-US", and any other value, or two,
@@ -369,8 +370,9 @@ exemption (M20.N1); U3 writes the core's 16 rows with their folders.
 - **A run proves it ran.** Each run ends with
   `[playwright:result] <selection> <i>/<k>: N selected, N ran, N passed, 0 failed, 0 over budget, slowest <s>s <test>`,
   its selection the selector's own words (`U8`, `through U8`, `all`, a pool's name), its shard `1/1` when whole, and
-  fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive,
-  each said on a line before it. What a run runs is decided before it starts. The runner joins the tests the spec
+  fails on no TRX, zero selected, ran other than selected, a failure, a test over budget, or a server left alive, the
+  conformance app's or a fresh app's, each said on a line before it. What a run runs is decided before it starts. The
+  runner joins the tests the spec
   lands (`spec/tools/landings.py`, which reads the spec through check.py: each test's promise, its unit, its screen
   and its hosts) with the tests the built assembly holds (`scripts/list-tests.cs`, each test's promise read from its
   `[FailsFor]` and its fixture's folder, which parts a shard unit, from the assembly's portable PDB), refuses a selected
@@ -524,10 +526,11 @@ and `scripts/playwright-result.mjs`, which list the built tests, select a run's 
 `scripts/test.sh` (both, its browser leg every test or, with `--through`, the tests landed through a unit); `scripts/build.sh`,
 `scripts/run.sh`, `scripts/pack.sh` (the six packages at one version, each read back from its nuspec),
 `scripts/delivery.sh` (`scripts/pack.sh` at a version of its own, then WhenAConsumerAppIsBuilt over the small apps its
-cases write on those packs), `scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,
+cases write on those packs and the fresh net10 app, then the browser tests under consumerNet10 on that app),
+`scripts/doctor.sh` (every pin against what the machine runs: the SDK, Node,
 Python, Java from `JAVA_HOME`, the TLC jar by its SHA-256 and `node_modules` by the lock, exit 1 on a difference),
 `scripts/plant-defect.sh`, which runs its one test, refuses a verdict unless it passes, then plants one defect and
-reads the runner's result line for that test again,
+reads the runner's result line for that test again, under the host its `--host` names, a fresh app's among them,
 `scripts/verify-release-tag.sh`, `scripts/pin-syncfusion.mjs`, `scripts/install-git-hooks.sh`.
 MSBuild never runs npm, and runs node only for the vendor contract a project opts into, whose target writes the
 table before the compiler reads it (D17.5, `Alis.Reactive.Analyzers/Vendors/VendorContract.targets`): `build.mjs` writes each bundle, the core's to
@@ -550,7 +553,9 @@ fails, and from U27 on so does a kind it lists that HEAD lacks.
 through one (`--through U8`), a feature (`--feature M6.F1`), a screen (`--screen residents`), one test by its promise
 constant (`--test M3_F1.X8_27_2`), a folder or a fixture of the project by its name (`RequestsAndResponses`), or
 everything the project holds (`--all`). `--host snakeCase` narrows any of them to one host; without it a run takes
-the hosts the conformance app serves on the machine, never the twin's or a fresh app's. A pool's shard (`--pool core
+the hosts the conformance app serves on the machine, never the twin's or a fresh app's. A run under a fresh app's
+host builds that app on the packs first: those in nupkgs/ at PACKAGE_VERSION, or, with none set, a version of its
+own that it packs and, when it ends, removes with what the app restored of it. A pool's shard (`--pool core
 --shard 1/2`) is section 2.8's, taken from the tests the project holds as `--all` is, and a workflow is its one caller. `--measure` writes the budget and the waits (2.5),
 and `--measure-parallelism` the count of tests a run takes at once (2.8).
 
@@ -611,7 +616,9 @@ and `--measure-parallelism` the count of tests a run takes at once (2.8).
   the files the package's build target copies into `Content\<PackageId>\` beside a `.gitignore` of `*`.
 - Script order in a layout, on both hosts: `ej2.min.js` (Fusion only), the Fusion templates script, each package's
   script, then `alis-reactive.js` last, every one a classic script without `async`.
-- A fresh net10 app: `dotnet add package`, the startup calls, a `@using` per module namespace a view uses, the links.
+- A fresh net10 app: `dotnet add package`, MVC's own startup with each of the framework's startup calls its pages use
+  (`AddReactiveRequests`, `AddReactiveFluentValidation`, `AddReactiveClassNames`, `AddReactiveTracing`), none for a
+  page that only reacts, a `@using` per module namespace a view uses, the links.
   A fresh MVC 5 app: PackageReference (packages.config retires, section 3), the startup calls and the resolver in
   `Application_Start`, the namespaces in `Views/Web.config`, the links.
 - The delivery tests run on both fresh apps: app.json's placements on its `fresh` screen under the hosts consumerNet10

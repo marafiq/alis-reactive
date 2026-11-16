@@ -1,4 +1,7 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.IO.Compression;
+using System.Text.Json;
 using NUnit.Framework;
 
 namespace Alis.Reactive.ArchitectureTests;
@@ -7,6 +10,9 @@ namespace Alis.Reactive.ArchitectureTests;
 public class WhenAConsumerAppIsBuilt
 {
     private const string Packs = "nupkgs";
+    private const string FreshNet10App = "tests/Alis.Reactive.Consumer.Net10";
+    private const string BrowserFiles = "staticwebassets/";
+    private const string Listening = "Now listening on: ";
     private const string Core = "AlisReactive";
     private const string Components = "AlisReactive.Native";
     private const string TraceSink = "AlisReactive.OpenTelemetry";
@@ -16,6 +22,7 @@ public class WhenAConsumerAppIsBuilt
     private const string AMarkedShift = "[Flags] public enum Shift { Early = 1, Late = 2 }";
     private const string ShiftIsNoFlagsEnum = "Startup.cs(12,30): error ALIS038: Flags<Shift>() names Shift as a flags enum, and Shift has no [Flags], so FluentValidation and System.Text.Json read it as one value; mark Shift [Flags], or take the call out";
     private const string NoTargetOfItsOwn = "";
+    private const string AProgramThatMapsTheStaticAssets = "using Microsoft.AspNetCore.Builder;\n\nvar app = WebApplication.CreateBuilder(args).Build();\napp.MapStaticAssets();\napp.Run();\n";
 
     private const string ATargetThatWritesAFileGitLists = """
         <Target Name="WriteTheRoundsScript" AfterTargets="Build">
@@ -33,6 +40,51 @@ public class WhenAConsumerAppIsBuilt
     private static readonly DateTime Untouched = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     private static readonly string[] VariablesThatPointAtTheRunsOwnFolders = ["NUGET_PACKAGES", "GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE"];
+
+    [Test]
+    public void git_lists_no_file_a_build_of_the_fresh_net10_app_wrote()
+    {
+        var app = Path.Combine(Repository.Root, FreshNet10App);
+        var before = Listed(app);
+
+        BuiltOnThePacks(app);
+
+        Assert.That(
+            Listed(app).Except(before).Select(path => $"git lists {path}, which a build of {FreshNet10App} wrote: a package writes only into the app's bin/ and obj/"),
+            Is.Empty);
+    }
+
+    [Test]
+    public async Task the_fresh_net10_apps_static_web_assets_serve_each_packages_browser_file_under_its_content_path()
+    {
+        var app = Path.Combine(Repository.Root, FreshNet10App);
+        BuiltOnThePacks(app);
+        var browserFiles = BrowserFilesOfThePacksItRestores(app);
+
+        Assert.That(browserFiles, Is.Not.Empty, $"The packs {FreshNet10App} restores hold no browser file under {BrowserFiles}");
+        Assert.That(await WhatTheAppDoesNotServe(app, Path.Combine(app, "bin", "Release", Net10, Path.GetFileName(FreshNet10App) + ".dll"), browserFiles), Is.Empty);
+    }
+
+    [RefusedCase]
+    public async Task a_net10_app_that_maps_no_static_assets_is_refused_for_each_packages_browser_file_it_does_not_serve()
+    {
+        using var written = new WrittenFolder();
+        var app = WriteApp(written, Net10, Core, AMarkedShift, NoTargetOfItsOwn);
+
+        Assert.That(
+            await WhatTheBuiltAppDoesNotServe(app),
+            Is.EqualTo(new[] { "/_content/AlisReactive/js/alis-reactive.js answers 404: the app's static web assets serve no file of its package there" }));
+    }
+
+    [AcceptedCase]
+    public async Task the_same_net10_app_mapping_its_static_assets_serves_each_packages_browser_file_as_its_pack_holds_it()
+    {
+        using var written = new WrittenFolder();
+        var app = WriteApp(written, Net10, Core, AMarkedShift, NoTargetOfItsOwn);
+        written.Write("App/Program.cs", AProgramThatMapsTheStaticAssets);
+
+        Assert.That(await WhatTheBuiltAppDoesNotServe(app), Is.Empty);
+    }
 
     [RefusedCase]
     public void a_file_an_alis_analyzer_refuses_fails_the_build_of_a_net10_app_that_names_a_consumer_package_alone_with_its_id()
@@ -189,6 +241,96 @@ public class WhenAConsumerAppIsBuilt
         if (versions.Count != 1)
             throw new InvalidOperationException($"{Packs}/ holds {versions.Count} versions of {Core}, and a case builds on the one a run packed. Run scripts/delivery.sh, which packs at a version of its own and runs these cases on it.");
         return versions[0];
+    }
+
+    private static void BuiltOnThePacks(string app)
+    {
+        var (output, exitCode) = Dotnet(app, "build", "-c", "Release", "-warnaserror", "--no-incremental", "-p:PACKAGE_VERSION=" + ThePacksVersion());
+        if (exitCode != 0) throw new InvalidOperationException($"{FreshNet10App} did not build on the packs in {Packs}/:\n{output}");
+    }
+
+    private static IReadOnlyList<(string Address, byte[] Bytes)> BrowserFilesOfThePacksItRestores(string app)
+    {
+        using var assets = JsonDocument.Parse(File.ReadAllText(Path.Combine(app, "obj", "project.assets.json")));
+        var restored = assets.RootElement.GetProperty("libraries").EnumerateObject()
+            .Select(library => library.Name.Split('/'))
+            .Where(library => library[0].StartsWith(Core, StringComparison.Ordinal))
+            .ToList();
+        return restored.SelectMany(library =>
+        {
+            using var pack = ZipFile.OpenRead(Path.Combine(Repository.Root, Packs, $"{library[0]}.{library[1]}.nupkg"));
+            return pack.Entries
+                .Where(entry => entry.FullName.StartsWith(BrowserFiles, StringComparison.Ordinal) && entry.Name.Length > 0)
+                .Select(entry => ($"/_content/{library[0]}/{entry.FullName[BrowserFiles.Length..]}", BytesOf(entry)))
+                .ToList();
+        }).OrderBy(file => file.Item1, StringComparer.Ordinal).ToList();
+    }
+
+    private static byte[] BytesOf(ZipArchiveEntry entry)
+    {
+        using var read = entry.Open();
+        using var bytes = new MemoryStream();
+        read.CopyTo(bytes);
+        return bytes.ToArray();
+    }
+
+    private static async Task<IReadOnlyList<string>> WhatTheBuiltAppDoesNotServe(string app)
+    {
+        Restore(app);
+        Built(app);
+        return await WhatTheAppDoesNotServe(app, Path.Combine(app, "bin", "Debug", Net10, "App.dll"), BrowserFilesOfThePacksItRestores(app));
+    }
+
+    private static async Task<IReadOnlyList<string>> WhatTheAppDoesNotServe(string app, string assembly, IReadOnlyList<(string Address, byte[] Bytes)> browserFiles)
+    {
+        var said = new ConcurrentQueue<string>();
+        var listening = new TaskCompletionSource<Uri>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var start = new ProcessStartInfo("dotnet", [assembly, "--urls", "http://127.0.0.1:0"])
+        {
+            WorkingDirectory = app,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            Environment = { ["ASPNETCORE_ENVIRONMENT"] = "Development" },
+        };
+        using var server = new Process { StartInfo = start };
+        void Heard(string? line)
+        {
+            if (line is null)
+            {
+                listening.TrySetException(new InvalidOperationException($"{assembly} ended its output before it said \"{Listening}\":\n{string.Join('\n', said)}"));
+                return;
+            }
+
+            said.Enqueue(line);
+            var at = line.IndexOf(Listening, StringComparison.Ordinal);
+            if (at >= 0) listening.TrySetResult(new Uri(line[(at + Listening.Length)..].Trim()));
+        }
+
+        server.OutputDataReceived += (_, line) => Heard(line.Data);
+        server.ErrorDataReceived += (_, line) => Heard(line.Data);
+        server.Start();
+        server.BeginOutputReadLine();
+        server.BeginErrorReadLine();
+        try
+        {
+            using var browser = new HttpClient { BaseAddress = await listening.Task };
+            var unserved = new List<string>();
+            foreach (var (address, bytes) in browserFiles)
+            {
+                using var answer = await browser.GetAsync(address);
+                var served = answer.IsSuccessStatusCode ? await answer.Content.ReadAsByteArrayAsync() : [];
+                if (!answer.IsSuccessStatusCode) unserved.Add($"{address} answers {(int)answer.StatusCode}: the app's static web assets serve no file of its package there");
+                else if (!served.AsSpan().SequenceEqual(bytes)) unserved.Add($"{address} serves other bytes than its package's pack holds");
+            }
+
+            return unserved;
+        }
+        finally
+        {
+            server.Kill(entireProcessTree: true);
+            await server.WaitForExitAsync();
+        }
     }
 
     private static IReadOnlyList<string> WhatTheBuildRefuses(string app)

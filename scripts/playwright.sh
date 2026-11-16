@@ -9,6 +9,7 @@ assembly="$project/bin/Release/net10.0/$name.dll"
 budget="$project/Harness/measured.json"
 weights="$project/shard-weights.json"
 measured_runs=20
+own_versions="0.0.0-playwright"
 
 usage() {
   cat <<'USAGE'
@@ -35,6 +36,12 @@ Selectors, one a run:
 
 Options:
   --host <name>   Take that host alone. Without it a run takes the hosts the conformance app serves on this machine.
+                  Under a fresh app's host (consumerNet10) the run builds that app on the packs and starts its own
+                  server: with no PACKAGE_VERSION set it packs at a version of its own first (scripts/pack.sh), so
+                  what the shipped projects hold reaches the app's page; with it set it takes the packs in nupkgs/.
+                  Before it builds a fresh app it removes every version restored in the app's obj/packages/ but
+                  the one it builds on, and a run that packed its own version removes those packs and their
+                  restored folders when it ends, whatever its exit code.
   --shard <i>/<k> Take the i-th of a pool's k shards, its units placed longest first by the weights --measure wrote.
   --measure       Run the selection 20 times, each green, and write to the harness's measured.json the budget,
                   four times the slowest test, and the action wait and the navigation wait, each four times the
@@ -86,11 +93,11 @@ done
 stop_servers_whose_test_process_ended() {
   local pid args test_process stopped=0
   while read -r pid args; do
-    [[ "$args" == *"$app.dll"* ]] || continue
+    [[ "$args" == *"$1"* ]] || continue
     [[ "$args" =~ --test-host[[:space:]]+([0-9]+) ]] || continue
     test_process="${BASH_REMATCH[1]}"
     kill -0 "$test_process" 2>/dev/null && continue
-    echo "[playwright:runner] $1: pid $pid, whose test process $test_process has ended" >&2
+    echo "[playwright:runner] $2: pid $pid, $1, whose test process $test_process has ended" >&2
     kill -9 "$pid" 2>/dev/null || true
     stopped=$((stopped + 1))
   done < <(ps -eo pid=,args=)
@@ -112,6 +119,59 @@ filter="$(node scripts/playwright-select.mjs --spec "$run/landings.tsv" --assemb
   "${selector[@]}" ${host[@]+"${host[@]}"} ${shard[@]+"${shard[@]}"})"
 echo "[playwright:runner] filter: ${filter:-every test}"
 
+fresh_apps=()
+while IFS= read -r fresh_app; do fresh_apps+=("$fresh_app"); done < <(
+  node -e 'for (const app of JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).freshApps) console.log(app);' "$run/selection.json")
+
+remove_every_restored_version_but_the_runs() {
+  local version
+  for version in "$1"/obj/packages/alisreactive*/*; do
+    if [ -d "$version" ] && [ "$(basename "$version")" != "$PACKAGE_VERSION" ]; then rm -rf "$version"; fi
+  done
+}
+
+remove_the_packs_this_run_wrote() {
+  local pack fresh_app version
+  for pack in nupkgs/*."$PACKAGE_VERSION".nupkg nupkgs/*."$PACKAGE_VERSION".snupkg; do
+    if [ -f "$pack" ]; then rm -f "$pack"; fi
+  done
+  for fresh_app in "${fresh_apps[@]}"; do
+    for version in "$fresh_app"/obj/packages/alisreactive*/"$PACKAGE_VERSION"; do
+      if [ -d "$version" ]; then rm -rf "$version"; fi
+    done
+  done
+}
+
+build_failed() {
+  echo "[playwright:runner] the build failed; no test ran." >&2
+  exit 4
+}
+
+if [ "${#fresh_apps[@]}" -gt 0 ]; then
+  if [ -z "${PACKAGE_VERSION:-}" ]; then
+    PACKAGE_VERSION="$own_versions.$(date -u +%Y%m%d%H%M%S)"
+    export PACKAGE_VERSION
+    trap remove_the_packs_this_run_wrote EXIT
+    echo "[playwright:runner] packing at $PACKAGE_VERSION, which ${fresh_apps[*]} builds on"
+    scripts/pack.sh "$PACKAGE_VERSION" || build_failed
+  else
+    echo "[playwright:runner] ${fresh_apps[*]} builds on the packs in nupkgs/ at $PACKAGE_VERSION"
+  fi
+  for fresh_app in "${fresh_apps[@]}"; do
+    remove_every_restored_version_but_the_runs "$fresh_app"
+    dotnet build "$fresh_app" -c Release -warnaserror --no-incremental --nologo || build_failed
+  done
+fi
+
+stop_every_server_whose_test_process_ended() {
+  local fresh_app
+  left="$(stop_servers_whose_test_process_ended "$app.dll" "$1")"
+  fresh_left=0
+  for fresh_app in ${fresh_apps[@]+"${fresh_apps[@]}"}; do
+    fresh_left=$((fresh_left + $(stop_servers_whose_test_process_ended "$(basename "$fresh_app").dll" "$1")))
+  done
+}
+
 run_the_tests() {
   local command=(dotnet test "$project" -c Release --no-build --nologo
     --logger "console;verbosity=normal" --logger "trx;LogFileName=$1.trx" --results-directory "$run")
@@ -124,9 +184,8 @@ run_measured() {
   export ALIS_MEASURED_STEPS="$PWD/$run/$1.steps.tsv"
   run_the_tests "$1" "$2" > "$run/$1.log"
   unset ALIS_MEASURED_STEPS
-  local left
-  left="$(stop_servers_whose_test_process_ended "a server left alive after the measured run $1")"
-  [ "$left" -eq 0 ] || refuse "the measured run $1 left $left server alive; nothing is written."
+  stop_every_server_whose_test_process_ended "a server left alive after the measured run $1"
+  [ "$((left + fresh_left))" -eq 0 ] || refuse "the measured run $1 left $((left + fresh_left)) server alive; nothing is written."
 }
 
 at_once=""
@@ -135,7 +194,7 @@ if [ "$parallelism" -eq 0 ]; then
     || refuse "no count of tests at once is measured in $budget; scripts/playwright.sh --measure-parallelism writes it."
 fi
 
-stop_servers_whose_test_process_ended "stopped a server an earlier run left alive" > /dev/null
+stop_every_server_whose_test_process_ended "stopped a server an earlier run left alive"
 
 if [ "$parallelism" -eq 1 ]; then
   measured=()
@@ -156,7 +215,7 @@ elif [ "$measure" -eq 1 ]; then
   node scripts/playwright-result.mjs --measure --selection "$run/selection.json" --budget "$budget" --weights "$weights" "$run"/measure-*.trx
 else
   run_the_tests run "$at_once" | tee "$run/run.log"
-  left="$(stop_servers_whose_test_process_ended "a server left alive after this run")"
+  stop_every_server_whose_test_process_ended "a server left alive after this run"
   echo "[playwright:runner] log: $run/run.log"
-  node scripts/playwright-result.mjs --selection "$run/selection.json" --trx "$run/run.trx" --budget "$budget" --servers-left "$left"
+  node scripts/playwright-result.mjs --selection "$run/selection.json" --trx "$run/run.trx" --budget "$budget" --servers-left "$left" --fresh-servers-left "$fresh_left"
 fi

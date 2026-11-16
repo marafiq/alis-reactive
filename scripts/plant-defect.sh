@@ -7,12 +7,14 @@ tests="tests/Alis.Reactive.Conformance.PlaywrightTests"
 
 usage() {
   cat >&2 <<'USAGE'
-usage: scripts/plant-defect.sh --test <constant> --in <file> --replace <text> --with <text>
+usage: scripts/plant-defect.sh --test <constant> [--host <name>] --in <file> --replace <text> --with <text>
 
 Runs the one test through scripts/playwright.sh, which must pass, then plants one defect in <file>, the text to
 replace found once, runs the test again, says whether it failed, and restores <file> on every exit, an interrupt
 included.
   --test <constant>   the test's promise constant as the test writes it after Promises. (M3_F1.X8_27_2)
+  --host <name>       the host the test runs under, for a test the conformance app does not serve here
+                      (consumerNet10), as scripts/playwright.sh takes it
 
   [plant] caught: ...    the test failed with the defect in place; its failure follows
   [plant] ESCAPED: ...   the test passed with the defect in place
@@ -28,6 +30,7 @@ refuse() {
 }
 
 constant=""
+host=()
 file=""
 anchor=""
 replacement=""
@@ -36,6 +39,7 @@ while [ "$#" -gt 0 ]; do
   [ "$#" -ge 2 ] || usage
   case "$1" in
     --test) constant="$2" ;;
+    --host) host=(--host "$2") ;;
     --in) file="$2" ;;
     --replace) anchor="$2" ;;
     --with) replacement="$2"; replacement_given=1 ;;
@@ -91,7 +95,7 @@ trap restore EXIT
 trap on_signal INT TERM HUP
 
 run_the_test() {
-  scripts/playwright.sh --test "$constant" >"$log" 2>&1 &
+  scripts/playwright.sh --test "$constant" ${host[@]+"${host[@]}"} >"$log" 2>&1 &
   child=$!
   run_status=0
   wait "$child" || run_status=$?

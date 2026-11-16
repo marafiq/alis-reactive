@@ -173,6 +173,21 @@ public class WhenAPlaywrightRunEnds
     }
 
     [RefusedCase]
+    public void a_fresh_apps_server_left_alive_is_refused()
+    {
+        using var written = new WrittenFolder();
+
+        var read = Run("--selection", Selection(written, [Listed]), "--trx", Trx(written, [Ran(Listed, "Passed", 1)]), "--budget", Budget(written, 8, 2), "--fresh-servers-left", "1");
+
+        Assert.That(read.Said, Is.EqualTo(new[]
+        {
+            "[playwright:result] 1 server of a fresh app left alive after the run",
+            $"[playwright:result] rounds 1/1: 1 selected, 1 ran, 1 passed, 0 failed, 0 over budget, slowest 1.00s {Listed}",
+        }));
+        Assert.That(read.ExitCode, Is.EqualTo(1));
+    }
+
+    [RefusedCase]
     public void a_budget_a_hand_chose_is_refused()
     {
         using var written = new WrittenFolder();

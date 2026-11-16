@@ -20,6 +20,7 @@ Selectors, one a run:
 --host <name> takes that host alone. Without it a run takes the hosts the conformance app serves on this machine.
 --every-host takes every host the spec lands a test under, the twin's and a fresh app's among them: the full list
 CI's proof reads its runs against.
+The selection names, as freshApps, the folder of each fresh app its cases run on, which the runner builds on the packs.
 --shard <i>/<k> takes the i-th of a pool's k shards. A shard unit is a module folder, a slice's folder under FusionComponents,
 and the hosts pool whole; units go longest first, each onto the lightest shard, by the seconds --weights holds.`;
 
@@ -28,6 +29,7 @@ const pools = ["core", "hosts", "fusion"];
 const fusionFolders = ["FusionComponents", "FusionTemplates", "FusionAppLevelObjects"];
 const folderPartedBySlice = "FusionComponents";
 const theAppsOwnHost = "net10";
+const freshAppOf = { consumerNet10: "tests/Alis.Reactive.Consumer.Net10", consumerNet48: "tests/Alis.Reactive.Consumer.Net48" };
 
 function refuse(message) {
   console.error(`[playwright:select] ${message}`);
@@ -187,5 +189,6 @@ const filter = [...tests, ...hosts].join("&");
 const selection = selector.kind === "through" ? `through ${selector.value}` : selector.value;
 const label = options.everyHost === true ? `${selection}@every host` : options.host === undefined ? selection : `${selection}@${options.host}`;
 const units = Object.fromEntries(cases.map(one => [one.id, one.unit]).sort(([one], [other]) => (one < other ? -1 : 1)));
-writeFileSync(options.out, `${JSON.stringify({ label, shard: `${shard.index}/${shard.count}`, filter, cases: cases.map(one => one.id).sort(), units }, null, 2)}\n`);
+const freshApps = [...new Set(taken.filter(row => row.served === "fresh").map(row => freshAppOf[row.host]))].sort();
+writeFileSync(options.out, `${JSON.stringify({ label, shard: `${shard.index}/${shard.count}`, filter, cases: cases.map(one => one.id).sort(), units, freshApps }, null, 2)}\n`);
 console.log(filter);

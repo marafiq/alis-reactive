@@ -10,7 +10,10 @@ Usage:
 Proves what the packages deliver to an app, in order, and stops at the first that fails:
   1. scripts/pack.sh at a version of this run's own, 0.0.0-delivery.<UTC time>, into ./nupkgs
   2. WhenAConsumerAppIsBuilt, whose cases build small apps on those packs, restored
-     from ./nupkgs and nuget.org into each app's own obj folder
+     from ./nupkgs and nuget.org into each app's own obj folder, and whose tests build
+     tests/Alis.Reactive.Consumer.Net10 on them
+  3. the browser tests under consumerNet10, scripts/playwright.sh --all --host consumerNet10,
+     on the fresh net10 app built on the same packs
 
 Its last line is "[delivery] every delivery check passed."
 USAGE
@@ -29,5 +32,8 @@ scripts/pack.sh "$version"
 
 echo "[delivery] WhenAConsumerAppIsBuilt"
 dotnet test tests/Alis.Reactive.ArchitectureTests -c Release --no-build --filter "FullyQualifiedName~WhenAConsumerAppIsBuilt"
+
+echo "[delivery] the browser tests under consumerNet10"
+PACKAGE_VERSION="$version" scripts/playwright.sh --all --host consumerNet10
 
 echo "[delivery] every delivery check passed."

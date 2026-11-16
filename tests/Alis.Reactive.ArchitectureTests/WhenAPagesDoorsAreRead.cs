@@ -184,6 +184,44 @@ public class WhenAPagesDoorsAreRead
             """));
 
     [AcceptedCase]
+    public void a_test_under_a_fresh_apps_host_is_read_by_none_of_the_apps_pages()
+        => Assert.That(Read(AnEastWard, Naming("/wards/east") + """
+
+           namespace NUnit.Framework
+           {
+               [System.AttributeUsage(System.AttributeTargets.Class)]
+               public sealed class CategoryAttribute(string name) : System.Attribute
+               {
+                   public string Name { get; } = name;
+               }
+           }
+
+           namespace Care.Tests
+           {
+               [NUnit.Framework.Category("consumerNet10")]
+               public sealed class WhenAFreshAppOpens
+               {
+                   [Alis.Reactive.Conformance.World.FailsFor("M19.F1 M19.X5 0")]
+                   public string[] the_home_page_boots() => ["/"];
+               }
+           }
+           """), Is.EqualTo(
+            """
+            exit 0
+            {
+              "M1.F1 X1.1 0": {
+                "modules": [
+                  "Wards"
+                ],
+                "views": [
+                  "/Wards/East.cshtml"
+                ]
+              }
+            }
+
+            """));
+
+    [AcceptedCase]
     public void a_link_the_test_names_opens_its_page_and_a_link_it_does_not_name_opens_none()
         => Assert.That(Read(AnEastWardWithItsRooms, Naming("/wards/east", "Open room four")), Is.EqualTo(
             """

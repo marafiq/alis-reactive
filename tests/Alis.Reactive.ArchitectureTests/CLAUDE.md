@@ -45,13 +45,19 @@ expects none.
   accepted one as literals. The core's own contract is held by the first step of `scripts/check.sh`.
 - `WhenAPagesDoorsAreRead` runs `scripts/page-doors.cs` over the assemblies each case compiles, an app, its tests and a
   framework with doors built and not built, and expects the exit, each refusal's own line and the table as one literal.
-  The conformance app's own table is held by `scripts/check.sh`'s step after its build.
+  A fixture under a fresh app's host is read by none of the app's pages, and the table leaves it out. The conformance
+  app's own table is held by `scripts/check.sh`'s step after its build.
 - `WhenAPlaywrightRunStarts` and `WhenAPlaywrightRunEnds` run the browser runner's two readers, the selection and the
-  result, over the tables and TRX files their cases write, and expect each refusal's own line. A case's tables
+  result, over the tables and TRX files their cases write, and expect each refusal's own line; a selection names the
+  fresh apps its cases run on, and a result counts a fresh app's server left alive on a line of its own. A case's tables
   hold what the real tools write: a fixture in the namespace of its first folder, as ALIS011 holds every test,
   beside the folder `scripts/list-tests.cs` reads from the assembly's portable PDB (the lead's mistake, 2026-11-13).
 - `WhenAConsumerAppIsBuilt` builds small apps its cases write on the packs in nupkgs/, each restored by its own
-  nuget.config into its own obj/; `scripts/check.sh` leaves it out and `scripts/delivery.sh` runs it.
+  nuget.config into its own obj/, and builds the fresh net10 app, `tests/Alis.Reactive.Consumer.Net10`, whose build
+  writes no file git lists and whose static web assets serve each package's browser file under _content/<PackageId>/js/;
+  `scripts/check.sh` leaves it out and `scripts/delivery.sh` runs it.
+- `WhenADocShowsAnExample` reads each example of README.md, every fence but bash and text, and refuses one found whole
+  in no view a browser test opens, as `spec/Reference/page-doors.json` lists them, and in no fresh app's tracked file.
 
 ```bash
 dotnet test tests/Alis.Reactive.ArchitectureTests
