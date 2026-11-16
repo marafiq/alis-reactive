@@ -1,5 +1,5 @@
 import { SpanKind, SpanStatusCode } from "@opentelemetry/api";
-import { InMemorySpanExporter, SimpleSpanProcessor } from "@opentelemetry/sdk-trace";
+import { InMemorySpanExporter, type SpanExporter } from "@opentelemetry/sdk-trace";
 import { describe, expect, test } from "vitest";
 import { TraceSink, type EndedSpan } from "./trace-sink";
 
@@ -33,7 +33,7 @@ const run: EndedSpan = {
 
 function exported(...spans: EndedSpan[]) {
   const memory = new InMemorySpanExporter();
-  const sink = new TraceSink(new SimpleSpanProcessor({ exporter: memory }), "care-home");
+  const sink = new TraceSink(memory, "care-home");
   for (const span of spans) sink.ended(span);
   return memory.getFinishedSpans();
 }
@@ -89,6 +89,20 @@ describe("when the page ends a span, the sink hands OpenTelemetry the span the p
     const [span] = exported({ ...run, events: [{ name: "alis.error", time: 1_763_200_000_150, attributes: {} }] });
 
     expect(span?.status).toStrictEqual({ code: SpanStatusCode.ERROR });
+  });
+
+  test("an error its exporter throws leaves the sink's call, so the page's port logs it and calls the sink no more (M26.D1)", () => {
+    const refusing: SpanExporter = {
+      export: () => {
+        throw new Error("The collector refused the span.");
+      },
+      shutdown: () => Promise.resolve(),
+    };
+    const sink = new TraceSink(refusing, "care-home");
+
+    expect(() => {
+      sink.ended(run);
+    }).toThrow("The collector refused the span.");
   });
 
   test("every span names the app's service and the framework's scope", () => {

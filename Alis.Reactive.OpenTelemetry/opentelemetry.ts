@@ -1,5 +1,4 @@
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { BatchSpanProcessor } from "@opentelemetry/sdk-trace";
 import { TraceSink } from "./Tracing/trace-sink";
 
 interface ExporterOptions {
@@ -28,4 +27,4 @@ function provide(name: string, instance: unknown): void {
 
 const options = optionsOf(document.currentScript);
 
-provide(sinkName, new TraceSink(new BatchSpanProcessor({ exporter: new OTLPTraceExporter({ url: options.tracesUrl }) }), options.serviceName));
+provide(sinkName, new TraceSink(new OTLPTraceExporter({ url: options.tracesUrl }), options.serviceName));

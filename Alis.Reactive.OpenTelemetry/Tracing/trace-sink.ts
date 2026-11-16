@@ -1,8 +1,10 @@
-import { SpanKind, SpanStatusCode, TraceFlags, type HrTime, type SpanContext, type SpanStatus } from "@opentelemetry/api";
+import { diag, SpanKind, SpanStatusCode, TraceFlags, type HrTime, type SpanContext, type SpanStatus } from "@opentelemetry/api";
 import { resourceFromAttributes, type Resource } from "@opentelemetry/resources";
-import type { ReadableSpan, SpanProcessor, TimedEvent } from "@opentelemetry/sdk-trace";
+import type { ReadableSpan, SpanExporter, TimedEvent } from "@opentelemetry/sdk-trace";
 
 export type Attribute = string | number | boolean;
+
+type ExportResult = Parameters<Parameters<SpanExporter["export"]>[1]>[0];
 
 export interface SpanEvent {
   readonly name: string;
@@ -77,16 +79,21 @@ function readableOf(span: EndedSpan, resource: Resource): ReadableSpan {
   };
 }
 
+function reportFailure(result: ExportResult): void {
+  if (result.error === undefined) return;
+  diag.error("The OpenTelemetry exporter could not send a span: " + result.error.message);
+}
+
 export class TraceSink {
-  readonly #processor: SpanProcessor;
+  readonly #exporter: SpanExporter;
   readonly #resource: Resource;
 
-  constructor(processor: SpanProcessor, service: string) {
-    this.#processor = processor;
+  constructor(exporter: SpanExporter, service: string) {
+    this.#exporter = exporter;
     this.#resource = resourceFromAttributes({ [serviceName]: service });
   }
 
   ended(span: EndedSpan): void {
-    this.#processor.onEnd(readableOf(span, this.#resource));
+    this.#exporter.export([readableOf(span, this.#resource)], reportFailure);
   }
 }
