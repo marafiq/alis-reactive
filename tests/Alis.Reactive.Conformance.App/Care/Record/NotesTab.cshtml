@@ -1,0 +1,23 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NotesTab
+@{
+    Layout = "/Care/Record/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Resident record";
+    var plan = Html.ReactivePlan<NotesTab>();
+}
+<h1>Record of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, NotesTabs.CloseTheTab)>Close tab</button>
+<section id="record-busy" aria-label="Record">
+    <p>Requests: <output id="@DefaultHooks.RequestLog"></output></p>
+</section>
+<p>Session: <output id="@DefaultHooks.FlushLine"></output></p>
+<section id="notes-tab" aria-label="Tab">
+    @await Html.PartialAsync("/Care/Record/NotesTabSheet.cshtml", Model.Sheet)
+</section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NotesTabs.CloseTheTab, pipeline => pipeline.Unload("notes-tab")));
+}
+@Html.RenderPlan(plan)

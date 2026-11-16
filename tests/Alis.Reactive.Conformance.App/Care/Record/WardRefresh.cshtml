@@ -1,0 +1,21 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model WardRefresh
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Resident record";
+    var plan = Html.ReactivePlan<WardRefresh>();
+}
+<h1>Record of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, WardRefreshes.CloseTheCard)>Close card</button>
+<section id="ward-busy" aria-label="Ward">
+    <p>Ward: <output id="ward-status"></output></p>
+</section>
+<section id="record-tab" aria-label="Tab">
+    @await Html.PartialAsync("/Care/Record/WardRefreshCard.cshtml", Model.Card)
+</section>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(WardRefreshes.CloseTheCard, pipeline => pipeline.Unload("record-tab")));
+}
+@Html.RenderPlan(plan)

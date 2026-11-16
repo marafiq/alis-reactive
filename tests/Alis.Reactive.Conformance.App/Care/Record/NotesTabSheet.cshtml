@@ -1,0 +1,17 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model NotesTabSheet
+@{
+    var plan = Html.ReactivePlan<NotesTabSheet>();
+}
+<h2>@Model.Title</h2>
+<button type="button" @Html.Raises(plan, NotesTabs.Refresh)>Refresh</button>
+<p>Notes: <output id="notes-refreshed"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(NotesTabs.Refresh, pipeline => pipeline
+        .Get(NotesTabEndpoints.Resident)
+        .Busy("record-busy")
+        .OnSuccess(pipeline => pipeline.Element("notes-refreshed").Text.Set("Refreshed"))));
+}
+@Html.RenderPlan(plan)

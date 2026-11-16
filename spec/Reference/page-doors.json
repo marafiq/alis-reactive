@@ -568,10 +568,26 @@
       "/Care/Residents/_ScriptedLayout.cshtml"
     ]
   },
+  "M17.F1 X11.23 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/NotesTab.cshtml",
+      "/Care/Record/NotesTabSheet.cshtml",
+      "/Care/Record/_ScriptedLayout.cshtml"
+    ]
+  },
   "M17.F1 X11.4 0": {
     "modules": [],
     "views": [
       "/Care/Round/OrderStart.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M17.F1 X11.5 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/WardRefresh.cshtml",
+      "/Care/Record/WardRefreshCard.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -2530,6 +2546,14 @@
     "views": [
       "/Care/Residents/SummaryOfOneCard.cshtml",
       "/Care/Residents/SummaryOfTwoCards.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F2 X10.17 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/WeekSummary.cshtml",
+      "/Care/Record/WeekSummaryTab.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
