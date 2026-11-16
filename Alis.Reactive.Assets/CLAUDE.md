@@ -13,8 +13,8 @@ as the C# module whose nodes it executes, and `runtime/SliceTree.txt` is its sli
   grammar (`tools/PlanContractGenerator`): the runtime declares no type of the plan's own, a hook refuses a hand
   edit of either file, and `scripts/check.sh` fails when the grammar generates another.
 - It never guesses: it reads no intent from the DOM, takes an element by its id alone, and retries nothing another
-  way. What it needs to know, the plan carries. One file finds a root's plan scripts, `runtime/Execution/plan-scripts.ts`,
-  and the lint refuses a query wider than an id in every other.
+  way. What it needs to know, the plan carries. One file finds a root's plan scripts and the other scripts a slot's content
+  holds, `runtime/Execution/plan-scripts.ts`, and the lint refuses a query wider than an id in every other.
 - A union of the plan has one switch, with a case for every kind, ending in `assertNever` (`runtime/Schema/kinds.ts`).
   A kind whose module's unit has not built it throws `notBuilt` there, as a door that is not built throws in C#: it
   runs or it fails loud. The evaluator's two switches, `runtime/Execution/statements.ts` and

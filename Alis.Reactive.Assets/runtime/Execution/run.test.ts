@@ -716,6 +716,36 @@ describe("when a release ends the runs of its owners that are in their own step 
     expect([chart.lines, waited]).toStrictEqual([["the page goes on", "the card's Finally", "the card's run ended disposed", "the slot released"], [true]]);
   });
 
+  test("Lanes.tla's Dispose: a step that raises its own handler under replace and meets its owner's slot unloaded begins no new run, since the owner's runs end at the cut", () => {
+    const chart = new Chart();
+    const waited: boolean[] = [];
+    const ends: (() => void)[] = [];
+    const theRound: AnOwner = {
+      ...anOwner(),
+      runs: (end) => {
+        ends.push(end);
+      },
+    };
+    const lane = new Lane("replace", [charts(named("round")), rings, charts(named("after"))], theRound);
+    theRound.runs(() => {
+      lane.dispose();
+    });
+    const quiet = new Bell(() => undefined);
+    const bell = new Bell(() => {
+      lane.raise(raisedWith({ chart, bell: quiet, round: "round 2", after: "after 2" }));
+      waited.push(
+        cutsRunsInTheirStep([theRound], () => {
+          chart.lines.push("the slot released");
+        }),
+      );
+      for (const end of ends.splice(0)) end();
+    });
+
+    lane.raise(raisedWith({ chart, bell, round: "round 1", after: "after 1" }));
+
+    expect([chart.lines, waited]).toStrictEqual([["round 1", "the slot released"], [true]]);
+  });
+
   test("a release whose owners have no run in its own step is told so and calls nothing back, and a run of its owner that waits goes on", async () => {
     const chart = new Chart();
     const settle = gate();

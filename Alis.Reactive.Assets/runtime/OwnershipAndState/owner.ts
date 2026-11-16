@@ -40,15 +40,21 @@ export class Holdings implements Owner {
     this.#held.registrations.push(drop);
   }
 
+  endsRuns(): ThrownAtAStep[] {
+    return this.#takes("runs");
+  }
+
   release(): ThrownAtAStep[] {
+    return releaseOrder.flatMap((step) => this.#takes(step));
+  }
+
+  #takes(step: ReleaseStep): ThrownAtAStep[] {
     const thrown: ThrownAtAStep[] = [];
-    for (const step of releaseOrder) {
-      for (const removal of this.#held[step].splice(0)) {
-        try {
-          removal();
-        } catch (error) {
-          thrown.push({ step, error });
-        }
+    for (const removal of this.#held[step].splice(0)) {
+      try {
+        removal();
+      } catch (error) {
+        thrown.push({ step, error });
       }
     }
     return thrown;

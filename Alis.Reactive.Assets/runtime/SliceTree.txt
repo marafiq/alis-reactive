@@ -10,5 +10,6 @@ TriggersAndPipelines
 InputsAndIds
 Validation
 RequestsAndResponses
+PartialsAndSlots
 Execution
 .

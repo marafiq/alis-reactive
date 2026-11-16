@@ -3018,8 +3018,10 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   `spec/OwnershipAndState/Ownership.tla` checks the release over the interleavings of a nested slot and the slot around it, each
   step issued by the page or by the slot it releases: every owner released past a throw
   (`EveryOwnerReleasedPastAThrow`), a raise running no listener whose removal threw (`ThrownListenerRunsNothing`),
-  and the content replaced (`StepReplacesTheContent`). That the step stops after a release that met a throw, and that
-  its `Finally` runs once, are browser promises (X12.15, X12.17), since no spec models a release inside a run.
+  and the content replaced (`StepReplacesTheContent`). A release inside a run is `Run.tla`'s `CutInItsStep("dispose")`,
+  which unwinds the run in its own step and begins no run after it, and `Lanes.tla`'s `Release`, which waits for every
+  run's `Finally` (`FinallyRunsBeforeRelease`); that the step stops after a release that met a throw, and that its
+  `Finally` runs once, are browser promises (X12.15, X12.17).
 - D12.5 Release removes exactly what the owner holds, and nothing another owner holds. A listener is removed only while
   its element still holds, where the vendor's `locate` finds it (D17.3), the object the listener was added to. A
   component its host destroyed took its listeners with it, and the owner calls nothing on it. EJ2's destroy takes the

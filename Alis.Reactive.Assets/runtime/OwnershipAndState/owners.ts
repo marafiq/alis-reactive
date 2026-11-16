@@ -50,6 +50,10 @@ export function ownersEndedBy(container: Placed): Owner[] {
   return leavingWith(container).map((slot) => slot.owner);
 }
 
+export function endRunsWith(container: Placed): Thrown[] {
+  return leavingWith(container).flatMap((slot) => slot.owner.endsRuns().map((thrown) => ({ slot: slot.container.id, ...thrown })));
+}
+
 export function releaseSlot(container: Placed): Thrown[] {
   const leaving = leavingWith(container);
   for (const slot of leaving) liveSlots.delete(slot.container.id);

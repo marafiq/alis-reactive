@@ -262,7 +262,7 @@ Native's table is `NativeComponents` over `NativeAppLevelObjects/* NativeCompone
 alone. The runtime has its own table,
 `Alis.Reactive.Assets/runtime/SliceTree.txt`, since its evaluator dispatches every kind and sits on top, and its last row is the dot, the bundle's entry beside
 the table: `Schema`, `ValuesAndSources`, `ArrayLambdas`, `Conditions`, `OwnershipAndState`, `Plugins`, `Tracing`,
-`Vendors`, `TriggersAndPipelines`, `InputsAndIds`, `RequestsAndResponses`, `Execution` and the dot today, a row entering with its first file. `ArrayLambdas` stands above
+`Vendors`, `TriggersAndPipelines`, `InputsAndIds`, `Validation`, `RequestsAndResponses`, `PartialsAndSlots`, `Execution` and the dot today, a row entering with its first file. `ArrayLambdas` stands above
 `Conditions` there, the reverse of the core's rows, since the one switch over the operators is `Conditions`' and runs
 a list's operators too; the decimal reader both share is `ArrayLambdas`' (D6.11). The test app
 holds `Components`, what its components share, over `Components/ConformancePeer`, which ConformanceComponent's

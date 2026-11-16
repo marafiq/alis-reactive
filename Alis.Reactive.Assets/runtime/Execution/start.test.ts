@@ -302,6 +302,19 @@ describe("when a handler's owner releases it, Ownership.tla's release holds", ()
     expect(bell.removed).toStrictEqual([]);
   });
 
+  test("NoUnsubscribeOnDestroyed: a component its host took off its element, the member its vendor locates it at gone, is called nothing and its release throws nothing (D12.5, X12.7)", () => {
+    const ward = new Ward();
+    const bell = new Bell();
+    const element: Host = { current: bell };
+    start(planOf(handler("bell", "rang")), ward, elementsOf(new Map([["bell-element", element]])), deskOf(undefined), untraced);
+    Reflect.deleteProperty(element, "current");
+    Object.defineProperty(bell, "off", { value: () => { throw new Error("The destroyed bell was called."); } });
+
+    ward.release();
+
+    expect(bell.removed).toStrictEqual([]);
+  });
+
   test("HostDestroys: after a restart, neither the old object nor the new is called", () => {
     const ward = new Ward();
     const bell = new Bell();

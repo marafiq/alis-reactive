@@ -48,8 +48,17 @@ export function heldBy(element: object, vendor: string, context: Context): Still
   const weak = new WeakRef(element);
   return (object) => {
     const held = weak.deref();
-    return held !== undefined && locate(held) === object;
+    return held !== undefined && holdsAt(held, locate, object);
   };
+}
+
+function holdsAt(element: object, locate: Locate, object: object): boolean {
+  try {
+    return locate(element) === object;
+  } catch (stopped) {
+    if (!(stopped instanceof Stop)) throw stopped;
+    return false;
+  }
 }
 
 function vendorOf(context: Context, name: string): Vendor {

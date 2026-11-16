@@ -186,6 +186,47 @@ describe("when a slot is released", () => {
     expect(done).toStrictEqual(["its run ended", "the unmount of 'card' announced", "its listener removed", "its hold released", "its registration dropped"]);
   });
 
+  test("Lanes.tla's Dispose: the runs of the owners its release ends end at its cut, innermost first and nothing beside them, and the release after the cut ends none again", async () => {
+    const { endRunsWith, releaseSlot, slotOwner } = await aPage();
+    const done: string[] = [];
+    const theCard = slotOwner(card, announcesTo(done));
+    theCard.runs(leaves(done, "the card's run ended"));
+    theCard.listens(leaves(done, "the card's listener removed"));
+    const theBedList = slotOwner(bedList, announcesTo(done));
+    theBedList.runs(leaves(done, "the bed list's run ended"));
+    theBedList.listens(leaves(done, "the bed list's listener removed"));
+    slotOwner(eastWard, unheard).runs(leaves(done, "the east ward's run ended"));
+
+    const thrownAtTheCut = endRunsWith(card);
+    const atTheCut = [...done];
+    releaseSlot(card);
+
+    expect([thrownAtTheCut, atTheCut, done]).toStrictEqual([
+      [],
+      ["the bed list's run ended", "the card's run ended"],
+      [
+        "the bed list's run ended",
+        "the card's run ended",
+        "the unmount of 'bed-list' announced",
+        "the bed list's listener removed",
+        "the unmount of 'card' announced",
+        "the card's listener removed",
+      ],
+    ]);
+  });
+
+  test("what an end of runs at the cut threw is kept with its slot and its step, and every owner's runs end past it", async () => {
+    const { endRunsWith, slotOwner } = await aPage();
+    const done: string[] = [];
+    const jammed = new Error("The round's lane jammed.");
+    slotOwner(card, unheard).runs(leaves(done, "the card's run ended"));
+    slotOwner(bedList, unheard).runs(() => {
+      throw jammed;
+    });
+
+    expect([endRunsWith(card), done]).toStrictEqual([[{ slot: "bed-list", step: "runs", error: jammed }], ["the card's run ended"]]);
+  });
+
   test("its owner announces the unmount once a release, however often it was asked for", async () => {
     const { releaseSlot, slotOwner } = await aPage();
     const heard: string[] = [];
