@@ -9,7 +9,7 @@ internal sealed class WorldData
 
     private readonly ConcurrentQueue<string> _residents = new();
     private readonly ConcurrentQueue<string> _carers = new();
-    private readonly ConcurrentDictionary<(string Gate, string At), WorldGate> _gates = new();
+    private readonly ConcurrentDictionary<(string Gate, string At), List<WorldGate>> _gates = new();
     private readonly ConcurrentDictionary<string, ConcurrentQueue<int>> _answers = new(StringComparer.Ordinal);
     private volatile string _word = "";
     private volatile string _componentText = "Alpha";
@@ -153,32 +153,54 @@ internal sealed class WorldData
 
     internal int NextAnswer(string endpoint) => _answers.TryGetValue(endpoint, out var statuses) && statuses.TryDequeue(out var status) ? status : StatusCodes.Status200OK;
 
-    internal void Arm(GateOrder order) => _gates[(order.Gate, order.At)] = new WorldGate();
-
-    internal Task Reach(string gate, string at)
+    internal GateOrder Arm(GateOrder order)
     {
-        var armed = NotYetHeld(gate, at) ?? NotYetHeld(gate, Anywhere);
-        return armed is null ? Task.CompletedTask : armed.Park();
+        var holds = _gates.GetOrAdd((order.Gate, order.At), _ => []);
+        lock (holds)
+        {
+            holds.Add(new WorldGate());
+            return new GateOrder { Gate = order.Gate, At = order.At, Hold = holds.Count };
+        }
     }
 
-    internal Task? Held(GateOrder order) => _gates.TryGetValue((order.Gate, order.At), out var armed) ? armed.Held : null;
+    internal Task Reach(string gate, string at) => ParkAt(gate, at) ?? ParkAt(gate, Anywhere) ?? Task.CompletedTask;
+
+    internal Task? Held(GateOrder order) => HoldOf(order)?.Held;
 
     internal bool Release(GateOrder order)
     {
-        if (!_gates.TryGetValue((order.Gate, order.At), out var armed) || !armed.IsParked) return false;
+        if (HoldOf(order) is not { IsParked: true } held) return false;
 
-        armed.Release();
+        held.Release();
         return true;
     }
 
     internal IList<string> End()
     {
-        var parked = _gates.Where(gate => gate.Value.IsParked).Select(gate => Named(gate.Key.Gate, gate.Key.At)).Order(StringComparer.Ordinal).ToList();
-        foreach (var gate in _gates.Values) gate.EndWithItsWorld();
+        var holds = _gates.SelectMany(gate => HoldsOf(gate.Value).Select(hold => (gate.Key.Gate, gate.Key.At, Hold: hold))).ToList();
+        var parked = holds.Where(armed => armed.Hold.IsParked).Select(armed => Named(armed.Gate, armed.At)).Order(StringComparer.Ordinal).ToList();
+        foreach (var armed in holds) armed.Hold.EndWithItsWorld();
         return parked;
     }
 
     internal static string Named(string gate, string at) => at == Anywhere ? gate : $"{gate} at {at}";
 
-    private WorldGate? NotYetHeld(string gate, string at) => _gates.TryGetValue((gate, at), out var armed) && !armed.Held.IsCompleted ? armed : null;
+    private static WorldGate[] HoldsOf(List<WorldGate> holds)
+    {
+        lock (holds) return [.. holds];
+    }
+
+    private Task? ParkAt(string gate, string at)
+    {
+        if (!_gates.TryGetValue((gate, at), out var holds)) return null;
+
+        lock (holds) return holds.Find(hold => !hold.Held.IsCompleted)?.Park();
+    }
+
+    private WorldGate? HoldOf(GateOrder order)
+    {
+        if (!_gates.TryGetValue((order.Gate, order.At), out var holds)) return null;
+
+        lock (holds) return holds.ElementAtOrDefault(order.Hold - 1);
+    }
 }

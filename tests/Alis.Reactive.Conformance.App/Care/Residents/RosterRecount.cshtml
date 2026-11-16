@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.World
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RosterRecount
+@{
+    Layout = "/Care/Residents/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Roster";
+    var plan = Html.ReactivePlan<RosterRecount>();
+}
+<h1>Roster of the @Model.Wing</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census" }))
+<button type="button" @Html.Raises(plan, RosterRecounts.Refresh)>Refresh</button>
+<p>Roster log: <output id="@DefaultHooks.RequestLog"></output></p>
+<p>Session: <output id="@DefaultHooks.FlushLine"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RosterRecounts.Refresh, Model.Policy, pipeline =>
+    {
+        var round = pipeline.Plugin<RosterRounds>().Next();
+        pipeline.Get(RosterRecountEndpoints.Roster)
+            .Finally(pipeline =>
+            {
+                pipeline.Element(DefaultHooks.RequestLog).Text.Append(pipeline.Concat("finally start ", round, " "));
+                pipeline.Component<ConformanceComponent>("census").Settle();
+                pipeline.Element(DefaultHooks.RequestLog).Text.Append(pipeline.Concat("finally end ", round, " "));
+            });
+        pipeline.Element(DefaultHooks.RequestLog).Text.Append(pipeline.Concat("after ", round, " "));
+    }));
+}
+@Html.RenderPlan(plan)

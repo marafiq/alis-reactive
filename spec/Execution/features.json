@@ -519,18 +519,18 @@
         },
         {
           "for": "X11.21",
-          "page": "A residents page whose Refresh button, under replace, sends GET /roster and writes its round, 1 then 2, into each line it appends. The request's own WhileLoading awaits the census panel's Settle(), which awaits the test app's settle endpoint, then shows roster-busy; its Finally appends finally, the app's request defaults' Finally defaults finally, and its success route route, each with the round. The harness gates the settle endpoint (Run.tla's Settle).",
+          "page": "A residents page whose Refresh button, under replace, sends GET /roster and writes its round, 1 then 2, into each line it appends. The request's own WhileLoading awaits the census panel's Settle(), which awaits the test app's settle endpoint, then shows roster-busy; its Finally appends finally and its success route route, each with the round, and the app's request defaults' Finally appends defaults finally, which reads no value the handler binds (D8.8, D11.10). The harness gates the settle endpoint (Run.tla's Settle).",
           "gesture": "Click Refresh, and once the harness reports the settle held click Refresh again, then release every held settle.",
-          "outcome": "After the second click the log reads defaults finally 1 and roster-busy stays hidden; after the release the log reads defaults finally 1, route 2, finally 2, defaults finally 2.",
-          "opposite": "Under overlap, the second click leaves round 1 running, and after the release the log holds route 1, finally 1 and defaults finally 1 as well.",
-          "defect": "The aborted request runs its own Finally although its WhileLoading never completed, so finally 1 appears; or the defaults' Finally is skipped with it, so defaults finally 1 is missing; or round 1's WhileLoading goes on after its await, so roster-busy shows before round 2 sends and route 1 appears.",
+          "outcome": "After the second click the log reads defaults finally and roster-busy stays hidden; after the release the log reads defaults finally, route 2, finally 2, defaults finally.",
+          "opposite": "Under overlap, the second click leaves round 1 running, and after the release the log holds route 1, finally 1 and a defaults finally after them as well.",
+          "defect": "The aborted request runs its own Finally although its WhileLoading never completed, so finally 1 appears; or the defaults' Finally is skipped with it, so the log's first defaults finally is missing; or round 1's WhileLoading goes on after its await, so roster-busy shows before round 2 sends and route 1 appears.",
           "observes": "Lanes.tla:Finally"
         },
         {
           "for": "X11.22",
           "page": "A residents page whose Refresh button, under replace, sends GET /roster and writes its round into each line it appends. The request's Finally appends finally start, awaits the census panel's Settle(), which awaits the test app's settle endpoint, then appends finally end; the app's request defaults' Finally appends defaults finally, and the step after the request appends after. The harness gates the settle endpoint (Run.tla's Settle).",
           "gesture": "Click Refresh, and once finally start 1 shows click Refresh again, then release each settle the harness reports held.",
-          "outcome": "finally end 1 shows once, after the first release, followed by defaults finally 1, and after 1 never shows.",
+          "outcome": "finally end 1 shows once, after the first release, followed by defaults finally, and after 1 never shows.",
           "opposite": "Under overlap, the second click leaves round 1 running, and after the releases the log holds after 1.",
           "defect": "The replace ends the old Finally at its await, so finally end 1 never shows; or the old Finally runs again for the new run, so finally end 1 shows twice; or the step after the old request runs, so after 1 shows.",
           "observes": "Lanes.tla:After"

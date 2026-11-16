@@ -60,8 +60,10 @@ public sealed class TestWorld
 
     private async Task<ArmedGate> Arm(GateOrder order)
     {
-        (await _harness.PostAsJsonAsync(WorldEndpoints.ArmGate, order)).EnsureSuccessStatusCode();
-        return new ArmedGate(_harness, order);
+        using var answer = await _harness.PostAsJsonAsync(WorldEndpoints.ArmGate, order);
+        answer.EnsureSuccessStatusCode();
+        var armed = await answer.Content.ReadFromJsonAsync<GateOrder>();
+        return new ArmedGate(_harness, armed!);
     }
 
     private void Keep(IConsoleMessage message)

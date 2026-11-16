@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Alis.Reactive.Conformance.App.World;
 using Alis.Reactive.Conformance.World;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.RequestsAndResponses;
@@ -18,6 +19,7 @@ internal static class AppHost
             case HostNames.NoRequests:
             case HostNames.NoAntiforgeryChoice:
             case HostNames.SiteHeader:
+            case HostNames.DefaultHooks:
                 WriteEnumNames(json);
                 return;
             case HostNames.NumbersAsText:
@@ -44,7 +46,7 @@ internal static class AppHost
                 json.RespectRequiredConstructorParameters = true;
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests} and {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests}, {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader} and {HostNames.DefaultHooks}.");
         }
     }
 
@@ -59,6 +61,16 @@ internal static class AppHost
                 return;
             case HostNames.SiteHeader:
                 services.AddReactiveRequests(requests => TheDefaults(requests).Header("Care-Site", "North"));
+                return;
+            case HostNames.DefaultHooks:
+                services.AddReactiveRequests(requests => TheDefaults(requests)
+                    .WhileLoading(pipeline => pipeline.Plugin<CareSession>().Renew())
+                    .Finally(pipeline =>
+                    {
+                        pipeline.Element(DefaultHooks.RequestLog).Text.Append("defaults finally ");
+                        pipeline.Plugin<CareSession>().Flush();
+                        pipeline.Element(DefaultHooks.FlushLine).Text.Set("flushed");
+                    }));
                 return;
             default:
                 services.AddReactiveRequests(requests => TheDefaults(requests));

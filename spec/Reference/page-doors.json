@@ -565,6 +565,20 @@
       "/Care/Shell/_ShellLayout.cshtml"
     ]
   },
+  "M17.F1 X11.21 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/RosterRefresh.cshtml",
+      "/Care/Residents/_ScriptedLayout.cshtml"
+    ]
+  },
+  "M17.F1 X11.22 0": {
+    "modules": [],
+    "views": [
+      "/Care/Residents/RosterRecount.cshtml",
+      "/Care/Residents/_ScriptedLayout.cshtml"
+    ]
+  },
   "M17.F1 X11.4 0": {
     "modules": [],
     "views": [

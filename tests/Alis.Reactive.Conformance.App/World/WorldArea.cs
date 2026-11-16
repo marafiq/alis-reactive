@@ -69,6 +69,10 @@ internal static class WorldArea
             .AddEndpointFilter(AtTheSettleGate);
         app.MapPost(WorldEndpoints.Check, (CurrentWorld world) => Results.Json(world.Data.CheckAnswer))
             .AddEndpointFilter(AtTheSettleGate);
+        app.MapPost(WorldEndpoints.SessionRenew, () => Results.NoContent())
+            .AddEndpointFilter(AtTheSettleGate);
+        app.MapPost(WorldEndpoints.SessionFlush, () => Results.NoContent())
+            .AddEndpointFilter(AtTheSettleGate);
     }
 
     private static IResult TheWorldsWord(CurrentWorld world) => Results.Content(Page("The word", $"<p>{Text(world.Data.Word)}</p>"), Html);

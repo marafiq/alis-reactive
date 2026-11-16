@@ -1,0 +1,31 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.App.Components
+@using Alis.Reactive.Conformance.App.World
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model RosterRefresh
+@{
+    Layout = "/Care/Residents/_ScriptedLayout.cshtml";
+    ViewData["Title"] = "Roster";
+    var plan = Html.ReactivePlan<RosterRefresh>();
+}
+<h1>Roster of the @Model.Wing</h1>
+@(plan.ConformanceComponent("census", new ConformanceStart { Text = "Census" }))
+<button type="button" @Html.Raises(plan, RosterRefreshes.Refresh)>Refresh</button>
+<section id="roster-busy" aria-label="Roster">
+    <p>Roster log: <output id="@DefaultHooks.RequestLog"></output></p>
+</section>
+<p>Session: <output id="@DefaultHooks.FlushLine"></output></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(RosterRefreshes.Refresh, Model.Policy, pipeline =>
+    {
+        var round = pipeline.Plugin<RosterRounds>().Next();
+        pipeline.Get(RosterRefreshEndpoints.Roster)
+            .Busy("roster-busy")
+            .WhileLoading(pipeline => pipeline.Component<ConformanceComponent>("census").Settle())
+            .OnSuccess(Content.None, (roster, pipeline) => pipeline.Element(DefaultHooks.RequestLog).Text.Append(pipeline.Concat("route ", round, " ")))
+            .Finally(pipeline => pipeline.Element(DefaultHooks.RequestLog).Text.Append(pipeline.Concat("finally ", round, " ")));
+    }));
+}
+@Html.RenderPlan(plan)

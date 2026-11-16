@@ -212,6 +212,6 @@ scripts/playwright.sh --measure --all
 scripts/playwright.sh --pool core --shard "1/1"
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace "Of(key)" --with "Of(string.Empty)"
 scripts/plant-defect.sh --test M14_F1.X19_3_0 --in Alis.Reactive.Assets/runtime/Schema/read-plan.ts --replace "plan.version === pageVersion" --with "plan.version > 0"
-scripts/plant-defect.sh --test Harness.WhenAGateIsHeldAtTwoEndpoints_each_endpoints_answer_waits_for_its_own_release --in tests/Alis.Reactive.Conformance.App/World/WorldData.cs --replace '(order.Gate, order.At)] = new' --with '(order.Gate, Anywhere)] = new'
+scripts/plant-defect.sh --test Harness.WhenAGateIsHeldAtTwoEndpoints_each_endpoints_answer_waits_for_its_own_release --in tests/Alis.Reactive.Conformance.App/World/WorldData.cs --replace 'GetOrAdd((order.Gate, order.At)' --with 'GetOrAdd((order.Gate, Anywhere)'
 scripts/plant-defect.sh --test Harness.WhenTwoWorldsRun_each_world_lists_only_the_residents_it_seeded --in tests/Alis.Reactive.Conformance.App/World/WorldArea.cs --replace '<title>{Text(title)}</title>' --with '<title>{Text(title)}</title><script src=\"/js/ej2.min.js\"></script>'
 ```
