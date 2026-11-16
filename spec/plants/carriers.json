@@ -70,8 +70,8 @@
   "edits": [
    {
     "file": "spec/Core/DESIGN.md",
-    "old": "are browser promises (X12.15, X12.17), since",
-    "new": "are browser promises (X12.15,\n  X12.17), since"
+    "old": "are browser promises (X12.15, X12.17).",
+    "new": "are browser promises (X12.15,\n  X12.17)."
    }
   ],
   "expect": null
