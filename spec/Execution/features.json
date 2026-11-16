@@ -3,7 +3,7 @@
   "features": [
     {
       "id": "M17.F1",
-      "summary": "Execution: how a plan runs in the browser. Boot starts each owner's handlers in plan order; a handler runs one run, a state machine whose steps run in the trigger's turn until one awaits, and only the closed awaited steps C# marks wait: a send, a Confirm, a hub's invoke and send, and a method declared MethodAsync, whose rejection stops the run. Steps before the first await run in the vendor's turn, so a payload write there reaches the vendor, and C# refuses one after it on the path the handler runs. A stop unwinds the run's frames innermost first, each request running its Finally layers once; a replace or a dispose aborts the run's blocks and runs no route; a join waits for every block's tail. Data read where a member is absent reads the start System.Text.Json binds for it, stops where the binding cannot make the holder or the holder lacks what its type requires, and a path value that reads nothing stops its request before it is sent. Main drops a call's promise and refuses no late payload write; the redesign logs a rejection and goes on, reads data's members as optional, and ends no run at dispose.",
+      "summary": "Execution: how a plan runs in the browser. Boot starts each owner's handlers in plan order; a handler runs one run, a state machine whose steps run in the trigger's turn until one awaits, and only the closed awaited steps C# marks wait: a send, a Confirm, a hub's invoke and send, and a method declared MethodAsync, whose rejection stops the run. Steps before the first await run in the vendor's turn, so a payload write there reaches the vendor, and C# refuses one after it on the path the handler runs. A stop, or an error a step throws, unwinds the run's frames innermost first, each request running its Finally layers once, and ends its own run alone, which its lane then holds no longer; a replace or a dispose aborts the run's blocks and runs no route; a join waits for every block's tail. Data read where a member is absent reads the start System.Text.Json binds for it, stops where the binding cannot make the holder or the holder lacks what its type requires, and a path value that reads nothing stops its request before it is sent. Main drops a call's promise and refuses no late payload write; the redesign logs a rejection and goes on, reads data's members as optional, and ends no run at dispose.",
       "status": "internal",
       "types": [],
       "claims": [],
@@ -228,12 +228,15 @@
         "Run.tla:DisposedRunNeverWaits",
         "Run.tla:ReplacedFinallyGoesOn",
         "Run.tla:TheOldFinallyRunsBeforeTheNewRun",
+        "Run.tla:RunningHasADriver",
+        "Run.tla:NothingRunsAfterAnError",
         "Lanes.tla:DisposedRunsNothingMore",
         "Lanes.tla:FinallyRunsBeforeRelease",
         "Lanes.tla:ReplacedRunRunsNoRoute",
         "Lanes.tla:ReplacedRunRunsNothingAfter",
         "Lanes.tla:AllSettledAfterEveryRequest",
-        "Lanes.tla:JoinAfterEveryBranchTail"
+        "Lanes.tla:JoinAfterEveryBranchTail",
+        "Lanes.tla:ErrorRunsNothingAfter"
       ],
       "defects": [
         {
@@ -331,6 +334,10 @@
         {
           "id": "X11.23",
           "rung": "behavior"
+        },
+        {
+          "id": "X11.25",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -421,6 +428,24 @@
           "outcome": "settle-status keeps Settling, order-status reads Finished and order-busy hides.",
           "opposite": "With the settle endpoint seeded to answer a success, settle-status reads Settled after the release, order-status reads Finished and order-busy hides.",
           "defect": "The call's promise is not awaited, as main drops it (Alis.Reactive.Assets/runtime/execution/reactions/execute.ts:181 at 623dd4a27), so Settled shows before the release; or the stop skips the Finally, so order-status stays empty and order-busy stays shown."
+        },
+        {
+          "for": "X11.25",
+          "page": "A medication review page on the round. Its dose scanner, a ConformanceComponent, raises Raised from its own box, the box's number as the payload's Count, and its payload's held object holds three items, Dose A, Dose B and Dose C. The Raised handler, under skip, sends POST /reviews with the busy indicator review-busy; its success route calls Act() on the item the payload's Held.ItemAt gives for Count, and the request's Finally appends Finished to the review history. The harness gates each POST /reviews (Lanes.tla's Respond).",
+          "gesture": "Type 4 into the scanner's box and click its Raise; once the harness reports the POST held, release it. Then type 1, click Raise and, once the harness reports the second POST held, release it.",
+          "outcome": "After the first release the review history reads Finished, review-busy hides and the console holds one error, There is no held item at 4.; after the second the history reads FinishedFinished and the scanner shows Dose A, acted.",
+          "opposite": "With 1 typed before the first Raise, its release shows Dose A, acted, the history reads Finished and the console holds no error.",
+          "defect": "The error a step throws is thrown out of its run, which stays running: the request's Finally never runs, so the history stays empty and review-busy stays shown, and under skip the lane counts that run in flight, so the second Raise sends no POST and the harness reports none held.",
+          "observes": "Lanes.tla:Throws"
+        },
+        {
+          "for": "X11.25",
+          "page": "A medication review page on the round. Its dose scanner, a ConformanceComponent, raises Raised from its own box, the box's number as the payload's Count, and its payload's held object holds three items, Dose A, Dose B and Dose C. The Raised handler, under replace, sends POST /reviews with the busy indicator review-busy; its success route calls Act() on the item the payload's Held.ItemAt gives for Count, and the request's Finally appends Finished to the review history. The harness gates each POST /reviews (Lanes.tla's Respond).",
+          "gesture": "Type 4 into the scanner's box and click its Raise; once the harness reports the POST held, release it. Then type 1, click Raise and, once the harness reports the second POST held, release it.",
+          "outcome": "After the first release the review history reads Finished, review-busy hides and the console holds one error, There is no held item at 4.; after the second the history reads FinishedFinished and the scanner shows Dose A, acted.",
+          "opposite": "With 1 typed before the first Raise, its release shows Dose A, acted, the history reads Finished and the console holds no error.",
+          "defect": "The error a step throws is thrown out of its run, which stays running: the request's Finally never runs, so the history stays empty and review-busy stays shown, and under replace the lane takes that run as inside its own step and keeps the new run for a return that never comes, so the second Raise sends no POST and the harness reports none held.",
+          "observes": "Lanes.tla:Throws"
         },
         {
           "for": "X11.5",

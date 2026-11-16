@@ -1,8 +1,8 @@
 # Execution
 
 How a plan runs in the browser: boot starts each owner's handlers, a handler runs one run, steps run in the trigger's
-turn until one awaits, a stop or an abort unwinds the run, and a data read meets an absent member. Module 17 of
-`spec/CLAUDE.md`. The module is internal and owns no door.
+turn until one awaits, a stop, an error a step throws or an abort unwinds the run, and a data read meets an absent
+member. Module 17 of `spec/CLAUDE.md`. The module is internal and owns no door.
 
 ## Core questions
 
@@ -10,13 +10,13 @@ turn until one awaits, a stop or an abort unwinds the run, and a data read meets
   cannot make a holder on the path or a holder lacks what its type requires (D4.2); a promise where a value is declared
   stops, and a `MethodAsync` is awaited, its settled value its result (D4.3); a path value that reads nothing stops its
   request before it is sent, and its `Finally` runs (D4.6); a value held as `undefined` reads as nothing (D4.9); a
-  stop ends its own handler only (D4.8).
+  stop, and an error a step throws, ends its own handler only (D4.8).
 - Q11: sync is the default, and a run waits only at the closed awaited steps C# marks (D11.1, D11.2); the declaration
   decides sync and async (D11.3); the steps before a handler's first await run in the vendor's turn, and a write to
   the payload itself after it is refused where the view renders (D11.4); the order is closed, and a step settles when
   every block it ran settles (D11.5); dispose ends its owner's runs before it releases what the owner holds (D11.8);
-  no step waits for time (D11.9); a run is one state machine whose stop and abort unwind its frames innermost first
-  (D11.11, D11.12).
+  no step waits for time (D11.9); a run is one state machine whose stop, error and abort unwind its frames innermost
+  first (D11.11, D11.12).
 
 ## Boundaries
 
@@ -26,8 +26,8 @@ list's lambda is module 4's (X4.12). A handler, its policy's door (N11.1), two h
 block are module 1's (X11.1, X11.6, X11.7, X11.10, X11.17, X11.19, X11.24). This module holds the run that executes
 them: what a data read does where a member is absent (X4.6 to X4.10), the path value's stop (X4.4), a converter's
 member read past (X4.13), the wait for a `MethodAsync` (X4.11, X11.4), the payload's turn (X11.2, X11.8, X11.9, X11.11
-to X11.13, X11.18), the joins (X11.14, X11.16), the unwinding of a stop and an abort (X11.15, X11.20 to X11.22) and a
-dispose's end of a run (X11.5, X11.23).
+to X11.13, X11.18), the joins (X11.14, X11.16), the unwinding of a stop, of an error a step throws and of an abort
+(X11.15, X11.20 to X11.22, X11.25) and a dispose's end of a run (X11.5, X11.23).
 
 A request's states and parts are module 6's (D10.23); this module runs each as a frame of its run. Where a start
 comes from in C# is module 16's (D16.6, D18.3); this module reads the step the plan carries. A slot's load and unload

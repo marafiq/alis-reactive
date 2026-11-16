@@ -2710,6 +2710,58 @@
     },
     {
       "feature": "M17.F1",
+      "for": "X11.25",
+      "index": 0,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "scanner",
+        "busy"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "each of the two POSTs of /reviews"
+        }
+      ]
+    },
+    {
+      "feature": "M17.F1",
+      "for": "X11.25",
+      "index": 1,
+      "screen": "round",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "doses",
+        "roundEndpoint",
+        "scanner",
+        "busy"
+      ],
+      "harness": [
+        "seed",
+        "gate"
+      ],
+      "held": [
+        {
+          "verb": "gate",
+          "action": "Lanes.tla:Respond",
+          "on": "each of the two POSTs of /reviews"
+        }
+      ]
+    },
+    {
+      "feature": "M17.F1",
       "for": "X11.5",
       "index": 0,
       "screen": "record",

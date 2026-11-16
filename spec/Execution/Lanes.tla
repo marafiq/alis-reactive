@@ -4,7 +4,8 @@ EXTENDS Naturals, Sequences
 CONSTANT Mutant
 
 Mutants == {"none", "DisposeLeavesRunsGoing", "ReplaceKeepsOld", "SkipStartsAnyway", "AllSettledEarly",
-            "BranchStopStopsOthers", "ReleaseBeforeFinally", "JoinAtTheBranchAwait", "ReplaceSparesTheFinally"}
+            "BranchStopStopsOthers", "ReleaseBeforeFinally", "JoinAtTheBranchAwait", "ReplaceSparesTheFinally",
+            "ErrorRunsTheTail"}
 
 ASSUME Mutant \in Mutants
 
@@ -13,10 +14,10 @@ Branches == {"one", "two"}
 
 VARIABLES policy, owner, pc, completion, routeRan, finallyRan, decided, ranWhileDisposed, branch,
           branchCompletion, stoppedItself, allSettled, parallelDone, released, finallyAfterRelease, tail, tailPending,
-          routeAfterReplace, afterAfterReplace, tailed
+          routeAfterReplace, afterAfterReplace, tailed, afterAfterError
 
 trigger == <<policy, owner, pc, completion, routeRan, finallyRan, decided, ranWhileDisposed, tail, tailPending,
-             routeAfterReplace, afterAfterReplace>>
+             routeAfterReplace, afterAfterReplace, afterAfterError>>
 parallel == <<branch, branchCompletion, stoppedItself, allSettled, parallelDone, tailed>>
 
 vars == <<trigger, parallel, released, finallyAfterRelease>>
@@ -42,6 +43,7 @@ Init ==
     /\ routeAfterReplace = FALSE
     /\ afterAfterReplace = FALSE
     /\ tailed = [b \in Branches |-> FALSE]
+    /\ afterAfterError = FALSE
 
 InFlight(r) ==
     IF Mutant = "ReplaceSparesTheFinally" THEN pc[r] = "attempt" \/ (pc[r] = "route" /\ tailPending[r])
@@ -59,7 +61,7 @@ FireFirst ==
     /\ owner = "live"
     /\ pc' = [pc EXCEPT !["first"] = "attempt"]
     /\ UNCHANGED <<policy, owner, completion, routeRan, finallyRan, decided, ranWhileDisposed, tail, tailPending,
-                   routeAfterReplace, afterAfterReplace, parallel, released, finallyAfterRelease>>
+                   routeAfterReplace, afterAfterReplace, afterAfterError, parallel, released, finallyAfterRelease>>
 
 FireSecond ==
     /\ decided = "none"
@@ -78,15 +80,15 @@ FireSecond ==
               /\ pc' = [pc EXCEPT !["second"] = "attempt"]
               /\ decided' = IF policy = "skip" /\ InFlight("first") THEN "skip" ELSE "overlap"
               /\ UNCHANGED completion
-    /\ UNCHANGED <<policy, owner, routeRan, finallyRan, ranWhileDisposed, tail, tailPending, routeAfterReplace, afterAfterReplace, parallel,
-                   released, finallyAfterRelease>>
+    /\ UNCHANGED <<policy, owner, routeRan, finallyRan, ranWhileDisposed, tail, tailPending, routeAfterReplace, afterAfterReplace,
+                   afterAfterError, parallel, released, finallyAfterRelease>>
 
 Respond(r) ==
     /\ pc[r] = "attempt"
     /\ owner = "live" \/ Mutant = "DisposeLeavesRunsGoing"
     /\ pc' = [pc EXCEPT ![r] = "route"]
     /\ UNCHANGED <<policy, owner, completion, routeRan, finallyRan, decided, ranWhileDisposed, tail, tailPending,
-                   routeAfterReplace, afterAfterReplace, parallel, released, finallyAfterRelease>>
+                   routeAfterReplace, afterAfterReplace, afterAfterError, parallel, released, finallyAfterRelease>>
 
 Route(r) ==
     /\ pc[r] = "route"
@@ -98,7 +100,7 @@ Route(r) ==
     /\ tailPending' = [tailPending EXCEPT ![r] = tail[r]]
     /\ pc' = [pc EXCEPT ![r] = IF tail[r] THEN "route" ELSE "finally"]
     /\ completion' = IF tail[r] THEN completion ELSE [completion EXCEPT ![r] = "completed"]
-    /\ UNCHANGED <<policy, owner, finallyRan, decided, tail, afterAfterReplace, parallel, released, finallyAfterRelease>>
+    /\ UNCHANGED <<policy, owner, finallyRan, decided, tail, afterAfterReplace, afterAfterError, parallel, released, finallyAfterRelease>>
 
 SettleTheTail(r) ==
     /\ pc[r] = "route"
@@ -109,21 +111,35 @@ SettleTheTail(r) ==
     /\ routeAfterReplace' = (routeAfterReplace \/ (decided = "replace" /\ r = "first"))
     /\ pc' = [pc EXCEPT ![r] = "finally"]
     /\ completion' = [completion EXCEPT ![r] = "completed"]
-    /\ UNCHANGED <<policy, owner, routeRan, finallyRan, decided, tail, afterAfterReplace, parallel, released, finallyAfterRelease>>
+    /\ UNCHANGED <<policy, owner, routeRan, finallyRan, decided, tail, afterAfterReplace, afterAfterError, parallel, released, finallyAfterRelease>>
+
+Throws(r) ==
+    /\ pc[r] = "route"
+    /\ owner = "live" \/ Mutant = "DisposeLeavesRunsGoing"
+    /\ routeRan' = [routeRan EXCEPT ![r] = TRUE]
+    /\ ranWhileDisposed' = (ranWhileDisposed \/ owner = "disposed")
+    /\ routeAfterReplace' = (routeAfterReplace \/ (decided = "replace" /\ r = "first"))
+    /\ tailPending' = [tailPending EXCEPT ![r] = FALSE]
+    /\ pc' = [pc EXCEPT ![r] = "finally"]
+    /\ completion' = [completion EXCEPT ![r] = "stopped"]
+    /\ UNCHANGED <<policy, owner, finallyRan, decided, tail, afterAfterReplace, afterAfterError, parallel, released, finallyAfterRelease>>
+
+EndsAtItsFinally(r) == completion[r] = "aborted" \/ (completion[r] = "stopped" /\ Mutant # "ErrorRunsTheTail")
 
 Finally(r) ==
     /\ pc[r] = "finally"
     /\ finallyRan' = [finallyRan EXCEPT ![r] = @ + 1]
     /\ finallyAfterRelease' = (finallyAfterRelease \/ released)
-    /\ pc' = [pc EXCEPT ![r] = IF completion[r] = "aborted" THEN "done" ELSE "after"]
+    /\ pc' = [pc EXCEPT ![r] = IF EndsAtItsFinally(r) THEN "done" ELSE "after"]
     /\ UNCHANGED <<policy, owner, completion, routeRan, decided, ranWhileDisposed, tail, tailPending, routeAfterReplace, afterAfterReplace,
-                   parallel, released>>
+                   afterAfterError, parallel, released>>
 
 After(r) ==
     /\ pc[r] = "after"
     /\ owner = "live" \/ Mutant = "DisposeLeavesRunsGoing"
     /\ ranWhileDisposed' = (ranWhileDisposed \/ owner = "disposed")
     /\ afterAfterReplace' = (afterAfterReplace \/ (policy = "replace" /\ pc["second"] # "idle" /\ r = "first"))
+    /\ afterAfterError' = (afterAfterError \/ completion[r] = "stopped")
     /\ pc' = [pc EXCEPT ![r] = "done"]
     /\ UNCHANGED <<policy, owner, completion, routeRan, finallyRan, decided, tail, tailPending, routeAfterReplace,
                    parallel, released, finallyAfterRelease>>
@@ -136,7 +152,7 @@ Dispose ==
          ELSE /\ pc' = [r \in Runs |-> EndOnCut(pc[r])]
               /\ completion' = [r \in Runs |-> IF pc[r] \in Cut THEN "aborted" ELSE completion[r]]
     /\ UNCHANGED <<policy, routeRan, finallyRan, decided, ranWhileDisposed, tail, tailPending, routeAfterReplace, afterAfterReplace,
-                   parallel, released, finallyAfterRelease>>
+                   afterAfterError, parallel, released, finallyAfterRelease>>
 
 Settle(b) ==
     /\ branch[b] \in {"attempt", "route"}
@@ -167,7 +183,7 @@ AllSettled ==
 
 Next ==
     \/ FireFirst \/ FireSecond \/ Dispose \/ Release \/ AllSettled
-    \/ \E r \in Runs : Respond(r) \/ Route(r) \/ SettleTheTail(r) \/ Finally(r) \/ After(r)
+    \/ \E r \in Runs : Respond(r) \/ Route(r) \/ SettleTheTail(r) \/ Throws(r) \/ Finally(r) \/ After(r)
     \/ \E b \in Branches : Settle(b)
 
 Spec == Init /\ [][Next]_vars
@@ -188,6 +204,8 @@ BranchStopEndsOnlyItself == \A b \in Branches : branchCompletion[b] = "stopped" 
 
 JoinAfterEveryBranchTail == parallelDone => \A b \in Branches : branch[b] # "route"
 
+ErrorRunsNothingAfter == ~afterAfterError
+
 ReachReplaced == ~(decided = "replace" /\ pc["first"] = "done" /\ completion["first"] = "aborted" /\ finallyRan["first"] = 1
                    /\ routeRan["second"])
 
@@ -201,5 +219,11 @@ ReachReplacedInItsFinally == ~(decided = "replace" /\ owner = "live" /\ routeRan
                                 /\ pc["first"] = "finally" /\ completion["first"] = "aborted")
 
 ReachSkippedInTheTail == ~(decided = "skip" /\ pc["first"] = "route" /\ tailPending["first"])
+
+FiredAgainAfterAnError == completion["first"] = "stopped" /\ finallyRan["first"] = 1 /\ pc["first"] = "done" /\ routeRan["second"]
+
+ReachFiredAgainAfterAnErrorUnderSkip == ~(policy = "skip" /\ FiredAgainAfterAnError)
+
+ReachFiredAgainAfterAnErrorUnderReplace == ~(policy = "replace" /\ FiredAgainAfterAnError)
 
 ====

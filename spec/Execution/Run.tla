@@ -7,7 +7,8 @@ Mutants == {"none", "EnclosingRunsOn", "AlwaysYields", "ChainHandlers", "AfterIf
             "StopRunsOn", "AbortRunsTheRoute", "AbortRunsUnloadedFinally", "UnwindRestartsFinally",
             "DefaultFinallyFirst", "DisposeSkipsRelease", "DisposeAwaitsFinally",
             "CutAtTheNextWait", "TopOnlyFinallyAtTheAbort", "TopOnlyFinallyAtTheAwait", "DisposeReadsTheFirstReason",
-            "DisposedAttemptSends", "ReplaceCutsTheFinallysRequest", "SecondBeginsInTheRaise"}
+            "DisposedAttemptSends", "ReplaceCutsTheFinallysRequest", "SecondBeginsInTheRaise", "ErrorEscapesRun",
+            "ErrorSparesItsFinally"}
 
 ASSUME Mutant \in Mutants
 
@@ -40,6 +41,29 @@ Seconds == {<<Leaf("write")>>, <<Leaf("await"), Leaf("write")>>}
 
 DefaultFinally == <<Leaf("await"), Leaf("write")>>
 
+Throw == Leaf("error")
+
+Throwing == {<<Throw, Leaf("write")>>, <<Leaf("await"), Throw, Leaf("write")>>}
+
+Fragile == {<<Leaf("write")>>} \cup Throwing
+
+ThrowsWhileLoading == {Stmt("request", <<>>, <<>>, <<Throw, Leaf("write")>>, <<Leaf("write")>>, <<Leaf("write")>>, d) : d \in BOOLEAN}
+
+FailingInner == ThrowsWhileLoading
+    \cup {Stmt("request", <<>>, <<>>, <<>>, r, f, d) : r \in Fragile, f \in Fragile, d \in BOOLEAN}
+
+FailingBody == Fragile
+    \cup {<<s, Leaf("write")>> : s \in FailingInner}
+    \cup {<<Stmt("if", y, <<>>, <<>>, <<>>, <<>>, FALSE), Leaf("write")>> : y \in Throwing}
+
+FailingFinally == Fragile
+    \cup {<<Stmt("request", <<>>, <<>>, <<>>, <<Throw, Leaf("write")>>, <<>>, FALSE), Leaf("write")>>}
+
+FailingOuter == ThrowsWhileLoading
+    \cup {Stmt("request", <<>>, <<>>, <<>>, r, f, d) : r \in FailingBody, f \in FailingFinally, d \in BOOLEAN}
+
+Failing == {<<s, Leaf("write")>> : s \in FailingOuter}
+
 Handlers == {1, 2}
 
 NoStmt == Leaf("none")
@@ -56,15 +80,15 @@ BlockFrame(body, path, role) == Frame("block", body, path, role, NoStmt, "none")
 
 RequestFrame(node, path) == Frame("request", <<>>, path, "none", node, IF node.defaults THEN "defaultLoading" ELSE "loading")
 
-VARIABLES prog, defaultLoading, stack, status, turn, active, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort,
+VARIABLES prog, defaultLoading, defaultFinally, stack, status, turn, active, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort,
           ranWhilePending, pending, loaded, finallies, held, aborted, cutDefaultFinally, abortNesting, deepest, innerStopped,
           finallyEnded, cutInStep, escalated, keptInBranch, cutInBranch, attemptCut, finallysRequestRouted,
-          newRun, owed, early
+          newRun, owed, early, erred
 
-vars == <<prog, defaultLoading, stack, status, turn, active, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort,
+vars == <<prog, defaultLoading, defaultFinally, stack, status, turn, active, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort,
           ranWhilePending, pending, loaded, finallies, held, aborted, cutDefaultFinally, abortNesting, deepest, innerStopped,
           finallyEnded, cutInStep, escalated, keptInBranch, cutInBranch, attemptCut, finallysRequestRouted,
-          newRun, owed, early>>
+          newRun, owed, early, erred>>
 
 RECURSIVE MarkFrom(_, _, _, _), MarkStmt(_, _, _)
 
@@ -78,6 +102,7 @@ MarkStmt(s, p, f) ==
     CASE s.k = "write" -> [marked |-> IF f THEN {p} ELSE {}, flag |-> f]
       [] s.k = "await" -> [marked |-> {}, flag |-> TRUE]
       [] s.k = "stop" -> [marked |-> {}, flag |-> f]
+      [] s.k = "error" -> [marked |-> {}, flag |-> f]
       [] s.k = "if" ->
            LET y == MarkFrom(s.yes, 1, p \o <<1>>, f)
                n == MarkFrom(s.no, 1, p \o <<2>>, f)
@@ -87,13 +112,16 @@ MarkStmt(s, p, f) ==
                l == MarkFrom(s.loading, 1, p \o <<1>>, d.flag)
                r == MarkFrom(s.route, 1, p \o <<2>>, TRUE)
                z == MarkFrom(s.finally, 1, p \o <<3>>, TRUE)
-               y == MarkFrom(IF s.defaults THEN DefaultFinally ELSE <<>>, 1, p \o <<5>>, TRUE)
+               y == MarkFrom(IF s.defaults THEN defaultFinally ELSE <<>>, 1, p \o <<5>>, TRUE)
            IN [marked |-> d.marked \cup l.marked \cup r.marked \cup z.marked \cup y.marked, flag |-> TRUE]
 
 Marked(program) == MarkFrom(program, 1, <<>>, FALSE).marked
 
 Init ==
-    /\ prog \in {[h \in Handlers |-> IF h = 1 THEN first ELSE second] : first \in Programs, second \in Seconds}
+    /\ \/ /\ prog \in {[h \in Handlers |-> IF h = 1 THEN first ELSE second] : first \in Programs, second \in Seconds}
+          /\ defaultFinally = DefaultFinally
+       \/ /\ prog \in {[h \in Handlers |-> IF h = 1 THEN first ELSE second] : first \in Failing, second \in Seconds}
+          /\ defaultFinally \in {DefaultFinally} \cup Throwing
     /\ defaultLoading \in {<<>>, <<Leaf("await")>>}
     /\ stack = [h \in Handlers |-> <<>>]
     /\ status = [h \in Handlers |-> "idle"]
@@ -124,6 +152,7 @@ Init ==
     /\ newRun = "none"
     /\ owed = {}
     /\ early = FALSE
+    /\ erred = {}
 
 InTurn == turn \in {"h1", "h2"}
 
@@ -243,6 +272,16 @@ Statement(h) ==
                  /\ innerStopped' = (innerStopped \/ (Len(p) = 5 /\ p[2] = 2 /\ p[4] = 2))
                  /\ Settled(h, Stopped(moved))
                  /\ UNCHANGED <<writes, awaitsRan, pending, loaded, finallies, held, cutDefaultFinally, cutInBranch>>
+            [] s.k = "error" ->
+                 /\ stopped' = [stopped EXCEPT ![h] = TRUE]
+                 /\ CASE Mutant = "ErrorEscapesRun" ->
+                           /\ stack' = [stack EXCEPT ![h] = moved]
+                           /\ active' = 0
+                           /\ UNCHANGED status
+                      [] Mutant = "ErrorSparesItsFinally" /\ f.role \in FinallyRoles ->
+                           Settled(h, [moved EXCEPT ![Len(moved) - 1].abrupt = TRUE])
+                      [] OTHER -> Settled(h, Stopped(moved))
+                 /\ UNCHANGED <<writes, awaitsRan, pending, loaded, finallies, held, cutDefaultFinally, innerStopped, cutInBranch>>
             [] s.k = "if" ->
                  /\ \E c \in {1, 2} : Push(h, moved, BlockFrame(IF c = 1 THEN s.yes ELSE s.no, p \o <<c>>, "branch"))
                  /\ UNCHANGED <<writes, awaitsRan, stopped, pending, loaded, finallies, held, cutDefaultFinally, innerStopped, cutInBranch>>
@@ -250,6 +289,7 @@ Statement(h) ==
                  /\ Push(h, moved, RequestFrame(s, p))
                  /\ UNCHANGED <<writes, awaitsRan, stopped, pending, loaded, finallies, held, cutDefaultFinally, innerStopped, cutInBranch>>
        /\ deepest' = IF s.k = "await" /\ Len(p) > deepest THEN Len(p) ELSE deepest
+       /\ erred' = IF s.k = "error" THEN erred \cup {[h |-> h, path |-> p, role |-> f.role, cut |-> IF h = 1 THEN aborted ELSE "no"]} ELSE erred
        /\ UNCHANGED <<finallyEnded, attemptCut, finallysRequestRouted>>
 
 BlockEnds(h) ==
@@ -266,7 +306,7 @@ BlockEnds(h) ==
                                                                      layer |-> IF f.role = "finally" THEN "own" ELSE "defaults"]}]
                             ELSE finallyEnded
        /\ UNCHANGED <<writes, awaitsRan, stopped, pending, finallies, held, cutDefaultFinally, deepest, innerStopped, cutInBranch,
-                      attemptCut, finallysRequestRouted>>
+                      attemptCut, finallysRequestRouted, erred>>
 
 RequestStep(h) ==
     LET r == Top(h)
@@ -297,7 +337,7 @@ RequestStep(h) ==
             [] r.state \in {"finally", "defaultFinally"} ->
                  /\ IF layerLoaded
                       THEN /\ opened(IF r.state = "finally" THEN "finallyRunning" ELSE "defaultFinallyRunning",
-                                     IF layer = "own" THEN r.node.finally ELSE DefaultFinally,
+                                     IF layer = "own" THEN r.node.finally ELSE defaultFinally,
                                      IF layer = "own" THEN "finally" ELSE "defaultFinally",
                                      IF layer = "own" THEN 3 ELSE 5)
                            /\ finallies' = [finallies EXCEPT ![h] = Append(@, [node |-> r.path, layer |-> layer])]
@@ -311,7 +351,7 @@ RequestStep(h) ==
                  /\ UNCHANGED <<awaitsRan, finallies, deepest, pending>>
        /\ attemptCut' = (attemptCut \/ (r.state = "attempt" /\ h = 1 /\ aborted = "dispose" /\ Mutant # "DisposedAttemptSends"))
        /\ finallysRequestRouted' = (finallysRequestRouted \/ (r.state = "route" /\ h = 1 /\ aborted = "replace" /\ InFinally(below, "abort")))
-       /\ UNCHANGED <<writes, stopped, loaded, cutDefaultFinally, innerStopped, finallyEnded, cutInBranch>>
+       /\ UNCHANGED <<writes, stopped, loaded, cutDefaultFinally, innerStopped, finallyEnded, cutInBranch, erred>>
 
 RequestStates == {"defaultLoading", "loading", "attempt", "route", "finally", "defaultFinally", "after"}
 
@@ -322,15 +362,15 @@ Step(h) ==
     /\ \/ Top(h).k = "block" /\ Top(h).i <= Len(Top(h).body) /\ Statement(h)
        \/ Top(h).k = "block" /\ Top(h).i > Len(Top(h).body) /\ BlockEnds(h)
        \/ Top(h).k = "request" /\ Top(h).state \in RequestStates /\ RequestStep(h)
-    /\ UNCHANGED <<prog, defaultLoading, turn, aborted, abortNesting, cutInStep, escalated, keptInBranch>>
+    /\ UNCHANGED <<prog, defaultLoading, defaultFinally, turn, aborted, abortNesting, cutInStep, escalated, keptInBranch>>
     /\ LET returned == h = 1 /\ newRun = "due" /\ status'[1] # "running"
        IN /\ newRun' = IF returned THEN "begun" ELSE newRun
           /\ owed' = IF returned THEN {} ELSE owed
           /\ early' = (early \/ (returned /\ owed # {} /\ ~Begun(owed, finallies'[1])))
 
-quiet == <<prog, defaultLoading, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort, ranWhilePending, pending, loaded,
+quiet == <<prog, defaultLoading, defaultFinally, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort, ranWhilePending, pending, loaded,
            finallies, held, aborted, cutDefaultFinally, abortNesting, deepest, innerStopped, finallyEnded, cutInStep, escalated,
-           keptInBranch, cutInBranch, attemptCut, finallysRequestRouted, newRun, owed, early>>
+           keptInBranch, cutInBranch, attemptCut, finallysRequestRouted, newRun, owed, early, erred>>
 
 Begin(h, t) ==
     /\ status' = [status EXCEPT ![h] = "running"]
@@ -396,9 +436,9 @@ Abort(cause) ==
           /\ keptInBranch' = (keptInBranch \/ (keepsWaiting /\ t.role = "branch"))
     /\ aborted' = cause
     /\ escalated' = (escalated \/ aborted = "replace")
-    /\ UNCHANGED <<prog, defaultLoading, turn, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort, ranWhilePending,
+    /\ UNCHANGED <<prog, defaultLoading, defaultFinally, turn, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort, ranWhilePending,
                    pending, loaded, finallies, held, deepest, innerStopped, finallyEnded, cutInStep, cutInBranch, attemptCut,
-                   finallysRequestRouted, newRun, owed, early>>
+                   finallysRequestRouted, newRun, owed, early, erred>>
 
 CutInItsStep(cause) ==
     /\ status[1] = "running"
@@ -419,9 +459,9 @@ CutInItsStep(cause) ==
     /\ aborted' = cause
     /\ cutInStep' = TRUE
     /\ escalated' = (escalated \/ aborted = "replace")
-    /\ UNCHANGED <<prog, defaultLoading, turn, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort, ranWhilePending,
+    /\ UNCHANGED <<prog, defaultLoading, defaultFinally, turn, writes, awaitsRan, stopped, ranAfterStop, ranAfterAbort, ranWhilePending,
                    pending, loaded, finallies, held, cutDefaultFinally, abortNesting, deepest, innerStopped, finallyEnded,
-                   keptInBranch, cutInBranch, attemptCut, finallysRequestRouted>>
+                   keptInBranch, cutInBranch, attemptCut, finallysRequestRouted, erred>>
 
 Next ==
     \/ Fire \/ FirstReturns \/ SecondReturns \/ VendorReads
@@ -463,6 +503,15 @@ ReleasedWhenEnded == \A h \in Handlers : status[h] = "ended" => held[h] = 0
 
 DisposedRunNeverWaits == aborted = "dispose" => status[1] # "waiting"
 
+RunningHasADriver == \A h \in Handlers : status[h] = "running" => active = h
+
+StandsAfter(error, step) == \E k \in 1..Len(error) : /\ k % 2 = 1
+                                                       /\ Len(step) >= k
+                                                       /\ SubSeq(step, 1, k - 1) = SubSeq(error, 1, k - 1)
+                                                       /\ step[k] > error[k]
+
+NothingRunsAfterAnError == \A e \in erred : ~\E w \in writes : w.h = e.h /\ StandsAfter(e.path, w.path)
+
 ReachAwaitDeepInARoute == deepest < 5
 
 ReachStopInAnInnerRoute == ~(innerStopped /\ \E h \in Handlers : status[h] = "ended" /\ Len(finallies[h]) = 4)
@@ -489,5 +538,14 @@ ReachDisposeCutsAFinallysBranch == ~(cutInBranch /\ status[1] = "ended")
 ReachFinallysRequestRoutesUnderReplace == ~(finallysRequestRouted /\ status[1] = "ended")
 
 ReachDisposedAttemptCut == ~(attemptCut /\ status[1] = "ended")
+
+ReachErrorInAFinally == ~(/\ \A role \in FinallyRoles : \E e \in erred : e.role = role /\ e.cut = "no"
+                          /\ ~\E w \in writes : w.h = 1 /\ w.role \in FinallyRoles
+                          /\ aborted = "no"
+                          /\ status[1] = "ended")
+
+ReachErrorUnderAReplace == ~((\E e \in erred : e.cut = "replace") /\ aborted = "replace" /\ newRun = "begun" /\ status[1] = "ended")
+
+ReachErrorUnderADispose == ~((\E e \in erred : e.cut = "dispose") /\ cutInStep /\ status[1] = "ended")
 
 ====

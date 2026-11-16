@@ -464,6 +464,10 @@ public static class Promises
         public const string X11_2_0 = "M17.F1 X11.2 0";
         [Holds(RunGate.Settle)]
         public const string X11_4_0 = "M17.F1 X11.4 0";
+        [Holds(LanesGate.Respond)]
+        public const string X11_25_0 = "M17.F1 X11.25 0";
+        [Holds(LanesGate.Respond)]
+        public const string X11_25_1 = "M17.F1 X11.25 1";
         [Holds(CompositionGate.Answer)]
         public const string X11_5_0 = "M17.F1 X11.5 0";
         public const string X11_8_0 = "M17.F1 X11.8 0";

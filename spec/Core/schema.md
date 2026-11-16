@@ -227,6 +227,12 @@ and in the blocks inside it, and nowhere else.
 | `listen` | `event`: the event's JavaScript name; `listen`: a vendor listening (a payload's object has no element for a vendor's `locate`); `release`: a listen release; `payload`: a path into the listener's arguments; `members`, as a handler's; `policy`; `payloadName`, `argumentsName`: the names the block binds them under | `object`: an expression; `do`: a block | listen to the event of the live object the expression reads, once per object and statement, for the owner of the plan; run the block on each raise, with the payload and the arguments bound under their names, in the scope of the block that holds the statement (D12.8) |
 | `stop` | `reason`: text C# wrote | | stop the pipeline: run none of its later statements, log the reason; each `request` it is inside runs its layers' `finally` blocks whose `whileLoading` completed, the innermost request's first, and nothing else (D10.23, N4.1) |
 
+A statement whose step throws an error that is no stop (a method, a setter or a getter of a component or a plugin, a
+DOM or browser API) ends its pipeline as `stop` does and logs the error once: none of the pipeline's later statements
+runs, and each `request` it is inside runs its layers' `finally` blocks whose `whileLoading` completed, the innermost
+request's first, with none of the later statements of a `finally` block the error stood in (D4.8, D10.23). The grammar
+carries nothing for it: no kind and no field names an error.
+
 A request's parts are closed (D10.23, S2):
 
 | Part | Carries | Holds |
@@ -259,7 +265,7 @@ A listen release says when release removes the listener the step added (D12.8):
 | `as` | | `expr`: an expression; `shape`: a shape that converts | the one conversion by `spec/Core/conversions.md` (D3.2, D3.4); a value the shape cannot hold reads nothing (D3.3) |
 | `call` | `path`; `members`: `required`, `optional`, `requiredIfHeld` or `optionalMember`, as `get` reads them | `target`, `args`: expressions | call the method at the path; a promise where a value is declared stops the pipeline (D4.3). Under `optional` and `optionalMember` a method the holder holds as undefined is absent and runs nothing, as `?` types it (D5.3). An empty path calls the target itself, applied with `this` undefined, and a target that is no function stops the pipeline (D17.14) |
 | `fn` | `params`: names | `body`: an expression | a function the framework calls, whose parameters are bound in its body: a list operation's item read, a sort's comparison, a vendor's locate |
-| `answer` | `arguments`: a name | `body`: an expression | the function a vendor calls for an answer, set into a property or passed as an argument: each call binds the list of its arguments to the name and answers its body's value, and a stop its body raises is thrown to the vendor's call (D17.12) |
+| `answer` | `arguments`: a name | `body`: an expression | the function a vendor calls for an answer, set into a property or passed as an argument: each call binds the list of its arguments to the name and answers its body's value, and a stop its body raises, or an error it throws, is thrown to the vendor's call (D17.12) |
 | `record` | | `fields`: a list of `RecordField` | an object built member by member (D7.4) |
 | `list` | | `items`: expressions | a list built from sources (N7.2), or the parts of a joined text (N7.7) |
 | `op` | `op`: an operator | `args`: expressions | the operator over its arguments; `and`, `or` and `cond` evaluate a term only when it is reached (D4.7); a comparison over an argument that reads nothing reads nothing, null compares as .NET's lifted operators compare it, and `not`, `and` and `or` are SQL's three-valued logic with nothing as its unknown (D8.9) |

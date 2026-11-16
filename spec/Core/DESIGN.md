@@ -444,7 +444,14 @@ Terms used throughout:
   nothing writes null (D4.5).
 - D4.8 A stop ends its own handler only. Other handlers, and the other blocks of a `Parallel`, run on (Q10). A stop
   never reaches the vendor that raised the event: its listener returns, and the vendor goes on with the work it does
-  after its listeners.
+  after its listeners. An error a step throws that is no stop (a method, a setter or a getter of a component or a
+  plugin that throws, a DOM or browser API that throws) is logged once, with the value thrown, and ends its own
+  handler or `Parallel` branch as a stop does: its frames unwind, each `Finally` layer it owes, one whose
+  `WhileLoading` completed, runs, and its run ends. No step of the handler runs after the error
+  (`Run.tla:NothingRunsAfterAnError`, `Lanes.tla:ErrorRunsNothingAfter`), and no run is left running with no driver in
+  it (`Run.tla:RunningHasADriver`). Other handlers, other branches and the vendor go on, and the handler runs again at
+  its next raise, under `skip` and under `replace` (X11.25). An error in a `Finally` ends that layer's remaining steps
+  and unwinds the layers still owed, each to its first awaited step under a dispose (D11.8).
 
 **Schema nodes.** `get`, `call`, `set` with `members`; `data` with its steps; `do` and `let` with `await`; `request`; `op`
 (`and`, `or`, `cond`, `coalesce`); the new statement `stop`.
@@ -2338,7 +2345,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   `WhileLoading` completed (`Run.tla:InnerFinallyFirst`, `Run.tla:FinallyRunsOnce`, `Run.tla:FinallyRunsWhenLoaded`,
   `Run.tla:FinallyOnlyWhenLoaded`). A request in a `Parallel` branch runs in that branch's block of `all`
   (`Lanes.tla:JoinAfterEveryBranchTail`). Every busy target a request held is released by the time its run ends,
-  aborted or disposed (`Run.tla:ReleasedWhenEnded`).
+  aborted or disposed (`Run.tla:ReleasedWhenEnded`). An error a step throws ends its state as the stop column states
+  for a stop, in every row (D4.8): in `finally` and in `defaultFinally` none of the layer's later steps runs
+  (`Run.tla:NothingRunsAfterAnError`), the layers still owed run, and the release follows.
 
 **Schema nodes.** `request`, its routes and its layers (D10.23), `get` of `status`, `outcome`, `body` and `request` on
 the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the reply, `HttpResponse`, with the fields
@@ -2763,16 +2772,21 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     file; an MVC 5 view is compiled where it first renders, so it stays the verify-net48 run's.
 - D11.11 A pipeline runs as one run, a state machine (`spec/Execution/Run.tla`). Its frames are the blocks and requests
   in progress, innermost last, and its status is running, waiting or ended. Only the run's driver continues on a
-  promise, in one place, its wait: a step completes, opens a frame, waits on one promise or stops, and the driver runs
-  steps in the trigger's turn until one waits. So a run with no awaited step ends in that turn, the second handler of
-  an event starts in it (`Run.tla:SyncRunEndsInItsTurn`, `Run.tla:SecondHandlerStartsInTheTurn`), and while a frame
-  waits no frame around it runs (`Run.tla:NothingRunsWhileItWaits`). A call that returns a promise its declaration
-  does not await stops its step, which handles that promise's rejection and continues nothing on it (D4.3, D4.4).
+  promise, in one place, its wait: a step completes, opens a frame, waits on one promise, stops or throws, and the
+  driver runs steps in the trigger's turn until one waits. So a run with no awaited step ends in that turn, the second
+  handler of an event starts in it (`Run.tla:SyncRunEndsInItsTurn`, `Run.tla:SecondHandlerStartsInTheTurn`), and while
+  a frame waits no frame around it runs (`Run.tla:NothingRunsWhileItWaits`). A call that returns a promise its
+  declaration does not await stops its step, which handles that promise's rejection and continues nothing on it (D4.3,
+  D4.4).
   - The C# refuses each payload write the run would make after the vendor's turn, by the path the run takes: a
     request waits at its send, its `WhileLoading` runs after the defaults' `WhileLoading`, and the steps after an `if`
     run after any branch's wait (D11.4, `Run.tla:WritesAfterTheTurnAreRefused`).
   - A stop unwinds the frames innermost first, and each request frame on the way runs its `Finally` layers as frames
-    of their own (D10.23, `Run.tla:NothingRunsAfterAStop`).
+    of their own (D10.23, `Run.tla:NothingRunsAfterAStop`). An error a step throws that is no stop unwinds the same
+    way from the step that threw (D4.8): the driver keeps the error inside the run, records the stopped completion and
+    goes on through the layers owed to the run's end, so a run that is running is the one its driver is in
+    (`Run.tla:RunningHasADriver`), and no later step of a block the error stood in runs, a `Finally` layer's own later
+    steps among them (`Run.tla:NothingRunsAfterAnError`).
   - An abort, by `replace` (D11.7) or a dispose (D11.8), unwinds the same way from the wait it lands on and runs no
     route outside a `Finally` (`Run.tla:NothingRunsAfterAnAbort`). Under `replace`, a run waiting anywhere inside a
     `Finally` (in its branch, or in a request inside it) goes on to that `Finally`'s end, that request's route included
@@ -2782,14 +2796,14 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   - An abort the run's own step causes lands when that step returns, before the next (`Run.tla:NothingRunsAfterAnAbort`):
     a step that loads or unloads the slot its owner holds, whose release waits for that return (D12.4), and a step
     that raises its handler's own event under `replace`. The new run starts after the old run's cut has landed and its
-    `Finally` layers have run to their first awaited step, as when a `replace` lands on a wait
-    (`Run.tla:TheOldFinallyRunsBeforeTheNewRun`), so what an old `Finally` does before an await never undoes what
-    the new run's `WhileLoading` shows. What it does after an await runs after that `WhileLoading`, since under
-    `replace` it goes on to its end (X11.22): an element an app shows in
-    `WhileLoading` and hides in `Finally` after an await is hidden by the old run while the new one loads, and the
-    door for that is the busy indicator, which the core counts per target (D10.21, `spec/RequestsAndResponses/Composition.tla`). A
-    hide before the old `Finally`'s first await runs before the new run starts. Neither TLA+ spec models the second
-    run, so the order is X11.24's, a Playwright promise of the rewrite's run unit.
+    `Finally` layers have run to their first awaited step, or to an error one of them throws, as when a `replace`
+    lands on a wait (`Run.tla:TheOldFinallyRunsBeforeTheNewRun`), so what an old `Finally` does before an await never
+    undoes what the new run's `WhileLoading` shows. What it does after an await runs after that `WhileLoading`, since
+    under `replace` it goes on to its end (X11.22): an element an app shows in `WhileLoading` and hides in `Finally`
+    after an await is hidden by the old run while the new one loads, and the door for that is the busy indicator,
+    which the core counts per target (D10.21, `spec/RequestsAndResponses/Composition.tla`). A hide before the old
+    `Finally`'s first await runs before the new run starts. Neither TLA+ spec models the second run, so the order is
+    X11.24's, a Playwright promise of the rewrite's run unit.
   - `all` ends when each of its blocks ended (D10.10, `Lanes.tla:JoinAfterEveryBranchTail`).
 - D11.12 The core's state machines are closed, each held in one place, its transitions its TLA+ spec's actions:
   - a run (D11.11, `spec/Execution/Run.tla`), under its handler's policy and its owner's dispose (`spec/Execution/Lanes.tla`);
@@ -2798,8 +2812,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   - a connection (Q21, `spec/Realtime/Realtime.tla`);
   - a busy target's count (D10.21, `spec/RequestsAndResponses/Composition.tla`).
   Each machine's states have one set of names, which every spec and the runtime's types use:
-  - a run is `idle`, `running`, `waiting` or `ended`, and ends completed, stopped, replaced or disposed (D20.6); a
-    trigger the `skip` policy refuses leaves its run `idle` (D11.7);
+  - a run is `idle`, `running`, `waiting` or `ended`, and ends completed, stopped, replaced or disposed (D20.6),
+    stopped by a stop and by an error a step throws alike (D4.8); a trigger the `skip` policy refuses leaves its run
+    `idle` (D11.7);
   - a request is `idle`, then in D10.23's states, and `done` however it ended;
   - how a request's body ended is its completion, `completed`, `stopped` or `aborted`, as ECMA-262's completion record
     carries how a `try` block ended into its `finally`. It is one closed value, carried by `finally`, `defaultFinally`
@@ -2814,8 +2829,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
     states that change nothing it checks. So `Composition.tla`, `Realtime.tla` and `Ownership.tla` step from `idle`
     to `attempt`, a run's wait at `attempt` is `Tracing.tla`'s `waiting`, and a route waiting on its tail is
     `Lanes.tla`'s `route`. `Run.tla` names a layer's state whose block is open by the state and `Running`
-    (`routeRunning`) and keeps of a frame's completion the one fact its steps read, `abrupt`, a stop's or an abort's;
-    `Request.tla`, which models no abort, keeps `stopped`.
+    (`routeRunning`) and keeps of a frame's completion the one fact its steps read, `abrupt`, a stop's, an error's or
+    an abort's; `Request.tla`, which models no abort, keeps `stopped`, and `Lanes.tla` keeps `stopped` of a handler
+    whose route threw, whose `Finally` then ends its run with no step after it (`Lanes.tla:ErrorRunsNothingAfter`).
   Nothing else holds state across a turn: a step reads the page when it runs (D10.18), a listener is a removal its
   owner holds, a plan's boot is one pass, and the C# writer's position is its stack of open blocks, each with its stage
   and whether a step before it awaited (D11.4).
@@ -2832,6 +2848,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `Lanes.tla:AllSettledAfterEveryRequest`
 - `Lanes.tla:BranchStopEndsOnlyItself`
 - `Lanes.tla:JoinAfterEveryBranchTail`
+- `Lanes.tla:ErrorRunsNothingAfter`
 - `Run.tla:WritesAfterTheTurnAreRefused`
 - `Run.tla:NothingRunsWhileItWaits`
 - `Run.tla:SyncRunEndsInItsTurn`
@@ -2846,6 +2863,8 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `Run.tla:DisposedRunNeverWaits`
 - `Run.tla:ReplacedFinallyGoesOn`
 - `Run.tla:TheOldFinallyRunsBeforeTheNewRun`
+- `Run.tla:RunningHasADriver`
+- `Run.tla:NothingRunsAfterAnError`
 - `Ownership.tla:HandlersHearInTheOrderTheySubscribed`
 - `probe:abort-signal-keeps-first-reason`
 - `probe:fetch-aborted-signal-sends-nothing`
@@ -2952,6 +2971,9 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
   route rings the same bell on round 1 and whose `Finally` logs "finally" and the round, then logs "after" and the
   round: the log reads "rang 1 finally 1 rang 2 finally 2 after 2", the old run's `Finally` before the new run's first
   step and no step after the old request (`Run.tla:NothingRunsAfterAnAbort`).
+- `X11.25` behavior (D4.8, D11.7): a route calls a method that throws, an item at a position its holder lacks: the
+  console holds that one error, the request's `Finally` runs and its busy target hides, and the handler's next raise
+  runs it again, under `skip` and under `replace` (`Run.tla:RunningHasADriver`, `Run.tla:FinallyRunsWhenLoaded`).
 - `X11.17` analyzer (D11.10): C#'s own branching (`if`, `?:`, `switch`, `try`, `return`) in any block: ALIS004,
   new:N18.6.
 
@@ -4439,12 +4461,14 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
   returns the result to the vendor in its turn. A method that takes a callback declares the argument with
   `Answer(key)`, so `chart.SortTicks(tick => tick.Doses)` passes the function the same way. A body is an expression
   with no steps: a step written inside it is refused where the view renders, and so is an awaited read, since the
-  body cannot wait. A method's result read in a body is its call, run on each call of the body (D5.11). A body
-  that stops gives its vendor no value, so the stop is thrown to the vendor's call: a step whose write or call
-  made the vendor ask stops its pipeline there, and a vendor that asks in its own turn receives the stop as the
-  error its call throws. An event's listener owes its vendor nothing, so D4.8 keeps its stop from the vendor; an
-  answer owes it the value, and no value is the plan's to invent. A callback that only reacts is an event, listened
-  to by a method pair, an assignment or a returned unsubscriber (D17.3), and runs a pipeline as any handler does.
+  body cannot wait. A method's result read in a body is its call, run on each call of the body (D5.11). A body that
+  stops or throws gives its vendor no value, so the stop or the error is thrown to the vendor's call: a step whose
+  write or call made the vendor ask ends its pipeline there, by a stop as a stop does and by an error as D4.8 ends a
+  step that throws (`Run.tla:RunningHasADriver`, `Run.tla:NothingRunsAfterAnError`), and a vendor that asks in its own
+  turn receives the stop, or the error, as the error its call throws. An event's listener owes its vendor nothing, so
+  D4.8 keeps its stop and its error from the vendor; an answer owes it the value, and no value is the plan's to
+  invent. A callback that only reacts is an event, listened to by a method pair, an assignment or a returned
+  unsubscriber (D17.3), and runs a pipeline as any handler does.
 - D17.13 A render helper starts its component in the state the model gives it, written as the plan writes a literal.
   `field.ValueJson` is the member's value, read through MVC with no compile and written by the plan's one literal
   writer in the live form (D7.7), `"null"` when a holder on the way holds nothing; `field.Json(options)` writes the
