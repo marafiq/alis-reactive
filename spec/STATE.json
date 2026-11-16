@@ -24,12 +24,12 @@
     },
     "bindings": {
       "counts": {
-        "constants": 596,
+        "constants": 597,
         "gates": 73,
         "marks": 60,
         "problems": 0
       },
-      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 596 constants, 60 of a held gate marked on them, each as the spec writes it",
+      "detail": "Gates.g.cs holds 73 gates and Promises.g.cs 597 constants, 60 of a held gate marked on them, each as the spec writes it",
       "pass": true
     },
     "carriers": {
@@ -1554,10 +1554,10 @@
     },
     "native_behaviors": {
       "counts": {
-        "behaviors": 42,
+        "behaviors": 49,
         "problems": 0
       },
-      "detail": "42 behaviors on 11 declarations of native.json, each naming tests of the spec",
+      "detail": "49 behaviors on 11 declarations of native.json, each naming tests of the spec",
       "pass": true
     },
     "no_comments": {
@@ -1596,7 +1596,7 @@
         "unrefused": 0
       },
       "detail": "247 refused plants caught and 86 accepted plants kept green; 39 of 39 checks proven both ways",
-      "digest": "ae00be37d64421c21b4a11c32588118cd97cd1f5a23cd7334791f87908a73d5e",
+      "digest": "b4898d1564a1330b7f451433394c9471c1171edbe24ece68a62b66a754411065",
       "pass": true
     },
     "probes": {
@@ -4182,11 +4182,11 @@
     },
     "unit_proofs": {
       "counts": {
-        "harness_tests": 9,
+        "harness_tests": 10,
         "problems": 0,
         "units": 27
       },
-      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 52m 3h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 16m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 17a, U18 66b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 51b 14m 1a, U22 7b 4m, U23 145b, U24 27b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
+      "detail": "each of 27 units proves something, as browser tests (b), the nodes its core features write, which its module tests read (m), analyzer cases (a) or harness tests (h): U1 6a, U2 3h, U3 1b 52m 3h, U4 1b 18m 3a, U5 1b 20m 2a, U6 9m, U7 10m 1a, U8 2b 16m, U9 2b 16m 2a, U10 5b 16m 10a, U11 16b 22m 24a 2h, U12 15m 2a, U13 98b 17m 23a, U14 6b 15m 2a, U15 29b 12m 1a 1h, U16 13m 4a, U17 21m 17a, U18 66b 17m 9a, U19 18b 15m, U20 8b 20m 3a, U21 51b 14m 1a 1h, U22 7b 4m, U23 145b, U24 27b 1a, U25 32b 1a, U26 69b 35a, U27 3b",
       "pass": true
     },
     "verdicts": {
@@ -4204,7 +4204,7 @@
     }
   },
   "passed": 40,
-  "read_at_head": "f84f3e338536e427088f53f8cc5cffb04f592f2d",
+  "read_at_head": "615fe9e07b01100b6cd1e7ad76a7cf44475ad6c9",
   "step": {
     "failing": [],
     "name": "End of session",
