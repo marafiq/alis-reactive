@@ -31,8 +31,8 @@ behavior when it turns green, and then fails on its planted defect (`scripts/pla
   own instance, and carries no `[Category]` of its own
   (`Validation/Admission/WhenARoomNumberIsCheckedByItsPattern.cs`). A case with JavaScript off opens its page by
   `NewPersonWithJavaScriptOff`, a person's context with no world.
-- A test names the server's culture in its page's address, a constant of the world contract, and the browser's
-  locale stays "en-US"; a culture's opposite case opens a second world at the other culture's address
+- A test names the server's culture and time zone in its page's address, a constant of the world contract, and the
+  browser's locale stays "en-US"; a culture's opposite case opens a second world at the other culture's address
   (`ArrayLambdas/Refusals/WhenATextKeyIsOrderedUnderAnAlternateSort.cs`).
 - A refusal where the view renders is read as its developer reads it: the heading of the page ASP.NET shows for
   an exception, the exception's name, a colon and the whole message, found by its role and its exact name.

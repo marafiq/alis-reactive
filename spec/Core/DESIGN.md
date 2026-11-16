@@ -349,7 +349,8 @@ Terms used throughout:
   by C# where the view renders, with the endpoint host's number styles per .NET type.
 - `N3.5` new: the view's time zone, the app's choice per request (D3.12), one door on both hosts that takes a
   `TimeZoneInfo`; C# writes its IANA id into the plan, through .NET on net10 and through the CLDR table
-  generated once on net48. Its door's form goes to gate 2.
+  generated once on net48. Its door is `RequestTimeZone.RendersUnder` on each host's request context, which keeps
+  the zone for that request's views (the lead, 2026-11-16, in spec/CLAUDE.md).
 
 **Evidence.**
 - B4: two conversions, `Alis.Reactive/Grammar/Operator.cs:27-30` and `Alis.Reactive.Assets/runtime/grammar/evaluate.ts:112-115`;

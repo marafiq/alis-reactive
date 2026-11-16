@@ -15,8 +15,9 @@ references no Alis.Reactive assembly, so a test that compiles against it cannot 
   endpoint, and `RestartOrder.cs` the id of the element whose component the host restarts; a bench cell's page is
   named for its cell in a part of `BenchPages` for its family (`BenchPages.Properties.cs`), and an endpoint its page calls in `BenchEndpoints.cs`; a refusal route's page is named in `RefusalPages.cs`, under the
   area's root that file names, by which the sweep of the app's pages knows a page that refuses by design.
-- A page's culture is part of its address, never world state: `RefusalPages.ArrayLambdas.Culture.cs` names the carer
-  directory under the German phonebook sort and under German, one route with two queries.
+- A page's culture and time zone are part of its address, never world state: `RefusalPages.ArrayLambdas.Culture.cs`
+  names the carer directory under the German phonebook sort and under German, one route with two queries, and
+  `CarePages.Record.TimeZones.cs` the visit board under New York.
 - It compiles for `net48` and `net10.0`, since the twin serves the same world.
 
 ```bash

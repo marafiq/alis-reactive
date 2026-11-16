@@ -28,6 +28,10 @@ its views.
   the invariant culture "". Each request names its own, a slot's load and a form's send among them; the world's seed
   and the browser's locale choose none. Invariant globalization mode is a process setting the query cannot reach, and
   no host of `spec/Reference/app.json` runs it.
+- A request names the time zone the app renders it under in its query "zone": "America/New_York" or
+  "Asia/Kolkata". A request with none chooses none, so its plans show and send each instant on the browser's
+  clock, and one that names another, or two, answers 400. `RequestZones.cs` chooses it by
+  `RequestTimeZone.RendersUnder` before MVC reads the request; each request names its own, a slot's load among them.
 - The World area (`World/`) scopes data, gates and caches to a test's world by the cookie `"world"`, in Development
   alone. A document's request that carries no world gets a new one, so a person runs the app as a test does; any
   other request with no world gets none. Its host endpoints stand for a component's host (`World/HostOrders.cs`):

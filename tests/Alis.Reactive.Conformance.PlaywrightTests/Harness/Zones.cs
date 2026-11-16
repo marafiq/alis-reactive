@@ -6,5 +6,7 @@ public static class Zones
 
     public const string Kolkata = "Asia/Kolkata";
 
+    public const string Utc = "UTC";
+
     internal const string LosAngeles = "America/Los_Angeles";
 }

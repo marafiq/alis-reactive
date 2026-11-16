@@ -162,7 +162,8 @@ tests/
                                               WhenAConsumerAppIsBuilt (section 2.9), and over the runner's selection
                                               and result WhenAPlaywrightRunStarts and WhenAPlaywrightRunEnds (section
                                               2.5), over the reader of the doors a test's pages call
-                                              WhenAPagesDoorsAreRead (section 4), over the lint's rules
+                                              WhenAPagesDoorsAreRead (section 4), over the net48 time zone table
+                                              WhenTheWindowsZoneTableIsWritten (section 2.7), over the lint's rules
                                               WhenTheLintIsConfigured (section 2.7), and over the shipped packages
                                               and their slice tables WhenAPackageShips (M20.D1), each rule with its
                                               refused and accepted cases, which WhenAnArchitectureTestIsWritten holds; over
@@ -509,7 +510,8 @@ runtime, and landed in U3: the import rows with the runtime's first row, and the
 that finds a root's plans, `runtime/Execution/plan-scripts.ts`, the one file it is lifted in. The pure tests' import rule
 is landed with its refused and accepted files, before U3 writes the first of them.
 
-Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; `npm audit`; the Syncfusion pin's
+Scripts: `scripts/check.sh` (the contract regenerated and diffed, from U3 on; the net48 time zone table written by
+`scripts/windows-zones.cs` from CLDR's windowsZones.xml at its pin and diffed, from U6 on; `npm audit`; the Syncfusion pin's
 agreement in NuGet, npm and the lock; `tsc -b`; eslint; vitest over the runtime's pure tests; the browser bundle, `node build.mjs`; a locked `dotnet restore`; `dotnet build -c Release`;
 the doors each browser test's pages call, written from that build by `scripts/page-doors.cs` and diffed with the
 tracked table;

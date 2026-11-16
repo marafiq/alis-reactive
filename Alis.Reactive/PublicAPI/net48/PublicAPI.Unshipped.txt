@@ -176,6 +176,7 @@ Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>
 Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>.Dispose() -> void
 Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>.Form.get -> Alis.Reactive.RequestsAndResponses.RequestForm<TModel>!
 Alis.Reactive.RenderingAndDelivery.RequestServices
+Alis.Reactive.RenderingAndDelivery.RequestTimeZone
 Alis.Reactive.RenderingAndDelivery.Rows<TModel, TRow>
 Alis.Reactive.RenderingAndDelivery.TracingServices
 Alis.Reactive.RenderingAndDelivery.ValidateAntiForgeryHeaderAttribute
@@ -797,6 +798,7 @@ static Alis.Reactive.RenderingAndDelivery.PlanHtml.RenderPlan<TModel>(this Syste
 static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestContainer<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestContainerBlock<TModel>!
 static Alis.Reactive.RenderingAndDelivery.RequestBlocks.BeginRequestForm<TModel>(this System.Web.Mvc.HtmlHelper<TModel>! html, Alis.Reactive.RenderingAndDelivery.ReactivePlan<TModel>! plan, string! containerId) -> Alis.Reactive.RenderingAndDelivery.RequestFormBlock<TModel>!
 static Alis.Reactive.RenderingAndDelivery.RequestServices.AddReactiveRequests(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.TriggersAndPipelines.RequestDefaults!>! requests) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Alis.Reactive.RenderingAndDelivery.RequestTimeZone.RendersUnder(this System.Web.HttpContextBase! context, System.TimeZoneInfo! timeZone) -> void
 static Alis.Reactive.RenderingAndDelivery.TracingServices.AddReactiveTracing(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Tracing.ReactiveTracing!>! tracing) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RenderingAndDelivery.ValidationServices.AddReactiveFluentValidation(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Alis.Reactive.Validation.ReactiveFluentValidationBuilder!>! validators) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
 static Alis.Reactive.RequestsAndResponses.Content.File.get -> Alis.Reactive.RequestsAndResponses.SuccessContent<Alis.Reactive.RequestsAndResponses.ResponseFile!>!

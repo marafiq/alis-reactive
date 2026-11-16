@@ -605,12 +605,12 @@
     },
     {
       "id": "cldr-windows-zone-default",
-      "statement": "CLDR release-48 maps each Windows time zone id to its default IANA zone, territory 001, 139 zones; the net48 table is generated once from it.",
+      "statement": "CLDR release-49 maps each Windows time zone id to its default IANA zone, territory 001, 142 zones; the net48 table is generated from it at its pin by scripts/windows-zones.cs.",
       "host": "net48",
-      "oracle": "Unicode CLDR release-48, common/supplemental/windowsZones.xml",
+      "oracle": "Unicode CLDR release-49, common/supplemental/windowsZones.xml at 96e54b273d2da4ec6fbad350ba19ff23fa24a588, SHA-256 in spec/probes/cldr/windowsZones.lock",
       "probe": "spec/probes/cldr/windowsZones.xml.txt",
       "expect": "<mapZone other=\"Eastern Standard Time\" territory=\"001\" type=\"America/New_York\"/>",
-      "source": "spec/probes/cldr/windowsZones.xml.txt:130"
+      "source": "spec/probes/cldr/windowsZones.xml.txt:141"
     },
     {
       "id": "core-partial-section-dropped",

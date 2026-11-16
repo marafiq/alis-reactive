@@ -10,18 +10,20 @@ Usage:
 
 Runs every check that needs no browser, in order, and stops at the first that fails:
   1. the plan contract, generated from the grammar and compared with the tracked plan.ts and plan.schema.json
-  2. npm ci when node_modules is missing, then npm audit
-  3. the Syncfusion pin's agreement in NuGet, npm and the lock
-  4. tsc -b over the runtime and conformance app, eslint with --max-warnings 0, vitest over the runtime's pure tests, then the browser bundle
-  5. dotnet restore in locked mode, then dotnet build -c Release, then the doors each browser test's pages call,
+  2. the net48 time zone table, written by scripts/windows-zones.cs from CLDR's windowsZones.xml at its pin and
+     compared with the tracked Alis.Reactive/PathsAndWire/WindowsZones.g.Net48.cs
+  3. npm ci when node_modules is missing, then npm audit
+  4. the Syncfusion pin's agreement in NuGet, npm and the lock
+  5. tsc -b over the runtime and conformance app, eslint with --max-warnings 0, vitest over the runtime's pure tests, then the browser bundle
+  6. dotnet restore in locked mode, then dotnet build -c Release, then the doors each browser test's pages call,
      written by scripts/page-doors.cs and compared with the tracked spec/Reference/page-doors.json
-  6. dotnet format --verify-no-changes over the solution
-  7. the architecture tests but WhenAConsumerAppIsBuilt, which scripts/delivery.sh runs on the packs,
+  7. dotnet format --verify-no-changes over the solution
+  8. the architecture tests but WhenAConsumerAppIsBuilt, which scripts/delivery.sh runs on the packs,
      the analyzer cases, the test rules' cases and the module tests
-  8. python3 spec/tools/check.py --ci, which reads JAVA_HOME and TLA2TOOLS_JAR
+  9. python3 spec/tools/check.py --ci, which reads JAVA_HOME and TLA2TOOLS_JAR
 
 Options:
-  --no-spec   Leave step 8 out: CI runs it as a job of its own.
+  --no-spec   Leave step 9 out: CI runs it as a job of its own.
   -h, --help  Show this help.
 USAGE
 }
@@ -44,6 +46,15 @@ dotnet run --project tools/PlanContractGenerator -c Release --property:RestoreLo
 git ls-files --error-unmatch "$contract/plan.ts" "$contract/plan.schema.json" > /dev/null
 if ! git diff --exit-code -- "$contract/plan.ts" "$contract/plan.schema.json"; then
   echo "[check] The grammar generates another contract than the tracked one: stage the plan.ts and plan.schema.json it wrote." >&2
+  exit 1
+fi
+
+zones=Alis.Reactive/PathsAndWire/WindowsZones.g.Net48.cs
+step "the net48 time zone table, generated from CLDR's windowsZones.xml at its pin"
+dotnet run scripts/windows-zones.cs -p:RestorePackagesWithLockFile=false -- spec/probes/cldr/windowsZones.xml.txt spec/probes/cldr/windowsZones.lock "$zones"
+git ls-files --error-unmatch "$zones" > /dev/null
+if ! git diff --exit-code -- "$zones"; then
+  echo "[check] CLDR's windowsZones.xml at its pin generates another table than the tracked one: stage the WindowsZones.g.Net48.cs it wrote." >&2
   exit 1
 fi
 

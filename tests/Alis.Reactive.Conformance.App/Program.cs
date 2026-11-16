@@ -29,6 +29,7 @@ public sealed class Program
 
         var app = builder.Build();
         app.UseRequestCultures();
+        app.UseRequestZones();
         if (app.Environment.IsDevelopment())
         {
             app.UseWorld();

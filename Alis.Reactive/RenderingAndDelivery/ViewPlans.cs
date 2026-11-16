@@ -10,6 +10,7 @@ using Alis.Reactive.Schema;
 using Alis.Reactive.Tracing;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.TypeKnowledge;
+using TimeZone = Alis.Reactive.Schema.TimeZone;
 
 namespace Alis.Reactive.RenderingAndDelivery;
 
@@ -18,11 +19,11 @@ internal static class ViewPlans
     private const string ScriptOpen = "<script type=\"application/json\" data-reactive-plan>";
     private const string ScriptClose = "</script>";
 
-    internal static ReactivePlan<TModel> Open<TModel>(AppJson json, Func<string> prefix, Func<string, string> fullName, Func<string, string> id, Func<string> view, Func<Type, bool> namesFlags,
+    internal static ReactivePlan<TModel> Open<TModel>(TimeZone timeZone, AppJson json, Func<string> prefix, Func<string, string> fullName, Func<string, string> id, Func<string> view, Func<Type, bool> namesFlags,
         Func<IServiceProvider> services, Func<PageAntiforgery> antiforgery, Func<string> pathBase)
     {
         var startPrefix = prefix();
-        var content = new PlanContent(IdOf<TModel>(), CultureInfo.CurrentCulture, ClockTimeZone.Instance, json, text =>
+        var content = new PlanContent(IdOf<TModel>(), CultureInfo.CurrentCulture, timeZone, json, text =>
         {
             var now = prefix();
             var name = fullName(text);

@@ -4630,7 +4630,8 @@
       "index": 0,
       "screen": "record",
       "hosts": [
-        "net10"
+        "net10",
+        "net48"
       ],
       "parts": [
         "tabSlot",

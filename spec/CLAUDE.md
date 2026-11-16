@@ -1767,6 +1767,16 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   their own that maps the AlisReactive ids to the packs' folder and keeps the restored packages under the app's own
   obj folder, beside an empty `Directory.Build.targets`; the twin's resolver wraps the one MVC starts with;
   verify-net48 sets the runner's zone to UTC before the twin starts. The owner can overrule each.
+- The lead, 2026-11-16, deciding N3.5's door, a form the line of 2026-11-15 gives the lead, from a Fable designer's
+  work read at the source: `RequestTimeZone.RendersUnder` on the request's context, HttpContext on net10 and
+  HttpContextBase on net48, keeps the chosen TimeZoneInfo in the request's Items under a key of its own, and each
+  view's plan names that zone's IANA id where the view renders; a request that chooses none renders under the
+  browser's clock (D3.12). D14.1 refuses plan state carried between views on the request; the zone is the app's
+  choice for the request, as its culture is, which every view of the request reads and no view writes, so that line
+  does not reach it. A zone passed to each view would let a partial render under the clock where its argument is
+  left out. The net48 table is CLDR release-49's, pinned by its SHA-256 and written again by `scripts/check.sh`,
+  and README.md carries the Unicode License V3 notice. M18.X1's first promise runs under net10 and the twin, where
+  section 2.9 of spec/REWRITE.md places it. The owner can overrule it.
 - For this folder, the root rule against other gates, coverage maps, checklists and proof artifacts does
   not apply, and the matrices are an upfront grid by the owner's decision.
 - Facts here come from the code at a SHA, a command's result line, or an oracle's source. A pilot's or
