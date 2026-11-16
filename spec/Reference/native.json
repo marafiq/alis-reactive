@@ -217,6 +217,13 @@
           "csharp": "IsDestroyed"
         },
         {
+          "js": "firstPeerState",
+          "kind": "readOnly",
+          "ts": "readonly firstPeerState: string, alive while the first peer it built lives and collected once that peer was collected",
+          "door": "ReadOnly<string>",
+          "csharp": "FirstPeerState"
+        },
+        {
           "js": "writeOnlyText",
           "kind": "writeOnly",
           "ts": "set writeOnlyText(text: string)",
@@ -721,6 +728,25 @@
             "X12.7",
             "X7.7 #2"
           ]
+        },
+        {
+          "behavior": "Each call of removeEventListener on one of its objects adds one to the page's count of them, a destroyed object's call before it throws among them, and an object whose render helper names an element writes the count there as it is built and at each call; a destroy, by its Destroy button, the harness's restart or alis:unmount, calls no removeEventListener.",
+          "tests": [
+            "X12.13"
+          ]
+        },
+        {
+          "behavior": "The harness's restart destroys the object, which takes its peer with it, empties its element and builds a new object there from the element's start, as alis:mount built the first.",
+          "tests": [
+            "X12.13",
+            "lane.slot.hostDestroyed"
+          ]
+        },
+        {
+          "behavior": "It holds the first peer it built by a WeakRef beside its own hold of its peer, which Drop the peer lets go of, and FirstPeerState reads alive while that peer lives and collected once it was collected.",
+          "tests": [
+            "X12.18"
+          ]
         }
       ]
     },
@@ -1043,11 +1069,18 @@
           "door": "Event<SearchArgs>",
           "csharp": "OnSearch",
           "type": "SearchArgs"
+        },
+        {
+          "js": "append",
+          "kind": "method",
+          "ts": "append(text: string): void, adding the text after a space to the line its last raise wrote",
+          "door": "Method",
+          "csharp": "Append(Arg<string> text)"
         }
       ],
       "behaviors": [
         {
-          "behavior": "Its own code assigns onRaised a function that appends own to its log; its Raise room 7 button calls onRaised with the room 7, each call writing a new line; Make it throw makes its own function throw after it appends, and Check shows whether onRaised holds its own function.",
+          "behavior": "Its own code assigns onRaised a function that appends its own word to its log, own unless its render helper gives another, with a space and the object's generation after it where the helper asks, 1 for the object alis:mount builds and one more at each restart; its raise button, Raise room 7 unless the helper names it, calls onRaised with the room 7, each call writing a new line; Make it throw makes its own function throw after it appends.",
           "tests": [
             "X17.17",
             "X17.49",
@@ -1057,12 +1090,40 @@
           ]
         },
         {
-          "behavior": "Its log is a log named Log, each line a list item that holds the texts one Raise room 7 appends, parted by a space. Its search box is the search box Search, and show draws the names it is handed as the list Names, empty at its start. Check writes own or other into its Holds status, and a throw its Raise room 7 meets shows its message in its Error status.",
+          "behavior": "Its log is a log named Log, each line a list item that holds the texts one Raise room 7 appends, parted by a space. Its search box is the search box Search, and show draws the names it is handed as the list Names, empty at its start. Check writes into its Holds status own while onRaised holds its own function, script while it holds the function Replace the callback assigned, and other for any other value, and a throw its Raise room 7 meets shows its message in its Error status.",
           "tests": [
             "X17.12",
             "X17.17",
             "X17.49",
             "X17.50"
+          ]
+        },
+        {
+          "behavior": "Append adds its text, after a space, to the line the last raise wrote; a handler's pipeline calls it on the object its element holds when the step runs.",
+          "tests": [
+            "X17.49",
+            "X17.50",
+            "X17.51",
+            "X17.52"
+          ]
+        },
+        {
+          "behavior": "Replace the callback assigns onRaised a function of the object's own that appends script, as a page's script assigns one.",
+          "tests": [
+            "X17.50"
+          ]
+        },
+        {
+          "behavior": "Its freeze button, Freeze unless its render helper names it, freezes the object, which then refuses an assignment of onRaised; its destroy freezes it too, so a destroyed object refuses a put-back.",
+          "tests": [
+            "X17.51",
+            "X17.52"
+          ]
+        },
+        {
+          "behavior": "The harness's restart destroys the object, empties its element and builds a new object there from the element's start, one generation on, its log empty.",
+          "tests": [
+            "X17.52"
           ]
         }
       ]
@@ -3233,9 +3294,9 @@
       "promise": {
         "page": "The bench page whose card slot holds a ConformanceComponent, with Close card and Open card buttons; the harness's restart, standing for the component's host, destroys it and mounts a new one (Ownership.tla's HostDestroys).",
         "gesture": "Restart the component through the harness; click Close card, then Open card.",
-        "outcome": "The page's error line stays empty and the reopened card shows its component with the value a-1.",
-        "opposite": "Closing without a restart also leaves the error line empty.",
-        "defect": "The unload removes the listener from the destroyed component, whose element no longer holds it, so removeEventListener throws and the error line reads it.",
+        "outcome": "The console shows no error, and the reopened card shows its component with the value a-1.",
+        "opposite": "Closing without a restart also leaves the console without an error.",
+        "defect": "The unload removes the listener from the destroyed component, whose element no longer holds it, so removeEventListener throws and the console shows the error.",
         "observes": "Ownership.tla:HostDestroys"
       }
     },

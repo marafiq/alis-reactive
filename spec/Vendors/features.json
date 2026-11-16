@@ -689,11 +689,11 @@
         },
         {
           "for": "X12.18",
-          "page": "A page that renders the ConformanceComponent at the id conformance, whose button Raise raises its Raised event with a payload holding its peer, a ConformancePeer on an element of its own, and whose button Drop the peer removes that element and lets go of that peer; the page holds the first peer only by a WeakRef, and its button Check the first peer writes collected or alive into peer-state. Open the slot loads the slot holder, whose plan's Raised handler listens to the payload's peer's change, adding one to the page's tally and writing it into heard, an element outside the slot; Close the slot unloads it, after which the page writes closed into slot-state and any error the unload threw into slot-error.",
+          "page": "A page that renders the ConformanceComponent at the id conformance, whose button Raise raises its Raised event with a payload holding its peer, a ConformancePeer on an element of its own, and whose button Drop the peer removes that element and lets go of that peer; the component also holds the first peer it built by a WeakRef, which its FirstPeerState reads, and the page's button Check the first peer writes collected or alive into peer-state. Open the slot loads the slot holder, whose plan's Raised handler listens to the payload's peer's change, adding one to the page's tally and writing it into heard, an element outside the slot; Close the slot unloads it, after which the page writes closed into slot-state.",
           "gesture": "Click Open the slot, Raise and Drop the peer; force a garbage collection with Playwright's Page.RequestGCAsync; click Check the first peer; click Close the slot.",
-          "outcome": "peer-state reads collected before Close the slot; after it slot-state reads closed and slot-error stays empty.",
+          "outcome": "peer-state reads collected before Close the slot; after it slot-state reads closed and the console shows no error.",
           "opposite": "Without Drop the peer, peer-state reads alive after the collection, and after Close the slot a change of the peer leaves heard unchanged.",
-          "defect": "The listen step holds the peer strongly, so peer-state reads alive after the collection; or the unload calls the collected peer's removeEventListener, so slot-error shows the TypeError and slot-state stays empty.",
+          "defect": "The listen step holds the peer strongly, so peer-state reads alive after the collection; or the unload calls the collected peer's removeEventListener, so the console shows the TypeError and slot-state stays empty.",
           "observes": "Ownership.tla:Collect"
         }
       ],
@@ -952,9 +952,9 @@
           "for": "X12.13",
           "page": "The resident record, whose slot panel-card, loaded by Open the card and unloaded by Close the card, renders a ConformanceComponent; the card's plan has the component's Raised handler, which adds one to the page's tally and writes it into raised-heard, an element outside the slot. The component's button Raise raises Raised; every object's unsubscribe adds one to the page's count in off-calls, and a destroy, by its host or on alis:unmount, calls no unsubscribe. The harness's restart, standing for the component's host, destroys it and puts a new ConformanceComponent object on the same element (Ownership.tla's HostDestroys).",
           "gesture": "Click Open the card and Raise; restart the component through the harness; click Raise, then Close the card.",
-          "outcome": "raised-heard reads 1, and off-calls reads 0 after Close the card.",
-          "opposite": "Without the restart, Close the card writes 1 into off-calls.",
-          "defect": "The handler follows the element to the new object, so raised-heard reads 2; or the release calls the unsubscribe of the object the element holds now, so off-calls reads 1.",
+          "outcome": "raised-heard reads 1, off-calls reads 0 after Close the card, and the console shows no error.",
+          "opposite": "Without the restart, the second Raise writes 2 into raised-heard.",
+          "defect": "The handler follows the element to the new object, so raised-heard reads 2; or the release calls the unsubscribe of the destroyed object it listened to, so off-calls reads 1 and the console shows the error the destroyed object throws.",
           "observes": "Ownership.tla:HostDestroys"
         },
         {
