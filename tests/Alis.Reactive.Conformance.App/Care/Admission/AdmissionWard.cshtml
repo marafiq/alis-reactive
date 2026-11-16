@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Conformance.World
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model AdmissionWard
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admission ward";
+    var plan = Html.ReactivePlan<AdmissionWard>();
+}
+<h1>Admission ward</h1>
+@using (var admission = Html.BeginRequestForm(plan, "admission-ward"))
+{
+    <fieldset>
+        <legend>Ward</legend>
+        @(Html.InputField(plan, m => m.Ward, options => options.Label("Ward")).NativeTextBox())
+    </fieldset>
+    @(Html.NativeButton("save-ward", "Save").Reactive(plan, button => button.Click, (clicked, pipeline) => pipeline
+        .Post<AdmissionWard>(CareEndpoints.AdmissionWards, request => request.Form(admission.Form))
+        .Validate<AdmissionWardRules>()
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("saved").Text.Set(saved.Body))))
+}
+<p id="saved"></p>
+@Html.RenderPlan(plan)

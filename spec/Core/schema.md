@@ -287,7 +287,8 @@ The operators are closed: `eq`, `neq`, `lt`, `lte`, `gt`, `gte`, `and`, `or`, `n
 `neg`, `coalesce`, `cond`, `nullableValue`, `nonNull`, `empty`, `matches`, `toArray`, `finite`, `compareNumbers`, `compareOrdinal`, `compareBooleans`, `compareCulture`, `merge`, `trim`, `trimStart`,
 `trimEnd`, `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`, `endsWith`, `nullOrEmpty`, `includes`, `sumInt`,
 `sumDouble`, `sumDecimal`, `eqDecimal`, `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey`, `spanKey`, `year`,
-`month`, `day`, `hour`, `minute`, `second` and `dayOfWeek`.
+`month`, `day`, `hour`, `minute`, `second`, `dayOfWeek`, `emailAddress`, `creditCard`, `url`, `precisionScale` and
+`inFlags`.
 `toNumber`,
 `toDate`, `toBoolean` and `toText` leave: `as` converts (D3.2, N3.1). The pattern of `matches` is a `lit` (D7.5,
 D16.11). The text operators carry .NET's meaning (`spec/Core/translated-members.md`) where JavaScript's own methods
@@ -331,6 +332,18 @@ JavaScript type. `compareCulture` compares two texts with the browser's `Intl.Co
 `culture.collation`, and stops the pipeline when the browser has no collation for it. `matches` tests its text against
 the pattern C# copied for the browser (D16.11), a `lit` with no flag, and reads nothing on a text that reads nothing
 or holds null.
+`emailAddress`, `creditCard`, `url`, `precisionScale` and `inFlags` are the checks of D16.10, each the server's own
+algorithm or the platform's standard parser, and each reads nothing on a value that reads nothing or holds null.
+`emailAddress` holds where its text holds one `@`, neither its first code unit nor its last. `creditCard` reads its
+text from the last code unit, passes over a space and a hyphen, fails on any other unit outside `0` to `9`, weighs
+each digit 1 then 2 in turn, adds a weighed digit's tens and units, and holds where the sum ends in 0. `url` holds
+where the URL Standard's parser reads its text with the scheme `http` or `https`. A value of the three that is no
+text stops the pipeline. `precisionScale` takes a number and two `lit`s, the rule's precision and scale: it reads
+the number by the one decimal reader, whose refusals stop the pipeline, drops the zeros its decimals end in, and
+holds where its decimals are at most the scale and its digits before the point at most the precision less the
+scale. `inFlags` takes the value a member holds and a `lit` of the enum's `FlagValue`s, the largest `number`
+first: it holds where D9.13's split reads the value, zero only where a row's `number` is zero, and is false on a
+value the split cannot read (N16.4).
 `coalesce` reads its second argument only when its first holds null or reads nothing; `cond` reads its second
 argument when its first reads true and its third when it reads false or nothing; `nullableValue` reads its argument,
 and nothing where it holds null (D6.14).
@@ -403,7 +416,7 @@ no argument type of its own (D9.1).
   renders, so every `held` is a `lit` of a scalar. A value that holds nothing, or null, reads nothing, and the member is
   sent by D9.10's `whenNothing`: `leave` or `empty`. `FlagValue` carries `held` and `name` as `EnumValue` does, and
   `number`, the value's number, an integer from 0 to 9,007,199,254,740,991 (N16.5); `flags` is written only for an
-  enum the app names as flags (N16.4).
+  enum the app names as flags (N16.4), and `inFlags` carries the same rows in its `lit` (D16.10).
 - `HttpResponse`, the reply a `request` binds in its routes and `chained` block (N10.2, N10.7, D10.23): `status`,
   `outcome`, `headers`, the headers of the answer the browser hands the page, lib.dom's `Headers`, whose `get` a `call`
   reads (N10.7), `request`, the members as the request sent them, `inputs`, the inputs it sent, each its binding name
@@ -542,8 +555,9 @@ The diff beyond the kinds, each with the decision that makes it:
   `compareOrdinal`, `compareBooleans` and `compareCulture` (D6.13), the text operators `trim`, `trimStart`, `trimEnd`,
   `upperInvariant`, `lowerInvariant`, `upper`, `lower`, `upperTurkic`, `lowerTurkic`, `contains`, `startsWith`,
   `endsWith` and `nullOrEmpty` (D6.5), `includes` (D6.6), `sumInt`, `sumDouble` and `sumDecimal` (D6.11), `eqDecimal`
-  (D6.12), the six date keys `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey` and `spanKey` (D6.12) and the
-  seven date parts `year`, `month`, `day`, `hour`, `minute`, `second` and `dayOfWeek` (D6.5);
+  (D6.12), the six date keys `dateKey`, `wallKey`, `instantKey`, `dayKey`, `timeKey` and `spanKey` (D6.12), the
+  seven date parts `year`, `month`, `day`, `hour`, `minute`, `second` and `dayOfWeek` (D6.5) and the five checks
+  `emailAddress`, `creditCard`, `url`, `precisionScale` and `inFlags` (D16.10);
 - `let` gains `binds`, `line` or `read`, so a term's own method call runs where its read is reached (D4.7);
 - `if` holds one `when` and its `then` in place of `arms`, and an `ElseIf` nests in `else` with its condition's results
   (D8.7), so `Arm` leaves;

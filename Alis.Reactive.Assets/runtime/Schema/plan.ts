@@ -228,7 +228,7 @@ export interface OpExpression {
   readonly args: readonly Expression[];
 }
 
-export type Operator = "eq" | "neq" | "lt" | "lte" | "gt" | "gte" | "and" | "or" | "not" | "add" | "sub" | "mul" | "mod" | "neg" | "coalesce" | "cond" | "nullableValue" | "nonNull" | "empty" | "matches" | "toArray" | "finite" | "compareNumbers" | "compareOrdinal" | "compareBooleans" | "compareCulture" | "merge" | "trim" | "trimStart" | "trimEnd" | "upperInvariant" | "lowerInvariant" | "upper" | "lower" | "upperTurkic" | "lowerTurkic" | "contains" | "startsWith" | "endsWith" | "nullOrEmpty" | "includes" | "sumInt" | "sumDouble" | "sumDecimal" | "eqDecimal" | "dateKey" | "wallKey" | "instantKey" | "dayKey" | "timeKey" | "spanKey" | "year" | "month" | "day" | "hour" | "minute" | "second" | "dayOfWeek";
+export type Operator = "eq" | "neq" | "lt" | "lte" | "gt" | "gte" | "and" | "or" | "not" | "add" | "sub" | "mul" | "mod" | "neg" | "coalesce" | "cond" | "nullableValue" | "nonNull" | "empty" | "matches" | "toArray" | "finite" | "compareNumbers" | "compareOrdinal" | "compareBooleans" | "compareCulture" | "merge" | "trim" | "trimStart" | "trimEnd" | "upperInvariant" | "lowerInvariant" | "upper" | "lower" | "upperTurkic" | "lowerTurkic" | "contains" | "startsWith" | "endsWith" | "nullOrEmpty" | "includes" | "sumInt" | "sumDouble" | "sumDecimal" | "eqDecimal" | "dateKey" | "wallKey" | "instantKey" | "dayKey" | "timeKey" | "spanKey" | "year" | "month" | "day" | "hour" | "minute" | "second" | "dayOfWeek" | "emailAddress" | "creditCard" | "url" | "precisionScale" | "inFlags";
 
 export interface SignalExpression {
   readonly kind: "signal";

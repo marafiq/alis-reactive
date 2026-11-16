@@ -1,10 +1,11 @@
 import { assertNever, notBuilt, type Operator } from "../Schema/index";
 import { nothing, Stop, value, type Read } from "../ValuesAndSources/index";
 import { arrayOf, comparedBooleans, comparedCulture, comparedNumbers, comparedOrdinal, lower, nonNull, nullableValue, summedDecimals, summedDoubles, summedInts, trimmed, upper } from "../ArrayLambdas/index";
-import { decimalsEqual } from "./decimals";
+import { decimalsEqual, precisionScaled } from "./decimals";
+import { inFlags } from "./flags";
 import { keyOf, partOf } from "./keys";
 import { empty, included } from "./lists";
-import { matched, nullOrEmpty, textTested } from "./texts";
+import { holdsLuhnSum, isEmailAddress, isWebAddress, matched, nullOrEmpty, textChecked, textTested } from "./texts";
 
 export type Term = () => Read;
 
@@ -109,6 +110,16 @@ export function operated(op: Operator, terms: readonly Term[], collation: string
     case "second":
     case "dayOfWeek":
       return partOf(op, termOf(op, terms, 0)());
+    case "emailAddress":
+      return textChecked(termOf(op, terms, 0)(), isEmailAddress);
+    case "creditCard":
+      return textChecked(termOf(op, terms, 0)(), holdsLuhnSum);
+    case "url":
+      return textChecked(termOf(op, terms, 0)(), isWebAddress);
+    case "precisionScale":
+      return precisionScaled(termOf(op, terms, 0)(), termOf(op, terms, 1)(), termOf(op, terms, 2)());
+    case "inFlags":
+      return inFlags(termOf(op, terms, 0)(), termOf(op, terms, 1)());
     default:
       return assertNever(op);
   }

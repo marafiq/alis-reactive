@@ -63,6 +63,11 @@ internal sealed class Operator : IChoice
     internal static readonly Operator Minute = new("minute");
     internal static readonly Operator Second = new("second");
     internal static readonly Operator DayOfWeek = new("dayOfWeek");
+    internal static readonly Operator EmailAddress = new("emailAddress");
+    internal static readonly Operator CreditCard = new("creditCard");
+    internal static readonly Operator Url = new("url");
+    internal static readonly Operator PrecisionScale = new("precisionScale");
+    internal static readonly Operator InFlags = new("inFlags");
 
     private Operator(string text)
     {

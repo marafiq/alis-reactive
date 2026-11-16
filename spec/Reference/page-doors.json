@@ -2881,6 +2881,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M8.F1 X16.40 0": {
+    "modules": [],
+    "views": [
+      "/Care/Admission/AdmissionWard.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M8.F1 X16.9 0": {
     "modules": [],
     "views": [

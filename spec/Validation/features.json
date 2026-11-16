@@ -139,7 +139,8 @@
         "core:Q8",
         "Validation.tla:ConditionAgrees",
         "Schema.tla:DatesComparedByKey",
-        "Validation.tla:ItemPeerAgrees"
+        "Validation.tla:ItemPeerAgrees",
+        "Schema.tla:CheckLimitsAreLiterals"
       ],
       "defects": [
         {
@@ -205,6 +206,10 @@
         {
           "id": "X16.39",
           "rung": "behavior"
+        },
+        {
+          "id": "X16.40",
+          "rung": "behavior"
         }
       ],
       "promises": [
@@ -247,6 +252,14 @@
           "outcome": "\"Give at least the least dose.\" shows beside the second Amount alone, saved stays empty and no request is sent.",
           "opposite": "Least 5 with amounts 5 and 6 shows 5, 6 in saved with no message.",
           "defect": "The rule reads the least at the amount's own path, where a number holds none, so both rows fail; or an item compared with another member stays the server's, so the first Save is sent and the message comes back in a 400."
+        },
+        {
+          "for": "X16.40",
+          "page": "An admission ward page whose form holds a Ward input under a validator with RuleFor(a => a.Ward).Cascade(CascadeMode.Stop).MaximumLength(3).WithMessage(\"Keep the ward to three letters.\").Matches(\"^[A-Z]*$\").WithMessage(\"Write the ward in capitals.\"); Save posts the form to an endpoint that checks it by the same validator and answers its failures with a 400, the page writes the ward the endpoint saved into saved, and the form's summary lists each message.",
+          "gesture": "Type north in Ward and click Save; then type abc in Ward and click Save.",
+          "outcome": "After the first Save the summary lists \"Keep the ward to three letters.\" alone; after the second it lists \"Write the ward in capitals.\" alone; saved stays empty and no request is sent.",
+          "opposite": "Typing ABC and clicking Save shows ABC in saved with no message.",
+          "defect": "The browser runs a stopping rule's later checks beside its first, so north lists both messages where the endpoint gives the first alone; or a later check stays the server's, so abc is sent and the endpoint answers its message with a 400."
         }
       ],
       "verdicts": [

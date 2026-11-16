@@ -190,3 +190,66 @@ describe("when the op switch runs a list's operator, each operator reaches its o
     expect(operated("sumDecimal", [held([0.1, 0.2])])).toStrictEqual(value(0.3));
   });
 });
+
+describe("when a rule's check runs in the browser, it answers as the server's own algorithm or the URL Standard's parser does", () => {
+  test("emailAddress holds over one @ that is neither the first unit nor the last", () => {
+    expect(operated("emailAddress", [held("ada@care.home")])).toStrictEqual(value(true));
+    expect(operated("emailAddress", [held("@care.home")])).toStrictEqual(value(false));
+    expect(operated("emailAddress", [held("ada@")])).toStrictEqual(value(false));
+    expect(operated("emailAddress", [held("ada@care@home")])).toStrictEqual(value(false));
+    expect(operated("emailAddress", [held(null)])).toStrictEqual(nothing);
+    expect(operated("emailAddress", [readsNothing])).toStrictEqual(nothing);
+  });
+
+  test("creditCard holds over the Luhn sum of the digits, passing over spaces and hyphens and failing on any other unit", () => {
+    expect(operated("creditCard", [held("4111 1111-1111 1111")])).toStrictEqual(value(true));
+    expect(operated("creditCard", [held("4111 1111 1111 1112")])).toStrictEqual(value(false));
+    expect(operated("creditCard", [held("4111.1111.1111.1111")])).toStrictEqual(value(false));
+    expect(operated("creditCard", [held("")])).toStrictEqual(value(true));
+    expect(operated("creditCard", [held(null)])).toStrictEqual(nothing);
+  });
+
+  test("url holds over an http or https URL the URL Standard reads, and a text of another kind stops", () => {
+    expect(operated("url", [held("http://a.com/b c")])).toStrictEqual(value(true));
+    expect(operated("url", [held("https://a.com")])).toStrictEqual(value(true));
+    expect(operated("url", [held("http://a.com:99999")])).toStrictEqual(value(false));
+    expect(operated("url", [held("ftp://a.com")])).toStrictEqual(value(false));
+    expect(operated("url", [held("a.com")])).toStrictEqual(value(false));
+    expect(operated("url", [held(null)])).toStrictEqual(nothing);
+    expect(() => operated("url", [held(5)])).toThrow("The value 5 is tested as text, and it is no text.");
+  });
+
+  test("precisionScale counts the digits and decimals of the number with its trailing zeros dropped", () => {
+    const precision = held(4);
+    const scale = held(2);
+    expect(operated("precisionScale", [held(12.34), precision, scale])).toStrictEqual(value(true));
+    expect(operated("precisionScale", [held("12.340"), precision, scale])).toStrictEqual(value(true));
+    expect(operated("precisionScale", [held(-0.05), precision, scale])).toStrictEqual(value(true));
+    expect(operated("precisionScale", [held(0), precision, scale])).toStrictEqual(value(true));
+    expect(operated("precisionScale", [held(123.4), precision, scale])).toStrictEqual(value(false));
+    expect(operated("precisionScale", [held(1.234), precision, scale])).toStrictEqual(value(false));
+    expect(operated("precisionScale", [held(null), precision, scale])).toStrictEqual(nothing);
+    expect(() => operated("precisionScale", [held("twelve"), precision, scale])).toThrow('The value "twelve" is no decimal the framework reads.');
+  });
+
+  test("inFlags holds where the split reads the value, zero only where a row's number is zero", () => {
+    const days = held([
+      { held: 4, name: "Wed", number: 4 },
+      { held: 2, name: "Tue", number: 2 },
+      { held: 1, name: "Mon", number: 1 },
+    ]);
+    const named = held([
+      { held: "Tue", name: "Tue", number: 2 },
+      { held: "Mon", name: "Mon", number: 1 },
+      { held: "None", name: "None", number: 0 },
+    ]);
+    expect(operated("inFlags", [held(3), days])).toStrictEqual(value(true));
+    expect(operated("inFlags", [held(8), days])).toStrictEqual(value(false));
+    expect(operated("inFlags", [held(0), days])).toStrictEqual(value(false));
+    expect(operated("inFlags", [held("Mon, Tue"), named])).toStrictEqual(value(true));
+    expect(operated("inFlags", [held("None"), named])).toStrictEqual(value(true));
+    expect(operated("inFlags", [held("Mon, Fri"), named])).toStrictEqual(value(false));
+    expect(operated("inFlags", [held(null), days])).toStrictEqual(nothing);
+    expect(() => operated("inFlags", [held(3), readsNothing])).toThrow("The plan's inFlags carries no rows.");
+  });
+});

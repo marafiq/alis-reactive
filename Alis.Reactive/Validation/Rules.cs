@@ -238,28 +238,30 @@ internal sealed class MemberRule<T, TValue> : ValidationRule<T>, IRuleBuilderOpt
     private protected override IReadOnlyList<RuleGroup> BrowserRules(BrowserScope<T> scope)
     {
         if (_serverOnly) return [];
-        var member = scope.Member<TValue>(_member, _path, _each, _displayName, () => _values(scope.Start()).First());
+        var stops = _cascade() == CascadeMode.Stop;
+        var member = scope.Member<TValue>(_member, _path, _each, stops, _displayName, () => _values(scope.Start()).First());
         var segments = new List<RuleGroup>();
         var tests = new List<RuleTest>();
-        var laterCheckWritten = false;
         foreach (var part in _parts)
         {
-            if (part.Guards.Any(guard => guard.DecidedOnTheServer)) continue;
-            if (part.Test(member) is { } test)
+            var decidedOnTheServer = part.Guards.Any(guard => guard.DecidedOnTheServer);
+            if (!decidedOnTheServer && part.Test(member) is { } test)
             {
                 tests.Add(test);
-                laterCheckWritten |= part != _parts[0];
                 continue;
             }
 
-            if (part.Group(member) is not { } group) continue;
-            laterCheckWritten |= part != _parts[0];
-            member.CloseField(segments, tests);
-            segments.Add(part.Guards.Count == 0 ? group : new RuleGroup([], scope.When(part.Guards), [], [group]));
+            if (!decidedOnTheServer && part.Group(member) is { } group)
+            {
+                member.CloseField(segments, tests);
+                segments.Add(part.Guards.Count == 0 ? group : new RuleGroup([], scope.When(part.Guards), [], [group]));
+            }
+
+            if (stops) break;
         }
 
         member.CloseField(segments, tests);
-        member.RequireTheServersOrder(_cascade(), _dependents.Count, laterCheckWritten);
+        member.RequireTheServersOrder(_dependents.Count);
         return segments;
     }
 
@@ -364,7 +366,7 @@ internal sealed class CheckPart<T, TValue> : RulePart<T, TValue>
     internal override RuleTest? Test(BrowserMember<T, TValue> member)
     {
         if (FromTheModel) return null;
-        return _check.Browser(member) is { } test ? new RuleTest(test.Check, member.When(Guards), member.Message(Text, test)) : null;
+        return _check.Browser(member) is { } test ? member.Written(test, Guards, Text) : null;
     }
 
     internal override async Task Validate(ValidationContext<T> context, TValue value, string fieldPath, MessageArguments arguments)

@@ -141,6 +141,7 @@ internal static class AppHost
             .Add<Care.DeputyNamelessAppointmentRules>()
             .Add<Care.HomeLeadRules>()
             .Add<Care.HouseholdContactsRules>()
+            .Add<Care.AdmissionWardRules>()
             .Add<Care.IntakeAssessmentRules>()
             .Add<Care.QuickAdmissionRules>()
             .Add<Care.ResidentAdmissionRules>()

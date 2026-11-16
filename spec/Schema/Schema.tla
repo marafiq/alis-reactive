@@ -6,7 +6,7 @@ CONSTANT Mutant
 Mutants == {"none", "TodaysShapeSwitches", "ConversionOperatorKept", "EachInARead", "AsOfAny", "PatternReadInBrowser",
             "NullableOfNullable", "EmptySet", "BindingLeavesItsBlock", "DecimalTextComparedAsText", "SelectFieldUnchecked",
             "DateComparedBare", "KeyAsAValue", "KeyFallbackComputed", "PartJoinedUnconverted", "PartOfAValue",
-            "PartOfTheInstant"}
+            "PartOfTheInstant", "CheckLimitRead"}
 
 ASSUME Mutant \in Mutants
 
@@ -45,13 +45,18 @@ Operators == {"eq", "neq", "lt", "lte", "gt", "gte", "and", "or", "not", "add", 
               "compareBooleans", "compareCulture", "merge", "trim", "trimStart", "trimEnd", "upperInvariant", "lowerInvariant",
               "upper", "lower", "upperTurkic", "lowerTurkic", "contains", "startsWith", "endsWith", "nullOrEmpty", "includes",
               "sumInt", "sumDouble", "sumDecimal", "eqDecimal", "nonNull", "dateKey", "wallKey", "instantKey", "dayKey",
-              "timeKey", "spanKey", "year", "month", "day", "hour", "minute", "second", "dayOfWeek"}
+              "timeKey", "spanKey", "year", "month", "day", "hour", "minute", "second", "dayOfWeek", "emailAddress",
+              "creditCard", "url", "precisionScale", "inFlags"}
 
 DateKeys == {"dateKey", "wallKey", "instantKey", "dayKey", "timeKey", "spanKey"}
 
 WallKeys == DateKeys \ {"instantKey", "spanKey"}
 
 DateParts == {"year", "month", "day", "hour", "minute", "second", "dayOfWeek"}
+
+TextChecks == {"emailAddress", "creditCard", "url"}
+
+CheckLimits == {"precisionScale", "inFlags"}
 
 Comparisons == {"eq", "neq", "lt", "lte", "gt", "gte", "compareOrdinal"}
 
@@ -114,6 +119,11 @@ JoinsOfParts == {Joined(<<e, x>>) : e \in Parts, x \in Parts}
 
 Joins == JoinsOfParts \cup {Joined(<<TextPart(j), x>>) : j \in JoinsOfParts, x \in Parts}
 
+CheckOps ==
+    {Node("op", <<e>>, <<>>, "string", check) : e \in PartReads, check \in TextChecks}
+    \cup {Node("op", <<e, x>>, <<>>, "string", "inFlags") : e \in PartReads, x \in Leaves}
+    \cup {Node("op", <<e, x, y>>, <<>>, "string", "precisionScale") : e \in PartReads, x \in Leaves, y \in Leaves}
+
 RECURSIVE Nodes(_)
 Nodes(e) == {e} \cup UNION {Nodes(e.c[i]) : i \in DOMAIN e.c}
 
@@ -124,6 +134,7 @@ WriterAccepts(e) ==
     /\ e.k = "as" => (e.s # "any" \/ Mutant = "AsOfAny")
     /\ e.k = "op" => (e.o \in Operators \/ Mutant = "ConversionOperatorKept")
     /\ (e.k = "op" /\ e.o = "matches") => (e.c[2].k = "lit" \/ Mutant = "PatternReadInBrowser")
+    /\ (e.k = "op" /\ e.o \in CheckLimits) => ((\A i \in 2..Len(e.c) : e.c[i].k = "lit") \/ Mutant = "CheckLimitRead")
     /\ (e.k = "op" /\ e.o \in {"eq", "neq"}) => ((\A i \in DOMAIN e.c : e.c[i].h # "decimalText") \/ Mutant = "DecimalTextComparedAsText")
     /\ (e.k = "op" /\ e.o = "eqDecimal") => \A i \in DOMAIN e.c : e.c[i].h = "decimalText"
     /\ e.k = "fn" => (e.c[1].h # "holdsNoNull" \/ Mutant = "SelectFieldUnchecked")
@@ -168,7 +179,7 @@ vars == <<plane, expr, shape, open, parent, log, writes>>
 
 Init ==
     /\ \/ /\ plane = "expr"
-          /\ expr \in {e \in ExprsTo(Depth) \cup Joins : WriterAccepts(e) /\ RootAccepts(e)}
+          /\ expr \in {e \in ExprsTo(Depth) \cup Joins \cup CheckOps : WriterAccepts(e) /\ RootAccepts(e)}
           /\ shape = NoShape
        \/ /\ plane = "shape"
           /\ shape \in {s \in ShapesTo(Depth) : ShapeAccepted(s)}
@@ -249,6 +260,8 @@ ReadsTakeNoEach == \A n \in Nodes(expr) : n.k = "get" => \A i \in DOMAIN n.p : n
 ConversionsConvert == \A n \in Nodes(expr) : n.k = "as" => n.s \in Converting
 
 PatternsAreLiterals == \A n \in Nodes(expr) : (n.k = "op" /\ n.o = "matches") => n.c[2].k = "lit"
+
+CheckLimitsAreLiterals == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in CheckLimits) => \A i \in 2..Len(n.c) : n.c[i].k = "lit"
 
 DecimalTextComparedByValue == \A n \in Nodes(expr) : (n.k = "op" /\ n.o \in {"eq", "neq"}) => \A i \in DOMAIN n.c : n.c[i].h # "decimalText"
 

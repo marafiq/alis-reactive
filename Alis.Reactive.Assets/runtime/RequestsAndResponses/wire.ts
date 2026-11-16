@@ -1,4 +1,5 @@
 import { assertNever, notBuilt, type Culture, type FlagValue, type ScalarWireForm, type SentField, type TimeZone, type ValueRead } from "../Schema/index";
+import { flagNames } from "../Conditions/index";
 import { Stop } from "../ValuesAndSources/index";
 
 export interface TextPlace {
@@ -106,30 +107,8 @@ function invalid(name: string, expected: string): Stop {
 }
 
 function flagsText(value: unknown, rows: readonly FlagValue[], name: string): string {
-  let bits = 0n;
-  if (typeof value === "number" && rows.every(row => typeof row.held === "number") && Number.isSafeInteger(value) && value >= 0) {
-    bits = BigInt(value);
-  } else if (typeof value === "string" && rows.every(row => typeof row.held === "string")) {
-    for (const part of value.split(", ")) {
-      const row = rows.find(row => row.held === part);
-      if (row === undefined) throw invalidFlags(value, name);
-      bits |= BigInt(row.number);
-    }
-  } else throw invalidFlags(value, name);
-  if (bits === 0n) {
-    const zero = rows.find(row => row.number === 0);
-    if (zero === undefined) throw invalidFlags(value, name);
-    return zero.name;
-  }
-  const names: string[] = [];
-  for (const row of rows) {
-    const part = BigInt(row.number);
-    if (part !== 0n && (bits & part) === part) {
-      bits ^= part;
-      names.unshift(row.name);
-    }
-  }
-  if (bits !== 0n) throw invalidFlags(value, name);
+  const names = flagNames(value, rows);
+  if (names === undefined) throw invalidFlags(value, name);
   return names.join(", ");
 }
 

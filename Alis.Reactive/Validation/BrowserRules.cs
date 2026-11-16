@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
@@ -35,9 +36,6 @@ internal static class BrowserTerms
     internal static PlanExpression NullOr(PlanExpression value, PlanExpression test) => new OpExpression(Operator.Or, [new OpExpression(Operator.Eq, [value, Null]), test]);
 
     internal static PlanExpression Matches(PlanExpression value, string pattern) => new OpExpression(Operator.Matches, [value, Literals.Text(pattern)]);
-
-    internal static NotImplementedException NoOperatorFor(string check)
-        => new($"{check} reads text by .NET's own test, which no operator of the plan writes: a rule that checks {check} has no browser form yet; mark the rule .ServerOnly().");
 }
 
 internal sealed class BrowserScalars(AppJson json)
@@ -115,8 +113,8 @@ internal sealed class BrowserScope<T>
         }
     }
 
-    internal BrowserMember<T, TValue> Member<TValue>(LambdaExpression member, string path, bool each, string displayName, Func<TValue> start)
-        => new(this, member, path, each, displayName, start);
+    internal BrowserMember<T, TValue> Member<TValue>(LambdaExpression member, string path, bool each, bool stops, string displayName, Func<TValue> start)
+        => new(this, member, path, each, stops, displayName, start);
 
     internal BrowserScope<TChild> Child<TChild>(IReadOnlyList<RegistrationStep> path, MemberPath holder, string prefix, bool each, Func<TChild> start)
         => new(_selection, Json, Form, Scalars, path, holder, prefix, each, start);
@@ -146,16 +144,19 @@ internal sealed class BrowserMember<T, TValue>
     private readonly LambdaExpression _member;
     private readonly string _path;
     private readonly bool _each;
+    private readonly bool _stops;
     private readonly string _displayName;
     private readonly Func<TValue> _start;
+    private readonly List<(FnExpression Check, FnExpression When)> _earlier = [];
     private int _written;
 
-    internal BrowserMember(BrowserScope<T> scope, LambdaExpression member, string path, bool each, string displayName, Func<TValue> start)
+    internal BrowserMember(BrowserScope<T> scope, LambdaExpression member, string path, bool each, bool stops, string displayName, Func<TValue> start)
     {
         _scope = scope;
         _member = member;
         _path = path;
         _each = each;
+        _stops = stops;
         _displayName = displayName;
         _start = start;
     }
@@ -164,7 +165,15 @@ internal sealed class BrowserMember<T, TValue>
 
     internal string Path => _path;
 
-    internal FnExpression When(IReadOnlyList<RuleGuard<T>> guards) => _scope.When(guards);
+    internal RuleTest Written(BrowserTest test, IReadOnlyList<RuleGuard<T>> guards, string text)
+    {
+        var when = _scope.When(guards);
+        var message = Message(text, test);
+        if (!_stops) return new RuleTest(test.Check, when, message);
+        var check = PassingWhereAnEarlierFailed(test.Check);
+        _earlier.Add((test.Check, when));
+        return new RuleTest(check, when, message);
+    }
 
     internal BrowserTest Tests(LambdaExpression passes, string check, Action<MessageArguments> arguments)
     {
@@ -178,6 +187,18 @@ internal sealed class BrowserMember<T, TValue>
         if (form.Own is { Member.HasItsOwnConverter: true } own) throw ItemLambda.WrittenUnlikeItsBase(Term(check), own.Member, form);
         return Whole(passes, arguments);
     }
+
+    internal BrowserTest TestsTheEmailAddress() => TestsTheText(Operator.EmailAddress, nameof(RuleBuilderExtensions.EmailAddress));
+
+    internal BrowserTest TestsTheCardNumber() => TestsTheText(Operator.CreditCard, nameof(RuleBuilderExtensions.CreditCard));
+
+    internal BrowserTest TestsTheWebAddress()
+        => TestsTheValue(value => new OpExpression(Operator.Or, [new OpExpression(Operator.NullOrEmpty, [value]), new OpExpression(Operator.Url, [value])]),
+            nameof(RuleBuilderExtensions.Url), NoArguments);
+
+    internal BrowserTest TestsTheDigits(int precision, int scale, Action<MessageArguments> arguments)
+        => TestsTheValue(value => BrowserTerms.NullOr(value, new OpExpression(Operator.PrecisionScale, [value, Number(precision), Number(scale)])),
+            nameof(RuleBuilderExtensions.PrecisionScale), arguments);
 
     internal BrowserTest NotNull()
     {
@@ -250,7 +271,17 @@ internal sealed class BrowserMember<T, TValue>
         return new BrowserTest(new FnExpression([read.Params[0], BrowserTerms.Instance], read.Body), NoArguments, [], true);
     }
 
-    internal string Message(string text, BrowserTest test)
+    internal BrowserTest InFlags(IEnumerable<Enum> flags)
+    {
+        var form = FormItsTestReads(nameof(RuleBuilderExtensions.IsInEnum));
+        var rows = flags.Select(flag => new FlagValue(form.Beside(flag, typeof(TValue)).Value, flag.ToString(), decimal.ToInt64(Convert.ToDecimal(flag, CultureInfo.InvariantCulture))))
+            .OrderByDescending(row => row.Number).ToArray();
+        var value = new RefExpression(BrowserTerms.Value);
+        var split = new OpExpression(Operator.InFlags, [value, new LitExpression(JsonSerializer.SerializeToElement(rows, PlanJson.Options))]);
+        return new BrowserTest(new FnExpression([BrowserTerms.Value, BrowserTerms.Instance], BrowserTerms.NullOr(value, split)), NoArguments, [], true);
+    }
+
+    private string Message(string text, BrowserTest test)
     {
         var unknown = test.Unknown.Concat(_each ? ["CollectionIndex", "PropertyPath"] : _scope.Each ? ["PropertyPath"] : []).ToList();
         var named = unknown.FirstOrDefault(name => text.Contains("{" + name));
@@ -280,20 +311,47 @@ internal sealed class BrowserMember<T, TValue>
         var members = ItsMemberPath();
         var path = FieldPath(members);
         var scope = _scope.Child([.. _scope.Path, .. path], _scope.Holder.Then(members), _scope.Prefix + _path + ".", _each || _scope.Each, ChildStart);
-        return new RuleGroup(path, BrowserTerms.HoldsAValue, [], reactive.BrowserGroups(scope));
+        var group = new RuleGroup(path, BrowserTerms.HoldsAValue, [], reactive.BrowserGroups(scope));
+        if (!_stops || _earlier.Count == 0) return group;
+        var instance = new RefExpression(BrowserTerms.Instance);
+        var value = PlanSubstitution.Applied(ItemLambda.Of(_member, _scope.Form), instance);
+        return new RuleGroup([], new FnExpression([BrowserTerms.Instance], new OpExpression(Operator.Not, [AnEarlierFailed(value, instance)])), [], [group]);
     }
 
-    internal void RequireTheServersOrder(CascadeMode cascade, int dependents, bool laterCheckWritten)
+    internal void RequireTheServersOrder(int dependents)
     {
         if (_written == 0) return;
         if (dependents > 0)
             throw new InvalidOperationException($"The rule of '{_path}' declares DependentRules, which the endpoint checks only while the rule passes, a condition no browser rule reads; write them under When with the rule's test as the condition, or mark the rule .ServerOnly().");
-        if (cascade != CascadeMode.Stop) return;
-        if (_each)
+        if (_stops && _each)
             throw new InvalidOperationException($"The rule of '{_path}' stops at its first failing item (CascadeMode.Stop), and the browser checks every item, so it would show failures the endpoint never gives; mark the rule .ServerOnly().");
-        if (laterCheckWritten)
-            throw new InvalidOperationException($"The rule of '{_path}' stops at its first failure (CascadeMode.Stop), and the browser runs a member's checks side by side, so a check after the rule's first would show a failure the endpoint never gives; write that check as a rule of its own, or mark the rule .ServerOnly().");
     }
+
+    private FnExpression PassingWhereAnEarlierFailed(FnExpression check)
+    {
+        if (_earlier.Count == 0) return check;
+        var failed = AnEarlierFailed(new RefExpression(check.Params[0]), new RefExpression(check.Params[1]));
+        return new FnExpression(check.Params, new OpExpression(Operator.Cond, [failed, Boolean(true), check.Body]));
+    }
+
+    private PlanExpression AnEarlierFailed(PlanExpression value, PlanExpression instance)
+    {
+        var failures = _earlier.Select(earlier => Failed(earlier.Check, earlier.When, value, instance)).ToList();
+        return failures.Skip(1).Aggregate(failures[0], (any, next) => new OpExpression(Operator.Or, [any, next]));
+    }
+
+    private static PlanExpression Failed(FnExpression check, FnExpression when, PlanExpression value, PlanExpression instance)
+    {
+        var fails = new OpExpression(Operator.Cond, [PlanSubstitution.Applied(check, value, instance), Boolean(false), Boolean(true)]);
+        return new OpExpression(Operator.Cond, [PlanSubstitution.Applied(when, instance), fails, Boolean(false)]);
+    }
+
+    private static LitExpression Boolean(bool held) => new(JsonSerializer.SerializeToElement(held));
+
+    private static LitExpression Number(int held) => new(JsonSerializer.SerializeToElement(held));
+
+    private BrowserTest TestsTheText(Operator check, string name)
+        => TestsTheValue(value => BrowserTerms.NullOr(value, new OpExpression(check, [value])), name, NoArguments);
 
     private static Expression<Func<string?, bool>> Blank => value => string.IsNullOrWhiteSpace(value);
 

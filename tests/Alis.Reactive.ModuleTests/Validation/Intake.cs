@@ -481,6 +481,44 @@ public sealed class CountedZerosRules : ReactiveValidator<DoseCard>
     public CountedZerosRules() => RuleFor(card => card.Dose).PrecisionScale(4, 1, false);
 }
 
+public sealed class ScaledDoseRules : ReactiveValidator<DoseCard>
+{
+    public ScaledDoseRules() => RuleFor(card => card.Dose).PrecisionScale(4, 2, true);
+}
+
+public sealed class EmailWardRules : ReactiveValidator<RoundCard>
+{
+    public EmailWardRules() => RuleFor(card => card.Ward).EmailAddress();
+}
+
+public sealed class CardWardRules : ReactiveValidator<RoundCard>
+{
+    public CardWardRules() => RuleFor(card => card.Ward).CreditCard();
+}
+
+public sealed class WebWardRules : ReactiveValidator<RoundCard>
+{
+    public WebWardRules() => RuleFor(card => card.Ward).Url();
+}
+
+[Flags]
+public enum RoundDays
+{
+    Mon = 1,
+    Tue = 2,
+    Wed = 4,
+}
+
+public sealed class DayCard
+{
+    public RoundDays Days { get; set; } = RoundDays.Mon | RoundDays.Tue;
+}
+
+public sealed class DayCardRules : ReactiveValidator<DayCard>
+{
+    public DayCardRules() => RuleFor(card => card.Days).IsInEnum();
+}
+
 public sealed class EmptyRoundsRules : ReactiveValidator<DoseCard>
 {
     public EmptyRoundsRules() => RuleFor(card => card.Rounds).NotEmpty();

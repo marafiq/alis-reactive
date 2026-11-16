@@ -77,15 +77,15 @@ public static class RuleBuilderExtensions
 
     /// <summary>Requires a text with one <c>@</c> that is neither its first nor its last character.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> EmailAddress<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.Email, Templates.Email, _ => throw BrowserTerms.NoOperatorFor("EmailAddress")));
+    public static IRuleBuilderOptions<T, string?> EmailAddress<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.Email, Templates.Email, member => member.TestsTheEmailAddress()));
 
     /// <summary>Requires an <c>http</c> or <c>https</c> URL.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> Url<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.Url, Templates.Url, _ => throw BrowserTerms.NoOperatorFor("Url")));
+    public static IRuleBuilderOptions<T, string?> Url<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.Url, Templates.Url, member => member.TestsTheWebAddress()));
 
     /// <summary>Requires a text whose digits, once its spaces and dashes are taken out, hold the Luhn checksum.</summary>
     /// <returns>The rule, which takes its options.</returns>
-    public static IRuleBuilderOptions<T, string?> CreditCard<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.CreditCard, Templates.CreditCard, _ => throw BrowserTerms.NoOperatorFor("CreditCard")));
+    public static IRuleBuilderOptions<T, string?> CreditCard<T>(this IRuleBuilder<T, string?> rule) => Add(rule, new ValueCheck<T, string?>(TextChecks.CreditCard, Templates.CreditCard, member => member.TestsTheCardNumber()));
 
     /// <summary>Requires the member to equal a value.</summary>
     /// <param name="rule">The rule.</param>

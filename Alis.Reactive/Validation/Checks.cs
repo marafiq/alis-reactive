@@ -242,7 +242,9 @@ internal sealed class PrecisionScaleCheck<T, TValue> : Check<T, TValue>
     {
         if (!_ignoreTrailingZeros)
             throw new InvalidOperationException($"The rule of '{member.Path}' counts the zeros its decimal ends in (PrecisionScale with ignoreTrailingZeros: false), and the browser holds a number, which ends in none; pass ignoreTrailingZeros: true, or mark the rule .ServerOnly().");
-        throw new NotImplementedException("PrecisionScale counts a decimal's digits, and the plan's operators count none: a PrecisionScale rule has no browser form yet; mark the rule .ServerOnly().");
+        var precision = _precision;
+        var scale = _scale;
+        return member.TestsTheDigits(precision, scale, arguments => arguments.With("ExpectedPrecision", precision).With("ExpectedScale", scale));
     }
 }
 
@@ -278,8 +280,7 @@ internal sealed class EnumCheck<T, TValue, TEnum>(Func<TValue, TEnum?> read) : C
 
     internal override BrowserTest Browser(BrowserMember<T, TValue> member)
     {
-        if (member.Flags.Contains(typeof(TEnum)))
-            throw new NotImplementedException($"{ClassNames.AsCSharpWritesIt(typeof(TEnum))} is named as flags, and the plan's operators test no bit of a combination: IsInEnum over a flags enum has no browser form yet; mark the rule .ServerOnly().");
+        if (member.Flags.Contains(typeof(TEnum))) return member.InFlags(Enum.GetValues(typeof(TEnum)).Cast<Enum>());
         return member.InEnum(Enum.GetValues(typeof(TEnum)).Cast<object>());
     }
 }

@@ -927,7 +927,12 @@
         "hour",
         "minute",
         "second",
-        "dayOfWeek"
+        "dayOfWeek",
+        "emailAddress",
+        "creditCard",
+        "url",
+        "precisionScale",
+        "inFlags"
       ]
     },
     "SignalExpression": {

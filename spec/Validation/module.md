@@ -75,6 +75,14 @@ The meaning `M8.D1`, a check's message, is in `spec/Validation/features.json`, o
   `Alis.Reactive/PlanModel/Validation/BrowserRules.cs:268` at 65fdf118d), so a `TimeOnly` and a `TimeSpan`, written
   as text (`Alis.Reactive/Members/ClrShape.cs:75-80` at 65fdf118d), have no browser rule. The keys give each one
   that agrees with FluentValidation's, null passing an ordering (D16.16, X16.27, `probe:fv-date-comparisons`).
+- A check's browser form is the server's. The redesign wrote `EmailAddress` and `Url` as patterns the browser read
+  (`Alis.Reactive/PlanModel/Validation/BrowserRule.cs:150-152` at 65fdf118d), which parted from the server's count
+  and `System.Uri`; the rewrite writes each check of D16.10 as an operator of the closed list that runs the
+  server's algorithm, or the URL Standard's parser where the server runs `System.Uri` (D16.10).
+- `CascadeMode.Stop` holds in the browser. The redesign's browser showed the first failing test of a field whatever
+  its rule's cascade (`Alis.Reactive.Assets/runtime/plugins/form/form.ts:66-79` at 65fdf118d), so a rule that
+  continues lost its later messages; the rewrite shows every failure of a rule that continues, and writes each later
+  check of a rule that stops to pass where an earlier one failed (D16.5, X16.40).
 - One registration. Main registers rules for the browser alone, keyed by a `System.Type`, beside the validator
   (`Alis.Reactive/Validation/ReactiveClientValidationServiceCollectionExtensions.cs:13-15` and `:39-41` at
   623dd4a27), and registers its validators by an assembly scan (`Alis.Reactive.SandboxApp/Program.cs:18-19` at

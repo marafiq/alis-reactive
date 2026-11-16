@@ -1,6 +1,6 @@
 import { described, Stop } from "../ValuesAndSources/index";
 
-interface Decimal {
+export interface Decimal {
   readonly digits: bigint;
   readonly scale: number;
 }
@@ -9,7 +9,7 @@ const greatestDigits = 79_228_162_514_264_337_593_543_950_335n;
 
 const greatestScale = 28;
 
-function decimalOf(held: unknown): Decimal {
+export function decimalOf(held: unknown): Decimal {
   const text = typeof held === "number" && Number.isFinite(held) ? plainText(held) : typeof held === "string" ? held : undefined;
   const read = text === undefined ? undefined : decimalText(text);
   if (read === undefined) throw new Stop("The value " + described(held) + " is no decimal the framework reads.");

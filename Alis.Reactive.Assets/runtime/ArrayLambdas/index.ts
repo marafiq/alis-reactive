@@ -1,4 +1,4 @@
-export { decimalsCompared } from "./decimals";
+export { decimalOf, decimalsCompared, type Decimal } from "./decimals";
 export { arrayOf } from "./iterables";
 export { nonNull, nullableValue } from "./nulls";
 export { comparedBooleans, comparedCulture, comparedNumbers, comparedOrdinal } from "./orders";

@@ -3760,6 +3760,12 @@ and a request's state, which no node holds: it is its `request` statement's, in 
     65fdf118d, which read the validated form's inputs for such a request.
   - The check with no request, `Validate(container)` (N16.3), and live validation read their container's inputs, as
     the container sends them.
+  - Under `CascadeMode.Stop` the endpoint runs a rule's checks in order and stops at the first that fails, so C#
+    writes each later check of the rule to pass where an earlier one whose condition held failed, and the browser
+    shows the rule's first failure alone, as the endpoint answers (X16.40). A child validator after the rule's checks
+    holds only where none of them failed. A check after one only the server decides (D16.9) or after a child
+    validator stays on the server, since no browser test reads that verdict, as a rule under a server's condition
+    does (D16.8). A rule of each item under it is refused (X16.34).
 - D16.6 Decision B: a starting value is the one the endpoint's binder leaves, for the request's host and body
   format. A member the body lacks reads from its nearest holder the body sends, at any depth, and that holder
   starts as this table says:
@@ -3809,20 +3815,22 @@ and a request's state, which no node holds: it is its `request` statement's, in 
 - D16.10 The framework writes no regular expression (the owner, 2026-11-06: regexes are never a good choice and
   are used sparingly). Each check the framework writes on both sides is one algorithm in C# and in the browser, or
   the platform's standard parser on each side, and its probe rows give one verdict on both:
-  - `EmailAddress`: one `@`, neither first nor last, as the server counts it today
-    (`Alis.Reactive/Validation/Checks.cs:166-170`);
-  - `CreditCard`: the Luhn sum over the digits once spaces and dashes are taken out (`Alis.Reactive/Validation/Checks.cs:180-193`);
+  - `EmailAddress`: one `@`, neither first nor last, as the server counts it
+    (`Alis.Reactive/Validation/Checks.cs:101-106`) and the operator `emailAddress` counts it in the browser;
+  - `CreditCard`: the Luhn sum over the digits once spaces and dashes are taken out
+    (`Alis.Reactive/Validation/Checks.cs:111-126`), the operator `creditCard` in the browser;
   - `PrecisionScale`: the digits and decimals of the number, its trailing zeros dropped as `ignoreTrailingZeros: true`
-    drops them, since the browser's number ends in none; a rule that counts them is the server's (X16.28);
+    drops them, since the browser's number ends in none, the operator `precisionScale` reading it by the one decimal
+    reader in the browser; a rule that counts them is the server's (X16.28);
   - `IsInEnum`: membership in the enum's names and numbers, as `Enum.IsDefined` reads it. Over an enum the app names
     as flags (N16.4) it is FluentValidation's flags meaning, which FluentValidation keys on `FlagsAttribute`: a value
     is in the enum when it is the union of the enum's values whose bits it holds all, so zero is in it only when a
-    value is zero (`probe:fv-flags-is-in-enum`). C# writes each value's number into the rule, and the browser tests
-    the bits as D9.13's split does. ALIS038 admits the door only over an enum `[Flags]` marks, whose values are
+    value is zero (`probe:fv-flags-is-in-enum`). C# writes each value's held form and number into the rule, the
+    enum's `FlagValue`s, and the operator `inFlags` tests the bits by D9.13's split, the one the wire form runs. ALIS038 admits the door only over an enum `[Flags]` marks, whose values are
     disjoint or one inside the other (N16.5), so the rule, net10's binding and D9.13's split agree on every value
     (`probe:core-flags-split-agrees`);
   - `Url()`: an http or https URL by the standards, parsed by `System.Uri` on the server and by the URL Standard's
-    `URL` in the browser, scheme `http` or `https`. The two parsers agree on every probe row, where today's browser
+    `URL` in the browser through the operator `url`, scheme `http` or `https`. The two parsers agree on every probe row, where today's browser
     pattern disagrees with the server on two (`probe:core-uri-absolute`, `probe:whatwg-url-http`,
     `probe:js-url-pattern`). They part on texts outside those rows, 30 of 112 in U17's design: a numeric host that is
     no dotted IPv4 (`http://256.256.256.256`, which `System.Uri` alone takes), a host written in Unicode, userinfo and
@@ -3945,6 +3953,7 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `probe:fv-date-comparisons`
 - `Schema.tla:DatesComparedByKey`
 - `Schema.tla:KeysOnlyCompared`
+- `Schema.tla:CheckLimitsAreLiterals`
 - `Ownership.tla:RulesLeaveWithTheirOwner`
 - `Ownership.tla:FailureReachesSummary`
 - `Ownership.tla:InlineOnlyAtTheSentInput`
@@ -4145,12 +4154,10 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.33` analyzer (D16.8): `DependentRules` behind a rule the browser checks: "The rule of '{member}' declares
   DependentRules, which the endpoint checks only while the rule passes, a condition no browser rule reads; write them
   under When with the rule's test as the condition, or mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
-- `X16.34` analyzer (D16.5): a rule under `CascadeMode.Stop` that writes for the browser a check other than its first,
-  test or child validator: "The rule of '{member}' stops at its first failure (CascadeMode.Stop), and the browser runs
-  a member's checks side by side, so a check after the rule's first would show a failure the endpoint never gives;
-  write that check as a rule of its own, or mark the rule .ServerOnly()."; and a rule of each item under it: "The
-  rule of '{member}' stops at its first failing item (CascadeMode.Stop), and the browser checks every item, so it
-  would show failures the endpoint never gives; mark the rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
+- `X16.34` analyzer (D16.5): a rule of each item under `CascadeMode.Stop`, which the endpoint stops at its first
+  failing item while the browser checks every item: "The rule of '{member}' stops at its first failing item
+  (CascadeMode.Stop), and the browser checks every item, so it would show failures the endpoint never gives; mark the
+  rule .ServerOnly()." At build by ALIS006, and where the view renders on code it does not follow (D18.6): new:N18.11.
 - `X16.35` analyzer (D16.14): a rule over no member path: "The rule of '{read}' checks no member of the model, and
   the browser's rule names the member it checks by its path; write the rule for a member, as RuleFor(x => x.Member)
   or RuleForEach(x => x.Items) does, or mark the rule .ServerOnly().", `{read}` the rule's lambda as the validator
@@ -4158,6 +4165,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
 - `X16.39` behavior (D16.16): of a round's amounts 5 and 4 under `RuleForEach(r => r.Amounts)
   .GreaterThanOrEqualTo(r => r.Least)` with a least of 5, the second fails in the browser before sending, as the
   endpoint answers; the least is read from the round, not from the amount.
+- `X16.40` behavior (D16.5): "north" under `RuleFor(a => a.Ward).Cascade(CascadeMode.Stop).MaximumLength(3)` and a
+  `Matches("^[A-Z]*$")` after it fails the length alone in the browser before sending, as the endpoint answers, and
+  "abc" fails the pattern alone.
 
 ## Q17. Vendors and inversion
 
@@ -5137,6 +5147,7 @@ shapes, starts and the payload's path of each event.
 - `Schema.tla:SetsWriteAMember`
 - `Schema.tla:RefsReadTheirBlock`
 - `Schema.tla:DecimalTextComparedByValue`
+- `Schema.tla:CheckLimitsAreLiterals`
 - `check:kinds`, which reads the grammar and `plan.schema.json` at 65fdf118d, schema.md's kinds table and Schema.tla's
   node set, and checks each today line holds its case.
 
