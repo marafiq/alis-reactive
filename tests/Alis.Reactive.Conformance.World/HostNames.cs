@@ -11,5 +11,6 @@ public static class HostNames
     public const string JsonContract = "jsonContract";
     public const string NoRequests = "noRequests";
     public const string NoAntiforgeryChoice = "noAntiforgeryChoice";
+    public const string SiteHeader = "siteHeader";
     public const string Net48 = "net48";
 }

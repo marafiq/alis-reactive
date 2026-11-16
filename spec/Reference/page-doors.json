@@ -2533,6 +2533,13 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F2 X10.2 0": {
+    "modules": [],
+    "views": [
+      "/Care/Record/SessionNotes.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F2 X10.20 0": {
     "modules": [],
     "views": [

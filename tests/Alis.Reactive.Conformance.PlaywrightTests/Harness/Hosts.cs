@@ -40,6 +40,10 @@ public static class Hosts
 
     public static readonly string[] NoAntiforgeryChoice = [NoAntiforgeryChoiceName];
 
+    public const string SiteHeaderName = HostNames.SiteHeader;
+
+    public static readonly string[] SiteHeader = [SiteHeaderName];
+
     public const string Net48Name = HostNames.Net48;
 
     public static readonly string[] Net48 = [Net48Name];

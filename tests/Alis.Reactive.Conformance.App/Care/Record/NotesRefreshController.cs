@@ -8,13 +8,13 @@ public sealed class NotesRefreshController : Controller
 {
     private const string PlainText = "text/plain";
 
-    private const string RequestedWith = "X-Requested-With";
+    private const string CareSite = "Care-Site";
 
     [HttpGet(CarePages.NotesRefresh)]
     public IActionResult OfAda() => View("/Care/Record/NotesRefresh.cshtml", new NotesRefresh("Ada Hart"));
 
     [HttpGet(NotesRefreshEndpoints.Notes)]
-    public IActionResult Notes() => Content(string.Join(", ", Request.Headers[RequestedWith].ToArray()), PlainText);
+    public IActionResult Notes() => Content(string.Join(", ", Request.Headers[CareSite].ToArray()), PlainText);
 }
 
 public sealed record NotesRefresh(string Resident);
@@ -28,5 +28,5 @@ public static class NotesRefreshes
 {
     public static readonly AppEvent Refresh = AppEvent.Declare();
 
-    public static readonly AppEvent RefreshByFetch = AppEvent.Declare();
+    public static readonly AppEvent RefreshFromSouth = AppEvent.Declare();
 }

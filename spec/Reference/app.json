@@ -46,7 +46,7 @@
   "hosts": [
     {
       "id": "net10",
-      "what": "ASP.NET Core MVC on net10 with the app's default options: camel-case members and enum names, Syncfusion's licence registered, ShowBusy(), the conformance library's busy indicator and notice in every layout whose pages send a request but the shell's, which renders NativeLoader and NativeToast, ShowReconnect() with the Native offer, request defaults with a 401 route and a catch-all that each show a notice, ShowValidationErrors() and the standard retry, antiforgery in a header, Flags<CareDays>() of the conformance library and of the care rota, and Flags<RotaDays>(), named, its process clock in America/New_York",
+      "what": "ASP.NET Core MVC on net10 with the app's default options: camel-case members and enum names, Syncfusion's licence registered, ShowBusy(), the conformance library's busy indicator and notice in every layout whose pages send a request but the shell's, which renders NativeLoader and NativeToast, ShowReconnect() with the Native offer, request defaults with a 401 route and a catch-all that each show a notice, ShowValidationErrors() and the standard retry, antiforgery in a header, cookie authentication whose login path is the record's sign-in page, Flags<CareDays>() of the conformance library and of the care rota, and Flags<RotaDays>(), named, its process clock in America/New_York",
       "framework": "net10"
     },
     {
@@ -122,6 +122,11 @@
     {
       "id": "noAntiforgeryChoice",
       "what": "AddReactiveRequests naming no antiforgery choice",
+      "framework": "net10"
+    },
+    {
+      "id": "siteHeader",
+      "what": "net10's request defaults with the app's header Care-Site: North beside them",
       "framework": "net10"
     },
     {
@@ -8435,7 +8440,7 @@
       "index": 0,
       "screen": "record",
       "hosts": [
-        "net10"
+        "siteHeader"
       ],
       "parts": [
         "notes",

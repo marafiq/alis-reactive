@@ -64,6 +64,9 @@ try
     Console.WriteLine("core-query-decimal-invariant: 1.5 binds " + await client.GetStringAsync("/amount?Value=1.5") + "; 1,5 binds " + await client.GetStringAsync("/amount?Value=1%2C5"));
     Console.WriteLine("core-json-result-names: " + await client.GetStringAsync("/person"));
     Console.WriteLine("core-cookie-auth-ajax: without the header " + await Status(client, false) + "; with X-Requested-With " + await Status(client, true));
+    Console.WriteLine("core-cookie-auth-api-endpoint: from no session an [ApiController] action answers " + await StatusUnder(client, "/api-secure", "application/json")
+        + " under Accept application/json and " + await StatusUnder(client, "/api-secure", "*/*") + " under */*, its Location " + await LoginPathOf(client, "/api-secure")
+        + "; a controller action with no such mark answers " + await StatusUnder(client, "/secure", "application/json") + " under Accept application/json");
     using (var problem = await client.PostAsync("/problem", new StringContent("", Encoding.UTF8, "application/x-www-form-urlencoded")))
     {
         Console.WriteLine("core-validation-problem-shape: " + (int)problem.StatusCode + " " + problem.Content.Headers.ContentType?.MediaType + " errors " + ErrorsOf(await problem.Content.ReadAsStringAsync()));
@@ -262,6 +265,20 @@ static async Task<string> Status(HttpClient client, bool ajax)
     if (ajax) request.Headers.Add("X-Requested-With", "XMLHttpRequest");
     using var response = await client.SendAsync(request);
     return ((int)response.StatusCode).ToString(CultureInfo.InvariantCulture);
+}
+
+static async Task<string> StatusUnder(HttpClient client, string path, string accept)
+{
+    using var request = new HttpRequestMessage(HttpMethod.Get, path);
+    request.Headers.Add("Accept", accept);
+    using var response = await client.SendAsync(request);
+    return ((int)response.StatusCode).ToString(CultureInfo.InvariantCulture);
+}
+
+static async Task<string> LoginPathOf(HttpClient client, string path)
+{
+    using var response = await client.GetAsync(path);
+    return response.Headers.Location is { } location ? new Uri(client.BaseAddress!, location).AbsolutePath : "no Location";
 }
 
 static string ErrorsOf(string body)
@@ -874,6 +891,10 @@ public sealed class ApiProbeController : ControllerBase
 {
     [HttpPost("/api-named")]
     public string Named([FromForm] Named named) => "reached the action";
+
+    [Authorize]
+    [HttpGet("/api-secure")]
+    public string Secure() => "secret";
 }
 
 public sealed class PageController : Controller

@@ -30,6 +30,7 @@ internal sealed class WorldData
     private volatile bool _textRefuses;
     private volatile bool _heldCountRefuses;
     private volatile bool _settleRefuses;
+    private volatile bool _sessionSignedOut;
     private volatile bool _countRefuses;
     private volatile bool _itemRefuses;
     private volatile bool _bedsDropTheirConnection;
@@ -85,6 +86,8 @@ internal sealed class WorldData
 
     internal bool SettleRefuses => _settleRefuses;
 
+    internal bool SessionSignedOut => _sessionSignedOut;
+
     internal bool CountRefuses => _countRefuses;
 
     internal bool ItemRefuses => _itemRefuses;
@@ -133,6 +136,7 @@ internal sealed class WorldData
         if (seed.TextRefuses is { } textRefuses) _textRefuses = textRefuses;
         if (seed.HeldCountRefuses is { } heldCountRefuses) _heldCountRefuses = heldCountRefuses;
         if (seed.SettleRefuses is { } settleRefuses) _settleRefuses = settleRefuses;
+        if (seed.SessionSignedOut is { } sessionSignedOut) _sessionSignedOut = sessionSignedOut;
         if (seed.CountRefuses is { } countRefuses) _countRefuses = countRefuses;
         if (seed.ItemRefuses is { } itemRefuses) _itemRefuses = itemRefuses;
         if (seed.BedsDropTheirConnection is { } bedsDropTheirConnection) _bedsDropTheirConnection = bedsDropTheirConnection;

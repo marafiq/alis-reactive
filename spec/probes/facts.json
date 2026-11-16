@@ -172,6 +172,15 @@
       "source": "spec/probes/AspNetCoreBinding/Program.cs"
     },
     {
+      "id": "core-cookie-auth-api-endpoint",
+      "statement": "Cookie authentication on net10 answers a challenge at an [ApiController] action 401, its Location the login path, whatever the request's Accept, and redirects one at an action of a controller with no such mark, under Accept application/json too.",
+      "host": "net10",
+      "oracle": "ASP.NET Core 10 MVC model binding, authentication and System.Text.Json",
+      "probe": "AspNetCoreBinding",
+      "expect": "core-cookie-auth-api-endpoint: from no session an [ApiController] action answers 401 under Accept application/json and 401 under */*, its Location /Account/Login; a controller action with no such mark answers 302 under Accept application/json",
+      "source": "spec/probes/AspNetCoreBinding/Program.cs"
+    },
+    {
       "id": "core-validation-problem-shape",
       "statement": "ValidationProblem answers 400 as application/problem+json with errors keyed by binding name, each a list of messages.",
       "host": "net10",

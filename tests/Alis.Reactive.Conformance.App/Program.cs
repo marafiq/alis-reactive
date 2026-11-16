@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Globalization;
+using Alis.Reactive.Conformance.App.Care;
 using Alis.Reactive.Conformance.App.World;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Alis.Reactive.Conformance.App;
 
@@ -21,6 +23,7 @@ public sealed class Program
         AppHost.AddRequests(host, builder.Services);
         AppHost.AddValidation(builder.Services);
         builder.Services.AddDistributedMemoryCache();
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(cookie => cookie.LoginPath = SessionNotesEndpoints.SignIn);
         if (builder.Environment.IsDevelopment()) builder.Services.AddWorld();
 
         var app = builder.Build();

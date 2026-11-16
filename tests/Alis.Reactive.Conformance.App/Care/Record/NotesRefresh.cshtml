@@ -10,14 +10,14 @@
 }
 <h1>Notes of @Model.Resident</h1>
 <button type="button" @Html.Raises(plan, NotesRefreshes.Refresh)>Refresh notes</button>
-<button type="button" @Html.Raises(plan, NotesRefreshes.RefreshByFetch)>Refresh by fetch</button>
-<p>Requested with: <span id="notes-echo"></span></p>
+<button type="button" @Html.Raises(plan, NotesRefreshes.RefreshFromSouth)>Refresh from South</button>
+<p>Notes of the site: <span id="notes-site"></span></p>
 @{
     Html.On(plan, trigger => trigger.CustomEvent(NotesRefreshes.Refresh, pipeline => pipeline
         .Get(NotesRefreshEndpoints.Notes)
-        .OnSuccess(Content.Text, (refreshed, pipeline) => pipeline.Element("notes-echo").Text.Set(refreshed.Body))));
-    Html.On(plan, trigger => trigger.CustomEvent(NotesRefreshes.RefreshByFetch, pipeline => pipeline
-        .Get<NoModel>(NotesRefreshEndpoints.Notes, request => request.Header("x-requested-with", "Fetch"))
-        .OnSuccess(Content.Text, (refreshed, pipeline) => pipeline.Element("notes-echo").Text.Set(refreshed.Body))));
+        .OnSuccess(Content.Text, (refreshed, pipeline) => pipeline.Element("notes-site").Text.Set(refreshed.Body))));
+    Html.On(plan, trigger => trigger.CustomEvent(NotesRefreshes.RefreshFromSouth, pipeline => pipeline
+        .Get<NoModel>(NotesRefreshEndpoints.Notes, request => request.Header("care-site", "South"))
+        .OnSuccess(Content.Text, (refreshed, pipeline) => pipeline.Element("notes-site").Text.Set(refreshed.Body))));
 }
 @Html.RenderPlan(plan)

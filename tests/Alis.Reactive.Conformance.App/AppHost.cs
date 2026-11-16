@@ -17,6 +17,7 @@ internal static class AppHost
             case HostNames.Net10:
             case HostNames.NoRequests:
             case HostNames.NoAntiforgeryChoice:
+            case HostNames.SiteHeader:
                 WriteEnumNames(json);
                 return;
             case HostNames.NumbersAsText:
@@ -43,7 +44,7 @@ internal static class AppHost
                 json.RespectRequiredConstructorParameters = true;
                 return;
             default:
-                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests} and {HostNames.NoAntiforgeryChoice}.");
+                throw new InvalidOperationException($"The conformance app serves no host '{host}'; it serves {HostNames.Net10}, {HostNames.NumbersAsText}, {HostNames.DateConverter}, {HostNames.SnakeCase}, {HostNames.PascalCase}, {HostNames.EnumsAsNumbers}, {HostNames.JsonContract}, {HostNames.NoRequests} and {HostNames.NoAntiforgeryChoice}, {HostNames.SiteHeader}.");
         }
     }
 
@@ -56,17 +57,22 @@ internal static class AppHost
             case HostNames.NoAntiforgeryChoice:
                 services.AddReactiveRequests(requests => { });
                 return;
+            case HostNames.SiteHeader:
+                services.AddReactiveRequests(requests => TheDefaults(requests).Header("Care-Site", "North"));
+                return;
             default:
-                services.AddReactiveRequests(requests => requests
-                    .Antiforgery(AntiforgeryIn.Header)
-                    .ShowBusy()
-                    .ShowValidationErrors()
-                    .OnError(401, Content.None, (expired, pipeline) => pipeline.Notice().Warning("Your session has ended."))
-                    .OnError((failed, pipeline) => pipeline.Notice().Error("The request failed."))
-                    .Retry(3, TimeSpan.FromSeconds(2)));
+                services.AddReactiveRequests(requests => TheDefaults(requests));
                 return;
         }
     }
+
+    private static RequestDefaults TheDefaults(RequestDefaults requests) => requests
+        .Antiforgery(AntiforgeryIn.Header)
+        .ShowBusy()
+        .ShowValidationErrors()
+        .OnError(401, Content.None, (expired, pipeline) => pipeline.Notice().Warning("Your session has ended."))
+        .OnError((failed, pipeline) => pipeline.Notice().Error("The request failed."))
+        .Retry(3, TimeSpan.FromSeconds(2));
 
     internal static void AddValidation(IServiceCollection services)
         => services.AddReactiveFluentValidation(validators => validators.Flags<Components.CareDays>().Flags<Care.CareDays>().Flags<Care.RotaDays>());

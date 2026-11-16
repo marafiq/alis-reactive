@@ -621,11 +621,11 @@
         },
         {
           "for": "X9.28",
-          "page": "A notes page whose request defaults send X-Requested-With: XMLHttpRequest. Its Refresh notes button GETs the notes with no header of its own; its Refresh by fetch button sends the same GET with its own header x-requested-with holding Fetch. The endpoint writes the X-Requested-With values it received, as the request carried them, into notes-echo.",
-          "gesture": "Click Refresh by fetch and wait until notes-echo has text.",
-          "outcome": "notes-echo reads Fetch.",
-          "opposite": "Click Refresh notes: notes-echo reads XMLHttpRequest.",
-          "defect": "C# that writes the request's own header beside the configured one, or compares the two names by case, sends both, and fetch's Headers joins them, so notes-echo reads XMLHttpRequest, Fetch; C# that lets the configured header win sends XMLHttpRequest from both buttons."
+          "page": "A notes page under request defaults that send the app's header Care-Site: North. Its Refresh notes button GETs the notes with no header of its own; its Refresh from South button sends the same GET with its own header care-site holding South. The endpoint answers the Care-Site values it received, as the request carried them, and the page shows them in notes-site.",
+          "gesture": "Click Refresh from South and wait until notes-site has text.",
+          "outcome": "notes-site reads South.",
+          "opposite": "Click Refresh notes: notes-site reads North.",
+          "defect": "C# that writes the request's own header beside the configured one, or compares the two names by case, sends both, and fetch's Headers joins them, so notes-site reads North, South; C# that lets the configured header win sends North from both buttons."
         }
       ],
       "verdicts": [
@@ -1350,11 +1350,11 @@
       "promises": [
         {
           "for": "X10.2",
-          "page": "A notes page whose request defaults send X-Requested-With: XMLHttpRequest, a GET of JSON with a route for 401 that writes Session expired and a catch-all that writes Request failed; a second page with the same request and no such default header. The test signs the session out on the server before each click.",
-          "gesture": "Click Refresh notes on the first page, then on the second.",
-          "outcome": "The first writes Session expired; the second writes Request failed.",
-          "opposite": "With the session signed in, both pages write the notes.",
-          "defect": "The redirect to the login page followed, so the first writes Request failed or reads the login page as notes; or the X-Responded-JSON status ignored on net48, so the first writes Request failed."
+          "page": "A notes page whose two GETs of JSON each have a route for 401 that writes Session expired and a catch-all that writes Request failed: Refresh notes gets the notes from an API endpoint, an action of a controller marked [ApiController], and Refresh from the chart gets them from an action of a controller with no such mark. Each endpoint challenges a request whose session the test signed out on the server, and the app's cookie authentication answers the challenge.",
+          "gesture": "Click Refresh notes, then Refresh from the chart.",
+          "outcome": "Refresh notes writes Session expired, from the 401 the API endpoint answers; Refresh from the chart writes Request failed, from the sign-in page its redirect ends at.",
+          "opposite": "With the session signed in, both write Ate well at lunch.",
+          "defect": "A 2xx body not of the route's kind run by OnSuccess, so the sign-in page reads as the notes and Refresh from the chart writes nothing; or the 401 run by the catch-all, so Refresh notes writes Request failed."
         },
         {
           "for": "X10.3",

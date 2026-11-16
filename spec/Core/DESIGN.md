@@ -1732,7 +1732,7 @@ Terms used throughout:
   makes needless whatever they name. Each is refused where the view renders, a list or an object source too.
 - D9.12 The headers every request sends are configured once in C#, and C# writes them into each request's
   `HttpSend` where the view renders; a request's own header of the same name, compared ignoring case, replaces
-  the configured one. An app that sends `X-Requested-With: XMLHttpRequest` on every request configures it there.
+  the configured one.
   The browser adds no header but W3C Trace Context's `traceparent` and `tracestate` while the plan's trace is on
   (D20.3), and `traceparent` and `baggage` on a retry (D20.11), each to the page's own origin only.
 - D9.13 A literal member, `Set(member, value)`, is written where the view renders, encoded as the endpoint binds it.
@@ -2070,9 +2070,9 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
 - `X9.27` behavior (D9.8): a multipart body with two documents, each a file nested by C# path beside its caption, one
   file name past US-ASCII, and a text field binds on both hosts: the endpoint reads both files with their names, sizes
   and captions, and the field.
-- `X9.28` behavior (D9.12): with `X-Requested-With: XMLHttpRequest` among the configured headers, a request whose own
-  header `x-requested-with` holds `Fetch` reaches the endpoint with one `X-Requested-With`, `Fetch`, and a request
-  with no header of its own sends `XMLHttpRequest`.
+- `X9.28` behavior (D9.12): with the app's `Care-Site: North` among the configured headers, a request whose own header
+  `care-site` holds `South` reaches the endpoint with one `Care-Site`, `South`, and a request with no header of its own
+  sends `North`.
 
 ## Q10. The request's flow and its response
 
@@ -2130,7 +2130,8 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
   HTML, so a 409's text and an invalid post's partial view are read as they are sent. It reads its body as data: a
   body not of its kind reads nothing, and the route runs.
 - D10.7 On net48 the plan carries that a response's `X-Responded-JSON` status replaces its own, so Katana's
-  answer to a request that sends `X-Requested-With` runs the route of the status it withheld.
+  answer to a request that sends `X-Requested-With` runs the route of the status it withheld
+  (`probe:katana-ajax-redirect-is-200`).
 - D10.8 A server's validation errors have one body on both hosts, `{"errors": {"<binding name>": ["message"]}}`,
   status 400, written by a framework door: on net10 MVC's `ValidationProblemDetails`
   (`probe:core-validation-problem-shape`), on net48 the same JSON with `TrySkipIisCustomErrors` set, the switch
@@ -2356,6 +2357,7 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `probe:fetch-follows-relative-redirect`
 - `probe:core-cookie-auth-ajax`
 - `probe:katana-ajax-redirect-is-200`
+- `probe:core-cookie-auth-api-endpoint`
 - `probe:core-validation-problem-shape`
 - `Composition.tla:IndicatorNeverHidesEarly`
 - `Composition.tla:IndicatorNeverStaysShown`
@@ -2568,10 +2570,11 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 **Defects.**
 - `X10.1` type: a route's data is typed by the route that declares it, `Data<TResponse>` and `Data<TError>`
   (`Alis.Reactive/PlanModel/Requests/RequestStep.cs:220`).
-- `X10.2` behavior (D9.12, D10.7): with `X-Requested-With` among the configured headers, a request whose cookie session expired
-  runs the route for 401 on net10 (`probe:core-cookie-auth-ajax`) and on net48 under Katana
-  (`probe:katana-ajax-redirect-is-200`). Without it the server redirects to its login page, and the request
-  ends there: a route that declares JSON runs the catch-all, and a route with no body runs `OnSuccess`.
+- `X10.2` behavior (D10.4, D10.5): a request whose cookie session ended runs its route for 401 where its endpoint
+  answers 401, as net10's cookie authentication answers at an API endpoint whatever the request's `Accept`
+  (`probe:core-cookie-auth-api-endpoint`); an endpoint that redirects to its login page (`probe:core-cookie-auth-ajax`)
+  ends the request there, where a route that declares JSON reads the page's HTML as a body not of its kind and runs
+  the catch-all, and a route with no body runs `OnSuccess`.
 - `X10.3` behavior (D10.1): a network failure runs `OnError()`, then its `Finally`, and its busy targets hide after the
   defaults' `Finally`.
 - `X10.4` behavior (D10.2): a form check that fails sends nothing and runs no step after the request.

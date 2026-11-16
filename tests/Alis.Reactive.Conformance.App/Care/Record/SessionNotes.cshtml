@@ -1,0 +1,27 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model SessionNotes
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Notes";
+    var plan = Html.ReactivePlan<SessionNotes>();
+}
+<h1>Notes of @Model.Resident</h1>
+<button type="button" @Html.Raises(plan, SessionNotesEvents.Refresh)>Refresh notes</button>
+<button type="button" @Html.Raises(plan, SessionNotesEvents.RefreshFromTheChart)>Refresh from the chart</button>
+<p>Notes: <span id="notes">-</span></p>
+<p>Chart notes: <span id="chart-notes">-</span></p>
+@{
+    Html.On(plan, trigger => trigger
+        .CustomEvent(SessionNotesEvents.Refresh, pipeline => pipeline.Get(SessionNotesEndpoints.Notes)
+            .OnSuccess<SessionNote>((note, pipeline) => pipeline.Element("notes").Text.Set(note.Body.Read(written => written.Text)))
+            .OnError(401, Content.None, (expired, pipeline) => pipeline.Element("notes").Text.Set("Session expired"))
+            .OnError((failed, pipeline) => pipeline.Element("notes").Text.Set("Request failed")))
+        .CustomEvent(SessionNotesEvents.RefreshFromTheChart, pipeline => pipeline.Get(SessionNotesEndpoints.ChartNotes)
+            .OnSuccess<SessionNote>((note, pipeline) => pipeline.Element("chart-notes").Text.Set(note.Body.Read(written => written.Text)))
+            .OnError(401, Content.None, (expired, pipeline) => pipeline.Element("chart-notes").Text.Set("Session expired"))
+            .OnError((failed, pipeline) => pipeline.Element("chart-notes").Text.Set("Request failed"))));
+}
+@Html.RenderPlan(plan)

@@ -54,6 +54,8 @@ public sealed class Seed
 
     public bool? SettleRefuses { get; set; }
 
+    public bool? SessionSignedOut { get; set; }
+
     public bool? CountRefuses { get; set; }
 
     public bool? ItemRefuses { get; set; }
@@ -125,6 +127,8 @@ public sealed class Seed
     public static Seed TheHeldCountEndpointRefuses() => new() { HeldCountRefuses = true };
 
     public static Seed TheSettleEndpointRefuses() => new() { SettleRefuses = true };
+
+    public static Seed TheSessionSignedOut() => new() { SessionSignedOut = true };
 
     public static Seed TheCountEndpointRefuses() => new() { CountRefuses = true };
 
