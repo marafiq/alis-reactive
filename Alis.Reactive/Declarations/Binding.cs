@@ -21,6 +21,8 @@ internal abstract class Binding
     internal abstract BlockWriter Writer { get; }
 
     internal abstract PathMembers Reads(bool optional);
+
+    internal virtual bool IsAnEventsPayload => false;
 }
 
 internal sealed class NotReached : Binding
@@ -91,6 +93,8 @@ internal sealed class Received(BlockWriter writer, string payload = "e", string 
     internal override BlockWriter Writer { get; } = writer;
 
     internal override PathMembers Reads(bool optional) => optional ? PathMembers.OptionalMember : PathMembers.Required;
+
+    internal override bool IsAnEventsPayload => true;
 }
 
 internal sealed class AnswerArguments : Binding

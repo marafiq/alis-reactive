@@ -34,7 +34,13 @@ public class ReadOnly<TValue> : TypedSource<TValue>
     private protected bool Optional { get; }
 
     internal override Schema.Expression Expression
-        => new GetExpression([Member], _fromArguments ? PathMembers.Required : Owner.Bound.Reads(Optional), _fromArguments ? Owner.Bound.Arguments : Owner.Bound.Target);
+    {
+        get
+        {
+            var read = new GetExpression([Member], _fromArguments ? PathMembers.Required : Owner.Bound.Reads(Optional), _fromArguments ? Owner.Bound.Arguments : Owner.Bound.Target);
+            return DateShapeOfAnEventsMember() is { } date ? new AsExpression(read, date) : read;
+        }
+    }
 
     internal override HeldForm Form => HeldForm.Live(Owner.Bound.Writer.Content.Json, Owner.Bound.Writer.Content.RendersUnder);
 
@@ -50,6 +56,9 @@ public class ReadOnly<TValue> : TypedSource<TValue>
 
     internal virtual TypedSource<TResult> ReadPast<TResult>(LambdaExpression path)
         => DataReads.Past<TResult>(Expression, Form, path, Form.DataOptions);
+
+    private Shape? DateShapeOfAnEventsMember()
+        => Owner.Bound.IsAnEventsPayload ? PayloadShapes.DateOf(Owner.Bound.Writer.Content.Json.LiveForm.GetTypeInfo(typeof(TValue))) : null;
 }
 
 /// <summary>

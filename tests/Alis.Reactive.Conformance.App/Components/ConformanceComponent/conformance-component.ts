@@ -34,8 +34,8 @@ export class ConformanceComponent extends ComponentEvents {
     private peer: ConformancePeer | null = null;
     private readonly box: HTMLInputElement;
     enabled: boolean;
-    day = new Date(2026, 10, 9, 9);
-    nullableDay: Date | null = null;
+    private heldDay = new Date(2026, 10, 9, 9);
+    private heldNullableDay: Date | null = null;
     moment = new Date("2026-11-09T14:00:00Z");
     choice: "low" | "high" = "low";
     days: number;
@@ -116,6 +116,10 @@ export class ConformanceComponent extends ComponentEvents {
     set nullableCount(value: number | null) { this.heldNullableCount = value; this.view.status("Nullable count", value === null ? "none" : String(value)); }
     get binding(): BindingData { return this.heldBinding; }
     set binding(value: BindingData) { this.heldBinding = this.start.bindingCountPending ? withPendingCount(value) : value; }
+    get day(): Date { return this.heldDay; }
+    set day(value: Date) { this.heldDay = value; this.appendLog(this.localDay(value)); }
+    get nullableDay(): Date | null { return this.heldNullableDay; }
+    set nullableDay(value: Date | null) { this.heldNullableDay = value; this.appendLog(value === null ? "null" : this.localDay(value)); }
     get records(): RecordData[] { return this.heldRecords; }
     set records(value: RecordData[]) { this.heldRecords = value; this.drawRecords(); }
     get readOnlyCount(): number { return this.count; }
@@ -179,6 +183,8 @@ export class ConformanceComponent extends ComponentEvents {
         const taken: unknown = record;
         if (taken === this.record)
             this.appendLog("same record");
+        else if (record.day instanceof Date)
+            this.appendLog(this.localDay(record.day));
     }
     takeAll(records: TakenRecord[]): void { this.called(); this.view.status("Records", records.map((record) => this.inItsCode(record)).join("; ")); }
     takeDays(days: Date[]): void { this.called(); for (const day of days)
@@ -352,8 +358,8 @@ export class ConformanceComponent extends ComponentEvents {
         this.view.button("Destroy", () => { this.destroy(); });
         const day = this.view.input("Day", "date");
         day.addEventListener("input", () => {
-            this.nullableDay = day.value === "" ? null : new Date(day.value + "T00:00:00");
-            this.day = this.nullableDay ?? new Date(NaN);
+            this.heldNullableDay = day.value === "" ? null : new Date(day.value + "T00:00:00");
+            this.heldDay = this.heldNullableDay ?? new Date(NaN);
         }, { signal: this.view.lifetime.signal });
         this.valueList();
     }

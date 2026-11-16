@@ -561,9 +561,11 @@ Terms used throughout:
 - D5.6 An event's payload is declared as what its listener receives, with the whole vocabulary. A live payload is
   a `JsObject` declaration: every door of D5.1 works on it and on every object it holds, at any depth (properties
   read, written or write-only, `LiveObject<T>`, `LiveObjects<T>`, every method kind, returned objects and lists, the events
-  of an object it holds by `listen` (D12.8), and callbacks (D17.12)), with presence and value as D5.3 states. Plain
-  data is `Data<T>`. A pushed message is `Data<T>` only, since it arrives as JSON (D5.7). What a payload's reads,
-  writes and calls do before and after an awaited step is D11.4.
+  of an object it holds by `listen` (D12.8), and callbacks (D17.12)), with presence and value as D5.3 states. A member
+  of a live payload, and an argument its listener receives, that is declared a date reads as its type from text too,
+  as a member of `Data<T>` does, since the vendor's data carries a date as text (D17.5): a date an event carries as
+  text reaches a live member as a `Date` (X3.10). Plain data is `Data<T>`. A pushed message is `Data<T>` only, since
+  it arrives as JSON (D5.7). What a payload's reads, writes and calls do before and after an awaited step is D11.4.
 - D5.7 A server-pushed message is `Data<T>`, the same as a custom event's payload and a response body.
 - D5.8 The declaration door names the kind of JavaScript member it declares. `LiveObject<T>()` and `LiveObjects<T>()`
   are the object and the list a property holds; `ReturnedObject<T>(..)` and `ReturnedObjects<T>(..)` are what

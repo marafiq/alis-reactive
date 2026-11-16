@@ -26,6 +26,8 @@ public sealed class InfusionPump : Component
 
     public MethodResult<int> SelectRate(Func<PumpReading, TypedSource<int>> key) => Method<int>([Answer(key)]);
 
+    public Event<PumpAlarm> Alarmed => Event<PumpAlarm>();
+
     public ReadOnly<int> FlowRate => ReadOnly<int>();
 
     public ReadOnly<int> Volume => ReadOnly<int>(name: "VTBI");
@@ -281,4 +283,13 @@ public sealed class PumpReading : JsObject
     public void Continue() => MethodAt(1);
 
     public void ContinueWith(Arg<int> rate) => MethodAt(1, [rate]);
+}
+
+public sealed class PumpAlarm : JsObject
+{
+    public ReadOnly<DateTime> RaisedAt => ReadOnly<DateTime>();
+
+    public ReadOnly<DateTimeOffset> ClearedAt => ReadOnly<DateTimeOffset>();
+
+    public ReadOnly<DateTime?> SilencedAt => Argument<DateTime?>(1);
 }
