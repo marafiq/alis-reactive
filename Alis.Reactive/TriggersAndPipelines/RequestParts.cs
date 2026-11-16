@@ -19,6 +19,10 @@ public sealed class QueryParts<TRequest>
         _stage = stage;
     }
 
+    internal QueryParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, _parts.FillsAPlaceholder(member)));
+
+    internal QueryParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, _parts.FillsAPlaceholder(member)));
+
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
@@ -176,6 +180,10 @@ public sealed class BodyParts<TRequest>
         _stage = stage;
     }
 
+    internal BodiedParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.Multipart(_stage, stage => _parts.PlacedLiteral(stage, member, value)));
+
+    internal BodiedParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.Multipart(_stage, stage => _parts.PlacedSource(stage, member, value)));
+
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
@@ -313,6 +321,10 @@ public sealed class BodiedParts<TRequest>
         _parts = parts;
         _stage = stage;
     }
+
+    internal BodiedParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.PlacedLiteral(_stage, member, value));
+
+    internal BodiedParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.PlacedSource(_stage, member, value));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>

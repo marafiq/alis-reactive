@@ -415,8 +415,7 @@
   },
   "M15.F1 X1.4 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/Index/Index.cshtml",
@@ -539,9 +538,7 @@
     ]
   },
   "M17.F1 X11.16 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/ResidentBoard.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2301,18 +2298,14 @@
     ]
   },
   "M6.F1 X9.18 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/StaffSearch.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F1 X9.19 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/StaffSearchLogged.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2330,9 +2323,7 @@
     ]
   },
   "M6.F1 X9.21 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/RequestsAndResponses/RoundsByItsName.cshtml",
       "/Refusals/RequestsAndResponses/RoundsByItsOwnConverter.cshtml",
@@ -2340,54 +2331,42 @@
     ]
   },
   "M6.F1 X9.22 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Refusals/RequestsAndResponses/ShiftRota.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F1 X9.23 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Round/StaffRoster.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F1 X9.24 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/CareWeek.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F1 X9.24 1": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/CareWeek.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F1 X9.24 2": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PanelDays.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
   "M6.F1 X9.25 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/PanelDaysHold.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2455,9 +2434,7 @@
     ]
   },
   "M6.F2 X10.14 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/CensusRefresh.cshtml",
       "/Shared/_Layout.cshtml"
@@ -2485,9 +2462,7 @@
     ]
   },
   "M6.F2 X10.6 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Residents/WingCounts.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3319,9 +3294,7 @@
     ]
   },
   "cell http.chained": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpChained.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3359,9 +3332,7 @@
     ]
   },
   "cell http.parallel": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpParallel.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3396,9 +3367,7 @@
     ]
   },
   "cell http.whileLoading": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpWhileLoading.cshtml",
       "/Shared/_Layout.cshtml"

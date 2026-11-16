@@ -17,7 +17,7 @@ public static class CondensedRequests
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public static QueryParts<TRequest> Set<TRequest, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
-        => throw new NotImplementedException();
+        => request.PlacedSource(member, value);
 
     /// <summary>Sends a member of the request, as a literal, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -26,7 +26,7 @@ public static class CondensedRequests
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public static QueryParts<TRequest> Set<TRequest, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TValue>> member, TValue value)
-        => throw new NotImplementedException();
+        => request.PlacedLiteral(member, value);
 
     /// <summary>Sends a member of the request, as a source reads it when the request is sent, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -36,14 +36,14 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static QueryParts<TRequest> Set<TRequest, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => throw new NotImplementedException();
+        => request.PlacedSource(member, value);
 
     /// <summary>Runs a pipeline when the server answers 2xx, without reading the body.</summary>
     /// <param name="request">The request.</param>
     /// <param name="success">The steps to run.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static GetRequest<TModel, TRequest, Response<TRequest>> OnSuccess<TModel, TRequest>(this GetRequest<TModel, TRequest> request, Action<Pipeline<TModel>> success)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.None, (_, pipeline) => success(pipeline));
 
     /// <summary>Loads the HTML of a 2xx answer into an element, replacing what the element held.</summary>
     /// <remarks>What the element held is released first: its plans stop and its components leave. An answer that is not HTML runs the catch-all route.</remarks>
@@ -140,7 +140,7 @@ public static class CondensedRequests
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
-        => throw new NotImplementedException();
+        => request.PlacedSource(member, value);
 
     /// <summary>Sends a member of the request, as a literal, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -149,7 +149,7 @@ public static class CondensedRequests
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TValue>> member, TValue value)
-        => throw new NotImplementedException();
+        => request.PlacedLiteral(member, value);
 
     /// <summary>Sends a member of the request, as a source reads it when the request is sent, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -159,7 +159,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => throw new NotImplementedException();
+        => request.PlacedSource(member, value);
 
     /// <summary>Sends a native form's submission set as the browser builds it: a GET's in its query, any other request's as multipart fields and files.</summary>
     /// <param name="request">The request's parts.</param>
@@ -200,7 +200,7 @@ public static class CondensedRequests
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
-        => throw new NotImplementedException();
+        => request.PlacedSource(member, value);
 
     /// <summary>Sends a member of the request, as a literal, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -209,7 +209,7 @@ public static class CondensedRequests
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TValue>> member, TValue value)
-        => throw new NotImplementedException();
+        => request.PlacedLiteral(member, value);
 
     /// <summary>Sends a member of the request, as a source reads it when the request is sent, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -219,7 +219,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Set<TRequest, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => throw new NotImplementedException();
+        => request.PlacedSource(member, value);
 
     /// <summary>Sends one input of the request's own view under a member's name, placed as a set member is.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -252,14 +252,14 @@ public static class CondensedRequests
     /// <param name="success">The steps to run.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static HeadRequest<TModel, TRequest, Response<TRequest>> OnSuccess<TModel, TRequest>(this HeadRequest<TModel, TRequest> request, Action<Pipeline<TModel>> success)
-        => throw new NotImplementedException();
+        => request.OnSuccess((_, pipeline) => success(pipeline));
 
     /// <summary>Runs a pipeline when the server answers 2xx, without reading the body.</summary>
     /// <param name="request">The request.</param>
     /// <param name="success">The steps to run.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static OptionsRequest<TModel, TRequest, Response<TRequest>> OnSuccess<TModel, TRequest>(this OptionsRequest<TModel, TRequest> request, Action<Pipeline<TModel>> success)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.None, (_, pipeline) => success(pipeline));
 
     /// <summary>Loads the HTML of a 2xx answer into an element, replacing what the element held.</summary>
     /// <remarks>What the element held is released first: its plans stop and its components leave. An answer that is not HTML runs the catch-all route.</remarks>
@@ -280,7 +280,7 @@ public static class CondensedRequests
     /// <param name="success">The steps to run.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static PostRequest<TModel, TRequest, Response<TRequest>> OnSuccess<TModel, TRequest>(this PostRequest<TModel, TRequest> request, Action<Pipeline<TModel>> success)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.None, (_, pipeline) => success(pipeline));
 
     /// <summary>Loads the HTML of a 2xx answer into an element, replacing what the element held.</summary>
     /// <remarks>What the element held is released first: its plans stop and its components leave. An answer that is not HTML runs the catch-all route.</remarks>
@@ -301,7 +301,7 @@ public static class CondensedRequests
     /// <param name="success">The steps to run.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static PutRequest<TModel, TRequest, Response<TRequest>> OnSuccess<TModel, TRequest>(this PutRequest<TModel, TRequest> request, Action<Pipeline<TModel>> success)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.None, (_, pipeline) => success(pipeline));
 
     /// <summary>Loads the HTML of a 2xx answer into an element, replacing what the element held.</summary>
     /// <remarks>What the element held is released first: its plans stop and its components leave. An answer that is not HTML runs the catch-all route.</remarks>
@@ -322,7 +322,7 @@ public static class CondensedRequests
     /// <param name="success">The steps to run.</param>
     /// <returns>The request, carrying its reply's type: it takes no second success route.</returns>
     public static DeleteRequest<TModel, TRequest, Response<TRequest>> OnSuccess<TModel, TRequest>(this DeleteRequest<TModel, TRequest> request, Action<Pipeline<TModel>> success)
-        => throw new NotImplementedException();
+        => request.OnSuccess(Content.None, (_, pipeline) => success(pipeline));
 
     /// <summary>Loads the HTML of a 2xx answer into an element, replacing what the element held.</summary>
     /// <remarks>What the element held is released first: its plans stop and its components leave. An answer that is not HTML runs the catch-all route.</remarks>

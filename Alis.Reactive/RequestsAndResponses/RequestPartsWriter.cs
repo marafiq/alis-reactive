@@ -123,6 +123,18 @@ internal sealed class RequestPartsWriter
         return _stage;
     }
 
+    internal bool FillsAPlaceholder(LambdaExpression member)
+    {
+        var named = new RequestMember(member);
+        return named.TopLevel && _url.Has(named.Name);
+    }
+
+    internal int PlacedLiteral<TValue>(int stage, LambdaExpression member, TValue value)
+        => FillsAPlaceholder(member) ? Literal(stage, member, value, true) : BodyLiteral(stage, member, value);
+
+    internal int PlacedSource<TValue>(int stage, LambdaExpression member, ITypedSource<TValue> value)
+        => FillsAPlaceholder(member) ? Source(stage, member, value, true) : BodySource(stage, member, value);
+
     internal int FilePart(int stage, LambdaExpression member, BrowserFile file)
     {
         Open(stage);

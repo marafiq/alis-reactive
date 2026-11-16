@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using Alis.Reactive.Elements;
 using Alis.Reactive.RequestsAndResponses;
+using Alis.Reactive.Schema;
 using Alis.Reactive.Validation;
 using Alis.Reactive.ValuesAndSources;
 
@@ -15,7 +17,12 @@ public static class RequestSteps
     /// <summary>Runs several pipelines at once, each sending its own request; the steps after this one run when every one has finished.</summary>
     /// <param name="pipeline">The pipeline the step is written in.</param>
     /// <param name="branches">The pipelines to run at once.</param>
-    public static void Parallel<TModel>(this Pipeline<TModel> pipeline, params Action<Pipeline<TModel>>[] branches) => throw new NotImplementedException();
+    public static void Parallel<TModel>(this Pipeline<TModel> pipeline, params Action<Pipeline<TModel>>[] branches)
+    {
+        var writer = pipeline.Writer;
+        var entered = writer.PathAwaited;
+        writer.Write(new AllStatement([.. branches.Select(branch => writer.Branch(entered, () => branch(new Pipeline<TModel>(writer))).Block)]));
+    }
 
     /// <summary>Checks a container's inputs, as it sends them, by the validator registered for its model, with no request.</summary>
     /// <remarks>
