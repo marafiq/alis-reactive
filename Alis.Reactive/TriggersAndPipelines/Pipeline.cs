@@ -344,6 +344,10 @@ public sealed class BoundInput<TValue>
         _writer = writer;
     }
 
+    internal string Id => _id;
+
+    internal ITypedSource<TValue> Value => new Computed<TValue>(ModelPlugin.ValueOf(_writer.Content, _id), HeldForm.Live(_writer.Content.Json, _writer.Content.RendersUnder));
+
     /// <summary>Reaches the component that renders the input, by the id the framework gave it.</summary>
     /// <typeparam name="TComponent">The component's declaration.</typeparam>
     /// <returns>The component.</returns>

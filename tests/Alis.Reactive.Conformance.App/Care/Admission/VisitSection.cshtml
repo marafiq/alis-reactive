@@ -1,0 +1,11 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RenderingAndDelivery
+@model FamilyVisit
+@{
+    var plan = Html.ReactivePlan<FamilyVisit>();
+}
+@using (Html.BeginRequestContainer(plan, "visit"))
+{
+    <p>Visit of @Model.Visitor</p>
+}
+@Html.RenderPlan(plan)

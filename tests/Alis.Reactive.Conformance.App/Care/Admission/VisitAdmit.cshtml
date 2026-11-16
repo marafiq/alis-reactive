@@ -1,0 +1,26 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model Admission
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Admit";
+    var plan = Html.ReactivePlan<Admission>();
+}
+<h1>Admit</h1>
+<section id="section"></section>
+<button type="button" @Html.Raises(plan, VisitAdmits.LoadSection)>Load the section</button>
+<button type="button" @Html.Raises(plan, VisitAdmits.Admit)>Admit</button>
+<p>Admitting: <span id="admitting">-</span></p>
+<p>Received by the desk: <span id="received">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(VisitAdmits.LoadSection, pipeline => pipeline.Get(Model.SectionUrl).Into("section")));
+    Html.On(plan, trigger => trigger.CustomEvent(VisitAdmits.Admit, pipeline =>
+    {
+        pipeline.Element("admitting").Text.Set("yes");
+        pipeline.Post<Admission>(VisitAdmitEndpoints.Admissions, request => request.Inputs(pipeline.Container<Admission>("visit")))
+            .OnSuccess(Content.Text, (received, pipeline) => pipeline.Element("received").Text.Set(received.Body));
+    }));
+}
+@Html.RenderPlan(plan)

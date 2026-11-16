@@ -25,11 +25,29 @@ internal static class ModelPlugin
 
     internal static Expression Captured(PlanContent plan, string containerId, string model) => Called(plan, "captured", containerId, model);
 
-    private static CallExpression Called(PlanContent plan, string method, string containerId, string model)
+    internal static Expression Sends(PlanContent plan, string containerId, string model) => Called(plan, "sends", containerId, model);
+
+    internal static Expression Submits(PlanContent plan, string formId, string model) => Called(plan, "submits", formId, model);
+
+    internal static Expression Input(PlanContent plan, string inputId, string name) => Called(plan, "input", inputId, name);
+
+    internal static Expression ValueOf(PlanContent plan, string inputId)
+    {
+        DeclaredIn(plan);
+        return new CallExpression([new MemberStep("valueOf")], PathMembers.Required, new ObjExpression(ObjectId), [ValuesAndSources.Literals.Text(inputId)]);
+    }
+
+    internal static Expression Checked(PlanContent plan, Expression inputs, Expression sentValue, Expression entries)
+    {
+        DeclaredIn(plan);
+        return new CallExpression([new MemberStep("checked")], PathMembers.Required, new ObjExpression(ObjectId), [inputs, sentValue, entries]);
+    }
+
+    private static CallExpression Called(PlanContent plan, string method, string id, string text)
     {
         DeclaredIn(plan);
         return new CallExpression([new MemberStep(method)], PathMembers.Required, new ObjExpression(ObjectId),
-            [ValuesAndSources.Literals.Text(containerId), ValuesAndSources.Literals.Text(model)]);
+            [ValuesAndSources.Literals.Text(id), ValuesAndSources.Literals.Text(text)]);
     }
 
     private static void DeclaredIn(PlanContent plan)

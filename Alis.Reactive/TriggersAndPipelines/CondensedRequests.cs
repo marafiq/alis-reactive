@@ -57,13 +57,13 @@ public static class CondensedRequests
     /// <param name="request">The request's parts.</param>
     /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
     /// <returns>The request's parts, which take no second container.</returns>
-    public static QueriedParts<TRequest> Form<TRequest>(this QueryParts<TRequest> request, RequestForm<TRequest> form) => throw new NotImplementedException();
+    public static QueriedParts<TRequest> Form<TRequest>(this QueryParts<TRequest> request, RequestForm<TRequest> form) => request.Submitted(form);
 
     /// <summary>Sends the framework inputs inside a container: a GET's in its query, any other request's as multipart fields and files.</summary>
     /// <param name="request">The request's parts.</param>
     /// <param name="container">The container whose framework inputs the request sends; it becomes the request's container, where its failures show.</param>
     /// <returns>The request's parts, which take no second container.</returns>
-    public static QueriedParts<TRequest> Inputs<TRequest>(this QueryParts<TRequest> request, RequestContainer<TRequest> container) => throw new NotImplementedException();
+    public static QueriedParts<TRequest> Inputs<TRequest>(this QueryParts<TRequest> request, RequestContainer<TRequest> container) => request.Sent(container);
 
     /// <summary>Sends a member of the request, as a source reads it when the request is sent, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -72,7 +72,7 @@ public static class CondensedRequests
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public static QueriedParts<TRequest> Set<TRequest, TValue>(this QueriedParts<TRequest> request, Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value)
-        => throw new NotImplementedException();
+        => request.PlacedSource(member, value);
 
     /// <summary>Sends a member of the request, as a literal, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -81,7 +81,7 @@ public static class CondensedRequests
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
     public static QueriedParts<TRequest> Set<TRequest, TValue>(this QueriedParts<TRequest> request, Expression<Func<TRequest, TValue>> member, TValue value)
-        => throw new NotImplementedException();
+        => request.PlacedLiteral(member, value);
 
     /// <summary>Sends a member of the request, as a source reads it when the request is sent, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -91,7 +91,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static QueriedParts<TRequest> Set<TRequest, TValue>(this QueriedParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => throw new NotImplementedException();
+        => request.PlacedSource(member, value);
 
     /// <summary>Sends one input of the request's own view under a member's name, placed as a set member is.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -101,7 +101,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static QueriedParts<TRequest> Input<TRequest, TMember, TValue>(this QueriedParts<TRequest> request, Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
-        => throw new NotImplementedException();
+        => request.PlacedInput(member, input);
 
     /// <summary>Sends one input of the request's own view under a member's name, placed as a set member is.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -111,7 +111,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static QueriedParts<TRequest> Input<TRequest, TValue>(this QueriedParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
         where TValue : struct
-        => throw new NotImplementedException();
+        => request.PlacedInput(member, input);
 
     /// <summary>Sends one input of the request's own view under a member's name, placed as a set member is.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -121,7 +121,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static QueryParts<TRequest> Input<TRequest, TMember, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
-        => throw new NotImplementedException();
+        => request.PlacedInput(member, input);
 
     /// <summary>Sends one input of the request's own view under a member's name, placed as a set member is.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -131,7 +131,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static QueryParts<TRequest> Input<TRequest, TValue>(this QueryParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
         where TValue : struct
-        => throw new NotImplementedException();
+        => request.PlacedInput(member, input);
 
     /// <summary>Sends a member of the request, as a source reads it when the request is sent, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -165,13 +165,13 @@ public static class CondensedRequests
     /// <param name="request">The request's parts.</param>
     /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
     /// <returns>The request's parts, which take no second container.</returns>
-    public static BodiedParts<TRequest> Form<TRequest>(this BodyParts<TRequest> request, RequestForm<TRequest> form) => throw new NotImplementedException();
+    public static BodiedParts<TRequest> Form<TRequest>(this BodyParts<TRequest> request, RequestForm<TRequest> form) => request.Submitted(form);
 
     /// <summary>Sends the framework inputs inside a container: a GET's in its query, any other request's as multipart fields and files.</summary>
     /// <param name="request">The request's parts.</param>
     /// <param name="container">The container whose framework inputs the request sends; it becomes the request's container, where its failures show.</param>
     /// <returns>The request's parts, which take no second container.</returns>
-    public static BodiedParts<TRequest> Inputs<TRequest>(this BodyParts<TRequest> request, RequestContainer<TRequest> container) => throw new NotImplementedException();
+    public static BodiedParts<TRequest> Inputs<TRequest>(this BodyParts<TRequest> request, RequestContainer<TRequest> container) => request.Sent(container);
 
     /// <summary>Sends one input of the request's own view under a member's name, placed as a set member is.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -181,7 +181,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Input<TRequest, TMember, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
-        => throw new NotImplementedException();
+        => request.PlacedInput(member, input);
 
     /// <summary>Sends one input of the request's own view under a member's name, placed as a set member is.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -191,7 +191,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Input<TRequest, TValue>(this BodyParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
         where TValue : struct
-        => throw new NotImplementedException();
+        => request.PlacedInput(member, input);
 
     /// <summary>Sends a member of the request, as a source reads it when the request is sent, wherever the request carries it.</summary>
     /// <remarks>A member named like a placeholder of the URL fills it. Any other goes in the query of a request with no body, and in the body of a POST, a PUT or a DELETE, which sends it as multipart unless the request names another body.</remarks>
@@ -229,7 +229,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Input<TRequest, TMember, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
-        => throw new NotImplementedException();
+        => request.PlacedInput(member, input);
 
     /// <summary>Sends one input of the request's own view under a member's name, placed as a set member is.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -239,7 +239,7 @@ public static class CondensedRequests
     /// <returns>The request's parts.</returns>
     public static BodiedParts<TRequest> Input<TRequest, TValue>(this BodiedParts<TRequest> request, Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
         where TValue : struct
-        => throw new NotImplementedException();
+        => request.PlacedInput(member, input);
 
     /// <summary>Saves the body of a 2xx answer as the browser's download.</summary>
     /// <param name="request">The request.</param>

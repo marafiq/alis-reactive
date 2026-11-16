@@ -1,9 +1,33 @@
 import type { Owner } from "../OwnershipAndState/index";
-import { assertNever, notBuilt, type AsExpression, type Container, type Expression, type InputBinding, type ModelPluginData, type OpExpression, type PathStep, type PlanDocument, type SentInput } from "../Schema/index";
+import {
+  assertNever, notBuilt, type AsExpression, type Container, type ContainerCapture, type Expression, type InputBinding, type InputCapture, type ModelPluginData, type OpExpression, type PathStep,
+  type PlanDocument, type SentInput, type SentInputs, type ValueRead,
+} from "../Schema/index";
 import { Stop } from "../ValuesAndSources/index";
 
 type ReadValue = (expression: Expression) => unknown;
 type Inside = (containerId: string) => ((inputId: string) => boolean) | null;
+type SubmissionOf = (formId: string) => FormData | null;
+
+export class Submission {
+  readonly entries: FormData;
+  readonly members: object;
+
+  constructor(entries: FormData, members: object) {
+    this.entries = entries;
+    this.members = members;
+  }
+}
+
+export interface CheckedEntry {
+  readonly path: readonly PathStep[];
+  readonly value: ValueRead;
+}
+
+export interface CheckedBody {
+  readonly body: object;
+  readonly inputs: readonly SentInput[];
+}
 
 interface Contribution {
   readonly planId: string;
@@ -26,11 +50,13 @@ export interface CapturedContainer {
 
 export class PageInputs {
   readonly #inside: Inside;
+  readonly #submissionOf: SubmissionOf;
   readonly #inputs = new Map<string, Input>();
   readonly #containers = new Map<string, Map<Contribution, Container>>();
 
-  constructor(inside: Inside) {
+  constructor(inside: Inside, submissionOf: SubmissionOf) {
     this.#inside = inside;
+    this.#submissionOf = submissionOf;
   }
 
   join(plan: PlanDocument, owner: Owner, place: string, read: ReadValue): void {
@@ -82,6 +108,58 @@ export class PageInputs {
     const body = first !== undefined && typeof first[1].binding.path[0] === "number" ? [] : {};
     for (const [, input] of inputs) write(body, input.binding.path, input.contribution.read(input.binding.value));
     return { kind: "captured", id: containerId, body, inputs: inputs.map(([id, input]) => ({ name: input.binding.name, entry: { id, binding: input.binding } })) };
+  }
+
+  sends(containerId: string, modelKey: string): ContainerCapture {
+    if (this.#inside(containerId) === null) return { kind: "missing", id: containerId };
+    return this.captured(containerId, modelKey);
+  }
+
+  submits(formId: string, modelKey: string): ContainerCapture {
+    const submitted = this.#submissionOf(formId);
+    if (submitted === null) return { kind: "missing", id: formId };
+    const captured = this.captured(formId, modelKey);
+    return { ...captured, body: new Submission(submitted, captured.body) };
+  }
+
+  input(inputId: string, name: string): InputCapture {
+    const input = this.#inputs.get(inputId);
+    if (input === undefined) return { kind: "missing", id: inputId, name };
+    return { kind: "captured", input: { name, entry: { id: inputId, binding: input.binding } } };
+  }
+
+  valueOf(inputId: string): unknown {
+    const input = this.#inputs.get(inputId);
+    return input === undefined ? undefined : input.contribution.read(input.binding.value);
+  }
+
+  checked(inputs: SentInputs, sentValue: unknown, entries: readonly CheckedEntry[]): CheckedBody | null {
+    const individual: SentInput[] = [];
+    for (const capture of inputs.individual) {
+      switch (capture.kind) {
+        case "missing":
+          return null;
+        case "captured":
+          individual.push(capture.input);
+          break;
+        default:
+          assertNever(capture);
+      }
+    }
+    const body = typeof sentValue === "object" && sentValue !== null ? structuredClone(sentValue) : {};
+    for (const entry of entries) if (entry.value.kind === "held") write(body, entry.path, entry.value.value);
+    const container = inputs.container;
+    switch (container.kind) {
+      case "none":
+        return { body, inputs: individual };
+      case "missing":
+        return null;
+      case "captured":
+        merge(body, container.body instanceof Submission ? container.body.members : container.body);
+        return { body, inputs: [...container.inputs, ...individual] };
+      default:
+        return assertNever(container);
+    }
   }
 
   typedText(sent: SentInput): string | null {
@@ -161,4 +239,17 @@ function write(holder: object, path: readonly PathStep[], value: unknown): void 
   const child = Object.hasOwn(holder, step) ? Reflect.get(holder, step) as object : typeof past[0] === "number" ? [] : {};
   Object.defineProperty(holder, step, { value: child, enumerable: true, writable: true, configurable: true });
   write(child, past, value);
+}
+
+function merge(holder: object, over: unknown): void {
+  if (typeof over !== "object" || over === null) return;
+  for (const [step, value] of Object.entries(over)) {
+    const current: unknown = Reflect.get(holder, step);
+    const nests = typeof value === "object" && value !== null && !Array.isArray(value) && typeof current === "object" && current !== null && !Array.isArray(current);
+    if (nests) {
+      merge(current, value);
+      continue;
+    }
+    Object.defineProperty(holder, step, { value, enumerable: true, writable: true, configurable: true });
+  }
 }

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { prepare } from "./index";
+import { prepare, Submission } from "./index";
 
 type Send = Parameters<typeof prepare>[0];
 type Field = Send["query"]["fields"][number];
@@ -303,5 +303,61 @@ describe("when a request reaches a deferred U18 case, it names the piece it wait
 
   test.each<Send["contracts"][number]>(["busy", "notice"])("DeferredContract: %s waits on its component contract", contract => {
     expect(() => prepare({ ...get(), contracts: [contract] }, clock, enUs)).toThrow("contract: U18's");
+  });
+});
+
+type Captured = Extract<Send["query"]["inputs"]["container"], { kind: "captured" }>;
+type Binding = Captured["inputs"][number]["entry"]["binding"];
+const bound = (name: string, path: Binding["path"], shape: Extract<Binding["value"], { kind: "as" }>["shape"]): Captured["inputs"][number] => ({
+  name,
+  entry: {
+    id: "Intake__" + name,
+    binding: {
+      name, path, committed: "change", invalidClass: "invalid", message: "",
+      value: { kind: "op", op: "coalesce", args: [{ kind: "as", expr: { kind: "lit", value: null }, shape: { kind: "nullable", inner: shape } }, { kind: "lit", value: null }] },
+    },
+  },
+});
+const ward = bound("Ward", ["ward"], { kind: "string", date: "none", negativeZero: "0" });
+const beds = bound("Beds", ["beds"], { kind: "number", of: "integer", text: "invariant", overflow: "nothing" });
+const container = (body: unknown, inputs: Captured["inputs"]): Send["query"]["inputs"] => ({ container: { kind: "captured", id: "intake", body, inputs }, individual: [] });
+const post = (body: Body): Send => ({ ...get(), method: "POST", body });
+
+describe("when a request sends a container, a form or an input", () => {
+  test("ContainerUnderItsBindingNames: a GET sends each framework input inside the container in its query, in its wire form", () => {
+    const prepared = prepare({ ...get([field("Ward", "North", { kind: "text" })]), query: { fields: [field("Ward", "North", { kind: "text" })], inputs: container({ ward: "East", beds: 3 }, [ward, beds]) } }, clock, enUs);
+    expect(prepared.url).toBe("/Residents?Ward=East&Beds=3");
+    expect(prepared.inputs.map(input => input.name)).toStrictEqual(["Ward", "Beds"]);
+  });
+
+  test("SubmissionSetAsTheBrowserBuildsIt: a form's controls are sent, its framework inputs replace their name's entries and the token replaces the form's own", async () => {
+    const submitted = new FormData();
+    submitted.append("Code", "A7");
+    submitted.append("Ward", "typed");
+    submitted.append("__RequestVerificationToken", "the form's");
+    const body: Body = { kind: "urlEncoded", fields: [], inputs: container(new Submission(submitted, { ward: "East" }), [ward]) };
+    const prepared = prepare({ ...post(body), antiforgery: { kind: "token", value: "framework", place: { kind: "field", name: "__RequestVerificationToken" } } }, clock, enUs);
+    expect(await new Response(prepared.body).text()).toBe("Code=A7&__RequestVerificationToken=framework&Ward=East");
+  });
+
+  test("ContainerInAnyBody: a JSON body holds the container's inputs over the members it sets, and multipart sends them as fields", () => {
+    const json = prepare(post({ kind: "json", value: { ward: "North", room: "R4" }, inputs: container({ ward: "East" }, [ward]) }), clock, enUs);
+    expect(json.body).toBe("{\"ward\":\"East\",\"room\":\"R4\"}");
+    const multipart = prepare(post({ kind: "multipart", parts: [], inputs: container({ beds: 2.5 }, [beds]) }), clock, deDe);
+    expect([...(multipart.body as FormData).entries()]).toStrictEqual([["Beds", "2,5"]]);
+  });
+
+  test("FileOnlyInFormData: a file a form holds stops a GET or URL-encoded request that would send it", () => {
+    const submitted = new FormData();
+    submitted.append("Photo", new File(["x"], "photo.png"));
+    expect(() => prepare({ ...get(), query: { fields: [], inputs: container(new Submission(submitted, {}), []) } }, clock, enUs))
+      .toThrow(/^The request's form control 'Photo' holds a file, which is sent only in multipart form data\.$/);
+  });
+
+  test("MissingStopsAtTheGuard: a container or an input the page lacks stops the request where it is prepared", () => {
+    expect(() => prepare({ ...get(), query: { fields: [], inputs: { container: { kind: "missing", id: "intake" }, individual: [] } } }, clock, enUs))
+      .toThrow(/^The request's container 'intake' is missing\.$/);
+    expect(() => prepare({ ...get(), query: { fields: [], inputs: { container: { kind: "none" }, individual: [{ kind: "missing", id: "Intake__Ward", name: "Ward" }] } } }, clock, enUs))
+      .toThrow(/^The request's input 'Intake__Ward' for 'Ward' is missing\.$/);
   });
 });

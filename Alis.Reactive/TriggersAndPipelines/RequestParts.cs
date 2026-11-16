@@ -1,6 +1,7 @@
 using System;
 using System.Linq.Expressions;
 using Alis.Reactive.RequestsAndResponses;
+using Alis.Reactive.TypeKnowledge;
 using Alis.Reactive.ValuesAndSources;
 
 namespace Alis.Reactive.TriggersAndPipelines;
@@ -22,6 +23,13 @@ public sealed class QueryParts<TRequest>
     internal QueryParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, _parts.FillsAPlaceholder(member)));
 
     internal QueryParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, _parts.FillsAPlaceholder(member)));
+
+    internal QueryParts<TRequest> PlacedInput<TValue>(LambdaExpression member, BoundInput<TValue> input)
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.Source(stage, member, input.Value, _parts.FillsAPlaceholder(member))));
+
+    internal QueriedParts<TRequest> Submitted(RequestForm<TRequest> form) => new(_parts, _parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))));
+
+    internal QueriedParts<TRequest> Sent(RequestContainer<TRequest> container) => new(_parts, _parts.Sends(_stage, container.ElementId, ClassNames.ModelKey(typeof(TRequest))));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
@@ -98,23 +106,35 @@ public sealed class QueryParts<TRequest>
 /// </summary>
 public sealed class QueriedParts<TRequest>
 {
-    internal QueriedParts()
+    private readonly RequestPartsWriter _parts;
+    private readonly int _stage;
+
+    internal QueriedParts(RequestPartsWriter parts, int stage)
     {
+        _parts = parts;
+        _stage = stage;
     }
+
+    internal QueriedParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, _parts.FillsAPlaceholder(member)));
+
+    internal QueriedParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, _parts.FillsAPlaceholder(member)));
+
+    internal QueriedParts<TRequest> PlacedInput<TValue>(LambdaExpression member, BoundInput<TValue> input)
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.Source(stage, member, input.Value, _parts.FillsAPlaceholder(member))));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueriedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotImplementedException();
+    public QueriedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, true));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with a literal.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueriedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotImplementedException();
+    public QueriedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, true));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
@@ -123,19 +143,19 @@ public sealed class QueriedParts<TRequest>
     /// <returns>The request's parts.</returns>
     public QueriedParts<TRequest> Path<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => throw new NotImplementedException();
+        => new(_parts, _parts.Source(_stage, member, value, true));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a source reads it when the request is sent.</summary>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueriedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => throw new NotImplementedException();
+    public QueriedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, ITypedSource<TValue> value) => new(_parts, _parts.Source(_stage, member, value, false));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a literal.</summary>
     /// <param name="member">The member of the request, as a member path.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueriedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => throw new NotImplementedException();
+    public QueriedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue>> member, TValue value) => new(_parts, _parts.Literal(_stage, member, value, false));
 
     /// <summary>Sends a member in the URL's query, under the name the endpoint binds it by, as a source reads it when the request is sent.</summary>
     /// <param name="member">The member of the request, as a member path.</param>
@@ -143,21 +163,21 @@ public sealed class QueriedParts<TRequest>
     /// <returns>The request's parts.</returns>
     public QueriedParts<TRequest> Query<TValue>(Expression<Func<TRequest, TValue?>> member, ITypedSource<TValue> value)
         where TValue : struct
-        => throw new NotImplementedException();
+        => new(_parts, _parts.Source(_stage, member, value, false));
 
     /// <summary>Sends a header with a fixed text.</summary>
     /// <remarks><c>Content-Type</c>, <c>Accept</c> and the headers the framework or the browser writes are refused where the view renders.</remarks>
     /// <param name="name">The header's name.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueriedParts<TRequest> Header(string name, string value) => throw new NotImplementedException();
+    public QueriedParts<TRequest> Header(string name, string value) => new(_parts, _parts.Header(_stage, name, value));
 
     /// <summary>Sends a header whose text a source reads when the request is sent; one that cannot be read is not sent.</summary>
     /// <remarks><c>Content-Type</c>, <c>Accept</c> and the headers the framework or the browser writes are refused where the view renders.</remarks>
     /// <param name="name">The header's name.</param>
     /// <param name="value">The value sent: a literal written where the view renders, or a source read when the request is sent.</param>
     /// <returns>The request's parts.</returns>
-    public QueriedParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value) => throw new NotImplementedException();
+    public QueriedParts<TRequest> Header<TValue>(string name, ITypedSource<TValue> value) => new(_parts, _parts.Header(_stage, name, value));
 
     /// <summary>Starts a condition on the parts its branch sends, read once when the request is sent.</summary>
     /// <remarks>When the condition is not true, each part the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start. The URL, the method and the body's format take no condition, so a branch takes no body and no container: the request names them before its first condition.</remarks>
@@ -183,6 +203,13 @@ public sealed class BodyParts<TRequest>
     internal BodiedParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.Multipart(_stage, stage => _parts.PlacedLiteral(stage, member, value)));
 
     internal BodiedParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.Multipart(_stage, stage => _parts.PlacedSource(stage, member, value)));
+
+    internal BodiedParts<TRequest> PlacedInput<TValue>(LambdaExpression member, BoundInput<TValue> input)
+        => new(_parts, _parts.Multipart(_stage, stage => _parts.Input(stage, member, input.Id, placed => _parts.PlacedSource(placed, member, input.Value))));
+
+    internal BodiedParts<TRequest> Submitted(RequestForm<TRequest> form) => new(_parts, _parts.Multipart(_parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))), _ => { }));
+
+    internal BodiedParts<TRequest> Sent(RequestContainer<TRequest> container) => new(_parts, _parts.Multipart(_parts.Sends(_stage, container.ElementId, ClassNames.ModelKey(typeof(TRequest))), _ => { }));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
@@ -250,7 +277,8 @@ public sealed class BodyParts<TRequest>
     /// <param name="container">The container whose framework inputs the request sends; it becomes the request's container, where its failures show.</param>
     /// <param name="body">The body's members.</param>
     /// <returns>The request's parts, which take no second body.</returns>
-    public BodiedParts<TRequest> Json(RequestContainer<TRequest> container, Action<JsonBody<TRequest>> body) => throw WaitingBodyDoors.Container("Json(container, body)");
+    public BodiedParts<TRequest> Json(RequestContainer<TRequest> container, Action<JsonBody<TRequest>> body)
+        => new(_parts, _parts.Json(_parts.Sends(_stage, container.ElementId, ClassNames.ModelKey(typeof(TRequest))), stage => body(new JsonBody<TRequest>(_parts, stage))));
 
     /// <summary>Sends a URL-encoded body whose fields the lambda sets.</summary>
     /// <param name="body">The body's members.</param>
@@ -261,13 +289,15 @@ public sealed class BodyParts<TRequest>
     /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
     /// <param name="body">The body's members.</param>
     /// <returns>The request's parts, which take no second body.</returns>
-    public BodiedParts<TRequest> UrlEncoded(RequestForm<TRequest> form, Action<UrlEncodedBody<TRequest>> body) => throw WaitingBodyDoors.Form("UrlEncoded(form, body)");
+    public BodiedParts<TRequest> UrlEncoded(RequestForm<TRequest> form, Action<UrlEncodedBody<TRequest>> body)
+        => new(_parts, _parts.UrlEncoded(_parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))), stage => body(new UrlEncodedBody<TRequest>(_parts, stage))));
 
     /// <summary>Sends a URL-encoded body whose fields the lambda sets, with the framework inputs of a container.</summary>
     /// <param name="container">The container whose framework inputs the request sends; it becomes the request's container, where its failures show.</param>
     /// <param name="body">The body's members.</param>
     /// <returns>The request's parts, which take no second body.</returns>
-    public BodiedParts<TRequest> UrlEncoded(RequestContainer<TRequest> container, Action<UrlEncodedBody<TRequest>> body) => throw WaitingBodyDoors.Container("UrlEncoded(container, body)");
+    public BodiedParts<TRequest> UrlEncoded(RequestContainer<TRequest> container, Action<UrlEncodedBody<TRequest>> body)
+        => new(_parts, _parts.UrlEncoded(_parts.Sends(_stage, container.ElementId, ClassNames.ModelKey(typeof(TRequest))), stage => body(new UrlEncodedBody<TRequest>(_parts, stage))));
 
     /// <summary>Sends a multipart body whose fields and files the lambda sets.</summary>
     /// <param name="body">The body's members.</param>
@@ -278,13 +308,15 @@ public sealed class BodyParts<TRequest>
     /// <param name="form">The native form whose submission set the request sends; it becomes the request's container, where its failures show.</param>
     /// <param name="body">The body's members.</param>
     /// <returns>The request's parts, which take no second body.</returns>
-    public BodiedParts<TRequest> Multipart(RequestForm<TRequest> form, Action<MultipartBody<TRequest>> body) => throw WaitingBodyDoors.Form("Multipart(form, body)");
+    public BodiedParts<TRequest> Multipart(RequestForm<TRequest> form, Action<MultipartBody<TRequest>> body)
+        => new(_parts, _parts.Multipart(_parts.Submits(_stage, form.ElementId, ClassNames.ModelKey(typeof(TRequest))), stage => body(new MultipartBody<TRequest>(_parts, stage))));
 
     /// <summary>Sends a multipart body whose fields and files the lambda sets, with the framework inputs of a container.</summary>
     /// <param name="container">The container whose framework inputs the request sends; it becomes the request's container, where its failures show.</param>
     /// <param name="body">The body's members.</param>
     /// <returns>The request's parts, which take no second body.</returns>
-    public BodiedParts<TRequest> Multipart(RequestContainer<TRequest> container, Action<MultipartBody<TRequest>> body) => throw WaitingBodyDoors.Container("Multipart(container, body)");
+    public BodiedParts<TRequest> Multipart(RequestContainer<TRequest> container, Action<MultipartBody<TRequest>> body)
+        => new(_parts, _parts.Multipart(_parts.Sends(_stage, container.ElementId, ClassNames.ModelKey(typeof(TRequest))), stage => body(new MultipartBody<TRequest>(_parts, stage))));
 
     /// <summary>Sends a text as the whole body.</summary>
     /// <param name="text">The text sent as the whole body.</param>
@@ -325,6 +357,9 @@ public sealed class BodiedParts<TRequest>
     internal BodiedParts<TRequest> PlacedLiteral<TValue>(LambdaExpression member, TValue value) => new(_parts, _parts.PlacedLiteral(_stage, member, value));
 
     internal BodiedParts<TRequest> PlacedSource<TValue>(LambdaExpression member, ITypedSource<TValue> value) => new(_parts, _parts.PlacedSource(_stage, member, value));
+
+    internal BodiedParts<TRequest> PlacedInput<TValue>(LambdaExpression member, BoundInput<TValue> input)
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.PlacedSource(stage, member, input.Value)));
 
     /// <summary>Fills the URL's placeholder named like a member of the request with what a source reads when the request is sent.</summary>
     /// <remarks>A value that cannot be read, is empty or holds a slash stops the request before it is sent.</remarks>
@@ -509,7 +544,7 @@ public sealed class JsonBody<TRequest>
     /// <returns>The body's members.</returns>
     public JsonBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
-        => throw WaitingBodyDoors.Input("JsonBody.Input(member, input)");
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.BodySource(stage, member, input.Value)));
 
     /// <summary>Sends one input of the request's own view in the body, under a member's name.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -518,7 +553,7 @@ public sealed class JsonBody<TRequest>
     /// <returns>The body's members.</returns>
     public JsonBody<TRequest> Input<TValue>(Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
         where TValue : struct
-        => throw WaitingBodyDoors.Input("JsonBody.Input(member, input)");
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.BodySource(stage, member, input.Value)));
 
     /// <summary>Starts a condition on the parts its branch sends, read once when the request is sent.</summary>
     /// <remarks>When the condition is not true, each member the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start.</remarks>
@@ -568,7 +603,7 @@ public sealed class UrlEncodedBody<TRequest>
     /// <returns>The body's members.</returns>
     public UrlEncodedBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
-        => throw WaitingBodyDoors.Input("UrlEncodedBody.Input(member, input)");
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.BodySource(stage, member, input.Value)));
 
     /// <summary>Sends one input of the request's own view in the body, under a member's name.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -577,7 +612,7 @@ public sealed class UrlEncodedBody<TRequest>
     /// <returns>The body's members.</returns>
     public UrlEncodedBody<TRequest> Input<TValue>(Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
         where TValue : struct
-        => throw WaitingBodyDoors.Input("UrlEncodedBody.Input(member, input)");
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.BodySource(stage, member, input.Value)));
 
     /// <summary>Starts a condition on the parts its branch sends, read once when the request is sent.</summary>
     /// <remarks>When the condition is not true, each member the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start.</remarks>
@@ -627,7 +662,7 @@ public sealed partial class MultipartBody<TRequest>
     /// <returns>The body's members.</returns>
     public MultipartBody<TRequest> Input<TMember, TValue>(Expression<Func<TRequest, TMember>> member, BoundInput<TValue> input)
         where TValue : TMember
-        => throw WaitingBodyDoors.Input("MultipartBody.Input(member, input)");
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.BodySource(stage, member, input.Value)));
 
     /// <summary>Sends one input of the request's own view in the body, under a member's name.</summary>
     /// <remarks>When an input and a set member send one name, the input's value is sent.</remarks>
@@ -636,7 +671,7 @@ public sealed partial class MultipartBody<TRequest>
     /// <returns>The body's members.</returns>
     public MultipartBody<TRequest> Input<TValue>(Expression<Func<TRequest, TValue?>> member, BoundInput<TValue> input)
         where TValue : struct
-        => throw WaitingBodyDoors.Input("MultipartBody.Input(member, input)");
+        => new(_parts, _parts.Input(_stage, member, input.Id, stage => _parts.BodySource(stage, member, input.Value)));
 
     /// <summary>Starts a condition on the parts its branch sends, read once when the request is sent.</summary>
     /// <remarks>When the condition is not true, each member the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start.</remarks>

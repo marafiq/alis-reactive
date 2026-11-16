@@ -46,8 +46,7 @@
   },
   "M1.F1 X11.7 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/ChartSave.cshtml",
@@ -476,8 +475,7 @@
   },
   "M15.F1 X3.5 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/StrengthIntake.cshtml",
@@ -486,8 +484,7 @@
   },
   "M15.F1 X3.6 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/IntakeAssessment.cshtml",
@@ -846,8 +843,7 @@
   },
   "M21.F1 M21.X2 0": {
     "modules": [
-      "FusionComponents",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/AllergyIntake.cshtml",
@@ -892,8 +888,7 @@
   },
   "M21.F13 M21.X505 0": {
     "modules": [
-      "FusionComponents",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/LanguageIntake.cshtml",
@@ -965,8 +960,7 @@
   },
   "M21.F20 M21.X507 0": {
     "modules": [
-      "FusionComponents",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/WardPlacement.cshtml",
@@ -993,8 +987,7 @@
   },
   "M21.F22 M21.X1014 0": {
     "modules": [
-      "FusionComponents",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/CarePlanUpload.cshtml",
@@ -1103,8 +1096,7 @@
   },
   "M21.F31 M21.X512 0": {
     "modules": [
-      "FusionComponents",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/BedAllocation.cshtml",
@@ -1302,8 +1294,7 @@
   },
   "M21.F5 M21.X503 0": {
     "modules": [
-      "FusionComponents",
-      "TriggersAndPipelines"
+      "FusionComponents"
     ],
     "views": [
       "/Care/AdmissionClinical/MedicationIntake.cshtml",
@@ -2062,8 +2053,7 @@
   },
   "M4.F1 X6.57 2": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/ArrayLambdas/BookedVisits.cshtml",
@@ -2335,13 +2325,30 @@
       "/Shared/_Layout.cshtml"
     ]
   },
+  "M6.F1 X9.15 0": {
+    "modules": [
+      "NativeComponents"
+    ],
+    "views": [
+      "/Care/Admission/IntakeAdmit.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
   "M6.F1 X9.16 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/IntakeContact.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X9.17 0": {
+    "modules": [
+      "TriggersAndPipelines"
+    ],
+    "views": [
+      "/Care/Admission/VisitAdmit.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },
@@ -2361,8 +2368,7 @@
   },
   "M6.F1 X9.20 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Refusals/RequestsAndResponses/WardBedsOfTwoWardsInOneForm.cshtml",
@@ -2429,8 +2435,7 @@
   },
   "M6.F1 X9.27 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/IntakeDocuments.cshtml",
@@ -2514,8 +2519,7 @@
   },
   "M6.F2 X10.29 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/BedCommit.cshtml",
@@ -2525,8 +2529,7 @@
   },
   "M6.F2 X10.4 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/QuickAdmission.cshtml",
@@ -2593,8 +2596,7 @@
   },
   "M7.F1 X14.9 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/KinContactCard.cshtml",
@@ -2614,8 +2616,7 @@
   },
   "M7.F2 X14.12 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/FluidsChart.cshtml",
@@ -2655,8 +2656,7 @@
   },
   "M7.F3 X13.1 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/ChartCards.cshtml",
@@ -2678,8 +2678,7 @@
   },
   "M7.F3 X13.2 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/SignInGuestName.cshtml",
@@ -2731,8 +2730,7 @@
   },
   "M8.F1 X16.10 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/RoomNumbering.cshtml",
@@ -2741,8 +2739,7 @@
   },
   "M8.F1 X16.22 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/CareRota.cshtml",
@@ -2752,8 +2749,7 @@
   },
   "M8.F1 X16.9 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/HouseholdContacts.cshtml",
@@ -2762,8 +2758,7 @@
   },
   "M8.F3 X16.2 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/HomeLead.cshtml",
@@ -2772,8 +2767,7 @@
   },
   "M8.F3 X16.3 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/DeputyAppointment.cshtml",
@@ -2783,8 +2777,7 @@
   },
   "M8.F3 X16.4 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Round/SupplyCount.cshtml",
@@ -2793,8 +2786,7 @@
   },
   "M8.F3 X16.6 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/ArrivalIntake.cshtml",
@@ -2847,8 +2839,7 @@
   "M8.F4 X16.15 0": {
     "modules": [
       "NativeAppLevelObjects",
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Admission/BedAssignment.cshtml",
@@ -2922,8 +2913,7 @@
   },
   "M8.F4 X16.7 0": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Care/Record/CarePlan.cshtml",
@@ -3345,9 +3335,7 @@
     ]
   },
   "cell http.beside.hidden": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Bench/Http/HttpBesideHidden.cshtml",
       "/Shared/_Layout.cshtml"
@@ -3708,8 +3696,7 @@
   },
   "cell validation.condition": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Validation/StrictCodeForm.cshtml",
@@ -3718,8 +3705,7 @@
   },
   "cell validation.listItem": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Validation/EntriesForm.cshtml",
@@ -3728,8 +3714,7 @@
   },
   "cell validation.live": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",
@@ -3738,8 +3723,7 @@
   },
   "cell validation.prefix": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Validation/EntryCode.cshtml",
@@ -3749,8 +3733,7 @@
   },
   "cell validation.rule": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",
@@ -3759,8 +3742,7 @@
   },
   "cell validation.summary": {
     "modules": [
-      "NativeComponents",
-      "TriggersAndPipelines"
+      "NativeComponents"
     ],
     "views": [
       "/Bench/Validation/CodeForm.cshtml",

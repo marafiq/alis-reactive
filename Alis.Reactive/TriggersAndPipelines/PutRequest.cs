@@ -89,7 +89,7 @@ public sealed class PutRequest<TModel, TRequest>
     /// <returns>The request.</returns>
     public PutRequest<TModel, TRequest> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
-        => throw new NotImplementedException();
+        => new(_request, _request.Validate<TRequest, TValidator>(_stage, BrowserRegistrations.DefaultRuleSet));
 
     /// <summary>Names the validator and the rule set that check what the request sends, before it is sent.</summary>
     /// <remarks>The check runs the rules the validator declares inside that rule set and no other. A check that fails shows its failures at the request's container, sends nothing and runs neither <c>WhileLoading</c> nor <c>Finally</c>.</remarks>
@@ -97,11 +97,11 @@ public sealed class PutRequest<TModel, TRequest>
     /// <returns>The request.</returns>
     public PutRequest<TModel, TRequest> Validate<TValidator>(string ruleSet)
         where TValidator : ReactiveValidator<TRequest>
-        => throw new NotImplementedException();
+        => new(_request, _request.Validate<TRequest, TValidator>(_stage, ruleSet));
 
     /// <summary>Sends the request without checking what it sends.</summary>
     /// <returns>The request.</returns>
-    public PutRequest<TModel, TRequest> NoValidation() => throw new NotImplementedException();
+    public PutRequest<TModel, TRequest> NoValidation() => new(_request, _request.NoValidation(_stage));
 
     /// <summary>Runs a pipeline when the request starts, before it is sent.</summary>
     /// <remarks>A step of it that stops the pipeline sends nothing and runs no <c>Finally</c>.</remarks>
@@ -188,7 +188,7 @@ public sealed class PutRequest<TModel, TRequest, TReply>
     /// <returns>The request.</returns>
     public PutRequest<TModel, TRequest, TReply> Validate<TValidator>()
         where TValidator : ReactiveValidator<TRequest>
-        => throw new NotImplementedException();
+        => new(_request, _request.Validate<TRequest, TValidator>(_stage, BrowserRegistrations.DefaultRuleSet), _reply);
 
     /// <summary>Names the validator and the rule set that check what the request sends, before it is sent.</summary>
     /// <remarks>The check runs the rules the validator declares inside that rule set and no other. A check that fails shows its failures at the request's container, sends nothing and runs neither <c>WhileLoading</c> nor <c>Finally</c>.</remarks>
@@ -196,11 +196,11 @@ public sealed class PutRequest<TModel, TRequest, TReply>
     /// <returns>The request.</returns>
     public PutRequest<TModel, TRequest, TReply> Validate<TValidator>(string ruleSet)
         where TValidator : ReactiveValidator<TRequest>
-        => throw new NotImplementedException();
+        => new(_request, _request.Validate<TRequest, TValidator>(_stage, ruleSet), _reply);
 
     /// <summary>Sends the request without checking what it sends.</summary>
     /// <returns>The request.</returns>
-    public PutRequest<TModel, TRequest, TReply> NoValidation() => throw new NotImplementedException();
+    public PutRequest<TModel, TRequest, TReply> NoValidation() => new(_request, _request.NoValidation(_stage), _reply);
 
     /// <summary>Runs a pipeline when the request starts, before it is sent.</summary>
     /// <remarks>A step of it that stops the pipeline sends nothing and runs no <c>Finally</c>.</remarks>

@@ -1,0 +1,12 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RenderingAndDelivery
+@model Admission
+@{
+    var plan = Html.ReactivePlan<Admission>();
+}
+@using (Html.BeginRequestContainer(plan, "visit"))
+{
+    @(Html.InputField(plan, m => m.Room, options => options.Label("Room")).NativeTextBox())
+}
+@Html.RenderPlan(plan)

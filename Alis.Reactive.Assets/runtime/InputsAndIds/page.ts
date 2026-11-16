@@ -7,4 +7,7 @@ export const pageInputs = new PageInputs(id => {
     const input = document.getElementById(inputId);
     return input !== null && container.contains(input);
   };
+}, id => {
+  const form = document.getElementById(id);
+  return form instanceof HTMLFormElement ? new FormData(form) : null;
 });

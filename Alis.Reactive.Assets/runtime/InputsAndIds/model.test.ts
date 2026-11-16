@@ -37,11 +37,11 @@ function literalValue(source: Source): unknown {
   return source.value;
 }
 
-function page(containers = new Map([["intake", new Set(["own", "slot", "second"])]])): PageInputs {
+function page(containers = new Map([["intake", new Set(["own", "slot", "second"])]]), forms = new Map<string, () => FormData>()): PageInputs {
   return new PageInputs(id => {
     const inputs = containers.get(id);
     return inputs === undefined ? null : input => inputs.has(input);
-  });
+  }, id => forms.get(id)?.() ?? null);
 }
 
 describe("when alis.model reads what a container sends", () => {
@@ -234,5 +234,63 @@ describe("when a check reads what a container sends", () => {
     if (input === undefined) throw new Error("The container sends one input.");
     owner.release();
     expect(() => inputs.typedText(input)).toThrow(/^Input 'own' left the page before its check read it\.$/);
+  });
+});
+
+describe("when a request captures what it sends", () => {
+  test("RecordsAMissingContainer: a container whose element the page lacks is recorded missing, not stopped at the read", () => {
+    const inputs = page(new Map());
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    expect(inputs.sends("intake", "Admission")).toStrictEqual({ kind: "missing", id: "intake" });
+    expect(inputs.submits("intake", "Admission")).toStrictEqual({ kind: "missing", id: "intake" });
+  });
+
+  test("ContainerOfItsOwnModel: a container rendered for another model stops the request where it is read", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    expect(() => inputs.sends("intake", "Visit")).toThrow(/^Container 'intake' is rendered for model 'Admission', not 'Visit'\.$/);
+    expect(inputs.sends("intake", "Admission")).toMatchObject({ kind: "captured", id: "intake", body: { nights: 5 } });
+  });
+
+  test("SubmissionSetAtTheRead: a native form's submission set is built when the request reads it, beside its framework inputs' body", () => {
+    let code = "A7";
+    const inputs = page(undefined, new Map([["intake", () => {
+      const submitted = new FormData();
+      submitted.append("Code", code);
+      return submitted;
+    }]]));
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    const captured = inputs.submits("intake", "Admission");
+    if (captured.kind !== "captured") throw new Error("The form is on the page.");
+    code = "B9";
+    const submission = captured.body as { entries: FormData; members: object };
+    expect([...submission.entries.entries()]).toStrictEqual([["Code", "A7"]]);
+    expect(submission.members).toStrictEqual({ nights: 5 });
+  });
+
+  test("RecordsAMissingInput: an input the page lacks is recorded missing and its value reads nothing", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    expect(inputs.input("gone", "Ward")).toStrictEqual({ kind: "missing", id: "gone", name: "Ward" });
+    expect(inputs.valueOf("gone")).toBeUndefined();
+    expect(inputs.input("own", "Stay")).toStrictEqual({ kind: "captured", input: { name: "Stay", entry: { id: "own", binding: field("Nights", ["nights"], literal(5)) } } });
+    expect(inputs.valueOf("own")).toBe(5);
+  });
+
+  test("CheckedIsWhatIsSent: the checked body holds the set members, with the container's inputs over them", () => {
+    const inputs = page();
+    inputs.join(plan(), new Visit(), "on the page", literalValue);
+    const container = inputs.sends("intake", "Admission");
+    const checked = inputs.checked({ container, individual: [] }, null,
+      [{ path: ["nights"], value: { kind: "held", value: 2 } }, { path: ["ward"], value: { kind: "held", value: "North" } }, { path: ["room"], value: { kind: "nothing" } }]);
+    expect(checked?.body).toStrictEqual({ nights: 5, ward: "North" });
+    expect(checked?.inputs.map(input => input.entry.id)).toStrictEqual(["own"]);
+    expect(inputs.checked({ container: { kind: "none" }, individual: [] }, { ward: "East" }, [])).toStrictEqual({ body: { ward: "East" }, inputs: [] });
+  });
+
+  test("CheckedWaitsForTheGuard: a missing container or input leaves the check to the guard that stops the request", () => {
+    const inputs = page();
+    expect(inputs.checked({ container: { kind: "missing", id: "intake" }, individual: [] }, null, [])).toBeNull();
+    expect(inputs.checked({ container: { kind: "none" }, individual: [{ kind: "missing", id: "gone", name: "Ward" }] }, null, [])).toBeNull();
   });
 });
