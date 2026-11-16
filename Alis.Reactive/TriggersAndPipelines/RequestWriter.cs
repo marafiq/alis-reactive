@@ -25,7 +25,8 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
     private readonly BlockWriter.Place _place;
     private readonly RequestDefaults _defaults;
     private readonly bool _sentByADefault;
-    private readonly Layer _defaultLayer = new([], []);
+    private readonly Func<RequestWriter<TModel>, IReadOnlyList<Statement>> _defaultCheck;
+    private Layer _defaultLayer = new([], []);
     private readonly List<(StatusRoute Route, bool ShowsNotice)> _defaultStatuses = [];
     private readonly List<(OtherwiseRoute Route, bool ShowsNotice)> _defaultOtherwise = [];
     private readonly List<StatusRoute> _statuses = [];
@@ -57,9 +58,8 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
         _enteredAfterAwait = writer.PathAwaited;
         _defaults = writer.Content.Services.GetRequiredService<RequestDefaults>();
         _sentByADefault = RequestScopes.SentByADefault(writer);
-        if (!_sentByADefault) _defaultLayer = RequestScopes.InDefaults(writer, WriteDefaults);
-        _check = defaultCheck(this);
-        _place = writer.Placed(Written());
+        _defaultCheck = defaultCheck;
+        _place = writer.Placed(Written(), Ended);
     }
 
     private enum BusyChoice
@@ -199,6 +199,13 @@ internal sealed class RequestWriter<TModel> : IDefaultRoutes
     {
         Reaches(reply);
         return _writer.Branch(true, () => body(reply, new Pipeline<NoModel>(_writer))).Block;
+    }
+
+    private Statement Ended()
+    {
+        if (TakesDefaults) _defaultLayer = RequestScopes.InDefaults(_writer, WriteDefaults);
+        if (!_namesItsCheck) _check = _defaultCheck(this);
+        return Written();
     }
 
     private Layer WriteDefaults()

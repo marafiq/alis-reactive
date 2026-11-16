@@ -39,6 +39,15 @@ public sealed class WhenValidationErrorsAreShown
     }
 
     [Test]
+    public void a_request_that_takes_no_defaults_declares_nothing_the_defaults_routes_declare()
+    {
+        var plan = Rendered(requests => requests.ShowValidationErrors(), pipeline => pipeline.Post("/beds").NoDefaults());
+        Assert.That(JsonDocument.Parse(plan).RootElement.GetProperty("objects").TryGetProperty("$form", out _), Is.False);
+        Assert.That(RequestPage.Request(plan).GetProperty("statuses").GetRawText(), Is.EqualTo("[]"));
+        Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
+    }
+
+    [Test]
     public void a_route_shows_a_problem_as_its_own_requests_failures()
     {
         var plan = Rendered(requests => { }, pipeline => pipeline.Put("/beds").OnError<ValidationProblem>(400, (refused, pipeline) => pipeline.ShowValidationErrors(refused.Body)));

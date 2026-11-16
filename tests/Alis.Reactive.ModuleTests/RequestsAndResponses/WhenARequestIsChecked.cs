@@ -1,4 +1,7 @@
 using System;
+using System.Linq;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using Alis.Reactive.RenderingAndDelivery;
 using Alis.Reactive.TriggersAndPipelines;
 using Alis.Reactive.Validation;
@@ -10,6 +13,7 @@ namespace Alis.Reactive.ModuleTests.RequestsAndResponses;
 public sealed class WhenARequestIsChecked
 {
     private const string Rules = "Alis.Reactive.ModuleTests.RequestsAndResponses.TransferRules";
+    private const string DoseRules = "Alis.Reactive.ModuleTests.RequestsAndResponses.DoseOrderRules";
     private const string WardNorth = """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"lit","value":"North"}}]}""";
 
     [Test]
@@ -39,6 +43,16 @@ public sealed class WhenARequestIsChecked
         Assert.That(Contracts(pipeline => pipeline.Post<Transfer>("/transfers", request => request.Set(r => r.Ward, "North"))), Is.EqualTo("""{"kind":"list","items":[{"kind":"lit","value":"notice"}]}"""));
         Assert.That(Contracts(pipeline => pipeline.Post<Transfer>("/transfers", request => request.Inputs(pipeline.Container<Transfer>("move")))), Is.EqualTo("""{"kind":"list","items":[]}"""));
         Assert.That(Contracts(pipeline => pipeline.Post<Transfer>("/transfers", request => request.Set(r => r.Ward, "North")).NoValidation()), Is.EqualTo("""{"kind":"list","items":[]}"""));
+    }
+
+    [Test]
+    public void a_rule_set_named_or_no_check_writes_no_default_check_so_a_default_rule_the_browser_refuses_refuses_nothing()
+    {
+        Assert.That(DoseForms(pipeline => pipeline.Post<DoseOrder>("/doses", request => request.Set(r => r.Medicine, "Aspirin")).NoValidation()), Is.Empty);
+        Assert.That(DoseForms(pipeline => pipeline.Post<DoseOrder>("/doses", request => request.Set(r => r.Medicine, "Aspirin")).Validate<DoseOrderRules>("stock")),
+            Is.EqualTo(new[] { "$form:" + DoseRules + ":stock" }));
+        Assert.That(() => DoseForms(pipeline => pipeline.Post<DoseOrder>("/doses", request => request.Set(r => r.Medicine, "Aspirin"))),
+            Throws.InvalidOperationException.With.Message.Contains("The pattern 'aspirin' ignores case, which no browser flag folds as .NET does"));
     }
 
     [Test]
@@ -104,6 +118,19 @@ public sealed class WhenARequestIsChecked
 
     private static string Contracts(Action<Pipeline<Transfer>> write) => RequestPage.Send(Plan(write), "contracts").GetRawText();
 
+    private static string[] DoseForms(Action<Pipeline<DoseOrder>> write)
+    {
+        var html = Views.Of(new DoseOrder(), _ => { }, app =>
+        {
+            app.AddReactiveRequests(requests => requests.NoAntiforgery());
+            app.AddReactiveFluentValidation(validation => validation.Add<DoseOrderRules>());
+        });
+        var plan = html.ReactivePlan<DoseOrder>();
+        html.On(plan, trigger => trigger.DomReady(write));
+        var rendered = Views.TextOf(html.RenderPlan(plan))["<script type=\"application/json\" data-reactive-plan>".Length..^"</script>".Length];
+        return [.. JsonDocument.Parse(rendered).RootElement.GetProperty("objects").EnumerateObject().Select(member => member.Name).Where(name => name.StartsWith("$form:", StringComparison.Ordinal))];
+    }
+
     private static string Plan(Action<Pipeline<Transfer>> write)
     {
         var html = Views.Of(new Transfer(), _ => { }, app =>
@@ -130,6 +157,20 @@ public sealed class TransferRules : ReactiveValidator<Transfer>
     {
         RuleFor(transfer => transfer.Ward).NotEmpty();
         RuleSet("moving", () => RuleFor(transfer => transfer.Room).NotEmpty());
+    }
+}
+
+public sealed class DoseOrder
+{
+    public string? Medicine { get; init; }
+}
+
+public sealed class DoseOrderRules : ReactiveValidator<DoseOrder>
+{
+    public DoseOrderRules()
+    {
+        RuleFor(order => order.Medicine).Matches("aspirin", RegexOptions.IgnoreCase);
+        RuleSet("stock", () => RuleFor(order => order.Medicine).NotEmpty());
     }
 }
 

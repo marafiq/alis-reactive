@@ -9,6 +9,7 @@ namespace Alis.Reactive.Execution;
 internal sealed class BlockWriter
 {
     private readonly Stack<List<Statement>> _open = new();
+    private readonly Stack<List<Action>> _sentenceEnds = new();
     private readonly Stack<HandlerResults> _handlers = new();
     private readonly Stack<LambdaResults> _lambdas = new();
     private readonly Dictionary<string, int> _bindings = new(StringComparer.Ordinal);
@@ -162,6 +163,7 @@ internal sealed class BlockWriter
 
         if (_open.Count == 0)
             throw new InvalidOperationException("A step is written inside a pipeline, the callback its trigger runs: no pipeline is open here.");
+        EndSentence();
         _open.Peek().Add(statement);
         if (Awaits(statement)) PathAwaited = true;
     }
@@ -193,6 +195,13 @@ internal sealed class BlockWriter
         return new Place(block, block.Count - 1);
     }
 
+    internal Place Placed(Statement statement, Func<Statement> ended)
+    {
+        var place = Placed(statement);
+        _sentenceEnds.Peek().Add(() => place.Block[place.Index] = ended());
+        return place;
+    }
+
     internal bool Replaced(Place place, Statement statement)
     {
         var stillItsBlocksLastStep = _open.Count > 0 && ReferenceEquals(_open.Peek(), place.Block) && place.Index == place.Block.Count - 1;
@@ -205,16 +214,28 @@ internal sealed class BlockWriter
     {
         var block = new List<Statement>();
         _open.Push(block);
+        _sentenceEnds.Push([]);
         try
         {
             body();
+            EndSentence();
         }
         finally
         {
+            _sentenceEnds.Pop();
             _open.Pop();
         }
 
         return block;
+    }
+
+    private void EndSentence()
+    {
+        var ends = _sentenceEnds.Peek();
+        if (ends.Count == 0) return;
+        var end = ends[0];
+        ends.Clear();
+        end();
     }
 
     private IReadOnlyList<Statement> Run(Action body) => Branch(false, body).Block;
