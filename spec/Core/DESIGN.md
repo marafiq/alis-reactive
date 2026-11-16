@@ -2203,18 +2203,22 @@ contract `HttpSend`, which is no node kind, and its wire forms, `enum` and `flag
     `Chained` request and a `Parallel` branch are one request each, with no pipeline around them
     (`Alis.Reactive/PlanAuthoring/Requests/ResponseBuilder.cs:116`,
     `Alis.Reactive/PlanAuthoring/Requests/RequestExtensions.cs:42`).
-  - A part the request sends takes a condition: a member `Set`, a container's inputs, a named input and a header.
-    When the condition fails, the part is left out, as if it were never gathered. The endpoint binds the
-    member's starting value (D9.10), and the check reads the member as the endpoint binds it (Q16).
+  - A part the request sends takes a condition: a member `Set`, a named input, a header and a file part.
+    When the condition fails, the part is left out, as if it were never gathered: its value is not read and a
+    named input is not looked up. The endpoint binds the member's starting value (D9.10), and the check reads
+    the member as the endpoint binds it (Q16). A header the defaults configure is sent where the request's own
+    header of its name is left out (D9.12).
     A part whose condition fails is never sent as nothing, which a nullable member would bind as null.
   - A chained request whose condition fails is not sent, and the steps after the first request run. A
     parallel branch whose condition fails sends nothing and settles at once.
   - The check takes no condition. The server checks by the same validator on every request, so a browser
     check a condition skipped would disagree with the server's verdict. A check that depends on the model
     is the validator's own `When` or `Unless` (Q8, Q16).
-  - The method, the URL and the body format take no condition: a request that differs in them is a second
-    request under a pipeline's `When`. The routes take none: the outcome picks the route (D10.13), and the
-    steps inside it take `p.When`.
+  - The method, the URL, the body format and a container's inputs take no condition, since a container fixes
+    the body's format: a request that differs in them is a second request under a pipeline's `When`. A member
+    that fills the URL, by `Path` or by a `Set` named like its placeholder, under a part's condition is refused
+    where the view renders, naming the member, the URL and that cure. The routes take none: the outcome picks
+    the route (D10.13), and the steps inside it take `p.When`.
   - A part's condition is evaluated by the one evaluator before the check reads the body, once per request,
     across every attempt (D10.15).
 - D10.17 A request has one lifecycle with every part, and a condensed form for the common request. A request
@@ -2410,10 +2414,13 @@ the reply and `call` of `get` on its `headers`, the contract `HttpSend` and the 
 - `N10.4` new: a condition on a part a request sends, on a chained request and on a parallel branch (D10.16), through
   the one condition core; its door's form went to gate 2. A chained request and a parallel branch are pipelines and
   take the pipeline's `When` (D10.16, D10.23's `chained` row). No line and no compiled sentence wrote a part's form,
-  so it is the owner's to decide (G13); U3 declares the lead's proposal as a signature: `PartsGuard<TParts>` with
-  `Then(branch)`, and `When(condition)` on each stage and body of a request's parts, whose branch is handed the stage
-  that takes no body and no container, so a member, a named input, a header and a file take a condition and a
-  container's inputs take none yet (the lead, 2026-11-13, `spec/CLAUDE.md`).
+  so it is the owner's to decide (G13), and the owner's answer of 2026-11-16 settles the lead's proposal
+  (`spec/CLAUDE.md`): `PartsGuard<TParts>` with `Then(branch)`, and `When(condition)` on each stage and body of a
+  request's parts, whose branch is handed the stage that takes no body and no container, so a member, a named input,
+  a header and a file take a condition and a container's inputs take none. C# binds the condition once, before the
+  request's values, as `cond(condition, true, false)`, a nested one as the `and` of the enclosing binding and its
+  own, and each part the branch writes carries that binding as its `when` (schema.md's `HttpSend`). A request that
+  names no body before its first `When` sends multipart, as `Set` does.
 - `N10.5` new: the condensed request of D10.17, whose default parts read the request's own parts; its form goes
   to gate 2.
 - `N10.7` new, the HTTP surface chosen 2026-11-08 from two independent designs (verdicts per axis in `spec/NOTES.md`),
@@ -4556,7 +4563,9 @@ calls, each with the request's sent inputs and summary place. The grammar gains 
     script did with the click is not read (`defaultPrevented`), since the runtime infers no intent from the page.
   - A link's address writes a text, a boolean, a whole number, an enum by its name and a written value, each as the
     request writes it. A date, an instant, a fraction, flags or a list in its route or query is refused where the
-    action is declared, the cure a button or the value as text the view formats.
+    action is declared, the cure a button or the value as text the view formats. A member its GET sends under a
+    part's condition is refused there too, since the address is written for each row before any condition is
+    read; the cure is a button, whose block reads the condition (D10.16).
   - Native's browser code, the plugin `native-row-actions`, finds each control by `getElementById` and raises
     `activated` with its entry's row and its element. The core reads no data attribute and walks no DOM.
   - Compiler rules: a row of another type does not compile (`RowOfAnotherType` in `spec/api/refused.sh`), nor a render

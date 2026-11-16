@@ -1,0 +1,25 @@
+@using Alis.Reactive.Conformance.App.Care
+@using Alis.Reactive.Native.NativeComponents
+@using Alis.Reactive.RequestsAndResponses
+@using Alis.Reactive.RenderingAndDelivery
+@using Alis.Reactive.TriggersAndPipelines
+@model MoodCheck
+@{
+    Layout = "/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Mood check";
+    var plan = Html.ReactivePlan<MoodCheck>();
+}
+<h1>Mood check for @Model.Resident</h1>
+@(Html.InputField(plan, m => m.AskedAboutMood, options => options.Label("Asked about mood")).NativeCheckBox())
+@(Html.InputField(plan, m => m.Mood, options => options.Label("Mood")).NativeTextBox())
+<button type="button" @Html.Raises(plan, MoodChecks.Save)>Save</button>
+<p>Mood recorded: <span id="mood-echo">-</span></p>
+@{
+    Html.On(plan, trigger => trigger.CustomEvent(MoodChecks.Save, pipeline => pipeline
+        .Post<MoodNote>(MoodCheckEndpoints.Checks, request => request
+            .Json(body => body
+                .When(pipeline.Input(m => m.AskedAboutMood).Component<NativeCheckBox>().Checked)
+                .Then(mood => mood.Set(check => check.Mood, pipeline.Input(m => m.Mood).Component<NativeTextBox>().Value))))
+        .OnSuccess(Content.Text, (saved, pipeline) => pipeline.Element("mood-echo").Text.Set(saved.Body))));
+}
+@Html.RenderPlan(plan)

@@ -37,7 +37,7 @@ internal static class RequestValues
         return (LiteralValue(value, type, writer, member), LiteralForm(type));
     }
 
-    internal static (Expression Value, WireForm Form, RefExpression Captured) Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, string member, Action<Statement> capture)
+    internal static (Expression Value, WireForm Form, RefExpression Captured) Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, string member, Action<LetStatement> capture)
     {
         var form = Sources.FormOf(source);
         var wire = SourceForm(typeof(TValue), form, writer, member);
@@ -45,7 +45,7 @@ internal static class RequestValues
         return (Read(captured), wire, captured);
     }
 
-    internal static RefExpression Captured(Expression value, BlockWriter writer, Action<Statement> capture)
+    internal static RefExpression Captured(Expression value, BlockWriter writer, Action<LetStatement> capture)
     {
         var captured = writer.NextBinding("requestValue");
         capture(new LetStatement(captured.Name, false, LetBinds.Line, value));

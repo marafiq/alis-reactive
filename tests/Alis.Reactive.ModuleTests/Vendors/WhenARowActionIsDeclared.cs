@@ -106,7 +106,7 @@ public sealed class WhenARowActionIsDeclared
             """{"name":"form","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"number"}}]}}]}]}},{"name":"query","value":{"kind":"lit","value":""}}]}},""" +
             """{"name":"query","value":{"kind":"record","fields":[{"name":"fields","value":{"kind":"list","items":[]}},{"name":"inputs","value":{"kind":"record","fields":[{"name":"container","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},{"name":"individual","value":{"kind":"list","items":[]}}]}}]}},""" +
             """{"name":"body","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},""" +
-            """{"name":"headers","value":{"kind":"list","items":[{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"Accept"}},{"name":"value","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"lit","value":"*/*"}}]}},{"name":"form","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"text"}}]}}]}]}},""" +
+            """{"name":"headers","value":{"kind":"list","items":[{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"Accept"}},{"name":"value","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"lit","value":"*/*"}}]}},{"name":"form","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"text"}}]}},{"name":"when","value":{"kind":"lit","value":true}}]}]}},""" +
             """{"name":"antiforgery","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},{"name":"retry","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},""" +
             """{"name":"busy","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},{"name":"respondedJson","value":{"kind":"lit","value":false}},{"name":"contracts","value":{"kind":"list","items":[]}}]},"check":[],"layers":[{"whileLoading":[],"finally":[]}],"success":{"kind":"none","do":[""" +
             """{"kind":"set","path":["textContent"],"members":"required","content":true,"target":{"kind":"obj","id":"room"},"value":{"kind":"as","expr":{"kind":"data","path":[{"name":"room","requires":[],"absent":{"kind":"nothing"}},{"name":"number","requires":[],"absent":{"kind":"start","value":null}}],"target":{"kind":"get","path":["row"],"members":"required","target":{"kind":"ref","name":"listenPayload1"}}}""" + ShownAsText + "}" +
@@ -218,6 +218,23 @@ public sealed class WhenARowActionIsDeclared
         Assert.That(queried, Is.EqualTo("""<a id="residents-1-0" href="/Residents?tab=care&Wing=a+b%2Bc">Ada</a>"""));
         Assert.That(byId, Is.EqualTo("""<a id="residents-2-0" href="/Residents/42">Ada</a>"""));
         Assert.That(nursing, Is.EqualTo("""<a id="levels-0-0" href="/Residents?Level=Nursing">Ada</a>"""));
+    }
+
+    [Test]
+    public void a_link_whose_get_sends_a_member_under_a_condition_is_refused_and_the_same_member_with_no_condition_is_in_its_address()
+    {
+        var html = Views.Of(new Ward("North"), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery()));
+        var plan = html.ReactivePlan<Ward>();
+        var wing = plan.Rows<ResidentRow>("residents").WardLink(HandlerPolicy.Overlap, (chosen, pipeline) => pipeline.Get<WingQuery>("/Residents", request => request.Query(r => r.Wing, chosen.Row.Read(row => row.Wing))));
+        var queried = wing.Render(new ResidentRow(1, "Ada", "North", new ResidentRoom("12", 1)), "Ada");
+        html.RenderPlan(plan);
+        var guarded = Views.Of(new Ward("North"), _ => { }, app => app.AddReactiveRequests(requests => requests.NoAntiforgery())).ReactivePlan<Ward>().Rows<ResidentRow>("residents");
+
+        Assert.That(queried, Is.EqualTo("""<a id="residents-0-0" href="/Residents?Wing=North">Ada</a>"""));
+        Assert.That(() => guarded.WardLink(HandlerPolicy.Overlap, (chosen, pipeline) => pipeline.Get<WingQuery>("/Residents", request => request
+                .When(pipeline.Element("filter").Hidden).Then(filtered => filtered.Query(r => r.Wing, chosen.Row.Read(row => row.Wing))))),
+            Throws.InvalidOperationException.With.Message.EqualTo(
+                "The row link on 'residents' sends 'GET /Residents' with 'r => r.Wing' under a condition, and a link's address is written for each row before any condition is read: send the member with no condition, or render a button for the action, whose block reads the condition."));
     }
 
     [Test]

@@ -649,6 +649,7 @@ export interface SentField {
   readonly value: ValueRead;
   readonly form: WireForm;
   readonly whenNothing: WhenNothing;
+  readonly when: boolean;
 }
 
 export type WireForm = TextScalarWireForm | NumberScalarWireForm | BooleanScalarWireForm | DateScalarWireForm | InstantScalarWireForm | WrittenScalarWireForm | EnumScalarWireForm | FlagsScalarWireForm | ListWireForm;
@@ -686,7 +687,7 @@ export interface CapturedContainerCapture {
   readonly inputs: readonly SentInput[];
 }
 
-export type InputCapture = MissingInputCapture | CapturedInputCapture;
+export type InputCapture = MissingInputCapture | CapturedInputCapture | LeftOutInputCapture;
 
 export interface MissingInputCapture {
   readonly kind: "missing";
@@ -699,6 +700,10 @@ export interface CapturedInputCapture {
   readonly input: SentInput;
 }
 
+export interface LeftOutInputCapture {
+  readonly kind: "leftOut";
+}
+
 export type SentBody = NoneSentBody | JsonSentBody | UrlEncodedSentBody | MultipartSentBody | TextSentBody | FileSentBody;
 
 export interface NoneSentBody {
@@ -708,7 +713,13 @@ export interface NoneSentBody {
 export interface JsonSentBody {
   readonly kind: "json";
   readonly value: EvaluatedValue;
+  readonly guarded: readonly GuardedMember[];
   readonly inputs: SentInputs;
+}
+
+export interface GuardedMember {
+  readonly path: readonly string[];
+  readonly when: boolean;
 }
 
 export interface UrlEncodedSentBody {
@@ -734,6 +745,7 @@ export interface FileMultipartPart {
   readonly kind: "file";
   readonly name: string;
   readonly value: ValueRead;
+  readonly when: boolean;
 }
 
 export interface TextSentBody {
@@ -752,6 +764,7 @@ export interface SentHeader {
   readonly name: string;
   readonly value: ValueRead;
   readonly form: ScalarWireForm;
+  readonly when: boolean;
 }
 
 export type Antiforgery = NoneAntiforgery | TokenAntiforgery;

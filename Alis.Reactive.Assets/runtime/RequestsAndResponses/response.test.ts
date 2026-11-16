@@ -9,7 +9,7 @@ const get: Send = {
   url: { parts: [{ kind: "text", text: "/Residents" }], query: "" },
   query: { fields: [], inputs: { container: { kind: "none" }, individual: [] } },
   body: { kind: "none" },
-  headers: [{ name: "Accept", value: { kind: "held", value: "application/json" }, form: { kind: "text" } }],
+  headers: [{ name: "Accept", value: { kind: "held", value: "application/json" }, form: { kind: "text" }, when: true }],
   antiforgery: { kind: "none" },
   retry: { kind: "none" },
   busy: { kind: "none" },

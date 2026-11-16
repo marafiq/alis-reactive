@@ -1,4 +1,4 @@
-import { attempt, prepare, routeFor, type Answer } from "../RequestsAndResponses/index";
+import { attempt, prepare, routeFor, sentParts, type Answer } from "../RequestsAndResponses/index";
 import type { HttpSend, RequestStatement, Statement } from "../Schema/index";
 import { heldOrNull, value, type Read } from "../ValuesAndSources/index";
 import { bind, under, type Context } from "./context";
@@ -114,9 +114,8 @@ export class RequestFrame {
     const state = this.#state;
     switch (state.kind) {
       case "check": {
-        const read = evaluate(this.#statement.send, this.#context);
-        const send = heldOrNull(read) as HttpSend;
-        this.#context = bind(this.#context, this.#statement.argument, read);
+        const send = sentParts(heldOrNull(evaluate(this.#statement.send, this.#context)) as HttpSend);
+        this.#context = bind(this.#context, this.#statement.argument, value(send));
         this.#state = { kind: "loading", send };
         return { kind: "opens", frame: BlockFrame.of(this.#statement.check, this.#context) };
       }

@@ -46,6 +46,52 @@ export function prepare(send: HttpSend, zone: TimeZone, culture: Culture, busy: 
   return { method: send.method, url, template, headers, body, request, inputs, respondedJson: send.respondedJson, retry: send.retry, releaseBusy };
 }
 
+export function sentParts(send: HttpSend): HttpSend {
+  return {
+    ...send,
+    query: { ...send.query, fields: send.query.fields.filter(field => field.when) },
+    body: sentBody(send.body),
+    headers: send.headers.filter(header => header.when),
+  };
+}
+
+function sentBody(body: SentBody): SentBody {
+  switch (body.kind) {
+    case "none":
+    case "text":
+    case "file":
+      return body;
+    case "json":
+      return { ...body, value: body.guarded.reduce<unknown>((value, member) => (member.when ? value : without(value, member.path)), body.value) };
+    case "urlEncoded":
+      return { ...body, fields: body.fields.filter(field => field.when) };
+    case "multipart":
+      return { ...body, parts: body.parts.filter(partSent) };
+    default:
+      return assertNever(body);
+  }
+}
+
+function partSent(part: MultipartPart): boolean {
+  switch (part.kind) {
+    case "field":
+      return part.field.when;
+    case "file":
+      return part.when;
+    default:
+      return assertNever(part);
+  }
+}
+
+function without(holder: unknown, path: readonly string[]): unknown {
+  const [step, ...past] = path;
+  if (step === undefined || typeof holder !== "object" || holder === null || !Object.hasOwn(holder, step)) return holder;
+  const copy: Record<string, unknown> = { ...holder };
+  if (past.length === 0) Reflect.deleteProperty(copy, step);
+  else copy[step] = without(Reflect.get(holder, step), past);
+  return copy;
+}
+
 interface FormWriting {
   readonly zone: TimeZone;
   readonly place: TextPlace;
@@ -130,7 +176,7 @@ function setInput(form: URLSearchParams | FormData, input: SentInput, value: unk
     appendFiles(form, input.name, value);
     return;
   }
-  const field: SentField = { name: input.name, path: [], value: { kind: "held", value }, form: wireFormOf(shape, input.name), whenNothing: "empty" };
+  const field: SentField = { name: input.name, path: [], value: { kind: "held", value }, form: wireFormOf(shape, input.name), whenNothing: "empty", when: true };
   for (const text of fieldTexts(field, zone, place)) form.append(input.name, text);
   write(request, input.name.split("."), snapshot(value));
 }
@@ -262,6 +308,8 @@ function sentInputs(capture: SentInputs): readonly SentInput[] {
         throw new Stop("The request's input '" + individual.id + "' for '" + individual.name + "' is missing.");
       case "captured":
         inputs.push(individual.input);
+        break;
+      case "leftOut":
         break;
       default:
         assertNever(individual);

@@ -6282,6 +6282,24 @@
     },
     {
       "feature": "M6.F1",
+      "for": "X10.10",
+      "index": 1,
+      "screen": "record",
+      "hosts": [
+        "net10"
+      ],
+      "parts": [
+        "tabForm",
+        "notes",
+        "recordEndpoint",
+        "noteInputs"
+      ],
+      "harness": [
+        "seed"
+      ]
+    },
+    {
+      "feature": "M6.F1",
       "for": "M6.X5",
       "index": 0,
       "screen": "residents",

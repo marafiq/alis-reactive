@@ -49,7 +49,7 @@ internal static class CardPlans
            "{\"name\":\"body\",\"value\":" + None + "}," +
            "{\"name\":\"headers\",\"value\":{\"kind\":\"list\",\"items\":[{\"kind\":\"record\",\"fields\":[{\"name\":\"name\",\"value\":{\"kind\":\"lit\",\"value\":\"Accept\"}}," +
            "{\"name\":\"value\",\"value\":{\"kind\":\"record\",\"fields\":[{\"name\":\"kind\",\"value\":{\"kind\":\"lit\",\"value\":\"held\"}},{\"name\":\"value\",\"value\":{\"kind\":\"lit\",\"value\":\"text/html\"}}]}}," +
-           "{\"name\":\"form\",\"value\":{\"kind\":\"record\",\"fields\":[{\"name\":\"kind\",\"value\":{\"kind\":\"lit\",\"value\":\"text\"}}]}}]}]}}," +
+           "{\"name\":\"form\",\"value\":{\"kind\":\"record\",\"fields\":[{\"name\":\"kind\",\"value\":{\"kind\":\"lit\",\"value\":\"text\"}}]}},{\"name\":\"when\",\"value\":{\"kind\":\"lit\",\"value\":true}}]}]}}," +
            "{\"name\":\"antiforgery\",\"value\":" + None + "}," +
            "{\"name\":\"retry\",\"value\":" + None + "}," +
            "{\"name\":\"busy\",\"value\":" + None + "}," +

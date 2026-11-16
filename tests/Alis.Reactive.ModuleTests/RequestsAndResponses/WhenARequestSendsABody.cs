@@ -56,7 +56,7 @@ public sealed class WhenARequestSendsABody
         var plan = RequestPage.Rendered(pipeline => pipeline.Put<SearchRequest>("/notes", request => request.Json(body => body
             .Set(r => r.Id, 7).Set(r => r.Address.Ward, "North").Set(r => r.Name, "Ada").Set(r => r.On, new DateTime(2026, 1, 12, 9, 30, 0, DateTimeKind.Utc)))));
         Assert.That(RequestPage.Send(plan, "body").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"record","fields":[{"name":"id","value":{"kind":"lit","value":7}},{"name":"address","value":{"kind":"record","fields":[{"name":"ward","value":{"kind":"lit","value":"North"}}]}},{"name":"not.the.binding","value":{"kind":"lit","value":"Ada"}},{"name":"on","value":{"kind":"lit","value":"2026-01-12T09:30:00"}}]}},{"name":"inputs","value":""" + NoInputs + "}]}"));
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"record","fields":[{"name":"id","value":{"kind":"lit","value":7}},{"name":"address","value":{"kind":"record","fields":[{"name":"ward","value":{"kind":"lit","value":"North"}}]}},{"name":"not.the.binding","value":{"kind":"lit","value":"Ada"}},{"name":"on","value":{"kind":"lit","value":"2026-01-12T09:30:00"}}]}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"inputs","value":""" + NoInputs + "}]}"));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
 
@@ -146,7 +146,7 @@ public sealed class WhenARequestSendsABody
         });
         var parts = RequestPage.Field(RequestPage.Send(plan, "body"), "parts").GetProperty("items");
         Assert.That(parts[0].GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"file"}},{"name":"name","value":{"kind":"lit","value":"Photo"}},{"name":"value","value":{"kind":"op","op":"cond","args":[{"kind":"op","op":"neq","args":[{"kind":"ref","name":"requestValue1"},{"kind":"lit","value":null}]},{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"list","items":[{"kind":"ref","name":"requestValue1"}]}}]},{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"nothing"}}]}]}}]}"""));
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"file"}},{"name":"name","value":{"kind":"lit","value":"Photo"}},{"name":"value","value":{"kind":"op","op":"cond","args":[{"kind":"op","op":"neq","args":[{"kind":"ref","name":"requestValue1"},{"kind":"lit","value":null}]},{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"list","items":[{"kind":"ref","name":"requestValue1"}]}}]},{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"nothing"}}]}]}},{"name":"when","value":{"kind":"lit","value":true}}]}"""));
         Assert.That(RequestPage.Field(RequestPage.Field(parts[1], "value").GetProperty("args")[1], "value").GetRawText(), Is.EqualTo(
             """{"kind":"op","op":"toArray","args":[{"kind":"ref","name":"requestValue2"}]}"""));
         Assert.That(RequestPage.Steps(plan)[0].GetRawText(), Is.EqualTo(

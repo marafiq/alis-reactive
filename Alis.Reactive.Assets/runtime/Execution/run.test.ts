@@ -195,7 +195,11 @@ const request = (...layers: Layer[]): Step => ({
   kind: "request",
   argument: "sent",
   reply: "reply",
-  send: { kind: "lit", value: null },
+  send: { kind: "lit", value: {
+    method: "GET", url: { parts: [{ kind: "text", text: "/Residents" }], query: "" },
+    query: { fields: [], inputs: { container: { kind: "none" }, individual: [] } },
+    body: { kind: "none" }, headers: [], antiforgery: { kind: "none" }, retry: { kind: "none" }, busy: { kind: "none" }, respondedJson: false, contracts: [],
+  } },
   check: [],
   layers,
   success: { kind: "none", do: [] },

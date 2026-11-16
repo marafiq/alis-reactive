@@ -39,6 +39,9 @@ internal sealed class RequestPartsWriter
     private readonly HashSet<string> _inputMembers = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, Action> _setMembers = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Expression, Func<Expression>> _checkedEntries = [];
+    private readonly Stack<RefExpression> _guards = new();
+    private readonly Dictionary<IReadOnlyList<string>, RefExpression> _jsonGuards = [];
+    private readonly Dictionary<string, RefExpression> _headerGuards = new(StringComparer.OrdinalIgnoreCase);
     private bool _closed;
     private int _stage;
 
@@ -76,6 +79,8 @@ internal sealed class RequestPartsWriter
 
     internal bool SendsAnInput => _individual.Count > 0;
 
+    private Expression When => _guards.Count == 0 ? Literal(true) : _guards.Peek();
+
     internal int Sends(int stage, string containerId, string model) => Contains(stage, containerId, ModelPlugin.Sends(_writer.Content, containerId, model));
 
     internal int Submits(int stage, string formId, string model) => Contains(stage, formId, ModelPlugin.Submits(_writer.Content, formId, model));
@@ -94,8 +99,21 @@ internal sealed class RequestPartsWriter
 
         var stageAfter = placed(stage);
         _inputMembers.Add(name);
-        _individual.Add(ModelPlugin.Input(_writer.Content, inputId, name));
+        var captured = ModelPlugin.Input(_writer.Content, inputId, name);
+        _individual.Add(_guards.Count == 0 ? captured : new OpExpression(Operator.Cond, [_guards.Peek(), captured, LeftOutInput]));
         return stageAfter;
+    }
+
+    internal int Guarded(int stage, Expression condition, Action<int> branch)
+    {
+        Open(stage);
+        var held = new OpExpression(Operator.Cond, [condition, Literal(true), Literal(false)]);
+        var guard = _writer.NextBinding("partCondition");
+        _captures.Add(new LetStatement(guard.Name, false, LetBinds.Line, _guards.Count == 0 ? held : new OpExpression(Operator.And, [_guards.Peek(), held])));
+        _guards.Push(guard);
+        branch(_stage);
+        _guards.Pop();
+        return _stage;
     }
 
     internal int Literal<TValue>(int stage, LambdaExpression member, TValue value, bool path)
@@ -112,7 +130,7 @@ internal sealed class RequestPartsWriter
     {
         if (SentByAnInput(member)) return Skipped(stage);
         Open(stage);
-        var sent = RequestValues.Source(value, _writer, member.ToString(), _captures.Add);
+        var sent = RequestValues.Source(value, _writer, member.ToString(), path ? _captures.Add : Capture);
         Add(member, (sent.Value, sent.Form), path, Sources.Of(value));
         if (path) _pathJson.Add(() => (JsonNames(member), JsonBodyValues.Captured<TValue>(sent.Captured, Sources.FormOf(value), _writer, member)));
         return _stage;
@@ -136,7 +154,7 @@ internal sealed class RequestPartsWriter
     {
         Open(stage);
         _body = Body.Text;
-        _whole = RequestValues.Read(RequestValues.Captured(Sources.Of(text), _writer, _captures.Add));
+        _whole = RequestValues.Read(RequestValues.Captured(Sources.Of(text), _writer, Capture));
         return _stage;
     }
 
@@ -144,7 +162,7 @@ internal sealed class RequestPartsWriter
     {
         Open(stage);
         _body = Body.File;
-        _whole = RequestValues.Read(RequestValues.Captured(file.Bound.Target, _writer, _captures.Add));
+        _whole = RequestValues.Read(RequestValues.Captured(file.Bound.Target, _writer, Capture));
         return _stage;
     }
 
@@ -163,11 +181,11 @@ internal sealed class RequestPartsWriter
         Open(stage);
         if (_body == Body.Json)
         {
-            AddJson(member, JsonBodyValues.Source(value, _writer, member, _captures.Add));
+            AddJson(member, JsonBodyValues.Source(value, _writer, member, Capture));
             return _stage;
         }
 
-        var sent = RequestValues.Source(value, _writer, member.ToString(), _captures.Add);
+        var sent = RequestValues.Source(value, _writer, member.ToString(), Capture);
         AddField(member, (sent.Value, sent.Form));
         return _stage;
     }
@@ -187,7 +205,7 @@ internal sealed class RequestPartsWriter
     internal int FilePart(int stage, LambdaExpression member, BrowserFile file)
     {
         Open(stage);
-        var captured = RequestValues.Captured(file.Bound.Target, _writer, _captures.Add);
+        var captured = RequestValues.Captured(file.Bound.Target, _writer, Capture);
         AddFile(member, RequestValues.ReadUnlessNull(captured, new ListExpression([captured])));
         return _stage;
     }
@@ -195,7 +213,7 @@ internal sealed class RequestPartsWriter
     internal int FileParts(int stage, LambdaExpression member, Expression files)
     {
         Open(stage);
-        var captured = RequestValues.Captured(files, _writer, _captures.Add);
+        var captured = RequestValues.Captured(files, _writer, Capture);
         AddFile(member, RequestValues.Read(captured, new OpExpression(Operator.ToArray, [captured])));
         return _stage;
     }
@@ -205,7 +223,7 @@ internal sealed class RequestPartsWriter
         Open(stage);
         HeaderName(name);
         HeaderNames.Value(name, value);
-        _headers.Add(LiteralHeader(name, value));
+        _headers.Add(HeaderRecord(name, RequestValues.Held(ContractRecord<SentHeader>.Literal(value)), new TextScalarWireForm(), When));
         return _stage;
     }
 
@@ -215,8 +233,8 @@ internal sealed class RequestPartsWriter
         HeaderName(name);
         if (!Sources.FormOf(value).WritesAsAScalar<TValue>())
             throw new InvalidOperationException($"Header '{name}' holds a list or an object; send a scalar source, or send the member in the query or body.");
-        var sent = RequestValues.Source(value, _writer, name, _captures.Add);
-        _headers.Add(HeaderRecord(name, sent.Value, (ScalarWireForm)sent.Form));
+        var sent = RequestValues.Source(value, _writer, name, Capture);
+        _headers.Add(HeaderRecord(name, sent.Value, (ScalarWireForm)sent.Form, When));
         return _stage;
     }
 
@@ -262,7 +280,7 @@ internal sealed class RequestPartsWriter
             .Set(sent => sent.Url, url)
             .Set(sent => sent.Query, new ContractRecord<SentQuery>().Set(query => query.Fields, new ListExpression(_query.ToArray())).Set(query => query.Inputs, _body == Body.None ? Inputs : NoInputs).Written)
             .Set(sent => sent.Body, SentBody(token.InField))
-            .Set(sent => sent.Headers, new ListExpression([.. DefaultHeaders(defaults), .. _headers, LiteralHeader("Accept", accept)]))
+            .Set(sent => sent.Headers, new ListExpression([.. DefaultHeaders(defaults), .. _headers, LiteralHeader("Accept", accept, Literal(true))]))
             .Set(sent => sent.Antiforgery, token.Record)
             .Set(sent => sent.Retry, defaults.Retry)
             .Set(sent => sent.Busy, defaults.Busy)
@@ -273,10 +291,22 @@ internal sealed class RequestPartsWriter
     private static RecordExpression NoContainer => new ContractRecord<NoneContainerCapture>().Set(container => container.Kind, "none").Written;
 
     private IEnumerable<Expression> DefaultHeaders(SendDefaults defaults)
-        => defaults.Headers.Where(header => !_headerNames.Contains(header.Name)).Select(header => LiteralHeader(header.Name, header.Value));
+        => defaults.Headers.Where(header => !_headerNames.Contains(header.Name) || _headerGuards.ContainsKey(header.Name))
+            .Select(header => LiteralHeader(header.Name, header.Value, _headerGuards.TryGetValue(header.Name, out var guard) ? Unless(guard) : Literal(true)));
 
-    private static RecordExpression LiteralHeader(string name, string value)
-        => HeaderRecord(name, RequestValues.Held(ContractRecord<SentHeader>.Literal(value)), new TextScalarWireForm());
+    private static RecordExpression LiteralHeader(string name, string value, Expression when)
+        => HeaderRecord(name, RequestValues.Held(ContractRecord<SentHeader>.Literal(value)), new TextScalarWireForm(), when);
+
+    private static OpExpression Unless(RefExpression guard) => new(Operator.Cond, [guard, Literal(false), Literal(true)]);
+
+    private static LitExpression Literal(bool value) => ContractRecord<SentField>.Literal(value);
+
+    private static RecordExpression LeftOutInput => new ContractRecord<LeftOutInputCapture>().Set(capture => capture.Kind, "leftOut").Written;
+
+    private static OpExpression ReadsNothing => new(Operator.NullableValue, [ContractRecord<ValueRead>.Literal<string?>(null)]);
+
+    private void Capture(LetStatement capture)
+        => _captures.Add(_guards.Count == 0 ? capture : new LetStatement(capture.Name, capture.Await, capture.Binds, new OpExpression(Operator.Cond, [_guards.Peek(), capture.Expr, ReadsNothing])));
 
     private static RecordExpression NoInputs => new ContractRecord<SentInputs>()
         .Set(sent => sent.Container, NoContainer)
@@ -309,6 +339,8 @@ internal sealed class RequestPartsWriter
             new RecordField("path", new ListExpression(JsonNames(member).Select(name => (Expression)Literals.Text(name)).ToArray())),
             new RecordField("value", value),
         ]);
+
+    private Expression Guarded(Expression read) => _guards.Count == 0 ? read : new OpExpression(Operator.Cond, [_guards.Peek(), read, Nothing]);
 
     private bool SentByAnInput(LambdaExpression member) => _inputMembers.Contains(new RequestMember(member).Name);
 
@@ -355,7 +387,8 @@ internal sealed class RequestPartsWriter
         if (_body == Body.Json)
         {
             return new ContractRecord<JsonSentBody>().Set(body => body.Kind, "json")
-                .Set(body => body.Value, JsonBodyValues.Object([.. _pathJson.Select(copy => copy()), .. _json])).Set(body => body.Inputs, Inputs).Written;
+                .Set(body => body.Value, JsonBodyValues.Object([.. _pathJson.Select(copy => copy()), .. _json]))
+                .Set(body => body.Guarded, new ListExpression(GuardedMembers().ToArray())).Set(body => body.Inputs, Inputs).Written;
         }
 
         if (_body == Body.Multipart)
@@ -370,6 +403,30 @@ internal sealed class RequestPartsWriter
         return new ContractRecord<UrlEncodedSentBody>().Set(body => body.Kind, "urlEncoded").Set(body => body.Fields, new ListExpression(fields)).Set(body => body.Inputs, Inputs).Written;
     }
 
+    private IEnumerable<Expression> GuardedMembers()
+    {
+        var members = _json.Select(member => member.Names).ToArray();
+        var guarded = members.Where(_jsonGuards.ContainsKey).ToArray();
+        var holders = new List<IReadOnlyList<string>>();
+        foreach (var holder in guarded.SelectMany(names => Enumerable.Range(1, names.Count - 1).Select(length => names.Take(length).ToArray())))
+        {
+            if (!holders.Any(known => known.SequenceEqual(holder))) holders.Add(holder);
+        }
+
+        foreach (var holder in holders)
+        {
+            var held = members.Where(names => names.Count > holder.Count && holder.SequenceEqual(names.Take(holder.Count))).ToArray();
+            if (!held.All(_jsonGuards.ContainsKey)) continue;
+            var whens = held.Select(names => (Expression)_jsonGuards[names]).Distinct().ToArray();
+            yield return GuardedRecord(holder, whens.Skip(1).Aggregate(whens[0], (either, next) => new OpExpression(Operator.Or, [either, next])));
+        }
+
+        foreach (var names in guarded) yield return GuardedRecord(names, _jsonGuards[names]);
+    }
+
+    private static RecordExpression GuardedRecord(IReadOnlyList<string> path, Expression when)
+        => new ContractRecord<GuardedMember>().Set(member => member.Path, new ListExpression(path.Select(name => (Expression)Literals.Text(name)).ToArray())).Set(member => member.When, when).Written;
+
     private int Opened(int stage, Body body, Action<int> members)
     {
         Open(stage);
@@ -381,18 +438,20 @@ internal sealed class RequestPartsWriter
     private void Add(LambdaExpression member, (Expression Value, WireForm Form) sent, bool path, Expression read)
     {
         var named = Named(member);
-        var sentMember = new SentMember(member.ToString(), named.Name, path, member.ReturnType, sent.Form, read);
+        var sentMember = new SentMember(member.ToString(), named.Name, path, member.ReturnType, sent.Form, read, _guards.Count > 0);
         if (path)
         {
             if (!named.TopLevel || !_url.Has(named.Name))
                 throw new InvalidOperationException($"Path member '{member}' names no top-level placeholder; use Query for this member, or name a top-level member that fills the URL.");
+            if (_guards.Count > 0)
+                throw new InvalidOperationException($"'{member}' fills a placeholder of the URL '{_url.Url}' under a condition on the request's parts, and the URL takes no condition: a request that differs in its URL is a second request under the pipeline's When.");
             if (member.ReturnType == typeof(DateTime) || member.ReturnType == typeof(DateTime?) || member.ReturnType == typeof(DateTimeOffset) || member.ReturnType == typeof(DateTimeOffset?))
                 throw new InvalidOperationException($"'{member}' is a date, and a date cannot fill the placeholder {named.Name}: IIS refuses a time in a path segment. Name the member so it goes in the query.");
             if (sent.Form is not ScalarWireForm)
                 throw new InvalidOperationException($"Path member '{member}' holds a list or an object; send it in the query and fill the placeholder with a scalar member.");
             _path.Add(named.Name, new ContractRecord<MemberPathPart>().Set(part => part.Kind, "member")
                 .Set(part => part.Name, named.Name).Set(part => part.Value, sent.Value).Set(part => part.Form, WireRecords.Of(sent.Form)).Written);
-            var pathField = FieldRecord(member, named, sent);
+            var pathField = FieldRecord(member, named, sent, Literal(true));
             _pathFields.Add(pathField);
             Checks(pathField, member, sent.Value);
             var pathJsonAt = _pathJson.Count;
@@ -407,9 +466,9 @@ internal sealed class RequestPartsWriter
             return;
         }
 
-        var queried = FieldRecord(member, named, sent);
+        var queried = FieldRecord(member, named, sent, When);
         _query.Add(queried);
-        Checks(queried, member, sent.Value);
+        Checks(queried, member, Guarded(sent.Value));
         _sent.Add(sentMember);
         _setMembers[named.Name] = () =>
         {
@@ -421,10 +480,10 @@ internal sealed class RequestPartsWriter
     private void AddField(LambdaExpression member, (Expression Value, WireForm Form) sent)
     {
         var named = Named(member);
-        var field = FieldRecord(member, named, sent);
+        var field = FieldRecord(member, named, sent, When);
         var placed = _body == Body.Multipart ? FieldPart(field) : field;
         _fields.Add(placed);
-        Checks(placed, member, sent.Value);
+        Checks(placed, member, Guarded(sent.Value));
         _setMembers[named.Name] = () => _fields.Remove(placed);
     }
 
@@ -434,9 +493,11 @@ internal sealed class RequestPartsWriter
         var entry = (JsonNames(member), leaf);
         _jsonMembers.Add(named);
         _json.Add(entry);
+        if (_guards.Count > 0) _jsonGuards.Add(entry.Item1, _guards.Peek());
         _setMembers[named] = () =>
         {
             _json.Remove(entry);
+            _jsonGuards.Remove(entry.Item1);
             _jsonMembers.Remove(named);
         };
     }
@@ -444,7 +505,7 @@ internal sealed class RequestPartsWriter
     private void AddFile(LambdaExpression member, Expression value)
     {
         var named = Named(member);
-        _fields.Add(new ContractRecord<FileMultipartPart>().Set(part => part.Kind, "file").Set(part => part.Name, named.Name).Set(part => part.Value, value).Written);
+        _fields.Add(new ContractRecord<FileMultipartPart>().Set(part => part.Kind, "file").Set(part => part.Name, named.Name).Set(part => part.Value, value).Set(part => part.When, When).Written);
     }
 
     private RequestMember Named(LambdaExpression member)
@@ -463,10 +524,10 @@ internal sealed class RequestPartsWriter
     private IReadOnlyList<string> JsonNames(LambdaExpression member)
         => MemberPath.TryOf(member, _writer.Content.Json.BodyForm, out var path) ? path.BodyNames : throw MemberPath.NoMemberPath(member);
 
-    private static RecordExpression FieldRecord(LambdaExpression member, RequestMember named, (Expression Value, WireForm Form) sent)
+    private static RecordExpression FieldRecord(LambdaExpression member, RequestMember named, (Expression Value, WireForm Form) sent, Expression when)
         => new ContractRecord<SentField>().Set(field => field.Name, named.Name).Set(field => field.Path, new ListExpression(named.Path.Select(step => ContractRecord<SentField>.Literal(step)).ToArray()))
             .Set(field => field.Value, sent.Value).Set(field => field.Form, WireRecords.Of(sent.Form))
-            .Set(field => field.WhenNothing, RequestValues.Absence(member.ReturnType)).Written;
+            .Set(field => field.WhenNothing, RequestValues.Absence(member.ReturnType)).Set(field => field.When, when).Written;
 
     private static RecordExpression FieldPart(Expression field)
         => new ContractRecord<FieldMultipartPart>().Set(part => part.Kind, "field").Set(part => part.Field, field).Written;
@@ -476,10 +537,12 @@ internal sealed class RequestPartsWriter
         HeaderNames.Request(name);
         if (!_headerNames.Add(name))
             throw new InvalidOperationException($"Header '{name}' is supplied twice; send each header name once, ignoring case.");
+        if (_guards.Count > 0) _headerGuards[name] = _guards.Peek();
     }
 
-    private static RecordExpression HeaderRecord(string name, Expression value, ScalarWireForm form)
-        => new ContractRecord<SentHeader>().Set(header => header.Name, name).Set(header => header.Value, value).Set(header => header.Form, WireRecords.Of(form)).Written;
+    private static RecordExpression HeaderRecord(string name, Expression value, ScalarWireForm form, Expression when)
+        => new ContractRecord<SentHeader>().Set(header => header.Name, name).Set(header => header.Value, value).Set(header => header.Form, WireRecords.Of(form))
+            .Set(header => header.When, when).Written;
 
     private void Open(int stage)
     {
@@ -490,7 +553,7 @@ internal sealed class RequestPartsWriter
     }
 }
 
-internal sealed class SentMember(string written, string name, bool inPath, Type valueType, WireForm form, Expression read)
+internal sealed class SentMember(string written, string name, bool inPath, Type valueType, WireForm form, Expression read, bool guarded)
 {
     internal string Written { get; } = written;
 
@@ -505,6 +568,8 @@ internal sealed class SentMember(string written, string name, bool inPath, Type 
     internal WhenNothing WhenNothing => RequestValues.Absence(ValueType);
 
     internal Expression Read { get; } = read;
+
+    internal bool Guarded { get; } = guarded;
 }
 
 internal sealed class SendDefaults(IReadOnlyList<(string Name, string Value)> headers, RecordExpression retry, RecordExpression busy, ListExpression contracts)

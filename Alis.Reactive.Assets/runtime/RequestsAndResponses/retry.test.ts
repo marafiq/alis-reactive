@@ -162,7 +162,7 @@ describe("when a standard policy runs, D10.14 and Request.tla bound every attemp
 
   test("SameArgumentAndHoldAcrossAttempts: a PUT keeps its body, headers and busy until release after the response", async () => {
     const busy = { show: vi.fn(), hide: vi.fn() };
-    const request: Send = { ...send, method: "PUT", body: { kind: "json", value: { name: "Ada" }, inputs: { container: { kind: "none" }, individual: [] } }, busy: { kind: "page" }, contracts: ["busy"] };
+    const request: Send = { ...send, method: "PUT", body: { kind: "json", value: { name: "Ada" }, guarded: [], inputs: { container: { kind: "none" }, individual: [] } }, busy: { kind: "page" }, contracts: ["busy"] };
     const held = prepare(request, { kind: "clock" }, culture, captureBusy(request.busy), () => busy);
     const fetch = fetches().mockResolvedValueOnce(response(503)).mockResolvedValueOnce(response(200));
     const pending = run(held);

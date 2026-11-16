@@ -577,7 +577,15 @@
           "gesture": "Leave Include note unchecked, type late and click Save.",
           "outcome": "The echo reads none.",
           "opposite": "With Include note checked, the echo reads late.",
-          "defect": "The member sent as JSON null or as an empty field, so the echo reads null or nothing in place of none."
+          "defect": "The member sent as an empty field, so the echo reads nothing in place of none."
+        },
+        {
+          "for": "X10.10",
+          "page": "A mood form whose POST sends a JSON body that sets r => r.Mood, a string? the request class starts at not asked, from the mood box under When(the Asked about mood box is checked); the endpoint echoes the Mood it bound, and cleared where it bound null.",
+          "gesture": "Leave Asked about mood unchecked, type calm and click Save.",
+          "outcome": "The echo reads not asked.",
+          "opposite": "With Asked about mood checked, the echo reads calm.",
+          "defect": "The member sent as JSON null, so the echo reads cleared in place of not asked."
         },
         {
           "for": "M6.X5",

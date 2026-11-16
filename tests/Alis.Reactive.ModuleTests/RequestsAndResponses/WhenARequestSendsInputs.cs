@@ -64,7 +64,7 @@ public sealed class WhenARequestSendsInputs
     {
         var json = RequestPage.Rendered(pipeline => pipeline.Post<IntakeSend>("/intakes", request => request.Json(pipeline.Container<IntakeSend>("contact"), body => body.Set(r => r.Beds, 2))));
         Assert.That(RequestPage.Send(json, "body").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"record","fields":[{"name":"beds","value":{"kind":"lit","value":2}}]}},{"name":"inputs","value":""" + ContainerInputs("sends", "contact") + "}]}"));
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"record","fields":[{"name":"beds","value":{"kind":"lit","value":2}}]}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"inputs","value":""" + ContainerInputs("sends", "contact") + "}]}"));
         var encoded = RequestPage.Rendered(pipeline => pipeline.Put<IntakeSend>("/intakes", request => request.UrlEncoded(pipeline.Container<IntakeSend>("contact"), body => body.Set(r => r.Ward, "North"))));
         Assert.That(RequestPage.Send(encoded, "body").GetRawText(), Is.EqualTo(
             """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"urlEncoded"}},{"name":"fields","value":{"kind":"list","items":[""" + WardNorth + """]}},{"name":"inputs","value":""" + ContainerInputs("sends", "contact") + "}]}"));
@@ -89,7 +89,7 @@ public sealed class WhenARequestSendsInputs
             """{"kind":"record","fields":[{"name":"fields","value":{"kind":"list","items":[""" + Field("Beds", Held("""{"kind":"lit","value":2}"""), """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"number"}}]}""", "leave") + "," +
             Field("Room", Held("""{"kind":"lit","value":"R4"}"""), WardText, "empty") + """]}},{"name":"inputs","value":""" + ContainerInputs("sends", "contact") + "}]}"));
         Assert.That(RequestPage.Send(plan, "headers").GetProperty("items")[0].GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"X-Desk"}},{"name":"value","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"lit","value":"front"}}]}},{"name":"form","value":""" + WardText + "}]}"));
+            """{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"X-Desk"}},{"name":"value","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"lit","value":"front"}}]}},{"name":"form","value":""" + WardText + """},{"name":"when","value":{"kind":"lit","value":true}}]}"""));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
 
@@ -110,7 +110,7 @@ public sealed class WhenARequestSendsInputs
     {
         var plan = DeskPlan(pipeline => pipeline.Post<IntakeSend>("/intakes", request => request.Json(body => body.Input(r => r.Beds, pipeline.Input(m => m.Beds)))));
         Assert.That(RequestPage.Send(plan, "body").GetRawText(), Is.EqualTo(
-            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"as","expr":{"kind":"record","fields":[{"name":"beds","value":{"kind":"ref","name":"requestValue1"}}]},"shape":{"kind":"object","fields":{"beds":{"shape":{"kind":"number","of":"fraction","text":"invariant","overflow":"nothing"},"nothing":"omit"}}}}},{"name":"inputs","value":{"kind":"record","fields":[{"name":"container","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},{"name":"individual","value":{"kind":"list","items":[""" + Captured(BedsInput, "Beds") + "]}}]}}]}"));
+            """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"json"}},{"name":"value","value":{"kind":"as","expr":{"kind":"record","fields":[{"name":"beds","value":{"kind":"ref","name":"requestValue1"}}]},"shape":{"kind":"object","fields":{"beds":{"shape":{"kind":"number","of":"fraction","text":"invariant","overflow":"nothing"},"nothing":"omit"}}}}},{"name":"guarded","value":{"kind":"list","items":[]}},{"name":"inputs","value":{"kind":"record","fields":[{"name":"container","value":{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"none"}}]}},{"name":"individual","value":{"kind":"list","items":[""" + Captured(BedsInput, "Beds") + "]}}]}}]}"));
         Assert.That(PlanSchema.ProblemsOf(plan), Is.Empty);
     }
 
@@ -155,7 +155,7 @@ public sealed class WhenARequestSendsInputs
         => $$$"""{"kind":"op","op":"cond","args":[{"kind":"op","op":"or","args":[{"kind":"op","op":"eq","args":[{"kind":"ref","name":"{{{captured}}}"},{"kind":"lit","value":null}]},{"kind":"op","op":"neq","args":[{"kind":"ref","name":"{{{captured}}}"},{"kind":"lit","value":null}]}]},{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":{"kind":"ref","name":"{{{captured}}}"}}]},{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"nothing"}}]}]}""";
 
     private static string Field(string name, string value, string form, string whenNothing)
-        => $$$"""{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"{{{name}}}"}},{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"{{{name}}}"}]}},{"name":"value","value":{{{value}}}},{"name":"form","value":{{{form}}}},{"name":"whenNothing","value":{"kind":"lit","value":"{{{whenNothing}}}"}}]}""";
+        => $$$"""{"kind":"record","fields":[{"name":"name","value":{"kind":"lit","value":"{{{name}}}"}},{"name":"path","value":{"kind":"list","items":[{"kind":"lit","value":"{{{name}}}"}]}},{"name":"value","value":{{{value}}}},{"name":"form","value":{{{form}}}},{"name":"whenNothing","value":{"kind":"lit","value":"{{{whenNothing}}}"}},{"name":"when","value":{"kind":"lit","value":true}}]}""";
 
     private static string Held(string value)
         => """{"kind":"record","fields":[{"name":"kind","value":{"kind":"lit","value":"held"}},{"name":"value","value":""" + value + "}]}";

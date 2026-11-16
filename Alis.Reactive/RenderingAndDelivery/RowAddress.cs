@@ -45,6 +45,8 @@ internal sealed class RowAddress
         var carried = parts.SendsAHeader ? "a header" : parts.SendsAnInput ? "an input's value" : parts.ContainerId is { } container ? $"the inputs of '{container}'" : "";
         if (carried.Length > 0)
             throw new InvalidOperationException($"The row link on '{rowsId}' sends '{request}' with {carried}, which a link's address cannot carry: send the URL's members alone, or {AButton}.");
+        if (parts.SentMembers.FirstOrDefault(member => member.Guarded) is { } guarded)
+            throw new InvalidOperationException($"The row link on '{rowsId}' sends '{request}' with '{guarded.Written}' under a condition, and a link's address is written for each row before any condition is read: send the member with no condition, or {AButton}, whose block reads the condition.");
         return new RowAddress(request, parts, parts.SentMembers.Select(member => LinkMember.Of(member, rowsId, reads)).ToArray());
     }
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { prepare, Submission } from "./index";
+import { prepare, sentParts, Submission } from "./index";
 
 type Send = Parameters<typeof prepare>[0];
 type Field = Send["query"]["fields"][number];
@@ -25,7 +25,7 @@ const get = (fields: readonly Field[] = []): Send => ({
   contracts: [],
 });
 const field = (name: string, value: unknown, form: Form, whenNothing: Field["whenNothing"] = "leave"): Field => ({
-  name, path: [name], value: { kind: "held", value }, form, whenNothing,
+  name, path: [name], value: { kind: "held", value }, form, whenNothing, when: true,
 });
 const care: Extract<Form, { kind: "flags" }> = {
   kind: "flags",
@@ -66,7 +66,7 @@ describe("when a bodyless request reaches Guard, its wire follows D9 and schema.
   });
 
   test("NothingBindsAsDeclared: leave omits a field, empty writes an empty field, and held null follows the same policy", () => {
-    const missing: Field = { name: "Beds", path: ["Beds"], value: { kind: "nothing" }, form: { kind: "number" }, whenNothing: "leave" };
+    const missing: Field = { name: "Beds", path: ["Beds"], value: { kind: "nothing" }, form: { kind: "number" }, whenNothing: "leave", when: true };
     const send = get([
       missing,
       { ...missing, name: "Note", path: ["Note"], whenNothing: "empty", form: { kind: "text" } },
@@ -152,10 +152,10 @@ describe("when a bodyless request reaches Guard, its wire follows D9 and schema.
     const prepared = prepare({
       ...get(),
       headers: [
-        { name: "X-Name", value: { kind: "held", value: " \tAda\t " }, form: { kind: "text" } },
-        { name: "X-Count", value: { kind: "held", value: 2.5 }, form: { kind: "number" } },
-        { name: "X-Missing", value: { kind: "nothing" }, form: { kind: "text" } },
-        { name: "X-Null", value: { kind: "held", value: null }, form: { kind: "text" } },
+        { name: "X-Name", value: { kind: "held", value: " \tAda\t " }, form: { kind: "text" }, when: true },
+        { name: "X-Count", value: { kind: "held", value: 2.5 }, form: { kind: "number" }, when: true },
+        { name: "X-Missing", value: { kind: "nothing" }, form: { kind: "text" }, when: true },
+        { name: "X-Null", value: { kind: "held", value: null }, form: { kind: "text" }, when: true },
       ],
     }, clock, enUs);
     expect([...prepared.headers]).toStrictEqual([["x-count", "2.5"], ["x-name", "Ada"]]);
@@ -167,7 +167,7 @@ describe("when a bodyless request reaches Guard, its wire follows D9 and schema.
   });
 
   test.each(["Zoë", "Ada\nHart", "Ada\rHart", "Ada\u007f"])("HeaderGuard: rejects %s outside the HTTP field value", value => {
-    expect(() => prepare({ ...get(), headers: [{ name: "X-Applicant", value: { kind: "held", value }, form: { kind: "text" } }] }, clock, enUs))
+    expect(() => prepare({ ...get(), headers: [{ name: "X-Applicant", value: { kind: "held", value }, form: { kind: "text" }, when: true }] }, clock, enUs))
       .toThrow("The request's header 'X-Applicant' must hold visible US-ASCII, spaces or tabs.");
   });
 
@@ -210,7 +210,7 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
   const post = (body: Body, antiforgery: Send["antiforgery"] = { kind: "none" }): Send => ({ ...get(), method: "POST", body, antiforgery });
   const urlEncoded = (fields: readonly Field[]): Body => ({ kind: "urlEncoded", fields, inputs: emptyInputs });
   const multipart = (parts: Extract<Body, { kind: "multipart" }>["parts"]): Body => ({ kind: "multipart", parts, inputs: emptyInputs });
-  const json = (held: unknown): Body => ({ kind: "json", value: held, inputs: emptyInputs });
+  const json = (held: unknown): Body => ({ kind: "json", value: held, guarded: [], inputs: emptyInputs });
   const sent = async (body: BodyInit | null): Promise<string> => new Response(body).text();
 
   test.each<Send["method"]>(["POST", "PUT", "DELETE"])("MethodsCarryTheirBodies: %s is sent as written, with no body when the plan carries none", method => {
@@ -227,7 +227,7 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
 
   test("NothingBindsAsDeclared: a value type or list that reads nothing is left out of JSON, a nullable is null, and form data leaves or empties it", async () => {
     expect(await sent(prepare(post(json({ beds: undefined, rooms: undefined, phone: null })), clock, enUs).body)).toBe('{"phone":null}');
-    const missing: Field = { name: "Beds", path: ["Beds"], value: { kind: "nothing" }, form: { kind: "number" }, whenNothing: "leave" };
+    const missing: Field = { name: "Beds", path: ["Beds"], value: { kind: "nothing" }, form: { kind: "number" }, whenNothing: "leave", when: true };
     const form = prepare(post(urlEncoded([missing, { ...missing, name: "Phone", path: ["Phone"], form: { kind: "text" }, whenNothing: "empty" }])), clock, enUs);
     expect(await sent(form.body)).toBe("Phone=");
     expect(form.request).toStrictEqual({ Phone: null });
@@ -235,7 +235,7 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
 
   test("ObjectNothingBindsAsDeclared: an object that reads nothing is null in JSON and left out of form data", async () => {
     expect(await sent(prepare(post(json({ address: null })), clock, enUs).body)).toBe('{"address":null}');
-    const address: Field = { name: "Address", path: ["Address"], value: { kind: "nothing" }, form: { kind: "text" }, whenNothing: "leave" };
+    const address: Field = { name: "Address", path: ["Address"], value: { kind: "nothing" }, form: { kind: "text" }, whenNothing: "leave", when: true };
     expect(await sent(prepare(post(multipart([{ kind: "field", field: address }, { kind: "field", field: field("Ward", "North", { kind: "text" }) }])), clock, enUs).body))
       .not.toContain('name="Address"');
   });
@@ -245,7 +245,7 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
     expect(await sent(prepare(post(urlEncoded([shifts])), clock, enUs).body)).toBe("Shifts=Day&Shifts=");
     expect(() => prepare(post(urlEncoded([field("Beds", [1, null], { kind: "list", item: { kind: "number" }, itemWhenNothing: "stop" })])), clock, enUs))
       .toThrow("The request's member 'Beds' must hold a list whose items all hold values.");
-    expect(() => prepare(post(multipart([{ kind: "file", name: "Documents", value: { kind: "held", value: [null] } }])), clock, enUs))
+    expect(() => prepare(post(multipart([{ kind: "file", name: "Documents", value: { kind: "held", value: [null] }, when: true }])), clock, enUs))
       .toThrow("The request's file part 'Documents' must hold a file in each item.");
   });
 
@@ -264,8 +264,8 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
     const scan = new File(["scan"], "Zoë.png", { type: "image/png" });
     const prepared = prepare(post(multipart([
       { kind: "field", field: field("Caption", "Plans", { kind: "text" }) },
-      { kind: "file", name: "Documents", value: { kind: "held", value: [care, scan] } },
-      { kind: "file", name: "Photo", value: { kind: "nothing" } },
+      { kind: "file", name: "Documents", value: { kind: "held", value: [care, scan] }, when: true },
+      { kind: "file", name: "Photo", value: { kind: "nothing" }, when: true },
     ])), clock, enUs);
     const form = prepared.body as FormData;
     expect(form.get("Caption")).toBe("Plans");
@@ -280,7 +280,7 @@ describe("when a request sends a body, D9.7 to D9.10, D9.16, D9.19, D9.21 and D9
     const whole = prepare(post({ kind: "file", value: { kind: "held", value: photo }, inputs: emptyInputs }), clock, enUs);
     expect(whole.body).toBe(photo);
     expect(whole.headers.has("Content-Type")).toBe(false);
-    expect((prepare(post(multipart([{ kind: "file", name: "Photo", value: { kind: "held", value: [photo] } }])), clock, enUs).body as FormData).get("Photo")).toBe(photo);
+    expect((prepare(post(multipart([{ kind: "file", name: "Photo", value: { kind: "held", value: [photo] }, when: true }])), clock, enUs).body as FormData).get("Photo")).toBe(photo);
   });
 
   test("TextBodyIsOneValue: a text is the whole body, and a text or file that reads nothing names what waits on a line", async () => {
@@ -335,7 +335,7 @@ describe("when a request sends a container, a form or an input", () => {
   });
 
   test("ContainerInAnyBody: a JSON body holds the container's inputs over the members it sets, and multipart sends them as fields", () => {
-    const json = prepare(post({ kind: "json", value: { ward: "North", room: "R4" }, inputs: container({ ward: "East" }, [ward]) }), clock, enUs);
+    const json = prepare(post({ kind: "json", value: { ward: "North", room: "R4" }, guarded: [], inputs: container({ ward: "East" }, [ward]) }), clock, enUs);
     expect(json.body).toBe("{\"ward\":\"East\",\"room\":\"R4\"}");
     const multipart = prepare(post({ kind: "multipart", parts: [], inputs: container({ beds: 2.5 }, [beds]) }), clock, deDe);
     expect([...(multipart.body as FormData).entries()]).toStrictEqual([["Beds", "2,5"]]);
@@ -353,5 +353,50 @@ describe("when a request sends a container, a form or an input", () => {
       .toThrow(/^The request's container 'intake' is missing\.$/);
     expect(() => prepare({ ...get(), query: { fields: [], inputs: { container: { kind: "none" }, individual: [{ kind: "missing", id: "Intake__Ward", name: "Ward" }] } } }, clock, enUs))
       .toThrow(/^The request's input 'Intake__Ward' for 'Ward' is missing\.$/);
+  });
+});
+
+describe("when a part's condition reads false, D10.16 leaves the part out as if it were never gathered", () => {
+  const guarded = (sent: Field, when: boolean): Field => ({ ...sent, when });
+  const kept = field("Ward", "North", { kind: "text" });
+  const leftOut = guarded(field("Note", "late", { kind: "text" }, "empty"), false);
+  const header = (name: string, when: boolean): Send["headers"][number] => ({ name, value: { kind: "held", value: "yes" }, form: { kind: "text" }, when });
+
+  test("FailedConditionLeavesThePartOut: a query field, a header, a form field and a file part whose condition failed are not sent, and their siblings are", async () => {
+    const query = prepare(sentParts({ ...get([kept, leftOut]), headers: [header("X-Urgent", false), header("X-Ward", true)] }), clock, enUs);
+    expect(query.url).toBe("/Residents?Ward=North");
+    expect([...query.headers.keys()]).toEqual(["x-ward"]);
+    expect(query.request).toEqual({ Ward: "North" });
+    const urlEncoded = prepare(sentParts(post({ kind: "urlEncoded", fields: [kept, leftOut], inputs: emptyInputs })), clock, enUs);
+    expect(await new Response(urlEncoded.body).text()).toBe("Ward=North");
+    const scan = new File(["scan"], "scan.png");
+    const multipart = prepare(sentParts(post({
+      kind: "multipart",
+      parts: [{ kind: "field", field: kept }, { kind: "field", field: leftOut }, { kind: "file", name: "Scan", value: { kind: "held", value: [scan] }, when: false }],
+      inputs: emptyInputs,
+    })), clock, enUs).body as FormData;
+    expect([...multipart.keys()]).toEqual(["Ward"]);
+  });
+
+  test("HeldConditionSendsThePart: a part whose condition reads true is sent as it would be with no condition", async () => {
+    const sent = prepare(sentParts(post({ kind: "urlEncoded", fields: [kept, guarded(leftOut, true)], inputs: emptyInputs })), clock, enUs);
+    expect(await new Response(sent.body).text()).toBe("Ward=North&Note=late");
+  });
+
+  test("FailedConditionLeavesTheJsonMemberOut: the member and a holder only guarded members fill leave the value, and a held member and its siblings stay", () => {
+    const value = { ward: "North", note: "late", address: { city: "Leeds" }, contact: { phone: "0113" } };
+    const body = sentParts(post({
+      kind: "json",
+      value,
+      guarded: [{ path: ["address"], when: false }, { path: ["note"], when: false }, { path: ["address", "city"], when: false }, { path: ["contact", "phone"], when: true }],
+      inputs: emptyInputs,
+    })).body;
+    expect(body.kind === "json" ? body.value : body.kind).toEqual({ ward: "North", contact: { phone: "0113" } });
+    expect(value).toEqual({ ward: "North", note: "late", address: { city: "Leeds" }, contact: { phone: "0113" } });
+  });
+
+  test("LeftOutInputIsNotRecorded: an input whose condition failed is neither looked up nor among the inputs the request sent", () => {
+    const prepared = prepare(sentParts({ ...get(), query: { fields: [], inputs: { container: { kind: "none" }, individual: [{ kind: "leftOut" }, { kind: "captured", input: ward }] } } }), clock, enUs);
+    expect(prepared.inputs).toEqual([ward]);
   });
 });

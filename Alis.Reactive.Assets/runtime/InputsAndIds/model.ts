@@ -142,6 +142,8 @@ export class PageInputs {
         case "captured":
           individual.push(capture.input);
           break;
+        case "leftOut":
+          break;
         default:
           assertNever(capture);
       }

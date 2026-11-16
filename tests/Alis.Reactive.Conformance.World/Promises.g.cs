@@ -181,6 +181,7 @@ public static class Promises
         public const string X9_24_2 = "M6.F1 X9.24 2";
         public const string X9_25_0 = "M6.F1 X9.25 0";
         public const string X10_10_0 = "M6.F1 X10.10 0";
+        public const string X10_10_1 = "M6.F1 X10.10 1";
         public const string M6_X5_0 = "M6.F1 M6.X5 0";
         public const string X9_26_0 = "M6.F1 X9.26 0";
         public const string X10_28_0 = "M6.F1 X10.28 0";

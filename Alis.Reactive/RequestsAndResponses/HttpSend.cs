@@ -72,13 +72,14 @@ internal sealed class SentQuery
 
 internal sealed class SentField
 {
-    internal SentField(string name, IReadOnlyList<PathStep> path, ValueRead value, WireForm form, WhenNothing whenNothing)
+    internal SentField(string name, IReadOnlyList<PathStep> path, ValueRead value, WireForm form, WhenNothing whenNothing, bool when)
     {
         Name = name;
         Path = path;
         Value = value;
         Form = form;
         WhenNothing = whenNothing;
+        When = when;
     }
 
     public string Name { get; }
@@ -90,15 +91,18 @@ internal sealed class SentField
     public WireForm Form { get; }
 
     public WhenNothing WhenNothing { get; }
+
+    public bool When { get; }
 }
 
 internal sealed class SentHeader
 {
-    internal SentHeader(string name, ValueRead value, ScalarWireForm form)
+    internal SentHeader(string name, ValueRead value, ScalarWireForm form, bool when)
     {
         Name = name;
         Value = value;
         Form = form;
+        When = when;
     }
 
     public string Name { get; }
@@ -106,6 +110,8 @@ internal sealed class SentHeader
     public ValueRead Value { get; }
 
     public ScalarWireForm Form { get; }
+
+    public bool When { get; }
 }
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Kind))]
@@ -177,9 +183,10 @@ internal sealed class NoneSentBody : SentBody
 
 internal sealed class JsonSentBody : SentBody
 {
-    internal JsonSentBody(EvaluatedValue value, SentInputs inputs)
+    internal JsonSentBody(EvaluatedValue value, IReadOnlyList<GuardedMember> guarded, SentInputs inputs)
     {
         Value = value;
+        Guarded = guarded;
         Inputs = inputs;
     }
 
@@ -187,7 +194,22 @@ internal sealed class JsonSentBody : SentBody
 
     public EvaluatedValue Value { get; }
 
+    public IReadOnlyList<GuardedMember> Guarded { get; }
+
     public SentInputs Inputs { get; }
+}
+
+internal sealed class GuardedMember
+{
+    internal GuardedMember(IReadOnlyList<string> path, bool when)
+    {
+        Path = path;
+        When = when;
+    }
+
+    public IReadOnlyList<string> Path { get; }
+
+    public bool When { get; }
 }
 
 internal sealed class UrlEncodedSentBody : SentBody
@@ -276,10 +298,11 @@ internal sealed class FieldMultipartPart : MultipartPart
 
 internal sealed class FileMultipartPart : MultipartPart
 {
-    internal FileMultipartPart(string name, ValueRead value)
+    internal FileMultipartPart(string name, ValueRead value, bool when)
     {
         Name = name;
         Value = value;
+        When = when;
     }
 
     public override string Kind => "file";
@@ -287,6 +310,8 @@ internal sealed class FileMultipartPart : MultipartPart
     public string Name { get; }
 
     public ValueRead Value { get; }
+
+    public bool When { get; }
 }
 
 [JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Kind))]

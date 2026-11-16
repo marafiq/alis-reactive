@@ -417,6 +417,15 @@ no argument type of its own (D9.1).
   sent by D9.10's `whenNothing`: `leave` or `empty`. `FlagValue` carries `held` and `name` as `EnumValue` does, and
   `number`, the value's number, an integer from 0 to 9,007,199,254,740,991 (N16.5); `flags` is written only for an
   enum the app names as flags (N16.4), and `inFlags` carries the same rows in its `lit` (D16.10).
+
+  Each part `HttpSend` sends, a field, a header, a file part and a JSON member, carries `when`, a boolean: `true` on
+  a part with no condition, and on a part a `When` guards the binding C# wrote before the request, `cond` of the
+  condition over `true` and `false`, or the `and` of the enclosing binding and that `cond` under a nested `When`
+  (N10.4). The browser leaves out each part whose `when` is false before `check` binds the argument, so the check,
+  the send and the reply's `request` read the body without it; C# reads a guarded part's value under the same
+  binding, so a value whose condition fails is never read, and writes the check's entry of a guarded field as
+  nothing there. A header the defaults configure carries the `cond` of the request's own header's binding over
+  `false` and `true` (D9.12, D10.16).
 - `HttpResponse`, the reply a `request` binds in its routes and `chained` block (N10.2, N10.7, D10.23): `status`,
   `outcome`, `headers`, the headers of the answer the browser hands the page, lib.dom's `Headers`, whose `get` a `call`
   reads (N10.7), `request`, the members as the request sent them, `inputs`, the inputs it sent, each its binding name
@@ -435,19 +444,26 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
 `Alis.Reactive/Schema/RequestChoices.cs`):
 - `HttpSend`: `method` (a `RequestMethod`), `url` (`parts`, a list of `PathPart`, `text` with its `text` or `member`
   with its `name`, `value` and scalar `form`; and `query`, the URL's own), `query` (`fields`, a list of `SentField`,
-  and `inputs`), `body` (a `SentBody`: `none`; `json` with its `value` and `inputs`; `urlEncoded` with its `fields`
-  and `inputs`; `multipart` with its `parts`, each a `field` with its `SentField` or a `file` with its `name` and
-  `value`, and `inputs`; `text` and `file`, each with its `value` and `inputs`), `headers` (a list of `SentHeader`:
-  `name`, `value`, scalar `form`), `antiforgery` (`none`, or `token` with its `value` and `place`, `header` or `field`,
+  and `inputs`), `body` (a `SentBody`: `none`; `json` with its `value`, `guarded` and `inputs`; `urlEncoded` with its
+  `fields` and `inputs`; `multipart` with its `parts`, each a `field` with its `SentField` or a `file` with its
+  `name`, `value` and `when`, and `inputs`; `text` and `file`, each with its `value` and `inputs`), `headers` (a list
+  of `SentHeader`: `name`, `value`, scalar `form`, `when`),
+  `antiforgery` (`none`, or `token` with its `value` and `place`, `header` or `field`,
   each with its `name`), `retry` (`none`, or `standard` with its `attempts` and `firstWaitMilliseconds`), `busy`
   (`none`, `page`, or `targets` with its `values`, each `missing` or `element` with its `id`, or `component` with its
   `value`), `respondedJson` and `contracts` (a list of `RequestContract`, `busy` or `notice`).
-- `SentField`: `name`, its `path`, `value`, `form` (a wire form) and `whenNothing` (`leave` or `empty`). A `value` is a
-  `ValueRead`, `nothing` or `held` with its `value`, so a value that reads nothing is apart from a held null; an
-  evaluated value is a leaf the contract writes as `unknown`, since it holds the user's data, a `Date` or a `File`.
+- `SentField`: `name`, its `path`, `value`, `form` (a wire form), `whenNothing` (`leave` or `empty`) and `when`.
+  A `value` is a `ValueRead`, `nothing` or `held` with its `value`, so a value that reads nothing is apart from a
+  held null; an evaluated value is a leaf the contract writes as `unknown`, since it holds the user's data, a
+  `Date` or a `File`.
 - `SentInputs`: `container` (`none`; `missing` with its `id`; or `captured` with its `id`, the `body` it sends and its
-  `inputs`) and `individual`, a list of `missing` (with its `id` and `name`) or `captured` (with its `input`). A
-  `SentInput` is its binding `name` and its `entry`, the inputs table's `InputEntry`, its `id` and `binding`.
+  `inputs`) and `individual`, a list of `missing` (with its `id` and `name`), `captured` (with its `input`) or
+  `leftOut`, a named input whose condition failed, which C# writes as the `cond` of its binding over the lookup, so
+  it is never looked up and is in neither the check's inputs nor the reply's. A `SentInput` is its binding `name`
+  and its `entry`, the inputs table's `InputEntry`, its `id` and `binding`.
+- `GuardedMember`: `path`, the wire names to a JSON member a `When` guards or to a holder only such members fill,
+  and `when`, the `or` of their bindings for a holder; the browser takes it out of the body's `value` where `when`
+  is false (D10.16).
 - The wire forms are the table's above: the scalar forms `text`, `number`, `boolean`, `date`, `instant`, `written`,
   `enum` and `flags`, each `enum` and `flags` with its `values`, and `list` with its scalar `item` and
   `itemWhenNothing` (`empty` or `stop`). An `EnumValue` is its `held` and `name`, a `FlagValue` those and its `number`.
@@ -458,8 +474,8 @@ each choice a sealed class (`Alis.Reactive/RequestsAndResponses/HttpSend.cs`, `H
   is its `destination`, `summary` with its `containerId` or `notice` with its `separator`.
 
 The generator reaches each from the node that holds it (`tools/PlanContractGenerator/CLAUDE.md`), and a contract's
-kinds are its own, never the grammar's. The part a condition guards (N10.4's `PartsGuard`) and a container's
-conditional inputs (D10.16) are the owner's, and no class holds them yet.
+kinds are its own, never the grammar's. A part a condition guards (N10.4's `PartsGuard`) carries its `when`, and a
+container's inputs take no condition (D10.16).
 
 ## Kinds
 

@@ -2531,6 +2531,9 @@
         },
         "whenNothing": {
           "$ref": "#/$defs/WhenNothing"
+        },
+        "when": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -2538,7 +2541,8 @@
         "path",
         "value",
         "form",
-        "whenNothing"
+        "whenNothing",
+        "when"
       ],
       "additionalProperties": false
     },
@@ -2699,6 +2703,9 @@
         },
         {
           "$ref": "#/$defs/CapturedInputCapture"
+        },
+        {
+          "$ref": "#/$defs/LeftOutInputCapture"
         }
       ]
     },
@@ -2735,6 +2742,18 @@
       "required": [
         "kind",
         "input"
+      ],
+      "additionalProperties": false
+    },
+    "LeftOutInputCapture": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "leftOut"
+        }
+      },
+      "required": [
+        "kind"
       ],
       "additionalProperties": false
     },
@@ -2781,6 +2800,12 @@
         "value": {
           "$ref": "#/$defs/EvaluatedValue"
         },
+        "guarded": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/GuardedMember"
+          }
+        },
         "inputs": {
           "$ref": "#/$defs/SentInputs"
         }
@@ -2788,7 +2813,27 @@
       "required": [
         "kind",
         "value",
+        "guarded",
         "inputs"
+      ],
+      "additionalProperties": false
+    },
+    "GuardedMember": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "when": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "path",
+        "when"
       ],
       "additionalProperties": false
     },
@@ -2875,12 +2920,16 @@
         },
         "value": {
           "$ref": "#/$defs/ValueRead"
+        },
+        "when": {
+          "type": "boolean"
         }
       },
       "required": [
         "kind",
         "name",
-        "value"
+        "value",
+        "when"
       ],
       "additionalProperties": false
     },
@@ -2935,12 +2984,16 @@
         },
         "form": {
           "$ref": "#/$defs/ScalarWireForm"
+        },
+        "when": {
+          "type": "boolean"
         }
       },
       "required": [
         "name",
         "value",
-        "form"
+        "form",
+        "when"
       ],
       "additionalProperties": false
     },

@@ -99,6 +99,7 @@ internal sealed class CapturedContainerCapture : ContainerCapture
 [JsonPolymorphic(TypeDiscriminatorPropertyName = nameof(Kind))]
 [JsonDerivedType(typeof(MissingInputCapture))]
 [JsonDerivedType(typeof(CapturedInputCapture))]
+[JsonDerivedType(typeof(LeftOutInputCapture))]
 internal abstract class InputCapture
 {
     private protected InputCapture()
@@ -133,4 +134,13 @@ internal sealed class CapturedInputCapture : InputCapture
     public override string Kind => "captured";
 
     public SentInput Input { get; }
+}
+
+internal sealed class LeftOutInputCapture : InputCapture
+{
+    internal LeftOutInputCapture()
+    {
+    }
+
+    public override string Kind => "leftOut";
 }

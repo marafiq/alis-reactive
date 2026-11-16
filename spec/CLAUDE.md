@@ -1391,11 +1391,10 @@ goes here; `spec/NOTES.md` holds the decisions, facts and owner answers, append-
   condition. A part a failed condition leaves out is never sent, and the endpoint binds the member's start (D10.16;
   Request.tla's FailedConditionSendsNothing is X10.10's planted defect). A branch's parameter is the app's word for
   what it sends, as X10.10's page names it note, since no parameter but the pipeline's hides an enclosing name
-  (`.claude/rules/csharp.md`); the callback table gains no row. Three things wait for the owner: the form; the
-  schema's contract, whose HttpSend gives a sent part its wire form alone, so the form needs a required field on each
-  sent part for its condition, which the owner adds; and D10.16's container's inputs, which the proposal leaves
-  without a door, since a container fixes the body's format, which takes no condition. X10.10 stands on it, its test
-  red.
+  (`.claude/rules/csharp.md`); the callback table gains no row. The owner's answer of 2026-11-16 below settles the
+  three things it waited on: the form stands, each sent part carries its condition's `when` (schema.md's
+  `HttpSend`), and a container's inputs take no condition, since a container fixes the body's format. X10.10 stands
+  on it.
 - The lead, 2026-11-13, landing three pages of a handler's policy, a Fable agent's work at xhigh read at the source,
   and settling what it read into. Each endpoint reaches Lanes.tla's Respond with its own path, as the care actions of
   the residents and admission screens reach theirs; the app's rule gives a gate other than the answer gate its filter

@@ -98,7 +98,7 @@ public sealed class QueryParts<TRequest>
     /// <remarks>When the condition is not true, each part the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start. The URL, the method and the body's format take no condition, so a branch takes no body and no container: the request names them before its first condition.</remarks>
     /// <param name="condition">The condition; the branch's parts are sent only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public PartsGuard<QueriedParts<TRequest>> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public PartsGuard<QueriedParts<TRequest>> When(TypedSource<bool> condition) => new(_parts, _stage, condition.Expression, stage => new QueriedParts<TRequest>(_parts, stage));
 }
 
 /// <summary>
@@ -183,7 +183,7 @@ public sealed class QueriedParts<TRequest>
     /// <remarks>When the condition is not true, each part the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start. The URL, the method and the body's format take no condition, so a branch takes no body and no container: the request names them before its first condition.</remarks>
     /// <param name="condition">The condition; the branch's parts are sent only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public PartsGuard<QueriedParts<TRequest>> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public PartsGuard<QueriedParts<TRequest>> When(TypedSource<bool> condition) => new(_parts, _stage, condition.Expression, stage => new QueriedParts<TRequest>(_parts, stage));
 }
 
 /// <summary>
@@ -334,10 +334,11 @@ public sealed class BodyParts<TRequest>
     public WholeBodyParts<TRequest> File(BrowserFile file) => new(_parts, _parts.File(_stage, file));
 
     /// <summary>Starts a condition on the parts its branch sends, read once when the request is sent.</summary>
-    /// <remarks>When the condition is not true, each part the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start. The URL, the method and the body's format take no condition, so a branch takes no body and no container: the request names them before its first condition.</remarks>
+    /// <remarks>When the condition is not true, each part the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start. The URL, the method and the body's format take no condition, so a branch takes no body and no container: a request that names no body before its first condition sends its members as multipart, as <c>Set</c> does.</remarks>
     /// <param name="condition">The condition; the branch's parts are sent only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public PartsGuard<BodiedParts<TRequest>> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public PartsGuard<BodiedParts<TRequest>> When(TypedSource<bool> condition)
+        => new(_parts, _parts.Multipart(_stage, _ => { }), condition.Expression, stage => new BodiedParts<TRequest>(_parts, stage));
 }
 
 /// <summary>
@@ -422,7 +423,7 @@ public sealed class BodiedParts<TRequest>
     /// <remarks>When the condition is not true, each part the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start. The URL, the method and the body's format take no condition, so a branch takes no body and no container: the request names them before its first condition.</remarks>
     /// <param name="condition">The condition; the branch's parts are sent only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public PartsGuard<BodiedParts<TRequest>> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public PartsGuard<BodiedParts<TRequest>> When(TypedSource<bool> condition) => new(_parts, _stage, condition.Expression, stage => new BodiedParts<TRequest>(_parts, stage));
 }
 
 /// <summary>
@@ -500,7 +501,7 @@ public sealed class WholeBodyParts<TRequest>
     /// <remarks>When the condition is not true, each part the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start. The URL, the method and the body's format take no condition, so a branch takes no body and no container: the request names them before its first condition.</remarks>
     /// <param name="condition">The condition; the branch's parts are sent only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public PartsGuard<WholeBodyParts<TRequest>> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public PartsGuard<WholeBodyParts<TRequest>> When(TypedSource<bool> condition) => new(_parts, _stage, condition.Expression, stage => new WholeBodyParts<TRequest>(_parts, stage));
 }
 
 /// <summary>
@@ -559,7 +560,7 @@ public sealed class JsonBody<TRequest>
     /// <remarks>When the condition is not true, each member the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start.</remarks>
     /// <param name="condition">The condition; the branch's parts are sent only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public PartsGuard<JsonBody<TRequest>> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public PartsGuard<JsonBody<TRequest>> When(TypedSource<bool> condition) => new(_parts, _stage, condition.Expression, stage => new JsonBody<TRequest>(_parts, stage));
 }
 
 /// <summary>
@@ -618,7 +619,7 @@ public sealed class UrlEncodedBody<TRequest>
     /// <remarks>When the condition is not true, each member the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start.</remarks>
     /// <param name="condition">The condition; the branch's parts are sent only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public PartsGuard<UrlEncodedBody<TRequest>> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public PartsGuard<UrlEncodedBody<TRequest>> When(TypedSource<bool> condition) => new(_parts, _stage, condition.Expression, stage => new UrlEncodedBody<TRequest>(_parts, stage));
 }
 
 /// <summary>
@@ -677,5 +678,5 @@ public sealed partial class MultipartBody<TRequest>
     /// <remarks>When the condition is not true, each member the branch writes is left out, as if it were never gathered, and the endpoint binds the member's start.</remarks>
     /// <param name="condition">The condition; the branch's parts are sent only when it is true.</param>
     /// <returns>The condition, which takes its branch with <c>Then</c>.</returns>
-    public PartsGuard<MultipartBody<TRequest>> When(TypedSource<bool> condition) => throw new NotImplementedException();
+    public PartsGuard<MultipartBody<TRequest>> When(TypedSource<bool> condition) => new(_parts, _stage, condition.Expression, stage => new MultipartBody<TRequest>(_parts, stage));
 }

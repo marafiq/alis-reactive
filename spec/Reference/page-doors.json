@@ -2381,11 +2381,16 @@
     ]
   },
   "M6.F1 X10.10 0": {
-    "modules": [
-      "TriggersAndPipelines"
-    ],
+    "modules": [],
     "views": [
       "/Care/Record/WellbeingCheck.cshtml",
+      "/Shared/_Layout.cshtml"
+    ]
+  },
+  "M6.F1 X10.10 1": {
+    "modules": [],
+    "views": [
+      "/Care/Record/MoodCheck.cshtml",
       "/Shared/_Layout.cshtml"
     ]
   },

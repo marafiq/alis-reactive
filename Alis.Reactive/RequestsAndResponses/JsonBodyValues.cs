@@ -44,7 +44,7 @@ internal static class JsonBodyValues
         return value is null ? Leaf<TValue>(written, writer, member) : JsonLeaf.NullWhenNothing(written);
     }
 
-    internal static JsonLeaf Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, LambdaExpression member, Action<Statement> capture)
+    internal static JsonLeaf Source<TValue>(ITypedSource<TValue> source, BlockWriter writer, LambdaExpression member, Action<LetStatement> capture)
         => Captured<TValue>(RequestValues.Captured(Sources.Of(source), writer, capture), Sources.FormOf(source), writer, member);
 
     internal static JsonLeaf Captured<TValue>(Expression captured, HeldForm form, BlockWriter writer, LambdaExpression member)
