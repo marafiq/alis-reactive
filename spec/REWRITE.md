@@ -463,7 +463,7 @@ actions its tests will observe. A change to an async lane is a spec change first
 | Python | 3.15.2, standard library | `spec/tools/check.py`, and `spec/tools/landings.py`, which prints where the spec lands each test |
 | Syncfusion | 33.1.47: Syncfusion.EJ2.AspNet.Core on net10, Syncfusion.EJ2.MVC5 on net48, @syncfusion/ej2, together | `node scripts/pin-syncfusion.mjs <version>` moves both; the owner's hold (the latest is 35.1.43) |
 | Actions | by SHA with Dependabot's version comment | CI |
-| The framework's own packages | AlisReactive and the five beside it in section 2.9, at the version the run packs from the source: 0.0.0-playwright.<UTC> under the runner, 0.0.0-delivery.<UTC> under delivery.sh, else PACKAGE_VERSION | what a fresh app restores, from nupkgs/ alone, so it runs the packages the source builds and never a registry's |
+| The framework's own packages | AlisReactive and the five beside it in section 2.9 (AlisReactive.Native, AlisReactive.Fusion, AlisReactive.OpenTelemetry, AlisReactive.DesignSystem and AlisReactive.NativeTagHelpers), at the version the run packs from the source: 0.0.0-playwright.<UTC> under the runner, 0.0.0-delivery.<UTC> under delivery.sh, else PACKAGE_VERSION | what a fresh app restores, from nupkgs/ alone, so it runs the packages the source builds and never a registry's |
 
 A pin is the latest stable version of its package or tool on the day its unit lands it (the owner, 2026-11-11), looked
 up at its own registry and proven by a restore or an install and a run. A pin below the latest names what holds it in
